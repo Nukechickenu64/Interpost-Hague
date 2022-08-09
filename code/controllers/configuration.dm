@@ -223,6 +223,9 @@ var/list/gamemode_cache = list()
 
 	var/static/regex/ic_filter_regex //For the cringe filter.
 
+	var/max_client_view_x = MAX_VIEW
+	var/max_client_view_y = MAX_VIEW
+
 /datum/configuration/New()
 	var/list/L = typesof(/datum/game_mode) - /datum/game_mode
 	for (var/T in L)

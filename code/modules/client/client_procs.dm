@@ -412,7 +412,8 @@ client/verb/character_setup()
 
 	force_dark_theme()
 
-
+var/global/const/MIN_VIEW = 15
+var/global/const/MAX_VIEW = 41
 /client/verb/OnResize()
 	set hidden = 1
 	var/divisor = text2num(winget(src, "mapwindow.map", "icon-size")) || world.icon_size
@@ -430,28 +431,6 @@ client/verb/character_setup()
 	eye = mob
 	if(eye != last_eye)
 		eye = last_eye
-/*
-/client/proc/toggle_fullscreen() //it's that fuckin easy.
-	set name = "Toggle Fullscreen"
-	set category = "OOC"
-
-	fullscreen = !fullscreen
-
-	if (fullscreen)
-		winset(usr, "mainwindow", "titlebar=false")
-		winset(usr, "mainwindow", "can-resize=false")
-		winset(usr, "mainwindow", "statusbar=false")
-		winset(usr, "mainwindow", "is-maximized=false")
-		winset(usr, "mainwindow", "is-maximized=true")
-		winset(usr, "mainwindow", "menu=false")
-	else
-		winset(usr, "mainwindow", "is-maximized=false")
-		winset(usr, "mainwindow", "titlebar=true")
-		winset(usr, "mainwindow", "statusbar=false")
-		winset(usr, "mainwindow", "can-resize=true")
-		winset(usr, "mainwindow", "menu=menu")
-	fit_viewport()
-*/
 
 /client/proc/toggle_fullscreen(new_value)
 	if(new_value == TRUE)

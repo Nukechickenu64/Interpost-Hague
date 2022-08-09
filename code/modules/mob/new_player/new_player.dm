@@ -126,7 +126,7 @@
 			to_chat(usr, "<span class='danger'>The [station_name()] is currently exploding. Joining would go poorly.</span>")
 			return
 		if(client.prefs.real_name in GLOB.player_name_list)
-			to_chat(usr, "<span class='danger'>Our records show that this character is in Kingdom's registry.  Please change your name to join the crew.</span>")
+			to_chat(usr, "<span class='danger'>Our records show that this character is already employed by the corporation.  Please change your name to join the crew.</span>")
 			return
 
 		var/datum/species/S = all_species[client.prefs.species]
@@ -274,18 +274,6 @@
 	if(job.latejoin_at_spawnpoints)
 		var/obj/S = job_master.get_roundstart_spawnpoint(job.title)
 		spawn_turf = get_turf(S)
-	var/radlevel = SSradiation.get_rads_at_turf(spawn_turf)
-	var/airstatus = IsTurfAtmosUnsafe(spawn_turf)
-	if(airstatus || radlevel > 0 )
-		var/reply = alert(usr, "Warning. Your selected spawn location seems to have unfavorable conditions. \
-		You may die shortly after spawning. \
-		Spawn anyway? More information: [airstatus] Radiation: [radlevel] Bq", "Atmosphere warning", "Abort", "Spawn anyway")
-		if(reply == "Abort")
-			return 0
-		else
-			// Let the staff know, in case the person complains about dying due to this later. They've been warned.
-			log_and_message_admins("User [src] spawned at spawn point with dangerous atmosphere.")
-
 		// Just in case someone stole our position while we were waiting for input from alert() proc
 		if(!IsJobAvailable(job))
 			to_chat(src, alert("[job.title] is not available. Please try another."))

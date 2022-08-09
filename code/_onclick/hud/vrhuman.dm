@@ -30,7 +30,7 @@
 
 
 	V.client.screen += list(V.vrhuman_shop, V.vrhuman_exit, V.vrhuman_main, V.vrhuman_cleanup)
-	V.client.screen |= GLOB.click_catchers
+	V.client.screen |= click_catchers
 
 /obj/screen/vrhuman_shop/Click(location, control, params)
 	var/mob/living/carbon/human/vrhuman/V = usr
