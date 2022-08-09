@@ -16,9 +16,9 @@ datum/preferences
 	S["gender"]					>> pref.gender
 	S["age"]					>> pref.age
 	S["spawnpoint"]				>> pref.spawnpoint
-	S["OOC_Notes"]				>> pref.metadata
+	//S["OOC_Notes"]				>> pref.metadata
 	S["religion"]				>> pref.religion
-	S["family"]					>> pref.family
+	//S["family"]					>> pref.family
 
 /datum/category_item/player_setup_item/general/basic/save_character(var/savefile/S)
 	S["real_name"]				<< pref.real_name
@@ -26,9 +26,9 @@ datum/preferences
 	S["gender"]					<< pref.gender
 	S["age"]					<< pref.age
 	S["spawnpoint"]				<< pref.spawnpoint
-	S["OOC_Notes"]				<< pref.metadata
+	//S["OOC_Notes"]				<< pref.metadata
 	S["religion"]				<< pref.religion
-	S["family"]					<< pref.family
+	//S["family"]					<< pref.family
 
 /datum/category_item/player_setup_item/general/basic/sanitize_character()
 	var/datum/species/S = all_species[pref.species ? pref.species : SPECIES_HUMAN]
@@ -51,13 +51,13 @@ datum/preferences
 	. += "<br>"
 	. += "<b>Gender:</b> <a href='?src=\ref[src];gender=1'><b>[gender2text(pref.gender)]</b></a><br>"
 	. += "<b>Age:</b> <a href='?src=\ref[src];age=1'>[pref.age]</a><br>"
-	. += "<b>Spawn Point</b>: <a href='?src=\ref[src];spawnpoint=1'>[pref.spawnpoint]</a><br>"
+	//. += "<b>Spawn Point</b>: <a href='?src=\ref[src];spawnpoint=1'>[pref.spawnpoint]</a><br>"
 	. += "<b>RELIGION</b> "
 	. += "<a href='?src=\ref[src];religion=1'>[pref.religion]</a><br/>"
-	. += "<b>Join Families</b> "
-	. += "<a href='?src=\ref[src];family=1'>[pref.family ? "Yes" : "No"]</a><br/>"
-	if(config.allow_Metadata)
-		. += "<b>OOC Notes:</b> <a href='?src=\ref[src];metadata=1'> Edit </a><br>"
+	//. += "<b>Join Families</b> "
+	//. += "<a href='?src=\ref[src];family=1'>[pref.family ? "Yes" : "No"]</a><br/>"
+	//if(config.allow_Metadata)
+		//. += "<b>OOC Notes:</b> <a href='?src=\ref[src];metadata=1'> Edit </a><br>"
 	. = jointext(.,null)
 
 /datum/category_item/player_setup_item/general/basic/OnTopic(var/href,var/list/href_list, var/mob/user)

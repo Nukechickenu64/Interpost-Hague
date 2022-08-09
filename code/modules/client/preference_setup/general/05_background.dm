@@ -9,7 +9,7 @@
 	var/home_system = "Unset"           //System of birth.
 	var/citizenship = "None"            //Current home system.
 	var/faction = "None"                //Antag faction/general associated faction.
-	var/religion = "Deo Machina"               //Religious association.
+	var/religion = "Atheism"               //Religious association.
 	var/family = TRUE
 /*
 /datum/category_item/player_setup_item/general/background

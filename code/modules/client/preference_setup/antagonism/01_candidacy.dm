@@ -28,6 +28,7 @@
 		if(!(role in special_roles))
 			pref.never_be_special_role -= role
 
+/*
 /datum/category_item/player_setup_item/antagonism/candidacy/content(var/mob/user)
 	. = list()
 	. += "<b>Special Role Availability:</b><br>"
@@ -64,6 +65,7 @@
 		. += "</td></tr>"
 	. += "</table>"
 	. = jointext(.,null)
+*/
 
 /datum/category_item/player_setup_item/proc/banned_from_ghost_role(var/mob, var/datum/ghosttrap/ghost_trap)
 	for(var/ban_type in ghost_trap.ban_checks)

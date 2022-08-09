@@ -58,6 +58,8 @@
 
 /obj/screen/storage/gridbox/MouseEntered()
 	..()
+	if(GAME_STATE < RUNLEVEL_GAME)
+		return
 	var/obj/item/weapon/storage/storage = master
 	if(istype(storage))
 		var/obj/item/I = usr.get_active_hand()

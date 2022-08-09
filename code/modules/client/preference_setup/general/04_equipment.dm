@@ -81,7 +81,7 @@
 				var/list/metadata = tweak_metadata["[tweak]"]
 				tweak_metadata["[tweak]"] = tweak.validate_metadata(metadata)
 
-
+/*
 /datum/category_item/player_setup_item/general/equipment/content()
 	. = list()
 	. += "<b>Equipment:</b><br>"
@@ -96,6 +96,7 @@
 
 		. += "<br>"
 	return jointext(.,null)
+*/
 
 /datum/category_item/player_setup_item/general/equipment/proc/get_underwear_metadata(var/underwear_category, var/datum/gear_tweak/gt)
 	var/metadata = pref.all_underwear_metadata[underwear_category]

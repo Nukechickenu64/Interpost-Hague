@@ -121,7 +121,7 @@
 #define COMPANY_SKEPTICAL		"Skeptical"
 #define COMPANY_OPPOSED			"Opposed"
 
-#define LEGAL_RELIGION 			"Deo Machina"
+#define LEGAL_RELIGION 			"Atheism"
 #define ILLEGAL_RELIGION 		"Old Gods"
 #define NARSIE_RELIGION			"Narsie"
 

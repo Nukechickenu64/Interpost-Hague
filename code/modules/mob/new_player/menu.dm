@@ -5,7 +5,7 @@
 	inventory_shown = FALSE
 	hotkey_ui_hidden = FALSE
 
-/datum/hud/new_player/FinalizeInstantiation(var/ui_style='icons/mob/screen1_White.dmi', var/ui_color = "#fffffe", var/ui_alpha = 255)
+/datum/hud/new_player/FinalizeInstantiation(var/ui_style='icons/mob/screen/dark.dmi', var/ui_alpha = 255)
 	adding = list()
 	var/obj/screen/using
 
@@ -50,9 +50,10 @@
 //SELECTION
 
 /obj/screen/new_player/selection/New(var/desired_loc)
+	color = null
 	return ..()
 
-/obj/screen/new_player/selection/join_game/New()
+/obj/screen/new_player/selection/join_game/update_icon()
 	var/mob/new_player/player = usr
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(player.ready)
@@ -62,18 +63,23 @@
 	else
 		icon_state = "joingame"
 
+/obj/screen/new_player/selection/join_game/New()
+	var/mob/new_player/player = usr
+	player.update_icon()
+
 /obj/screen/new_player/selection/join_game/Click()
 	var/mob/new_player/player = usr
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(!player.ready)
 			player.ready = 1
-			icon_state = "ready"
+			update_icon()
 		else
 			player.ready = 0
-			icon_state = "unready"
+			update_icon()
 	else
-		icon_state = "joingame"
+		update_icon()
 		player.join_game()
+	update_icon()
 
 /obj/screen/new_player/selection/manifest/Click()
 	var/mob/new_player/player = usr

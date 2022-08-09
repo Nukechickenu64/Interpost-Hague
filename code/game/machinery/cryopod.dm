@@ -258,7 +258,6 @@
 /obj/machinery/cryopod/Destroy()
 	if(occupant)
 		occupant.forceMove(loc)
-		occupant.resting = 1
 	return ..()
 
 /obj/machinery/cryopod/Initialize()
@@ -467,8 +466,6 @@
 	if(usr.stat != 0)
 		return
 
-
-
 	//Eject any items that aren't meant to be in the pod.
 	var/list/items = src.contents
 	if(occupant) items -= occupant
@@ -481,7 +478,7 @@
 	add_fingerprint(usr)
 
 
-	SetName(initial(name))
+	SetName("[name]")
 	return
 
 /obj/machinery/cryopod/verb/move_inside()
@@ -530,10 +527,7 @@
 			occupant.client.eye = src.occupant.client.mob
 			occupant.client.perspective = MOB_PERSPECTIVE
 
-
-
 		occupant.forceMove(get_turf(src))
-		occupant.resting = 0
 		playsound(src, 'sound/machines/cryoexit.ogg', 40)
 		set_occupant(null)
 
@@ -554,5 +548,8 @@
 	occupant.forceMove(src)
 	time_entered = world.time
 
-	SetName("[name] ([occupant])")
+	if(occupant)
+		SetName("[name] ([occupant])")
+	else
+		SetName("[name]")
 	icon_state = occupied_icon_state

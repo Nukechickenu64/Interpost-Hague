@@ -238,19 +238,6 @@
 
 	character.backpack_setup = new(backpack, backpack_metadata["[backpack]"])
 
-	for(var/N in character.organs_by_name)
-		var/obj/item/organ/external/O = character.organs_by_name[N]
-		O.markings.Cut()
-
-	for(var/M in body_markings)
-		var/datum/sprite_accessory/marking/mark_datum = GLOB.body_marking_styles_list[M]
-		var/mark_color = "[body_markings[M]]"
-
-		for(var/BP in mark_datum.body_parts)
-			var/obj/item/organ/external/O = character.organs_by_name[BP]
-			if(O)
-				O.markings[M] = list("color" = mark_color, "datum" = mark_datum)
-
 	character.force_update_limbs()
 	character.update_mutations(0)
 	character.update_body(0)

@@ -48,6 +48,7 @@
 	usr.client.eye = src
 	usr.forceMove(src)
 	src.occupant = usr
+	playsound(src, 'sound/machines/scanner_entry.ogg', 50)
 	update_use_power(2)
 	src.icon_state = "body_scanner_1"
 	for(var/obj/O in src)
@@ -66,6 +67,7 @@
 	if (src.occupant.client)
 		src.occupant.client.eye = src.occupant.client.mob
 		src.occupant.client.perspective = MOB_PERSPECTIVE
+	playsound(src, 'sound/machines/scan_exit.ogg', 50)
 	src.occupant.dropInto(loc)
 	src.occupant = null
 	update_use_power(1)
@@ -279,6 +281,7 @@
 	dat +="<b>SCAN RESULTS FOR: [H]</b>"
 	dat +="Scan performed at [stationtime2text()]<br>"
 
+	playsound(src, 'sound/machines/scanner_scan.ogg', 50)
 	var/brain_result = "normal"
 	if(H.should_have_organ(BP_BRAIN))
 		var/obj/item/organ/internal/brain/brain = H.internal_organs_by_name[BP_BRAIN]
