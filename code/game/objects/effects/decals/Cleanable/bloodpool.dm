@@ -1,6 +1,6 @@
 /obj/effect/decal/cleanable/bloodpool
 	name = "blood pool"
-	desc = "A pool of blood. Or, perhaps, the chef spilled his cooking again?"
+	desc = "A pool of blood. Or a tomato soup."
 	gender = PLURAL //pool of blood refers to itself by zie xie or some shit those retards with colored hair make up
 	density = 0
 	anchored = 1
@@ -72,8 +72,6 @@
 			STOP_PROCESSING(SSobj, src)
 	else
 		STOP_PROCESSING(SSobj, src)
-
-
 
 /obj/effect/decal/cleanable/bloodpool/update_icon()
 	if(basecolor == "rainbow") basecolor = get_random_colour(1)

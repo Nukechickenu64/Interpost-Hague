@@ -154,3 +154,16 @@
 
 	if(BP && !B) // to prevent double sounds
 		playsound(T, "liquid_step", 15)
+
+	var/turf/simulated/open/O = get_turf(src)
+	var/turf/space/SP = get_turf(src)
+	if(!istype(O))
+		return
+
+	if(!istype(SP))
+		return
+
+	var/obj/structure/catwalk/C = locate(/obj/structure/catwalk) in (O || SP)
+
+	if(C)
+		playsound(C, "catwalk_step", 15)

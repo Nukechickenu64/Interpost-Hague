@@ -10,8 +10,8 @@ SUBSYSTEM_DEF(skybox)
 	var/skybox_icon = 'icons/turf/skybox.dmi' //Path to our background. Lets us use anything we damn well please. Skyboxes need to be 736x736
 	var/background_icon = "space"
 	var/use_stars = TRUE
-	var/use_overmap_details = TRUE
-	var/star_path = 'icons/turf/stars.dmi'
+	var/star_path = 'icons/turf/skybox.dmi'
+	var/star_state = "stars"
 	var/list/skybox_cache = list()
 	var/list/space_appearance_cache
 
@@ -19,11 +19,11 @@ SUBSYSTEM_DEF(skybox)
 	build_space_appearances()
 
 /datum/controller/subsystem/skybox/proc/build_space_appearances()
-	space_appearance_cache = new(65)
-	for (var/i in 0 to 64)
-		var/mutable_appearance/dust = mutable_appearance('icons/turf/stars.dmi', "star_[i]")
+	space_appearance_cache = new(26)
+	for (var/i in 0 to 25)
+		var/mutable_appearance/dust = mutable_appearance('icons/turf/space_dust.dmi', "[i]")
 		dust.plane = DUST_PLANE
-		dust.alpha = 180
+		dust.alpha = 30
 		dust.blend_mode = BLEND_ADD
 
 		var/mutable_appearance/space = new /mutable_appearance(/turf/space)
@@ -32,10 +32,10 @@ SUBSYSTEM_DEF(skybox)
 		space_appearance_cache[i + 1] = space.appearance
 
 /datum/controller/subsystem/skybox/Initialize(start_uptime)
-	background_color = RANDOM_RGB
+	//background_color = RANDOM_RGB
 
 /datum/controller/subsystem/skybox/Recover()
-	background_color = SSskybox.background_color
+	//background_color = SSskybox.background_color
 	skybox_cache = SSskybox.skybox_cache
 
 /datum/controller/subsystem/skybox/proc/get_skybox(z)
@@ -44,20 +44,17 @@ SUBSYSTEM_DEF(skybox)
 	return skybox_cache["[z]"]
 
 /datum/controller/subsystem/skybox/proc/generate_skybox(z)
-	var/star_state = "star_[rand(1, 64)]"
 	var/image/res = image(skybox_icon)
 
-	var/image/base = overlay_image(skybox_icon, background_icon, background_color)
+	var/image/base = overlay_image(skybox_icon, background_icon)
 
 	if(use_stars)
-		var/mutable_appearance/space = new /mutable_appearance(/turf/space)
-		var/image/stars = overlay_image(skybox_icon, star_state, flags = RESET_COLOR)
-		space.overlays += stars
+		var/image/stars = overlay_image(skybox_icon, star_state, plane = STAR_PLANE, flags = RESET_COLOR)
+		base.overlays += stars
 
 	res.overlays += base
 
 	return res
-
 /datum/controller/subsystem/skybox/proc/rebuild_skyboxes(var/list/zlevels)
 	for(var/z in zlevels)
 		skybox_cache["[z]"] = generate_skybox(z)
@@ -78,10 +75,6 @@ SUBSYSTEM_DEF(skybox)
 
 	if(new_use_stars != use_stars)
 		use_stars = new_use_stars
-		need_rebuild = TRUE
-
-	if(new_use_overmap_details != use_overmap_details)
-		use_overmap_details = new_use_overmap_details
 		need_rebuild = TRUE
 
 	if(need_rebuild)

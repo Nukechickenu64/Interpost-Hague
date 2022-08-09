@@ -63,6 +63,8 @@ What is the naming convention for planes or layers?
 	#define DEBRIS_LAYER                 1
 	#define DUST_LAYER                   2
 
+#define STAR_PLANE                -96
+
 #define GLIDE_SIZE_CONSTANT world.tick_lag
 
 // Openspace uses planes -80 through -70.

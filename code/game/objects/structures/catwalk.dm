@@ -74,6 +74,7 @@
 			if(istype(src.loc, /turf/space) || istype(src.loc, /turf/simulated/open))
 				new /obj/structure/lattice/(src.loc)
 			qdel(src)
+
 /*
 		return
 	if(isCrowbar(C) && plated_tile)

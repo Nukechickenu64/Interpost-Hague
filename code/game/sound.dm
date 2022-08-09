@@ -147,7 +147,12 @@ GLOBAL_LIST_INIT(chop_sound,list('sound/weapons/chop1.ogg','sound/weapons/chop2.
 GLOBAL_LIST_INIT(truekeyboard_sound, list('sound/effects/keyboard/keyboard1.ogg', 'sound/effects/keyboard/keyboard2.ogg', 'sound/effects/keyboard/keyboard3.ogg', 'sound/effects/keyboard/keyboard4.ogg'))
 GLOBAL_LIST_INIT(blood_sound, list('sound/effects/gore/blood1.ogg', 'sound/effects/gore/blood2.ogg', 'sound/effects/gore/blood3.ogg', 'sound/effects/gore/blood3.ogg', 'sound/effects/gore/blood4.ogg', 'sound/effects/gore/blood5.ogg', 'sound/effects/gore/blood6.ogg'))
 GLOBAL_LIST_INIT(liquid_step_sound, list('sound/effects/footsteps/water1.ogg', 'sound/effects/footsteps/water2.ogg', 'sound/effects/footsteps/water3.ogg', 'sound/effects/footsteps/water4.ogg'))
-
+GLOBAL_LIST_INIT(catwalk_step_sound, list(
+		'sound/effects/footstep/catwalk1.ogg',
+		'sound/effects/footstep/catwalk2.ogg',
+		'sound/effects/footstep/catwalk3.ogg',
+		'sound/effects/footstep/catwalk4.ogg',
+		'sound/effects/footstep/catwalk5.ogg'))
 /*
 job music
 */
@@ -500,6 +505,7 @@ var/const/FALLOFF_SOUNDS = 0.5
 			if ("sparks") 				soundin = pick(GLOB.spark_sound)
 			if ("blood_drip")			soundin = pick (GLOB.blood_sound)
 			if ("liquid_step")			soundin = pick (GLOB.liquid_step_sound)
+			if ("catwalk_step")			soundin = pick (GLOB.catwalk_step_sound)
 			if ("rustle") 				soundin = pick(GLOB.rustle_sound)
 			if ("punch") 				soundin = pick(GLOB.punch_sound)
 			if ("clownstep") 			soundin = pick(GLOB.clown_sound)

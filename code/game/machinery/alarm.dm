@@ -873,12 +873,12 @@ FIRE ALARM
 	desc = "<i>\"Pull this in case of emergency\"</i>. Thus, keep pulling it forever."
 	icon = 'icons/obj/monitors.dmi'
 	icon_state = "fire0"
-	var/detecting = 1.0
-	var/working = 1.0
-	var/time = 10.0
-	var/timing = 0.0
-	var/lockdownbyai = 0
-	anchored = 1.0
+	var/detecting = TRUE
+	var/working = TRUE
+	var/time = 10
+	var/timing = FALSE
+	var/lockdownbyai = FALSE
+	anchored = TRUE
 	idle_power_usage = 2
 	active_power_usage = 6
 	power_channel = ENVIRON
@@ -887,6 +887,7 @@ FIRE ALARM
 	var/buildstage = 2 // 2 = complete, 1 = no wires,  0 = circuit gone
 	var/seclevel
 	var/sound_state = 0
+	var/alarmfired = 0
 
 /obj/machinery/firealarm/examine(mob/user)
 	. = ..(user)
@@ -919,14 +920,19 @@ FIRE ALARM
 		set_light(0)
 	else
 		if(!detecting)
-			icon_state = "fire1"
+			icon_state = "firep"
 			set_light(l_range = 4, l_power = 2, l_color = COLOR_RED)
 		else if(z in GLOB.using_map.contact_levels)
-			icon_state = "fire0"
 			var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 			var/decl/security_level/sl = security_state.current_security_level
 
 			set_light(sl.light_range, sl.light_power, sl.light_color_alarm)
+
+			if(alarmfired == 1)
+				icon_state = "fire1"
+				set_light(l_range = 4, l_power = 2, l_color = COLOR_RED)
+			else
+				icon_state = "fire0"
 
 /obj/machinery/firealarm/fire_act(datum/gas_mixture/air, temperature, volume)
 	if(src.detecting)
@@ -1104,6 +1110,7 @@ FIRE ALARM
 	for(var/obj/machinery/firealarm/FA in area)
 		fire_alarm.clearAlarm(loc, FA)
 		FA.sound_state = 0
+	alarmfired = 0
 	update_icon()
 	return
 
@@ -1113,9 +1120,10 @@ FIRE ALARM
 	var/area/area = get_area(src)
 	for(var/obj/machinery/firealarm/FA in area)
 		fire_alarm.triggerAlarm(loc, FA, duration)
+	alarmfired = 1
 	update_icon()
 	sound_state = 1
-	//playsound(src.loc, 'sound/machines/fire_alarm.ogg', 75, 0)
+	playsound(src.loc, 'sound/machines/fire_alarm.ogg', 75, 0)
 	return
 
 /obj/machinery/firealarm/New(loc, dir, atom/frame)
