@@ -155,6 +155,7 @@
 			return 1
 		else
 			to_chat(user, "<span class='warning'>You don't have enough carpet!</span>")
+
 	if(!reinforced && !carpeted && material && istype(W, /obj/item/weapon/wrench))
 		remove_material(W, user)
 		if(!material)

@@ -573,16 +573,16 @@ var/global/datum/controller/occupations/job_master
 													to_chat(H, "<B>.......<B>")
 													spawn(20)
 														if(H.religion_is_legal())
-															to_chat(H, "<B>May <font color='red'>Verina</font></b> watch over me. She knows I need it, around these parts...")
+															to_chat(H, "<B>May <font color='red'>May the laws of reality</font></b> watch over me. They know I need it, around these parts...")
 															spawn(20)
 																to_chat(H, "<B>.......<B> ")
 																spawn(20)
-																	to_chat(H, "<B>The cryosleep's made my mind a bit fuzzy... I should really try to remember the Holy Prayer.")
+																	to_chat(H, "<B>The cryosleep's made my mind a bit fuzzy... I should really try to remember the prayer.")
 																	spawn(20)
 																		if(player_is_antag(H.mind))
 																			to_chat(H, "<B>.......<B>")
 																			spawn(20)
-																				to_chat(H, "<B><font color = 'red'>I remember what I'm here to do.</font><B>")
+																				to_chat(H, "<B><font color = 'red'>Oh, now I remember what I'm here to do!</font><B>")
 
 														else
 															to_chat(H, "<B>May the great <b><font color='red'>[H.religion]</font> watch over me and protect me from the infidels around me.")
@@ -591,9 +591,6 @@ var/global/datum/controller/occupations/job_master
 																	to_chat(H, "<B>.......<B>")
 																	spawn(20)
 																		to_chat(H, "<B><font color = 'red'>I remember what I'm here to do.</font><B>")
-
-
-
 
 		// EMAIL GENERATION
 		var/domain

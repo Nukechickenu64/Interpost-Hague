@@ -73,8 +73,12 @@ GLOBAL_VAR(spawntypes)
 	for(var/obj/machinery/cryopod/C in A)
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(rand(1,6))
+			victim.Sleeping(7)
+			victim.resting = 0
 			return
+	give_advice()
+	give_effect()
+
 /datum/spawnpoint/cyborg
 	display_name = "Cyborg Storage"
 	msg = "has been activated from storage"

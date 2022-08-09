@@ -53,7 +53,15 @@
 	color = null
 	return ..()
 
-/obj/screen/new_player/selection/join_game/update_icon()
+/obj/screen/new_player/selection/MouseEntered(location,control,params) //Yellow color for the font
+	color = "#ffb200"
+	return ..()
+
+/obj/screen/new_player/selection/MouseExited(location,control,params)
+	color = null
+	return ..()
+
+/obj/screen/new_player/selection/join_game/New()
 	var/mob/new_player/player = usr
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(player.ready)
@@ -63,23 +71,18 @@
 	else
 		icon_state = "joingame"
 
-/obj/screen/new_player/selection/join_game/New()
-	var/mob/new_player/player = usr
-	player.update_icon()
-
 /obj/screen/new_player/selection/join_game/Click()
 	var/mob/new_player/player = usr
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(!player.ready)
 			player.ready = 1
-			update_icon()
+			icon_state = "ready"
 		else
 			player.ready = 0
-			update_icon()
+			icon_state = "unready"
 	else
-		update_icon()
+		icon_state = "joingame"
 		player.join_game()
-	update_icon()
 
 /obj/screen/new_player/selection/manifest/Click()
 	var/mob/new_player/player = usr

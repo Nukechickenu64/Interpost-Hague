@@ -182,7 +182,6 @@
 	happiness = -20
 	timeout = 1800
 
-//Unused so far but I want to remember them to use them later.
 /datum/happiness_event/disturbing
 	description = "<span class='danger'>I recently saw something disturbing.</span>\n"
 	happiness = -2
@@ -202,6 +201,11 @@
 /datum/happiness_event/pain
 	description = "<span class='danger'>IT HURTS SO MUCH!</span>\n"
 	happiness = -10
+	timeout = 1800
+
+/datum/happiness_event/cryo
+	description = "<span class='info'>Being in a metal coffin for so long doesn't feel good.</span>\n"
+	happiness = -4
 	timeout = 1800
 
 //For when you see someone die and you're not hardcore.

@@ -354,6 +354,8 @@
 #include "code\datums\sell_orders\mining.dm"
 #include "code\datums\sell_orders\rnd.dm"
 #include "code\datums\sell_orders\sell_order.dm"
+#include "code\datums\spawnpoints\cryo_advices.dm"
+#include "code\datums\spawnpoints\cryo_effects.dm"
 #include "code\datums\supplypacks\atmospherics.dm"
 #include "code\datums\supplypacks\engineering.dm"
 #include "code\datums\supplypacks\hydroponics.dm"

@@ -580,8 +580,14 @@ its easier to just keep the beam vertical.
 		|| istype(user.wear_suit, /obj/item/clothing/suit/straight_jacket) || istype(user.loc, /obj/structure/closet))
 		return
 
-	if(user.handcuffed && prob(45) && !user.incapacitated(INCAPACITATION_FORCELYING))//User can fail to kick smbd if cuffed
+	if(user.handcuffed && prob(75) && !user.incapacitated(INCAPACITATION_FORCELYING))//User can fail to kick smbd if cuffed
 		user.visible_message("<span class='danger'>[user.name] loses \his balance while trying to kick \the [src].</span>", \
+					"<span class='warning'> You lost your balance.</span>")
+		user.Weaken(1)
+		return
+
+	if(user.statcheck(user.stats[STAT_DX], 8, null, STAT_DX) && prob(50))
+		user.visible_message("<span class='danger'>Clumsily, [user.name] loses \his balance while trying to kick \the [src].</span>", \
 					"<span class='warning'> You lost your balance.</span>")
 		user.Weaken(1)
 		return
@@ -602,6 +608,12 @@ its easier to just keep the beam vertical.
 		|| istype(user.wear_suit, /obj/item/clothing/suit/straight_jacket) || istype(user.loc, /obj/structure/closet))
 		return
 
+	if(user.statcheck(user.stats[STAT_DX], 8, null, STAT_DX) && prob(60))
+		user.visible_message("<span class='danger'>Clumsily, [user.name] loses \his balance while trying to jump.</span>", \
+					"<span class='warning'> You lost your balance while attempting to jump.</span>")
+		user.Weaken(1)
+		return
+
 	for(var/limbcheck in list(BP_L_LEG,BP_R_LEG))//But we need to see if we have legs.
 		var/obj/item/organ/affecting = user.get_organ(limbcheck)
 		if(!affecting)//Oh shit, we don't have have any legs, we can't jump.
@@ -611,8 +623,8 @@ its easier to just keep the beam vertical.
 	playsound(user, user.gender == MALE ? 'sound/effects/jump_male.ogg' : 'sound/effects/jump_female.ogg', 25, 0, 1)
 	user.visible_message("<span class='danger'>[user.name] jumps.</span>", \
 					"<span class='warning'> I jump to [loc]!</span>")
-	user.adjustStaminaLoss(rand(30,50))//Jumping is exhausting.
-	user.throw_at(target, 3, 0.5, user)
+	user.adjustStaminaLoss(rand(60,80))//Jumping is VERY exhausting.
+	user.throw_at(target, 2, 0.5, user)
 	user.setClickCooldown(DEFAULT_SLOW_COOLDOWN)
 
 /atom/proc/get_color()

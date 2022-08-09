@@ -81,16 +81,13 @@ GLOBAL_LIST_INIT(numbers_as_words, list("One", "Two", "Three", "Four",
 	"Eighteen", "Nineteen"))
 
 GLOBAL_LIST_INIT(music_tracks, list(
-		"Starter" = 'sound/jukebox/barsong1.ogg',
-		"Pupper" = 'sound/jukebox/barsong2.ogg',
-		"Hellfire" = 'sound/jukebox/barsong3.ogg',
-		"Chop" = 'sound/jukebox/barsong4.ogg',
-		"Cosmic" = 'sound/jukebox/barsong5.ogg',
-		"Streak" = 'sound/jukebox/barsong6.ogg',
-		"Drive" = 'sound/jukebox/barsong7.ogg',
-		"Jammed" = 'sound/jukebox/barsong8.ogg',
-		"Pixies" = 'sound/jukebox/barsong9.ogg',
-		"Chery Bomb" = 'sound/jukebox/barsong10.ogg',
+		"Steel Mill" = 'sound/jukebox/barsong1.ogg',
+		"The Highway King" = 'sound/jukebox/barsong2.ogg',
+		"A Ride" = 'sound/jukebox/barsong3.ogg',
+		"CORRUPTED" = 'sound/jukebox/barsong4.ogg',
+		"Chris Columbo" = 'sound/jukebox/barsong5.ogg',
+		"Exploding Hearts" = 'sound/jukebox/barsong6.ogg',
+		"Pebble Man" = 'sound/jukebox/barsong7.ogg',
 ))
 
 /proc/setup_music_tracks(list/tracks)

@@ -23,7 +23,7 @@ SUBSYSTEM_DEF(skybox)
 	for (var/i in 0 to 64)
 		var/mutable_appearance/dust = mutable_appearance('icons/turf/stars.dmi', "star_[i]")
 		dust.plane = DUST_PLANE
-		dust.alpha = 80
+		dust.alpha = 180
 		dust.blend_mode = BLEND_ADD
 
 		var/mutable_appearance/space = new /mutable_appearance(/turf/space)

@@ -980,15 +980,7 @@
 	/obj/item/weapon/reagent_containers/food/drinks/coffeecup = 8,
 	/obj/item/weapon/reagent_containers/food/drinks/glass2/carafe = 2,
 	/obj/item/weapon/reagent_containers/food/drinks/glass2/square = 8,
-	/obj/item/clothing/suit/chef/classic = 2,
-	/obj/item/weapon/storage/lunchbox = 3,
-	/obj/item/weapon/storage/lunchbox/heart = 3,
-	/obj/item/weapon/storage/lunchbox/cat = 3,
-	/obj/item/weapon/storage/lunchbox/nt = 3,
-	/obj/item/weapon/storage/lunchbox/mars = 3,
-	/obj/item/weapon/storage/lunchbox/cti = 3,
-	/obj/item/weapon/storage/lunchbox/nymph = 3,
-	/obj/item/weapon/storage/lunchbox/syndicate = 3)
+	/obj/item/clothing/suit/chef/classic = 2)
 
 
 	contraband = list(/obj/item/weapon/material/knife/butch = 2)

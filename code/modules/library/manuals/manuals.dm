@@ -1,8 +1,8 @@
 /obj/item/weapon/book/manual/chef_recipes
-	name = "Chef Recipes"
+	name = "Recipe Book"
 	icon_state = "cooked_book"
-	author = "Victoria Ponsonby"
-	title = "Chef Recipes"
+	author = "TTC CB"
+	title = "Recipe Book"
 
 	dat = {"<html>
 				<head>
@@ -18,10 +18,10 @@
 				</head>
 				<body>
 
-				<h1>Food for Dummies</h1>
-				Here is a guide on basic food recipes and also how to not poison your customers accidentally.
+				<h1>FOOD RECIPES</h1>
+				This is a guide mandated by the TetraCorp Chef Board for the enjoyment of the crew.
 
-				<h3>Basics:</h3>
+				<h3>Dough:</h3>
 				Knead an egg and some flour along with some water to make dough. Bake that to make a bun or flatten and cut it.
 
 				<h3>Burger:</h3>

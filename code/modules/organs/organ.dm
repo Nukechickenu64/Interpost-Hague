@@ -290,7 +290,7 @@ var/list/organ_cache = list()
 		set_dna(owner.dna)
 	return 1
 
-/obj/item/organ/attack(var/mob/target, var/mob/user)
+/obj/item/organ/attack(var/mob/target, var/mob/user, var/mob/living/carbon/M)
 
 	if(robotic >= ORGAN_ROBOT || !istype(target) || !istype(user) || (user != target && user.a_intent == I_HELP))
 		return ..()
@@ -311,6 +311,7 @@ var/list/organ_cache = list()
 	user.put_in_active_hand(O)
 	qdel(src)
 	target.attackby(O, user)
+	M.add_event("disgusted", /datum/happiness_event/disgust/disgusted)
 
 /obj/item/organ/proc/can_feel_pain()
 	return (robotic < ORGAN_ROBOT && (!species || !(species.species_flags & SPECIES_FLAG_NO_PAIN)))

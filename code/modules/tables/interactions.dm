@@ -121,6 +121,7 @@
 	// Placing stuff on tables
 	if(user.drop_from_inventory(W, src.loc))
 		auto_align(W, click_params)
+		playsound(W, W.drop_sound, 25, 0)
 		return 1
 
 	return

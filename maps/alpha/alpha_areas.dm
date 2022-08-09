@@ -348,6 +348,9 @@
 
 // Maintenance
 
+/area/maintenance
+	forced_ambience = list('sound/ambience/maintenance.ogg')
+
 /area/maintenance/atmos_control
 	name = "Atmospherics Maintenance"
 	icon_state = "fpmaint"
