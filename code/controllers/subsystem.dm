@@ -175,7 +175,7 @@
 	init_finish = REALTIMEOFDAY
 	. = (REALTIMEOFDAY - timeofday)/10
 	var/msg = "Initialized [name] subsystem within [.] second[. == 1 ? "" : "s"]!"
-	to_chat(world, "<span class='boldannounce'>[msg]</span>")
+	message_admins("<span class='boldannounce'>[msg]</span>")
 	log_world(msg)
 
 	init_state = SS_INITSTATE_DONE

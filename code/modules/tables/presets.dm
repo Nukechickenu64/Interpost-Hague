@@ -44,9 +44,7 @@
 	material = "wood"
 
 /obj/structure/table/glass
-	icon_state = "plain_preview"
-	color = COLOR_DEEP_SKY_BLUE
-	alpha = 77 // 0.3 * 255
+	icon_state = "glass_preview"
 	material = "glass"
 
 /obj/structure/table/glass/pglass

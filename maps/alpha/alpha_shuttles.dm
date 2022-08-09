@@ -267,46 +267,6 @@
 
 //Ninja Shuttle.
 
-/datum/shuttle/autodock/multi/antag/ninja
-	name = "Ninja"
-	warmup_time = 0
-	destination_tags = list(
-		"nav_ninja_north",
-		"nav_ninja_south",
-		"nav_ninja_east",
-		"nav_ninja_west"
-		)
-	shuttle_area = /area/ninja_dojo/start
-	current_location = "nav_ninja_start"
-	landmark_transition = "nav_ninja_transition"
-	announcer = "Alpha Sensor Array"
-	arrival_message = "Attention, anomalous sensor reading detected entering vessel proximity."
-	departure_message = "Attention, anomalous sensor reading detected leaving vessel proximity."
-
-/obj/effect/shuttle_landmark/ninja/start
-	name = "Clan Dojo"
-	landmark_tag = "nav_ninja_start"
-
-/obj/effect/shuttle_landmark/ninja/internim
-	name = "In transit"
-	landmark_tag = "nav_ninja_transition"
-
-/obj/effect/shuttle_landmark/ninja/north
-	name = "North of the Station"
-	landmark_tag = "nav_ninja_north"
-
-/obj/effect/shuttle_landmark/ninja/south
-	name = "South of the Station"
-	landmark_tag = "nav_ninja_south"
-
-/obj/effect/shuttle_landmark/ninja/east
-	name = "East of the Station"
-	landmark_tag = "nav_ninja_east"
-
-/obj/effect/shuttle_landmark/ninja/west
-	name = "West of the Station"
-	landmark_tag = "nav_ninja_west"
-
 //Skipjack
 /*
 /datum/shuttle/autodock/multi/antag/skipjack

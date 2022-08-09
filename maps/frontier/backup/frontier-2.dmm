@@ -701,7 +701,7 @@
 "ny" = (/obj/effect/floor_decal/industrial/warning{dir = 4},/obj/structure/cable{d1 = 1; d2 = 2; icon_state = "1-2"; pixel_y = 0; tag = ""},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 6},/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4},/turf/simulated/floor/tiled,/area/security/main)
 "nz" = (/obj/machinery/door/window/brigdoor/southleft{dir = 4; id = "Cell 1"; name = "Cell 1"; req_access = list(2)},/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/machinery/door/firedoor,/turf/simulated/floor/tiled,/area/security/main)
 "nA" = (/obj/effect/floor_decal/industrial/warning{icon_state = "warning"; dir = 8},/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/effect/floor_decal/newcorner/red{tag = "icon-red (EAST)"; icon_state = "red"; dir = 4},/turf/simulated/floor/tiled,/area/security/main)
-"nB" = (/obj/old_god_shrine/hasard_shrine,/turf/simulated/floor/plating,/area/maintenance/sub/port)
+"nB" = (/obj/old_god_shrine/xom_shrine,/turf/simulated/floor/plating,/area/maintenance/sub/port)
 "nC" = (/obj/effect/landmark{name = "JoinLateCryo"},/turf/simulated/floor/tiled,/area/crew_quarters/sleep/cryo)
 "nD" = (/obj/structure/cable{d1 = 4; d2 = 8; icon_state = "4-8"; pixel_x = 0; tag = ""},/obj/effect/floor_decal/spline/plain,/turf/simulated/floor/tiled,/area/security/main)
 "nE" = (/obj/machinery/door/airlock/multi_tile/glass,/obj/machinery/door/firedoor,/turf/simulated/floor/tiled,/area/crew_quarters/sleep/bedrooms)

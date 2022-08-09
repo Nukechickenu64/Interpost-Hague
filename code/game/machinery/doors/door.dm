@@ -28,6 +28,7 @@
 	var/hitsound = 'sound/weapons/smash.ogg' //sound door makes when hit with a weapon
 	var/obj/item/stack/material/repairing
 	var/block_air_zones = 1 //If set, air zones cannot merge across the door even when it is opened.
+	var/turf/filler //Fixes double door opacity issue
 
 	//Multi-tile doors
 	dir = EAST
@@ -62,12 +63,30 @@
 		else
 			bound_width = world.icon_size
 			bound_height = width * world.icon_size
+		handle_multidoor()
 
 	health = maxhealth
 	update_icon()
 
+	if(filler && width > 1)
+		filler.set_opacity(0)// Ehh... let's hope there are no walls there. Must fix this
+		filler = null
+
 	update_nearby_tiles(need_rebuild=1)
 	return
+
+/obj/machinery/door/proc/handle_multidoor()
+	if(width > 1)
+		if(dir in list(EAST, WEST))
+			bound_width = width * world.icon_size
+			bound_height = world.icon_size
+			filler = get_step(src,EAST)
+			filler.set_opacity(opacity)
+		else
+			bound_width = world.icon_size
+			bound_height = width * world.icon_size
+			filler = get_step(src,NORTH)
+			filler.set_opacity(opacity)
 
 /obj/machinery/door/Destroy()
 	set_density(0)
@@ -125,7 +144,6 @@
 	if(istype(mover) && mover.checkpass(PASS_FLAG_GLASS))
 		return !opacity
 	return !density
-
 
 /obj/machinery/door/proc/bumpopen(mob/user as mob)
 	if(operating)	return
@@ -369,11 +387,14 @@
 /obj/machinery/door/proc/open(var/forced = 0)
 	if(!can_open(forced))
 		return
+
 	operating = 1
 
 	do_animate("opening")
 	icon_state = "door0"
 	set_opacity(0)
+	if (filler)
+		filler.set_opacity(0)
 	sleep(3)
 	src.set_density(0)
 	update_nearby_tiles()
@@ -407,6 +428,8 @@
 	update_icon()
 	if(visible && !glass)
 		set_opacity(1)	//caaaaarn!
+		if (filler)
+			filler.set_opacity(0)
 	operating = 0
 
 	//I shall not add a check every x ticks if a door has closed over some fire.
@@ -445,9 +468,13 @@
 		if(dir in list(EAST, WEST))
 			bound_width = width * world.icon_size
 			bound_height = world.icon_size
+			filler.set_opacity(0)
+			filler = (get_step(src,EAST)) //Find new turf
 		else
 			bound_width = world.icon_size
 			bound_height = width * world.icon_size
+			filler.set_opacity(0)
+			filler = (get_step(src,NORTH)) //Find new turf
 
 	if(.)
 		deconstruct(null, TRUE)

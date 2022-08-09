@@ -40,7 +40,10 @@
 
 	var/pulse_mod = owner.chem_effects[CE_PULSE]
 
+	// Now pulse mod is impacted by shock stage and other things too
 	if(owner.shock_stage > 30)
+		pulse_mod++
+	if(owner.shock_stage > 80)
 		pulse_mod++
 
 	var/oxy = owner.get_blood_oxygenation()
@@ -65,6 +68,13 @@
 			to_chat(owner, "<span class='danger'>Your heart has stopped!</span>")
 			pulse = PULSE_NONE
 			return
+
+	// Pulse normally shouldn't go above PULSE_2FAST, unless extreme amounts of bad stuff in blood
+	if (pulse_mod < 6)
+		pulse = clamp(PULSE_NORM + pulse_mod, PULSE_SLOW, PULSE_2FAST)
+	else
+		pulse = clamp(PULSE_NORM + pulse_mod, PULSE_SLOW, PULSE_THREADY)
+
 	if(pulse && oxy <= BLOOD_VOLUME_SURVIVE && !owner.chem_effects[CE_STABLE])	//I SAID MOAR OXYGEN
 		pulse = PULSE_THREADY
 		return
@@ -148,7 +158,12 @@
 			blood_max *= 0.8
 
 		if(world.time >= next_blood_squirt && istype(owner.loc, /turf) && do_spray.len)
-			owner.visible_message("<span class='danger'>Blood squirts out from \the [pick(do_spray)]!</span>")
+			var/spray_organ = pick(do_spray)
+			owner.visible_message(
+				SPAN_DANGER("Blood sprays out from \the [owner]'s [spray_organ]!"),
+				SPAN_DANGER("Blood sprays out from your [spray_organ]!")
+			)
+			owner.eye_blurry = 2
 
 			//AB occurs every heartbeat, this only throttles the visible effect
 			next_blood_squirt = world.time + 80

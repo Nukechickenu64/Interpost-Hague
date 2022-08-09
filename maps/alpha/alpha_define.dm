@@ -25,17 +25,16 @@
 
 	map_admin_faxes = list("TetraCorp Mail System")
 
-	shuttle_docked_message = "The Spiteful has docked with the station. The nobles are awaited onboard."
+	shuttle_docked_message = "The Spiteful has docked with the station. Command staff is prioritised."
 	shuttle_leaving_dock = "The Spiteful has departed from home dock."
 	shuttle_called_message = "A scheduled crew transfer shuttle Spiteful has been sent."
 	shuttle_recall_message = "The Spiteful has been recalled. Continuous wasting of resources may result in the crew's termination."
-	emergency_shuttle_docked_message = "The Spiteful has docked with the station. The nobles are awaited onboard."
+	emergency_shuttle_docked_message = "The Spiteful has docked with the station. Command staff is prioritised."
 	emergency_shuttle_leaving_dock = "The Spiteful emergency escape shuttle has departed from %dock_name%."
 	emergency_shuttle_called_message = "Spiteful emergency escape shuttle has been sent. It will arrive in approximately 10 minutes."
 	emergency_shuttle_recall_message = "The Spiteful emergency escape shuttle has been recalled. Continuous wasting of resources may result in the crew's termination."
 
 	evac_controller_type = /datum/evacuation_controller/shuttle
-
 
 /datum/map/alpha/perform_map_generation()
 	new /datum/random_map/automata/cave_system(null,1,1,1,200, 200) // Create the mining Z-level.

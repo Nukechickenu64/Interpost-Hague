@@ -68,9 +68,11 @@
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(!player.ready)
 			player.ready = 1
+			to_chat(player, "<span class='info'>You are now ready for what will come.</span>")
 			icon_state = "ready"
 		else
 			player.ready = 0
+			to_chat(player, "<span class='info'>You are no longer ready. Coward.</span>")
 			icon_state = "unready"
 	else
 		icon_state = "joingame"

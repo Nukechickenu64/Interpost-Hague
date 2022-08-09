@@ -214,6 +214,8 @@ proc/blood_splatter(var/target,var/datum/reagent/blood/source,var/large,var/spra
 	if(istype(source,/mob/living/carbon/human))
 		var/mob/living/carbon/human/M = source
 		source = M.get_blood(M.vessel)
+	if(!istype(source))
+		source = null
 
 	// Are we dripping or splattering?
 	var/list/drips = list()
@@ -225,7 +227,6 @@ proc/blood_splatter(var/target,var/datum/reagent/blood/source,var/large,var/spra
 		decal_type = /obj/effect/decal/cleanable/blood/drip
 
 	// Find a blood decal or create a new one.
-	B = locate(decal_type) in T
 	if(T)
 		var/list/existing = filter_list(T.contents, decal_type)
 		if(length(existing) > 3)
