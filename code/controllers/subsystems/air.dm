@@ -93,7 +93,7 @@ SUBSYSTEM_DEF(air)
 
 	// Make sure we don't rebuild mid-tick.
 	if (state != SS_IDLE)
-		report_progress("ZAS Rebuild initiated. Waiting for current air tick to complete before continuing.")
+		message_admins("ZAS Rebuild initiated. Waiting for current air tick to complete before continuing.")
 		while (state != SS_IDLE)
 			stoplag()
 
@@ -130,7 +130,7 @@ SUBSYSTEM_DEF(air)
 /datum/controller/subsystem/air/Initialize(timeofday, simulate = TRUE)
 
 	var/starttime = REALTIMEOFDAY
-	report_progress("Processing Geometry...")
+	message_admins("Processing Geometry...")
 
 	var/simulated_turf_count = 0
 	for(var/turf/simulated/S)
@@ -139,21 +139,21 @@ SUBSYSTEM_DEF(air)
 
 		CHECK_TICK
 
-	report_progress({"Total Simulated Turfs: [simulated_turf_count]
+	message_admins({"Total Simulated Turfs: [simulated_turf_count]
 Total Zones: [zones.len]
 Total Edges: [edges.len]
 Total Active Edges: [active_edges.len ? "<span class='danger'>[active_edges.len]</span>" : "None"]
 Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_count]"})
 
-	report_progress("Geometry processing completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
+	message_admins("Geometry processing completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
 
 	if (simulate)
-		report_progress("Settling air...")
+		message_admins("Settling air...")
 
 		starttime = REALTIMEOFDAY
 		fire(FALSE, TRUE)
 
-		report_progress("Air settling completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
+		message_admins("Air settling completed in [(REALTIMEOFDAY - starttime)/10] seconds!")
 
 	..(timeofday)
 

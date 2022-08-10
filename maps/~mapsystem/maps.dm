@@ -184,10 +184,10 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 
 /datum/map/proc/build_away_sites()
 #ifdef UNIT_TEST
-	report_progress("Unit testing, so not loading away sites")
+	message_admins("Unit testing, so not loading away sites")
 	return // don't build away sites during unit testing
 #else
-	report_progress("Loading away sites...")
+	message_admins("Loading away sites...")
 	var/list/sites_by_spawn_weight = list()
 	for (var/site_name in SSmapping.away_sites_templates)
 		var/datum/map_template/ruin/away_site/site = SSmapping.away_sites_templates[site_name]
@@ -208,7 +208,7 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 		if (selected_site.load_new_z())
 			report_progress("Loaded away site [selected_site]!")
 			away_site_budget -= selected_site.cost
-	report_progress("Finished loading away sites, remaining budget [away_site_budget], remaining sites [sites_by_spawn_weight.len]")
+	message_admins("Finished loading away sites, remaining budget [away_site_budget], remaining sites [sites_by_spawn_weight.len]")
 #endif
 
 /datum/map/proc/build_exoplanets()

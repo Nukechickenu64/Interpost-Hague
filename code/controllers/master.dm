@@ -92,10 +92,10 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	for(var/datum/controller/subsystem/ss in subsystems)
 		if (ss.flags & SS_NEEDS_SHUTDOWN)
 			var/time = REALTIMEOFDAY
-			report_progress("Shutting down [ss] subsystem...")
+			message_admins("Shutting down [ss] subsystem...")
 			ss.Shutdown()
-			report_progress("[ss] shutdown in [(REALTIMEOFDAY - time)/10]s.")
-	report_progress("Shutdown complete.")
+			message_admins("[ss] shutdown in [(REALTIMEOFDAY - time)/10]s.")
+	message_admins("Shutdown complete.")
 
 // Returns 1 if we created a new mc, 0 if we couldn't due to a recent restart,
 //	-1 if we encountered a runtime trying to recreate it
@@ -171,7 +171,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	if(init_sss)
 		init_subtypes(/datum/controller/subsystem, subsystems)
 
-	report_progress("Initializing subsystems...")
+	message_admins("Initializing subsystems...")
 
 	initializing = TRUE
 
@@ -190,7 +190,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	var/time = (REALTIMEOFDAY - start_timeofday) / 10
 
 	var/msg = "Initializations complete within [time] second\s!"
-	report_progress(msg)
+	message_admins(msg)
 	log_world(msg)
 
 	initializing = FALSE
@@ -221,7 +221,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 		old_runlevel = "NULL"
 
 	current_runlevel = log(2, new_runlevel) + 1
-	report_progress("The performance went from [old_runlevel] to [current_runlevel].")
+	message_admins("The performance went from [old_runlevel] to [current_runlevel].")
 	if(current_runlevel < 1)
 		CRASH("Attempted to set invalid runlevel: [new_runlevel].")
 
@@ -230,13 +230,13 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	set waitfor = 0
 	if(delay)
 		sleep(delay)
-	report_progress("Master starting processing")
+	report_progress("The start-up is finished, the game is ready.")
 	var/rtn = Loop()
 	if (rtn > 0 || processing < 0)
 		return //this was suppose to happen.
 	//loop ended, restart the mc
 	log_game("MC crashed or runtimed, restarting")
-	message_admins("MC crashed or runtimed, restarting")
+	report_progress("MC crashed or runtimed, restarting now.")
 	var/rtn2 = Recreate_MC()
 	if (rtn2 <= 0)
 		log_game("Failed to recreate MC (Error code: [rtn2]), it's up to the failsafe now")

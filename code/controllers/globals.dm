@@ -19,8 +19,8 @@ GLOBAL_REAL(GLOB, /datum/controller/global_vars)
 	var/global_vars = vars.len - gvars_datum_in_built_vars.len
 	var/global_procs = length(typesof(/datum/controller/global_vars/proc))
 
-	report_progress("[global_vars] global variables")
-	report_progress("[global_procs] global init procs")
+	message_admins("[global_vars] global variables")
+	message_admins("[global_procs] global init procs")
 
 	try
 		if(global_vars == global_procs)
