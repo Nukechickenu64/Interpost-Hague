@@ -368,6 +368,18 @@ var/list/name_to_material
 	hitsound = 'sound/weapons/smash.ogg'
 	apply_icon_colour_to_walls = FALSE
 
+/material/hardenedsteel
+	name = "hardened steel"
+	stack_type = /obj/item/stack/material/hardenedsteel
+	integrity = 150
+	brute_armor = 5
+	icon_base = "hardenedsteel"
+	table_icon_base = "hardenedsteel"
+	icon_reinf = "reinf_over"
+	icon_colour = null
+	hitsound = 'sound/weapons/smash.ogg'
+	apply_icon_colour_to_walls = FALSE
+
 /material/diona
 	name = "biomass"
 	icon_colour = null

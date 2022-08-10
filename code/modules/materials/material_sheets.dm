@@ -231,6 +231,17 @@
 /obj/item/stack/material/steel/fifty
 	amount = 50
 
+/obj/item/stack/material/hardenedsteel
+	name = "hardened steel"
+	icon_state = "sheet-hardened-metal"
+	default_type = "hardenedsteel"
+
+/obj/item/stack/material/hardenedsteel
+	amount = 10
+
+/obj/item/stack/material/hardenedsteel
+	amount = 50
+
 /obj/item/stack/material/plasteel
 	name = "plasteel"
 	icon_state = "sheet-plasteel"

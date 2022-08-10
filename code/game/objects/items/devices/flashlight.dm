@@ -41,6 +41,10 @@
 	on = !on
 	if(on && activation_sound)
 		playsound(src.loc, activation_sound, 75, 1)
+		item_state = "[initial(icon_state)]-on"
+	else
+		playsound(src.loc, activation_sound, 75, 1)
+		item_state = "[initial(icon_state)]"
 	update_icon()
 	user.update_action_buttons()
 	return 1

@@ -8,6 +8,11 @@
 	color = COLOR_GRAY40
 	material = DEFAULT_WALL_MATERIAL
 
+/obj/structure/table/counter
+	icon_state = "hardenedsteel_preview"
+	color = null
+	material = "hardened steel"
+
 /obj/structure/table/reinftable3
 	icon_state = "reinf_table3"
 	color = null
@@ -54,6 +59,7 @@
 /obj/structure/table/holotable
 	icon_state = "holo_preview"
 	color = COLOR_OFF_WHITE
+
 /obj/structure/table/holotable/New()
 	material = "holo[DEFAULT_TABLE_MATERIAL]"
 	..()
