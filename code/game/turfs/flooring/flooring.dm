@@ -155,7 +155,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	can_paint = 1
 
 /decl/flooring/tiling/bright
@@ -167,7 +167,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	can_paint = 1
 
 /decl/flooring/tiling/verybright
@@ -179,7 +179,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	can_paint = 1
 
 /decl/flooring/tiling/barnew
@@ -191,7 +191,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	can_paint = 1
 
 /decl/flooring/tiling/no0
@@ -203,7 +203,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/no1
@@ -215,7 +215,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/bleeky
@@ -227,7 +227,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/lev
@@ -239,7 +239,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/purpleos
@@ -251,7 +251,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/darkpurpleos
@@ -263,7 +263,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/cargo5
@@ -275,7 +275,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/cargochess
@@ -287,7 +287,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/f2
@@ -299,7 +299,7 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
 
 /decl/flooring/tiling/f3
@@ -311,10 +311,8 @@ var/list/flooring_types
 	has_damage_range = 4
 	damage_temperature = T0C+1400
 	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
-//	build_type = /obj/item/stack/tile/floor
+	build_type = /obj/item/stack/tile/floor
 	//can_paint = 1
-
-
 
 /decl/flooring/tiling/mono
 	icon_base = "monotile"
@@ -417,12 +415,26 @@ var/list/flooring_types
 	has_damage_range = null
 	flags = TURF_REMOVE_CROWBAR
 
+/decl/flooring/tiling/bunker/polar_chess
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_chess"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
 /decl/flooring/tiling/bunker/polar_circuit
 	name = "floor"
 	desc = "Don't slip."
 	icon_base = "polar_circuit"
 	has_damage_range = null
 	flags = TURF_REMOVE_CROWBAR
+
+/decl/flooring/tiling/grider
+	name = "grider"
+	desc = "A set of metal."
+	icon = 'icons/turf/bunk.dmi'
+	icon_base = "grider"
+	has_damage_range = null
 
 /decl/flooring/tiling/bar
 	name = "floor"

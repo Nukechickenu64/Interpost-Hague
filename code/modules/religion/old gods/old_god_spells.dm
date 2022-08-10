@@ -35,6 +35,7 @@
 	for(var/direction in spell_components)
 		qdel(spell_components[direction])
 
+/* // Demonstration of working order.
 /datum/old_god_spell/smoke_example
 	name = "Simple puff of smoke to demonstrate"
 	requirments = list("NORTH" = /obj/item/weapon/paper)
@@ -45,6 +46,7 @@
 		smoke.set_up(5, 0, user.loc)
 		smoke.attach(user)
 		smoke.start()
+*/
 
 //Yeah this is fucking stupid, but I can't make associatve lists like list(NORTH=1) because fucking byond, so we need to do list("NORTH"=1) and pass through here.
 proc/DIRECTION_TO_VAL(var/direction)

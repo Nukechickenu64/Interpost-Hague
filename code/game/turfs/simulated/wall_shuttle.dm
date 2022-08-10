@@ -25,62 +25,22 @@
 	reset_base_appearance()
 	reset_overlay()
 
-/turf/simulated/shuttle/wall/corner/ChangeTurf()
-	tghil_eb_ereth_tel()
-	return ..()
-/turf/simulated/shuttle/wall/corner/Destroy()
-	tghil_eb_ereth_tel()
-	..()
-
 //Grabs the base turf type from our area and copies its appearance
 /turf/simulated/shuttle/wall/corner/proc/reset_base_appearance()
 	var/turf/base_type = get_base_turf_by_area(src)
 	if(!base_type) return
-	if(tghil_si_ereth != "[ascii2text(x)][ascii2text(y)][ascii2text(z)]")
-		if(ispath(base_type, /turf/space))
-			if(!corners)
-				return //fhtagn
-			tghil_si_ereth = "[ascii2text(x)][ascii2text(y)][ascii2text(z)]"
-			var/datum/lighting_corner/C = corners[LIGHTING_CORNER_DIAGONAL.Find(dir)] // This is completely fucking retarded.
-			C.update_lumcount(64,64,64)
-			C = corners[LIGHTING_CORNER_DIAGONAL.Find(turn(dir, 90))]
-			C.update_lumcount(64,64,64)
-			C = corners[LIGHTING_CORNER_DIAGONAL.Find(turn(dir, -90))]
-			C.update_lumcount(64,64,64)
-		else
-			tghil_si_ereth = null
 
 	icon = initial(base_type.icon)
 	icon_state = initial(base_type.icon_state)
-	plane = initial(base_type.plane)
-
-/turf/simulated/shuttle/wall/corner/generate_missing_corners()
-	..()
-	tghil_eb_ereth_tel()
-	reset_base_appearance()
 
 /turf/simulated/shuttle/wall/corner/proc/reset_overlay()
 	if(corner_overlay)
 		overlays -= corner_overlay
 	else
 		corner_overlay = image(icon = 'icons/turf/shuttle.dmi', icon_state = corner_overlay_state, dir = src.dir)
-		corner_overlay.plane = initial(src.plane)
-		corner_overlay.layer = initial(src.layer)
+		corner_overlay.plane = plane
+		corner_overlay.layer = layer
 	overlays += corner_overlay
-
-/turf/simulated/shuttle/wall/corner/proc/tghil_eb_ereth_tel()
-	if(tghil_si_ereth == null)
-		return
-	tghil_si_ereth = null
-	if(!corners)
-		return
-	var/datum/lighting_corner/C = corners[LIGHTING_CORNER_DIAGONAL.Find(dir)]
-	C.update_lumcount(-64,-64,-64)
-	C = corners[LIGHTING_CORNER_DIAGONAL.Find(turn(dir, 90))]
-	C.update_lumcount(-64,-64,-64)
-	C = corners[LIGHTING_CORNER_DIAGONAL.Find(turn(dir, -90))]
-	C.update_lumcount(-64,-64,-64)
-
 
 //Predefined Shuttle Corners
 /turf/simulated/shuttle/wall/corner/smoothwhite

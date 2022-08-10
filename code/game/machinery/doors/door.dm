@@ -390,11 +390,11 @@
 
 	operating = 1
 
+	if (filler)
+		filler.set_opacity(0)
 	do_animate("opening")
 	icon_state = "door0"
 	set_opacity(0)
-	if (filler)
-		filler.set_opacity(0)
 	sleep(3)
 	src.set_density(0)
 	update_nearby_tiles()

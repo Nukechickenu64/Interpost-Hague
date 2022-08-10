@@ -6,6 +6,7 @@
 #define FOOTSTEP_DIRT		"dirt"
 #define FOOTSTEP_GRASS 		"grass"
 #define FOOTSTEP_WATER		"water"
+#define FOOTSTEP_TILE		"tile"
 #define FOOTSTEP_BLANK		"blank"
 
 /turf/simulated/floor/var/global/list/footstep_sounds = list(
@@ -52,6 +53,12 @@
 		'sound/effects/footstep/water2.ogg',
 		'sound/effects/footstep/water3.ogg',
 		'sound/effects/footstep/water4.ogg'),
+	FOOTSTEP_TILE = list(
+		'sound/effects/footstep/tile1.ogg',
+		'sound/effects/footstep/tile2.ogg',
+		'sound/effects/footstep/tile3.ogg',
+		'sound/effects/footstep/tile4.ogg',
+		'sound/effects/footstep/tile5.ogg'),
 	FOOTSTEP_BLANK = list(
 		'sound/effects/footstep/blank.ogg')
 )
@@ -63,6 +70,10 @@
 /decl/flooring/linoleum/footstep_type = FOOTSTEP_TILES
 /decl/flooring/wood/footstep_type = FOOTSTEP_WOOD
 /decl/flooring/reinforced/footstep_type = FOOTSTEP_PLATING
+/decl/flooring/tiling/freezer/footstep_type = FOOTSTEP_TILE
+/decl/flooring/tiling/bunker/footstep_type = FOOTSTEP_TILE
+/decl/flooring/tiling/mono/footstep_type = FOOTSTEP_TILE
+/decl/flooring/tiling/white/footstep_type = FOOTSTEP_TILE
 
 /turf/simulated/floor/proc/get_footstep_sound()
 	if(is_plating())

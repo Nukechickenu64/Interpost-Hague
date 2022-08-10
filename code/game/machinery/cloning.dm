@@ -97,7 +97,7 @@
 	locked = 1
 
 	eject_wait = 1
-	spawn(30)
+	spawn(90)
 		eject_wait = 0
 
 	var/mob/living/carbon/human/H = new /mob/living/carbon/human(src, R.dna.species)
@@ -188,8 +188,8 @@
 		occupant.adjustBrainLoss(-(ceil(0.5*heal_rate)))
 
 		//So clones don't die of oxyloss in a running pod.
-		if(occupant.reagents.get_reagent_amount("inaprovaline") < 30)
-			occupant.reagents.add_reagent("inaprovaline", 60)
+		if(occupant.reagents.get_reagent_amount(/datum/reagent/inaprovaline) < 30)
+			occupant.reagents.add_reagent(/datum/reagent/inaprovaline, 60)
 		occupant.Sleeping(30)
 		//Also heal some oxyloss ourselves because inaprovaline is so bad at preventing it!!
 		occupant.adjustOxyLoss(-4)

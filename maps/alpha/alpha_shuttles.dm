@@ -335,6 +335,7 @@
 	landmark_tag = "nav_skipjack_deck5"
 */
  //////////////////////////////////////////////////
+
 /area/shuttle/lift
   name = "Cargo Lift"
   icon_state = "shuttle3"

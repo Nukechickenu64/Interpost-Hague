@@ -319,7 +319,6 @@
 	density = 1
 	anchored = 1
 
-
 /obj/structure/woodenclock/Initialize()
 	START_PROCESSING(SSobj, src)
 	. = ..()
@@ -329,7 +328,7 @@
 	STOP_PROCESSING(SSobj, src)
 
 /obj/structure/woodenclock/Process()
-	playsound(src, 'sound/machines/clock_ticking.ogg', 40, 0)
+	playsound(src, 'sound/machines/clock_ticking.ogg', 20, 0)
 
 /obj/structure/nuclearwaste
 	name = "big nuclear waste canister"

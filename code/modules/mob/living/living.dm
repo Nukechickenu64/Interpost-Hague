@@ -261,7 +261,7 @@ default behaviour is:
 
 /mob/living/proc/adjustBruteLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	health = max(health-amount, 0)
+	health = Clamp(health-amount, 0, maxHealth)
 
 /mob/living/proc/getOxyLoss()
 	return 0

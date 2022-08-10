@@ -357,6 +357,18 @@
 	icon_state = "polar_circuit"
 	initial_flooring = /decl/flooring/tiling/bunker/polar_circuit
 
+/turf/simulated/floor/tiled/bunker/polar_chess
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_chess"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_chess
+
+/turf/simulated/floor/tiled/bunker/grider
+	name = "grider"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "grider"
+	initial_flooring = /decl/flooring/tiling/grider
+
 /turf/simulated/floor/tiled/dark
 	name = "dark floor"
 	icon_state = "dark"

@@ -270,7 +270,7 @@
 		if(robotic < ORGAN_ROBOT && !(status & ORGAN_ARTERY_CUT) && !initial(O.open))
 			status |= ORGAN_ARTERY_CUT
 			if(artery_name == "cartoid artery")
-				playsound(owner.loc, 'sound/voice/throat.ogg', 50, 1, -1)
+				playsound(src.loc, 'sound/voice/throat.ogg', 50, 1, -1)
 			return TRUE
 	return FALSE
 

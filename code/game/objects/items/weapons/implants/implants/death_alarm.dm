@@ -29,19 +29,19 @@
 	else if(M.stat == DEAD)
 		activate("death")
 
-/obj/item/weapon/implant/death_alarm/activate(var/cause)
-	var/mob/M = imp_in
-	var/area/t = get_area(M)
-	var/location = t.name
+/obj/item/weapon/implant/death_alarm/activate(cause)
+	var/location
 	if (cause == "emp" && prob(50))
 		location =  pick(teleportlocs)
-	if(!t.requires_power) // We assume areas that don't use power are some sort of special zones
-		var/area/default = world.area
-		location = initial(default.name)
-	var/death_message = "[mobname] has died in [location]!"
-	sound_to(world, sound('sound/effects/death_alarm_legacy.ogg'))
-	if(!cause)
-		death_message = "[mobname] has died-zzzzt in-in-in..."
+	else
+		var/mob/M = imp_in
+		var/area/t = get_area(M)
+		location = t?.name
+	var/death_message
+	if(!cause || !location)
+		death_message = "A message from [name] has been received. [mobname] has died-zzzzt in-in-in..."
+	else
+		death_message = "A message from [name] has been received. [mobname] has died in [location]!"
 	STOP_PROCESSING(SSobj, src)
 
 	for(var/channel in list("Security", "Medical", "Command"))
