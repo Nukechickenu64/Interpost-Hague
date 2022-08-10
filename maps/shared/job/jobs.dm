@@ -106,27 +106,27 @@
 						/datum/job/captain,
 						//datum/job/countess,
 						/datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						///datum/job/supreme_arbiter,
+						///datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						/datum/job/officer,
 						///datum/job/detective,
 						/datum/job/doctor,
-						/datum/job/cmo,
-						/datum/job/rd,
+						///datum/job/cmo,
+						///datum/job/rd,
 						/datum/job/scientist,
 						/datum/job/qm,
 						/datum/job/cargo_tech,
-						/datum/job/cargo_tech/machinist,
+						///datum/job/cargo_tech/machinist,
 						/datum/job/mining,
 						/datum/job/chef,
-						/datum/job/bartender,
-						/datum/job/hydro,
+						///datum/job/bartender,
+						///datum/job/hydro,
 						/datum/job/janitor,
 						/datum/job/engineer,
-						/datum/job/chaplain,
-						/datum/job/jester
+						///datum/job/chaplain,
+						///datum/job/jester
 						///datum/job/assistant,
 						///datum/job/cadet
 						///datum/job/ouvrier
@@ -266,7 +266,7 @@
 
 
 /datum/job/hop
-	title = "Junior Manager"
+	title = "Executive Officer"
 	supervisors = "the Captain"
 	minimal_player_age = 31
 	economic_modifier = 5
@@ -288,7 +288,7 @@
 
 /datum/job/rd
 	selection_color = "#0055A1"
-	title = "Scientific Overseer"
+	title = "Head Scientist"
 	supervisors = "the Captain"
 	minimal_player_age = 21
 	economic_modifier = 9
@@ -323,7 +323,7 @@
 
 /datum/job/scientist
 	selection_color = "#006BCA"
-	title = "Technologist"
+	title = "General Researcher"
 	supervisors = "the Scientific Overseer"
 	minimal_player_age = 19
 	economic_modifier = 2
@@ -345,9 +345,9 @@
 
 /datum/job/doctor
 	selection_color = "#633d63"
-	title = "Physician"
+	title = "Medical Officer"
 	department_flag = MED
-	supervisors = "the Medical Officer and Hippocrates"
+	supervisors = "Hippocrates"
 	minimal_player_age = 19
 	economic_modifier = 2
 	ideal_character_age = 30
@@ -364,7 +364,7 @@
 	H.generate_skills(list("medical","cleaning", "surgery"))
 
 /datum/job/cmo
-	title = "Medical Officer"
+	title = "CMO"
 	supervisors = "the Captain"
 	selection_color = "#382238"
 	department = "Medical"
@@ -383,7 +383,7 @@
 	H.generate_skills(list("medical","cleaning", "surgery"))
 
 /datum/job/hos
-	title = "Marshal"
+	title = "Major"
 	supervisors = "the Captain"
 	department_flag = SEC
 	total_positions = 1
@@ -454,7 +454,7 @@
 
 /datum/job/qm
 	selection_color = "#3d3315"
-	title = "Logistics Officer"
+	title = "Vessel Overseer"
 	supervisors = "the Overseer"
 	minimal_player_age = 21
 	economic_modifier = 3
@@ -472,7 +472,7 @@
 		H.generate_skills(list("crafting","engineering", "mining"))
 
 /datum/job/engineer
-	title = "Station Maintainer"
+	title = "Engineer"
 	supervisors = "the Overseer"
 	minimal_player_age = 16
 	economic_modifier = 3
@@ -494,8 +494,8 @@
 
 /datum/job/mining
 	selection_color = "#7c6a2e"
-	title = "Asteroid Miner"
-	supervisors = "the Logistics Officer"
+	title = "Miner"
+	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
 	ideal_character_age = 21
@@ -514,8 +514,8 @@
 
 /datum/job/cargo_tech
 	selection_color = "#7c6a2e"
-	title = "Logistics Worker"
-	supervisors = "the Logistics Officer"
+	title = "Cargo Technician"
+	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
 	ideal_character_age = 21
@@ -613,7 +613,7 @@
 
 /datum/job/janitor
 	title = "Sanitation Technician"
-	supervisors = "the Viscount"
+	supervisors = "the Executive Officer"
 	minimal_player_age = 16
 	economic_modifier = 1
 	ideal_character_age = 21
