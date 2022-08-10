@@ -138,6 +138,7 @@ var/global/list/valid_bloodtypes = list("A+", "A-", "B+", "B-", "AB+", "AB-", "O
 	. += "(<a href='?src=\ref[src];random=1'>&reg;</A>)"
 	. += "<br>"
 
+/*
 	if(config.use_cortical_stacks)
 		. += "Neural lace: "
 		if(mob_species.spawn_flags & SPECIES_NO_LACE)
@@ -146,6 +147,7 @@ var/global/list/valid_bloodtypes = list("A+", "A-", "B+", "B-", "AB+", "AB-", "O
 			. += pref.has_cortical_stack ? "present." : "<b>not present.</b>"
 			. += " \[<a href='byond://?src=\ref[src];toggle_stack=1'>toggle</a>\]"
 		. += "<br>"
+*/
 
 	//. += "Species: <a href='?src=\ref[src];show_species=1'>[pref.species]</a><br>"
 	//if(/datum/species/nabber)

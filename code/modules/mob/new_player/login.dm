@@ -4,6 +4,7 @@
 	name = "Interpost Hague" // god bless us
 	desc = "This shouldn't be read."
 	screen_loc = "WEST,SOUTH"
+	mouse_opacity = 0
 
 /obj/effect/lobby_image/Initialize()
 	icon = GLOB.using_map.lobby_icon
