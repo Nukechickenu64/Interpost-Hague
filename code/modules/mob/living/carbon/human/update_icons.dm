@@ -123,29 +123,30 @@ Please contact me on #coderbus IRC. ~Carn x
 #define UNDERWEAR_LAYER         5
 #define UNIFORM_LAYER			6
 #define ID_LAYER				7
-#define SHOES_LAYER				8
-#define GLOVES_LAYER			9
-#define BELT_LAYER				10
-#define SUIT_LAYER				11
-#define TAIL_LAYER				12		//bs12 specific. this hack is probably gonna come back to haunt me
-#define GLASSES_LAYER			13
-#define BELT_LAYER_ALT			14
-#define SUIT_STORE_LAYER		15
-#define BACK_LAYER				16
-#define HAIR_LAYER				17		//TODO: make part of head layer?
-#define GOGGLES_LAYER			18
-#define EARS_LAYER				19
-#define FACEMASK_LAYER			20
-#define HEAD_LAYER				21
-#define COLLAR_LAYER			22
-#define HANDCUFF_LAYER			23
-#define L_HAND_LAYER			24
-#define R_HAND_LAYER			25
-#define FIRE_LAYER				26		//If you're on fire
-#define TARGETED_LAYER			27		//BS12: Layer for the target overlay from weapon targeting system
-#define BANDAGES_LAYER			28
-#define BLEEDING_LAYER			29
-#define TOTAL_LAYERS			29
+#define AMULET_LAYER			8
+#define SHOES_LAYER				9
+#define GLOVES_LAYER			10
+#define BELT_LAYER				11
+#define SUIT_LAYER				12
+#define TAIL_LAYER				13		//bs12 specific. this hack is probably gonna come back to haunt me
+#define GLASSES_LAYER			14
+#define BELT_LAYER_ALT			15
+#define SUIT_STORE_LAYER		16
+#define BACK_LAYER				17
+#define HAIR_LAYER				18		//TODO: make part of head layer?
+#define GOGGLES_LAYER			19
+#define EARS_LAYER				20
+#define FACEMASK_LAYER			21
+#define HEAD_LAYER				22
+#define COLLAR_LAYER			23
+#define HANDCUFF_LAYER			24
+#define L_HAND_LAYER			25
+#define R_HAND_LAYER			26
+#define FIRE_LAYER				27		//If you're on fire
+#define TARGETED_LAYER			28		//BS12: Layer for the target overlay from weapon targeting system
+#define BANDAGES_LAYER			29
+#define BLEEDING_LAYER			30
+#define TOTAL_LAYERS			31
 //////////////////////////////////
 
 /mob/living/carbon/human
@@ -452,6 +453,7 @@ var/global/list/damage_icon_parts = list()
 	update_hair(0)
 	update_inv_w_uniform(0)
 	update_inv_wear_id(0)
+	update_inv_wear_amulet(0)
 	update_inv_gloves(0)
 	update_inv_glasses(0)
 	update_inv_ears(0)
@@ -500,6 +502,14 @@ var/global/list/damage_icon_parts = list()
 	BITSET(hud_updateflag, WANTED_HUD)
 
 	if(update_icons)   update_icons()
+
+/mob/living/carbon/human/update_inv_wear_amulet(var/update_icons=1)
+	if(wear_amulet)
+		overlays_standing[AMULET_LAYER] = wear_amulet.get_mob_overlay(src,slot_wear_amulet_str)
+	else
+		overlays_standing[AMULET_LAYER] = null
+	if(update_icons)
+		update_icons()
 
 /mob/living/carbon/human/update_inv_gloves(var/update_icons=1)
 	if(gloves && !(wear_suit && wear_suit.flags_inv & HIDEGLOVES))
@@ -812,6 +822,7 @@ var/global/list/damage_icon_parts = list()
 #undef SURGERY_LEVEL
 #undef UNIFORM_LAYER
 #undef ID_LAYER
+#undef AMULET_LAYER
 #undef SHOES_LAYER
 #undef GLOVES_LAYER
 #undef EARS_LAYER
