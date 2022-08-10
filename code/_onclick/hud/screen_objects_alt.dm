@@ -21,8 +21,17 @@
 	master = null
 	return ..()
 
+/obj/screen/text
+	icon = null
+	icon_state = null
+	mouse_opacity = 0
+	screen_loc = "CENTER-7,CENTER-7"
+	maptext_height = 480
+	maptext_width = 480
+
 /obj/screen/inventory
 	var/slot_id	//The indentifier for the slot. It has nothing to do with ID cards.
+	var/list/object_overlays = list() // Required for inventory/screen overlays.
 
 /obj/screen/close
 	name = "close"
@@ -35,6 +44,7 @@
 			var/obj/item/weapon/storage/S = master
 			S.close(usr)
 	return 1
+
 
 /obj/screen/item_action
 	var/obj/item/owner
