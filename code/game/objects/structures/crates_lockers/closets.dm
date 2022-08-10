@@ -22,6 +22,8 @@
 							  //then open it in a populated area to crash clients.
 	var/open_sound = 'sound/effects/locker_open.ogg'
 	var/close_sound = 'sound/effects/locker_close.ogg'
+	var/unlock_sound = 'sound/machines/locker_unlock.ogg'
+	var/lock_sound = 'sound/machines/locker_lock.ogg'
 
 	var/storage_types = CLOSET_STORAGE_ALL
 	var/setup = CLOSET_CAN_BE_WELDED
@@ -509,6 +511,10 @@
 	if(CanToggleLock(user, id_card))
 		locked = !locked
 		visible_message("<span class='notice'>\The [src] has been [locked ? null : "un"]locked by \the [user].</span>", range = 3)
+		if(locked)
+			playsound(src.loc, unlock_sound, 35, 1, -3)
+		else if (!locked)
+			playsound(src.loc, lock_sound, 35, 1, -3)
 		update_icon()
 		return TRUE
 	else
