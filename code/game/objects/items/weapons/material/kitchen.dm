@@ -57,6 +57,7 @@
 	name = "fork"
 	desc = "It's a fork. Sure is pointy."
 	icon_state = "fork"
+	drop_sound 'sound/items/drop_small.ogg'
 
 /obj/item/weapon/material/kitchen/utensil/fork/plastic
 	default_material = "plastic"
@@ -67,6 +68,7 @@
 	icon_state = "spoon"
 	attack_verb = list("attacked", "poked")
 	force_divisor = 0.1 //2 when wielded with weight 20 (steel)
+	drop_sound 'sound/items/drop_small.ogg'
 
 /obj/item/weapon/material/kitchen/utensil/spoon/plastic
 	default_material = "plastic"
@@ -82,6 +84,7 @@
 	scoop_food = 0
 	sharp = 1
 	edge = 1
+	drop_sound = 'sound/items/knife_drop.ogg'
 
 // Identical to the tactical knife but nowhere near as stabby.
 // Kind of like the toy esword compared to the real thing.
@@ -127,6 +130,7 @@
 	default_material = "wood"
 	force_divisor = 0.7 // 10 when wielded with weight 15 (wood)
 	thrown_force_divisor = 1 // as above
+	drop_sound = 'sound/items/wooden_drop.ogg'
 
 /obj/item/weapon/material/kitchen/rollingpin/attack(mob/living/M as mob, mob/living/user as mob)
 	if ((CLUMSY in user.mutations) && prob(50))

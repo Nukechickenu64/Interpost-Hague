@@ -25,6 +25,8 @@
 	possible_transfer_amounts = "5;10;15;30"
 	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 
+	drop_sound = 'sound/items/drop_glass.ogg'
+
 /obj/item/weapon/reagent_containers/food/drinks/glass2/examine(mob/M as mob)
 	. = ..()
 

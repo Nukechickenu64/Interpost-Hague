@@ -15,6 +15,8 @@
 
 	pull_sound = "pull_glass"
 
+	drop_sound = 'sound/items/drop_glass.ogg'
+
 /obj/item/weapon/reagent_containers/food/drinks/on_reagent_change()
 	update_icon()
 	return

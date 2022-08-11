@@ -15,6 +15,8 @@
 
 	var/insrank = null
 
+	drop_sound = 'sound/items/drop_clothing.ogg'
+
 // Updates the icons of the mob wearing the clothing item, if any.
 /obj/item/clothing/proc/update_clothing_icon()
 	return

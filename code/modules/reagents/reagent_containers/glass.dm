@@ -16,6 +16,7 @@
 	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 	unacidable = 1 //glass doesn't dissolve in acid
 
+	drop_sound = 'sound/items/drop_glass.ogg'
 
 	var/list/can_be_placed_into = list(
 		/obj/machinery/chem_master/,
