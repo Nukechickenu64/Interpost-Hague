@@ -305,12 +305,14 @@ proc/get_radio_key_from_channel(var/channel)
 	var/speech_bubble_test = say_test(message)
 	var/image/speech_bubble = image('icons/mob/talk.dmi',src,"h[speech_bubble_test]")
 
+/*
 	for (var/atom/movable/AM in get_above_oo())
 		var/turf/ST = get_turf(AM)
 		if(ST)
 			get_mobs_and_objs_in_view_fast(ST, message_range, listening, listening_obj, /datum/client_preference/ghost_ears)
 			var/image/z_speech_bubble = image('icons/mob/talk.dmi', AM, "h[speech_bubble_test]")
 			QDEL_IN(z_speech_bubble, 30)
+*/
 
 	var/list/speech_bubble_recipients = list()
 	for(var/mob/M in listening)
