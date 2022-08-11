@@ -12,6 +12,7 @@
 	var/list/mob_overlay = list()
 	var/overlay_state = null
 	var/list/accessory_icons = list(slot_w_uniform_str = 'icons/mob/onmob/ties.dmi', slot_wear_suit_str = 'icons/mob/onmob/ties.dmi')
+	var/list/slim_accessory_icons = list(slot_w_uniform_str = 'icons/mob/onmob/ties_slim.dmi', slot_wear_suit_str = 'icons/mob/onmob/ties_slim.dmi')
 	sprite_sheets = list(
 		SPECIES_NABBER = 'icons/mob/species/nabber/ties.dmi',
 		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/ties.dmi'
@@ -57,6 +58,8 @@
 		var/use_sprite_sheet = accessory_icons[slot]
 		if(sprite_sheets[bodytype])
 			use_sprite_sheet = sprite_sheets[bodytype]
+		if(user_human.gender == FEMALE && user_human.species.name == SPECIES_HUMAN)
+			use_sprite_sheet = slim_accessory_icons[slot]
 
 		if(icon_override && ("[tmp_icon_state]_mob" in icon_states(icon_override)))
 			return overlay_image(icon_override, "[tmp_icon_state]_mob", color, RESET_COLOR)

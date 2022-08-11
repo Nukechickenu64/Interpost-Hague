@@ -380,7 +380,7 @@ var/global/list/damage_icon_parts = list()
 	for(var/entry in worn_underwear)
 		var/obj/item/underwear/UW = entry
 
-		var/image/I = image(icon = UW.icon, icon_state = UW.icon_state)
+		var/image/I = image(icon = UW.icon, icon_state = UW.CheckGender(src, icon_state))
 		I.appearance_flags = RESET_COLOR | PIXEL_SCALE
 		I.color = UW.color
 

@@ -8,9 +8,9 @@
 	temperature = T20C
 	thermal_conductivity = OPEN_HEAT_TRANSFER_COEFFICIENT
 	var/static/list/dust_cache
-	var/obj/skybox/stars
 	permit_ao = FALSE
 	appearance_flags = TILE_BOUND | PIXEL_SCALE | TILE_MOVER
+	var/dirt = 0
 
 /turf/space/Initialize()
 	. = ..()
