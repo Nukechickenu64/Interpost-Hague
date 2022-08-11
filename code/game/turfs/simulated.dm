@@ -85,66 +85,73 @@
 	. = ..()
 
 /turf/simulated/Entered(atom/A, atom/OL)
-	if (istype(A,/mob/living))
-		var/mob/living/M = A
-		if(M.lying)
-			return ..()
+	. = ..()
+	if (istype(A))
+		A.OnSimulatedTurfEntered(src)
 
-		// Dirt overlays.
-		update_dirt()
+/atom/proc/OnSimulatedTurfEntered(turf/simulated/T)
+	set waitfor = FALSE
+	return
 
-		if(istype(M, /mob/living/carbon/human))
+/mob/living/OnSimulatedTurfEntered(turf/simulated/T, atom/A)
+	var/mob/living/M = A
+	var/mob/living/carbon/human/H = M
+
+	T.update_dirt()
+
+	HandleBloodTrail(T)
+
+	if(lying || !T.wet)
+		return
+
+	if(H.buckled || (H.m_intent == "walk" && prob(min(100, 100/(T.wet/10))) ) )
+		return
+
+	var/slip_dist = 1
+	var/slip_stun = 6
+	var/floor_type = "wet"
+
+	if(2 <= T.wet) // Lube
+		floor_type = "slippery"
+		slip_dist = 4
+		slip_stun = 10
+
+	if(slip("the [floor_type] floor", slip_stun))
+		for(var/i = 1 to slip_dist)
+			step(src, dir)
+			sleep(1)
+
+/mob/living/proc/HandleBloodTrail(turf/simulated/T)
+	return
+
+/mob/living/carbon/human/HandleBloodTrail(turf/simulated/T, atom/A)
+	// Tracking blood
+	var/list/bloodDNA = null
+	var/bloodcolor = ""
+	if(shoes)
+		if (istype(A,/mob/living))
+			var/mob/living/M = A
 			var/mob/living/carbon/human/H = M
-			// Tracking blood
-			var/list/bloodDNA = null
-			var/bloodcolor=""
-			if(H.shoes)
-				var/obj/item/clothing/shoes/S = H.shoes
-				if(istype(S))
-					S.handle_movement(src,(H.m_intent == "run" ? 1 : 0))
-					if(S.track_blood && S.blood_DNA)
-						bloodDNA = S.blood_DNA
-						bloodcolor=S.blood_color
-						S.track_blood--
-			else
-				if(H.track_blood && H.feet_blood_DNA)
-					bloodDNA = H.feet_blood_DNA
-					bloodcolor = H.feet_blood_color
-					H.track_blood--
+			var/obj/item/clothing/shoes/S = shoes
+			if(istype(S))
+				S.handle_movement(src,(H.m_intent == "run" ? 1 : 0))
+				if(S.track_blood && S.blood_DNA)
+					bloodDNA = S.blood_DNA
+					bloodcolor = S.blood_color
+					S.track_blood--
+	else
+		if(track_blood && feet_blood_DNA)
+			bloodDNA = feet_blood_DNA
+			bloodcolor = feet_blood_color
+			track_blood--
 
-			if (bloodDNA)
-				src.AddTracks(H.species.get_move_trail(H),bloodDNA,H.dir,0,bloodcolor) // Coming
-				var/turf/simulated/from = get_step(H,reverse_direction(H.dir))
-				if(istype(from) && from)
-					from.AddTracks(H.species.get_move_trail(H),bloodDNA,0,H.dir,bloodcolor) // Going
+	if (bloodDNA && species.get_move_trail(src))
+		T.AddTracks(species.get_move_trail(src),bloodDNA, dir, 0, bloodcolor) // Coming
+		var/turf/simulated/from = get_step(src, GLOB.reverse_dir[dir])
+		if(istype(from))
+			from.AddTracks(species.get_move_trail(src), bloodDNA, 0, dir, bloodcolor) // Going
 
-				bloodDNA = null
-
-		if(src.wet)
-
-			if(M.buckled || (M.m_intent == "walk" && prob(min(100, 100/(wet/10))) ) )
-				return
-
-			var/slip_dist = 1
-			var/slip_stun = 6
-			var/floor_type = "wet"
-
-			if(2 <= src.wet) // Lube
-				floor_type = "slippery"
-				slip_dist = 4
-				slip_stun = 10
-
-			if(M.Process_Spaceslipping(75))
-				M.slip("the [floor_type] floor", slip_stun)
-				for(var/i = 1 to slip_dist)
-					step(M, M.dir)
-					sleep(1)
-			else
-				M.inertia_dir = 0
-		else
-			M.inertia_dir = 0
-
-	..()
+		bloodDNA = null
 
 //returns 1 if made bloody, returns 0 otherwise
 /turf/simulated/add_blood(mob/living/carbon/human/M as mob)

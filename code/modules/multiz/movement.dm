@@ -230,6 +230,7 @@
 		visible_message("\The [src] falls from the deck above through \the [landing]!", "You hear a whoosh of displaced air.")
 	else
 		visible_message("\The [src] falls from the deck above and slams into \the [landing]!", "You hear something slam into the deck.")
+		playsound(src.loc, 'sound/weapons/tablehit1.ogg', 100, 1)
 		if(fall_damage())
 			for(var/mob/living/M in landing.contents)
 				visible_message("\The [src] hits \the [M.name]!")
@@ -253,7 +254,7 @@
 		return
 
 	if(!istype(landing, /turf/simulated/open))
-		if(statcheck(stats[STAT_DX], 12, "You completely fail the landing.", "dex") && !lying)  //Gotta be dexterous to land when falling
+		if(statcheck(stats[STAT_DX], 14, "You completely fail the landing.", "dex") && !lying)  //Gotta be VERY dexterous to land when falling
 			to_chat(src, "<span class = 'notice'>You land softly.</span>")
 			return
 		/* We've fallen badly for sure, now we see how bad, and apply damage accordingly.
@@ -267,7 +268,7 @@
 			to_chat(src, "<span class='danger'>You manage to get your feet under you.</span>")
 			apply_damage(rand(0, damage), BRUTE, BP_L_LEG)
 			apply_damage(rand(0, damage), BRUTE, BP_R_LEG)
-		else if(statcheck(stats[STAT_DX], 8, 0, "dex"))
+		else if(statcheck(stats[STAT_DX], 10, 0, "dex"))
 			to_chat(src, "<span class='danger'>You catch yourself on your hands and feel a jolt of pain.</span>")
 			apply_damage(rand(0, damage), BRUTE, BP_L_ARM)
 			apply_damage(rand(0, damage), BRUTE, BP_R_ARM)
@@ -276,6 +277,9 @@
 			damage = 35
 			to_chat(src, "<span class='danger'><font size=3>You land square on your face.  Ouch.</font></span>")
 			apply_damage(rand(0, damage), BRUTE, BP_HEAD)
+			apply_damage(rand(0, damage), BRUTE, BP_L_ARM)
+			apply_damage(rand(0, damage), BRUTE, BP_R_ARM)
+			apply_damage(rand(0, damage), BRUTE, BP_CHEST)
 		Stun(1)
 		Weaken(1)
 		updatehealth()
