@@ -117,8 +117,6 @@
 			if(!(receptions.receiver_reception[PDA] & TELECOMMS_RECEPTION_RECEIVER))
 				continue
 
-			PDA.new_news(annoncement)
-
 var/datum/feed_network/news_network = new /datum/feed_network     //The global news-network, which is coincidentally a global list.
 
 var/list/obj/machinery/newscaster/allCasters = list() //Global list that will contain reference to all newscasters in existence.

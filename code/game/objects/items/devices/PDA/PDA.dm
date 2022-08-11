@@ -5,7 +5,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 /obj/item/device/pda
 	name = "\improper PDA"
-	desc = "A portable microcomputer by Thinktronic Systems, LTD. Functionality determined by a preprogrammed ROM cartridge."
+	desc = "A portable microcomputer by TetraCorp Personal Devices. Functionality determined by a preprogrammed ROM cartridge."
 	icon = 'icons/obj/pda.dmi'
 	icon_state = "pda"
 	item_state = "electronic"
@@ -37,7 +37,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/lock_code = "" // Lockcode to unlock uplink
 	var/honkamt = 0 //How many honks left when infected with honk.exe
 	var/mimeamt = 0 //How many silence left when infected with mime.exe
-	var/note = "Thank you for choosing the Thinktronic 5230 Personal Data Assistant!" //Current note in the notepad function
+	var/note = "Welcome to your personal device assistant, crewmember." //Current note in the notepad function
 	var/notehtml = ""
 	var/cart = "" //A place to stick cartridge menu information
 	var/detonate = 1 // Can the PDA be blown up?
@@ -432,14 +432,14 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 	data["stationTime"] = stationtime2text()
 	data["new_Message"] = new_message
-	data["new_News"] = new_news
+	//data["new_News"] = new_news
 
 	var/datum/reception/reception = get_reception(src, do_sleep = 0)
 	var/has_reception = reception.telecomms_reception & TELECOMMS_RECEPTION_SENDER
 	data["reception"] = has_reception
 
-	if(mode==41)
-		data["crew_manifest"] = html_crew_manifest(1, 0)
+	//if(mode==41)
+		//data["crew_manifest"] = html_crew_manifest(1, 0)
 
 	if(mode==2)
 		var/convopdas[0]
@@ -471,6 +471,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				data["convo_job"] = sanitize(c["job"])
 				break
 
+/*
 	if(mode==3)
 		var/turf/T = get_turf(user.loc)
 		if(!isnull(T))
@@ -497,6 +498,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 					)
 		if(isnull(data["aircontents"]))
 			data["aircontents"] = list("reading" = 0)
+*/
+
 	if(mode==6)
 		if(has_reception)
 			feeds.Cut()
@@ -634,20 +637,27 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			mode = 2
 		if("21")//Read messages
 			mode = 21
+/*
 		if("3")//Atmos scan
 			mode = 3
+*/
+
 		if("4")//Redirects to hub
 			mode = 0
+
+/*
 		if("chatroom") // chatroom hub
 			mode = 5
 		if("41") //Manifest
 			mode = 41
+*/
 
 
 //MAIN FUNCTIONS===================================
 
 		if("Light")
 			toggle_light()
+/*
 		if("Medical Scan")
 			if(scanmode == 1)
 				scanmode = 0
@@ -672,6 +682,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				scanmode = 0
 			else if((!isnull(cartridge)) && (cartridge.access_atmos))
 				scanmode = 5
+*/
 
 //MESSENGER/NOTE FUNCTIONS===================================
 
@@ -720,6 +731,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			else
 				ui.close()
 				return 0
+/*
 		if("Newstone")
 			var/t = input(U, "Please enter new news tone", name, newstone) as text
 			if (in_range(src, U) && loc == U)
@@ -729,6 +741,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			else
 				ui.close()
 				return 0
+*/
+
 		if("Message")
 
 			var/obj/item/device/pda/P = locate(href_list["target"])
@@ -840,6 +854,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				ui.close()
 				return 0
 
+/*
 //pAI FUNCTIONS===================================
 		if("pai")
 			if(pai)
@@ -859,16 +874,18 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			mode = text2num(href_list["choice"])
 			if(cartridge)
 				cartridge.mode = mode
-
+*/
 //EXTRA FUNCTIONS===================================
 
 	if (mode == 2||mode == 21)//To clear message overlays.
 		new_message = 0
 		update_icon()
 
+/*
 	if (mode == 6||mode == 61)//To clear news overlays.
 		new_news = 0
 		update_icon()
+*/
 
 	if ((honkamt > 0) && (prob(60)))//For clown virus.
 		honkamt--
@@ -1056,6 +1073,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			to_chat(L, reception_message)
 		SSnano.update_user_uis(L, src) // Update the receiving user's PDA UI so that they can see the new message
 
+/*
 /obj/item/device/pda/proc/new_news(var/message)
 	new_info(news_silent, newstone, news_silent ? "" : "\icon[src] <b>[message]</b>")
 
@@ -1063,8 +1081,10 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		new_news = 1
 		update_icon()
 
+
 /obj/item/device/pda/ai/new_news(var/message)
 	// Do nothing
+*/
 
 /obj/item/device/pda/proc/new_message_from_pda(var/obj/item/device/pda/sending_device, var/message)
 	new_message(sending_device, sending_device.owner, sending_device.ownjob, message)
@@ -1345,9 +1365,6 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 		// Inform the user
 		to_chat(user, "<span class='notice'>Paper scanned and OCRed to notekeeper.</span>")//concept of scanning paper copyright brainoblivion 2009
-
-
-
 
 /obj/item/device/pda/proc/explode() //This needs tuning. //Sure did.
 	if(!src.detonate) return
