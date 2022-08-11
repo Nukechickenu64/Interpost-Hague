@@ -104,6 +104,8 @@
 	var/halluci = 0
 	quench_amount = 5
 
+	reagent_addiction_strength = 1
+
 	glass_name = "ethanol"
 	glass_desc = "A well-known alcohol with a variety of applications."
 

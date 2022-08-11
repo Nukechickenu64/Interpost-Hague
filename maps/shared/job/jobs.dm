@@ -834,3 +834,23 @@
 /obj/item/clothing/under/ert/raider
 	name = "raiders uniform"
 */
+
+/mob/living/proc/assign_random_quirk()
+	if(prob(50))//50% of not choosing a quirk at all.
+		return
+	var/list/random_quirks = list()
+	for(var/thing in subtypesof(/datum/quirk))//Populate possible quirks list.
+		var/datum/quirk/Q = thing
+		random_quirks += Q
+	if(!random_quirks.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/quirk/chosen_quirk = pick(random_quirks)
+	src.quirk = new chosen_quirk
+	to_chat(src, "<span class='notice'>I remember what's wrong with me. I am [quirk.name]. [quirk.description]</span>")
+	switch(chosen_quirk)
+		if(/datum/quirk/cig_addict)
+			var/datum/reagent/new_reagent = new /datum/reagent/nicotine
+			src.reagents.addiction_list.Add(new_reagent)
+		if(/datum/quirk/alcoholic)
+			var/datum/reagent/new_reagent = new /datum/reagent/ethanol
+			src.reagents.addiction_list.Add(new_reagent)

@@ -617,6 +617,7 @@
 	color = "#684b3c"
 	scannable = 1
 	var/nicotine = REM * 0.2
+	reagent_addiction_strength = 2
 
 /datum/reagent/tobacco/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()

@@ -355,10 +355,10 @@
 
 //Hardcore mode stuff
 
-#define STARVATION_MIN 60 //If you have less nutrition than this value, the hunger indicator starts flashing
-#define STARVATION_NOTICE 45 //If you have more nutrition than this value, you get an occasional message reminding you that you're going to starve soon
-#define STARVATION_WEAKNESS 20 //Otherwise, if you have more nutrition than this value, you occasionally become weak and receive minor damage
-#define STARVATION_NEARDEATH 5 //Otherwise, if you have more nutrition than this value, you have seizures and occasionally receive damage
+#define STARVATION_MIN 150 //If you have less nutrition than this value, the hunger indicator starts flashing
+#define STARVATION_NOTICE 125 //If you have more nutrition than this value, you get an occasional message reminding you that you're going to starve soon
+#define STARVATION_WEAKNESS 100 //Otherwise, if you have more nutrition than this value, you occasionally become weak and receive minor damage
+#define STARVATION_NEARDEATH 50 //Otherwise, if you have more nutrition than this value, you have seizures and occasionally receive damage
 
 //If you have less nutrition than STARVATION_NEARDEATH, you start getting damage
 #define STARVATION_OXY_DAMAGE 2.5

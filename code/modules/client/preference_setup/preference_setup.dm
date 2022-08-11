@@ -83,7 +83,9 @@ var/const/CHARACTER_PREFERENCE_INPUT_TITLE = "Character Preference"
 	for(var/datum/category_group/player_setup_category/PS in categories)
 		if(PS == selected_category)
 			dat += "[PS.name] "	// TODO: Check how to properly mark a href/button selected in a classic browser window
+			dat += "  "
 		else
+			dat += "  "
 			dat += "<a href='?src=\ref[src];category=\ref[PS]'>[PS.name]</a> "
 	return dat
 

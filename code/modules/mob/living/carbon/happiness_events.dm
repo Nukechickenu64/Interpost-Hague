@@ -30,8 +30,6 @@
 	description = "<span class='danger'>I NEED WATER!</span>\n"
 	happiness = -14
 
-
-
 //nutrition
 /datum/happiness_event/nutrition/fat
 	description = "<span class='warning'><B>I'm so fat..</B></span>\n" //muh fatshaming
@@ -81,8 +79,6 @@
 	happiness = 5
 	timeout = 1800
 
-
-
 //Disgust
 /datum/happiness_event/disgust/gross
 	description = "<span class='warning'>That was gross.</span>\n"
@@ -99,8 +95,6 @@
 	happiness = -6
 	timeout = 1800
 
-
-
 //Generic events
 /datum/happiness_event/favorite_food
 	description = "<span class='info'>I really liked eating that.</span>\n"
@@ -116,21 +110,6 @@
 	description = "<span class='warning'>I guess my antics finally caught up with me..</span>\n"
 	happiness = -1
 
-/datum/happiness_event/booze
-	description = "<span class='info'>Alcohol makes the pain go away.</span>\n"
-	happiness = 3
-	timeout = 2400
-
-/datum/happiness_event/relaxed//For nicotine.
-	description = "<span class='info'>I feel relaxed.</span>\n"
-	happiness = 1
-	timeout = 1800
-
-/datum/happiness_event/antsy//Withdrawl.
-	description = "<span class='danger'>I could use a smoke.</span>\n"
-	happiness = -3
-	timeout = 1800
-
 /datum/happiness_event/hot_food //Hot food feels good!
 	description = "<span class='info'>I've eaten something warm.</span>\n"
 	happiness = 3
@@ -140,12 +119,6 @@
 	description = "<span class='info'>I've had something refreshing.</span>\n"
 	happiness = 3
 	timeout = 1800
-
-/datum/happiness_event/high
-	description = "<span class='binfo'>I'm high as fuck</span>\n"
-	happiness = 12
-
-
 
 //Embarassment
 /datum/happiness_event/hygiene/shit
@@ -198,6 +171,16 @@
 	description = "<span class='danger'>HE'S CUTTING ME OPEN!!</span>\n"
 	happiness = -8
 
+/datum/happiness_event/verymildpain
+	description = "<span class='danger'>I feel some pain...</span>\n"
+	happiness = -4
+	timeout = 1800
+
+/datum/happiness_event/mildpain
+	description = "<span class='danger'>It hurts...a lot.</span>\n"
+	happiness = -6
+	timeout = 1800
+
 /datum/happiness_event/pain
 	description = "<span class='danger'>IT HURTS SO MUCH!</span>\n"
 	happiness = -10
@@ -218,3 +201,39 @@
 	description = "<span class='danger'>I shouldn't have taken so much drugs!</span>\n"
 	happiness = -15
 	timeout = 1800
+
+// Addiction Events
+
+/datum/happiness_event/addiction/withdrawal_small
+	description = "<span class='danger'>I don't indulge in my addiction.</span>\n"
+	happiness = -3
+	timeout = FALSE
+
+/datum/happiness_event/addiction/withdrawal_medium
+	description = "<span class='danger'>I don't indulge in my addiction, that makes me unhappy!.</span>\n"
+	happiness = -5
+	timeout = FALSE
+
+/datum/happiness_event/addiction/withdrawal_large
+	description = "<span class='danger'>I don't indulge in my addiction, that makes me very unhappy!.</span>\n"
+	happiness = -10
+	timeout = FALSE
+
+/datum/happiness_event/addiction/withdrawal_extreme
+	description = "<span class='danger'>I DON'T INDULGE IN MY ADDICTION, MY DAY IS SHIT!!.</span>\n"
+	happiness = -12
+	timeout = FALSE
+
+/datum/happiness_event/high
+	description = "<span class='binfo'>I'm high as fuck</span>\n"
+	happiness = 12
+
+/datum/happiness_event/relaxed
+	description = "<span class='binfo'>That cigarette was good.</span>\n"
+	happiness = 10
+	timeout = 1800
+
+/datum/happiness_event/booze
+	description = "<span class='binfo'>Alcohol makes the pain go away.</span>\n"
+	happiness = 10
+	timeout = 2400

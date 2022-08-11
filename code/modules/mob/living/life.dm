@@ -43,6 +43,9 @@
 /mob/living/proc/handle_breathing()
 	return
 
+/mob/living/proc/handle_stomach()
+	return
+
 /mob/living/proc/handle_mutations_and_radiation()
 	return
 

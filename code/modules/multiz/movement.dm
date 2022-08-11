@@ -254,7 +254,7 @@
 		return
 
 	if(!istype(landing, /turf/simulated/open))
-		if(statcheck(stats[STAT_DX], 14, "You completely fail the landing.", "dex") && !lying)  //Gotta be VERY dexterous to land when falling
+		if(statcheck(stats[STAT_DX], 12, 0, "dex") && !lying)  //Gotta be dexterous to land when falling
 			to_chat(src, "<span class = 'notice'>You land softly.</span>")
 			return
 		/* We've fallen badly for sure, now we see how bad, and apply damage accordingly.
@@ -263,12 +263,12 @@
 		   Even worse, we smash our face into the ground.
 		*/
 		playsound(src.loc, 'sound/effects/gore/fallsmash.ogg', 75, 1)//Splat
-		var/damage = 15
-		if(statcheck(stats[STAT_DX], 12, 0, "dex")	)
+		var/damage = 25
+		if(statcheck(stats[STAT_DX], 10, 0, "dex")	)
 			to_chat(src, "<span class='danger'>You manage to get your feet under you.</span>")
 			apply_damage(rand(0, damage), BRUTE, BP_L_LEG)
 			apply_damage(rand(0, damage), BRUTE, BP_R_LEG)
-		else if(statcheck(stats[STAT_DX], 10, 0, "dex"))
+		else if(statcheck(stats[STAT_DX], 8, 0, "dex"))
 			to_chat(src, "<span class='danger'>You catch yourself on your hands and feel a jolt of pain.</span>")
 			apply_damage(rand(0, damage), BRUTE, BP_L_ARM)
 			apply_damage(rand(0, damage), BRUTE, BP_R_ARM)
@@ -277,13 +277,9 @@
 			damage = 35
 			to_chat(src, "<span class='danger'><font size=3>You land square on your face.  Ouch.</font></span>")
 			apply_damage(rand(0, damage), BRUTE, BP_HEAD)
-			apply_damage(rand(0, damage), BRUTE, BP_L_ARM)
-			apply_damage(rand(0, damage), BRUTE, BP_R_ARM)
-			apply_damage(rand(0, damage), BRUTE, BP_CHEST)
 		Stun(1)
 		Weaken(1)
 		updatehealth()
-
 
 /mob/living/carbon/human/proc/climb_up(atom/A)
 	if(!isturf(loc) || !bound_overlay || bound_overlay.destruction_timer || is_physically_disabled())	// This destruction_timer check ideally wouldn't be required, but I'm not awake enough to refactor this to not need it.

@@ -157,6 +157,9 @@ var/list/gamemode_cache = list()
 	var/comms_password = ""
 	var/ban_comms_password = null
 
+	var/bot_url = ""
+	var/bot_api_key = ""
+
 	var/login_export_addr = null
 
 	var/enter_allowed = 1
@@ -415,6 +418,12 @@ var/list/gamemode_cache = list()
 
 				if ("serversuffix")
 					config.server_suffix = 1
+
+				if ("bot_url")
+					config.bot_url = value
+
+				if ("api_key")
+					config.bot_api_key = value
 
 				if ("hostedby")
 					config.hostedby = value

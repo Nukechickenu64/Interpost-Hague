@@ -35,12 +35,24 @@ mob/var/next_pain_time = 0
 
 			switch(actual_flash)
 				if(1 to 50)
+					if(has_quirk(/datum/quirk/tough))
+						return 0
 					flash_weakest_pain()
+					add_event("pain", /datum/happiness_event/verymildpain)
 				if(50 to 90)
 					flash_weak_pain()
+					if(prob(20))
+						agony_moan()
+					if(has_quirk(/datum/quirk/tough))
+						if(prob(75))
+							return 0
 					if(stuttering < 10)
 						stuttering += 5
+					add_event("pain", /datum/happiness_event/mildpain)
 				if(90 to INFINITY)
+					if(has_quirk(/datum/quirk/tough))
+						if(prob(50))
+							return 0
 					flash_pain()
 					if(stuttering < 10)
 						stuttering += 10

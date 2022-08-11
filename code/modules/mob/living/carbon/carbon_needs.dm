@@ -5,7 +5,7 @@
 	msg += "<span class='info'>I believe I am </span><font color='red'>[H.age]</font> <span class='info'>years old.</span>\n"
 	msg += "<span class='info'>Everyone knows that I am </span>[get_social_class()].\n"
 	msg += "<span class='info'>I am a </span><font color='blue'>[H.gender]</font>, <span class='info'>as well.</span>\n"
-	msg += "<span class='info'>*---------*\n<EM>Current mood</EM>\n"
+	msg += "<span class='info'>---------------------------\n<EM>Current mood:</EM><br>\n"
 	for(var/i in events)
 		var/datum/happiness_event/event = events[i]
 		msg += event.description
@@ -15,6 +15,10 @@
 	else if(happiness < MOOD_LEVEL_SAD2)
 		msg += "<span class='warning'>I am stressed out!</span>\n"
 
+	if(trait)
+		msg += 	"<br><span class='info'>I am <span class='danger'>[trait.name]</span>. [trait.description]</span>\n"
+	if(quirk)//NOT THE SAME THING AS TRAITS
+		msg += "<span class='info'>Oh lucky, I am also <span class='danger'>[quirk.name]</span>. [quirk.description]</span>\n"
 
 	msg += "</div></div>"
 	to_chat(src, msg)

@@ -21,6 +21,9 @@
 		//Random events (vomiting etc)
 		handle_random_events()
 
+		//stuff in the stomach
+		handle_stomach()
+
 		// eye, ear, brain damages
 		handle_disabilities()
 

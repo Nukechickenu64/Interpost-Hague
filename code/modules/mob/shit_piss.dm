@@ -136,26 +136,30 @@
 	if(bladder <= 0)
 		bladder = 0
 
+	if(has_quirk(/datum/quirk/no_bathroom))//You'll never have to use the restroom now.
+		bladder = 0
+		bowels = 0
+
 	if(bowels >= 250)
 		switch(bowels)
 			if(250 to 400)
-				if(prob(5))
+				if(prob(25))
 					to_chat(src, "<b>You need to use the bathroom.</b>")
 					bowels += 15
 			if(400 to 450)
-				if(prob(5))
+				if(prob(35))
 					to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 					bowels += 15
 			if(450 to 500)
 				if(prob(2))
 					handle_shit()
-				else if(prob(10))
+				else if(prob(45))
 					to_chat(src, "<span class='danger'>You're about to shit yourself!</span>")
 					bowels += 25
 			if(500 to 550)
 				if(prob(15))
 					handle_shit()
-				else if(prob(30))
+				else if(prob(60))
 					to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO SHIT!</span>")
 					bowels += 35
 			if(550 to INFINITY)
@@ -164,21 +168,21 @@
 	if(bladder >= 100)//Your bladder is smaller than your colon
 		switch(bladder)
 			if(100 to 250)
-				if(prob(5))
+				if(prob(25))
 					to_chat(src, "<b>You need to use the bathroom.</b>")
 					bladder += 15
 			if(250 to 400)
-				if(prob(5))
+				if(prob(25))
 					to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 					bladder += 15
 			if(400 to 500)
-				if(prob(2))
+				if(prob(45))
 					handle_piss()
 				else if(prob(10))
 					to_chat(src, "<span class='danger'>You're about to piss yourself!</span>")
 					bladder += 25
 			if(500 to 550)
-				if(prob(15))
+				if(prob(60))
 					handle_piss()
 				else if(prob(30))
 					to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO PEE!</span>")

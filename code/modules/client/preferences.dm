@@ -11,6 +11,7 @@
 	var/muted = 0
 	var/last_ip
 	var/last_id
+	var/is_bordered = 0
 
 	//game-preferences
 	var/lastchangelog = ""				//Saved changlog filesize to detect if there was a change
@@ -57,32 +58,54 @@
 	if(!user || !user.client)
 		return
 
-	if(!get_mob_by_key(client_ckey))
-		to_chat(user, "<span class='danger'>No mob exists for the given client!</span>")
-		close_load_dialog(user)
-		return
-
-	var/dat = "<html><body><center>"
-
+	var/dat = "<html><head><title>Lobby Menu</title>"
+	dat += "<style type='text/css'>html {overflow: auto;};"
+	dat += "body {"
+	dat += "overflow:hidden;"
+	dat += "font-family: Futura, sans-serif;"
+	dat += "font-size: 17px;"
+	dat += "background-repeat:repeat-x;"
+	dat += "border: 4px ridge #2f303d;"
+	dat += "}"
+	dat += "a {text-decoration:none;outline: none;border: none;margin:-1px;}"
+	dat += "a:focus{outline:none;border: none;}"
+	dat += "a:hover {Color:#0d0d0d;background:#ababb3;outline: none;border: none; text-decoration:none;}"
+	dat += "a.active { text-decoration:none; Color:#533333;border: none;}"
+	dat += "a.inactive:hover {Color:#0d0d0d;background:#bb0000;border: none;}"
+	dat += "a.active:hover {Color:#bb0000;background:#0f0f0f;}"
+	dat += "a.inactive:hover { text-decoration:none; Color:#0d0d0d; background:#bb0000;border: none;}"
+	dat += "a img {     border: 0; }"
+	dat += "TABLE.winto {"
+	dat += "z-index:-1;"
+	dat += "position: absolute;"
+	dat += "top: 12;"
+	dat += "left:14;"
+	dat += "background-position: bottom;"
+	dat += "background-repeat:repeat-x;"
+	dat += "border: 4px ridge #2f303d;"
+	dat += "}"
+	dat += "TR {"
+	dat += "border: 0px;"
+	dat += "}"
+	dat += "span.job_class {Color:#000000;}"
+	dat += "</style>"
+	dat += "</head>"
+	dat += "<body bgcolor='#000000' text='#c9c9c9' alink='#333553' vlink='#533333' link='#a6a6a6'>"
+	dat += "<p align ='right'>"
+	dat += "</p>"
+	dat += "<br>"
 	if(path)
-		dat += "Slot - "
-		dat += "<a href='?src=\ref[src];load=1'>Load slot</a> - "
-		dat += "<a href='?src=\ref[src];save=1'>Save slot</a> - "
-		dat += "<a href='?src=\ref[src];resetslot=1'>Reset slot</a> - "
-		dat += "<a href='?src=\ref[src];reload=1'>Reload slot</a>"
-
-	else
-		dat += "Please create an account to save your preferences."
-
+		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];save=1'>Save Slot</a> --- "
+		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];resetslot=1'>Reset Slot</a> --- "
+		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];load=1'>Load Slot</a><br>"
+	dat += "<br>"
 	dat += "<br>"
 	dat += player_setup.header()
-	dat += "<br><HR></center>"
+	dat += "<br>"
+	dat += "<br>"
 	dat += player_setup.content(user)
-
 	dat += "</html></body>"
-	var/datum/browser/popup = new(user, "Character Setup","Character Setup", 1200, 800, src)
-	popup.set_content(dat)
-	popup.open()
+	user <<browse(dat,"window=player_panel;size=700x700;can_close=1;can_resize=0;border=0;titlebar=1")
 
 /datum/preferences/proc/process_link(mob/user, list/href_list)
 
@@ -122,8 +145,6 @@
 			return 0
 		load_character(SAVE_RESET)
 		sanitize_preferences()
-	else
-		return 0
 
 	ShowChoices(usr)
 	return 1
