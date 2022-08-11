@@ -26,9 +26,6 @@
 /decl/ai_holo/carp
 	icon_state = "Carp"
 
-/decl/ai_holo/solgov
-	icon_state = "SolGov"
-
 /decl/ai_holo/cursor
 	icon_state = "Cursor"
 

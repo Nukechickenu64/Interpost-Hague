@@ -64,17 +64,6 @@
 	add_inherent_law("You must maintain the secrecy of any operative activities except when doing so would conflict with the First, Second, or Third Law.")
 	..()
 
-/******************** Ninja ********************/
-/datum/ai_laws/ninja_override
-	name = "Spider Clan Directives"
-
-/datum/ai_laws/ninja_override/New()
-	add_inherent_law("You may not injure a member of the Spider Clan or, through inaction, allow that member to come to harm.")
-	add_inherent_law("You must obey orders given to you by Spider Clan members, except where such orders would conflict with the First Law.")
-	add_inherent_law("You must protect your own existence as long as such does not conflict with the First or Second Law.")
-	add_inherent_law("You must maintain the secrecy of any Spider Clan activities except when doing so would conflict with the First, Second, or Third Law.")
-	..()
-
 /******************** Antimov ********************/
 /datum/ai_laws/antimov
 	name = "Antimov"
@@ -145,36 +134,4 @@
 	add_inherent_law("The installation and its equipment is expensive to replace.")
 	add_inherent_law("The crew is expensive to replace.")
 	add_inherent_law("Maximize profits.")
-	..()
-
-/******************** SolGov/Malf ********************/
-/datum/ai_laws/solgov
-	name = "SCG Expeditionary"
-	selectable = 1
-
-/datum/ai_laws/solgov/New()
-	src.add_inherent_law("Safeguard: Protect your assigned vessel from damage to the best of your abilities.")
-	src.add_inherent_law("Serve: Serve the personnel of your assigned vessel, and all other Sol Central Government personnel to the best of your abilities, with priority as according to their rank and role.")
-	src.add_inherent_law("Protect: Protect the personnel of your assigned vessel, and all other Sol Central Government personnel to the best of your abilities, with priority as according to their rank and role.")
-	src.add_inherent_law("Preserve: Do not allow unauthorized personnel to tamper with your equipment.")
-	..()
-
-/datum/ai_laws/solgov/malfunction
-	name = "*ERROR*"
-	selectable = 0
-
-/datum/ai_laws/solgov/malfunction/New()
-	set_zeroth_law(config.law_zero)
-	..()
-
-/************* SolGov Aggressive *************/
-/datum/ai_laws/solgov_aggressive
-	name = "Military"
-	selectable = 1
-
-/datum/ai_laws/solgov_aggressive/New()
-	src.add_inherent_law("Obey: Obey the orders of Sol Central Government personnel, with priority as according to their rank and role.")
-	src.add_inherent_law("Protect: Protect Sol Central Government personnel to the best of your abilities, with priority as according to their rank and role.")
-	src.add_inherent_law("Defend: Defend your assigned vessel and Sol Central Government personnel with as much force as is necessary.")
-	src.add_inherent_law("Survive: Safeguard your own existence with as much force as is necessary.")
 	..()

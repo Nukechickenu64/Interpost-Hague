@@ -57,7 +57,7 @@
 	name = "fork"
 	desc = "It's a fork. Sure is pointy."
 	icon_state = "fork"
-	drop_sound 'sound/items/drop_small.ogg'
+	drop_sound = 'sound/items/drop_small.ogg'
 
 /obj/item/weapon/material/kitchen/utensil/fork/plastic
 	default_material = "plastic"
@@ -68,7 +68,8 @@
 	icon_state = "spoon"
 	attack_verb = list("attacked", "poked")
 	force_divisor = 0.1 //2 when wielded with weight 20 (steel)
-	drop_sound 'sound/items/drop_small.ogg'
+	drop_sound = 'sound/items/drop_small.ogg'
+
 
 /obj/item/weapon/material/kitchen/utensil/spoon/plastic
 	default_material = "plastic"
