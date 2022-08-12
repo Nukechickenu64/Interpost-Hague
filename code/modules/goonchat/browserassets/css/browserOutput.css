@@ -257,8 +257,8 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 200; font-size: 107%; text-shadow: 0 0 2px #cccce2}
-.nameradio {font-weight: 200; font-size: 107%}
+.name {font-weight: 150; font-size: 100%; text-shadow: 0 0 4px #cccce2}
+.nameradio {font-weight: 100; font-size: 100%}
 
 /* ADD HERE FOR ITALIC */
 .italic, .italics, .emote {font-style: italic;}
@@ -298,7 +298,7 @@ em						{font-style: normal;	font-weight: bold;}
 
 /* Radio: Misc */
 .deadsay				{color: #e2c1ff}
-.radio					{color: #1ecc43;}
+.radio					{color: #684f8c; text-shadow: 0 0 2px #684f8c;}
 .deptradio				{color: #ff00ff;}	/* when all other department colors fail */
 .newscaster				{color: #750000;}
 
@@ -318,10 +318,9 @@ em						{font-style: normal;	font-weight: bold;}
 .expradio				{color: #a3a332;}
 .inqradio				{color: #696969;}
 /* Miscellaneous */
-.name					{font-weight: bold;}
-.alert					{color: #d82020; text-shadow: 0 0 4px #d82020}
-h1.alert, h2.alert		{color: #a4bad6; text-shadow: 0 0 8px #a4bad6}
-h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00}
+.alert					{color: #d82020; text-shadow: 0 0 4px #d82020;}
+h1.alert, h2.alert		{color: #a4bad6; text-shadow: 0 0 8px #a4bad6;}
+h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 
 .emote					{font-style: italic;}
 
@@ -331,14 +330,17 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00}
 .disarm					{color: #990000;}
 .passive				{color: #660000;}
 
-.danger					{color: #c51e1e; text-shadow: 0 0 7px #c51e1e}
-.warning				{color: #c51e1e;	font-style: italic; text-shadow: 0 0 4px #c51e1e}
-.boldannounce			{color: #c51e1e;	font-weight: bold; text-shadow: 0 0 3px #c51e1e}
+.danger					{color: #c51e1e; text-shadow: 0 0 7px #c51e1e;}
+.blueglow				{color: #2f25b8; text-shadow: 0 0 5px #2f25b8;}
+.warning				{color: #c51e1e;	font-style: italic; text-shadow: 0 0 4px #c51e1e;}
+.boldannounce			{color: #c51e1e;	font-weight: bold; text-shadow: 0 0 3px #c51e1e;}
 .rose					{color: #ff5050;}
-.info					{color: #6685f5; text-shadow: 0 0 5px #6685f5}
-.notice					{color: #6685f5; text-shadow: 0 0 3px #6685f5}
+.info					{color: #6685f5; text-shadow: 0 0 5px #6685f5;}
+.notice					{color: #6685f5; text-shadow: 0 0 3px #6685f5;}
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
+.wakeup					{color: #c5bfff; text-shadow: 0 0 2px #c5bfff;}
+.tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
 
 /* Languages */
 .alien					{color: #855d85;}
