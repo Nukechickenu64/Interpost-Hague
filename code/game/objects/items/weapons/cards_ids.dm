@@ -130,25 +130,22 @@ var/global/const/NO_EMAG_ACT = -50
 			access |= j.get_access()
 
 /obj/item/weapon/card/id/examine(mob/user)
-	set src in oview(1)
-	if(in_range(usr, src))
-		show(usr)
-		to_chat(usr, desc)
-	else
-		to_chat(usr, "<span class='warning'>It is too far away.</span>")
+	. = ..(user)
+	var/msg = "\n<div class='firstdiv'><div class='box'><span class = 'blueglow'>You look at what's written on it:</span>\n<BR>"
+	msg += "<span class = 'info'>Name: [registered_name]</span>\n"
+	msg += "<span class = 'info'>Sex: [sex]</span>\n"
+	msg += "<span class = 'info'>Age: [age]</span>\n"
+
+	msg += "<span class = 'info'>Assignment: [assignment]</span>\n"
+	msg += "<span class = 'info'>Fingerprint: [fingerprint_hash]</span>\n"
+	msg += "<span class = 'info'>Blood Type: [blood_type]</span>\n"
+	msg += "<span class = 'info'>DNA Hash: [dna_hash]</span>"
+	msg += "</div></div>"
+
+	to_chat(user, msg)
 
 /obj/item/weapon/card/id/proc/prevent_tracking()
 	return 0
-
-/obj/item/weapon/card/id/proc/show(mob/user as mob)
-	if(front && side)
-		user << browse_rsc(front, "front.png")
-		user << browse_rsc(side, "side.png")
-	var/datum/browser/popup = new(user, "idcard", name, 600, 250)
-	popup.set_content(dat())
-	popup.set_title_image(usr.browse_rsc_icon(src.icon, src.icon_state))
-	popup.open()
-	return
 
 /obj/item/weapon/card/id/proc/update_name()
 	var/final_name = "[registered_name]'s ID Card"
@@ -183,26 +180,6 @@ var/global/const/NO_EMAG_ACT = -50
 
 	if(GLOB.using_map.flags & MAP_HAS_RANK)
 		id_card.military_rank = char_rank
-
-/obj/item/weapon/card/id/proc/dat()
-	var/list/dat = list("<table><tr><td>")
-	dat += text("Name: []</A><BR>", registered_name)
-	dat += text("Sex: []</A><BR>\n", sex)
-	dat += text("Age: []</A><BR>\n", age)
-
-	if(GLOB.using_map.flags & MAP_HAS_BRANCH)
-		dat += text("Branch: []</A><BR>\n", military_branch ? military_branch.name : "\[UNSET\]")
-	if(GLOB.using_map.flags & MAP_HAS_RANK)
-		dat += text("Rank: []</A><BR>\n", military_rank ? military_rank.name : "\[UNSET\]")
-
-	dat += text("Assignment: []</A><BR>\n", assignment)
-	dat += text("Fingerprint: []</A><BR>\n", fingerprint_hash)
-	dat += text("Blood Type: []<BR>\n", blood_type)
-	dat += text("DNA Hash: []<BR><BR>\n", dna_hash)
-	if(front && side)
-		dat +="<td align = center valign = top>Photo:<br><img src=front.png height=80 width=80 border=4><img src=side.png height=80 width=80 border=4></td>"
-	dat += "</tr></table>"
-	return jointext(dat,null)
 
 /obj/item/weapon/card/id/attack_self(mob/user as mob)
 	user.visible_message("\The [user] shows you: \icon[src] [src.name]. The assignment on the card: [src.assignment]",\

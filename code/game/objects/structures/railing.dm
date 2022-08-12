@@ -32,11 +32,6 @@
 	//var/RightSide = list(0,0,0)
 	var/check = 0
 
-/obj/structure/railing/grey
-	name = "grey railing"
-	desc = "A standard steel railing. Prevents stupid people from falling to their doom."
-	icon_state = "grey_railing0"
-
 /obj/structure/railing/Initialize(loc, constructed=0)
 	. = ..()
 	if (constructed)	//player-constructed railings
