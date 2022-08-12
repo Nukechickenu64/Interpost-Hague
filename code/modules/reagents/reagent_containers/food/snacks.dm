@@ -576,11 +576,14 @@
 	filling_color = "#e00d34"
 	center_of_mass = "x=16;y=16"
 
-	New()
-		..()
-		reagents.add_reagent(/datum/reagent/nutriment/protein, rand(3,5))
-		reagents.add_reagent(/datum/reagent/toxin, rand(1,3))
-		src.bitesize = 3
+/obj/item/weapon/reagent_containers/food/snacks/organ/New()
+	..()
+	reagents.add_reagent(/datum/reagent/nutriment/protein, rand(3,5))
+	reagents.add_reagent(/datum/reagent/toxin, rand(1,3))
+	src.bitesize = 3
+
+/obj/item/weapon/reagent_containers/food/snacks/organ/On_Consume(var/mob/living/carbon/M)
+	M.add_event("disgusted", /datum/happiness_event/disgust/disgusted)
 
 /obj/item/weapon/reagent_containers/food/snacks/tofu
 	name = "Tofu"

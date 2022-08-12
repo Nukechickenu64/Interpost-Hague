@@ -97,7 +97,8 @@
 	locked = 1
 
 	eject_wait = 1
-	spawn(90)
+	playsound(src, 'sound/machines/cloningpod_inprogress.ogg', 50)
+	spawn(270)
 		eject_wait = 0
 
 	var/mob/living/carbon/human/H = new /mob/living/carbon/human(src, R.dna.species)
@@ -172,7 +173,7 @@
 			return
 
 		if(GetCloneReadiness() >= 100 && !eject_wait)
-			playsound(src.loc, 'sound/machines/ding.ogg', 50, 1)
+			playsound(src, 'sound/machines/cloningpod_finished.ogg', 50)
 			src.audible_message("\The [src] signals that the cloning process is complete.")
 			connected_message("Cloning Process Complete.")
 			locked = 0

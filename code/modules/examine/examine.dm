@@ -45,9 +45,9 @@
 	description_holders["fluff"] = A.get_description_fluff()
 	description_holders["antag"] = (update_antag_info)? A.get_description_antag() : ""
 
-	description_holders["name"] = "[A.name]"
-	description_holders["icon"] = "\icon[A]"
-	description_holders["desc"] = A.desc
+	description_holders["name"] = "<div class='firstdiv'><div class='box'>[A.name]</div></div>"
+	description_holders["icon"] = "<div class='firstdiv'><div class='box'>[icon2html(A)]</div></div>"
+	description_holders["desc"] = "<div class='firstdiv'><div class='box'>[A.desc]</div></div>"
 
 /mob/Stat()
 	. = ..()

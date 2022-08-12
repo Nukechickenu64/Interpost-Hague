@@ -128,6 +128,56 @@
 						to_chat(user, "<span class='warning'>You need more welding fuel to complete this task.</span>")
 					return
 
+
+		if(istype(C, /obj/item/grab) && get_dist(src,user)<2)
+			var/obj/item/grab/G = C
+			if(G.assailant.zone_sel.selecting == "head" && G.affecting.lying)
+				if(ishuman(G.affecting))
+/*
+					G.affecting.attack_log += text("\[[time_stamp()]\] <span class='warning'>Has been smashed on the floor by [G.assailant.name] ([G.assailant.ckey])</font>")
+					G.assailant.attack_log += text("\[[time_stamp()]\] <span class='danger'>Smashed [G.affecting.name] ([G.affecting.ckey]) on the floor.</font>")
+
+					//log_admin("ATTACK: [G.assailant] ([G.assailant.ckey]) smashed [G.affecting] ([G.affecting.ckey]) on a table.", 2)
+					message_admins("ATTACK: [G.assailant] ([G.assailant.ckey])(<A HREF='?_src_=holder;adminplayerobservejump=\ref[G]'>JMP</A>) smashed [G.affecting] ([G.affecting.ckey]) on the floor.", 2)
+					log_attack("[G.assailant] ([G.assailant.ckey]) smashed [G.affecting] ([G.affecting.ckey]) on a table.")
+*/
+
+					var/mob/living/carbon/human/H = G.affecting
+					var/obj/item/organ/external/affecting = H.get_organ("head")
+					if(prob(25))
+						affecting.take_damage(rand(25,35), 0)
+						H.Weaken(2)
+						if(prob(20)) // One chance in 20 to DENT THE TABLE
+							affecting.take_damage(rand(8,15), 0) //Extra damage
+							H.apply_effect(5, PARALYZE)
+							visible_message("<span class='danger'><b>[H]</b>< has been knocked unconscious!</span>")
+							H.ear_damage += rand(0, 3)
+							H.ear_deaf = max(H.ear_deaf,6)
+							G.assailant.visible_message("\red \The [G.assailant] smashes \the [H]'s head on \the [src] with enough force to further deform \the [src]!\nYou wish you could unhear that sound.",\
+							"\red You smash \the [H]'s head on \the [src] with enough force to leave another dent!\n[prob(50)?"That was a satisfying noise." : "That sound will haunt your nightmares"]",\
+							"\red You hear the nauseating crunch of bone and gristle on solid metal and the squeal of said metal deforming.")
+						else if(prob(50))
+							G.assailant.visible_message("\red [G.assailant] smashes \the [H]'s head on \the [src], [H.get_visible_gender() == MALE ? "his" : H.get_visible_gender() == FEMALE ? "her" : "their"] bone and cartilage making a loud crunch!",\
+							"\red You smash \the [H]'s head on \the [src], [H.get_visible_gender() == MALE ? "his" : H.get_visible_gender() == FEMALE ? "her" : "their"] bone and cartilage making a loud crunch!",\
+							"\red You hear the nauseating crunch of bone and gristle on solid metal, the noise echoing through the room.")
+						else
+							G.assailant.visible_message("\red [G.assailant] smashes \the [H]'s head on \the [src], [H.get_visible_gender() == MALE ? "his" : H.get_visible_gender() == FEMALE ? "her" : "their"] nose smashed and face bloodied!",\
+							"\red You smash \the [H]'s head on \the [src], [H.get_visible_gender() == MALE ? "his" : H.get_visible_gender() == FEMALE ? "her" : "their"] nose smashed and face bloodied!",\
+							"\red You hear the nauseating crunch of bone and gristle on solid metal and the gurgling gasp of someone who is trying to breathe through their own blood.")
+					else
+						affecting.take_damage(rand(5,10), 0)
+						G.assailant.visible_message("\red [G.assailant] smashes \the [H]'s head on \the [src]!",\
+						"\red You smash \the [H]'s head on \the [src]!",\
+						"\red You hear the nauseating crunch of bone and gristle on solid metal.")
+					add_blood(G.affecting, 1) //Forced
+					H.UpdateDamageIcon()
+					H.updatehealth()
+					var/mob/living/carbon/human/AS = G.assailant
+					AS.adjustStaminaLoss(rand(6,15))
+					playsound(H.loc, pick('sound/effects/gore/smash1.ogg','sound/effects/gore/smash2.ogg','sound/effects/gore/smash3.ogg'), 50, 1, -3)
+					user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+					qdel(G)
+
 	return ..()
 
 /turf/simulated/floor/acid_melt()

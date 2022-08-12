@@ -35,12 +35,15 @@ img {
 	padding: 0;
 	line-height: 1;
 	size: 4in 6in;
+	width: 4px;
+	height: 4px;
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: pixelated;
 }
 img.icon {
+	width: 4px;
+	height: 4px;
 	size: 4in 6in;
-	width: auto;
 	vertical-align: bottom;
 }
 
@@ -254,8 +257,8 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 400; font-size: 110%; text-shadow: 0 0 3px #cccce2}
-.nameradio {font-weight: 400; font-size: 110%}
+.name {font-weight: 200; font-size: 107%; text-shadow: 0 0 2px #cccce2}
+.nameradio {font-weight: 200; font-size: 107%}
 
 /* ADD HERE FOR ITALIC */
 .italic, .italics, .emote {font-style: italic;}
