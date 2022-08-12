@@ -277,13 +277,14 @@
 	department_flag = SPT
 	social_class = SOCIAL_CLASS_HIGH
 	sex_lock = MALE
+	rankprefix  = "Executive Officer"
 
 	equip(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal())//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
-		H.newgeneratestats(8,12,9,13,10,14,7,14)
+		H.newgeneratestats(8,12,9,13,10,12,7,12)
 		H.generate_skills(list("melee","ranged","medical"))
 
 /datum/job/rd
@@ -299,6 +300,7 @@
 	social_class = SOCIAL_CLASS_HIGH
 	sex_lock = MALE
 	department_flag = SCI
+	rankprefix  = "Head Scientist"
 	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
 			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
 			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks,
@@ -331,6 +333,7 @@
 	total_positions = 1
 	spawn_positions = 3
 	department_flag = SCI
+	rankprefix  = "General Researcher"
 	access = list(access_robotics, access_tox, access_tox_storage, access_research, access_xenobiology, access_xenoarch, access_robotics)
 	minimal_access = list(access_tox, access_tox_storage, access_research, access_xenoarch, access_robotics)
 
@@ -347,12 +350,13 @@
 	selection_color = "#633d63"
 	title = "Medical Officer"
 	department_flag = MED
-	supervisors = "Hippocrates"
+	supervisors = "the Captain and Hippocrates"
 	minimal_player_age = 19
 	economic_modifier = 2
 	ideal_character_age = 30
 	total_positions = 2
 	spawn_positions = 3
+	rankprefix  = "Medical Officer"
 	access = list(access_medical, access_medical_equip, access_genetics, access_tox,
 			access_chemistry, access_virology, access_surgery)
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_tox,
@@ -390,6 +394,7 @@
 	spawn_positions = 1
 	selection_color = "#601c1c"
 	economic_modifier = 5
+	rankprefix  = "Major"
 	sex_lock = MALE
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory,
 			            access_forensics_lockers, access_morgue, access_maint_tunnels, access_all_personal_lockers,
@@ -419,6 +424,7 @@
 	spawn_positions = 8
 	economic_modifier = 3
 	sex_lock = MALE
+	rankprefix  = "Enforcer"
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_morgue, access_external_airlocks)
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_external_airlocks)
 	minimal_player_age = 0
@@ -455,13 +461,14 @@
 /datum/job/qm
 	selection_color = "#3d3315"
 	title = "Vessel Overseer"
-	supervisors = "the Overseer"
+	supervisors = "the Captain"
 	minimal_player_age = 21
 	economic_modifier = 3
 	ideal_character_age = 30
 	total_positions = 1
 	spawn_positions = 2
 	department_flag = SUP
+	rankprefix  = "Vessel Overseer"
 
 	equip(var/mob/living/carbon/human/H)
 		..()
@@ -472,8 +479,8 @@
 		H.generate_skills(list("crafting","engineering", "mining"))
 
 /datum/job/engineer
-	title = "Engineer"
-	supervisors = "the Overseer"
+	title = "Maintainer"
+	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 3
 	ideal_character_age = 21
@@ -482,6 +489,7 @@
 	//alt_titles = null
 	sex_lock = MALE
 	department_flag = ENG
+	rankprefix  = "Maintainer"
 	outfit_type = /decl/hierarchy/outfit/job/dreyfus/inge/inge
 	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
 	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
@@ -494,7 +502,7 @@
 
 /datum/job/mining
 	selection_color = "#7c6a2e"
-	title = "Miner"
+	title = "Excavator"
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
@@ -503,6 +511,7 @@
 	spawn_positions = 2
 	department_flag = SUP
 	sex_lock = MALE
+	rankprefix  = "Excavator"
 	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
 	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
 
@@ -521,6 +530,7 @@
 	ideal_character_age = 21
 	total_positions = 1
 	spawn_positions = 2
+	rankprefix  = "Cargo Technician"
 	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
 	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
 
@@ -572,6 +582,7 @@
 	spawn_positions = 2
 	minimal_access = list(access_bar, access_kitchen, access_hydroponics)
 	department_flag = SRV
+	rankprefix  = "Nutritionist"
 	equip(var/mob/living/carbon/human/H)
 		..()
 		H.newgeneratestats(11,13,8,13,6,11,9,16)
@@ -620,6 +631,7 @@
 	total_positions = 2
 	spawn_positions = 2
 	department_flag = SRV
+	rankprefix  = "Sanitation Technician"
 	equip(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,12), rand(9,12), rand(5,9))

@@ -321,9 +321,6 @@
 		else
 			return if_no_id
 
-
-
-
 //repurposed proc. Now it combines get_id_name() and get_face_name() to determine a mob's name variable. Made into a seperate proc as it'll be useful elsewhere
 /mob/living/carbon/human/proc/get_visible_name()
 	var/face_name = get_face_name()
@@ -354,6 +351,37 @@
 		if(I)
 			return I.registered_name
 	return
+
+var/list/rank_prefix = list(\
+	"Captain" = "Captain",\
+	"Executive Officer" = "Executive Officer",\
+	"Head Scientist" = "Head Scientist",\
+	"Major" = "Major",\
+	"Vessel Overseer" = "Vessel Overseer",\
+	"Enforcer" = "Enforcer",\
+	"Maintainer" = "Maintainer",\
+	"Medical Officer" = "Medical Officer",\
+	"General Researcher" = "General Researcher",\
+	"Anomaly Researcher" = "Anomaly Researcher",\
+	"Excavator" = "Excavator",\
+	"Anomaly Excavator" = "Anomaly Excavator",\
+	"Cargo Technician" = "Cargo Technician",\
+	"Nutritionist" = "Nutritionist",\
+	"Sanitation Technician" = "Sanitation Technician",\
+	)
+
+/mob/living/carbon/human/proc/rank_prefix_name(name)
+	if(get_ins_rank())
+		if(findtext(name, " "))
+			name = copytext(name, findtext(name, " "))
+		name = get_ins_rank() + name
+	return name
+
+/mob/living/carbon/human/proc/get_ins_rank()
+	var/rank
+	if(rank_prefix[rank])
+		return rank_prefix[rank]
+	return ""
 
 /mob/living/carbon/human/proc/get_job_name()
 	if(wear_id)
@@ -421,56 +449,6 @@
 	for(var/obj/item/organ/external/E in to_shock)
 		total_damage += ..(shock_damage, E.organ_tag, base_siemens_coeff * get_siemens_coefficient_organ(E))
 	return total_damage
-
-var/list/rank_prefix = list(\
-	"Captain" = "Captain",\
-	"Efreitor" = "Efr.",\
-	"Mladshiy Sergant" = "M.Sgt.",\
-	"Sergant" = "Sgt.",\
-	"Starshiy Sergant" = "S.Sgt.",\
-	"Starshina" = "Starsh.",\
-	"Praporshik" = "Prap.",\
-	"Starshiy Praporshik" = "St.Prap.",\
-	"Leitenant" = "Lt.",\
-	"Starshiy Leitenant" = "St.Lt.",\
-	"Kapitan" = "Kap.",\
-	"Mladshiy Leitenant" = "Ml.Lt.",\
-	"Private" = "PVT",\
-	"Private First Class" = "PFC",\
-	"Lance Corporal" = "LCPL",\
-	"Corporal" = "CPL",\
-	"Sergeant" = "SGT",\
-	"Staff Sergeant" = "SSGT",\
-	"Master Sergeant" = "MSGT",\
-	"Gunnery Sergeant" = "GySGT",\
-	"First Sergeant" = "FSGT",\
-	"Second Lieutenant" = "SLT",\
-	"Soldat" = "Soldat",\
-	"Gefreiter" = "Gefreiter",\
-	"Stabsgefreiter" = "Stabsgefreiter",\
-	"Stabsunteroffizier" = "Stabsunteroffizier",\
-	"Unteroffizier" = "Unteroffizier",\
-	"Leutnant" = "Leutnant",\
-	"Vojin" = "Vojin",\
-	"Svobodnik" = "Svobodnik",\
-	"Cetar" = "Cetar",\
-	"Rotmistr" = "Rotmistr",\
-	"Rotny" = "Rotny",\
-	"Porucik" = "Porucik",\
-	)
-
-/mob/living/carbon/human/proc/rank_prefix_name(name)
-	if(get_ins_rank())
-		if(findtext(name, " "))
-			name = copytext(name, findtext(name, " "))
-		name = get_ins_rank() + name
-	return name
-
-/mob/living/carbon/human/proc/get_ins_rank()
-	var/rank
-	if(rank_prefix[rank])
-		return rank_prefix[rank]
-	return ""
 
 /mob/living/carbon/human/proc/trace_shock(var/obj/item/organ/external/init, var/obj/item/organ/external/floor)
 	var/obj/item/organ/external/list/traced_organs = list(floor)
