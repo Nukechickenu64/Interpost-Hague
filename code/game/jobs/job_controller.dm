@@ -563,7 +563,7 @@ var/global/datum/controller/occupations/job_master
 								spawn(20)
 									to_chat(H, "<B>.......<B> ")
 									spawn(60)
-										to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'tetracorp'>Tetracorp</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
+										to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
 										spawn(20)
 											to_chat(H, "<B>.......<B>")
 											spawn(100)

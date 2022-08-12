@@ -294,7 +294,7 @@
 
 	if(!character.isSynthetic())
 		character.set_nutrition(rand(140,360))
-		character.set_thirst(rand(140,360))
+		character.set_thirst(rand(200,360))
 
 	return
 
