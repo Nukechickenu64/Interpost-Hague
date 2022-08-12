@@ -90,7 +90,7 @@
 	dat += "span.job_class {Color:#000000;}"
 	dat += "</style>"
 	dat += "</head>"
-	dat += "<body bgcolor='#000000' text='#c9c9c9' alink='#333553' vlink='#533333' link='#a6a6a6'>"
+	dat += "<body bgcolor='#000000' text='#c9c9c9' alink='#a6a6a6' vlink='#a6a6a6' link='#a6a6a6'>"
 	dat += "<p align ='right'>"
 	dat += "</p>"
 	dat += "<br>"

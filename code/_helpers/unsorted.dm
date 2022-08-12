@@ -35,6 +35,10 @@
 	return text("#[][][]", textr, textg, textb)
 	return
 
+/mob/dview/Destroy()
+	crash_with("Prevented attempt to delete dview mob: [log_info_line(src)]")
+	return QDEL_HINT_LETMELIVE // Prevents destruction
+
 //Returns the middle-most value
 /proc/dd_range(var/low, var/high, var/num)
 	return max(low,min(high,num))

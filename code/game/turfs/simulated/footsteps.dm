@@ -73,7 +73,6 @@
 /decl/flooring/tiling/freezer/footstep_type = FOOTSTEP_TILE
 /decl/flooring/tiling/bunker/footstep_type = FOOTSTEP_TILE
 /decl/flooring/tiling/mono/footstep_type = FOOTSTEP_TILE
-/decl/flooring/tiling/white/footstep_type = FOOTSTEP_TILE
 
 /turf/simulated/floor/proc/get_footstep_sound()
 	if(is_plating())

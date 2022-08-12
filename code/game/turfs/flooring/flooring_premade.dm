@@ -363,6 +363,36 @@
 	icon_state = "polar_chess"
 	initial_flooring = /decl/flooring/tiling/bunker/polar_chess
 
+/turf/simulated/floor/tiled/bunker/polar_cargo
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_cargo"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_cargo
+
+/turf/simulated/floor/tiled/bunker/polar_cargo_chess
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_cargo_chess"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_cargo_chess
+
+/turf/simulated/floor/tiled/bunker/polar_brighter
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_brighter"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_brighter
+
+/turf/simulated/floor/tiled/bunker/polar_green
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_green"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_green
+
+/turf/simulated/floor/tiled/bunker/polar_blue
+	name = "floor"
+	icon = 'icons/turf/bunk.dmi'
+	icon_state = "polar_blue"
+	initial_flooring = /decl/flooring/tiling/bunker/polar_blue
+
 /turf/simulated/floor/tiled/bunker/grider
 	name = "grider"
 	icon = 'icons/turf/bunk.dmi'

@@ -300,7 +300,7 @@
 	social_class = SOCIAL_CLASS_HIGH
 	sex_lock = MALE
 	department_flag = SCI
-	rankprefix  = "Head Scientist"
+	rankprefix  = "Dr."
 	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
 			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
 			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks,
@@ -333,7 +333,7 @@
 	total_positions = 1
 	spawn_positions = 3
 	department_flag = SCI
-	rankprefix  = "General Researcher"
+	rankprefix  = "Dr."
 	access = list(access_robotics, access_tox, access_tox_storage, access_research, access_xenobiology, access_xenoarch, access_robotics)
 	minimal_access = list(access_tox, access_tox_storage, access_research, access_xenoarch, access_robotics)
 
@@ -356,7 +356,7 @@
 	ideal_character_age = 30
 	total_positions = 2
 	spawn_positions = 3
-	rankprefix  = "Medical Officer"
+	rankprefix  = "Dr."
 	access = list(access_medical, access_medical_equip, access_genetics, access_tox,
 			access_chemistry, access_virology, access_surgery)
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_tox,

@@ -403,13 +403,14 @@
 /obj/machinery/light/proc/flicker(var/amount = rand(10, 20))
 	if(flickering) return
 	flickering = 1
+	playsound(src, 'sound/machines/lflick.ogg', 40)
 	spawn(0)
 		if(on && get_status() == LIGHT_OK)
 			for(var/i = 0; i < amount; i++)
 				if(get_status() != LIGHT_OK) break
 				on = !on
 				update_icon(0)
-				sleep(rand(5, 15))
+				sleep(rand(3, 9))
 			on = (get_status() == LIGHT_OK)
 			update_icon(0)
 		flickering = 0
@@ -562,6 +563,7 @@
 	var/brightness_color = "#FAEABE"
 	var/list/lighting_modes = list()
 	var/sound_on
+	var/sound_off
 
 /obj/item/weapon/light/tube
 	name = "light tube"
@@ -578,6 +580,7 @@
 		LIGHTMODE_EMERGENCY = list(l_range = 4, l_power = 1, l_color = "#da0205"),
 		)
 	sound_on = 'sound/machines/lightson.ogg'
+	sound_off = 'sound/machines/lightsoff.ogg'
 
 /obj/item/weapon/light/tube/large
 	w_class = ITEM_SIZE_SMALL
@@ -711,6 +714,8 @@
 		status = LIGHT_BROKEN
 	else if(prob(min(60, switchcount*switchcount*0.01)))
 		status = LIGHT_BURNED
-	else if(sound_on)
-		playsound(get_turf(src),sound_on, 40)
+	else if(!sound_on)
+		playsound(get_turf(src),sound_off, 40)
+	else
+		playsound(get_turf(src), sound_on, 40)
 	return status

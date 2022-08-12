@@ -422,6 +422,41 @@ var/list/flooring_types
 	has_damage_range = null
 	flags = TURF_REMOVE_CROWBAR
 
+/decl/flooring/tiling/bunker/polar_cargo
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_cargo"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
+/decl/flooring/tiling/bunker/polar_cargo_chess
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_cargo_chess"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
+/decl/flooring/tiling/bunker/polar_brighter
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_brighter"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
+/decl/flooring/tiling/bunker/polar_blue
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_green"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
+/decl/flooring/tiling/bunker/polar_green
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "polar_blue"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
 /decl/flooring/tiling/bunker/polar_circuit
 	name = "floor"
 	desc = "Don't slip."

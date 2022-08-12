@@ -75,7 +75,10 @@ GLOBAL_VAR(spawntypes)
 			C.set_occupant(victim, 1)
 			victim.Sleeping(7)
 			victim.resting = 0
+			victim.add_event("cryo", /datum/happiness_event/cryo)
 			return
+	for(var/obj/machinery/light/L in A)
+		L.flicker(10)
 	give_advice()
 	give_effect()
 
