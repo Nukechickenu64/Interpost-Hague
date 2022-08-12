@@ -299,8 +299,8 @@
 	var/pressure_levels = TLV["pressure"]
 
 	if (environment_pressure <= pressure_levels[1] && environment_pressure <= pressure_levels[3]) //low OR high pressures
-		if (!(mode == AALARM_MODE_PANIC || mode == AALARM_MODE_CYCLE))
-			playsound(src.loc, 'sound/machines/airalarm.ogg', 25, 0, 4)
+		if (mode == AALARM_MODE_PANIC || mode == AALARM_MODE_CYCLE)
+			playsound(src.loc, 'sound/machines/airalarm.ogg', 45, 0, 4)
 			return 1
 
 	return 0
@@ -344,16 +344,16 @@
 	switch(icon_level)
 		if (0)
 			icon_state = "alarm0"
-			new_color = COLOR_LIME
+			new_color = COLOR_RED_LIGHT
 		if (1)
 			icon_state = "alarm2" //yes, alarm2 is yellow alarm
-			new_color = COLOR_SUN
+			new_color = COLOR_RED_LIGHT
 		if (2)
 			icon_state = "alarm1"
 			new_color = COLOR_RED_LIGHT
 	overlays  += overlay_image(icon, "alarm[icon_level]", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
-	set_light(l_range = 2, l_power = 0.6, l_color = new_color)
+	set_light(l_range = 1, l_power = 1, l_color = new_color)
 
 /obj/machinery/alarm/receive_signal(datum/signal/signal)
 	if(stat & (NOPOWER|BROKEN))

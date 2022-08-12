@@ -131,15 +131,15 @@ var/global/const/NO_EMAG_ACT = -50
 
 /obj/item/weapon/card/id/examine(mob/user)
 	. = ..(user)
-	var/msg = "\n<div class='firstdiv'><div class='box'><span class = 'blueglow'>You look at what's written on it:</span>\n<BR>"
-	msg += "<span class = 'info'>Name: [registered_name]</span>\n"
-	msg += "<span class = 'info'>Sex: [sex]</span>\n"
-	msg += "<span class = 'info'>Age: [age]</span>\n"
+	var/msg = "\n<div class='firstdiv'><div class='box'><span class = 'wakeup'>You look at what's written on it:</span>\n<BR>"
+	msg += "<span class = 'tetracorp'>Name:</span> <span class = 'info'>[registered_name]</span>\n"
+	msg += "<span class = 'tetracorp'>Sex:</span> <span class = 'info'>[sex]</span>\n"
+	msg += "<span class = 'tetracorp'>Age:</span> <span class = 'info'>[age]</span>\n"
 
-	msg += "<span class = 'info'>Assignment: [assignment]</span>\n"
-	msg += "<span class = 'info'>Fingerprint: [fingerprint_hash]</span>\n"
-	msg += "<span class = 'info'>Blood Type: [blood_type]</span>\n"
-	msg += "<span class = 'info'>DNA Hash: [dna_hash]</span>"
+	msg += "<span class = 'tetracorp'>Assignment:</span> <span class = 'info'>[assignment]</span>\n"
+	msg += "<span class = 'tetracorp'>Fingerprint:</span> <span class = 'info'>[fingerprint_hash]</span>\n"
+	msg += "<span class = 'tetracorp'>Blood Type:</span> <span class = 'info'>[blood_type]</span>\n"
+	msg += "<span class = 'tetracorp'>DNA Hash:</span> <span class = 'info'>[dna_hash]</span>"
 	msg += "</div></div>"
 
 	to_chat(user, msg)
