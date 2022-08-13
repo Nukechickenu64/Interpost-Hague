@@ -15,24 +15,20 @@
 	var/list/npc_attack_emote = list("yells!", "makes a scary noise!")
 	var/list/npc_attack_sound = list()
 	var/aggroed = TRUE
-
+	var/cycle_pause = 5
 
 	proc/aggro_npc()
 		if(!is_npc)
 			return
 		aggroed = TRUE
 
-
 	// this is called when the target is within one tile
-	// of distance from the hostile npc
-	proc/attack_target()
-		var/obj/item/I = get_active_hand()
-		var/obj/item/II = get_inactive_hand()
-
-		if(target.stat != CONSCIOUS && prob(70) || target.is_npc)
-			target = null
+	// of distance from the zombie
+	proc/attack_target(var/mob/living/carbon/human/target)
+		if(!target)
 			return
-
+		if(target?.stat != CONSCIOUS && prob(70))
+			return
 		var/direct = get_dir(src, target)
 		if ( (direct - 1) & direct)
 			var/turf/Step_1
@@ -63,174 +59,155 @@
 				check_2 = Adjacent(get_turf(src), Step_2, target) && Adjacent(Step_2, get_turf(target), target)
 
 				if(check_1 || check_2)
-					get_attack_type(I, II, target)
-					if(prob(30))
-						custom_emote(2, pick(npc_attack_emote))
-						if(npc_attack_sound.len)
-							playsound(src, pick(npc_attack_sound), 50, 0)
-						return
+					target.attack_hand(src)
 					return
 				else
-					var/obj/structure/window/W = locate() in target.loc
-					var/obj/structure/window/WW = locate() in src.loc
+					var/obj/structure/table/W = locate() in target.loc
+					var/obj/structure/table/WW = locate() in src.loc
 					if(W)
-						W.attack_hand(src)
-						if(prob(30))
-							custom_emote(2, pick(npc_attack_emote))
-							if(npc_attack_sound.len)
-								playsound(src, pick(npc_attack_sound), 50, 0)
-							return
+						W.do_climb(src)
 						return 1
 					else if(WW)
-						WW.attack_hand(src)
-						if(prob(30))
-							custom_emote(2, pick(npc_attack_emote))
-							if(npc_attack_sound.len)
-								playsound(src, pick(npc_attack_sound), 50, 0)
-							return
+						WW.do_climb(src)
 						return 1
-		else if(Adjacent(src.loc , target.loc,target))
-			get_attack_type(I, II, target)//target.attack_hand(src)
-			if(prob(30))
-				custom_emote(2, pick(npc_attack_emote))
-				if(npc_attack_sound.len)
-					playsound(src, pick(npc_attack_sound), 50, 0)
-				return
+					var/obj/structure/window/WWW = locate() in target.loc
+					var/obj/structure/window/WWWW = locate() in src.loc
+					if(W)
+						if(src.r_hand || src.l_hand)
+							if(r_hand)
+								WWW.attackby(r_hand, src)
+							else
+								if(l_hand)
+									WWW.attackby(l_hand, src)
+						else
+							WWW.attack_hand(src)
+						return 1
+					else if(WWWW)
+						if(src.r_hand || src.l_hand)
+							if(r_hand)
+								WWWW.attackby(r_hand, src)
+							else if(l_hand)
+								WWWW.attackby(l_hand, src)
+						else
+							WWWW.attack_hand(src)
+						return 1
+		else if(Adjacent(src?.loc , target?.loc,target))
+			if(src.r_hand || src.l_hand)
+				if(r_hand && istype(r_hand, /obj/item))
+					target.attackby(r_hand, src)
+				else
+					if(l_hand && istype(l_hand, /obj/item))
+						target.attackby(l_hand, src)
+			else
+				target.attack_hand(src)
+			//target.attack_hand(src)
 			// sometimes push the enemy
-			//if(prob(30))
-			//	step(src,direct)
+			if(prob(80))
+				if(prob(10))
+					step(src,direct)
+				else
+					if(prob(80))
+						zone_sel.selecting = pick("groin","l_leg","r_leg","r_foot","l_foot")
+						target.kick_act(src)
+/*
+					else
+						if(prob(80))
+							zone_sel.selecting = pick("chest","vitals","r_hand","l_hand","groin")
+							target.steal_act(src)
+*/
 			return 1
 		else
 			var/obj/structure/window/W = locate() in target.loc
 			var/obj/structure/window/WW = locate() in src.loc
 			if(W)
-				W.attack_hand(src)
-				if(prob(30))
-					custom_emote(2, pick(npc_attack_emote))
-					if(npc_attack_sound.len)
-						playsound(src, pick(npc_attack_sound), 50, 0)
-					return
+				if(src.r_hand || src.l_hand)
+					if(r_hand)
+						W.attackby(r_hand, src)
+					else
+						if(l_hand)
+							W.attackby(l_hand, src)
+				else
+					W.attack_hand(src)
 				return 1
 			else if(WW)
-				WW.attack_hand(src)
-				if(prob(30))
-					custom_emote(2, pick(npc_attack_emote))
-					if(npc_attack_sound.len)
-						playsound(src, pick(npc_attack_sound), 50, 0)
-					return
+				if(r_hand)
+					WW.attackby(r_hand, src)
+				else if(l_hand)
+					WW.attackby(l_hand, src)
+				else
+					WW.attack_hand(src)
 				return 1
 
 	// main loop
 	proc/process()
 		set background = 1
 
-		if (stat)
-			walk_to(src, 0)
+		if (stat == 2)
 			return 0
-
-
-		if(weakened || paralysis || handcuffed)
-			walk_to(src, 0)
+		if(weakened || paralysis || handcuffed || !canmove)
 			return 1
-
 		if(resting)
 			mob_rest()
-			return 1
-
-		if(!canmove)
-			return 1
-
-		setStaminaLoss(0)//So they don't wear themselves out.
-		if(!aggroed)//If they ain't angry then we don't want them searching for targets.
-			step(src, pick(GLOB.cardinal))
-			return 1
+			return
 
 		if(destroy_on_path())
 			return 1
 
-		if(!target)
-			// no target, and we're angery, look for a new one
-
-			// look for a target, taking into consideration their health
-			// and distance from the npc
-			var/last_health = INFINITY
-			var/last_dist = INFINITY
-
-			for (var/mob/living/carbon/human/C in orange(viewrange-2,src.loc))
-				var/dist = get_dist(src, C)
-
-				// if the npc can't directly see the human, they're
-				// probably blocked off by a wall, so act as if the
-				// human is further away
-				if(!(C in view(src, viewrange)))
-					dist += 3
-
-				if (C.stat == 2 || !can_see(src,C,viewrange))
-					continue
-				if(C.stunned || C.paralysis || C.weakened)
-					target = C
-					break
-				if(C.health < last_health && dist <= last_dist) if(!prob(30))
-					last_health = C.health
-					last_dist = dist
-					target = C
-
-		// if we have found a target
+		combat_mode = 0
 		if(target)
-			if(target.is_npc)// If the target is an NPC then search again.
-				target = null
-				return
-
 			// change the target if there is another human that is closer
-			for (var/mob/living/carbon/human/C in orange(2,src.loc))
-				if (C.stat == 2 || !can_see(src,C,viewrange))
+			if(prob(30))
+				target = null
+			for (var/mob/living/carbon/C in orange(2,src.loc))
+				if (C.stat == 2|| !can_see(src,C,viewrange))
+					continue
+				if (istype(C, /mob/living/carbon/human/raider))
 					continue
 				if(get_dist(src, target) >= get_dist(src, C) && prob(30))
 					target = C
 					break
 
-			if(target.stat == 2)
+			if(target?.stat == 2)
 				target = null
-
 
 			var/distance = get_dist(src, target)
 
 			if(target in orange(viewrange,src))
 				if(distance <= 1)
 					if(attack_target())
+						var/turf/T = get_step(src, target.dir)
+						for(var/atom/A in T.contents)
+							if(A.density)
+								return 1
+						if(!T.density)
+							Move(T)
 						return 1
-				else
-					walk_to(src, target, 1, 5)
+				if(step_towards_3d(src,target))
 					return 1
 			else
 				target = null
 				return 1
+		if(prob(20))
+			step_rand(src)
+		for(var/mob/living/carbon/human/H in orange(1, src.loc))
+			if (!istype(H, /mob/living/carbon/human/raider))
+				combat_mode = 1
+				if(prob(75))
+					var/face = 0
+					if(grabbed_by.len)
+						for(var/x = 1; x <= grabbed_by.len; x++)
+							if(grabbed_by[x])
+								face = 1
+								break
 
-		// if there is no target in range, roam randomly
-		else
-			frustration--
-			frustration = max(frustration, 0)
-
-			if(stat == 2) return 0
-
-			var/prev_loc = loc
-			// make sure they don't walk into space
-			if(!(locate(/turf/space) in get_step(src,dir)))
-				step(src,dir)
-			// if we couldn't move, pick a different direction
-			// also change the direction at random sometimes
-			if(loc == prev_loc || prob(20))
-				sleep(5)
-				dir = pick(NORTH,SOUTH,EAST,WEST)
-
-			return 1
-
-		// if we couldn't do anything, take a random step
-		step_rand(src)
-		dir = get_dir(src,target) // still face to the target
-		frustration++
-
-		return 1
+					if(face)
+						resist()
+					if(!face)
+						dir = get_dir(src, H)
+						attack_target(H)
+					target = H
+				return 1
+		return
 
 	// destroy items on the path
 	proc/destroy_on_path()
@@ -243,11 +220,6 @@
 				// we know the target has attack_hand
 				// since we only use such objects as the target
 				object_target:attack_hand(src)
-				if(prob(30))
-					custom_emote(2, pick(npc_attack_emote))
-					if(npc_attack_sound.len)
-						playsound(src, pick(npc_attack_sound), 50, 0)			//But he will say one of the prepared words, or do an emote from say.dm
-					return
 				return 1
 
 		// first, try to destroy airlocks and walls that are in the way
@@ -257,11 +229,6 @@
 				if(D.density && !(locate(/turf/space) in range(1,D)) )
 					D.attack_hand(src)
 					object_target = D
-					if(prob(30))
-						custom_emote(2, pick(npc_attack_emote))
-						if(npc_attack_sound.len)
-							playsound(src, pick(npc_attack_sound), 50, 0)			//But he will say one of the prepared words, or do an emote from say.dm
-						return
 					return 1
 		// before clawing through walls, try to find a direct path first
 		if(frustration > 8 )
@@ -271,29 +238,12 @@
 					if(W.density && !(locate(/turf/space) in range(1,W)))
 						W.attack_hand(src)
 						object_target = W
-						if(prob(30))
-							custom_emote(2, pick(npc_attack_emote))
-							if(npc_attack_sound.len)
-								playsound(src, pick(npc_attack_sound), 50, 0)			//But he will say one of the prepared words, or do an emote from say.dm
-							return
 						return 1
 		return 0
 
 	death()
 		..()
 		target = null
-
-	//This is the ugliest thing I have ever seen.
-	proc/get_attack_type(var/obj/item/I, var/obj/item/II, mob/living/carbon/human/target)
-		I = get_active_hand()
-		II = get_inactive_hand()
-		if(I)
-			target.attackby(I, src)
-		else if(II)
-			target.attackby(II, src)
-		else
-			target.attack_hand(src)
-
 
 /mob/living/carbon/human/monkey/punpun/New()
 	..()
@@ -347,8 +297,16 @@
 /mob/living/carbon/human/raider/ssd_check()
 	return FALSE
 
-/mob/living/carbon/human/raider/Initialize(var/new_loc)
-	. = ..()
+/mob/living/carbon/human/raider/New(var/new_loc)
+	..()
+	..()
+	sleep(3)
+	if(!mind)
+		mind = new /datum/mind(src)
+	// main loop
+	spawn while(stat != 2 && is_npc)
+		sleep(cycle_pause)
+		src.process()
 	var/number = "[pick(possible_changeling_IDs)]-[rand(1,30)]"
 	fully_replace_character_name("raider [number]")
 	zone_sel = new /obj/screen/zone_sel( null )
