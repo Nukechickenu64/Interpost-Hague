@@ -105,7 +105,7 @@ GLOBAL_LIST_INIT(symbols_unicode_keys, list(
 		return "<img class='icon icon-[icon_state] [class]' style='width:[I.Width()]px;height:[I.Height()]px;min-height:[I.Height()]px' src=\"[url_encode(key)]\">"
 
 
-	return "<img class='icon icon-[icon_state] [class]' src=\"[url_encode(key)]\">"
+	return "<img class='icon icon-[icon_state] [class]' style='width:25px;height:22px;min-height:22px' src=\"[url_encode(key)]\">"
 
 /proc/icon2base64html(thing)
 	if (!thing)

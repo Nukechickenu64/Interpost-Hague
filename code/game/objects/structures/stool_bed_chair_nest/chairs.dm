@@ -8,6 +8,10 @@
 	var/propelled = 0 // Check for fire-extinguisher-driven chairs
 	buckling_sound = 'sound/effects/metal_close.ogg'
 
+/obj/structure/bed/chair/Initialize()
+	. = ..()
+	material.icon_colour = null
+
 /obj/structure/bed/chair/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
 	if(!padding_material && istype(W, /obj/item/assembly/shock_kit))
@@ -41,8 +45,6 @@
 	var/cache_key = "[base_icon]-[material.name]-over"
 	if(isnull(stool_cache[cache_key]))
 		var/image/I = image('icons/obj/furniture.dmi', "[base_icon]_over")
-		if(material_alteration & MATERIAL_ALTERATION_COLOR)
-			I.color = material.icon_colour
 		I.layer = ABOVE_HUMAN_LAYER
 		stool_cache[cache_key] = I
 	overlays |= stool_cache[cache_key]
@@ -51,8 +53,6 @@
 		var/padding_cache_key = "[base_icon]-padding-[padding_material.name]-over"
 		if(isnull(stool_cache[padding_cache_key]))
 			var/image/I =  image(icon, "[base_icon]_padding_over")
-			if(material_alteration & MATERIAL_ALTERATION_COLOR)
-				I.color = padding_material.icon_colour
 			I.layer = ABOVE_HUMAN_LAYER
 			stool_cache[padding_cache_key] = I
 		overlays |= stool_cache[padding_cache_key]
@@ -62,8 +62,6 @@
 		if(isnull(stool_cache[cache_key]))
 			var/image/I = image(icon, "[base_icon]_armrest")
 			I.layer = ABOVE_HUMAN_LAYER
-			if(material_alteration & MATERIAL_ALTERATION_COLOR)
-				I.color = padding_material.icon_colour
 			stool_cache[cache_key] = I
 		overlays |= stool_cache[cache_key]
 

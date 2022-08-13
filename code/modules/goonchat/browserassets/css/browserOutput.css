@@ -257,8 +257,8 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 150; font-size: 100%; color: #399ccc; text-shadow: 0 0 4px #399ccc}
-.nameradio {font-weight: 100; font-size: 100%}
+.name {font-weight: 150; font-size: 103%; color: #399ccc; text-shadow: 0 0 4px #399ccc}
+.nameradio {font-weight: 100; font-size: 102%}
 
 /* ADD HERE FOR ITALIC */
 .italic, .italics, .emote {font-style: italic;}
@@ -402,8 +402,8 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 
 .icon 					{height: 1em;	width: auto;}
 
-.connectionClosed, .fatalError {background: red;	color: white;	padding: 5px;}
-.connectionClosed.restored {background: green;}
+.connectionClosed, .fatalError {background: #400000;	color: white;	padding: 5px;}
+.connectionClosed.restored {background: #003440;}
 .internal.boldnshit {color: #3d5bc3;	font-weight: bold;}
 
 /* HELPER CLASSES */
@@ -428,4 +428,26 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 	margin: 2px 8px;
 	padding: 8px 12px;
 	max-width: 750px;
+}
+
+.firstdivexamine {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    *zoom: 1;
+    *display: inline;
+}
+
+.boxexamine {
+    display: inline-block;
+    min-width: 10px;
+    width: 275px;
+    text-align: left;
+    padding: 10px;
+    font-size: 15px;
+    vertical-align: middle;
+    background-color: rgba(50, 50, 50, 0.3);
+    border: 1px solid rgba(50, 50, 50, 0.3);
+    *zoom: 1;
+    *display: inline;
 }

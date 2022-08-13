@@ -635,6 +635,11 @@
 	name = "Poster"
 	icon_state = "sc"
 
+/obj/structure/sign/bogdanoff
+	name = "Portrait"
+	icon_state = "bogdanoff"
+	desc = "Looks familiar."
+
 /obj/structure/sign/flag
 	var/ripped = FALSE
 
