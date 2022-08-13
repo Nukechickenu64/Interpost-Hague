@@ -15,7 +15,6 @@
 	var/list/npc_attack_emote = list("yells!", "makes a scary noise!")
 	var/list/npc_attack_sound = list()
 	var/aggroed = TRUE
-	var/cycle_pause = 5
 
 	proc/aggro_npc()
 		if(!is_npc)

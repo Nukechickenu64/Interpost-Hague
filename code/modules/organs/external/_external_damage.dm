@@ -91,8 +91,8 @@
 
 	if(status & ORGAN_BROKEN && brute)
 		jostle_bone(brute)
-		//if(can_feel_pain() && prob(40))
-		//	owner.emote("scream")	//getting hit on broken hand hurts
+		if(can_feel_pain() && prob(40))
+			owner.emote("scream")	//getting hit on broken hand hurts
 
 	if(brute_dam > min_broken_damage && prob(brute_dam + brute * (1+blunt)) ) //blunt damage is gud at fracturing
 		fracture()
@@ -119,7 +119,7 @@
 		else
 			createwound(BURN, burn)
 
-	adjust_pain(0.6*burn + 0.4*brute)
+	adjust_pain(0.9*burn + 0.6*brute)
 	//If there are still hurties to dispense
 	if (spillover)
 		owner.shock_stage += spillover * config.organ_damage_spillover_multiplier
