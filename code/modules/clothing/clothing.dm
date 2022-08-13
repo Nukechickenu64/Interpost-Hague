@@ -219,10 +219,6 @@ BLIND     // can't see anything
 	var/darkness_view = 0//Base human is 2
 	var/see_invisible = -1
 	var/light_protection = 0
-	sprite_sheets = list(
-		SPECIES_VOX = 'icons/mob/species/vox/eyes.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/eyes.dmi',
-		)
 
 /obj/item/clothing/glasses/get_icon_state(mob/user_mob, slot)
 	if(item_state_slots && item_state_slots[slot])
@@ -252,11 +248,6 @@ BLIND     // can't see anything
 	body_parts_covered = HANDS
 	slot_flags = SLOT_GLOVES
 	attack_verb = list("challenged")
-	sprite_sheets = list(
-		SPECIES_VOX = 'icons/mob/species/vox/gloves.dmi',
-		SPECIES_NABBER = 'icons/mob/species/nabber/gloves.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/hands.dmi',
-		)
 	blood_overlay_type = "bloodyhands"
 
 /obj/item/clothing/gloves/Initialize()
@@ -611,11 +602,6 @@ BLIND     // can't see anything
 	blood_overlay_type = "suit"
 	siemens_coefficient = 0.9
 	w_class = ITEM_SIZE_NORMAL
-
-	sprite_sheets = list(
-		SPECIES_VOX = 'icons/mob/species/vox/suit.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/suit.dmi',
-		)
 
 /obj/item/clothing/suit/update_clothing_icon()
 	if (ismob(src.loc))

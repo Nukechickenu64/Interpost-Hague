@@ -69,21 +69,12 @@
 
 /obj/item/clothing/suit/space/rig/military
 	species_restricted = list(SPECIES_HUMAN)
-	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/suit.dmi'
-		)
 
 /obj/item/clothing/shoes/magboots/rig/military
 	species_restricted = list(SPECIES_HUMAN)
-	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/feet.dmi'
-		)
 
 /obj/item/clothing/gloves/rig/military
 	species_restricted = list(SPECIES_HUMAN)
-	sprite_sheets = list(
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/hands.dmi'
-		)
 
 /obj/item/weapon/rig/military/equipped
 	initial_modules = list(

@@ -13,10 +13,6 @@
 	var/overlay_state = null
 	var/list/accessory_icons = list(slot_w_uniform_str = 'icons/mob/onmob/ties.dmi', slot_wear_suit_str = 'icons/mob/onmob/ties.dmi')
 	var/list/slim_accessory_icons = list(slot_w_uniform_str = 'icons/mob/onmob/ties_slim.dmi', slot_wear_suit_str = 'icons/mob/onmob/ties_slim.dmi')
-	sprite_sheets = list(
-		SPECIES_NABBER = 'icons/mob/species/nabber/ties.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/ties.dmi'
-		)
 	var/list/on_rolled = list()	//used when jumpsuit sleevels are rolled ("rolled" entry) or it's rolled down ("down"). Set to "none" to hide in those states.
 	var/high_visibility	//if it should appear on examine without detailed view
 	var/slowdown //used when an accessory is meant to slow the wearer down when attached to clothing

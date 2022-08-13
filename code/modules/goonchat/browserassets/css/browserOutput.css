@@ -15,7 +15,7 @@ body {
 	background-attachment: fixed;
 	font-family: Bahnschrift, sans-serif;
 	font-size: 19px;
-	font-color: #cccce2;
+	font-color: #8b97a6;
 	line-height: 1.2;
 	overflow-x: hidden;
 	overflow-y: scroll;
@@ -257,7 +257,7 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 150; font-size: 100%; text-shadow: 0 0 4px #cccce2}
+.name {font-weight: 150; font-size: 100%; color: #399ccc; text-shadow: 0 0 4px #399ccc}
 .nameradio {font-weight: 100; font-size: 100%}
 
 /* ADD HERE FOR ITALIC */
@@ -277,7 +277,7 @@ em						{font-style: normal;	font-weight: bold;}
 .ooc					{font-weight: bold;}
 .ooc img.text_tag		{width: 32px; height: 10px;}
 
-.ooc .everyone			{color: #5353ff;}
+.ooc .everyone			{color: #9461fa;}
 .ooc .looc				{color: #3a9696;}
 .ooc .elevated			{color: #2e78d9;}
 .ooc .moderator			{color: #184880;}
@@ -322,7 +322,7 @@ em						{font-style: normal;	font-weight: bold;}
 h1.alert, h2.alert		{color: #a4bad6; text-shadow: 0 0 8px #a4bad6;}
 h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 
-.emote					{font-style: italic;}
+.emote					{font-style: italic; color: #454a52;}
 
 /* Game Messages */
 .attack					{color: #ff0000;}
@@ -335,8 +335,8 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 .warning				{color: #c51e1e;	font-style: italic; text-shadow: 0 0 4px #c51e1e;}
 .boldannounce			{color: #c51e1e;	font-weight: bold; text-shadow: 0 0 3px #c51e1e;}
 .rose					{color: #ff5050;}
-.info					{color: #6685f5; text-shadow: 0 0 5px #6685f5;}
-.notice					{color: #6685f5; text-shadow: 0 0 3px #6685f5;}
+.info					{color: #4786c4; text-shadow: 0 0 5px #4786c4;}
+.notice					{color: #4781c4; text-shadow: 0 0 3px #4781c4;}
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
 .wakeup					{color: #c5bfff; text-shadow: 0 0 2px #c5bfff;}

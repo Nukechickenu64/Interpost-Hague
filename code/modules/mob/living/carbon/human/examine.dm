@@ -374,10 +374,7 @@
 		msg += "<span class = 'deptradio'>Physical status:</span> <a href='?src=\ref[src];medical=1'>\[[medical]\]</a>\n"
 		msg += "<span class = 'deptradio'>Medical records:</span> <a href='?src=\ref[src];medrecord=`'>\[View\]</a>\n"
 
-
-	if(print_flavor_text()) msg += "[print_flavor_text()]\n"
-
-	msg += "</span></div></div><br>"
+	msg += "</span></div></div>"
 	msg += applying_pressure
 
 	if (pose)
