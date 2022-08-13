@@ -122,15 +122,6 @@
 		if ( istype(W,/obj/item/clothing/suit/space ) )
 			to_chat(user, "This item does not fit.")
 			return
-		if ( istype(W,/obj/item/clothing/suit/syndicatefake ) )
-			to_chat(user, "This item does not fit.")
-			return
-//		if ( istype(W,/obj/item/clothing/suit/powered ) )
-//			to_chat(user, "This item does not fit.")
-//			return
-		if ( istype(W,/obj/item/clothing/suit/cyborg_suit ) )
-			to_chat(user, "This item does not fit.")
-			return
 		if ( istype(W,/obj/item/clothing/suit/bomb_suit ) )
 			to_chat(user, "This item does not fit.")
 			return
@@ -146,12 +137,6 @@
 		if ( istype(W,/obj/item/clothing/mask/smokable/cigarette ) )
 			to_chat(user, "This item does not fit.")
 			return
-		if ( istype(W,/obj/item/clothing/head/syndicatefake ) )
-			to_chat(user, "This item does not fit.")
-			return
-//		if ( istype(W,/obj/item/clothing/head/powered ) )
-//			to_chat(user, "This item does not fit.")
-//			return
 		if ( istype(W,/obj/item/clothing/head/helmet ) )
 			to_chat(user, "This item does not fit.")
 			return

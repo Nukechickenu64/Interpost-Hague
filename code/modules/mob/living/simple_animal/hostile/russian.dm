@@ -19,7 +19,6 @@
 	melee_damage_upper = 15
 	attacktext = "punched"
 	a_intent = I_HURT
-	var/corpse = /obj/effect/landmark/corpse/russian
 	var/weapon1 = /obj/item/weapon/material/knife
 	unsuitable_atoms_damage = 15
 	faction = "russian"
@@ -29,7 +28,6 @@
 /mob/living/simple_animal/hostile/russian/ranged
 	icon_state = "russianranged"
 	icon_living = "russianranged"
-	corpse = /obj/effect/landmark/corpse/russian/ranged
 	weapon1 = /obj/item/weapon/gun/projectile/revolver/mateba
 	ranged = 1
 	projectiletype = /obj/item/projectile/bullet
@@ -39,8 +37,6 @@
 
 /mob/living/simple_animal/hostile/russian/death(gibbed, deathmessage, show_dead_message)
 	..(gibbed, deathmessage, show_dead_message)
-	if(corpse)
-		new corpse (src.loc)
 	if(weapon1)
 		new weapon1 (src.loc)
 	qdel(src)

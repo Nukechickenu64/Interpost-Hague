@@ -20,9 +20,6 @@
 	new /obj/item/clothing/shoes/jackboots(src)
 	new /obj/item/clothing/shoes/jackboots(src)
 	new /obj/item/clothing/shoes/jackboots(src)
-	new /obj/item/clothing/head/soft/sec(src)
-	new /obj/item/clothing/head/soft/sec(src)
-	new /obj/item/clothing/head/soft/sec(src)
 	new /obj/item/clothing/head/beret/sec(src)
 	new /obj/item/clothing/head/beret/sec(src)
 	new /obj/item/clothing/head/beret/sec(src)
@@ -60,35 +57,9 @@
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
 	new /obj/item/clothing/shoes/black(src)
-	new /obj/item/clothing/head/that(src)
-	new /obj/item/clothing/head/that(src)
-	new /obj/item/clothing/head/that(src)
 	new /obj/item/clothing/head/soft/black(src)
 	new /obj/item/clothing/head/soft/black(src)
 	new /obj/item/clothing/head/soft/black(src)
-	return
-
-
-/obj/structure/closet/wardrobe/chaplain_black
-	name = "chapel wardrobe"
-	desc = "It's a storage unit for approved religious attire."
-	icon_state = "black"
-	icon_closed = "black"
-
-/obj/structure/closet/wardrobe/chaplain_black/New()
-	..()
-	new /obj/item/clothing/under/rank/chaplain(src)
-	new /obj/item/clothing/shoes/black(src)
-	new /obj/item/clothing/suit/nun(src)
-	new /obj/item/clothing/head/nun_hood(src)
-	new /obj/item/clothing/suit/chaplain_hoodie(src)
-	new /obj/item/clothing/head/chaplain_hood(src)
-	new /obj/item/clothing/suit/holidaypriest(src)
-	new /obj/item/clothing/under/wedding/bride_white(src)
-	new /obj/item/weapon/storage/backpack/cultpack (src)
-	new /obj/item/weapon/storage/fancy/candle_box(src)
-	new /obj/item/weapon/storage/fancy/candle_box(src)
-	new /obj/item/weapon/deck/tarot(src)
 	return
 
 
@@ -114,8 +85,6 @@
 
 /obj/structure/closet/wardrobe/xenos/New()
 	..()
-	new /obj/item/clothing/suit/unathi/mantle(src)
-	new /obj/item/clothing/suit/unathi/robe(src)
 	new /obj/item/clothing/shoes/sandal(src)
 	new /obj/item/clothing/shoes/sandal(src)
 	new /obj/item/clothing/shoes/sandal(src)

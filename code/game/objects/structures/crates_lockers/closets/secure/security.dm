@@ -105,7 +105,6 @@
 	return list(
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/security, /obj/item/weapon/storage/backpack/satchel_sec)),
 		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/sec, 50),
-		/obj/item/clothing/head/helmet/nt,
 		/obj/item/clothing/suit/armor/vest/nt,
 		/obj/item/clothing/suit/storage/vest/nt/warden,
 		/obj/item/clothing/under/rank/warden,
@@ -146,7 +145,6 @@
 		/obj/item/taperoll/police,
 		/obj/item/device/hailer,
 		/obj/item/clothing/accessory/storage/black_vest,
-		/obj/item/clothing/head/soft/sec/corp,
 		/obj/item/weapon/gun/energy/taser,
 		/obj/item/device/holowarrant,
 		/obj/item/clothing/head/helmet/steelhelm,
@@ -262,10 +260,9 @@
 	return list(
 		/obj/item/clothing/shoes/brown,
 		/obj/item/weapon/paper/Court = 3,
-		/obj/item/weapon/pen ,
+		/obj/item/weapon/pen,
 		/obj/item/clothing/suit/judgerobe,
-		/obj/item/clothing/head/powdered_wig ,
-		/obj/item/weapon/storage/briefcase,
+		/obj/item/weapon/storage/briefcase
 	)
 
 /obj/structure/closet/secure_closet/wall

@@ -151,14 +151,6 @@
 	name = "Pirate Gunner"
 	corpse_outfits = list(/decl/hierarchy/outfit/pirate/space)
 
-/obj/effect/landmark/corpse/russian
-	name = "Russian"
-	corpse_outfits = list(/decl/hierarchy/outfit/soviet_soldier)
-	spawn_flags = CORPSE_SPAWNER_NO_RANDOMIZATION
-
-/obj/effect/landmark/corpse/russian/ranged
-	corpse_outfits = list(/decl/hierarchy/outfit/soviet_soldier)
-
 /obj/effect/landmark/corpse/syndicate
 	name = "Syndicate Operative"
 	corpse_outfits = list(/decl/hierarchy/outfit/mercenary/syndicate)

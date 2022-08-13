@@ -70,6 +70,7 @@
 	ui_users.Cut()
 	..()
 
+/*
 // The following mirror is ~special~.
 /obj/structure/mirror/raider
 	name = "cracked mirror"
@@ -97,6 +98,7 @@
 					GLOB.raiders.update_access(vox)
 				qdel(user)
 	..()
+*/
 
 /obj/item/weapon/mirror
 	name = "mirror"
@@ -107,17 +109,7 @@
 
 /obj/item/weapon/mirror/attack_self(mob/user as mob)
 	if(ishuman(user))
-		var/datum/nano_module/appearance_changer/AC = ui_users[user]
-		if(!AC)
-			AC = new(src, user)
-			AC.name = "SalonPro Nano-Mirror&trade;"
-			AC.flags = APPEARANCE_HAIR
-			ui_users[user] = AC
-		AC.ui_interact(user)
+		to_chat(user, "<span class='info'>I am very glad that I am not a vampire.</span>")
 
 /obj/item/weapon/mirror/Destroy()
-	for(var/user in ui_users)
-		var/datum/nano_module/appearance_changer/AC = ui_users[user]
-		qdel(AC)
-	ui_users.Cut()
 	..()

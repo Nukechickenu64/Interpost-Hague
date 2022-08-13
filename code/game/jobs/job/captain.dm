@@ -27,34 +27,6 @@ var/datum/announcement/minor/captain_announcement = new(do_newscast = 1)
 /datum/job/captain/get_access()
 	return get_all_station_access()
 
-/datum/job/countess
-	title = "Countess"
-	department = "Command"
-	head_position = 1
-	department_flag = COM
-
-	total_positions = 1
-	spawn_positions = 1
-	supervisors = "the captain"
-	selection_color = "#1d1d4f"
-	req_admin_notify = 1
-	access = list() 			//See get_access()
-	minimal_access = list() 	//See get_access()
-	minimal_player_age = 14
-	economic_modifier = 20
-
-	ideal_character_age = 70 // Old geezer captains ftw
-	outfit_type = /decl/hierarchy/outfit/job/countess
-
-/datum/job/countess/equip(var/mob/living/carbon/human/H)
-	. = ..()
-	if(.)
-		H.implant_loyalty(src)
-
-/datum/job/countess/get_access()
-	return get_all_station_access()
-
-
 /datum/job/hop
 	title = "Head of Personnel"
 	head_position = 1

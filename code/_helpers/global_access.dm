@@ -87,8 +87,6 @@
 			return global.SSskybox;
 		if("SStgui")
 			return global.SStgui;
-		if("SStrade")
-			return global.SStrade;
 		if("SSradiation")
 			return global.SSradiation;
 		if("SSstatistics")
@@ -1022,8 +1020,6 @@
 			global.SSinactivity=newval;
 		if("SStgui")
 			global.SStgui=newval;
-		if("SStrade")
-			global.SStrade=newval;
 		if("SSevac")
 			global.SSevac=newval;
 		if("SSlighting")

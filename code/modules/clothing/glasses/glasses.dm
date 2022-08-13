@@ -134,37 +134,6 @@
 	siemens_coefficient = 0.6
 	electric = 1
 
-/obj/item/clothing/glasses/eyepatch
-	name = "eyepatch"
-	desc = "Yarr."
-	icon_state = "eyepatch"
-	item_state = "eyepatch"
-	body_parts_covered = 0
-	var/flipped = 0 // Indicates left or right eye; 0 = on the right
-
-/obj/item/clothing/glasses/eyepatch/verb/flip_patch()
-	set name = "Flip Patch"
-	set category = "Object"
-	set src in usr
-
-	if (usr.stat || usr.restrained())
-		return
-
-	src.flipped = !src.flipped
-	if(src.flipped)
-		icon_state = "[icon_state]_r"
-	else
-		src.icon_state = initial(icon_state)
-	to_chat (usr, "You change \the [src] to cover the [src.flipped ? "left" : "right"] eye.")
-	update_clothing_icon()
-
-/obj/item/clothing/glasses/monocle
-	name = "monocle"
-	desc = "Such a dapper eyepiece!"
-	icon_state = "monocle"
-	item_state = "headset" // lol
-	body_parts_covered = 0
-
 /obj/item/clothing/glasses/material
 	name = "optical material scanner"
 	desc = "Very confusing glasses."
@@ -191,26 +160,6 @@
 	icon_state = "uzenwa_sissra_1"
 	light_protection = 7
 	electric = 1
-
-/obj/item/clothing/glasses/regular/hipster
-	name = "prescription glasses"
-	desc = "Made by Uncool. Co."
-	icon_state = "hipster_glasses"
-	item_state = "hipster_glasses"
-
-/obj/item/clothing/glasses/threedglasses
-	name = "3D glasses"
-	desc = "A long time ago, people used these glasses to makes images from screens threedimensional."
-	icon_state = "3d"
-	item_state = "3d"
-	body_parts_covered = 0
-
-/obj/item/clothing/glasses/gglasses
-	name = "green glasses"
-	desc = "Forest green glasses, like the kind you'd wear when hatching a nasty scheme."
-	icon_state = "gglasses"
-	item_state = "gglasses"
-	body_parts_covered = 0
 
 /obj/item/clothing/glasses/sunglasses
 	name = "sunglasses"
@@ -279,7 +228,7 @@
 
 /obj/item/clothing/glasses/sunglasses/blindfold/tape
 	name = "length of tape"
-	desc = "It's a robust DIY blindfold!"
+	desc = "It's a DIY blindfold."
 	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "tape_cross"
 	item_state = null
@@ -378,26 +327,6 @@
 	activation_sound = null
 	action_button_name = null
 
-/obj/item/clothing/glasses/thermal/plain/monocle
-	name = "thermoncle"
-	desc = "A monocle thermal."
-	icon_state = "thermoncle"
-	body_parts_covered = 0 //doesn't protect eyes because it's a monocle, duh
-
-/obj/item/clothing/glasses/thermal/plain/eyepatch
-	name = "optical thermal eyepatch"
-	desc = "An eyepatch with built-in thermal optics."
-	icon_state = "eyepatch"
-	item_state = "eyepatch"
-	body_parts_covered = 0
-
-/obj/item/clothing/glasses/thermal/plain/jensen
-	name = "optical thermal implants"
-	gender = PLURAL
-	desc = "A set of implantable lenses designed to augment your vision."
-	icon_state = "thermalimplants"
-	item_state = "syringe_kit"
-
 /obj/item/clothing/glasses/eyepatch/hud
 	name = "iPatch"
 	desc = "For the technologically inclined pirate. It connects directly to the optical nerve of the user, replacing the need for that useless eyeball."
@@ -458,43 +387,9 @@
 	..()
 	overlay = GLOB.global_hud.meson
 
-
-/*---Tajaran-specific Eyewear---*/
-
-/obj/item/clothing/glasses/tajblind
-	name = "embroidered veil"
-	desc = "An Ahdominian made veil that allows the user to see while obscuring their eyes."
-	icon_state = "tajblind"
-	item_state = "tajblind"
-	prescription = 5
-	body_parts_covered = EYES
-
-/obj/item/clothing/glasses/hud/health/tajblind
-	name = "lightweight veil"
-	desc = "An Ahdominian made veil that allows the user to see while obscuring their eyes. This one has an installed medical HUD."
-	icon_state = "tajblind_med"
-	item_state = "tajblind_med"
-	body_parts_covered = EYES
-
-/obj/item/clothing/glasses/sunglasses/sechud/tajblind
-	name = "sleek veil"
-	desc = "An Ahdominian made veil that allows the user to see while obscuring their eyes. This one has an in-built security HUD."
-	icon_state = "tajblind_sec"
-	item_state = "tajblind_sec"
-	prescription = 5
-	body_parts_covered = EYES
-
-/obj/item/clothing/glasses/meson/prescription/tajblind
-	name = "industrial veil"
-	desc = "An Ahdominian made veil that allows the user to see while obscuring their eyes. This one has installed mesons."
-	icon_state = "tajblind_meson"
-	item_state = "tajblind_meson"
-	off_state = "tajblind_meson"
-	body_parts_covered = EYES
-
 /obj/item/clothing/glasses/priest
 	name = "priests's googles"
-	desc = "His vision is guided by Verina, but it does not mean he can escape physical constraints."
+	desc = "His vision is guided by TetraCorp, but it does not mean he can escape physical constraints."
 	icon_state = "priest"
 	item_state = "priest" // lol
 	body_parts_covered = EYES

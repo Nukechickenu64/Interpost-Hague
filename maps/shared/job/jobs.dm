@@ -36,7 +36,6 @@
 /datum/map/utopia
 	allowed_jobs = list(
 						/datum/job/captain,
-						/datum/job/countess,
 						/datum/job/hop,
 						/datum/job/supreme_arbiter,
 						/datum/job/arbiter,
@@ -139,7 +138,6 @@
 /datum/map/bearcat
 	allowed_jobs = list(
 						/datum/job/captain,
-						/datum/job/countess,
 						/datum/job/hop,
 						/datum/job/supreme_arbiter,
 						/datum/job/arbiter,
@@ -244,18 +242,6 @@
 		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
 		H.newgeneratestats(9,14,9,13,9,15,10,16)
 		H.generate_skills(list("ranged"))
-
-/datum/job/countess
-	title = "Countess"
-	supervisors = "your other ruler, the Count"
-	minimal_player_age = 41
-	economic_modifier = 10
-	ideal_character_age = 55
-	outfit_type = /decl/hierarchy/outfit/job/dreyfus/countess
-	social_class = SOCIAL_CLASS_MAX
-	department_flag = SPT
-	sex_lock = FEMALE
-
 
 	equip(var/mob/living/carbon/human/H)
 		..()

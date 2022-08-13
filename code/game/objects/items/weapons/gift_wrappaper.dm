@@ -57,7 +57,6 @@
 		/obj/item/weapon/storage/box/snappops,
 		/obj/item/weapon/storage/fancy/crayons,
 		/obj/item/weapon/storage/backpack/holding,
-		/obj/item/weapon/storage/belt/champion,
 		/obj/item/weapon/soap/deluxe,
 		/obj/item/weapon/pickaxe/silver,
 		/obj/item/weapon/pen/invisible,

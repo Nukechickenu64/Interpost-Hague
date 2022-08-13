@@ -145,8 +145,6 @@
 	recipes += new/datum/stack_recipe("light tubes box", /obj/item/weapon/storage/box/lights/tubes/empty)
 	recipes += new/datum/stack_recipe("light bulbs box", /obj/item/weapon/storage/box/lights/bulbs/empty)
 	recipes += new/datum/stack_recipe("mouse traps box", /obj/item/weapon/storage/box/mousetraps/empty)
-	recipes += new/datum/stack_recipe("cardborg suit", /obj/item/clothing/suit/cardborg, 3)
-	recipes += new/datum/stack_recipe("cardborg helmet", /obj/item/clothing/head/cardborg)
 	recipes += new/datum/stack_recipe("pizza box", /obj/item/pizzabox)
 	recipes += new/datum/stack_recipe_list("folders",list( \
 		new/datum/stack_recipe("blue folder", /obj/item/weapon/folder/blue), \

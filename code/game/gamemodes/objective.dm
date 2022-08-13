@@ -590,6 +590,7 @@ var/global/list/all_objectives = list()
 		else
 			return 0
 
+/*
 // Heist objectives.
 /datum/objective/heist
 	proc/choose_target()
@@ -751,13 +752,14 @@ var/global/list/all_objectives = list()
 		if(total_amount >= target_amount) return 1
 		return 0
 
-
 /datum/objective/heist/preserve_crew
 	explanation_text = "Do not leave anyone behind, alive or dead."
 
 	check_completion()
 		if(GLOB.raiders && GLOB.raiders.is_raider_crew_safe()) return 1
 		return 0
+*/
+
 
 //Borer objective(s).
 /datum/objective/borer_survive

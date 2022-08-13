@@ -122,7 +122,6 @@
 				/obj/item/weapon/hand_labeler = 1,
 				/obj/random/bomb_supply = 2,
 				/obj/item/weapon/extinguisher = 1,
-				/obj/item/clothing/gloves/insulated/cheap = 1,
 				/obj/item/stack/cable_coil/random = 2,
 				/obj/random/toolbox = 2,
 				/obj/item/weapon/storage/belt/utility = 2,
@@ -428,7 +427,6 @@ obj/random/closet/spawn_choices()
 				/obj/structure/closet/firecloset/full,
 				/obj/structure/closet/emcloset,
 				/obj/structure/closet/jcloset,
-				/obj/structure/closet/athletic_mixed,
 				/obj/structure/closet/toolcloset,
 				/obj/structure/closet/l3closet/general,
 				/obj/structure/closet/cabinet,
@@ -438,7 +436,6 @@ obj/random/closet/spawn_choices()
 				/obj/structure/closet/crate/internals,
 				/obj/structure/closet/crate/trashcart,
 				/obj/structure/closet/crate/medical,
-				/obj/structure/closet/boxinggloves,
 				/obj/structure/largecrate,
 				/obj/structure/closet/wardrobe/xenos,
 				/obj/structure/closet/wardrobe/mixed,
@@ -747,16 +744,13 @@ obj/random/obstruction/spawn_choices()
 /obj/random/gloves/spawn_choices()
 	return list(/obj/item/clothing/gloves/insulated = 3,
 				/obj/item/clothing/gloves/thick = 6,
-				/obj/item/clothing/gloves/thick/botany = 5,
 				/obj/item/clothing/gloves/latex = 4,
 				/obj/item/clothing/gloves/thick/swat = 3,
 				/obj/item/clothing/gloves/thick/combat = 3,
-				/obj/item/clothing/gloves/white = 5,
 				/obj/item/clothing/gloves/rainbow = 1,
 				/obj/item/clothing/gloves/duty = 5,
 				/obj/item/clothing/gloves/guards = 3,
-				/obj/item/clothing/gloves/tactical = 3,
-				/obj/item/clothing/gloves/insulated/cheap = 5)
+				/obj/item/clothing/gloves/tactical = 3)
 
 /obj/random/glasses
 	name = "random eyewear"
@@ -812,10 +806,8 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/clothing/suit/armor/vest = 4,
 				/obj/item/clothing/suit/storage/vest/tactical = 1,
 				/obj/item/clothing/suit/storage/vest = 3,
-				/obj/item/clothing/suit/storage/toggle/bomber = 3,
 				/obj/item/clothing/suit/chef/classic = 3,
 				/obj/item/clothing/suit/surgicalapron = 2,
-				/obj/item/clothing/suit/apron/overalls = 3,
 				/obj/item/clothing/suit/bio_suit/general = 1,
 				/obj/item/clothing/suit/storage/toggle/hoodie/black = 3,
 				/obj/item/clothing/suit/storage/toggle/brown_jacket = 3,
@@ -941,12 +933,10 @@ something, make sure it's not in one of the other lists.*/
 				/obj/random/voidsuit = 10,
 				/obj/random/hardsuit = 10,
 				/obj/item/clothing/mask/muzzle = 7,
-				/obj/item/clothing/mask/gas/vox = 8,
 				/obj/item/clothing/mask/gas/syndicate = 10,
 				/obj/item/clothing/glasses/night = 3,
 				/obj/item/clothing/glasses/thermal = 1,
 				/obj/item/clothing/glasses/welding/superior = 7,
-				/obj/item/clothing/head/collectable/petehat = 4,
 				/obj/item/clothing/suit/storage/vest/merc = 3,
 				/obj/item/clothing/suit/straight_jacket = 6,
 				/obj/item/clothing/head/helmet/merc = 3,
@@ -1035,9 +1025,7 @@ something, make sure it's not in one of the other lists.*/
 				/obj/item/weapon/rig/eva,
 				/obj/item/weapon/rig/light/hacker,
 				/obj/item/weapon/rig/light/stealth,
-				/obj/item/weapon/rig/light,
-				/obj/item/weapon/rig/unathi,
-				/obj/item/weapon/rig/unathi/fancy)
+				/obj/item/weapon/rig/light)
 
 /obj/random/hostile
 	name = "Random Hostile Mob"

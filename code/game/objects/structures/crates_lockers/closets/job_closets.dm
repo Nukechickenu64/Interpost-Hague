@@ -6,30 +6,6 @@
  */
 
 /*
- * Bartender
- */
-/obj/structure/closet/gmcloset
-	name = "formal closet"
-	desc = "It's a storage unit for formal clothing."
-	icon_state = "black"
-	icon_closed = "black"
-
-/obj/structure/closet/gmcloset/WillContain()
-	return list(
-		/obj/item/clothing/head/that = 2,
-		/obj/item/device/radio/headset/headset_service = 2,
-		/obj/item/clothing/head/hairflower,
-		/obj/item/clothing/head/hairflower/pink,
-		/obj/item/clothing/head/hairflower/yellow,
-		/obj/item/clothing/head/hairflower/blue,
-		/obj/item/clothing/under/sl_suit = 2,
-		/obj/item/clothing/under/rank/bartender = 2,
-		/obj/item/clothing/under/dress/dress_saloon,
-		/obj/item/clothing/accessory/wcoat = 2,
-		/obj/item/clothing/shoes/black = 2
-	)
-
-/*
  * Chef
  */
 /obj/structure/closet/chefcloset
@@ -63,7 +39,6 @@
 		/obj/item/device/radio/headset/headset_service,
 		/obj/item/weapon/cartridge/janitor,
 		/obj/item/clothing/gloves/thick,
-		/obj/item/clothing/head/soft/purple,
 		/obj/item/clothing/head/beret/purple,
 		/obj/item/device/flashlight,
 		/obj/item/weapon/caution = 4,

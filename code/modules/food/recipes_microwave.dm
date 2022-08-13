@@ -1024,10 +1024,6 @@ I said no!
 	reagents = list(/datum/reagent/drink/milk = 5, /datum/reagent/nutriment/flour = 15, /datum/reagent/nutriment/protein/egg = 9, /datum/reagent/nutriment/coco = 4, /datum/reagent/sugar = 5)
 	result = /obj/item/weapon/reagent_containers/food/snacks/sliceable/chocolatecake
 
-/datum/recipe/cake/birthday
-	items = list(/obj/item/clothing/head/cakehat)
-	result = /obj/item/weapon/reagent_containers/food/snacks/sliceable/birthdaycake
-
 /datum/recipe/cake/apple
 	fruit = list("apple" = 2)
 	result = /obj/item/weapon/reagent_containers/food/snacks/sliceable/applecake

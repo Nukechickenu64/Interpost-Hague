@@ -19,19 +19,6 @@
 	siemens_coefficient = 0.7
 	w_class = ITEM_SIZE_NORMAL
 
-/obj/item/clothing/head/helmet/nt
-	name = "\improper corporate security helmet"
-	desc = "A helmet with 'CORPORATE SECURITY' printed on the back in red lettering."
-	icon_state = "helmet_nt"
-
-/obj/item/clothing/head/helmet/pcrc
-	name = "\improper PCRC helmet"
-	desc = "A helmet with 'PRIVATE SECURITY' printed on the back in cyan lettering."
-	icon_state = "helmet_pcrc"
-
-/obj/item/clothing/head/helmet/nt/guard
-	starting_accessories = list(/obj/item/clothing/accessory/armor/helmcover/nt)
-
 /obj/item/clothing/head/helmet/tactical
 	name = "tactical helmet"
 	desc = "A tan helmet made from advanced ceramic. Comfortable and robust."
@@ -133,25 +120,6 @@
 	min_cold_protection_temperature = SPACE_HELMET_MIN_COLD_PROTECTION_TEMPERATURE
 	siemens_coefficient = 0.5
 
-/obj/item/clothing/head/helmet/thunderdome
-	name = "\improper Thunderdome helmet"
-	desc = "<i>'Let the battle commence!'</i>"
-	icon_state = "thunderdome"
-	valid_accessory_slots = null
-	armor = list(melee = 80, bullet = 60, laser = 50,energy = 10, bomb = 25, bio = 10, rad = 0)
-	cold_protection = HEAD
-	min_cold_protection_temperature = SPACE_HELMET_MIN_COLD_PROTECTION_TEMPERATURE
-	siemens_coefficient = 1
-
-/obj/item/clothing/head/helmet/gladiator
-	name = "gladiator helmet"
-	desc = "Ave, Imperator, morituri te salutant."
-	icon_state = "gladiator"
-	valid_accessory_slots = null
-	flags_inv = HIDEMASK|HIDEEARS|HIDEEYES|BLOCKHAIR
-	body_parts_covered = HEAD|FACE
-	siemens_coefficient = 1
-
 /*
 /obj/item/clothing/head/helmet/tactical
 	name = "tactical helmet"
@@ -179,42 +147,6 @@
 	cold_protection = HEAD
 	min_cold_protection_temperature = SPACE_HELMET_MIN_COLD_PROTECTION_TEMPERATURE
 	siemens_coefficient = 0.5
-
-//Non-hardsuit ERT helmets.
-//Commander
-/obj/item/clothing/head/helmet/ert
-	name = "asset protection command helmet"
-	desc = "An in-atmosphere helmet worn by many corporate and private asset protection forces. Has blue highlights."
-	icon_state = "erthelmet_cmd"
-	valid_accessory_slots = null
-	item_state_slots = list(
-		slot_l_hand_str = "syndicate-helm-green",
-		slot_r_hand_str = "syndicate-helm-green",
-		)
-	armor = list(melee = 62, bullet = 50, laser = 50,energy = 35, bomb = 10, bio = 2, rad = 0)
-
-//Security
-/obj/item/clothing/head/helmet/ert/security
-	name = "asset protection security helmet"
-	desc = "An in-atmosphere helmet worn by many corporate and private asset protection forces. Has red highlights."
-	icon_state = "erthelmet_sec"
-
-//Engineer
-/obj/item/clothing/head/helmet/ert/engineer
-	name = "asset protection engineering helmet"
-	desc = "An in-atmosphere helmet worn by many corporate and private asset protection forces. Has orange highlights."
-	icon_state = "erthelmet_eng"
-
-//Medical
-/obj/item/clothing/head/helmet/ert/medical
-	name = "asset protection medical helmet"
-	desc = "An in-atmosphere helmet worn by many corporate and private asset protection forces. Has red and white highlights."
-	icon_state = "erthelmet_med"
-
-/obj/item/clothing/head/helmet/tactical/mirania
-	name = "bundeforz tactical helmet"
-	desc = "A light grey helmet made from advanced ceramic. Comfortable and robust."
-	icon_state = "m_helmet"
 
 /obj/item/clothing/head/helmet/handmade
 	name = "handmade combat helmet"

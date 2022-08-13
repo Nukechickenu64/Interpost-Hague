@@ -2,7 +2,6 @@
 	hierarchy_type = /decl/hierarchy/outfit/nanotrasen
 	uniform = /obj/item/clothing/under/rank/centcom
 	shoes = /obj/item/clothing/shoes/laceup
-	gloves = /obj/item/clothing/gloves/white
 	l_ear = /obj/item/device/radio/headset/heads/hop
 	glasses = /obj/item/clothing/glasses/sunglasses
 
@@ -33,7 +32,6 @@
 
 /decl/hierarchy/outfit/nanotrasen/commander
 	name = "NanoTrasen Commander"
-	head = /obj/item/clothing/head/centhat
 	mask = /obj/item/clothing/mask/smokable/cigarette/cigar/cohiba
 	shoes = /obj/item/clothing/shoes/swat
 	uniform = /obj/item/clothing/under/rank/centcom_captain

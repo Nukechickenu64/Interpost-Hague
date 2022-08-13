@@ -66,12 +66,6 @@
 	body_parts_covered = FACE|EYES
 	armor = list(melee = 15, bullet = 15, laser = 15, energy = 0, bomb = 0, bio = 75, rad = 0)
 
-/obj/item/clothing/mask/gas/swat/vox
-	name = "alien mask"
-	desc = "Clearly not designed for a human face."
-	body_parts_covered = 0 //Hack to allow vox to eat while wearing this mask.
-	species_restricted = list(SPECIES_VOX)
-
 /obj/item/clothing/mask/gas/syndicate
 	name = "tactical mask"
 	desc = "A close-fitting tactical mask that can be connected to an air supply."
@@ -85,31 +79,6 @@
 	desc = "A true prankster's facial attire. A clown is incomplete without their wig and mask."
 	icon_state = "clown"
 	item_state = "clown_hat"
-
-/obj/item/clothing/mask/gas/sexyclown
-	name = "sexy-clown wig and mask"
-	desc = "A feminine clown mask for the dabbling crossdressers or female entertainers."
-	icon_state = "sexyclown"
-	item_state = "sexyclown"
-
-/obj/item/clothing/mask/gas/mime
-	name = "mime mask"
-	desc = "The traditional mime's mask. It has an eerie facial posture."
-	icon_state = "mime"
-	item_state = "mime"
-
-/obj/item/clothing/mask/gas/monkeymask
-	name = "monkey mask"
-	desc = "A mask used when acting as a monkey."
-	icon_state = "monkeymask"
-	item_state = "monkeymask"
-	body_parts_covered = HEAD|FACE|EYES
-
-/obj/item/clothing/mask/gas/sexymime
-	name = "sexy mime mask"
-	desc = "A traditional female mime's mask."
-	icon_state = "sexymime"
-	item_state = "sexymime"
 
 /obj/item/clothing/mask/gas/death_commando
 	name = "Death Commando Mask"
@@ -127,15 +96,6 @@
 	desc = "Twoooo!"
 	icon_state = "owl"
 	body_parts_covered = HEAD|FACE|EYES
-
-/obj/item/clothing/mask/gas/vox
-	name = "vox breathing mask"
-	desc = "A small oxygen filter for use by Vox"
-	icon_state = "respirator"
-	flags_inv = 0
-	body_parts_covered = 0
-	species_restricted = list(SPECIES_VOX)
-	filtered_gases = list("phoron", "sleeping_agent", "oxygen")
 
 /obj/item/clothing/mask/gas/newsecurity
 	name = "enforcer gas mask"

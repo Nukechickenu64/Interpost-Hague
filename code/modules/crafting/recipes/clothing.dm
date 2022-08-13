@@ -3,16 +3,6 @@
 	time = 50
 	result = null
 
-/datum/crafting_recipe/clothing/cardborg_suit
-	name = "cardborg suit"
-	result = list(/obj/item/clothing/suit/cardborg = 1)
-	parts = list(MATERIAL_CARDBOARD_TYPE= 3)
-
-/datum/crafting_recipe/clothing/cardborg_helmet
-	name = "cardborg helmet"
-	result = list(/obj/item/clothing/head/cardborg = 1)
-	parts = list(MATERIAL_CARDBOARD_TYPE= 1)
-
 /datum/crafting_recipe/clothing/sandals
 	name = "wooden sandals"
 	result = list(/obj/item/clothing/shoes/sandal = 1)

@@ -170,17 +170,6 @@
 	new /obj/item/device/soulstone(src)
 	new /obj/item/device/soulstone(src)
 
-
-/obj/item/weapon/storage/belt/champion
-	name = "championship belt"
-	desc = "Proves to the world that you are the strongest!"
-	icon_state = "championbelt"
-	item_state = "champion"
-	storage_slots_w = 1
-	can_hold = list(
-		/obj/item/clothing/mask/luchador
-		)
-
 /obj/item/weapon/storage/belt/security/tactical
 	name = "combat belt"
 	desc = "Can hold security gear like handcuffs and flashes, with more pouches for more storage."

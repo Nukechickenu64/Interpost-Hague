@@ -236,7 +236,6 @@ obj/structure/net/Initialize(var/mapload)
 /decl/hierarchy/outfit/corpse/carp_fisher
 	name = "Dead carp fisher"
 	uniform = /obj/item/clothing/under/color/green
-	suit = /obj/item/clothing/suit/apron/overalls
 	belt = /obj/item/weapon/material/hatchet/tacknife
 	shoes = /obj/item/clothing/shoes/jackboots
 	head = /obj/item/clothing/head/hardhat/dblue

@@ -66,7 +66,6 @@
 					/obj/item/weapon/material/hatchet,
 					/obj/item/weapon/material/minihoe,
 					/obj/item/device/analyzer/plant_analyzer,
-					/obj/item/clothing/gloves/thick/botany,
 					/obj/item/clothing/suit/apron,
 					/obj/item/weapon/material/minihoe,
 					/obj/item/weapon/storage/box/botanydisk

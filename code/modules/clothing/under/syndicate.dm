@@ -18,7 +18,7 @@
 
 /obj/item/clothing/under/syndicate/tacticool
 	name = "\improper Tacticool turtleneck"
-	desc = "Just looking at it makes you want to buy an SKS, go into the woods, and -operate-."
+	desc = "A classy style of a dress for a real operative."
 	icon_state = "tactifool"
 	item_state = "bl_suit"
 	worn_state = "tactifool"

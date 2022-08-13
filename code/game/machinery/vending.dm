@@ -1006,7 +1006,7 @@
 	products = list(/obj/item/stack/cable_coil/random = 10,/obj/item/weapon/crowbar = 5,/obj/item/weapon/weldingtool = 3,/obj/item/weapon/wirecutters = 5,
 					/obj/item/weapon/wrench = 5,/obj/item/device/analyzer = 5,/obj/item/device/t_scanner = 5,/obj/item/weapon/screwdriver = 5,
 					/obj/item/device/flashlight/glowstick = 3, /obj/item/device/flashlight/glowstick/red = 3)
-	contraband = list(/obj/item/weapon/weldingtool/hugetank = 2,/obj/item/clothing/gloves/insulated/cheap = 2)
+	contraband = list(/obj/item/weapon/weldingtool/hugetank = 2)
 	premium = list(/obj/item/clothing/gloves/insulated = 1)
 
 /obj/machinery/vending/engivend
@@ -1076,7 +1076,6 @@
 	product_ads = "Impress the love of your life!;Don't look poor, look rich!;100% authentic designers!;All sales are final!;Lowest prices guaranteed!"
 	products = list(/obj/item/weapon/mirror = 8,
 					/obj/item/weapon/haircomb = 8,
-					/obj/item/clothing/glasses/monocle = 5,
 					/obj/item/clothing/glasses/sunglasses = 5,
 					/obj/item/weapon/lipstick = 3,
 					/obj/item/weapon/lipstick/black = 3,
@@ -1087,7 +1086,6 @@
 	premium = list(/obj/item/clothing/mask/smokable/pipe = 3)
 	prices = list(/obj/item/weapon/mirror = 60,
 					/obj/item/weapon/haircomb = 40,
-					/obj/item/clothing/glasses/monocle = 700,
 					/obj/item/clothing/glasses/sunglasses = 500,
 					/obj/item/weapon/lipstick = 100,
 					/obj/item/weapon/lipstick/black = 100,
