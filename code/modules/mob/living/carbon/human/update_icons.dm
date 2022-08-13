@@ -352,8 +352,10 @@ var/global/list/damage_icon_parts = list()
 				base_icon.Blend(temp, ICON_OVERLAY)
 
 		if(pale)
-			base_icon.ColorTone(rgb(32,32,164))
-			base_icon.SetIntensity(0.7)
+			var/pale_color_mod = rgb(199,182,163)
+			base_icon.SetIntensity(0.4)
+			base_icon.Blend(pale_color_mod)
+			base_icon.ColorTone(pale_color_mod)
 
 		if(!skeleton)
 			if(husk)
@@ -831,14 +833,14 @@ var/global/list/damage_icon_parts = list()
 				overlays_standing[BODYHAIR_LAYER] = null
 				var/image/standing = image("icon_state" = "bodyhair_s")
 				standing.icon = 'icons/mob/human_detail.dmi'
-				standing.alpha = 130
+				standing.alpha = 120
 				standing.color = "[rgb(r_hair, g_hair, b_hair)]"
 				overlays_standing[BODYHAIR_LAYER] = standing
 			else
 				overlays_standing[BODYHAIR_LAYER] = null
 				var/image/standing = image("icon_state" = "fbodyhair_s")
 				standing.icon = 'icons/mob/human_detail.dmi'
-				standing.alpha = 130
+				standing.alpha = 120
 				standing.color = "[rgb(r_hair, g_hair, b_hair)]"
 				overlays_standing[BODYHAIR_LAYER] = standing
 	else
