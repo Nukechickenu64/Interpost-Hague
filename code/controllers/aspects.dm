@@ -20,7 +20,7 @@
 
 /datum/round_event/without_light
 	id = "withoutlight"
-	event_message = "The station did not receive the heroes of this shift very favourably: the complete darkness accompanied them to their workplaces, and only the dim PDA flashlights lit the way. The staff has yet to return the station to a more or less working condition, as long as they do not have a problem with their determination."
+	event_message = "The station did not receive the heroes of this shift very favourably: a complete darkness accompanied them to their workplaces."
 
 /datum/round_event/without_light/apply_event()
 	lightsout(0, 0)
@@ -38,6 +38,7 @@
 	for(var/obj/machinery/the_singularitygen/LORDSINGULO in world)
 		qdel(LORDSINGULO)
 
+/*
 /datum/round_event/old_times
 	id = "oldtimes"
 	event_message = "The ghosts of the past drag the staff down, showing them what was unheard of. The station's waste in the person of the \"olds\" has decided to open the curtain of darkness to those who still have to find out and understand everything.."
@@ -47,10 +48,13 @@
 		LO.icon = 'icons/effects/lighting_overlay.dmi'
 		LO.update_overlay()
 		CHECK_TICK
+*/
 
+/*
 /datum/round_event/assjesters
 	id = "assclowns"
 	event_message = "On this wild shift, the members of the grey brotherhood decided to fold their clothes to raise the banner of absurdity and demonstrate the real meaning of \"Space Station\" to the plebians!"
+*/
 
 /*
 /datum/round_event/ghetto_medbay
@@ -161,7 +165,7 @@
 
 /datum/round_event/can_you_hear_me_major_tom
 	id = "CANYOUHEARMEMAJTOM"
-	event_message = "Absence of a specialized headset will never prevent the faithful servants of the King from working. At least they still have walkie-talkies..."
+	event_message = "Absence of a specialized headset will never prevent anyone in the station from working. As long as they have walkie-talkies, that is."
 
 /datum/round_event/can_you_hear_me_major_tom/apply_event()
 	for(var/obj/item/device/radio/headset/RH in world)
@@ -177,6 +181,7 @@
 		L.on = L.powered()
 		L.update_icon()
 
+/*
 /datum/round_event/pussy_riot
 	id = "pussyriot"
 	event_message = "Today the Security Department is acting especially gently. This tenderness is expressed by the general attitude of the department...  As well as its equipment."
@@ -203,6 +208,7 @@
 			W.color = COLOR_LIGHT_PINK
 		for(var/obj/machinery/door/airlock/A in S)
 			A.color = COLOR_LIGHT_PINK
+*/
 
 /datum/round_event/wherecams
 	id = "wherecams"
@@ -226,7 +232,7 @@
 
 /datum/round_event/guns_n_roses
 	id = "guns_n_roses"
-	event_message = "After a renowned 21st century band song started playing on the jukebox before you arrived, you suddenly notice that all melee weapons are now suddenly gone."
+	event_message = "After a renowned 21st century band song started playing on the jukebox before you arrived, you suddenly notice that all melee weapons are now gone."
 
 /datum/round_event/guns_n_roses/apply_event()
 	for(var/obj/item/weapon/material/sword/B in world)

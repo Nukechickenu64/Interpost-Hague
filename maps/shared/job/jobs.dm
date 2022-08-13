@@ -234,7 +234,6 @@
 	sex_lock = MALE
 	rankprefix  = "Captain"
 
-
 	equip(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal())//So that they can't be heretics.
@@ -242,14 +241,6 @@
 		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
 		H.newgeneratestats(9,14,9,13,9,15,10,16)
 		H.generate_skills(list("ranged"))
-
-	equip(var/mob/living/carbon/human/H)
-		..()
-		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
-		H.generate_stats(STAT_DX)
-		H.generate_skills(list("medical","cleaning"))
-		to_chat(H, "<span class='warning'>Be wary, as you are not respected as much as the Count. Try to find a guard for yourself.</span>")
-
 
 /datum/job/hop
 	title = "Executive Officer"

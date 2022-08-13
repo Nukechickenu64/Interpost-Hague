@@ -53,15 +53,14 @@ REAGENT SCANNER
 	if(user.skillcheck(user.skills[SKILL_MED], 60, null, "Medical") || user.statcheck(user.stats[STAT_IQ], 11, null, STAT_IQ))
 		user.visible_message("<span class='notice'>\The [user] runs \the [src] over \the [H].</span>")
 		playsound(src, 'sound/items/scanner_medical.ogg', 50)
-		to_chat(user, "<hr>")
 		to_chat(user, medical_scan_results(H, mode))
-		to_chat(user, "<hr>")
 	else
 		to_chat(user, "<span class='warning'>You do not know how to operate this device.</span>")
 
 proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	. = list()
-	. += "<div class='firstdiv'><div class='box'><span class='notice'><b>Scan results for \the [H]:</b></span>"
+	. += "<div class='firstdiv'><div class='box'>"
+	. += "<span class='notice'><b>Scan results for \the [H]:</b></span>"
 
 	// Brain activity.
 	var/brain_result = "normal"
@@ -255,7 +254,9 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 
 	if(print_reagent_default_message)
 		. += "No results."
-	. = jointext(.,"<br></div></div>")
+
+	. += "</div></div>"
+	. = jointext(.,"")
 
 // Calculates severity based on the ratios defined external limbs.
 proc/get_wound_severity(var/damage_ratio, var/vital = 0)

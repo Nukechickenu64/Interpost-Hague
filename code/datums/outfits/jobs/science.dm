@@ -30,7 +30,6 @@
 
 /decl/hierarchy/outfit/job/science/xenobiologist
 	name = OUTFIT_JOB_NAME("Xenobiologist")
-	uniform = /obj/item/clothing/under/rank/scientist
 	id_type = /obj/item/weapon/card/id/science/xenobiologist
 	suit = /obj/item/clothing/suit/storage/toggle/labcoat/science
 

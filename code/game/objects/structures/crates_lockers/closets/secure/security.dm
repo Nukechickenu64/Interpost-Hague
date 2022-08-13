@@ -9,8 +9,7 @@
 
 /obj/structure/closet/secure_closet/captains/WillContain()
 	return list(
-		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/captain, /obj/item/weapon/storage/backpack/satchel_cap)),
-		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/captain, 50),
+		/obj/item/weapon/storage/backpack/satchel_cap,
 		/obj/item/clothing/head/capshat,
 		/obj/item/clothing/glasses/sunglasses,
 		/obj/item/clothing/under/rank/captain,
@@ -19,9 +18,7 @@
 		/obj/item/clothing/suit/capsuit,
 		/obj/item/clothing/gloves/captain,
 		/obj/item/weapon/gun/energy/gun,
-		/obj/item/clothing/suit/armor/captain,
-		/obj/item/weapon/melee/telebaton
-	)
+		/obj/item/weapon/melee/telebaton)
 
 /obj/structure/closet/secure_closet/hop
 	name = "head of personnel's locker"
