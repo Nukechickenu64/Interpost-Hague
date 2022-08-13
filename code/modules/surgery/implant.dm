@@ -28,7 +28,7 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/cavity/make_space
 	allowed_tools = list(
-	/obj/item/weapon/surgicaldrill = 100,	\
+	/obj/item/weapon/surgery_tool/surgicaldrill = 100,	\
 	/obj/item/weapon/pen = 75,	\
 	/obj/item/stack/rods = 50
 	)
@@ -60,7 +60,7 @@
 /datum/surgery_step/cavity/close_space
 	priority = 2
 	allowed_tools = list(
-	/obj/item/weapon/cautery = 100,			\
+	/obj/item/weapon/surgery_tool/cautery = 100,			\
 	/obj/item/clothing/mask/smokable/cigarette = 75,	\
 	/obj/item/weapon/flame/lighter = 50,			\
 	/obj/item/weapon/weldingtool = 25
@@ -148,7 +148,7 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/cavity/implant_removal
 	allowed_tools = list(
-	/obj/item/weapon/hemostat = 100,	\
+	/obj/item/weapon/surgery_tool/hemostat = 100,	\
 	/obj/item/weapon/wirecutters = 75,	\
 	/obj/item/weapon/material/kitchen/utensil/fork = 20
 	)

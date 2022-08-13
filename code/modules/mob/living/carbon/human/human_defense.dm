@@ -328,6 +328,18 @@ meteor_act
 	if(user.skillcheck(user.skills["melee"], 0, null,"melee") == CRIT_SUCCESS)
 		resolve_critical_hit()
 
+	if(user.stats[STAT_HT] >= src.stats.[STAT_HT]+4 && !lying)
+		Weaken(1)
+		var/turf/target = get_turf(src.loc)
+		var/range = src.throw_range
+		var/throw_dir = get_dir(user, src)
+		for(var/i = 1; i < range; i++)
+			var/turf/new_turf = get_step(target, throw_dir)
+			target = new_turf
+			if(new_turf.density)
+				break
+		src.throw_at(target, rand(2,4), src.throw_speed)
+
 	//Blood to gold
 	if(GLOB.all_religions["Gozag Ym Sagoz"].bloodgold)
 		var/datum/transaction/T = new("Gozag Ym Sagoz", "Blood money", -effective_force)

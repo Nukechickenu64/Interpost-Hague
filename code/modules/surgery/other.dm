@@ -9,7 +9,7 @@
 /datum/surgery_step/fix_tendon
 	priority = 2
 	allowed_tools = list(
-	/obj/item/weapon/FixOVein = 100, \
+	/obj/item/weapon/surgery_tool/FixOVein = 100, \
 	/obj/item/stack/cable_coil = 75,	\
 	/obj/item/weapon/tape_roll = 50
 	)
@@ -53,7 +53,7 @@
 /datum/surgery_step/fix_vein
 	priority = 3
 	allowed_tools = list(
-	/obj/item/weapon/FixOVein = 100, \
+	/obj/item/weapon/surgery_tool/FixOVein = 100, \
 	/obj/item/stack/cable_coil = 75,	\
 	/obj/item/weapon/tape_roll = 50
 	)
@@ -99,7 +99,7 @@
 /datum/surgery_step/hardsuit
 	allowed_tools = list(
 		/obj/item/weapon/weldingtool = 80,
-		/obj/item/weapon/circular_saw = 60,
+		/obj/item/weapon/surgery_tool/circular_saw = 60,
 		/obj/item/weapon/gun/energy/plasmacutter = 30
 		)
 

@@ -181,7 +181,6 @@
 	affecting.plane = assailant.plane
 	affecting.layer = assailant.layer - 0.01
 
-
 /obj/item/grab/proc/throw_held()
 	return current_grab.throw_held(src)
 

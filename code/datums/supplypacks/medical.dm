@@ -123,7 +123,6 @@
 					/obj/item/clothing/glasses/hud/health,
 					/obj/item/clothing/suit/storage/toggle/labcoat,
 					/obj/item/clothing/under/rank/medical/paramedic,
-					/obj/item/clothing/suit/storage/toggle/fr_jacket,
 					/obj/item/clothing/mask/gas,
 					/obj/item/clothing/under/rank/medical/paramedic,
 					/obj/item/clothing/accessory/stethoscope,
@@ -181,7 +180,7 @@
 					/obj/item/device/camera,
 					/obj/item/device/camera_film = 2,
 					/obj/item/weapon/autopsy_scanner,
-					/obj/item/weapon/scalpel,
+					/obj/item/weapon/surgery_tool/scalpel,
 					/obj/item/weapon/storage/box/masks,
 					/obj/item/weapon/storage/box/gloves,
 					/obj/item/weapon/pen)
@@ -239,17 +238,17 @@
 
 /decl/hierarchy/supply_pack/medical/surgery
 	name = "Surgery crate"
-	contains = list(/obj/item/weapon/cautery,
-					/obj/item/weapon/surgicaldrill,
+	contains = list(/obj/item/weapon/surgery_tool/cautery,
+					/obj/item/weapon/surgery_tool/surgicaldrill,
 					/obj/item/clothing/mask/breath/medical,
 					/obj/item/weapon/tank/anesthetic,
-					/obj/item/weapon/FixOVein,
-					/obj/item/weapon/hemostat,
-					/obj/item/weapon/scalpel,
-					/obj/item/weapon/bonegel,
-					/obj/item/weapon/retractor,
-					/obj/item/weapon/bonesetter,
-					/obj/item/weapon/circular_saw)
+					/obj/item/weapon/surgery_tool/FixOVein,
+					/obj/item/weapon/surgery_tool/hemostat,
+					/obj/item/weapon/surgery_tool/scalpel,
+					/obj/item/weapon/surgery_tool/bonegel,
+					/obj/item/weapon/surgery_tool/retractor,
+					/obj/item/weapon/surgery_tool/bonesetter,
+					/obj/item/weapon/surgery_tool/circular_saw)
 	cost = 25
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Surgery crate"

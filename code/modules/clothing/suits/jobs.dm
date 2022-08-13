@@ -185,34 +185,9 @@
 	name = "blue suit jacket"
 	color = "#00326e"
 
-/obj/item/clothing/suit/storage/toggle/suit/purple
-	name = "purple suit jacket"
-	color = "#6c316c"
-
 /obj/item/clothing/suit/storage/toggle/suit/black
 	name = "black suit jacket"
 	color = "#1f1f1f"
-
-//Medical
-/obj/item/clothing/suit/storage/toggle/fr_jacket
-	name = "first responder jacket"
-	desc = "A high-visibility jacket worn by medical first responders."
-	icon_state = "fr_jacket_open"
-	item_state = "fr_jacket"
-	icon_open = "fr_jacket_open"
-	icon_closed = "fr_jacket"
-	blood_overlay_type = "armor"
-	allowed = list(/obj/item/stack/medical, /obj/item/weapon/reagent_containers/dropper, /obj/item/weapon/reagent_containers/hypospray, /obj/item/weapon/reagent_containers/syringe, \
-	/obj/item/device/healthanalyzer, /obj/item/device/flashlight, /obj/item/device/radio, /obj/item/weapon/tank/emergency)
-	body_parts_covered = UPPER_TORSO|ARMS
-
-/obj/item/clothing/suit/storage/toggle/fr_jacket/ems
-	name = "\improper EMS jacket"
-	desc = "A dark blue, martian-pattern, EMS jacket. It sports high-visibility reflective stripes and a star of life on the back."
-	icon_state = "ems_jacket_closed"
-	item_state = "ems_jacket_closed"
-	icon_open = "ems_jacket_open"
-	icon_closed = "ems_jacket_closed"
 
 /obj/item/clothing/suit/surgicalapron
 	name = "surgical apron"
@@ -222,5 +197,5 @@
 	blood_overlay_type = "armor"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO
 	allowed = list(/obj/item/stack/medical, /obj/item/weapon/reagent_containers/dropper, /obj/item/weapon/reagent_containers/hypospray, /obj/item/weapon/reagent_containers/syringe, \
-	/obj/item/device/healthanalyzer, /obj/item/device/flashlight, /obj/item/device/radio, /obj/item/weapon/tank/emergency,/obj/item/weapon/scalpel,/obj/item/weapon/retractor,/obj/item/weapon/hemostat, \
-	/obj/item/weapon/cautery,/obj/item/weapon/bonegel,/obj/item/weapon/FixOVein)
+	/obj/item/device/healthanalyzer, /obj/item/device/flashlight, /obj/item/device/radio, /obj/item/weapon/tank/emergency,/obj/item/weapon/surgery_tool/scalpel,/obj/item/weapon/surgery_tool/retractor,/obj/item/weapon/surgery_tool/hemostat, \
+	/obj/item/weapon/surgery_tool/cautery,/obj/item/weapon/surgery_tool/bonegel,/obj/item/weapon/surgery_tool/FixOVein)

@@ -120,29 +120,29 @@
 	storage_slots_h = 9
 
 	can_hold = list(
-		/obj/item/weapon/bonesetter,
-		/obj/item/weapon/cautery,
-		/obj/item/weapon/circular_saw,
-		/obj/item/weapon/hemostat,
-		/obj/item/weapon/retractor,
-		/obj/item/weapon/scalpel,
-		/obj/item/weapon/surgicaldrill,
-		/obj/item/weapon/bonegel,
-		/obj/item/weapon/FixOVein,
+		/obj/item/weapon/surgery_tool/bonesetter,
+		/obj/item/weapon/surgery_tool/cautery,
+		/obj/item/weapon/surgery_tool/circular_saw,
+		/obj/item/weapon/surgery_tool/hemostat,
+		/obj/item/weapon/surgery_tool/retractor,
+		/obj/item/weapon/surgery_tool/scalpel,
+		/obj/item/weapon/surgery_tool/surgicaldrill,
+		/obj/item/weapon/surgery_tool/bonegel,
+		/obj/item/weapon/surgery_tool/FixOVein,
 		/obj/item/stack/medical/advanced/bruise_pack,
 		/obj/item/stack/nanopaste
 		)
 
 	startswith = list(
-		/obj/item/weapon/bonesetter,
-		/obj/item/weapon/cautery,
-		/obj/item/weapon/circular_saw,
-		/obj/item/weapon/hemostat,
-		/obj/item/weapon/retractor,
-		/obj/item/weapon/scalpel,
-		/obj/item/weapon/surgicaldrill,
-		/obj/item/weapon/bonegel,
-		/obj/item/weapon/FixOVein,
+		/obj/item/weapon/surgery_tool/bonesetter,
+		/obj/item/weapon/surgery_tool/cautery,
+		/obj/item/weapon/surgery_tool/circular_saw,
+		/obj/item/weapon/surgery_tool/hemostat,
+		/obj/item/weapon/surgery_tool/retractor,
+		/obj/item/weapon/surgery_tool/scalpel,
+		/obj/item/weapon/surgery_tool/surgicaldrill,
+		/obj/item/weapon/surgery_tool/bonegel,
+		/obj/item/weapon/surgery_tool/FixOVein,
 		/obj/item/stack/medical/advanced/bruise_pack,
 		)
 

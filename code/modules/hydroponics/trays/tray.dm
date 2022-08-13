@@ -402,7 +402,7 @@
 	if (O.is_open_container())
 		return 0
 
-	if(isWirecutter(O) || istype(O, /obj/item/weapon/scalpel))
+	if(isWirecutter(O) || istype(O, /obj/item/weapon/surgery_tool/scalpel))
 
 		if(!seed)
 			to_chat(user, "There is nothing to take a sample from in \the [src].")

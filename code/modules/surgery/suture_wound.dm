@@ -1,7 +1,7 @@
 /datum/surgery_step/suture_wounds
-	
+
 	allowed_tools = list(
-	/obj/item/weapon/FixOVein/suture = 100,
+	/obj/item/weapon/surgery_tool/FixOVein/suture = 100,
 	/obj/item/stack/cable_coil = 60
 	)
 

@@ -66,10 +66,18 @@
 
 // does stuff to end the step, which is normally print a message + do whatever this step changes
 /datum/surgery_step/proc/end_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	if(istype(tool, /obj/item/weapon/surgery_tool))
+		var/obj/item/weapon/surgery_tool/T = tool
+		if(T.operation_sound)
+			playsound(user.loc, T.operation_sound, 50, 3)
 	return
 
 // stuff that happens when the step fails
 /datum/surgery_step/proc/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	if(istype(tool, /obj/item/weapon/surgery_tool))
+		var/obj/item/weapon/surgery_tool/T = tool
+		if(T.operation_sound_fail)
+			playsound(user.loc, T.operation_sound_fail, 50, 3)
 	return null
 
 /datum/surgery_step/proc/success_chance(mob/living/user, mob/living/carbon/human/target, obj/item/tool)

@@ -408,7 +408,6 @@
 	new /obj/item/clothing/under/lawyer/bluesuit(src)
 	new /obj/item/clothing/suit/storage/toggle/suit/blue(src)
 	new /obj/item/clothing/under/lawyer/purpsuit(src)
-	new /obj/item/clothing/suit/storage/toggle/suit/purple(src)
 	new /obj/item/clothing/shoes/brown(src)
 	new /obj/item/clothing/shoes/laceup(src)
 

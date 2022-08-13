@@ -54,11 +54,9 @@
 	activate_effect = !activate_effect
 	G.assailant.visible_message("<span class='warning'>[G.assailant] [activate_effect ? "starts" : "stops"] strangling [G.affecting]</span>")
 
-
 /obj/item/grab/special/wrench
 	type_name = GRAB_WRENCH
 	start_grab_name = GRAB_WRENCH
-
 
 /datum/grab/special/wrench
 	type_name = GRAB_WRENCH
@@ -116,7 +114,6 @@
 	// Keeps those who are on the ground down
 	if(G.affecting.lying)
 		G.affecting.Weaken(4)
-
 
 /datum/grab/special/takedown/proc/do_takedown(var/obj/item/grab/G)
 	var/mob/living/carbon/human/affecting = G.affecting
