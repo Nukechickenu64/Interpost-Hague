@@ -362,10 +362,6 @@ BLIND     // can't see anything
 	var/brightness_on
 	var/on = 0
 
-	sprite_sheets = list(
-		SPECIES_VOX = 'icons/mob/species/vox/head.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/head.dmi',
-		)
 	blood_overlay_type = "helmetblood"
 
 /obj/item/clothing/head/get_mob_overlay(mob/user_mob, slot)
