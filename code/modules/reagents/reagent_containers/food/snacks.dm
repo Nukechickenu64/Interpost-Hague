@@ -1689,31 +1689,6 @@
 	obj_flags = 0
 	wrapped = 1
 
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/farwacube
-	name = "farwa cube"
-	monkey_type = /mob/living/carbon/human/farwa
-
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/farwacube
-	name = "farwa cube"
-	monkey_type = /mob/living/carbon/human/farwa
-
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/stokcube
-	name = "stok cube"
-	monkey_type = /mob/living/carbon/human/stok
-
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/stokcube
-	name = "stok cube"
-	monkey_type = /mob/living/carbon/human/stok
-
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/neaeracube
-	name = "neaera cube"
-	monkey_type = /mob/living/carbon/human/neaera
-
-/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/neaeracube
-	name = "neaera cube"
-	monkey_type = /mob/living/carbon/human/neaera
-
-
 /obj/item/weapon/reagent_containers/food/snacks/spellburger
 	name = "Spell Burger"
 	desc = "This is absolutely Ei Nath."
@@ -3348,15 +3323,3 @@
 	New()
 		..()
 		bitesize = 2
-
-/obj/item/weapon/reagent_containers/food/snacks/skrellsnacks
-	name = "\improper SkrellSnax"
-	desc = "Cured fungus shipped all the way from Jargon 4, almost like jerky! Almost."
-	icon_state = "skrellsnacks"
-	filling_color = "#a66829"
-	center_of_mass = "x=15;y=12"
-	nutriment_desc = list("mushroom" = 5, "salt" = 5)
-	nutriment_amt = 10
-	New()
-		..()
-		bitesize = 3

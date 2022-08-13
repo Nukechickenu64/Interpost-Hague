@@ -12,9 +12,8 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/inaprovaline/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.add_chemical_effect(CE_STABLE)
-		M.add_chemical_effect(CE_PAINKILLER, 10)
+	M.add_chemical_effect(CE_STABLE)
+	M.add_chemical_effect(CE_PAINKILLER, 10)
 
 /datum/reagent/bicaridine
 	name = "Bicaridine"
@@ -28,8 +27,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/bicaridine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.heal_organ_damage(6 * removed, 0)
+	M.heal_organ_damage(6 * removed, 0)
 
 /datum/reagent/kelotane
 	name = "Kelotane"
@@ -42,8 +40,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/kelotane/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.heal_organ_damage(0, 6 * removed)
+	M.heal_organ_damage(0, 6 * removed)
 
 /datum/reagent/dermaline
 	name = "Dermaline"
@@ -57,8 +54,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dermaline/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.heal_organ_damage(0, 12 * removed)
+	M.heal_organ_damage(0, 12 * removed)
 
 /datum/reagent/dylovene
 	name = "Dylovene"
@@ -73,8 +69,6 @@
 	)
 
 /datum/reagent/dylovene/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.drowsyness = max(0, M.drowsyness - 6 * removed)
 	M.adjust_hallucination(-9 * removed)
 	M.add_up_to_chemical_effect(CE_ANTITOX, 1)
@@ -100,10 +94,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dexalin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_VOX)
-		M.adjustToxLoss(removed * 6)
-	else if(alien != IS_DIONA)
-		M.add_chemical_effect(CE_OXYGENATED, 1)
+	M.add_chemical_effect(CE_OXYGENATED, 1)
 	holder.remove_reagent(/datum/reagent/lexorin, 2 * removed)
 
 /datum/reagent/dexalinp
@@ -117,10 +108,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dexalinp/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_VOX)
-		M.adjustToxLoss(removed * 9)
-	else if(alien != IS_DIONA)
-		M.add_chemical_effect(CE_OXYGENATED, 2)
+	M.add_chemical_effect(CE_OXYGENATED, 2)
 	holder.remove_reagent(/datum/reagent/lexorin, 3 * removed)
 
 /datum/reagent/tricordrazine
@@ -133,8 +121,7 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/tricordrazine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.heal_organ_damage(3 * removed, 3 * removed)
+	M.heal_organ_damage(3 * removed, 3 * removed)
 
 /datum/reagent/cryoxadone
 	name = "Cryoxadone"
@@ -282,8 +269,6 @@
 	scannable = 1
 
 /datum/reagent/synaptizine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.drowsyness = max(M.drowsyness - 5, 0)
 	M.AdjustParalysis(-1)
 	M.AdjustStunned(-1)
@@ -306,8 +291,6 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/alkysine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.add_chemical_effect(CE_PAINKILLER, 10)
 	M.add_chemical_effect(CE_BRAIN_REGEN, 1)
 	if(ishuman(M))
@@ -389,8 +372,6 @@
 	overdose = REAGENTS_OVERDOSE * 0.5
 
 /datum/reagent/hyperzine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(prob(5))
 		M.emote(pick("twitch", "blink_r", "shiver"))
 	M.add_chemical_effect(CE_SPEEDBOOST, 1)
@@ -404,8 +385,6 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/ethylredoxrazine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.dizziness = 0
 	M.drowsyness = 0
 	M.stuttering = 0
@@ -525,8 +504,6 @@
 	data = 0
 
 /datum/reagent/methylphenidate/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(volume <= 0.1 && M.chem_doses[type] >= 0.5 && world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 		data = world.time
 		to_chat(M, "<span class='warning'>You lose focus...</span>")
@@ -545,8 +522,6 @@
 	data = 0
 
 /datum/reagent/citalopram/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(volume <= 0.1 && M.chem_doses[type] >= 0.5 && world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 		data = world.time
 		to_chat(M, "<span class='warning'>Your mind feels a little less stable...</span>")
@@ -565,8 +540,6 @@
 	data = 0
 
 /datum/reagent/paroxetine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(volume <= 0.1 && M.chem_doses[type] >= 0.5 && world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY)
 		data = world.time
 		to_chat(M, "<span class='warning'>Your mind feels much less stable...</span>")
@@ -592,8 +565,6 @@
 	data = 0
 
 /datum/reagent/nicotine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(prob(volume*20))
 		M.add_chemical_effect(CE_PULSE, 1)
 	if(volume <= 0.02 && M.chem_doses[type] >= 0.05 && world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY * 0.3)
@@ -651,8 +622,6 @@
 	data = 0
 
 /datum/reagent/menthol/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY * 0.35)
 		data = world.time
 		to_chat(M, "<span class='notice'>You feel faintly sore in the throat.</span>")
@@ -690,11 +659,6 @@
 	scannable = 1
 	flags = IGNORE_MOB_SIZE
 
-/datum/reagent/noexcutite/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-
-	if(alien != IS_DIONA)
-		M.make_jittery(-50)
-
 /datum/reagent/antidexafen
 	name = "Antidexafen"
 	description = "All-in-one cold medicine. Fever, cough, sneeze, safe for babies."
@@ -707,9 +671,6 @@
 	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/antidexafen/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
-
 	M.add_chemical_effect(CE_PAINKILLER, 15)
 	M.add_chemical_effect(CE_ANTIVIRAL, 1)
 
@@ -729,8 +690,6 @@
 	metabolism = 0.1
 
 /datum/reagent/adrenaline/affect_blood(var/mob/living/carbon/human/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 
 	if(M.chem_doses[type] < 0.2)	//not that effective after initial rush
 		M.add_chemical_effect(CE_PAINKILLER, min(30*volume, 80))

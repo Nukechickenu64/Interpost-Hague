@@ -119,34 +119,35 @@ Please contact me on #coderbus IRC. ~Carn x
 #define MUTATIONS_LAYER			1
 #define SKIN_LAYER				2
 #define DAMAGE_LAYER			3
-#define SURGERY_LEVEL			4		//bs12 specific.
-#define UNDERWEAR_LAYER         5
-#define UNIFORM_LAYER			6
-#define ID_LAYER				7
-#define AMULET_LAYER			8
-#define SHOES_LAYER				9
-#define GLOVES_LAYER			10
-#define BELT_LAYER				11
-#define SUIT_LAYER				12
-#define TAIL_LAYER				13		//bs12 specific. this hack is probably gonna come back to haunt me
-#define GLASSES_LAYER			14
-#define BELT_LAYER_ALT			15
-#define SUIT_STORE_LAYER		16
-#define BACK_LAYER				17
-#define HAIR_LAYER				18		//TODO: make part of head layer?
-#define GOGGLES_LAYER			19
-#define EARS_LAYER				20
-#define FACEMASK_LAYER			21
-#define HEAD_LAYER				22
-#define COLLAR_LAYER			23
-#define HANDCUFF_LAYER			24
-#define L_HAND_LAYER			25
-#define R_HAND_LAYER			26
-#define FIRE_LAYER				27		//If you're on fire
-#define TARGETED_LAYER			28		//BS12: Layer for the target overlay from weapon targeting system
-#define BANDAGES_LAYER			29
-#define BLEEDING_LAYER			30
-#define TOTAL_LAYERS			31
+#define BODYHAIR_LAYER			4
+#define SURGERY_LEVEL			5		//bs12 specific.
+#define UNDERWEAR_LAYER         6
+#define UNIFORM_LAYER			7
+#define ID_LAYER				8
+#define AMULET_LAYER			9
+#define SHOES_LAYER				10
+#define GLOVES_LAYER			11
+#define BELT_LAYER				12
+#define SUIT_LAYER				13
+#define TAIL_LAYER				14		//bs12 specific. this hack is probably gonna come back to haunt me
+#define GLASSES_LAYER			15
+#define BELT_LAYER_ALT			16
+#define SUIT_STORE_LAYER		17
+#define BACK_LAYER				18
+#define HAIR_LAYER				19		//TODO: make part of head layer?
+#define GOGGLES_LAYER			20
+#define EARS_LAYER				21
+#define FACEMASK_LAYER			22
+#define HEAD_LAYER				23
+#define COLLAR_LAYER			24
+#define HANDCUFF_LAYER			25
+#define L_HAND_LAYER			26
+#define R_HAND_LAYER			27
+#define FIRE_LAYER				28		//If you're on fire
+#define TARGETED_LAYER			29		//BS12: Layer for the target overlay from weapon targeting system
+#define BANDAGES_LAYER			30
+#define BLEEDING_LAYER			31
+#define TOTAL_LAYERS			32
 //////////////////////////////////
 
 /mob/living/carbon/human
@@ -311,11 +312,14 @@ var/global/list/damage_icon_parts = list()
 			icon_key += "2[part.model ? "-[part.model]": ""]"
 		else if(part.status & ORGAN_DEAD)
 			icon_key += "3"
+		if(pale)
+			icon_key += "4"
 		else
 			icon_key += "1"
 
 	icon_key = "[icon_key][husk ? 1 : 0][fat ? 1 : 0][hulk ? 1 : 0][skeleton ? 1 : 0]"
 
+	bodyhair()
 	var/icon/base_icon
 	if(human_icon_cache[icon_key])
 		base_icon = human_icon_cache[icon_key]
@@ -346,6 +350,10 @@ var/global/list/damage_icon_parts = list()
 				base_icon.Blend(temp, ICON_UNDERLAY)
 			else
 				base_icon.Blend(temp, ICON_OVERLAY)
+
+		if(pale)
+			base_icon.ColorTone(rgb(32,32,164))
+			base_icon.SetIntensity(0.7)
 
 		if(!skeleton)
 			if(husk)
@@ -813,6 +821,29 @@ var/global/list/damage_icon_parts = list()
 			total.overlays += IM
 	total.appearance_flags = RESET_COLOR | PIXEL_SCALE
 	overlays_standing[BLEEDING_LAYER] = total
+	if(update_icons)   update_icons()
+
+/mob/living/carbon/human/proc/bodyhair(var/update_icons=1)
+	var/fat = (FAT in src.mutations)
+	if(age > 21 && prob(85)) // TESTE
+		if(species.name == "Human" && !fat)
+			if(gender == MALE)
+				overlays_standing[BODYHAIR_LAYER] = null
+				var/image/standing = image("icon_state" = "bodyhair_s")
+				standing.icon = 'icons/mob/human_detail.dmi'
+				standing.alpha = 130
+				standing.color = "[rgb(r_hair, g_hair, b_hair)]"
+				overlays_standing[BODYHAIR_LAYER] = standing
+			else
+				overlays_standing[BODYHAIR_LAYER] = null
+				var/image/standing = image("icon_state" = "fbodyhair_s")
+				standing.icon = 'icons/mob/human_detail.dmi'
+				standing.alpha = 130
+				standing.color = "[rgb(r_hair, g_hair, b_hair)]"
+				overlays_standing[BODYHAIR_LAYER] = standing
+	else
+		overlays_standing[BODYHAIR_LAYER] = null
+
 	if(update_icons)   update_icons()
 
 

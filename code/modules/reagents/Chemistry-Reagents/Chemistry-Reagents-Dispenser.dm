@@ -7,8 +7,6 @@
 	metabolism = REM * 0.2
 
 /datum/reagent/acetone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_NABBER)
-		return
 
 	M.adjustToxLoss(removed * 3)
 
@@ -46,12 +44,6 @@
 	color = "#404030"
 	metabolism = REM * 0.5
 
-/datum/reagent/ammonia/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_VOX)
-		M.adjustOxyLoss(-removed * 10)
-	else if(alien != IS_DIONA)
-		M.adjustToxLoss(removed * 1.5)
-
 /datum/reagent/carbon
 	name = "Carbon"
 	description = "A chemical element, the building block of life."
@@ -62,8 +54,6 @@
 	ingest_met = REM * 5
 
 /datum/reagent/carbon/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(M.ingested && M.ingested.reagent_list.len > 1) // Need to have at least 2 reagents - cabon and something to remove
 		var/effect = 1 / (M.ingested.reagent_list.len - 1)
 		for(var/datum/reagent/R in M.ingested.reagent_list)
@@ -120,10 +110,6 @@
 /datum/reagent/ethanol/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	M.adjust_nutrition(nutriment_factor * removed)
 	var/strength_mod = 1
-	if(alien == IS_SKRELL)
-		strength_mod *= 5
-	if(alien == IS_DIONA)
-		strength_mod = 0
 
 	M.add_chemical_effect(CE_ALCOHOL, 1)
 	M.add_event("booze", /datum/happiness_event/booze)
@@ -206,8 +192,7 @@
 	color = "#353535"
 
 /datum/reagent/iron/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		M.add_chemical_effect(CE_BLOODRESTORE, 8 * removed)
+	M.add_chemical_effect(CE_BLOODRESTORE, 8 * removed)
 
 /datum/reagent/lithium
 	name = "Lithium"
@@ -217,11 +202,10 @@
 	color = "#808080"
 
 /datum/reagent/lithium/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		if(M.canmove && !M.restrained() && istype(M.loc, /turf/space))
-			step(M, pick(GLOB.cardinal))
-		if(prob(5))
-			M.emote(pick("twitch", "drool", "moan"))
+	if(M.canmove && !M.restrained() && istype(M.loc, /turf/space))
+		step(M, pick(GLOB.cardinal))
+	if(prob(5))
+		M.emote(pick("twitch", "drool", "moan"))
 
 /datum/reagent/mercury
 	name = "Mercury"
@@ -231,12 +215,11 @@
 	color = "#484848"
 
 /datum/reagent/mercury/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien != IS_DIONA)
-		if(M.canmove && !M.restrained() && istype(M.loc, /turf/space))
-			step(M, pick(GLOB.cardinal))
-		if(prob(5))
-			M.emote(pick("twitch", "drool", "moan"))
-		M.adjustBrainLoss(0.1)
+	if(M.canmove && !M.restrained() && istype(M.loc, /turf/space))
+		step(M, pick(GLOB.cardinal))
+	if(prob(5))
+		M.emote(pick("twitch", "drool", "moan"))
+	M.adjustBrainLoss(0.1)
 
 /datum/reagent/phosphorus
 	name = "Phosphorus"
@@ -268,12 +251,7 @@
 				M.antibodies |= V.antigen
 				if(prob(50))
 					M.apply_effect(50, IRRADIATE, blocked = 0) // curing it that way may kill you instead
-					var/absorbed = 0
-					var/obj/item/organ/internal/diona/nutrients/rad_organ = locate() in M.internal_organs
-					if(rad_organ && !rad_organ.is_broken())
-						absorbed = 1
-					if(!absorbed)
-						M.adjustToxLoss(100)
+					M.adjustToxLoss(100)
 
 /datum/reagent/radium/touch_turf(var/turf/T)
 	if(volume >= 3)
@@ -404,19 +382,18 @@
 /datum/reagent/sugar/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.adjust_nutrition(removed * 3)
 
-	if(alien == IS_UNATHI)
-		if(M.chem_doses[type] < 2)
-			if(M.chem_doses[type] == metabolism * 2 || prob(5))
-				M.emote("yawn")
-		else if(M.chem_doses[type] < 5)
-			M.eye_blurry = max(M.eye_blurry, 10)
-		else if(M.chem_doses[type] < 20)
-			if(prob(50))
-				M.Weaken(2)
-			M.drowsyness = max(M.drowsyness, 20)
-		else
-			M.sleeping = max(M.sleeping, 20)
-			M.drowsyness = max(M.drowsyness, 60)
+	if(M.chem_doses[type] < 2)
+		if(M.chem_doses[type] == metabolism * 2 || prob(5))
+			M.emote("yawn")
+	else if(M.chem_doses[type] < 5)
+		M.eye_blurry = max(M.eye_blurry, 10)
+	else if(M.chem_doses[type] < 20)
+		if(prob(50))
+			M.Weaken(2)
+		M.drowsyness = max(M.drowsyness, 20)
+	else
+		M.sleeping = max(M.sleeping, 20)
+		M.drowsyness = max(M.drowsyness, 60)
 
 /datum/reagent/sulfur
 	name = "Sulfur"

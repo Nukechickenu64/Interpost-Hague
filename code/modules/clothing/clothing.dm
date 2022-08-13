@@ -3,7 +3,7 @@
 	siemens_coefficient = 0.9
 	var/flash_protection = FLASH_PROTECTION_NONE	// Sets the item's level of flash protection.
 	var/tint = TINT_NONE							// Sets the item's level of visual impairment tint.
-	var/list/species_restricted = list("exclude", SPECIES_NABBER) //Only these species can wear this kit.
+	var/list/species_restricted = list("exclude") //Only these species can wear this kit.
 	var/gunshot_residue //Used by forensics.
 
 	var/list/accessories = list()
@@ -109,8 +109,8 @@
 
 	//Set species_restricted list
 	switch(target_species)
-		if(SPECIES_HUMAN, SPECIES_SKRELL)	//humanoid bodytypes
-			species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_IPC) //skrell/humans/machines can wear each other's suits
+		if(SPECIES_HUMAN)	//humanoid bodytypes
+			species_restricted = list(SPECIES_HUMAN) //skrell/humans/machines can wear each other's suits
 		else
 			species_restricted = list(target_species)
 
@@ -125,10 +125,10 @@
 
 	//Set species_restricted list
 	switch(target_species)
-		if(SPECIES_SKRELL)
-			species_restricted = list(SPECIES_HUMAN, SPECIES_SKRELL, SPECIES_IPC) //skrell helmets fit humans too
 		if(SPECIES_HUMAN)
-			species_restricted = list(SPECIES_HUMAN, SPECIES_IPC) //human helmets fit IPCs too
+			species_restricted = list(SPECIES_HUMAN) //skrell helmets fit humans too
+		if(SPECIES_HUMAN)
+			species_restricted = list(SPECIES_HUMAN) //human helmets fit IPCs too
 		else
 			species_restricted = list(target_species)
 
@@ -252,7 +252,6 @@ BLIND     // can't see anything
 	body_parts_covered = HANDS
 	slot_flags = SLOT_GLOVES
 	attack_verb = list("challenged")
-	species_restricted = list("exclude",SPECIES_NABBER, SPECIES_UNATHI,SPECIES_TAJARA, SPECIES_VOX)
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/gloves.dmi',
 		SPECIES_NABBER = 'icons/mob/species/nabber/gloves.dmi',
@@ -308,9 +307,6 @@ BLIND     // can't see anything
 	clipped = 1
 	name = "modified [name]"
 	desc = "[desc]<br>They have been modified to accommodate a different shape."
-	if("exclude" in species_restricted)
-		species_restricted -= SPECIES_UNATHI
-		species_restricted -= SPECIES_TAJARA
 	return
 
 /obj/item/clothing/gloves/mob_can_equip(mob/user)
@@ -418,13 +414,6 @@ BLIND     // can't see anything
 	var/success
 	if(istype(user, /mob/living/silicon/robot/drone))
 		var/mob/living/silicon/robot/drone/D = user
-		if(D.hat)
-			success = 2
-		else
-			D.wear_hat(src)
-			success = 1
-	else if(istype(user, /mob/living/carbon/alien/diona))
-		var/mob/living/carbon/alien/diona/D = user
 		if(D.hat)
 			success = 2
 		else
@@ -558,11 +547,6 @@ BLIND     // can't see anything
 	permeability_coefficient = 0.50
 	force = 2
 	var/overshoes = 0
-	species_restricted = list("exclude", SPECIES_NABBER, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_VOX)
-	sprite_sheets = list(
-		SPECIES_VOX = 'icons/mob/species/vox/shoes.dmi',
-		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/feet.dmi',
-		)
 	blood_overlay_type = "shoeblood"
 
 /obj/item/clothing/shoes/proc/draw_knife()
@@ -921,5 +905,5 @@ BLIND     // can't see anything
 	icon = 'icons/obj/clothing/rings.dmi'
 	slot_flags = SLOT_GLOVES
 	gender = NEUTER
-	species_restricted = list("exclude", SPECIES_NABBER, SPECIES_DIONA)
+	species_restricted = list("exclude")
 	var/undergloves = 1

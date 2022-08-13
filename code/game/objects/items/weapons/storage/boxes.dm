@@ -286,21 +286,6 @@
 	can_hold = list(/obj/item/weapon/reagent_containers/food/snacks/monkeycube)
 	startswith = list(/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped = 5)
 
-/obj/item/weapon/storage/box/monkeycubes/farwacubes
-	name = "farwa cube box"
-	desc = "Drymate brand farwa cubes, shipped from Ahdomai. Just add water!"
-	startswith = list(/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/farwacube = 5)
-
-/obj/item/weapon/storage/box/monkeycubes/stokcubes
-	name = "stok cube box"
-	desc = "Drymate brand stok cubes, shipped from Moghes. Just add water!"
-	startswith = list(/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/stokcube = 5)
-
-/obj/item/weapon/storage/box/monkeycubes/neaeracubes
-	name = "neaera cube box"
-	desc = "Drymate brand neaera cubes, shipped from Jargon 4. Just add water!"
-	startswith = list(/obj/item/weapon/reagent_containers/food/snacks/monkeycube/wrapped/neaeracube = 5)
-
 /obj/item/weapon/storage/box/ids
 	name = "box of spare IDs"
 	desc = "Has so many empty IDs."

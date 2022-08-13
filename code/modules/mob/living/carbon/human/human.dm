@@ -45,6 +45,7 @@
 
 	add_teeth()
 	add_tongue()
+	bodyhair()
 	bladder = rand(0,100)
 	bowels = rand(0, 100)
 

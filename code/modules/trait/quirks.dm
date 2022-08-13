@@ -4,6 +4,7 @@
 /datum/quirk
 	var/name = "quirk name"
 	var/description = "quirk description"
+	var/normal = 1 //If it's a "normal" quirk, then you can get it on roundstart. If it isn't, you get it by other means.
 
 /datum/quirk/hypersensitive //Doubles mood values.
 	name = "hypersensitive"
@@ -20,10 +21,12 @@
 /datum/quirk/brave //Still gets moods, but is not bothered by them.
 	name = "brave"
 	description = "I'm not stressed by the harsh environments."
+	normal = 0
 
 /datum/quirk/no_bathroom //You'll never have to use the restroom.
 	name = "bladderless"
 	description = "I don't have to use the restroom."
+	normal = 0
 
 /datum/quirk/tough //Still feel pain, just not bothered by it as often.
 	name = "tough"
@@ -40,10 +43,12 @@
 /datum/quirk/dead_inside //Gets no moods. Isn't bothered by anything.
 	name = "dead inside"
 	description = "I feel nothing anymore."
+	normal = 0
 
 /datum/quirk/psychopath //Shooting people boosts their mood.
 	name = "psychopath"
 	description = "I love killing people!"
+	normal = 0
 
 /mob/living/proc/has_quirk(var/datum/quirk/this_quirk)
 	return istype(quirk, this_quirk)

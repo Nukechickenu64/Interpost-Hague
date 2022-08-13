@@ -283,13 +283,13 @@
 			if(E.is_stump())
 				wound_flavor_text[E.name] += "<b>[T.He] [T.has] a stump where [T.his] [organ_descriptor] should be.</b>\n"
 				//if((E.wounds.len || E.open) && E.parent)
-				//	wound_flavor_text[E.name] += "[T.He] [T.has] [E.get_wounds_desc()] on [T.his] [E.parent.name].<br>"
+					//wound_flavor_text[E.name] += "[T.He] [T.has] [E.get_wounds_desc()] on [T.his] [E.parent.name].<br>"
 			else
 				if(!is_synth && E.robotic >= ORGAN_ROBOT && (E.parent && E.parent.robotic < ORGAN_ROBOT))
 					wound_flavor_text[E.name] = "[T.He] [T.has] a [E.name].\n"
-				//var/wounddesc = E.get_wounds_desc()
-				//if(wounddesc != "nothing")
-				//	wound_flavor_text[E.name] += "[T.He] [T.has] [wounddesc] on [T.his] [E.name].<br>"
+				var/wounddesc = E.get_wounds_desc()
+				if(wounddesc != "nothing")
+					wound_flavor_text[E.name] += "[T.He] [T.has] [wounddesc] on [T.his] [E.name].<br>"
 		if(!hidden || distance <=1)
 			if(E.dislocated > 0)
 				wound_flavor_text[E.name] += "[T.His] [E.joint] is dislocated!<br>"
@@ -316,6 +316,9 @@
 	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in organs
 	if(O && O.get_teeth() < O.max_teeth)
 		msg += "<span class='warning'><B>[O.get_teeth() <= 0 ? "All" : "[O.max_teeth - O.get_teeth()]"] of [T.his] teeth are missing!</B></span>\n"
+
+	if(pale)
+		msg += "\n<span class='combatglow'><b>They look pale.</b></span>\n"
 
 	if(!skipface)
 		if(happiness <= MOOD_LEVEL_SAD2)

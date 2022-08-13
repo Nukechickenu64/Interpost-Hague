@@ -193,19 +193,23 @@
 				if(BLOOD_VOLUME_SAFE to INFINITY)
 					if(can_heal)
 						damage--
-					//if(owner.pale)
-						//owner.pale = 0
-						//owner.updatepale()
+					if(owner.pale)
+						owner.pale = 0
+						owner.update_body()
 				if(BLOOD_VOLUME_OKAY to BLOOD_VOLUME_SAFE)
+					if(!owner.pale)
+						owner.pale = 1
+						owner.update_body()
 					if(prob(1))
 						to_chat(owner, "<span class='warning'>You feel [pick("dizzy","woozy","faint")]...</span>")
 					damprob = owner.chem_effects[CE_STABLE] ? 30 : 60
 					if(!past_damage_threshold(2) && prob(damprob))
 						take_damage(1)
-					//if(owner.pale)
-						//owner.pale = 0
-						//owner.updatepale()
 				if(BLOOD_VOLUME_BAD to BLOOD_VOLUME_OKAY)
+					if(!owner.pale)
+						owner.pale = 1
+						owner.update_body()
+					owner.add_event("bleeding", /datum/happiness_event/bleedingout)
 					owner.eye_blurry = max(owner.eye_blurry,6)
 					damprob = owner.chem_effects[CE_STABLE] ? 40 : 80
 					if(!past_damage_threshold(4) && prob(damprob))
@@ -213,10 +217,11 @@
 					if(!owner.paralysis && prob(10))
 						owner.Paralyse(rand(1,3))
 						to_chat(owner, "<span class='warning'>You feel extremely [pick("dizzy","woozy","faint")]...</span>")
-					//if(!owner.pale)
-						//owner.updatepale()
-						//owner.pale = 1
 				if(BLOOD_VOLUME_SURVIVE to BLOOD_VOLUME_BAD)
+					if(!owner.pale)
+						owner.pale = 1
+						owner.update_body()
+					owner.add_event("bleeding", /datum/happiness_event/bleedingouthard)
 					owner.eye_blurry = max(owner.eye_blurry,6)
 					damprob = owner.chem_effects[CE_STABLE] ? 60 : 100
 					if(!past_damage_threshold(6) && prob(damprob))
@@ -224,15 +229,12 @@
 					if(!owner.paralysis && prob(15))
 						owner.Paralyse(3,5)
 						to_chat(owner, "<span class='warning'>You feel extremely [pick("dizzy","woozy","faint")]...</span>")
-					//if(!owner.pale)
-						//owner.updatepale()
-						//owner.pale = 1
 				if(-(INFINITY) to BLOOD_VOLUME_SURVIVE) // Also see heart.dm, being below this point puts you into cardiac arrest.
+					if(!owner.pale)
+						owner.pale = 1
+						owner.update_body()
 					owner.eye_blurry = max(owner.eye_blurry,6)
 					damprob = owner.chem_effects[CE_STABLE] ? 80 : 100
 					if(prob(damprob))
 						take_damage(1)
-					//if(!owner.pale)
-						//owner.updatepale()
-						//owner.pale = 1
 	..()

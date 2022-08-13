@@ -171,24 +171,34 @@
 	description = "<span class='danger'>HE'S CUTTING ME OPEN!!</span>\n"
 	happiness = -8
 
+/datum/happiness_event/bleedingout
+	description = "<span class='danger'>I feel that I am bleeding out...</span>\n"
+	happiness = -4
+	timeout = 1800
+
+/datum/happiness_event/bleedingouthard
+	description = "<span class='danger'>I REALLY NEED TO STOP THIS BLEEDING!</span>\n"
+	happiness = -6
+	timeout = 1800
+
 /datum/happiness_event/verymildpain
 	description = "<span class='danger'>I feel some pain...</span>\n"
-	happiness = -4
+	happiness = -2
 	timeout = 1800
 
 /datum/happiness_event/mildpain
 	description = "<span class='danger'>It hurts...a lot.</span>\n"
-	happiness = -6
+	happiness = -4
 	timeout = 1800
 
 /datum/happiness_event/pain
 	description = "<span class='danger'>IT HURTS SO MUCH!</span>\n"
-	happiness = -10
+	happiness = -6
 	timeout = 1800
 
 /datum/happiness_event/cryo
 	description = "<span class='info'>Being in a metal coffin for so long doesn't feel good.</span>\n"
-	happiness = -4
+	happiness = -6
 	timeout = 1800
 
 //For when you see someone die and you're not hardcore.
@@ -220,12 +230,12 @@
 	timeout = FALSE
 
 /datum/happiness_event/addiction/withdrawal_extreme
-	description = "<span class='danger'>I DON'T INDULGE IN MY ADDICTION, MY DAY IS SHIT!!.</span>\n"
+	description = "<span class='danger'>I DON'T INDULGE IN MY ADDICTION, MY DAY IS SHIT!</span>\n"
 	happiness = -12
 	timeout = FALSE
 
 /datum/happiness_event/high
-	description = "<span class='binfo'>I'm high as fuck</span>\n"
+	description = "<span class='binfo'>I'm high as fuck!</span>\n"
 	happiness = 12
 
 /datum/happiness_event/relaxed

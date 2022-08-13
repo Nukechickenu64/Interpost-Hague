@@ -380,7 +380,7 @@ var/list/name_to_material
 	hitsound = 'sound/weapons/smash.ogg'
 	apply_icon_colour_to_walls = FALSE
 
-/material/diona
+/material/diona // Needs a rework.
 	name = "biomass"
 	icon_colour = null
 	stack_type = null
@@ -392,9 +392,6 @@ var/list/name_to_material
 
 /material/diona/place_dismantled_product()
 	return
-
-/material/diona/place_dismantled_girder(var/turf/target)
-	spawn_diona_nymph(target)
 
 /material/steel/holographic
 	name = "holo" + DEFAULT_WALL_MATERIAL

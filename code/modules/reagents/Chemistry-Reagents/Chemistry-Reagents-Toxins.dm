@@ -13,7 +13,7 @@
 	var/strength = 4 // How much damage it deals per unit
 
 /datum/reagent/toxin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(strength && alien != IS_DIONA)
+	if(strength)
 		M.add_chemical_effect(CE_TOXIN, strength)
 		var/dam = (strength * removed)
 		if(target_organ && ishuman(M))
@@ -81,8 +81,6 @@
 		L.adjust_fire_stacks(amount / fire_mult)
 
 /datum/reagent/toxin/phoron/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_NABBER)
-		return
 	..()
 
 /datum/reagent/toxin/phoron/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
@@ -177,8 +175,6 @@
 
 /datum/reagent/toxin/zombiepowder/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if(alien == IS_DIONA)
-		return
 	M.status_flags |= FAKEDEATH
 	M.adjustOxyLoss(3 * removed)
 	M.Weaken(10)
@@ -233,13 +229,11 @@
 
 /datum/reagent/toxin/plantbgone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if(alien == IS_DIONA)
-		M.adjustToxLoss(50 * removed)
+	M.adjustToxLoss(10 * removed)
 
 /datum/reagent/toxin/plantbgone/affect_touch(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
-	if(alien == IS_DIONA)
-		M.adjustToxLoss(50 * removed)
+	M.adjustToxLoss(10 * removed)
 
 /datum/reagent/acid/polyacid
 	name = "Polytrinic acid"
@@ -259,16 +253,9 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/lexorin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
-	if(alien == IS_SKRELL)
-		M.take_organ_damage(2.4 * removed, 0)
-		if(M.losebreath < 22.5)
-			M.losebreath++
-	else
-		M.take_organ_damage(3 * removed, 0)
-		if(M.losebreath < 15)
-			M.losebreath++
+	M.take_organ_damage(3 * removed, 0)
+	if(M.losebreath < 15)
+		M.losebreath++
 
 /datum/reagent/mutagen
 	name = "Unstable mutagen"
@@ -315,8 +302,6 @@
 	color = "#801e28"
 
 /datum/reagent/slimejelly/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(prob(10))
 		to_chat(M, "<span class='danger'>Your insides are burning!</span>")
 		M.adjustToxLoss(rand(100, 300) * removed)
@@ -333,12 +318,8 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/soporific/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 
 	var/threshold = 1
-	if(alien == IS_SKRELL)
-		threshold = 1.2
 
 	if(M.chem_doses[type] < 1 * threshold)
 		if(M.chem_doses[type] == metabolism * 2 || prob(5))
@@ -364,12 +345,8 @@
 	overdose = REAGENTS_OVERDOSE * 0.5
 
 /datum/reagent/chloralhydrate/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 
 	var/threshold = 1
-	if(alien == IS_SKRELL)
-		threshold = 1.2
 
 	if(M.chem_doses[type] <= metabolism * threshold)
 		M.confused += 2
@@ -405,12 +382,7 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/space_drugs/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
-
 	var/drug_strength = 15
-	if(alien == IS_SKRELL)
-		drug_strength = drug_strength * 0.8
 
 	M.druggy = max(M.druggy, drug_strength)
 	if(prob(10) && isturf(M.loc) && !istype(M.loc, /turf/space) && M.canmove && !M.restrained())
@@ -429,8 +401,6 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/serotrotium/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	if(prob(7))
 		M.emote(pick("twitch", "drool", "moan", "gasp"))
 	return
@@ -445,11 +415,7 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/cryptobiolin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	var/drug_strength = 4
-	if(alien == IS_SKRELL)
-		drug_strength = drug_strength * 0.8
 	M.make_dizzy(drug_strength)
 	M.confused = max(M.confused, drug_strength * 5)
 
@@ -462,8 +428,6 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/impedrezene/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.jitteriness = max(M.jitteriness - 5, 0)
 	if(prob(80))
 		M.adjustBrainLoss(0.1 * removed)
@@ -482,13 +446,8 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/mindbreaker/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 	M.add_chemical_effect(CE_MIND, -2)
-	if(alien == IS_SKRELL)
-		M.hallucination(25, 30)
-	else
-		M.hallucination(50, 50)
+	M.hallucination(50, 50)
 
 /datum/reagent/psilocybin
 	name = "Psilocybin"
@@ -499,13 +458,8 @@
 	metabolism = REM * 0.5
 
 /datum/reagent/psilocybin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
 
 	var/threshold = 1
-	if(alien == IS_SKRELL)
-		threshold = 1.2
-
 	M.druggy = max(M.druggy, 30)
 
 	if(M.chem_doses[type] < 1 * threshold)
@@ -542,8 +496,6 @@
 /datum/reagent/slimetoxin/affect_blood(var/mob/living/carbon/human/H, var/alien, var/removed)
 	if(!istype(H))
 		return
-	if(H.species.name == SPECIES_PROMETHEAN)
-		return
 	H.adjustToxLoss(40 * removed)
 	if(H.chem_doses[type] < 1 || prob(30))
 		return
@@ -551,12 +503,11 @@
 	var/list/meatchunks = list()
 	for(var/limb_tag in list(BP_R_ARM, BP_L_ARM, BP_R_LEG,BP_L_LEG))
 		var/obj/item/organ/external/E = H.get_organ(limb_tag)
-		if(!E.is_stump() && E.robotic < ORGAN_ROBOT && E.species.name != SPECIES_PROMETHEAN)
+		if(!E.is_stump() && E.robotic < ORGAN_ROBOT)
 			meatchunks += E
 	if(!meatchunks.len)
 		if(prob(10))
 			to_chat(H, "<span class='danger'>Your flesh rapidly mutates!</span>")
-			H.set_species(SPECIES_PROMETHEAN)
 			H.shapeshifter_set_colour("#05ff9b")
 			H.verbs -= /mob/living/carbon/human/proc/shapeshifter_select_colour
 		return
@@ -566,7 +517,6 @@
 		wrapped_species_by_ref["\ref[H]"] = H.species.name
 	meatchunks = list(O) | O.children
 	for(var/obj/item/organ/external/E in meatchunks)
-		E.species = all_species[SPECIES_PROMETHEAN]
 		E.s_tone = null
 		E.s_col = ReadRGB("#05ff9b")
 		E.s_col_blend = ICON_ADD
@@ -637,8 +587,6 @@
 	overdose = REAGENTS_OVERDOSE
 
 /datum/reagent/toxin/hair_remover/affect_touch(var/mob/living/carbon/human/M, var/alien, var/removed)
-	if(alien == IS_SKRELL)	//skrell can't have hair unless you hack it in, also to prevent tentacles from falling off
-		return
 	M.species.set_default_hair(M)
 	to_chat(M, "<span class='warning'>Your feel a chill, your skin feels lighter..</span>")
 	remove_self(volume)

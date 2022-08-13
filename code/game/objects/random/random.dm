@@ -669,8 +669,7 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/pizzabox/vegetable,
 				/obj/item/pizzabox/margherita,
 				/obj/item/pizzabox/mushroom,
-				/obj/item/weapon/reagent_containers/food/snacks/plumphelmetbiscuit,
-				/obj/item/weapon/reagent_containers/food/snacks/skrellsnacks)
+				/obj/item/weapon/reagent_containers/food/snacks/plumphelmetbiscuit)
 
 
 /obj/random/storage
@@ -952,9 +951,6 @@ something, make sure it's not in one of the other lists.*/
 				/obj/item/stack/material/mhydrogen/ten = 6,
 				/obj/item/stack/material/plasteel/ten = 9,
 				/obj/item/weapon/storage/box/monkeycubes = 5,
-				/obj/item/weapon/storage/box/monkeycubes/neaeracubes = 4,
-				/obj/item/weapon/storage/box/monkeycubes/stokcubes = 4,
-				/obj/item/weapon/storage/box/monkeycubes/farwacubes = 4,
 				/obj/item/weapon/storage/firstaid/surgery = 4,
 				/obj/item/weapon/cell/infinite = 1,
 				/obj/item/weapon/archaeological_find = 2,

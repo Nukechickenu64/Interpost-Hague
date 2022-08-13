@@ -49,7 +49,6 @@
 
 	START_PROCESSING(SSobj, src)
 
-
 /obj/effect/decal/cleanable/bloodpool/Process()
 	//sorry for the shitty yandare dev code, but its the only way without switches(broken) or maths(inneficient apparently)
 	if(locate(/mob/living/carbon/human) in src.loc)

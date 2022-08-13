@@ -209,20 +209,6 @@
 			set_light(max(1,min(10,radiation/10)), max(1,min(20,radiation/20)), species.get_flesh_colour(src))
 		// END DOGSHIT SNOWFLAKE
 
-		var/obj/item/organ/internal/diona/nutrients/rad_organ = locate() in internal_organs
-		if (rad_organ && !rad_organ.is_broken())
-			var/rads = radiation/25
-
-			radiation -= rads
-			nutrition += rads
-
-			if (radiation < 2)
-				radiation = 0
-
-			set_nutrition(clamp(nutrition+rads, 0, 550))
-
-			return
-
 		var/damage = 0
 		radiation -= 1 * RADIATION_SPEED_COEFFICIENT
 		if(prob(25))
@@ -1384,7 +1370,7 @@
 //couldn't find a better way to handle their appearance, maybe there is trigger or hook or whatever when the player rests, i dont know,
 // but this didn't seem to affect performance too much
 /mob/living/carbon/human/proc/handle_blood_pools()
-	if((stat == UNCONSCIOUS || resting) && bloodstr.total_volume)//check if human is laying and has blood, i dont know if this is the right way to check for laying
+	if((stat == UNCONSCIOUS || stat == DEAD || resting) && bloodstr.total_volume)//check if human is laying and mayhaps is dead and has blood, i dont know if this is the right way to check for laying
 		for(var/obj/item/organ/external/org in organs)
 			if(org.status & ORGAN_BLEEDING) // check if bleeding, i dont know if there is another way to do it maybe without the loop
 				if(isturf(loc))

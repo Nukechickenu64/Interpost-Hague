@@ -1,3 +1,5 @@
+/*
+
 /obj/item/weapon/slugegg
 	name = "slugegg"
 	desc = "A pulsing, disgusting door to new life."
@@ -19,18 +21,6 @@
 /obj/item/weapon/slugegg/attack_self(var/mob/living/user)
 	user.drop_from_inventory(src)
 	squish()
-
-/obj/item/weapon/slugegg/HasProximity(var/atom/movable/AM)
-	if(isliving(AM))
-		if(ishuman(AM))
-			var/mob/living/carbon/human/H = AM
-			if(H.species && H.species.get_bodytype() == SPECIES_VOX)
-				return
-		else
-			var/mob/living/L = AM
-			if(L.faction == SPECIES_VOX)
-				return
-		squish()
 
 /obj/item/weapon/slugegg/proc/squish()
 	src.visible_message("<span class='warning'>\The [src] bursts open!</span>")
@@ -66,3 +56,4 @@
 /obj/item/weapon/gun/launcher/alien/slugsling/attack_self(var/mob/living/user)
 	mode = mode == "Impact" ? "Sentry" : "Impact"
 	to_chat(user,"<span class='notice'>You switch \the [src]'s mode to \"[mode]\"</span>")
+*/
