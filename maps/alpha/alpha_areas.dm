@@ -10,6 +10,9 @@
 ////////////
 //SHUTTLES//
 ////////////
+
+/area/shuttle
+	forced_ambience = list('sound/ambience/shuttle_loop.ogg')
 //shuttle areas must contain at least two areas in a subgroup if you want to move a shuttle from one
 //place to another. Look at escape shuttle for example.
 //All shuttles should now be under shuttle since we have smooth-wall code.
@@ -641,6 +644,7 @@
 	name = "Engineering"
 	icon_state = "engineering"
 	ambience = list('sound/ambience/ambisin1.ogg','sound/ambience/ambisin2.ogg','sound/ambience/ambisin3.ogg','sound/ambience/ambisin4.ogg')
+	forced_ambience = list('sound/ambience/engineering2.ogg')
 
 /area/engineering/engine_airlock
 	name = "Engine Room Airlock"
@@ -1613,6 +1617,7 @@ area/rnd/test_area
 	icon_state = "mining"
 	ambience = list('sound/ambience/ambimine.ogg', 'sound/ambience/song_game.ogg')
 	sound_env = ASTEROID
+	forced_ambience = list('sound/ambience/caves.ogg')
 
 /area/mine/explored
 	name = "Mine"
@@ -1622,25 +1627,13 @@ area/rnd/test_area
 	name = "Mine"
 	icon_state = "unexplored"
 
+/area/mine/deep
+	name = "Deep Caves"
+	icon_state = "unexplored"
+	forced_ambience = list('sound/ambience/deepcaves.ogg')
+
 // OUTPOSTS
 
 /area/outpost/abandoned
 	name = "Abandoned Outpost"
 	icon_state = "dark"
-
-// Ninja areas
-/area/ninja_dojo
-	name = "Ninja Base"
-	icon_state = "green"
-	requires_power = 0
-	dynamic_lighting = 1
-	area_flags = AREA_FLAG_RAD_SHIELDED
-
-/area/ninja_dojo/dojo
-	name = "Clan Dojo"
-	dynamic_lighting = 0
-
-/area/ninja_dojo/start
-	name = "Clan Dojo"
-	icon_state = "shuttlered"
-	base_turf = /turf/simulated/floor/plating
