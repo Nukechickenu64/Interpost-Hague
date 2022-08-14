@@ -1,7 +1,5 @@
 #if !defined(using_map_DATUM)
 
-	#include "../shared/exodus_torch/_include.dm"
-
 	#include "frontier_announcements.dm"
 	#include "frontier_areas.dm"
 

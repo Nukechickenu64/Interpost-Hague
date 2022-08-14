@@ -257,7 +257,7 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 150; font-size: 103%; color: #399ccc; text-shadow: 0 0 4px #399ccc}
+.name {font-weight: 150; font-size: 105%; color: #395ecc; text-shadow: 0 0 4px #395ecc}
 .nameradio {font-weight: 100; font-size: 102%}
 
 /* ADD HERE FOR ITALIC */
@@ -309,7 +309,7 @@ em						{font-style: normal;	font-weight: bold;}
 
 /* Radio: Misc */
 .deadsay				{color: #e2c1ff}
-.radio					{color: #684f8c; text-shadow: 0 0 2px #684f8c;}
+.radio					{color: #759bd9; text-shadow: 0 0 2px #759bd9;}
 .deptradio				{color: #ff00ff;}	/* when all other department colors fail */
 .newscaster				{color: #750000;}
 
@@ -396,7 +396,7 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 .notice					{color: #4781c4; text-shadow: 0 0 3px #4781c4;}
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
-.wakeup					{color: #c5bfff; text-shadow: 0 0 2px #c5bfff;}
+.wakeup					{color: #928ebf; text-shadow: 0 0 2px #928ebf;}
 .tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
 
 /* Languages */

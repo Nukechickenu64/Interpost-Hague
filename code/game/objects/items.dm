@@ -574,12 +574,12 @@ var/list/global/slot_flags_enumeration = list(
 		if(slot_belt)
 			if(!H.w_uniform && (slot_w_uniform in mob_equip))
 				if(!disable_warning)
-					to_chat(H, "<span class='warning'>You need a jumpsuit before you can attach this [name].</span>")
+					to_chat(H, "<span class='warning'>Nuh-uh. I need a jumpsuit before I can attach this [name].</span>")
 				return 0
 		if(slot_l_store, slot_r_store)
 			if(!H.w_uniform && (slot_w_uniform in mob_equip))
 				if(!disable_warning)
-					to_chat(H, "<span class='warning'>You need a jumpsuit before you can attach this [name].</span>")
+					to_chat(H, "<span class='warning'>Nuh-uh. I need a jumpsuit before I can attach this [name].</span>")
 				return 0
 			if(slot_flags & SLOT_DENYPOCKET)
 				return 0
@@ -590,7 +590,7 @@ var/list/global/slot_flags_enumeration = list(
 		if(slot_s_store)
 			if(!H.wear_suit && (slot_wear_suit in mob_equip))
 				if(!disable_warning)
-					to_chat(H, "<span class='warning'>You need a suit before you can attach this [name].</span>")
+					to_chat(H, "<span class='warning'>No. I need a suit before I can attach this [name].</span>")
 				return 0
 			if(!H.wear_suit.allowed)
 				if(!disable_warning)
@@ -612,13 +612,13 @@ var/list/global/slot_flags_enumeration = list(
 		if(slot_tie)
 			if((!H.w_uniform && (slot_w_uniform in mob_equip)) && (!H.wear_suit && (slot_wear_suit in mob_equip)))
 				if(!disable_warning)
-					to_chat(H, "<span class='warning'>You need something you can attach \the [src] to.</span>")
+					to_chat(H, "<span class='warning'>I don't have anything to attach \the [src] to.</span>")
 				return 0
 			var/obj/item/clothing/under/uniform = H.w_uniform
 			var/obj/item/clothing/suit/suit = H.wear_suit
 			if((uniform && !uniform.can_attach_accessory(src)) && (suit && !suit.can_attach_accessory(src)))
 				if (!disable_warning)
-					to_chat(H, "<span class='warning'>You can not equip \the [src].</span>")
+					to_chat(H, "<span class='warning'>Nope, can't equip \the [src].</span>")
 				return 0
 	return 1
 
@@ -891,13 +891,13 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 
 	var/mob/living/carbon/human/H = user
 	if(user.incapacitated(INCAPACITATION_DISABLED))
-		to_chat(user, "<span class='warning'>You are unable to focus through the [devicename].</span>")
+		to_chat(user, "<span class='warning'>I cannot focus through \the [devicename].</span>")
 		cannotzoom = 1
 	else if(!zoom && istype(H) && H.equipment_tint_total >= TINT_MODERATE)
-		to_chat(user, "<span class='warning'>Your visor gets in the way of looking through the [devicename].</span>")
+		to_chat(user, "<span class='warning'>My visor is in the way of looking through the [devicename].</span>")
 		cannotzoom = 1
 	else if(!zoom && usr.get_active_hand() != src)
-		to_chat(user, "<span class='warning'>You are too distracted to look through the [devicename], perhaps if it was in your active hand this might work better.</span>")
+		to_chat(user, "<span class='warning'>I am too distracted to look through \the [devicename]. Perhaps I should focus my hands on it instead.</span>")
 		cannotzoom = 1
 
 	if(!zoom && !cannotzoom)
