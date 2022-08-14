@@ -78,6 +78,8 @@
 
 		handle_medical_side_effects()
 
+		handle_eye_blink()
+
 		handle_blood_pools()
 
 		if(!client && !mind)
