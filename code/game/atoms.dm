@@ -255,6 +255,7 @@ its easier to just keep the beam vertical.
 //All atoms
 /atom/proc/examine(mob/user, var/distance = -1, var/infix = "", var/suffix = "")
 	//This reformat names to get a/an properly working on item descriptions when they are bloody
+	set src in view(usr.client) //If it can be seen, it can be examined.
 	var/f_name = "\a [src][infix]."
 	if(src.blood_DNA && !istype(src, /obj/effect/decal))
 		if(gender == PLURAL)
@@ -273,8 +274,23 @@ its easier to just keep the beam vertical.
 			to_chat(user, "<span class='info'>It's too far away to see clearly.</span>")
 			return
 
-	to_chat(user, "[icon2html(src, user)] That's [f_name] [suffix]")
-	to_chat(user, desc)
+	if(desc)
+		if(ishuman(usr))
+			var/mob/living/carbon/human/H = usr
+			if(H.stats[STAT_IQ] <= 5)
+				var/randtext = pick("Yoh!","Doh!","Haha")
+				to_chat(usr, "<span class='statustext'>That's [f_name]</span>, [randtext]")
+			else
+				to_chat(usr, "<span class='uppertext'>That's [f_name]</span>\n<span class='statustext'>[desc]</span>")
+
+	else
+		if(ishuman(usr))
+			var/mob/living/carbon/human/H = usr
+			if(H.stats[STAT_IQ] <= 5)
+				var/randtext = pick("Yoh!","Doh!","Haha")
+				to_chat(usr, "<span class='statustext'>That's [f_name]</span>, <span class='uppertext'>[randtext]</span>")
+			else
+				to_chat(usr, "<span class='statustext'>That's</span> <span class='uppertext'>[f_name]</span>")
 
 	return distance == -1 || (get_dist(src, user) <= distance)
 

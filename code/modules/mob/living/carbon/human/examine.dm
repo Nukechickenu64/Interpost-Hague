@@ -1,6 +1,6 @@
 /mob/living/carbon/human/examine(mob/user)
 	if(!isobserver(user))
-		user.visible_message("<font size=1>[user.name] looks at [src].</font>")
+		user.visible_message("<span class='looksatbold'>[usr]</span> <span class='looksat'>looks at [src].</span>")
 
 		if(get_dist(user,src) > 5)//Don't get descriptions of things far away.
 			to_chat(user, "<span class='info'>It's too far away to see clearly.</span>")
@@ -35,7 +35,7 @@
 	if(get_dist(user, src) > 3)
 		skipears = 1
 
-	var/list/msg = list("<div class='firstdiv'><div class='box'><span class='info'>Oh, this is ")
+	var/list/msg = list("<div class='firstdivexamineplyr'><div class='boxexamineplyr'><span class='statustext'><span class='info'>Oh, this is ")
 
 	var/datum/gender/T = gender_datums[get_gender()]
 	if(skipjumpsuit && skipface) //big suits/masks/helmets make it hard to tell their gender
@@ -45,7 +45,7 @@
 		// Just in case someone VVs the gender to something strange. It'll runtime anyway when it hits usages, better to CRASH() now with a helpful message.
 		CRASH("Gender datum was null; key was '[(skipjumpsuit && skipface) ? PLURAL : gender]'")
 
-	msg += "<EM>[src.name]!</EM>"
+	msg += "<span class='uppertext'>[src.name]!</span>\n"
 
 	var/is_synth = isSynthetic()
 	if(!(skipjumpsuit && skipface))

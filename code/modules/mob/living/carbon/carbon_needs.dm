@@ -5,7 +5,8 @@
 	msg += "<span class='info'>I believe I am </span><font color='red'>[H.age]</font> <span class='info'>years old.</span>\n"
 	msg += "<span class='info'>Everyone knows that I am </span>[get_social_class()].\n"
 	msg += "<span class='info'>I am a </span><font color='blue'>[H.gender]</font>, <span class='info'>as well.</span>\n"
-	msg += "<span class='info'>---------------------------\n<EM>Current mood:</EM><br>\n"
+	msg += "<hr class='linexd'>"
+	msg += "<span class='info'><EM>Current mood:</EM></span><br>\n"
 	for(var/i in events)
 		var/datum/happiness_event/event = events[i]
 		msg += event.description
@@ -14,6 +15,8 @@
 		msg += "<span class='info'>I feel indifferent.</span>\n"
 	else if(happiness < MOOD_LEVEL_SAD2)
 		msg += "<span class='warning'>I am stressed out!</span>\n"
+
+	msg += "<hr class='linexd'>"
 
 	if(trait)
 		msg += 	"<br><span class='info'>I am <span class='danger'>[trait.name]</span>. [trait.description]</span>\n"

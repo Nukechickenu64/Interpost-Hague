@@ -306,22 +306,47 @@
 	src.loc = T
 */
 
-/obj/item/examine(mob/user, var/distance = -1)
-	var/size
-	switch(src.w_class)
-		if(ITEM_SIZE_TINY)
-			size = "tiny"
-		if(ITEM_SIZE_SMALL)
-			size = "small"
-		if(ITEM_SIZE_NORMAL)
-			size = "normal-sized"
-		if(ITEM_SIZE_LARGE)
-			size = "large"
-		if(ITEM_SIZE_HUGE)
-			size = "bulky"
-		if(ITEM_SIZE_HUGE + 1 to INFINITY)
-			size = "huge"
-	return ..(user, distance, "", "It is a [size] item.")
+/obj/item/examine()
+	set src in view()
+
+	var/TheReach
+	if(istype(src, /obj/item/weapon))
+		var/obj/item/weapon/W = src
+		if(W.w_class >= 1)
+			TheReach = "Size: "
+			switch(W.w_class)
+				if(1)
+					TheReach += "•"
+				if(2)
+					TheReach += "••"
+				if(3)
+					TheReach += "•••"
+				if(4)
+					TheReach += "••••"
+				if(5)
+					TheReach += "•••••"
+				if(6)
+					TheReach += "••••••"
+
+	if(!isobserver(usr))
+		usr.visible_message("<span class='looksatbold'>[usr.name]</span> <span class='looksat'>looks at [src].</span>")
+		if(get_dist(usr,src) > 5)//Don't get descriptions of things far away.
+			to_chat(usr, "<span class='passivebold'>It's too far away to see clearly.</span>")
+			return
+
+	var/randtext = null
+	//var/valuetext = "No idea."
+
+	if(ishuman(usr))
+		var/mob/living/carbon/human/H = usr
+		if(H.stats[STAT_IQ] <= 5)
+			randtext = pick("Yoh!","Doh!","Haha")
+/*
+		if(H.check_perk(/datum/perk/ref/value))
+			valuetext = "[src.item_worth]"
+*/
+
+		to_chat(H, "<div class='firstdivexamine'><div class='box'><span class='statustext'>This is a [src.blood_DNA ? "bloody " : ""][icon2html(src, usr)]</span> <span class='uppertext'>[src.name]. [randtext]</span>\n<span class='statustext'>[src.desc]</span>\n[TheReach]</div></div>")
 
 /obj/item/attack_hand(mob/user as mob)
 	if (!user) return

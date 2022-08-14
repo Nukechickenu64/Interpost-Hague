@@ -336,6 +336,52 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 .emote					{font-style: italic; color: #454a52;}
 
 /* Game Messages */
+
+.looksat {
+    color: #635fcf;
+    font-size: 85%;
+}
+
+.looksatbold {
+    color: #635fcf;
+    font-weight: bold;
+    font-size: 80%;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    margin-left: 3px;
+}
+
+.examinebold {
+    color: #635fcf;
+    font-weight: bold;
+    font-size: 100%;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    margin-left: 2px;
+}
+
+.passivebold {
+    color: #416777;
+    font-weight: bold;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    margin-left: 2px;
+}
+
+.statustext {
+    color: #6e6e6e;
+    text-shadow: 0px 0px 1px #00000f;
+}
+
+.uppertext {
+    color: #685f8a;
+    font-weight: bold;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+}
+
+.bname {
+    color: #8a8f99;
+    font-weight: bold;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+}
+
 .attack					{color: #ff0000;}
 .moderate				{color: #cc0000;}
 .disarm					{color: #990000;}
@@ -378,7 +424,7 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 .box {
     display: inline-block;
     min-width: 10px;
-    text-align: left;
+    text-align: center;
     border: 1px ridge #151319;
     padding: 10px;
     font-size: 15px;
@@ -390,7 +436,7 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 
 .firstdiv {
     padding: 10px;
-    text-align: left;
+    text-align: center;
     vertical-align: middle;
     *zoom: 1;
     *display: inline;
@@ -503,4 +549,26 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
     color: #444;
     width: 80%;
     border-bottom: 1px solid #444;
+}
+
+.firstdivexamineplyr {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    *zoom: 1;
+    *display: inline;
+}
+
+.boxexamineplyr {
+    display: inline-block;
+    min-width: 10px;
+    width: 280px;
+    text-align: left;
+    padding: 10px;
+    font-size: 15px;
+    vertical-align: middle;
+    background-color: rgba(50, 50, 50, 0.3);
+    border: 1px solid rgba(50, 50, 50, 0.3);
+    *zoom: 1;
+    *display: inline;
 }
