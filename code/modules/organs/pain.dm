@@ -23,6 +23,8 @@ mob/var/next_pain_time = 0
 	if(stat || !can_feel_pain() || chem_effects[CE_PAINKILLER] > power)//!message
 		return 0
 
+	power -= chem_effects[CE_PAINKILLER]/2	//Take the edge off.
+
 	// Excessive halloss is horrible, just give them enough to make it visible.
 	if(!nohalloss && (power || flash_pain))//Flash pain is so that handle_pain actually makes use of this proc to flash pain.
 		var/actual_flash
