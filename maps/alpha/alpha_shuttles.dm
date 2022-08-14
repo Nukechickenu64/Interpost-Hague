@@ -407,3 +407,39 @@
 	icon_keyboard = "tiny_keyboard"
 	icon_screen = "lift"
 	density = 0
+
+/area/shuttle/lift3
+  name = "Cryo Lift"
+  icon_state = "shuttle3"
+
+/obj/effect/shuttle_landmark/lift3/top
+	name = "Top Deck"
+	landmark_tag = "nav_cryo_lift_top"
+	base_area = /area/quartermaster/storage
+	base_turf = /turf/simulated/open
+
+/obj/effect/shuttle_landmark/lift3/bottom
+	name = "Lower Deck"
+	landmark_tag = "nav_cryo_lift_bottom"
+	base_area = /area/quartermaster/miningdock
+	base_turf = /turf/simulated/floor/plating
+
+/datum/shuttle/autodock/ferry/lift3
+	name = "Cryo Lift"
+	shuttle_area = /area/shuttle/lift3
+	warmup_time = 6	//give those below some time to get out of the way
+	waypoint_station = "nav_cryo_lift_top"
+	waypoint_offsite = "nav_cryo_lift_bottom"
+	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
+	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
+	ceiling_type = null
+	knockdown = 0
+
+/obj/machinery/computer/shuttle_control/lift3
+	name = "cryogenic lift controls"
+	shuttle_tag = "Cryo Lift"
+	ui_template = "shuttle_control_console_lift.tmpl"
+	icon_state = "tiny"
+	icon_keyboard = "tiny_keyboard"
+	icon_screen = "lift"
+	density = 0

@@ -36,8 +36,6 @@
 	else if(atk_mode == BASH)
 		switch_intent(user,SLASH)
 
-
-
 /obj/item/weapon/material/sword/proc/switch_intent(mob/user,var/intent)
 	switch(intent)
 		if(STAB)
@@ -62,9 +60,6 @@
 			attack_verb = list("slashed", "diced")
 			hitsound = "slash_sound"
 			return
-
-
-
 
 /obj/item/weapon/material/sword/replica
 	edge = 0

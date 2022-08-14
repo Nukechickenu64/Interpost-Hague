@@ -80,7 +80,7 @@
 					return
 
 				H.visible_message("<span class='notice'>\The [H] performs CPR on \the [src]!</span>")
-				if(prob(5))
+				if(prob(20 - usr.stats[STAT_IQ]))
 					var/obj/item/organ/external/chest = get_organ(BP_CHEST)
 					if(chest)
 						chest.fracture()
@@ -164,11 +164,11 @@
 				return
 
 		if(I_HURT)
-			M.adjustStaminaLoss(rand(2,5))//No more spamming disarm without consequences.
+			M.adjustStaminaLoss(rand(12,18))//No more spamming disarm without consequences.
 			if(!istype(H))
 				attack_generic(H,rand(1,3),"punched")
 				return
-			var/rand_damage = rand(1, 4)
+			var/rand_damage = rand(1, 5)
 			var/damage_modifier = 0
 			if(H.c_intent == I_STRONG) // If H is using STRONG combat mod
 				damage_modifier = (stat_to_modifier(H.stats[STAT_ST]) > 0) ?  strToDamageModifier(H.stats[STAT_ST]) : 1 //This is to prevent low str from fucking you up
@@ -235,10 +235,10 @@
 				*/
 				if(prob(80))
 					hit_zone = ran_zone(hit_zone)
-				if(prob(15) && hit_zone != BP_CHEST) // Missed!
+				if(prob(20) && hit_zone != BP_CHEST) // Missed!
 					if(!src.lying)
 						if(H.skillcheck(H.skills["melee"], 60, null, "melee") == CRIT_FAILURE)
-							H.resolve_critical_miss()
+							H.resolve_critical_miss_unarmed()
 							attack_message = null
 						else
 							attack_message = "[H] attempted to strike [src], but missed!"

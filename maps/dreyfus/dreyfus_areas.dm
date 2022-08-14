@@ -70,6 +70,14 @@
 	name = "Aft Solar Control"
 	icon_state = "SolarcontrolA"
 
+/area/supply/dock
+	name = "Dock Supply"
+	icon_state = "SolarcontrolA"
+
+/area/maintenance/exterior
+	name = "ExtMaint"
+	icon_state = "SolarcontrolA"
+
 //Pont administratif
 
 /area/dreyfus/administration/corridor

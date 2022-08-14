@@ -135,11 +135,17 @@
 				M.op_stage.in_progress += zone
 				S.begin_step(user, M, zone, src)		//start on it
 				//We had proper tools! (or RNG smiled.) and user did not move or change hands.
-				if(user.skillcheck(user.skills["medical"], 45, null, "Medical") || user.statcheck(user.stats[STAT_IQ], 6 ,"I don't have enough training for this...  Maybe if I keep trying I can get it.", "Int"))
-					if(prob(S.success_chance(user, M, src)) && do_mob(user, M, rand(S.min_duration, S.max_duration)))
+				if(prob(S.success_chance(user, M, src)) && do_mob(user, M, rand(S.min_duration, S.max_duration)))
+					if(user.statcheck(user.stats[STAT_IQ], user.skillcheck(user.skills["medical"], 45, null, "Medical"), "6d6", 20) >= SUCCESS)
 						S.end_step(user, M, zone, src)		//finish successfully
+					else
+						visible_message("<span class='warning'>[user] messes up the surgery step. They must try again.</span>")
+						S.fail_step(user, M, zone, src)
+						//user.my_skills[SKILL(surgery)].give_xp(25, user)//If they fail it then give them some XP for trying.
 				else if ((src in user.contents) && user.Adjacent(M))			//or
+					visible_message("<span class='warning'>[user] messes up the surgery step. They must try again.</span>")
 					S.fail_step(user, M, zone, src)		//malpractice~
+					//user.my_skills[SKILL(surgery)].give_xp(25, user)//If they fail it then give them some XP for trying.
 				else // This failing silently was a pain.
 					to_chat(user, "<span class='warning'>You must remain close to your patient to conduct surgery.</span>")
 				if (M)

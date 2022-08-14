@@ -1,7 +1,5 @@
 #if !defined(using_map_DATUM)
 
-	#include "../shared/exodus_torch/_include.dm"
-
 	#include "dreyfus_announcements.dm"
 	#include "dreyfus_areas.dm"
 	#include "dreyfus_elevator.dm"
@@ -27,8 +25,6 @@
 	#include "dreyfus-06.dmm" // - Coupole - Jardin, réception des invités
 	#include "dreyfus-07.dmm"
 	#include "dreyfus-08.dmm"
-
-	#include "../shared/exodus_torch/_include.dm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

@@ -294,25 +294,37 @@
 
 	var/atom/movable/item = src.get_active_hand()
 
+	var/itemsize = ITEM_SIZE_HUGE//If it's not an item we're throwing it's probably a person and they're fucking huge.
+
 	if(!item) return
 
-	var/throw_range = item.throw_range
-	var/itemsize
-	if (istype(item, /obj/item/grab))
-		var/obj/item/grab/G = item
-		item = G.throw_held() //throw the person instead of the grab
-		if(ismob(item))
-			var/mob/M = item
+	if(istype(item,/obj/item) && !istype(item, /obj/item/grab))//If it's an item and not a grab, set the itemsize to the item's w_class
+		var/obj/item/I = item
+		itemsize = I.w_class
 
-			//limit throw range by relative mob size
-			throw_range = round(M.throw_range * min(src.mob_size/M.mob_size, 1))
-			itemsize = round(M.mob_size/4)
-			var/turf/start_T = get_turf(loc) //Get the start and target tile for the descriptors
-			var/turf/end_T = get_turf(target)
-			if(start_T && end_T)
-				var/start_T_descriptor = "<font color='#6b5d00'>[start_T] \[[start_T.x],[start_T.y],[start_T.z]\] ([start_T.loc])</font>"
-				var/end_T_descriptor = "<font color='#6b4400'>[start_T] \[[end_T.x],[end_T.y],[end_T.z]\] ([end_T.loc])</font>"
-				admin_attack_log(usr, M, "Threw the victim from [start_T_descriptor] to [end_T_descriptor].", "Was from [start_T_descriptor] to [end_T_descriptor].", "threw, from [start_T_descriptor] to [end_T_descriptor], ")
+	var/throw_range = item.throw_range
+	var/throw_delay = strToSpeedModifier(stats[STAT_ST], itemsize)
+	throw_delay /= (10/get_dist(src, target))
+	src.visible_message("<span class='warning'>[src] is trying to throw [item].</span>")
+	if(do_after(src, throw_delay))
+		if (istype(item, /obj/item/grab))
+			var/obj/item/grab/G = item
+			item = G.throw_held() //throw the person instead of the grab
+			if(ismob(item))
+				var/mob/M = item
+
+				//limit throw range by relative mob size
+				throw_range = round(M.throw_range * min(src.mob_size/M.mob_size, 1))
+				itemsize = round(M.mob_size/4)
+				var/turf/start_T = get_turf(loc) //Get the start and target tile for the descriptors
+				var/turf/end_T = get_turf(target)
+				if(start_T && end_T)
+					var/start_T_descriptor = "<font color='#6b5d00'>[start_T] \[[start_T.x],[start_T.y],[start_T.z]\] ([start_T.loc])</font>"
+					var/end_T_descriptor = "<font color='#6b4400'>[start_T] \[[end_T.x],[end_T.y],[end_T.z]\] ([end_T.loc])</font>"
+					admin_attack_log(usr, M, "Threw the victim from [start_T_descriptor] to [end_T_descriptor].", "Was from [start_T_descriptor] to [end_T_descriptor].", "threw, from [start_T_descriptor] to [end_T_descriptor], ")
+					if(ishuman(usr))//People are heavy. Throwing them is VERY exhausting.
+						var/mob/living/carbon/human/H = usr
+						H.adjustStaminaLoss(rand(30,45))
 
 	else if (istype(item, /obj/item/))
 		var/obj/item/I = item

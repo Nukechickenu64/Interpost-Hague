@@ -106,6 +106,8 @@
 	var/bodytemperature = 310.055	//98.7 F
 	var/default_pixel_x = 0
 	var/default_pixel_y = 0
+	var/happiness = 0
+	var/staminaloss = 0
 
 	var/shakecamera = 0
 	var/a_intent = I_HELP//Living

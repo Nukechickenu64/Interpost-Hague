@@ -469,7 +469,7 @@ This function completely restores a damaged organ to perfect condition.
 		if(prob(ceil(damage/4)) && sever_tendon())
 			internal_damage = TRUE
 		if(internal_damage)
-			owner.custom_pain("You feel something rip in your [name]!", 50, affecting = src)
+			owner.custom_pain("<span class='combat'>You feel something rip in your [name]!</span>", 50, affecting = src)
 
 	//Burn damage can cause fluid loss due to blistering and cook-off
 	if((type in list(BURN, LASER)) && (damage > 5 || damage + burn_dam >= 15) && (robotic < ORGAN_ROBOT))
@@ -494,17 +494,18 @@ This function completely restores a damaged organ to perfect condition.
 				W.open_wound(damage)
 				if(prob(25))
 					if(BP_IS_CRYSTAL(src))
-						owner.visible_message("<span class='danger'>The cracks in \the [owner]'s [name] spread.</span>",\
-						"<span class='danger'>The cracks in your [name] spread.</span>",\
-						"<span class='danger'>You hear the cracking of crystal.</span>")
+						owner.visible_message("<span class='combat'>The cracks in \the [owner]'s [name] spread.</span>",\
+						"<span class='combat'>The cracks in your [name] spread.</span>",\
+						"<span class='combat'>You hear the cracking of crystal.</span>")
 					if(robotic >= ORGAN_ROBOT)
-						owner.visible_message("<span class='danger'>The damage to [owner.name]'s [name] worsens.</span>",\
-						"<span class='danger'>The damage to your [name] worsens.</span>",\
-						"<span class='danger'>You hear the screech of abused metal.</span>")
+						owner.visible_message("<span class='combat'>The damage to [owner.name]'s [name] worsens.</span>",\
+						"<span class='combat'>The damage to your [name] worsens.</span>",\
+						"<span class='combat'>You hear the screech of abused metal.</span>")
 					else
-						owner.visible_message("<span class='danger'>The wound on [owner.name]'s [name] widens with a nasty ripping noise.</span>",\
-						"<span class='danger'>The wound on your [name] widens with a ripping noise. Your head starts to ring.</span>",\
-						"<span class='danger'>You hear a ripping noise, as if flesh is being torn apart.</span>")
+						owner.visible_message("<span class='combat'>The wound on [owner.name]'s [name] widens with a nasty ripping noise.</span>",\
+						"<span class='combat'>The wound on your [name] widens with a ripping noise. Your head starts to ring.</span>",\
+						"<span class='combat'>You hear a ripping noise, as if flesh is being torn apart.</span>")
+						playsound(owner, 'sound/effects/gore/flesh_born.ogg', 50, 0, -1)
 				return W
 
 	//Creating wound
@@ -794,9 +795,9 @@ Note that amputating the affected organ does in fact remove the infection from t
 			if(!clean)
 				var/gore_sound = "[(robotic >= ORGAN_ROBOT) ? "tortured metal" : "ripping tendons and flesh"]"
 				owner.visible_message(
-					"<span class='danger'><big>\The [owner]'s [src.name] flies off in a bloody arc, spraying things around it with blood!</big></span>",\
+					"<span class='combat'><big>\The [owner]'s [src.name] flies off in a bloody arc, spraying things around it with blood!</big></span>",\
 					"<span class='moderate'><big><b>Your [src.name] goes flying off and you feel sharp pain striking you!</b></big></span>",\
-					"<span class='danger'>You hear a terrible sound of [gore_sound].</span>")
+					"<span class='combat'>You hear a terrible sound of [gore_sound].</span>")
 				playsound(owner, severed_sound, 100, 0)
 
 			else
@@ -808,9 +809,9 @@ Note that amputating the affected organ does in fact remove the infection from t
 		if(DROPLIMB_BURN)
 			var/gore = "[(robotic >= ORGAN_ROBOT) ? "": " of burning flesh"]"
 			owner.visible_message(
-				"<span class='danger'><big>\The [owner]'s [src.name] flashes away into ashes!</big></span>",\
+				"<span class='combat'><big>\The [owner]'s [src.name] flashes away into ashes!</big></span>",\
 				"<span class='moderate'><big><b>Your [src.name] flashes away into ashes!</b><</big></span>",\
-				"<span class='danger'>You hear a crackling sound[gore].</span>")
+				"<span class='combat'>You hear a crackling sound[gore].</span>")
 			if(owner.can_feel_pain() && prob(50))
 				owner.agony_scream()
 
@@ -818,9 +819,9 @@ Note that amputating the affected organ does in fact remove the infection from t
 			var/gore = "[(robotic >= ORGAN_ROBOT) ? "": " in shower of gore"]"
 			var/gore_sound = "[(robotic >= ORGAN_ROBOT) ? "rending sound of tortured metal" : "sickening splatter of gore"]"
 			owner.visible_message(
-				"<span class='danger'><big>\The [owner]'s [src.name] explodes[gore]!</big></span>",\
+				"<span class='combat'><big>\The [owner]'s [src.name] explodes[gore]!</big></span>",\
 				"<span class='moderate'><big><b>Your [src.name] explodes[gore]!</b></big></span>",\
-				"<span class='danger'>You hear the [gore_sound].</span>")
+				"<span class='combat'>You hear the [gore_sound].</span>")
 			playsound(owner, 'sound/effects/gore/chop6.ogg', 100 , 0)//Splat.
 
 			if(owner.can_feel_pain() && prob(50))
@@ -993,16 +994,16 @@ Note that amputating the affected organ does in fact remove the infection from t
 
 	if(owner)
 		owner.visible_message(\
-			"<span class='danger'><big>[owner]'s [name] shatters!</big></span>",\
-			"<span class='danger'><big>Something feels like it shattered in your [name]!</big></span>",\
-			"<span class='danger'>You hear a sickening crack.</span>")
+			"<span class='combat'><big>[owner]'s [name] shatters!</big></span>",\
+			"<span class='combat'><big>Something feels like it shattered in your [name]!</big></span>",\
+			"<span class='combat'>You hear a sickening crack.</span>")
 		jostle_bone()
 		if(can_feel_pain())
 			pain += 150
 			if(prob(50))
 				owner.agony_scream()
 
-		playsound(owner, "trauma", 75, 0)
+	playsound(owner, "trauma", 75, 0)
 	status |= ORGAN_BROKEN
 	broken_description = pick("shattered")//,"fracture","hairline fracture")
 

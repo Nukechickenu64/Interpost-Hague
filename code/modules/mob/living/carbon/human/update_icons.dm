@@ -18,6 +18,7 @@ var/global/list/light_overlay_cache = list()
 	ret.appearance_flags = flags | PIXEL_SCALE
 	return ret
 
+
 	///////////////////////
 	//UPDATE_ICONS SYSTEM//
 	///////////////////////
@@ -353,10 +354,8 @@ var/global/list/damage_icon_parts = list()
 
 		if(pale)
 			var/pale_color_mod = rgb(199,182,163)
-			var/pale_color_gradient = list(pale_color_mod, base_icon)
-			gradient(pale_color_gradient)
-			base_icon.ColorTone(pale_color_gradient)
-			base_icon.SetIntensity(0.4)
+			base_icon.Blend(pale_color_mod)
+			base_icon.ColorTone(pale_color_mod)
 
 		if(!skeleton)
 			if(husk)

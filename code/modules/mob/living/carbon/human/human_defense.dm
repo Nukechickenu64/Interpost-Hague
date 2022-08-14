@@ -240,13 +240,13 @@ meteor_act
 
 
 	if(hit_zone != aim_zone && (aim_zone != BP_MOUTH) &&  (aim_zone != BP_THROAT) && (aim_zone != BP_EYES))//This is ugly but it works.
-		visible_message("<span class='danger'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
+		visible_message("<span class='combat'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
 
 	else if(blocked < 20 && blocked > 1)//This is ugly and it doesn't work.
-		visible_message("<span class='danger'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]! Slight damage was done.<span class='danger'>")//visible_message("<span class='danger'>[src] has been [I.attack_verb.len? pick(I.attack_verb) : "attacked"] in the [organ_hit] with [I.name] by [user]! It only did a little damage!</span>")
+		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]! Slight damage was done.</span>")
 
 	else
-		visible_message("<span class='danger'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]!<span class='danger'>")//visible_message("<span class='danger'>[src] has been [I.attack_verb.len? pick(I.attack_verb) : "attacked"] in the [organ_hit] with [I.name] by [user]!</span>")
+		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]!</span>")
 
 	receive_damage()
 
@@ -295,14 +295,13 @@ meteor_act
 
 	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
 	else if(I.sharp && I.edge)
-		if(I.sharpness >= 1 && user.statcheck(user.stats[STAT_ST], 12, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
-			if(!hit_zone == BP_HEAD && prob(10)) //shouldnt instantly dismember limbs due to a stat check...
+		if(I.sharpness >= 1 && user.statcheck(user.stats[STAT_ST], 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
+			if(!hit_zone == BP_HEAD && prob(4)) //shouldnt instantly dismember limbs due to a stat check...
 				log_debug("Sharpness: [I.sharpness].  StrMod: [strToDamageModifier(user.stats[STAT_ST])])") //Debugging
 				affecting.droplimb(0, DROPLIMB_EDGE)
-			else if(hit_zone == BP_HEAD && prob(2)) // VERY LOW PROB TO DISMEMBER HEAD DUE TO EVENTUAL RESPAWN REMOVAL
+			else if(hit_zone == BP_HEAD && prob(1)) // VERY LOW PROB TO DISMEMBER HEAD DUE TO EVENTUAL RESPAWN REMOVAL
 				log_debug("Sharpness: [I.sharpness].  StrMod: [strToDamageModifier(user.stats[STAT_ST])])") //Debugging
 				affecting.droplimb(0, DROPLIMB_EDGE)
-
 
 	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in src.organs
 
@@ -676,14 +675,14 @@ meteor_act
 
 	//STR makes you hit harder, DEX makes it less tiring
 	var/kickdam = rand(5,20) + stat_to_modifier(user.stats[STAT_ST])
-	user.adjustStaminaLoss(rand(10,15) - stat_to_modifier(user.stats[STAT_DX]))//Kicking someone is a big deal.
+	user.adjustStaminaLoss(rand(30,45) - stat_to_modifier(user.stats[STAT_DX]))//Kicking someone is a big deal.
 	if(kickdam)
 		playsound(user.loc, 'sound/weapons/kick.ogg', 50, 0)
 		apply_damage(kickdam, BRUTE, hit_zone, armour)
-		user.visible_message("<span class=danger>[user] kicks [src] in the [affecting.name]!<span>")
+		user.visible_message("<span class= 'combat'>[user] kicks [src] in the [affecting.name]!</span>")
 		admin_attack_log(user, src, "Has kicked [src]", "Has been kicked by [user].")
 	else
-		user.visible_message("<span class=danger>[user] tried to kick [src] in the [affecting.name], but missed!<span>")
+		user.visible_message("<span class= 'combat'>[user] tried to kick [src] in the [affecting.name], but missed!</span>")
 		playsound(loc, 'sound/weapons/punchmiss.ogg', 50, 1)
 
 
@@ -698,19 +697,25 @@ meteor_act
 
 	switch(result)
 		if(1)//They drop their weapon.
-			visible_message("<span class='danger'><big>CRITICAL FAILURE! \The [I] flies out of [src]'s hand!</big></span>")
+			visible_message("<span class='combat'><big>CRITICAL FAILURE! \The [I] flies out of [src]'s hand!</big></span>")
 			drop_from_inventory(I)
 			throw_at(get_edge_target_turf(I, pick(GLOB.alldirs)), rand(1,3), throw_speed)//Throw that sheesh away
 			return
 		if(2)
-			visible_message("<span class='danger'><big>CRITICAL FAILURE! [src] botches the attack, stumbles, and falls!</big></span>")
+			visible_message("<span class='combat'><big>CRITICAL FAILURE! [src] botches the attack, stumbles, and falls!</big></span>")
 			playsound(loc, 'sound/weapons/punchmiss.ogg', 50, 1)
 			Weaken(1)
 			Stun(3)
 			return
 		if(3)
-			visible_message("<span class='danger'><big>CRITICAL FAILURE! [src] botches the attack and hits themself!</big></span>")
-			attackby(I, src)
+			visible_message("<span class='combat'><big>CRITICAL FAILURE! [src] botches the attack and hits themself!</big></span>")
+			I.attack(src, src, zone_sel)
+			apply_damage(rand(5,10), BRUTE)
+
+/mob/living/proc/resolve_critical_miss_unarmed()
+	visible_message("<span class='danger'>[src] punches themself in the face!</span>")
+	attack_hand(src)
+	return
 
 /mob/living/proc/resolve_critical_hit()
 	var/result = rand(1,3)
@@ -732,12 +737,8 @@ meteor_act
 			apply_effect(10, PARALYZE)
 			return
 
-/*
 //Add screaming here.
 /mob/living/carbon/human/IgniteMob()
-	if(!on_fire)
-		return
-
-	if(on_fire)
-		emote(pick("agony","sadisticyelling"))
-*/
+	..()
+	if(fire_stacks)
+		agony_scream()

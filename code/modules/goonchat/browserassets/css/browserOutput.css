@@ -273,6 +273,17 @@ em						{font-style: normal;	font-weight: bold;}
 /* LOG */
 .log_message			{color: #386aff;	font-weight: bold;}
 
+.combat {
+    color: #fd5b5b;
+	text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+}
+
+.combatbold {
+    color: #fd5b5b;
+    font-weight: bold;
+    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+}
+
 /* OOC */
 .ooc					{font-weight: bold;}
 .ooc img.text_tag		{width: 32px; height: 10px;}
@@ -450,4 +461,46 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
     border: 1px solid rgba(50, 50, 50, 0.3);
     *zoom: 1;
     *display: inline;
+}
+
+.firstdivskill {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    *zoom: 1;
+    *display: inline;
+}
+
+.skilldiv {
+    display: inline-block;
+    min-width: 10px;
+    width: 270px;
+    text-align: left;
+    padding: 10px;
+    font-size: 15px;
+    vertical-align: middle;
+    background-color: rgba(50, 50, 50, 0.3);
+    border: 1px solid rgba(50, 50, 50, 0.3);
+    *zoom: 1;
+    *display: inline;
+}
+
+.linediv {
+    display: inline-block;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.linexd {
+    border: none;
+    height: 1px;
+    float: center;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    color: #444;
+    width: 80%;
+    border-bottom: 1px solid #444;
 }

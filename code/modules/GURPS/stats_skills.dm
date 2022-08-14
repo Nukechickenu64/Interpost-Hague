@@ -43,7 +43,7 @@
 	var/roll = rand(1,20)// our "dice"
 	//log_debug("Roll: [roll], Mood affect: (-)[mood_affect(1)], Ability modifier [stat_to_modifier(stat)]")
 	log_debug("[src] Rolled a [roll] against a DC [requirement] [type] check")
-	roll -= mood_affect(1)// our mood
+	roll -= mood_stat() + fatigue_stat()// our mood
 	roll += stat_to_modifier(stat) //our stat mod
 	//learn_stats(type) We can't have nice things
 	if(roll >= requirement)//We met the DC requirement
@@ -67,18 +67,50 @@
 	if(round(stats[stat_type]) > initial_stat)
 		to_chat(src,"You feel like live you've gained new insights.")
 
-//having a bad mood fucks your shit up fam.
-/mob/proc/mood_affect(var/stat, var/skill)
-	//Just check this first
-	if(!iscarbon(src))
-		return 0
-	var/mob/living/carbon/C = src
-	// We return the mood, based on MOOD_LEVEL_NEUTRAL or whatever
-	if(stat)
-		return C.happiness * -3 /* 1/5th of our happiness This will be SUBTRACTED from the stat roll.  Goes from +4 to -4 */
-	if(skill)
-		return C.happiness * -2 //This will be ADDED to the skill roll.  Goes from +20 - -20  *PENDING REWORK&*
-	return 0
+///Modifiers///
+//Converts mood level into number for the modifier
+/mob/proc/mood_stat()
+	switch(happiness)
+		if(-5000000 to MOOD_LEVEL_SAD4)
+			return -4
+		if(MOOD_LEVEL_SAD4 to MOOD_LEVEL_SAD3)
+			return -3
+		if(MOOD_LEVEL_SAD3 to MOOD_LEVEL_SAD2)
+			return -2
+		if(MOOD_LEVEL_SAD2 to MOOD_LEVEL_SAD1)
+			return -1
+		if(MOOD_LEVEL_SAD1 to MOOD_LEVEL_HAPPY1)
+			return 1
+		if(MOOD_LEVEL_HAPPY1 to MOOD_LEVEL_HAPPY2)
+			return 2
+		if(MOOD_LEVEL_HAPPY2 to MOOD_LEVEL_HAPPY3)
+			return 3
+		else
+			return 4
+
+//Converts stamina level into number for the modifier
+/mob/proc/fatigue_stat()
+	switch(staminaloss)
+		if(0)
+			return 2
+		if(1 to 20)
+			return 0
+		if(21 to 40)
+			return -1
+		if(41 to 60)
+			return -2
+		if(61 to 80)
+			return -3
+		if(81 to 100)
+			return -4
+		else
+			return -5
+
+proc/dexToAccuracyModifier(var/dexterity)
+	return dexterity - 10
+
+proc/conToStaminaModifier(var/constitution)
+	return (constitution - 10) * 15
 
 proc/stat_to_modifier(var/stat)
 	return round((stat - 10) * 0.5)
@@ -86,17 +118,29 @@ proc/stat_to_modifier(var/stat)
 proc/strToDamageModifier(var/strength)
 	return strength * 0.1  //This is better then division
 
-proc/strToSpeedModifier(var/strength, var/w_class)//Looks messy. Is messy. Is also only used once. But I don't give a fuuuuuuuuck.
+proc/strToSpeedModifier(var/strength, var/w_class)//
 	switch(strength)
 		if(1 to 5)
 			if(w_class > ITEM_SIZE_NORMAL)
 				return 20
 
+		if(6 to 11)
+			if(w_class > ITEM_SIZE_NORMAL)
+				return 15
+
+		if(12 to 15)
+			if(w_class > ITEM_SIZE_NORMAL)
+				return 10
+
+		if(16 to INFINITY)
+			if(w_class > ITEM_SIZE_NORMAL)
+				return 5
+
 proc/conToToxinModifier(var/constitution, var/w_class)
 	return stat_to_modifier(constitution) * 0.05
 
 //Stats helpers.
-/mob/proc/add_stats(var/stre, var/dexe, var/inti, var/cons)//To make adding stats quicker.
+/mob/living/carbon/proc/add_stats(var/stre, var/dexe, var/inti, var/cons)//To make adding stats quicker.
 	if(stre)
 		stats[STAT_ST] = stre
 	if(dexe)
@@ -108,7 +152,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 
 //Different way of generating stats.  Takes a "main_stat" argument.
 // Totals top 3 D6 for stats.  Then puts the top stat in the "main_stat" and the rest randomly
-/mob/proc/generate_stats(var/main_stat)
+/mob/living/carbon/proc/generate_stats(var/main_stat)
 	var/list/rand_stats = list()
 	var/top_stat = 0
 	//Roll a new random roll for each stat
@@ -124,7 +168,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 		stats[stat] = pick(rand_stats)
 		rand_stats.Remove(stats[stat])
 
-/mob/living/proc/newgeneratestats(var/stre1, var/stre2, var/dext1, var/dext2, var/int1, var/int2, var/helt1, var/helt2)
+/mob/living/carbon/proc/newgeneratestats(var/stre1, var/stre2, var/dext1, var/dext2, var/int1, var/int2, var/helt1, var/helt2)
 	stats[STAT_ST] = rand(stre1, stre2)
 	if(has_quirk(/datum/quirk/weak))
 		stats[STAT_ST] -= 2
@@ -140,20 +184,20 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 	if(gender == FEMALE)
 		stats[STAT_HT] -= (rand(2,4))
 
-/mob/proc/adjustStrength(var/num)
+/mob/living/carbon/proc/adjustStrength(var/num)
 	stats[STAT_ST] += num
 
-/mob/proc/adjustDexterity(var/num)
+/mob/living/carbon/proc/adjustDexterity(var/num)
 	stats[STAT_DX] += num
 
-/mob/proc/adjustInteligence(var/num)
+/mob/living/carbon/proc/adjustInteligence(var/num)
 	stats[STAT_IQ] += num
 
-/mob/proc/adjustConstitution(var/num)
+/mob/living/carbon/proc/adjustConstitution(var/num)
 	stats[STAT_HT] += num
 
 
-/mob/proc/temporary_stat_adjust(var/stat, var/modifier, var/time)
+/mob/living/carbon/proc/temporary_stat_adjust(var/stat, var/modifier, var/time)
 	if(stats[stat] && modifier && time)//In case you somehow call this without using all three vars.
 		stats[stat] += modifier
 		spawn(time)
@@ -195,7 +239,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 			return CRIT_SUCCESS
 		return 1
 	else
-		if(prob(skill + src.mood_affect(0, 1)))//Otherwise we roll to see if we pass.
+		if(prob(skill + mood_stat()))//Otherwise we roll to see if we pass.
 			if(prob(get_success_chance()))//And again to see if we get a crit scucess.
 				return CRIT_SUCCESS
 			return 1
@@ -257,7 +301,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 	skills[SKILL_MELEE] = skills[SKILL_MELEE] + rand(30, 60)
 	skills[SKILL_RANGE] = skills[SKILL_RANGE] + rand(30, 60)
 
-/mob/living/carbon/human/verb/check_skills()//Debug tool for checking skills until I add the icon for it to the HUD.
+/mob/verb/check_skills()//Debug tool for checking skills until I add the icon for it to the HUD.
 	set name = "Check Skills"
 	set category = "IC"
 
@@ -267,7 +311,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 			message += "I am <b>[skillnumtodesc(skills[skill])]</b> at [skill].\n"
 	to_chat(src, message)
 
-/mob/living/carbon/human/verb/reset_stats_skills()
+/mob/living/carbon/verb/reset_stats_skills()
 	set hidden = 1
 	for(var/stats in stats)
 		if(stats[stat] > 20)
