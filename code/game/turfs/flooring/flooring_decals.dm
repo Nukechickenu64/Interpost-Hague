@@ -828,3 +828,6 @@ var/list/floor_decals = list()
 
 /obj/effect/floor_decal/turf/plating
 	icon_state = "platingfull"
+
+/obj/effect/floor_decal/rustyborder
+	icon_state = "border_rust"

@@ -185,8 +185,44 @@
 /turf/simulated/floor/tiled/verybright
 	name = "steel floor"
 	icon = 'icons/turf/flooring/tiles.dmi'
-	icon_state = "steel4"
+	icon_state = "os9"
 	initial_flooring = /decl/flooring/tiling/verybright
+
+/turf/simulated/floor/tiled/kindadark
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "steel5"
+	initial_flooring = /decl/flooring/tiling/kindadark
+
+/turf/simulated/floor/tiled/chesssteel
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "os10"
+	initial_flooring = /decl/flooring/tiling/chesssteel
+
+/turf/simulated/floor/tiled/osb1
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "osb1"
+	initial_flooring = /decl/flooring/tiling/osb1
+
+/turf/simulated/floor/tiled/os3
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "os3"
+	initial_flooring = /decl/flooring/tiling/os3
+
+/turf/simulated/floor/tiled/os13
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "os13"
+	initial_flooring = /decl/flooring/tiling/os13
+
+/turf/simulated/floor/tiled/os14
+	name = "steel floor"
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_state = "os14"
+	initial_flooring = /decl/flooring/tiling/os14
 
 /turf/simulated/floor/tiled/no0
 	name = "floor"

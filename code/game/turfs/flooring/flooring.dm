@@ -174,7 +174,79 @@ var/list/flooring_types
 	name = "floor"
 	desc = "A solid, heavy set of flooring plates."
 	icon = 'icons/turf/flooring/tiles.dmi'
-	icon_base = "steel4"
+	icon_base = "os9"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/kindadark
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "steel5"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/chesssteel
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "os10"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/osb1
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "osb1"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/os3
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "os3"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/os13
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "os13"
+	color = null
+	has_damage_range = 4
+	damage_temperature = T0C+1400
+	flags = TURF_REMOVE_CROWBAR | TURF_CAN_BREAK | TURF_CAN_BURN
+	build_type = /obj/item/stack/tile/floor
+	can_paint = 1
+
+/decl/flooring/tiling/os14
+	name = "floor"
+	desc = "A solid, heavy set of flooring plates."
+	icon = 'icons/turf/flooring/tiles.dmi'
+	icon_base = "os14"
 	color = null
 	has_damage_range = 4
 	damage_temperature = T0C+1400
