@@ -242,6 +242,11 @@
 /obj/item/stack/material/hardenedsteel
 	amount = 50
 
+/obj/item/stack/material/rustysteel
+	name = "rusty steel"
+	icon_state = "sheet-rusty-metal"
+	default_type = "rusty"
+
 /obj/item/stack/material/plasteel
 	name = "plasteel"
 	icon_state = "sheet-plasteel"

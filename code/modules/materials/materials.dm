@@ -380,6 +380,18 @@ var/list/name_to_material
 	hitsound = 'sound/weapons/smash.ogg'
 	apply_icon_colour_to_walls = FALSE
 
+/material/rustysteel
+	name = "rusty steel"
+	stack_type = /obj/item/stack/material/rustysteel
+	integrity = 150
+	brute_armor = 5
+	icon_base = "rusty"
+	table_icon_base = "rusty"
+	icon_reinf = "reinf_over"
+	icon_colour = null
+	hitsound = 'sound/weapons/smash.ogg'
+	apply_icon_colour_to_walls = FALSE
+
 /material/diona // Needs a rework.
 	name = "biomass"
 	icon_colour = null

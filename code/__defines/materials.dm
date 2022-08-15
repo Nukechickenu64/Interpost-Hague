@@ -11,5 +11,6 @@
 #define MATERIAL_PLASTEEL_TYPE /obj/item/stack/material/plasteel/
 #define MATERIAL_CARDBOARD_TYPE /obj/item/stack/material/cardboard/
 #define MATERIAL_HARDENED_STEEL_TYPE /obj/item/stack/material/hardenedsteel/
+#define MATERIAL_RUSTY_STEEL_TYPE /obj/item/stack/material/rustysteel/
 
 #define MATERIAL_NULLGLASS /obj/item/stack/material/nullglass

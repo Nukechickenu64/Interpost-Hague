@@ -79,3 +79,7 @@
 /turf/simulated/wall/rusty
 	name = "rusty wall"
 	icon_state = "rusty"
+	material = "rusty steel"
+
+/turf/simulated/wall/rusty/New(var/newloc)
+	..(newloc,"rustysteel")
