@@ -55,7 +55,6 @@
 /turf/simulated/wall/sandstonediamond/New(var/newloc)
 	..(newloc,"sandstone","diamond")
 
-
 // Kind of wondering if this is going to bite me in the butt.
 /turf/simulated/wall/voxshuttle/New(var/newloc)
 	..(newloc,"voxalloy")
@@ -69,7 +68,7 @@
 	floor_type = /turf/simulated/floor/fixed/alium
 
 /turf/simulated/wall/alium/New(var/newloc)
-	..(newloc,"alien alloy")
+	..(newloc,"rusty steel")
 
 /turf/simulated/wall/alium/ex_act(severity)
 	if(prob(explosion_resistance))
@@ -79,7 +78,6 @@
 /turf/simulated/wall/rusty
 	name = "rusty wall"
 	icon_state = "rusty"
-	material = "rusty steel"
 
 /turf/simulated/wall/rusty/New(var/newloc)
 	..(newloc,"rustysteel")

@@ -385,10 +385,10 @@ var/list/name_to_material
 	stack_type = /obj/item/stack/material/rustysteel
 	integrity = 150
 	brute_armor = 5
-	icon_base = "rusty"
-	table_icon_base = "rusty"
+	icon_base = "rustysteel"
+	table_icon_base = "rustysteel"
 	icon_reinf = "reinf_over"
-	icon_colour = null
+	icon_colour = "#61574a"
 	hitsound = 'sound/weapons/smash.ogg'
 	apply_icon_colour_to_walls = FALSE
 
