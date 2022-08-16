@@ -485,3 +485,9 @@
 
 /obj/machinery/door/morgue
 	icon = 'icons/obj/doors/doormorgue.dmi'
+
+/obj/machinery/door/prison
+	name = "prison door"
+	desc = "Behind bars."
+	icon = 'icons/obj/doors/door_prison.dmi'
+	opacity = 0

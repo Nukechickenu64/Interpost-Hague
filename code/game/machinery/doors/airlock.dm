@@ -249,6 +249,28 @@
 	opacity = 1
 	assembly_type = /obj/structure/door_assembly/door_assembly_hatch
 
+/obj/machinery/door/airlock/door3
+	name = "Airlock"
+	icon = 'icons/obj/doors/door3.dmi'
+	explosion_resistance = 20
+	opacity = 1
+	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
+
+/obj/machinery/door/airlock/bigairlock
+	name = "Airlock"
+	desc = "This one only opens if you use the ID  scanner."
+	icon = 'icons/obj/doors/door_tnc.dmi'
+	explosion_resistance = 20
+	opacity = 1
+	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
+
+/obj/machinery/door/airlock/doorgeneral
+	name = "Airlock"
+	icon = 'icons/obj/doors/doorgeneral.dmi'
+	explosion_resistance = 20
+	opacity = 1
+	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
+
 /obj/machinery/door/airlock/maintenance_hatch
 	name = "Maintenance Hatch"
 	icon = 'icons/obj/doors/Doorhatchmaint2.dmi'
