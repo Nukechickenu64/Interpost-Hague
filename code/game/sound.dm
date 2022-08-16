@@ -463,6 +463,7 @@ var/const/FALLOFF_SOUNDS = 0.5
 				S.environment = UNDERWATER
 			else if (pressure_factor < 0.5)
 				S.environment = SPACE
+				S.volume = 0
 			else if (override_env)
 				S.environment = override_env
 			else
@@ -471,6 +472,7 @@ var/const/FALLOFF_SOUNDS = 0.5
 
 		else if (pressure_factor < 0.5)
 			S.environment = SPACE
+			S.volume = 0
 		else
 			var/area/A = get_area(src)
 			S.environment = A.sound_env
