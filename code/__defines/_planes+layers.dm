@@ -232,6 +232,7 @@ What is the naming convention for planes or layers?
 	plane = DEFAULT_PLANE
 	filters = filter(type = "wave", size = 10)
 	filters = filter(type = "radial_blur", size = 3)
+	filters = filter(type = "bloom", size = 3)
 	filters = filter(type = "angular_blur", size = 2)
 
 /obj/screen/plane_master/drugabuseextreme
@@ -239,8 +240,20 @@ What is the naming convention for planes or layers?
 	filters = filter(type = "wave", size = 20)
 	filters = filter(type = "radial_blur", size = 5)
 	filters = filter(type = "angular_blur", size = 4)
+	filters = filter(type = "ripple", size = 2)
+	filters = filter(type = "bloom", size = 8)
 	filters = filter(type = "outline", size = 4)
 
+/obj/screen/plane_master/pain
+	plane = DEFAULT_PLANE
+	filters = filter(type = "ripple", size = 2)
+	filters = filter(type = "wave", size = 4)
+	filters = filter(type = "outline", size = 1)
+
+/obj/screen/plane_master/borg
+	plane = DEFAULT_PLANE
+	filters = filter(type = "ripple", size = 2)
+	filters = filter(type = "outline", size = 1)
 
 /obj/screen/plane_master/openspace_blur
 	plane = OVER_OPENSPACE_PLANE
