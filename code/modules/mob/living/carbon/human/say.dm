@@ -35,8 +35,8 @@
 			return
 		else if(L.breath_fail_ratio > 0.7)
 			whisper_say(length(message) > 5 ? stars(message) : message, speaking, alt_name)
-		else if(L.breath_fail_ratio > 0.4 && length(message) > 10)
-			whisper_say(message, speaking, alt_name)
+		else if(L.breath_fail_ratio > 0.4)
+			return whisper_say(length(message) > 10 ? stars(message) : message, speaking, alt_name)
 	else
 		return ..(message, alt_name = alt_name, speaking = speaking, whispering = whispering)
 

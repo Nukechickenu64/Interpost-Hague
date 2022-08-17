@@ -23,6 +23,7 @@
 /obj/effect/acid/New(loc, supplied_target)
 	..(loc)
 	target = supplied_target
+	desc += "\n<b>It's melting \the [target]!</b>"
 	melt_time = melt_time / acid_strength
 	START_PROCESSING(SSprocessing, src)
 

@@ -1005,7 +1005,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 
 	playsound(owner, "trauma", 75, 0)
 	status |= ORGAN_BROKEN
-	broken_description = pick("shattered")//,"fracture","hairline fracture")
+	broken_description = pick("broken", "fracture", "hairline fracture")
 
 	// Fractures have a chance of getting you out of restraints
 	if (prob(25))
