@@ -721,7 +721,6 @@ var/global/datum/controller/occupations/job_master
 			tmp_str += "HIGH=[level1]|MEDIUM=[level2]|LOW=[level3]|NEVER=[level4]|BANNED=[level5]|YOUNG=[level6]|-"
 			SSstatistics.add_field_details("job_preferences",tmp_str)
 
-
 	proc/SetCombatMusic(var/mob/living/carbon/human/H, var/rank)
 		switch(rank)
 			if("Count" || "Viscount")
