@@ -37,6 +37,8 @@
 
 	var/write_sounds = list('sound/items/write1.ogg', 'sound/items/write2.ogg')
 
+	drop_sound = 'sound/items/drop_paper.ogg'
+
 /obj/item/weapon/paper/New(loc, text,title)
 	..(loc)
 	set_content(text ? text : info, title)
