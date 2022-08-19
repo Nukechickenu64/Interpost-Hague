@@ -405,7 +405,7 @@
 	else
 		take_overall_damage(brute=LOW_PRESSURE_DAMAGE, used_weapon = "Low Pressure")
 		if(getOxyLoss() < 55) // 11 OxyLoss per 4 ticks when wearing internals;    unconsciousness in 16 ticks, roughly half a minute
-			adjustOxyLoss(4)  // 16 OxyLoss per 4 ticks when no internals present; unconsciousness in 13 ticks, roughly twenty seconds
+			adjustOxyLoss(12)  // 16 OxyLoss per 4 ticks when no internals present; unconsciousness in 13 ticks, roughly ten seconds
 		pressure_alert = -2
 
 	return

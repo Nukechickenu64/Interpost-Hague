@@ -119,7 +119,7 @@
 	if(breath_pressure < species.hazard_low_pressure || breath_pressure > species.hazard_high_pressure)
 		var/datum/gas_mixture/environment = loc.return_air_for_internal_lifeform()
 		var/env_pressure = environment.return_pressure()
-		var/lung_rupture_prob =  robotic >= ORGAN_ROBOT ? prob(2.5) : prob(5) //Robotic lungs are less likely to rupture.
+		var/lung_rupture_prob =  robotic >= ORGAN_ROBOT ? prob(45) : prob(55) //Robotic lungs are less likely to rupture.
 		if(env_pressure < species.hazard_low_pressure || env_pressure > species.hazard_high_pressure)
 			if(!is_bruised() && lung_rupture_prob) //only rupture if NOT already ruptured
 				var/obj/item/organ/external/parent = owner.get_organ(parent_organ)

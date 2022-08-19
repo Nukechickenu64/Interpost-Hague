@@ -35,6 +35,8 @@
 	var/const/signfont = "Times New Roman"
 	var/const/crayonfont = "Comic Sans MS"
 
+	var/write_sounds = list('sound/items/write1.ogg', 'sound/items/write2.ogg')
+
 /obj/item/weapon/paper/New(loc, text,title)
 	..(loc)
 	set_content(text ? text : info, title)
@@ -312,6 +314,8 @@
 		else
 			info += t // Oh, he wants to edit to the end of the file, let him.
 			updateinfolinks()
+
+		playsound(pick(write_sounds), 50)
 
 		update_space(t)
 
