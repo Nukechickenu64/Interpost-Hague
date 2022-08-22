@@ -55,6 +55,8 @@
 			return global.SScharacter_setup;
 		if("SSfastprocess")
 			return global.SSfastprocess;
+		if("SSfluids")
+			return global.SSfluids;
 		if("SSgarbage")
 			return global.SSgarbage;
 		if("SSicon_update")
@@ -1010,6 +1012,8 @@
 			global.SScharacter_setup=newval;
 		if("SSfastprocess")
 			global.SSfastprocess=newval;
+		if("SSfluids")
+			global.SSfluids=newval;
 		if("SSgarbage")
 			global.SSgarbage=newval;
 		if("SSicon_update")
@@ -1942,6 +1946,7 @@
 	"SSevent",
 	"SScharacter_setup",
 	"SSfastprocess",
+	"SSfluids",
 	"SSgarbage",
 	"SSicon_update",
 	"SSradiation",

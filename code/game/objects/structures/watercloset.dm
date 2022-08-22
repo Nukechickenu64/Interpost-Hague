@@ -1,6 +1,51 @@
 //todo: toothbrushes, and some sort of "toilet-filthinator" for the hos
+/obj/structure/hygiene
+	var/next_gurgle = 0
+	var/clogged // -1 = never clog
 
-/obj/structure/toilet
+/obj/structure/hygiene/New()
+	..()
+	SSfluids.hygiene_props[src] = TRUE
+
+/obj/structure/hygiene/Destroy()
+	STOP_PROCESSING(SSprocessing, src)
+	SSfluids.hygiene_props -= src
+	. = ..()
+
+/obj/structure/hygiene/proc/clog(var/severity)
+	if(!isnull(clogged))
+		return FALSE
+	clogged = severity
+	START_PROCESSING(SSprocessing, src)
+	return TRUE
+
+/obj/structure/hygiene/proc/unclog()
+	clogged = null
+	STOP_PROCESSING(SSprocessing, src)
+
+/obj/structure/hygiene/attackby(var/obj/item/thing, var/mob/user)
+	if(!isnull(clogged) && clogged > 0 && istype(thing, /obj/item/clothing/mask/plunger))
+		user.visible_message("<span class='notice'>\The [user] strives valiantly to unclog \the [src] with \the [thing]!</span>")
+		spawn
+			playsound(loc, 'sound/effects/plunger.ogg', 75, 1)
+			sleep(5)
+			playsound(loc, 'sound/effects/plunger.ogg', 75, 1)
+			sleep(5)
+			playsound(loc, 'sound/effects/plunger.ogg', 75, 1)
+			sleep(5)
+			playsound(loc, 'sound/effects/plunger.ogg', 75, 1)
+			sleep(5)
+			playsound(loc, 'sound/effects/plunger.ogg', 75, 1)
+		if(do_after(user, 45, src) && clogged)
+			visible_message("<span class='notice'>With a loud gurgle, \the [src] begins flowing more freely.</span>")
+			playsound(loc, pick(SSfluids.gurgles), 100, 1)
+			clogged--
+			if(clogged <= 0)
+				unclog()
+		return
+	. = ..()
+
+/obj/structure/hygiene/toilet
 	name = "toilet"
 	desc = "The HT-451, a torque rotation-based, waste disposal unit for small matter. This one seems remarkably clean."
 	icon = 'icons/obj/watercloset.dmi'
@@ -12,11 +57,11 @@
 	var/w_items = 0			//the combined w_class of all the items in the cistern
 	var/mob/living/swirlie = null	//the mob being given a swirlie
 
-/obj/structure/toilet/New()
+/obj/structure/hygiene/toilet/New()
 	open = round(rand(0, 1))
 	update_icon()
 
-/obj/structure/toilet/attack_hand(mob/living/user as mob)
+/obj/structure/hygiene/toilet/attack_hand(mob/living/user as mob)
 	if(swirlie)
 		usr.visible_message("<span class='danger'>[user] slams the toilet seat onto [swirlie.name]'s head!</span>", "<span class='notice'>You slam the toilet seat onto [swirlie.name]'s head!</span>", "You hear reverberating porcelain.")
 		swirlie.adjustBruteLoss(8)
@@ -39,10 +84,10 @@
 	open = !open
 	update_icon()
 
-/obj/structure/toilet/update_icon()
+/obj/structure/hygiene/toilet/update_icon()
 	icon_state = "toilet[open][cistern]"
 
-/obj/structure/toilet/attackby(obj/item/I as obj, mob/living/user as mob)
+/obj/structure/hygiene/toilet/attackby(obj/item/I as obj, mob/living/user as mob)
 	if(isCrowbar(I))
 		to_chat(user, "<span class='notice'>You start to [cistern ? "replace the lid on the cistern" : "lift the lid off the cistern"].</span>")
 		playsound(loc, 'sound/effects/stonedoor_openclose.ogg', 50, 1)
@@ -65,7 +110,7 @@
 		to_chat(user, "You carefully place \the [I] into the cistern.")
 		return
 
-/obj/structure/urinal
+/obj/structure/hygiene/urinal
 	name = "urinal"
 	desc = "The HU-452, an experimental urinal."
 	icon = 'icons/obj/watercloset.dmi'
@@ -73,7 +118,7 @@
 	density = 0
 	anchored = 1
 
-/obj/machinery/shower
+/obj/structure/hygiene/shower
 	name = "shower"
 	desc = "A standard shower on the type of stations you reside in."
 	icon = 'icons/obj/watercloset.dmi'
@@ -88,7 +133,7 @@
 	var/is_washing = 0
 	var/list/temperature_settings = list("normal" = 310, "boiling" = T0C+100, "freezing" = T0C)
 
-/obj/machinery/shower/New()
+/obj/structure/hygiene/shower/New()
 	..()
 	create_reagents(50)
 
@@ -102,7 +147,7 @@
 	anchored = 1
 	mouse_opacity = 0
 
-/obj/machinery/shower/attack_hand(mob/M as mob)
+/obj/structure/hygiene/shower/attack_hand(mob/M as mob)
 	var/showersound = "sound/machines/shower_mid[rand(1,3)].ogg"
 	on = !on
 	update_icon()
@@ -114,7 +159,7 @@
 		for (var/atom/movable/G in src.loc)
 			G.clean_blood()
 
-/obj/machinery/shower/attackby(obj/item/I as obj, mob/user as mob)
+/obj/structure/hygiene/shower/attackby(obj/item/I as obj, mob/user as mob)
 	if(I.type == /obj/item/device/analyzer)
 		to_chat(user, "<span class='notice'>The water temperature seems to be [watertemp].</span>")
 	if(isWrench(I))
@@ -126,7 +171,7 @@
 			user.visible_message("<span class='notice'>\The [user] adjusts \the [src] with \the [I].</span>", "<span class='notice'>You adjust the shower with \the [I].</span>")
 			add_fingerprint(user)
 
-/obj/machinery/shower/update_icon()	//this is terribly unreadable, but basically it makes the shower mist up
+/obj/structure/hygiene/shower/update_icon()	//this is terribly unreadable, but basically it makes the shower mist up
 	overlays.Cut()					//once it's been on for a while, in addition to handling the water overlay.
 	if(mymist)
 		qdel(mymist)
@@ -154,7 +199,7 @@
 				ismist = 0
 
 //Yes, showers are super powerful as far as washing goes.
-/obj/machinery/shower/proc/wash(atom/movable/O as obj|mob)
+/obj/structure/hygiene/shower/proc/wash(atom/movable/O as obj|mob)
 	if(!on) return
 
 	if(isliving(O))
@@ -254,7 +299,7 @@
 
 	reagents.splash(O, 10)
 
-/obj/machinery/shower/Process()
+/obj/structure/hygiene/shower/Process()
 	if(!on) return
 
 	for(var/thing in loc)
@@ -267,7 +312,7 @@
 	wash_floor()
 	reagents.add_reagent(/datum/reagent/water, reagents.get_free_space())
 
-/obj/machinery/shower/proc/wash_floor()
+/obj/structure/hygiene/shower/proc/wash_floor()
 	if(!ismist && is_washing)
 		return
 	is_washing = 1
@@ -277,7 +322,7 @@
 	spawn(100)
 		is_washing = 0
 
-/obj/machinery/shower/proc/check_clothes(mob/living/carbon/human/H)
+/obj/structure/hygiene/shower/proc/check_clothes(mob/living/carbon/human/H)
 	if(H.wear_suit)
 		// Do not check underclothing if the over-suit is suitable.
 		// This stops people feeling dumb if they're showering
@@ -293,7 +338,7 @@
 	else if(H.head)
 		. = TRUE
 
-/obj/machinery/shower/proc/process_heat(mob/living/M)
+/obj/structure/hygiene/shower/proc/process_heat(mob/living/M)
 	if(!on || !istype(M)) return
 
 	var/temperature = temperature_settings[watertemp]
@@ -314,7 +359,7 @@
 	icon_state = "rubberducky"
 	item_state = "rubberducky"
 
-/obj/structure/sink
+/obj/structure/hygiene/sink
 	name = "sink"
 	icon = 'icons/obj/watercloset.dmi'
 	icon_state = "sink"
@@ -322,7 +367,7 @@
 	anchored = 1
 	var/busy = 0 	//Something's being washed at the moment
 
-/obj/structure/sink/MouseDrop_T(var/obj/item/thing, var/mob/user)
+/obj/structure/hygiene/sink/MouseDrop_T(var/obj/item/thing, var/mob/user)
 	..()
 	if(!istype(thing) || !thing.is_open_container())
 		return ..()
@@ -336,7 +381,7 @@
 	thing.reagents.clear_reagents()
 	thing.update_icon()
 
-/obj/structure/sink/attack_hand(mob/user as mob)
+/obj/structure/hygiene/sink/attack_hand(mob/user as mob)
 	if (ishuman(user))
 		var/mob/living/carbon/human/H = user
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
@@ -384,7 +429,7 @@
 		V.show_message("<span class='notice'>[user] washes their hands using \the [src].</span>")
 
 
-/obj/structure/sink/attackby(obj/item/O as obj, mob/living/user as mob)
+/obj/structure/hygiene/sink/attackby(obj/item/O as obj, mob/living/user as mob)
 	if(busy)
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
@@ -441,21 +486,21 @@
 		"<span class='notice'>You wash \a [I] using \the [src].</span>")
 
 
-/obj/structure/sink/kitchen
+/obj/structure/hygiene/sink/kitchen
 	name = "kitchen sink"
 	icon_state = "sink_alt"
 
-/obj/structure/sink/puddle	//splishy splashy ^_^
+/obj/structure/hygiene/sink/puddle	//splishy splashy ^_^
 	name = "puddle"
 	icon_state = "puddle"
 	desc = "A small pool of some liquid, ostensibly water."
 
-/obj/structure/sink/puddle/attack_hand(mob/M as mob)
+/obj/structure/hygiene/sink/puddle/attack_hand(mob/M as mob)
 	icon_state = "puddle-splash"
 	..()
 	icon_state = "puddle"
 
-/obj/structure/sink/puddle/attackby(obj/item/O as obj, mob/user as mob)
+/obj/structure/hygiene/sink/puddle/attackby(obj/item/O as obj, mob/user as mob)
 	icon_state = "puddle-splash"
 	..()
 	icon_state = "puddle"

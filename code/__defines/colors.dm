@@ -98,3 +98,6 @@
 #define COLOR_DARKMODE_DARKBACKGROUND "#171717"
 #define COLOR_DARKMODE_TEXT "#f5f8fa"
 #define COLOR_WEBHOOK_DEFAULT 0x8bbbd5
+
+// Used by fluid system.
+#define COLOR_OCEAN "#99f5ff"

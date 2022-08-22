@@ -483,6 +483,9 @@
 /obj/machinery/door/proc/deconstruct(mob/user, var/moved = FALSE)
 	return null
 
+/obj/machinery/door/CanFluidPass(var/coming_from)
+	return !density
+
 /obj/machinery/door/morgue
 	icon = 'icons/obj/doors/doormorgue.dmi'
 

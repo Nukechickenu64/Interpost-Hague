@@ -14,12 +14,19 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 //For anything that can light stuff on fire
 /obj/item/weapon/flame
+	waterproof = FALSE
 	var/lit = 0
 
 /obj/item/weapon/flame/proc/extinguish(var/mob/user, var/no_message)
 	lit = 0
 	damtype = "brute"
 	STOP_PROCESSING(SSobj, src)
+
+/obj/item/weapon/flame/water_act(var/depth)
+	..()
+	if(!waterproof && lit)
+		if(submerged(depth))
+			extinguish(no_message = TRUE)
 
 /proc/isflamesource(A)
 	if(isWelder(A))
@@ -56,6 +63,9 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		M.IgniteMob()
 	var/turf/location = get_turf(src)
 	smoketime--
+	if(submerged() || smoketime < 1)
+		extinguish()
+		return
 	if(location)
 		location.hotspot_expose(700, 5)
 		return
@@ -98,6 +108,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	var/weldermes = "USER lights NAME with FLAME"
 	var/ignitermes = "USER lights NAME with FLAME"
 	var/brand
+	waterproof = FALSE
 
 /obj/item/clothing/mask/smokable/New()
 	..()
@@ -122,6 +133,9 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 /obj/item/clothing/mask/smokable/Process()
 	var/turf/location = get_turf(src)
 	smoke(1)
+	if(submerged() || smoketime < 1)
+		extinguish()
+		return
 	if(location)
 		location.hotspot_expose(700, 5)
 
@@ -138,8 +152,17 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		M.update_inv_l_hand(0)
 		M.update_inv_r_hand(1)
 
+/obj/item/clothing/mask/smokable/water_act(var/depth)
+	..()
+	if(!waterproof && lit)
+		if(submerged(depth))
+			extinguish(no_message = TRUE)
+
 /obj/item/clothing/mask/smokable/proc/light(var/flavor_text = "[usr] lights the [name].")
 	if(!src.lit)
+		if(submerged())
+			to_chat(usr, "<span class='warning'>You cannot light \the [src] underwater.</span>")
+			return
 		src.lit = 1
 		damtype = "fire"
 		if(reagents.get_reagent_amount(/datum/reagent/toxin/phoron)) // the phoron explodes when exposed to fire
@@ -161,13 +184,6 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		T.visible_message(flavor_text)
 		set_light(0.6, 0.5, 2, 2, "#e38f46")
 		START_PROCESSING(SSobj, src)
-
-/obj/item/clothing/mask/smokable/proc/die(var/nomessage = 0)
-	playsound(src, 'sound/items/cig_snuff.ogg', 25, 1)
-	set_light(0)
-	lit = 0
-	STOP_PROCESSING(SSobj, src)
-	update_icon()
 
 /obj/item/clothing/mask/smokable/proc/extinguish(var/mob/user, var/no_message)
 	lit = 0
@@ -712,6 +728,9 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 /obj/item/clothing/mask/smokable/pipe/light(var/flavor_text = "[usr] lights the [name].")
 	if(!src.lit && src.smoketime)
+		if(submerged())
+			to_chat(usr, "<span class='warning'>You cannot light \the [src] underwater.</span>")
+			return
 		src.lit = 1
 		damtype = "fire"
 		icon_state = icon_on
@@ -1010,6 +1029,9 @@ obj/item/clothing/mask/chewable/Destroy()
 	update_icon()
 
 /obj/item/weapon/flame/lighter/proc/light(mob/user)
+	if(submerged())
+		to_chat(usr, "<span class='warning'>You cannot light \the [src] underwater.</span>")
+		return
 	lit = 1
 	update_icon()
 	light_effects(user)
@@ -1114,13 +1136,17 @@ obj/item/clothing/mask/chewable/Destroy()
 	..()
 
 /obj/item/weapon/flame/lighter/Process()
-	if(ismob(loc) && prob(10) && reagents.get_reagent_amount(/datum/reagent/fuel) < 1)
-		to_chat(loc, "<span class='warning'>[src]'s flame flickers.</span>")
-		set_light(0)
-		spawn(4)
-			set_light(0.6, 0.5, 2)
-	reagents.remove_reagent(/datum/reagent/fuel, 0.05)
+	if(!submerged() && reagents.has_reagent(/datum/reagent/fuel))
+		if(ismob(loc) && prob(10) && reagents.get_reagent_amount(/datum/reagent/fuel) < 1)
+			to_chat(loc, "<span class='warning'>[src]'s flame flickers.</span>")
+			set_light(0)
+			spawn(4)
+				set_light(0.6, 0.5, 2)
+		reagents.remove_reagent(/datum/reagent/fuel, 0.05)
+	else
+		extinguish()
+		return
 
-	var/turf/location = get_turf(src)
-	if(location)
-		location.hotspot_expose(700, 5)
+		var/turf/location = get_turf(src)
+		if(location)
+			location.hotspot_expose(700, 5)

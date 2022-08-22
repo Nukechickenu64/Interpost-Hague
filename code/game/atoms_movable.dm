@@ -4,6 +4,8 @@
 	appearance_flags = TILE_BOUND | PIXEL_SCALE | LONG_GLIDE
 	glide_size = 8
 
+	var/waterproof = TRUE
+
 	var/last_move = null
 	var/last_move_time = 0
 	var/anchored = 0

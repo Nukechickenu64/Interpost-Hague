@@ -290,6 +290,8 @@
 
 	var/obj/item/weapon/welder_tank/tank = /obj/item/weapon/welder_tank // where the fuel is stored
 
+	waterproof = FALSE
+
 /obj/item/weapon/weldingtool/improvised
 	name = "jury-rigged torch"
 	desc = "An assembly of pipes attached to a little gas tank. Serves capably as a welder, though a bit risky."
@@ -410,10 +412,13 @@
 	else
 		..()
 
+/obj/item/weapon/weldingtool/water_act()
+	if(welding && !waterproof)
+		setWelding(0)
 
 /obj/item/weapon/weldingtool/Process()
 	if(welding)
-		if(!remove_fuel(0.05))
+		if((!waterproof && submerged()) || !remove_fuel(0.05))
 			setWelding(0)
 
 /obj/item/weapon/weldingtool/afterattack(obj/O as obj, mob/user as mob, proximity)
@@ -514,6 +519,11 @@
 //so that the welding tool updates accordingly
 /obj/item/weapon/weldingtool/proc/setWelding(var/set_welding, var/mob/M)
 	if(!status)	return
+
+	if(!welding && !waterproof && submerged())
+		if(M)
+			to_chat(M, "<span class='warning'>You cannot light \the [src] underwater.</span>")
+		return
 
 	var/turf/T = get_turf(src)
 	//If we're turning it on

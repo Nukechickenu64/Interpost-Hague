@@ -14,9 +14,22 @@
 
 /obj/structure/Destroy()
 	reset_mobs_offset()
-	if(parts)
-		new parts(loc)
+	var/turf/T = get_turf(src)
+	if(T && parts)
+		new parts(T)
 	. = ..()
+	if(istype(T))
+		T.fluid_update()
+
+/obj/structure/Initialize()
+	. = ..()
+	if(!CanFluidPass())
+		fluid_update()
+
+/obj/structure/Move()
+	. = ..()
+	if(. && !CanFluidPass())
+		fluid_update()
 
 /obj/structure/Crossed(mob/living/M)
 	if(istype(M))
