@@ -45,6 +45,7 @@
 /turf/simulated/ocean/non_flooded
 	flooded = FALSE
 
+/*
 GLOBAL_LIST_INIT(submerged_levels, new)
 /datum/admins/proc/submerge_map()
 	set category = "Admin"
@@ -123,3 +124,4 @@ GLOBAL_LIST_INIT(submerged_levels, new)
 	SSfluids.wake()
 
 	to_world(SPAN_NOTICE("<b>[usr.key] has finished dunking the server into the ocean.</b>"))
+*/

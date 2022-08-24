@@ -474,6 +474,9 @@ BLIND     // can't see anything
 		verbs += /obj/item/clothing/mask/proc/adjust_mask
 	..()
 
+/obj/item/clothing/mask/proc/filters_water()
+	return FALSE
+
 /obj/item/clothing/mask/update_clothing_icon()
 	if (ismob(src.loc))
 		var/mob/M = src.loc

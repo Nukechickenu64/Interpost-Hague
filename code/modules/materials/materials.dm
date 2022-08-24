@@ -392,6 +392,15 @@ var/list/name_to_material
 	hitsound = 'sound/weapons/smash.ogg'
 	apply_icon_colour_to_walls = FALSE
 
+/material/deuterium
+	name = MATERIAL_DEUTERIUM
+	stack_type = /obj/item/stack/material/deuterium
+	icon_colour = "#999999"
+	stack_origin_tech = list(TECH_MATERIAL = 3)
+	sheet_singular_name = "ingot"
+	sheet_plural_name = "ingots"
+	is_fusion_fuel = 1
+
 /material/diona // Needs a rework.
 	name = "biomass"
 	icon_colour = null

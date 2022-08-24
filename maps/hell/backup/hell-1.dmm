@@ -27,7 +27,7 @@
 "aA" = (/obj/structure/body3,/turf/simulated/floor/helldirt,/area/exoplanet)
 "aB" = (/obj/structure/kitchenspike,/turf/simulated/floor/hellslate,/area/exoplanet)
 "aC" = (/obj/structure/woodenclock,/turf/simulated/floor/hellslate,/area/exoplanet)
-"aD" = (/obj/structure/mirror/raider,/turf/unsimulated/wall/cult,/area/exoplanet)
+"aD" = (/obj/structure/mirror,/turf/unsimulated/wall/cult,/area/exoplanet)
 "aE" = (/obj/structure/sink/puddle,/turf/simulated/floor/helldirt,/area/exoplanet)
 "aF" = (/mob/living/simple_animal/alien2,/turf/simulated/floor/helldirt,/area/exoplanet)
 "aG" = (/obj/effect/spider/stickyweb,/turf/simulated/floor/hellslate,/area/exoplanet)

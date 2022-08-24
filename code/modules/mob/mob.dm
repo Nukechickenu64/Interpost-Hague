@@ -1120,3 +1120,18 @@ proc/uh(var/S)
 	S = lower.Replace(S, "h")	 //replaces all lowercase letters with "h"
 	S = replacetext(S," h"," u") //makes it so we words start with "u" most of the time.
 	return S
+
+/mob/proc/handle_drowning()
+	return FALSE
+
+/mob/proc/can_drown()
+	return 0
+
+/mob/is_fluid_pushable(var/amt)
+	if(..() && !buckled && (lying || !Check_Shoegrip()) && (amt >= mob_size * (lying ? 5 : 10)))
+		if(!lying)
+			Weaken(1)
+			if(lying && prob(20))
+				to_chat(src, "<span class='danger'>You are pushed down by the flood!</span>")
+		return TRUE
+	return FALSE

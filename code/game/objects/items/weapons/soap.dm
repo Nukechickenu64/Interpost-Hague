@@ -47,7 +47,7 @@
 		user.visible_message("<span class='warning'>[user] starts scrubbing \the [T].</span>")
 		T.clean(src, user, 80, "<span class='notice'>You scrub \the [target.name] clean.</span>")
 		cleaned = TRUE
-	else if(istype(target,/obj/structure/sink))
+	else if(istype(target,/obj/structure/hygiene/sink))
 		to_chat(user, "<span class='notice'>You wet \the [src] in the sink.</span>")
 		wet()
 	else

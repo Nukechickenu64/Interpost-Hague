@@ -70,9 +70,7 @@
 	. = ..()
 
 /mob/living/simple_animal/Life()
-	. = ..()
-	if(!.)
-		return FALSE
+	..()
 	if(!living_observers_present(GetConnectedZlevels(z)))
 		return
 	//Health
@@ -84,7 +82,6 @@
 			set_density(1)
 		return 0
 
-
 	if(health <= 0)
 		death()
 		return
@@ -92,21 +89,27 @@
 	if(health > maxHealth)
 		health = maxHealth
 
+
 	handle_stunned()
 	handle_weakened()
 	handle_paralysed()
 	handle_supernatural()
+	handle_impaired_vision()
+
+	if(buckled)
+		if(istype(buckled, /obj/effect/energy_net))
+			var/obj/effect/energy_net/Net = buckled
+			Net.escape_net(src)
+		else if(prob(50))
+			visible_message("<span class='warning'>\The [src] struggles against \the [buckled]!</span>")
 
 	//Movement
 	if(!client && !stop_automated_movement && wander && !anchored)
-		if(isturf(src.loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
+		if(isturf(src.loc) && !resting)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
 			turns_since_move++
 			if(turns_since_move >= turns_per_move)
-				if(!(stop_automated_movement_when_pulled && pulledby)) //Soma animals don't move when pulled
-					var/moving_to = 0 // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
-					moving_to = pick(GLOB.cardinal)
-					set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
-					Move(get_step(src,moving_to))
+				if(!(stop_automated_movement_when_pulled && pulledby)) //Some animals don't move when pulled
+					SelfMove(pick(GLOB.cardinal))
 					turns_since_move = 0
 
 	//Speaking
@@ -125,29 +128,46 @@
 					audible_emote("[pick(emote_hear)].")
 				if("emote_see")
 					visible_emote("[pick(emote_see)].")
+	handle_atmos()
+	return 1
 
-	if(in_stasis)
-		return 1 // return early to skip atmos checks
-
+/mob/living/simple_animal/proc/handle_atmos(var/atmos_suitable = 1)
 	//Atmos
-	var/atmos_suitable = 1
 
-	var/atom/A = loc
 	if(!loc)
-		return 1
-	var/datum/gas_mixture/environment = A.return_air()
+		return
 
+	var/datum/gas_mixture/environment = loc.return_air()
 	if(environment)
-		if( abs(environment.temperature - bodytemperature) > 40 )
-			bodytemperature += (environment.temperature - bodytemperature) / 5
-		if(min_gas)
-			for(var/gas in min_gas)
-				if(environment.gas[gas] < min_gas[gas])
-					atmos_suitable = 0
-		if(max_gas)
-			for(var/gas in max_gas)
-				if(environment.gas[gas] > max_gas[gas])
-					atmos_suitable = 0
+
+		if(abs(environment.temperature - bodytemperature) > 40 )
+			bodytemperature += ((environment.temperature - bodytemperature) / 5)
+
+		 // don't bother checking it twice if we got a supplied 0 val.
+		if(atmos_suitable)
+			if(LAZYLEN(min_gas))
+				for(var/gas in min_gas)
+					if(environment.gas[gas] < min_gas[gas])
+						atmos_suitable = 0
+						break
+			if(atmos_suitable && LAZYLEN(max_gas))
+				for(var/gas in max_gas)
+					if(environment.gas[gas] < max_gas[gas])
+						atmos_suitable = 0
+						break
+
+	//Atmos effect
+	if(bodytemperature < minbodytemp)
+		fire_alert = 2
+		adjustBruteLoss(cold_damage_per_tick)
+	else if(bodytemperature > maxbodytemp)
+		fire_alert = 1
+		adjustBruteLoss(heat_damage_per_tick)
+	else
+		fire_alert = 0
+
+	if(!atmos_suitable)
+		adjustBruteLoss(unsuitable_atoms_damage)
 
 	//Atmos effect
 	if(bodytemperature < minbodytemp)

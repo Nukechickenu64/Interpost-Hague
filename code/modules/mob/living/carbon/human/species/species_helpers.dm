@@ -4,3 +4,6 @@ var/list/stored_shock_by_ref = list()
 	if(stored_shock_by_ref["\ref[src]"])
 		target.electrocute_act(stored_shock_by_ref["\ref[src]"]*0.9, src)
 		stored_shock_by_ref["\ref[src]"] = 0
+
+/datum/species/proc/water_act(var/mob/living/carbon/human/H, var/depth)
+	return

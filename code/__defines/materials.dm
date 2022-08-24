@@ -14,3 +14,4 @@
 #define MATERIAL_RUSTY_STEEL_TYPE /obj/item/stack/material/rustysteel/
 
 #define MATERIAL_NULLGLASS /obj/item/stack/material/nullglass
+#define MATERIAL_DEUTERIUM               "deuterium"

@@ -18,10 +18,10 @@
 	var/tmp/deuterium_generation_chance = 10
 	var/tmp/deuterium_generation_amount = 1
 
-/obj/machinery/portable_atmospherics/cracker/on_update_icon()
+/obj/machinery/portable_atmospherics/cracker/update_icon()
 	icon_state = (use_power == POWER_USE_ACTIVE) ? "cracker_on" : "cracker"
 
-/obj/machinery/portable_atmospherics/cracker/interface_interact(mob/user)
+/obj/machinery/portable_atmospherics/cracker/ui_interact(mob/user)
 	if(use_power == POWER_USE_IDLE)
 		update_use_power(POWER_USE_ACTIVE)
 	else

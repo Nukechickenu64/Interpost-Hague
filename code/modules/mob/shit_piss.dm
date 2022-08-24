@@ -196,7 +196,7 @@
 	if (src.bowels >= 30)
 
 		//Poo in the loo.
-		var/obj/structure/toilet/T = locate() in src.loc
+		var/obj/structure/hygiene/toilet/T = locate() in src.loc
 		var/mob/living/M = locate() in src.loc
 		if(T && T.open)
 			message = "<B>[src]</B> defecates into \the [T]."
@@ -237,10 +237,10 @@
 		to_chat(src, "You don't have to.")
 		return
 
-	var/obj/structure/urinal/U = locate() in src.loc
-	var/obj/structure/toilet/T = locate() in src.loc
+	var/obj/structure/hygiene/urinal/U = locate() in src.loc
+	var/obj/structure/hygiene/toilet/T = locate() in src.loc
 	//var/obj/structure/toilet/T2 = locate() in src.loc
-	var/obj/structure/sink/S = locate() in src.loc
+	var/obj/structure/hygiene/sink/S = locate() in src.loc
 	var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
 	if((U || S) && gender != FEMALE)//In the urinal or sink.
 		message = "<B>[src]</B> urinates into [U ? U : S]."

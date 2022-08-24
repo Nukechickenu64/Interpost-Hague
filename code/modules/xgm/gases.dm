@@ -157,3 +157,6 @@
 
 	specific_heat = 30	// J/(mol*K)
 	molar_mass = 0.020	// kg/mol
+	breathed_product =     /datum/reagent/water
+	condensation_product = /datum/reagent/water
+	condensation_point =   308.15 // 35C. Dew point is ~20C but this is better for gameplay considerations.

@@ -187,3 +187,8 @@
 		coil.turf_place(src, user)
 		return
 	return ..()
+
+/turf/simulated/Initialize()
+	if(GAME_STATE >= RUNLEVEL_GAME)
+		fluid_update()
+	. = ..()

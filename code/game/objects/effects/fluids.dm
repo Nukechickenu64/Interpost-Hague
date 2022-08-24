@@ -9,6 +9,7 @@
 	alpha = 0
 	color = COLOR_OCEAN
 
+	var/temperature = T20C
 	var/fluid_amount = 0
 	var/turf/start_loc
 	var/list/equalizing_fluids = list()
@@ -45,7 +46,7 @@
 	REMOVE_ACTIVE_FLUID(src)
 	. = ..()
 
-/obj/effect/fluid/on_update_icon()
+/obj/effect/fluid/update_icon()
 
 	overlays.Cut()
 

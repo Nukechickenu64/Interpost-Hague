@@ -50,6 +50,7 @@
 	attack_verb = list("struck", "hit", "bashed")
 	zoomdevicename = "scope"
 	drawsound = 'sound/items/unholster.ogg'
+	waterproof = FALSE
 
 	var/burst = 1
 	var/automatic = 0  //can gun use it, 0 is no, anything above 0 is the delay between clicks in ds
@@ -198,7 +199,7 @@
 
 	add_fingerprint(user)
 
-	if(!special_check(user))
+	if((!waterproof && submerged()) || !special_check(user))
 		return
 
 	if(world.time < next_fire_time)
