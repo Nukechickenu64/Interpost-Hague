@@ -86,7 +86,7 @@
 
 /turf/simulated/Entered(atom/A, atom/OL)
 	. = ..()
-	if (istype(A))
+	if (istype(A,/mob/living))
 		A.OnSimulatedTurfEntered(src)
 
 /atom/proc/OnSimulatedTurfEntered(turf/simulated/T)
@@ -95,31 +95,39 @@
 
 /mob/living/OnSimulatedTurfEntered(turf/simulated/T, atom/A)
 	var/mob/living/M = A
-	var/mob/living/carbon/human/H = M
 
 	T.update_dirt()
 
 	HandleBloodTrail(T)
 
-	if(lying || !T.wet)
+	if(M.lying)
 		return
 
-	if(H.buckled || (H.m_intent == "walk" && prob(min(100, 100/(T.wet/10))) ) )
-		return
+	if(T.wet)
 
-	var/slip_dist = 1
-	var/slip_stun = 6
-	var/floor_type = "wet"
+		if(M.buckled || (M.m_intent == "walk" && prob(min(100, 100/(T.wet/10))) ) )
+			return
 
-	if(2 <= T.wet) // Lube
-		floor_type = "slippery"
-		slip_dist = 4
-		slip_stun = 10
+		var/slip_dist = 1
+		var/slip_stun = 6
+		var/floor_type = "wet"
 
-	if(slip("the [floor_type] floor", slip_stun))
-		for(var/i = 1 to slip_dist)
-			step(src, dir)
-			sleep(1)
+		if(2 <= T.wet) // Lube
+			floor_type = "slippery"
+			slip_dist = 4
+			slip_stun = 10
+
+		if(M.slip("the [floor_type] floor", slip_stun))
+			addtimer(CALLBACK(M, /mob/proc/slip_handler, M.dir, slip_dist - 1, 1), 1)
+		else
+			M.inertia_dir = 0
+	else
+		M.inertia_dir = 0
+
+/mob/proc/slip_handler(dir, dist, delay)
+	if (dist > 0)
+		addtimer(CALLBACK(src, .proc/slip_handler, dir, dist - 1, delay), delay)
+	step(src, dir)
 
 /mob/living/proc/HandleBloodTrail(turf/simulated/T)
 	return

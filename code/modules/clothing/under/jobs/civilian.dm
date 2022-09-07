@@ -16,12 +16,44 @@
 	worn_state = "magistrate"
 
 /obj/item/clothing/under/rank/captain //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
-	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station"
+	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station."
 	name = "high-quality clothes"
 	icon_state = "newcaptain"
 	item_state = "newcaptain"
 	worn_state = "newcaptain"
 	insrank = "Captain"
+
+/obj/item/clothing/under/rank/eofficer //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
+	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station."
+	name = "high-quality clothes"
+	icon_state = "newexecman"
+	item_state = "newexecman"
+	worn_state = "newexecman"
+	insrank = "Executive Officer"
+
+/obj/item/clothing/under/rank/majorformal //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
+	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station"
+	name = "high-quality clothes"
+	icon_state = "newmajor"
+	item_state = "newmajor"
+	worn_state = "newmajor"
+	insrank = "Major"
+
+/obj/item/clothing/under/rank/headsciformal //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
+	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station"
+	name = "high-quality clothes"
+	icon_state = "newheadsci"
+	item_state = "newheadsci"
+	worn_state = "newheadsci"
+	insrank = "Head Scientist"
+
+/obj/item/clothing/under/rank/vesseloverseer //Alright, technically not a 'civilian' but its better then giving a .dm file for a single define.
+	desc = "It's a white shirt and blue pants combo. Noticeably higher quality than other pieces of clothing on the station"
+	name = "high-quality clothes"
+	icon_state = "newvessover"
+	item_state = "newvessover"
+	worn_state = "newvessover"
+	insrank = "Vessel Overseer"
 
 /obj/item/clothing/under/rank/tetra //gonna replace everyone's uniforms with this, makes sense to be standardized.
 	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
@@ -30,7 +62,40 @@
 	item_state = "cargotetro"
 	worn_state = "cargotetro"
 
+/obj/item/clothing/under/rank/med //gonna replace everyone's uniforms with this, makes sense to be standardized.
+	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
+	name = "Tetracorp uniform"
+	icon_state = "med"
+	item_state = "med"
+	worn_state = "uniform_med"
 
+/obj/item/clothing/under/rank/sec //gonna replace everyone's uniforms with this, makes sense to be standardized.
+	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
+	name = "Tetracorp uniform"
+	icon_state = "sec"
+	item_state = "sec"
+	worn_state = "uniform_sec"
+
+/obj/item/clothing/under/rank/sci //gonna replace everyone's uniforms with this, makes sense to be standardized.
+	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
+	name = "Tetracorp uniform"
+	icon_state = "sci"
+	item_state = "sci"
+	worn_state = "uniform_sci"
+
+/obj/item/clothing/under/rank/misc //gonna replace everyone's uniforms with this, makes sense to be standardized.
+	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
+	name = "Tetracorp uniform"
+	icon_state = "misc"
+	item_state = "misc"
+	worn_state = "misc"
+
+/obj/item/clothing/under/rank/eng //gonna replace everyone's uniforms with this, makes sense to be standardized.
+	desc =  "It's a grey jumpsuit with a deep purple vest. It has the Tetracorp logo stamped onto it. The standard uniform for all workers."
+	name = "Tetracorp uniform"
+	icon_state = "eng"
+	item_state = "eng"
+	worn_state = "eng"
 
 /obj/item/clothing/under/rank/cargo
 	name = "quartermaster's jumpsuit"
@@ -38,7 +103,6 @@
 	icon_state = "qm"
 	item_state = "lb_suit"
 	worn_state = "qm"
-
 
 /obj/item/clothing/under/rank/cargotech
 	name = "cargo technician's jumpsuit"

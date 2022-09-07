@@ -20,6 +20,20 @@
 	item_state = "captshat"
 	desc = "Eternally fashionable statement, surefire way to signal that you're the boss of this station."
 
+//EO
+/obj/item/clothing/head/eocap
+	name = "executive officer's hat"
+	icon_state = "eocap"
+	item_state = "eocap"
+	desc = "Eternally fashionable statement. As practiced by the NKVD."
+
+//EO
+/obj/item/clothing/head/majorberet
+	name = "major's beret"
+	icon_state = "majorberet"
+	item_state = "majorberet"
+	desc = "OORAH, enforcers!"
+
 //Magistrate
 /obj/item/clothing/head/crown
 	name = "count's crown"

@@ -22,6 +22,23 @@
 	item_state = "robes"
 	body_parts_covered = UPPER_TORSO|ARMS
 
+//Major
+/obj/item/clothing/suit/major
+	name = "major's coat"
+	desc = "Major's massive drip."
+	icon_state = "majorcoat"
+	item_state = "majorcoat"
+	body_parts_covered = UPPER_TORSO|ARMS|LOWER_TORSO
+
+//E.O
+/obj/item/clothing/suit/eoficer
+	name = "vessel overseer's vest"
+	desc = "In...Vest."
+	icon_state = "newvest"
+	item_state = "newvest"
+	body_parts_covered = UPPER_TORSO
+
+
 //Captain
 /obj/item/clothing/suit/capsuit
 	name = "captain's suit"
