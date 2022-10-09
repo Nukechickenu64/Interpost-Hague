@@ -51,15 +51,15 @@
 #define ui_swaphand1 "-1,8"
 #define ui_dropbutton "0,3"
 #define ui_drop_throw "0,2" //Intents, actually. Hate Baycode.
-#define ui_pull "-2,3"//12"
+#define ui_pull "-2,1"//12"
 #define ui_atk "-1,3"//Dodge intents
 #define ui_atk_intents "-2, 2" //atk_intents
 #define ui_skills_family "-1,2"
-#define ui_resist "0,1"
+#define ui_resist "-2,3"
 #define ui_acti "-2,0"//"SOUTH-1,8"
-#define ui_combat "-2,1"//COMBAT MODE!
+#define ui_combat "-1,1"//COMBAT MODE!
 #define ui_combat_intent "-1,4"
-#define ui_movi "-1,1"
+#define ui_movi "0,1"
 #define ui_zonesel "EAST+1, NORTH-2"
 #define ui_acti_alt "SOUTH-1,8" //alternative intent switcher for when the interface is hidden (F12)
 #define ui_gun4 "EAST-3:24,SOUTH+2:7"
@@ -88,23 +88,23 @@
 #define ui_gun_select "10, SOUTH-1"
 
 //Upper-middle right (damage indicators)
-#define ui_toxin "EAST+1, NORTH-6"//6
+#define ui_toxin "EAST+1, NORTH-7"//6
 #define ui_fire "EAST+1, NORTH-8"//8
 #define ui_oxygen "EAST+1, NORTH-4"//NORTH-3"
-#define ui_pressure "EAST+1, NORTH-7"//7
-#define ui_surrender "EAST+1, NORTH-9"
-#define ui_fixeye "EAST+1, NORTH-10"
+#define ui_pressure "EAST+1, NORTH-5"//7
+#define ui_surrender "EAST+1, NORTH-10"
+#define ui_fixeye "EAST+1, NORTH-11"
 
 #define ui_alien_toxin "14:28,13:25"
 #define ui_alien_fire "14:28,12:25"
 #define ui_alien_oxygen "14:28,11:25"
 
 //Middle right (status indicators)
-#define ui_stamina "EAST+1, NORTH-11"
-#define ui_temp "EAST+1, NORTH-5"
-#define ui_health "EAST+1, NORTH-12"
-#define ui_happiness "EAST+1, NORTH-13"
-#define ui_nutrition "EAST+1, NORTH-14"
+#define ui_stamina "EAST+1, NORTH-12"
+#define ui_temp "EAST+1, NORTH-6"
+#define ui_health "EAST+1, NORTH-13"
+#define ui_happiness "EAST+1, NORTH-14"
+#define ui_nutrition "EAST+1, NORTH-9"
 #define ui_internal "EAST+1, NORTH-3"
 									//borgs
 #define ui_borg_health "EAST-1:28,CENTER-1:13" //borgs have the health display where humans have the pressure damage indicator.

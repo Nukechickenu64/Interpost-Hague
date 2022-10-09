@@ -43,23 +43,7 @@
 	using.dir = NORTH
 	using.icon = ui_style
 	using.icon_state = "new2"
-	using.screen_loc = "0,1 to 0,4"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new3"
-	using.screen_loc = "0,4 to 0,8"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new2"
-	using.screen_loc = "0,8 to 0,14"
+	using.screen_loc = "0,1 to 0,14"
 	using.layer = UNDER_HUD_LAYER
 	adding += using
 
