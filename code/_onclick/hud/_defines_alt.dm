@@ -26,13 +26,13 @@
 #define ui_inventory "1,2"
 
 //Lower center, persistant menu
-#define ui_sstore1 "0,11"
+#define ui_sstore1 "-2,10"
 #define ui_id "-1,6"
-#define ui_belt "-2,7"
-#define ui_back "-1,11"
-#define ui_rhand "-2,8"
-#define ui_lhand "0,8"
-#define ui_swaphand2 "-1,8"
+#define ui_belt "-2,9"
+#define ui_back "0,10"
+#define ui_rhand "-2,7"
+#define ui_lhand "0,7"
+#define ui_swaphand2 "-1,7"
 #define ui_storage1 "-2,6"
 #define ui_storage2 "0,6"
 
@@ -48,17 +48,18 @@
 #define ui_monkey_back "SOUTH+1,3"	//monkey
 
 //Lower right, persistant menu
-#define ui_swaphand1 "-1,8"
+#define ui_swaphand1 "-1,7"
 #define ui_dropbutton "0,3"
 #define ui_drop_throw "0,2" //Intents, actually. Hate Baycode.
 #define ui_pull "-2,1"//12"
-#define ui_atk "-1,3"//Dodge intents
+#define ui_atk "0,4"//Dodge intents
+#define ui_wield "-1,3"//Dodge intents
 #define ui_atk_intents "-2, 2" //atk_intents
 #define ui_skills_family "-1,2"
 #define ui_resist "-2,3"
 #define ui_acti "-2,0"//"SOUTH-1,8"
 #define ui_combat "-1,1"//COMBAT MODE!
-#define ui_combat_intent "-1,4"
+#define ui_combat_intent "-2,4"
 #define ui_movi "0,1"
 #define ui_zonesel "EAST+1, NORTH-2"
 #define ui_acti_alt "SOUTH-1,8" //alternative intent switcher for when the interface is hidden (F12)
@@ -111,20 +112,20 @@
 #define ui_alien_health "EAST-1:28,CENTER-1:13" //aliens have the health display where humans have the pressure damage indicator.
 
 //Pop-up inventory
-#define ui_shoes "-1,7"
+#define ui_shoes "-1,9"
 
-#define ui_iclothing "-1,9"
-#define ui_oclothing "-1,10"
-#define ui_gloves "0,7"
+#define ui_iclothing "-0.5,8"
+#define ui_oclothing "-1.5,8"
+#define ui_gloves "0,9"
 
-#define ui_glasses "-1,12"
-#define ui_mask "-1,13"
-#define ui_l_ear "0,12"
-#define ui_r_ear "-2,12"
+#define ui_glasses "-1,11"
+#define ui_mask "-1.5,12"
+#define ui_l_ear "0,11"
+#define ui_r_ear "-2,11"
 
-#define ui_amulet "0,13"
+#define ui_amulet "-1,10"
 
-#define ui_head "-1,14"
+#define ui_head "-0.5,12"
 
 //#define ui_swapbutton "6:-16,1:5" //Unused
 

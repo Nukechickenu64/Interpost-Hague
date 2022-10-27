@@ -35,7 +35,7 @@
 	if(get_dist(user, src) > 3)
 		skipears = 1
 
-	var/list/msg = list("<div class='firstdivexamineplyr'><div class='boxexamineplyr'><span class='statustext'><span class='info'>Oh, this is ")
+	var/list/msg = list("<div class='firstdivexamineplyr'><div class='boxexamineplyr'><span class='statustext'><span class='info'>It's nice seeing ")
 
 	var/datum/gender/T = gender_datums[get_gender()]
 	if(skipjumpsuit && skipface) //big suits/masks/helmets make it hard to tell their gender
@@ -45,7 +45,7 @@
 		// Just in case someone VVs the gender to something strange. It'll runtime anyway when it hits usages, better to CRASH() now with a helpful message.
 		CRASH("Gender datum was null; key was '[(skipjumpsuit && skipface) ? PLURAL : gender]'")
 
-	msg += "<span class='uppertext'>[src.name]!</span>\n"
+	msg += "<span class='uppertext'>[src.name] around.</span>\n"
 
 	var/is_synth = isSynthetic()
 	if(!(skipjumpsuit && skipface))
@@ -66,8 +66,10 @@
 		var/mob/living/carbon/human/H = user
 		var/classdesc = get_social_description(H)
 		if(src?.mind?.assigned_role)
-			msg += "I always knew [T.him] as the <b>[src.mind.assigned_role]</b>.\n"
+			msg += "[T.He]'s known by everyone as the <b>[src.mind.assigned_role]</b>.\n"
 		msg += "[T.He] [T.is] [get_social_class()]. [classdesc]\n\n"
+
+	msg += "<hr class='linexd'>"
 
 	//uniform
 	if(w_uniform && !skipjumpsuit)
@@ -134,6 +136,8 @@
 
 	if(wear_amulet)
 		msg += "[T.He] [T.is] wearing [wear_amulet.get_examine_line(user)] on his neck.\n"
+
+	msg += "<hr class='linexd'>"
 
 	//handcuffed?
 	if(handcuffed)

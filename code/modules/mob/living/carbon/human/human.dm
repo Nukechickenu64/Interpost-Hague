@@ -1526,17 +1526,21 @@ var/list/rank_prefix = list(\
 /mob/living/carbon/human/proc/exam_self()
 	if(!stat)
 		visible_message("<span class='info'>[src] examines [gender==MALE ? "himself" : "herself"].</span>")
-	var/msg = "<div class='firstdiv'><div class='box'><span class='notice'><b>Let's see how I am doing.</b></span>\n"
+	var/msg = "<div class='firstdiv'><div class='box'><span class='notice'><b>I wonder if I'm fine.</b></span>\n"
+
+	msg += "<hr class='linexd'>"
 
 	if(!stat)
-		msg += "<span class='info'>I am alive and conscious.</span>\n"
+		msg += "<span class='info'>Yes, I am alive and conscious.</span>\n"
 	if(stat == DEAD)
-		msg += "<span class='danger'>I am dead.</span>\n"
+		msg += "<span class='danger'>No, I am dead.</span>\n"
 	else if(sleeping || stat == UNCONSCIOUS)
 		if(!is_asystole())
-			msg += "<span class='danger'>I am unconscious, but still breathing.</span>\n"
+			msg += "<span class='danger'>Kind of. I am unconscious, but still breathing.</span>\n"
 		else
-			msg += "<span class='danger'>I am dying.</span>\n"
+			msg += "<span class='danger'>No, I am dying!</span>\n"
+
+	msg += "<hr class='linexd'>"
 
 	for(var/obj/item/organ/external/org in organs)
 		var/list/status = list()

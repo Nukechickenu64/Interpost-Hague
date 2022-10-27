@@ -31,67 +31,11 @@
 	using.layer = UNDER_HUD_LAYER
 	adding += using
 
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new"
-	using.screen_loc = "-1,15"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new2"
-	using.screen_loc = "0,1 to 0,14"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new4"
-	using.screen_loc = "-2,1 to -2,14"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
 	using = new /obj/screen() //Upper bar
 	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "middle"
-	using.screen_loc = "-1,1 to -1,4"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen() //Upper bar
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "middle2"
-	using.screen_loc = "-1,5"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen() //Upper bar
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "middle"
-	using.screen_loc = "-1,6 to -1,14"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new5"
-	using.screen_loc = "0,15"
-	using.layer = UNDER_HUD_LAYER
-	adding += using
-
-	using = new /obj/screen()
-	using.dir = NORTH
-	using.icon = ui_style
-	using.icon_state = "new6"
-	using.screen_loc = "-2,15"
+	using.icon = 'icons/mob/screen/backgrounds.dmi'
+	using.icon_state = "6"
+	using.screen_loc = "-2,1"
 	using.layer = UNDER_HUD_LAYER
 	adding += using
 
@@ -366,6 +310,7 @@
 	mymob.stamina_icon.screen_loc = ui_stamina
 	hud_elements |= mymob.stamina_icon
 
+/*
 	mymob.film_grain = new()
 	mymob.film_grain.icon = 'icons/effects/static.dmi'
 	mymob.film_grain.icon_state = "7 moderate"
@@ -373,6 +318,17 @@
 	mymob.film_grain.alpha = 165
 	mymob.film_grain.layer = FULLSCREEN_LAYER
 	mymob.film_grain.mouse_opacity = 0
+	hud_elements |= mymob.film_grain
+*/
+
+	mymob.film_grain = new /obj/screen()
+	mymob.film_grain.icon = 'icons/misc/fullscreen.dmi'
+	mymob.film_grain.icon_state = "grain"
+	mymob.film_grain.name = " "
+	mymob.film_grain.screen_loc = "1,1"
+	mymob.film_grain.alpha = 140
+	mymob.film_grain.mouse_opacity = 0
+	mymob.film_grain.layer = FULLSCREEN_LAYER
 	hud_elements |= mymob.film_grain
 
 	mymob.rest = new /obj/screen()
@@ -417,10 +373,11 @@
 	hud_elements |= mymob.pain
 
 	mymob.noise = new /obj/screen()
-	mymob.noise.icon = 'icons/mob/noise.dmi'
-	mymob.noise.icon_state = "[rand(1,9)]"
+	mymob.noise.icon = 'icons/misc/fullscreen.dmi'
+	mymob.noise.icon_state = "grain"
 	mymob.noise.name = " "
-	mymob.noise.screen_loc = "1,1 to 15,15"
+	mymob.noise.screen_loc = "1,1"
+	mymob.noise.alpha = 120
 	mymob.noise.mouse_opacity = 0
 	hud_elements |= mymob.noise
 
@@ -449,7 +406,7 @@
 	mymob.wield_icon.name = "wield"
 	mymob.wield_icon.icon = ui_style
 	mymob.wield_icon.icon_state = "wield"
-	mymob.wield_icon.screen_loc = ui_atk
+	mymob.wield_icon.screen_loc = ui_wield
 	hud_elements |= mymob.wield_icon
 
 	mymob.happiness_icon = new /obj/screen()
