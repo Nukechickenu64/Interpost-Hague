@@ -13,7 +13,10 @@
 		return FALSE
 	if(!src.Adjacent(user) || !over.Adjacent(user))
 		return FALSE // should stop you from dragging through windows
-	return TRUE
+	return check_mousedrop_interactivity(user)
+
+/atom/proc/check_mousedrop_interactivity(var/mob/user)
+	return CanPhysicallyInteract(user)
 
 /atom/MouseDrop(atom/over)
 	if(!usr || !over) return

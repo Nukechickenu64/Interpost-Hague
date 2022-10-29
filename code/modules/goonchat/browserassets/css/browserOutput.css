@@ -388,15 +388,15 @@ h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
 .passive				{color: #660000;}
 
 .danger					{color: #c51e1e; text-shadow: 0 0 7px #c51e1e;}
-.blueglow				{color: #2f25b8; text-shadow: 0 0 5px #2f25b8;}
+.blueglow				{color: #2f785a; text-shadow: 0 0 5px #2f785a;}
 .warning				{color: #c51e1e;	font-style: italic; text-shadow: 0 0 4px #c51e1e;}
 .boldannounce			{color: #c51e1e;	font-weight: bold; text-shadow: 0 0 3px #c51e1e;}
 .rose					{color: #ff5050;}
-.info					{color: #4786c4; text-shadow: 0 0 5px #4786c4;}
-.notice					{color: #4781c4; text-shadow: 0 0 3px #4781c4;}
+.info					{color: #065f35; text-shadow: 0 0 5px #065f35;}
+.notice					{color: #065535; text-shadow: 0 0 3px #065535;}
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
-.wakeup					{color: #928ebf; text-shadow: 0 0 2px #928ebf;}
+.wakeup					{color: #8ebf92; text-shadow: 0 0 2px #8ebf92;}
 .tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
 
 /* Languages */

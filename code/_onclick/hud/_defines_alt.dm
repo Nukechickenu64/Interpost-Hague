@@ -114,18 +114,18 @@
 //Pop-up inventory
 #define ui_shoes "-1,9"
 
-#define ui_iclothing "-0.5,8"
-#define ui_oclothing "-1.5,8"
+#define ui_iclothing "-0.52,8"
+#define ui_oclothing "-1.52,8"
 #define ui_gloves "0,9"
 
 #define ui_glasses "-1,11"
-#define ui_mask "-1.5,12"
+#define ui_mask "-1.52,12"
 #define ui_l_ear "0,11"
 #define ui_r_ear "-2,11"
 
 #define ui_amulet "-1,10"
 
-#define ui_head "-0.5,12"
+#define ui_head "-0.52,12"
 
 //#define ui_swapbutton "6:-16,1:5" //Unused
 
