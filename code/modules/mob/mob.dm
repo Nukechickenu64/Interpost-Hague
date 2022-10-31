@@ -451,7 +451,6 @@
 	if(istype(M,/mob/living/silicon/ai)) return
 	show_inv(usr)
 
-
 /mob/verb/stop_pulling()
 
 	set name = "Stop Pulling"
@@ -1135,3 +1134,6 @@ proc/uh(var/S)
 				to_chat(src, "<span class='danger'>You are pushed down by the flood!</span>")
 		return TRUE
 	return FALSE
+
+/mob/proc/return_pointer(var/client/client)
+	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'

@@ -37,7 +37,7 @@
 	* item/afterattack(atom,user,adjacent,params) - used both ranged and adjacent
 	* mob/RangedAttack(atom,params) - used only ranged, only used for tk and laser eyes but could be changed
 */
-/mob/proc/ClickOn(var/atom/A, var/params)
+/mob/proc/ClickOn(var/atom/A, var/params, mob/user, var/client/client)
 
 	if(world.time <= next_click) // Hard check, before anything else, to avoid crashing
 		return
@@ -75,6 +75,10 @@
 		return
 
 	face_atom(A) // change direction to face what you clicked on
+
+	usr.client.mouse_pointer_icon = 'icons/misc/attack_pointer.dmi'
+	sleep(2) // I hate to do this.
+	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
 
 	if(modifiers["middle"])//This goes below everything else because of how middle click is used.
 		MiddleClickOn(A)

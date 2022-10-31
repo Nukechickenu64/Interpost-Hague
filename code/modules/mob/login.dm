@@ -71,6 +71,9 @@
 
 	next_move = 1
 	set_sight(sight|SEE_SELF)
+
+	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
+
 	..()
 
 	my_client = client
