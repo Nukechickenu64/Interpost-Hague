@@ -76,9 +76,7 @@
 
 	face_atom(A) // change direction to face what you clicked on
 
-	usr.client.mouse_pointer_icon = 'icons/misc/attack_pointer.dmi'
-	sleep(2) // I hate to do this.
-	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
+	switch_pointer()
 
 	if(modifiers["middle"])//This goes below everything else because of how middle click is used.
 		MiddleClickOn(A)
@@ -549,3 +547,8 @@ var/const/CLICK_HANDLER_ALL                  = (~0)
 		jump_act(src, M)
 	else
 		M.swap_hand()
+
+/mob/proc/switch_pointer()
+	usr.client.mouse_pointer_icon = 'icons/misc/attack_pointer.dmi'
+	sleep(1) // I hate to do this.
+	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
