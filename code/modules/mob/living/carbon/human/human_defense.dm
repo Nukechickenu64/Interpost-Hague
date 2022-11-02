@@ -286,12 +286,12 @@ meteor_act
 		if(affecting.artery_name == "cartoid artery")
 			src.visible_message("<span class='danger'>[user] slices [src]'s throat!</span>")
 		else
-			src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.artery_name] artery!</span>")
+			src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.artery_name]!</span>")
 
 	//Next tendon, which disables the limb, but does not remove it, making it easier to fix, and less lethal, than losing it.
 	else if(I.sharp && (I.sharpness * 2) && !(affecting.status & ORGAN_TENDON_CUT) && affecting.has_tendon)//Yes this is the same exactly probability again. But I'm running it seperate because I don't want the two to be exclusive.
 		affecting.sever_tendon()
-		src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.tendon_name] tendon!</span>")
+		src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.tendon_name]!</span>")
 
 	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
 	else if(I.sharp && I.edge)
