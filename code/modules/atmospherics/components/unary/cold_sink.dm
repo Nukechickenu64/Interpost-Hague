@@ -19,6 +19,7 @@
 
 	var/set_temperature = T20C		// Thermostat
 	var/cooling = 0
+	layer = STRUCTURE_LAYER
 
 /obj/machinery/atmospherics/unary/freezer/New()
 	..()

@@ -99,22 +99,22 @@
 	overlays += overlay_image(overlay_icon, "smes-op[outputting]")
 
 	if(inputting == 2)
-		overlays += overlay_image(overlay_icon, "smes-oc2", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-oc2", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else if (inputting == 1)
-		overlays += overlay_image(overlay_icon, "smes-oc1", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-oc1", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else if (input_attempt)
-		overlays += overlay_image(overlay_icon, "smes-oc0", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-oc0", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
 	var/clevel = chargedisplay()
 	if(clevel)
-		overlays += overlay_image(overlay_icon, "smes-og[clevel]", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-og[clevel]", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
 	if(outputting == 2)
-		overlays += overlay_image(overlay_icon, "smes-op2", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-op2", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else if (outputting == 1)
-		overlays += overlay_image(overlay_icon, "smes-op1", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-op1", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else
-		overlays += overlay_image(overlay_icon, "smes-op0", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(overlay_icon, "smes-op0", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
 /obj/machinery/power/smes/proc/chargedisplay()
 	return round(5.5*charge/(capacity ? capacity : 5e6))

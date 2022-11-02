@@ -129,7 +129,7 @@
 				var/obj/item/organ/external/parent = owner.get_organ(parent_organ)
 				if(istype(parent))
 					owner.custom_pain("You feel a stabbing pain in your [parent.name]!", 5, affecting = parent)
-					take_damage(5)
+					take_internal_damage(5)
 	if(breath.total_moles == 0)
 		breath_fail_ratio = 1
 		handle_failed_breath()

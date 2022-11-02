@@ -560,7 +560,7 @@
 
 	var/brightness_range = 2 //how much light it gives off
 	var/brightness_power = 1
-	var/brightness_color = "#99b3c9"
+	var/brightness_color = "#a5afbe"
 	var/list/lighting_modes = list()
 	var/sound_on
 	var/sound_off
@@ -575,7 +575,7 @@
 
 	brightness_range = 5	// luminosity when on, also used in power calculation
 	brightness_power = 4
-	brightness_color = "#99b3c9"//"#FAE1AF"//"#C5D8B3"//#CDFEE0//"#B2B2B2"
+	brightness_color = "#a5afbe"//"#FAE1AF"//"#C5D8B3"//#CDFEE0//"#B2B2B2"
 	lighting_modes = list(
 		LIGHTMODE_EMERGENCY = list(l_range = 4, l_power = 1, l_color = "#da0205"),
 		)
@@ -599,7 +599,7 @@
 
 	brightness_range = 3
 	brightness_power = 4
-	brightness_color = "#99b3c9"//"#a0a080"
+	brightness_color = "#a5afc7"//"#a0a080"
 	lighting_modes = list(
 		LIGHTMODE_EMERGENCY = list(l_range = 3, l_power = 1, l_color = "#da0205"),
 		)

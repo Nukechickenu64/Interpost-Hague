@@ -113,7 +113,7 @@ var/list/organ_cache = list()
 			reagents.remove_reagent(/datum/reagent/blood,0.1)
 			blood_splatter(src,B,1)
 		if(config.organs_decay)
-			take_damage(rand(1,3))
+			take_general_damage(rand(1,3))
 		germ_level += rand(2,6)
 		if(germ_level >= INFECTION_LEVEL_TWO)
 			germ_level += rand(2,6)
@@ -168,7 +168,7 @@ var/list/organ_cache = list()
 			parent.germ_level++
 
 		if (prob(3))	//about once every 30 seconds
-			take_damage(1,silent=prob(30))
+			take_general_damage(1,silent=prob(30))
 
 /obj/item/organ/proc/handle_rejection()
 	// Process unsuitable transplants. TODO: consider some kind of
@@ -229,8 +229,8 @@ var/list/organ_cache = list()
 
 //Note: external organs have their own version of this proc
 //All intenal stuff hapens here
-/obj/item/organ/proc/take_damage(amount, var/silent=0)
-	damage = between(0, damage + round(amount, 0.1), max_damage)
+/obj/item/organ/proc/take_general_damage(var/amount, var/silent = FALSE)
+	CRASH("Not Implemented")
 
 /obj/item/organ/proc/heal_damage(amount)
 	damage = between(0, damage - round(amount, 0.1), max_damage)
@@ -244,17 +244,6 @@ var/list/organ_cache = list()
 	status = 0
 	robotic = ORGAN_ASSISTED
 	min_broken_damage += 5
-
-/obj/item/organ/emp_act(severity)
-	if(!(robotic >= ORGAN_ROBOT))
-		return
-	switch (severity)
-		if (1)
-			take_damage(9)
-		if (2)
-			take_damage(3)
-		if (3)
-			take_damage(1)
 
 /**
  *  Remove an organ

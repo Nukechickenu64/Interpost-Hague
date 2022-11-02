@@ -287,30 +287,30 @@
 		status_overlays_lighting.len = 5
 		status_overlays_environ.len = 5
 
-		status_overlays_lock[1] = overlay_image(icon, "apcox-0", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)    // 0=blue 1=red
-		status_overlays_lock[2] = overlay_image(icon, "apcox-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lock[1] = overlay_image(icon, "apcox-0", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)    // 0=blue 1=red
+		status_overlays_lock[2] = overlay_image(icon, "apcox-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
 
-		status_overlays_charging[1] = overlay_image(icon, "apco3-0", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_charging[2] = overlay_image(icon, "apco3-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_charging[3] = overlay_image(icon, "apco3-2", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_charging[1] = overlay_image(icon, "apco3-0", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_charging[2] = overlay_image(icon, "apco3-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_charging[3] = overlay_image(icon, "apco3-2", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
 
-		status_overlays_equipment[POWERCHAN_OFF + 1] = overlay_image(icon, "apco0-0", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_equipment[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco0-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_equipment[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco0-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_equipment[POWERCHAN_ON + 1] = overlay_image(icon, "apco0-2", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_equipment[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco0-3", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_equipment[POWERCHAN_OFF + 1] = overlay_image(icon, "apco0-0", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_equipment[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco0-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_equipment[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco0-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_equipment[POWERCHAN_ON + 1] = overlay_image(icon, "apco0-2", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_equipment[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco0-3", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
 
-		status_overlays_lighting[POWERCHAN_OFF + 1] = overlay_image(icon, "apco1-0", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_lighting[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco1-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_lighting[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco1-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_lighting[POWERCHAN_ON + 1] = overlay_image(icon, "apco1-2", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_lighting[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco1-3", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lighting[POWERCHAN_OFF + 1] = overlay_image(icon, "apco1-0", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lighting[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco1-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lighting[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco1-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lighting[POWERCHAN_ON + 1] = overlay_image(icon, "apco1-2", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_lighting[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco1-3", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
 
-		status_overlays_environ[POWERCHAN_OFF + 1] = overlay_image(icon, "apco2-0", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_environ[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco2-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_environ[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco2-1", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_environ[POWERCHAN_ON + 1] = overlay_image(icon, "apco2-2", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
-		status_overlays_environ[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco2-3", EFFECTS_ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_environ[POWERCHAN_OFF + 1] = overlay_image(icon, "apco2-0", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_environ[POWERCHAN_OFF_TEMP + 1] = overlay_image(icon, "apco2-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_environ[POWERCHAN_OFF_AUTO + 1] = overlay_image(icon, "apco2-1", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_environ[POWERCHAN_ON + 1] = overlay_image(icon, "apco2-2", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
+		status_overlays_environ[POWERCHAN_ON_AUTO + 1] = overlay_image(icon, "apco2-3", ABOVE_LIGHTING_PLANE, ABOVE_LIGHTING_LAYER)
 
 	var/update = check_updates() 		//returns 0 if no need to update icons.
 						// 1 if we need to update the icon_state

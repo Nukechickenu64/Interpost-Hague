@@ -124,7 +124,10 @@
 /obj/item/organ/internal/proc/is_bruised()
 	return damage >= min_bruised_damage
 
-/obj/item/organ/internal/take_damage(amount, var/silent=0)
+obj/item/organ/internal/take_general_damage(var/amount, var/silent = FALSE)
+	take_internal_damage(amount, silent)
+
+/obj/item/organ/internal/proc/take_internal_damage(amount, var/silent=0)
 	if(!(src in owner.bad_internal_organs))
 		owner.bad_internal_organs += src
 	if(isrobotic())
@@ -147,3 +150,14 @@
 	name = "penis"
 	icon_state = "penis"
 	desc = "Ah, the ol one eyed snake."
+
+/obj/item/organ/internal/emp_act(severity)
+	if(!(robotic >= ORGAN_ROBOT))
+		return
+	switch (severity)
+		if (1)
+			take_internal_damage(9)
+		if (2)
+			take_internal_damage(3)
+		if (3)
+			take_internal_damage(1)

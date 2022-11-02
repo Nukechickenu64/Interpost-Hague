@@ -351,7 +351,7 @@
 		if (2)
 			icon_state = "alarm1"
 			new_color = COLOR_RED_LIGHT
-	overlays  += overlay_image(icon, "alarm[icon_level]", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+	overlays  += overlay_image(icon, "alarm[icon_level]", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 
 	set_light(l_range = 1, l_power = 1, l_color = new_color)
 

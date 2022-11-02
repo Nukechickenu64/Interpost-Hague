@@ -19,6 +19,7 @@
 
 	var/set_temperature = T20C	//thermostat
 	var/heating = 0		//mainly for icon updates
+	layer = STRUCTURE_LAYER
 
 /obj/machinery/atmospherics/unary/heater/New()
 	..()

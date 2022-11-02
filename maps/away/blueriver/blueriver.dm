@@ -146,7 +146,7 @@
 	icon='blueriver.dmi'
 	icon_state = "bluespacecrystal1"
 	layer = SUPERMATTER_WALL_LAYER
-	plane = EFFECTS_ABOVE_LIGHTING_PLANE
+	plane = ABOVE_LIGHTING_PLANE
 	opacity = 0
 	dynamic_lighting = 0
 
@@ -165,7 +165,7 @@
 	icon='blueriver.dmi'
 	icon_state = "bloodf2"
 	layer = SUPERMATTER_WALL_LAYER
-	plane = EFFECTS_ABOVE_LIGHTING_PLANE
+	plane = ABOVE_LIGHTING_PLANE
 	opacity = 0
 	dynamic_lighting = 0
 

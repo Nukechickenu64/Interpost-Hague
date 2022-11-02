@@ -37,7 +37,7 @@
 	name = "Bluespace"
 	icon = 'icons/turf/space.dmi'
 	icon_state = "bluespacify"
-	plane = EFFECTS_ABOVE_LIGHTING_PLANE
+	plane = ABOVE_LIGHTING_PLANE
 	layer = SUPERMATTER_WALL_LAYER
 
 /obj/effect/overlay/wallrot

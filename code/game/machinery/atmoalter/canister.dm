@@ -163,13 +163,13 @@ update_flag
 	if(update_flag & 2)
 		overlays += "can-connector"
 	if(update_flag & 4)
-		overlays += overlay_image(icon, "can-o0", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(icon, "can-o0", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	if(update_flag & 8)
-		overlays += overlay_image(icon, "can-o1", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(icon, "can-o1", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else if(update_flag & 16)
-		overlays += overlay_image(icon, "can-o2", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(icon, "can-o2", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	else if(update_flag & 32)
-		overlays += overlay_image(icon, "can-o3", plane = EFFECTS_ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		overlays += overlay_image(icon, "can-o3", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
 	return
 
 /obj/machinery/portable_atmospherics/canister/fire_act(datum/gas_mixture/air, exposed_temperature, exposed_volume)

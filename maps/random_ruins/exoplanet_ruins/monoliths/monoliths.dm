@@ -33,7 +33,7 @@
 		I.appearance_flags = RESET_COLOR
 		I.color = get_random_colour(0, 150, 255)
 		I.layer = ABOVE_LIGHTING_LAYER
-		I.plane = EFFECTS_ABOVE_LIGHTING_PLANE
+		I.plane = ABOVE_LIGHTING_PLANE
 		overlays += I
 		set_light(2, 1, I.color)
 

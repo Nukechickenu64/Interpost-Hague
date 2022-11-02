@@ -18,6 +18,7 @@
 	var/phase = "filling"//"filling", "processing", "releasing"
 	var/datum/gas_mixture/inner_tank = new
 	var/tank_volume = 400//Litres
+	layer = STRUCTURE_LAYER
 
 /obj/machinery/atmospherics/binary/oxyregenerator/New()
 	..()

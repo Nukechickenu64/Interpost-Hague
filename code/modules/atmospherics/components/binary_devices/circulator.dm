@@ -21,6 +21,7 @@
 	var/last_stored_energy_transferred = 0
 	var/volume_capacity_used = 0
 	var/stored_energy = 0
+	layer = STRUCTURE_LAYER
 
 	density = 1
 

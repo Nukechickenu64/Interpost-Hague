@@ -145,10 +145,10 @@
 					var/mob/living/carbon/human/H = G.affecting
 					var/obj/item/organ/external/affecting = H.get_organ("head")
 					if(prob(25))
-						affecting.take_damage(rand(25,35), 0)
+						affecting.take_external_damage(rand(25,35), 0)
 						H.Weaken(2)
 						if(prob(20)) // One chance in 20 to DENT THE TABLE
-							affecting.take_damage(rand(8,15), 0) //Extra damage
+							affecting.take_external_damage(rand(8,15), 0) //Extra damage
 							H.apply_effect(5, PARALYZE)
 							visible_message("<span class='danger'><b>[H]</b>< has been knocked unconscious!</span>")
 							H.ear_damage += rand(0, 3)
@@ -165,7 +165,7 @@
 							"\red You smash \the [H]'s head on \the [src], [H.get_visible_gender() == MALE ? "his" : H.get_visible_gender() == FEMALE ? "her" : "their"] nose smashed and face bloodied!",\
 							"\red You hear the nauseating crunch of bone and gristle on solid metal and the gurgling gasp of someone who is trying to breathe through their own blood.")
 					else
-						affecting.take_damage(rand(5,10), 0)
+						affecting.take_external_damage(rand(5,10), 0)
 						G.assailant.visible_message("\red [G.assailant] smashes \the [H]'s head on \the [src]!",\
 						"\red You smash \the [H]'s head on \the [src]!",\
 						"\red You hear the nauseating crunch of bone and gristle on solid metal.")

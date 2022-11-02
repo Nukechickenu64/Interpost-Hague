@@ -55,7 +55,6 @@ What is the naming convention for planes or layers?
 
 #define SPACE_PLANE               -99
 	#define SPACE_LAYER                  1
-
 #define SKYBOX_PLANE              -98
 	#define SKYBOX_LAYER                 1
 
@@ -64,8 +63,6 @@ What is the naming convention for planes or layers?
 	#define DUST_LAYER                   2
 
 #define STAR_PLANE                -96
-
-#define GLIDE_SIZE_CONSTANT world.tick_lag
 
 // Openspace uses planes -80 through -70.
 
@@ -89,6 +86,7 @@ What is the naming convention for planes or layers?
 	//ABOVE TURF
 	#define DECAL_LAYER                 2.03
 	#define RUNE_LAYER                  2.04
+	#define AO_LAYER                    2.045
 	#define ABOVE_TILE_LAYER            2.05
 	#define EXPOSED_PIPE_LAYER          2.06
 	#define EXPOSED_WIRE_LAYER          2.07
@@ -97,7 +95,6 @@ What is the naming convention for planes or layers?
 	#define BLOOD_LAYER                 2.10
 	#define MOUSETRAP_LAYER             2.11
 	#define PLANT_LAYER                 2.12
-	#define AO_LAYER                    2.13
 	//HIDING MOB
 	#define HIDING_MOB_LAYER            2.14
 	#define SHALLOW_FLUID_LAYER         2.15
@@ -133,73 +130,61 @@ What is the naming convention for planes or layers?
 	#define MECH_ARM_LAYER              4.06
 	#define MECH_GEAR_LAYER             4.07
 	//ABOVE HUMAN
-	#define ABOVE_HUMAN_LAYER           4.09
-	#define VEHICLE_LOAD_LAYER          4.10
-	#define CAMERA_LAYER                4.11
+	#define ABOVE_HUMAN_LAYER           4.08
+	#define VEHICLE_LOAD_LAYER          4.09
+	#define CAMERA_LAYER                4.10
 	//BLOB
-	#define BLOB_SHIELD_LAYER           4.12
-	#define BLOB_NODE_LAYER             4.13
-	#define BLOB_CORE_LAYER	            4.14
+	#define BLOB_SHIELD_LAYER           4.11
+	#define BLOB_NODE_LAYER             4.12
+	#define BLOB_CORE_LAYER	            4.13
 	//EFFECTS BELOW LIGHTING
-	#define BELOW_PROJECTILE_LAYER      4.15
-	#define DEEP_FLUID_LAYER            4.16
-	#define FIRE_LAYER                  4.17
-	#define PROJECTILE_LAYER            4.18
-	#define ABOVE_PROJECTILE_LAYER      4.19
-	#define SINGULARITY_LAYER           4.20
+	#define BELOW_PROJECTILE_LAYER      4.14
+	#define DEEP_FLUID_LAYER            4.15
+	#define FIRE_LAYER                  4.16
+	#define PROJECTILE_LAYER            4.17
+	#define ABOVE_PROJECTILE_LAYER      4.18
+	#define SINGULARITY_LAYER           4.19
+	#define SINGULARITY_EFFECT_LAYER    4.20
 	#define POINTER_LAYER               4.21
-	#define MIMICED_LIGHTING_LAYER      4.22	// Z-Mimic-managed lighting
+	// Z-Mimic-managed lighting
+	#define MIMICED_LIGHTING_LAYER      4.22
 
 	//FLY_LAYER                          5
 	//OBSERVER
-	#define OBSERVER_LAYER              5.1
-
 	#define BASE_AREA_LAYER             999
 
-#define OBSERVER_PLANE             1
+#define OBSERVER_PLANE           1
+  #define OBSERVER_LAYER           1
 
-#define OBSCURITY_PLANE 		        2 // For visualnets, such as the AI's static.
+#define LIGHTING_PLANE           2 // For Lighting. - The highest plane (ignoring all other even higher planes)
+  #define LIGHTBULB_LAYER          1
+  #define LIGHTING_LAYER           2
 
-#define LIGHTING_PLANE             3 // For Lighting. - The highest plane (ignoring all other even higher planes)
-	#define LIGHTBULB_LAYER        0
-	#define LIGHTING_LAYER         1
-	#define ABOVE_LIGHTING_LAYER   2
+#define EMISSIVE_PLANE           3 // For over-lighting overlays (ex. cigarette glows)
+  #define EMISSIVE_LAYER           1
 
-#define EFFECTS_ABOVE_LIGHTING_PLANE   4 // For glowy eyes, laser beams, etc. that shouldn't be affected by darkness
-	#define EYE_GLOW_LAYER         1
-	#define BEAM_PROJECTILE_LAYER  2
-	#define SUPERMATTER_WALL_LAYER 3
-	#define OBFUSCATION_LAYER      4
+#define ABOVE_LIGHTING_PLANE     4 // laser beams, etc. that shouldn't be affected by darkness
+  #define ABOVE_LIGHTING_LAYER     1
+  #define BEAM_PROJECTILE_LAYER    2
+  #define SUPERMATTER_WALL_LAYER   3
+  #define OBFUSCATION_LAYER        4
 
-#define FULLSCREEN_PLANE                5 // for fullscreen overlays that do not cover the hud.
+#define FULLSCREEN_PLANE         5 // for fullscreen overlays that do not cover the hud.
+  #define FULLSCREEN_LAYER         0
+  #define DAMAGE_LAYER             1
+  #define IMPAIRED_LAYER           2
+  #define BLIND_LAYER              3
+  #define CRIT_LAYER               4
 
-	#define FULLSCREEN_LAYER    0
-	#define DAMAGE_LAYER        1
-	#define IMPAIRED_LAYER      2
-	#define BLIND_LAYER         3
-	#define CRIT_LAYER          4
-
-#define HUD_PLANE                    6
-	#define UNDER_HUD_LAYER              0
-	#define HUD_BASE_LAYER               2
-	#define HUD_ITEM_LAYER               3
-	#define HUD_ABOVE_ITEM_LAYER         4
-
-
-//This is difference between planes used for atoms and effects
-#define PLANE_DIFFERENCE              5
+#define HUD_PLANE                6
+  #define UNDER_HUD_LAYER          0
+  #define HUD_BASE_LAYER           2
+  #define HUD_ITEM_LAYER           3
+  #define HUD_ABOVE_ITEM_LAYER     4
+  #define HUD_ABOVE_HUD_LAYER      5
 
 /atom
 	plane = DEFAULT_PLANE
-
-/image/proc/plating_decal_layerise()
-	plane = DEFAULT_PLANE
-	layer = DECAL_PLATING_LAYER
-
-/image/proc/turf_decal_layerise()
-	//This is disabled because it cause issues with overlays + zmimic
-	//plane =  DEFAULT_PLANE
-	//layer = DECAL_LAYER
 
 /atom/proc/hud_layerise()
 	plane = HUD_PLANE
