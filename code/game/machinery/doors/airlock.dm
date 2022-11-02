@@ -271,6 +271,20 @@
 	opacity = 1
 	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
 
+/obj/machinery/door/airlock/doorgeneral2
+	name = "Airlock"
+	icon = 'icons/obj/doors/Doorgeneral2.dmi'
+	explosion_resistance = 20
+	opacity = 1
+	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
+
+/obj/machinery/door/airlock/doorgeneral3
+	name = "Airlock"
+	icon = 'icons/obj/doors/Doorgeneral3.dmi'
+	explosion_resistance = 20
+	opacity = 1
+	//assembly_type = /obj/structure/door_assembly/door_assembly_hatch
+
 /obj/machinery/door/airlock/maintenance_hatch
 	name = "Maintenance Hatch"
 	icon = 'icons/obj/doors/Doorhatchmaint2.dmi'
