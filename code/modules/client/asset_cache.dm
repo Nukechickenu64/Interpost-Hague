@@ -297,6 +297,35 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	send_asset_list(client, uncommon, FALSE)
 	send_asset_list(client, common, TRUE)
 
+/datum/asset/nanoui/send(client, uncommon)
+	if(!islist(uncommon))
+		uncommon = list(uncommon)
+
+	send_asset_list(client, uncommon, FALSE)
+	send_asset_list(client, common, TRUE)
+
+/datum/asset/goonchat
+	var/list/common = list()
+	var/list/common_dirs = list(
+		"code/modules/html_interface/js/",
+		"code/modules/goonchat/browserassets/js/scrollbar/",
+		"code/modules/goonchat/browserassets/js/",
+		"code/modules/goonchat/browserassets/css/"
+	)
+
+/datum/asset/goonchat/register()
+	// Crawl the directories to find files.
+	for (var/path in common_dirs)
+		var/list/filenames = flist(path)
+		for(var/filename in filenames)
+			if(copytext(filename, length(filename)) != "/") // Ignore directories.
+				if(fexists(path + filename))
+					common[filename] = fcopy_rsc(path + filename)
+					register_asset(filename, common[filename])
+
+/datum/asset/goonchat/send(client)
+	send_asset_list(client, common, TRUE)
+
 /datum/asset/group/goonchat
 	children = list(
 		/datum/asset/simple/jquery,
@@ -308,6 +337,8 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	verify = FALSE
 	assets = list(
 		"jquery.min.js"            = 'code/modules/goonchat/browserassets/js/jquery.min.js',
+		"jquery.jscrollpane.min.js"= 'code/modules/goonchat/browserassets/js/scrollbar/jquery.jscrollpane.min.js',
+		"jquery.jscrollpane.css"   = 'code/modules/goonchat/browserassets/js/scrollbar/jquery.jscrollpane.css',
 	)
 
 /datum/asset/simple/goonchat
@@ -316,10 +347,14 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 		"json2.min.js"             = 'code/modules/goonchat/browserassets/js/json2.min.js',
 		"browserOutput.js"         = 'code/modules/goonchat/browserassets/js/browserOutput.js',
 		"browserOutput.css"	       = 'code/modules/goonchat/browserassets/css/browserOutput.css',
-		"jquery.jscrollpane.min.js"= 'code/modules/goonchat/browserassets/js/scrollbar/jquery.jscrollpane.min.js',
-		"jquery.jscrollpane.css"   = 'code/modules/goonchat/browserassets/js/scrollbar/jquery.jscrollpane.css',
 		"chatbg.png"			   = 'icons/misc/chatbg.png',
 		"tchatshadow.png"		   = 'icons/misc/tchatshadow.png',
+		"chatscrollbar-bg.png"			   = 'icons/misc/chatscrollbar-bg.png',
+		"chatscrollbar-scrolldown.png"		   = 'icons/misc/chatscrollbar-scrolldown.png',
+		"chatscrollbar-scrollup.png"			   = 'icons/misc/chatscrollbar-scrollup.png',
+		"chatscroller-b.png"		   = 'icons/misc/chatscroller-b.png',
+		"chatscroller-m.png"		   = 'icons/misc/chatscroller-m.png',
+		"chatscroller-t.png"		   = 'icons/misc/chatscroller-t.png',
 		"PTsans.ttf"			   = 'fonts/PTsans.ttf',
 	)
 

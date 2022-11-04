@@ -403,19 +403,6 @@ function output(message, flag) {
 			if ($('#newMessages').length) {
 				$('#newMessages').remove();
 			}
-		//If not, put the new messages box in
-		} else {
-			if ($('#newMessages').length) {
-				var messages = $('#newMessages .number').text();
-				messages = parseInt(messages);
-				messages++;
-				$('#newMessages .number').text(messages);
-				if (messages == 2) {
-					$('#newMessages .messageWord').append('s');
-				}
-			} else {
-				$messages.after('<a href="#" id="newMessages"><span class="number">1</span> new <span class="messageWord">message</span> <i class="icon-double-angle-down"></i></a>');
-			}
 		}
 	}
 
@@ -440,24 +427,10 @@ function output(message, flag) {
 	if (opts.messageCombining) {
 		var lastmessages = $messages.children('div.entry:last-child').last();
 		if (lastmessages.length && $last_message && $last_message == trimmed_message) {
-			var badge = lastmessages.children('.r').last();
-			if (badge.length) {
-				badge = badge.detach();
-				badge.text(parseInt(badge.text()) + 1);
-			} else {
-				badge = $('<span/>', {'class': 'r', 'text': 2});
-			}
 			lastmessages.html(message);
 			lastmessages.find('[replaceRegex]').each(replaceRegex);
-			lastmessages.append(badge);
-			badge.animate({
-				"font-size": "0.9em"
-			}, 100, function() {
-				badge.animate({
-					"font-size": "0.7em"
-				}, 100);
-			});
 			opts.messageCount--;
+			updateIconsSize(entry);
 			handled = true;
 		}
 	}
@@ -475,8 +448,6 @@ function output(message, flag) {
 
 		$last_message = trimmed_message;
 		$messages[0].appendChild(entry);
-
-		updateIconsSize(entry);
 
 		$(entry).find("img.icon").error(iconError);
 
@@ -498,6 +469,8 @@ function output(message, flag) {
 		if (opts.highlightTerms && opts.highlightTerms.length > 0) {
 			highlightTerms(entry);
 		}
+		api.reinitialise()
+		api.scrollToY(10000000000000000)
 	}
 
 	if (!filteredOut && atBottom) {

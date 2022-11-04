@@ -7,8 +7,10 @@
 	<link rel="stylesheet" type="text/css" href="font-awesome.css" />
 	<link id="sheetofstyles" rel="stylesheet" type="text/css" href="browserOutput.css" />
 	<link rel="stylesheet" type="text/css" href="spritesheet_chat.css" />
+	<link rel="stylesheet" type="text/css" href="jquery.jscrollpane.css" />
 	<script type="text/javascript" src="jquery.min.js"></script>
 	<script type="text/javascript" src="json2.min.js"></script>
+	<script type="text/javascript" src="jquery.jscrollpane.min.js"></script>
 </head>
 <body>
 	<div id="loading">
@@ -19,16 +21,32 @@
 			If it <b>still</b> doesn't work, report to Turret.
 		</div>
 	</div>
-	<div id="messages">
-
+	<div class="scroll-pane-split">
+		<span id="messages">
+			
+		</span>
 	</div>
-	<script type="text/javascript" src="browserOutput.js"></script>
+<script>
+	var settings = {
+		showArrows: true,
+		stickToBottom: true,
+		maintainPosition: true
+	};
+	var pane = $(".scroll-pane-split")
+	pane.jScrollPane(settings);
+	var api = pane.data('jsp');
+	api.reinitialise()
+	api.scrollToY(999999999999999999)
+</script>
+
+<script type="text/javascript" src="browserOutput.js"></script>
+
 </body>
 </html>
 
 <style>
 .topimg {
-    position: fixed;
+    position: absolute;
     top: 0px;
     width: 100%;
     height: 50px;
