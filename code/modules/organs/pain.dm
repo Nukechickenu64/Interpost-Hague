@@ -40,7 +40,10 @@ mob/var/next_pain_time = 0
 					if(has_quirk(/datum/quirk/tough))
 						return 0
 					flash_weakest_pain()
+					make_jittery(-500)
 					add_event("pain", /datum/happiness_event/verymildpain)
+					remove_all_pain()
+					remove_all_pain_extreme()
 				if(50 to 90)
 					flash_weak_pain()
 					make_jittery(40)
@@ -52,6 +55,7 @@ mob/var/next_pain_time = 0
 					if(stuttering < 10)
 						stuttering += 5
 					add_event("pain", /datum/happiness_event/mildpain)
+					set_all_pain()
 				if(90 to INFINITY)
 					if(has_quirk(/datum/quirk/tough))
 						if(prob(50))
@@ -65,6 +69,8 @@ mob/var/next_pain_time = 0
 						shake_camera(src, 20, 3)
 						agony_scream()
 					add_event("pain", /datum/happiness_event/pain)
+					remove_all_pain()
+					set_all_pain_extreme()
 		else
 			adjustHalLoss(ceil(power/2))
 

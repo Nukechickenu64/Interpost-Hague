@@ -71,3 +71,7 @@
 	var/obj/screen/plane_master/drugabuse/drug_effect = new
 
 	var/obj/screen/plane_master/drugabuseextreme/drug_effect_extreme = new
+
+	var/obj/screen/plane_master/pain/pain_effect = new
+
+	var/obj/screen/plane_master/pain_extreme/pain_effect_extreme = new

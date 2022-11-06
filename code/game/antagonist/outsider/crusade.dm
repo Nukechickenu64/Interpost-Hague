@@ -1,5 +1,6 @@
-GLOBAL_DATUM_INIT(crusaders, /datum/antagonist/crusade, new)
+//GLOBAL_DATUM_INIT(crusaders, /datum/antagonist/crusade, new)
 
+/*
 /datum/antagonist/crusade
 	id = MODE_CRUSADE
 	role_text = "Crusade"
@@ -19,14 +20,14 @@ GLOBAL_DATUM_INIT(crusaders, /datum/antagonist/crusade, new)
 
 	faction = "crusader"
 
-/datum/antagonist/mercenary/create_global_objectives()
+/datum/antagonist/crusade/create_global_objectives()
 	if(!..())
 		return 0
 	global_objectives = list()
 	global_objectives |= new /datum/objective/nuclear
 	return 1
 
-/datum/antagonist/mercenary/equip(var/mob/living/carbon/human/player, var/mob/living/carbon/human/H)
+/datum/antagonist/crusade/equip(var/mob/living/carbon/human/player, var/mob/living/carbon/human/H)
 	if(!..())
 		return 0
 
@@ -37,3 +38,4 @@ GLOBAL_DATUM_INIT(crusaders, /datum/antagonist/crusade, new)
 	H.generate_skills(list("melee", "ranged"))
 
 	return 1
+*/
