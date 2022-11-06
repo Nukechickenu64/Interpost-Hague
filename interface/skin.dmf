@@ -882,8 +882,11 @@ window "outputwindow"
 		image = 'icons\\misc\\chatbg.png'
 	elem "input"
 		type = INPUT
-		pos = 1,421
-		size = 640x38
+		pos = 0,421
+		font-size = 12
+		text-color = #aaff6c
+		background-color = #000000
+		size = 640x23
 		anchor1 = 0,100
 		anchor2 = 100,100
 		is-default = true
