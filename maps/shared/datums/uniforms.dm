@@ -46,13 +46,6 @@
 	id_type = /obj/item/weapon/card/id/engineering
 	pda_type = /obj/item/device/pda/engineering
 
-/decl/hierarchy/outfit/job/dreyfus/ouvrier
-	name = OUTFIT_JOB_NAME("Ouvrier")
-	uniform = /obj/item/clothing/under/overalls
-	id_type = /obj/item/weapon/card/id/dreyfus/cargo/ouvrier
-	pda_type = /obj/item/device/pda/cargo
-	l_ear = /obj/item/device/radio/headset/headset_cargo
-
 /decl/hierarchy/outfit/job/science/superviseur
 	name = OUTFIT_JOB_NAME("Superviseur")
 	l_ear = null

@@ -326,6 +326,25 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 /datum/asset/goonchat/send(client)
 	send_asset_list(client, common, TRUE)
 
+/datum/asset/pig
+	var/list/common = list()
+	var/list/common_dirs = list(
+		"code/porco/html/"
+	)
+
+/datum/asset/pig/register()
+	// Crawl the directories to find files.
+	for (var/path in common_dirs)
+		var/list/filenames = flist(path)
+		for(var/filename in filenames)
+			if(copytext(filename, length(filename)) != "/") // Ignore directories.
+				if(fexists(path + filename))
+					common[filename] = fcopy_rsc(path + filename)
+					register_asset(filename, common[filename])
+
+/datum/asset/pig/send(client)
+	send_asset_list(client, common, TRUE)
+
 /datum/asset/group/goonchat
 	children = list(
 		/datum/asset/simple/jquery,

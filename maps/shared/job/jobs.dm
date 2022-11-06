@@ -3,8 +3,8 @@
 						/datum/job/captain,
 						//datum/job/countess,
 						//datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						//datum/job/officer,
@@ -37,8 +37,8 @@
 	allowed_jobs = list(
 						/datum/job/captain,
 						/datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						/datum/job/officer,
@@ -56,7 +56,7 @@
 						/datum/job/hydro,
 						/datum/job/janitor,
 						/datum/job/engineer,
-						/datum/job/jester
+						//datum/job/jester
 						///datum/job/assistant,
 						///datum/job/cadet
 						///datum/job/ouvrier
@@ -72,8 +72,8 @@
 						/datum/job/captain,
 						//datum/job/countess,
 						//datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						/datum/job/officer,
@@ -90,7 +90,7 @@
 						/datum/job/hydro,
 						/datum/job/janitor,
 						/datum/job/engineer,
-						/datum/job/jester
+						//datum/job/jester
 						///datum/job/assistant,
 						///datum/job/cadet
 						///datum/job/ouvrier
@@ -139,8 +139,8 @@
 	allowed_jobs = list(
 						/datum/job/captain,
 						/datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						/datum/job/officer,
@@ -159,7 +159,7 @@
 						/datum/job/janitor,
 						/datum/job/engineer,
 						/datum/job/chaplain,
-						/datum/job/jester
+						//datum/job/jester
 						///datum/job/assistant,
 						///datum/job/cadet
 						///datum/job/ouvrier
@@ -174,8 +174,8 @@
 						/datum/job/captain,
 						//datum/job/countess,
 						/datum/job/hop,
-						/datum/job/supreme_arbiter,
-						/datum/job/arbiter,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
 						///datum/job/medassist
 						/datum/job/hos,
 						/datum/job/officer,
@@ -194,7 +194,7 @@
 						/datum/job/janitor,
 						/datum/job/engineer,
 						/datum/job/chaplain,
-						/datum/job/jester
+						//datum/job/jester
 						///datum/job/assistant,
 						///datum/job/cadet
 						///datum/job/ouvrier
@@ -632,6 +632,7 @@
 		H.generate_stats(STAT_HT)
 		H.generate_skills(list("gardening","cooking"))
 
+/*
 /datum/job/jester
 	title = "Jester"
 	department = "Service"
@@ -697,7 +698,7 @@
 		//H.add_stats(rand(11,16), rand(10,14), rand(7,10))
 		H.generate_stats(STAT_ST)
 		H.generate_skills(list("melee","ranged"))
-
+*/
 
 /datum/job/medassist
 	selection_color = "#633d63"

@@ -39,6 +39,8 @@
 	var/ambience_playing= null
 	var/played			= 0
 
+	var/pigReady = FALSE
+
 		////////////
 		//SECURITY//
 		////////////

@@ -850,9 +850,9 @@ window "outputwindow"
 	elem "outputwindow"
 		type = MAIN
 		pos = 281,0
-		size = 640x442
-		anchor1 = none
-		anchor2 = none
+		size = 640x714
+		anchor1 = -1,-1
+		anchor2 = -1,-1
 		saved-params = "pos;size;is-minimized;is-maximized"
 		titlebar = false
 		statusbar = false
@@ -860,29 +860,27 @@ window "outputwindow"
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		image = 'icons\\misc\\chatbg.png'
-	elem "browseroutput"
+		image = 'code\\porco\\chatbg.png'
+	elem "browser"
 		type = BROWSER
 		pos = 0,0
-		size = 640x422
+		size = 541x315
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #060606
+		saved-params = ""
+	elem "browseroutput"
+		type = BROWSER
+		pos = 0,316
+		size = 640x348
 		anchor1 = 0,0
 		anchor2 = 100,100
 		background-color = #ffffff
 		is-visible = false
 		saved-params = ""
-		auto-format = true
-	elem "output"
-		type = OUTPUT
-		pos = 0,0
-		size = 640x442
-		anchor1 = 0,0
-		anchor2 = 100,100
-		is-default = true
-		saved-params = ""
-		image = 'icons\\misc\\chatbg.png'
 	elem "input"
 		type = INPUT
-		pos = 0,421
+		pos = 0,665
 		font-size = 12
 		text-color = #aaff6c
 		background-color = #000000
@@ -892,87 +890,37 @@ window "outputwindow"
 		is-default = true
 		command = "say"
 		saved-params = "command"
+	elem "csay"
+		type = INPUT
+		pos = 0,645
+		size = 640x23
+		anchor1 = 0,100
+		anchor2 = 100,100
+		font-size = 12
+		text-color = #ff0000
+		is-visible = false
+		is-default = true
+		saved-params = "command"
 
 window "rpane"
 	elem "rpane"
 		type = MAIN
 		pos = 281,0
 		size = 640x480
-		anchor1 = none
-		anchor2 = none
+		anchor1 = -1,-1
+		anchor2 = -1,-1
 		background-color = #262222
 		saved-params = "pos;size;is-minimized;is-maximized"
 		is-pane = true
-		outer-size = 656x538
-		inner-size = 640x499
 	elem "rpanewindow"
 		type = CHILD
 		pos = 0,0
-		size = 640x474
+		size = 640x506
 		anchor1 = 0,0
 		anchor2 = 100,100
-		background-color = none
 		saved-params = "splitter"
 		left = "infowindow"
 		right = "outputwindow"
 		is-vert = false
 		splitter = 30
 		show-splitter = false
-	elem "textb"
-		type = BUTTON
-		pos = 5,0
-		size = 60x20
-		anchor1 = none
-		anchor2 = none
-		background-color = none
-		is-visible = false
-		saved-params = "is-checked"
-		text = "Text"
-		command = ".winset \"rpanewindow.left=;\""
-		is-checked = true
-		group = "rpanemode"
-		button-type = pushbox
-	elem "infob"
-		type = BUTTON
-		pos = 40,0
-		size = 60x20
-		anchor1 = none
-		anchor2 = none
-		background-color = none
-		is-visible = false
-		saved-params = "is-checked"
-		text = "Info"
-		command = ".winset \"rpanewindow.left=infowindow\""
-		group = "rpanemode"
-		button-type = pushbox
-
-window "infowindow"
-	elem "infowindow"
-		type = MAIN
-		pos = 281,0
-		size = 640x480
-		anchor1 = none
-		anchor2 = none
-		background-color = #000000
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "Info"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-		image = 'icons\\misc\\chatbg.png'
-		image-mode = tile
-	elem "info"
-		type = INFO
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		is-default = true
-		saved-params = ""
-		highlight-color = #70a0ff
-		on-show = ".winset\"rpane.infob.is-visible=true;rpane.infob.pos=65,0 rpane.textb.is-visible=true rpane.infob.is-checked=true rpane.rpanewindow.pos=0,30 rpane.rpanewindow.size=0x0 rpane.rpanewindow.left=infowindow\""
-		on-hide = ".winset\"rpane.infob.is-visible=false;rpane.textb.is-visible=true rpane.rpanewindow.pos=0,30 rpane.rpanewindow.size=0x0 rpane.rpanewindow.left=\""
-

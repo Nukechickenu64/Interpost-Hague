@@ -611,5 +611,25 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 		return
 	client.screen -= drug_effect_extreme
 
+/mob/living/proc/set_all_pain()
+	if(!client)
+		return
+	client.screen += pain_effect
+
+/mob/living/proc/remove_all_pain()
+	if(!client)
+		return
+	client.screen -= pain_effect
+
+/mob/living/proc/set_all_pain_extreme()
+	if(!client)
+		return
+	client.screen += pain_effect_extreme
+
+/mob/living/proc/remove_all_pain_extreme()
+	if(!client)
+		return
+	client.screen -= pain_effect_extreme
+
 /datum/species/proc/post_organ_rejuvenate(var/obj/item/organ/org)
 	return

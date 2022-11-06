@@ -39,7 +39,6 @@
 	using.layer = UNDER_HUD_LAYER
 	adding += using
 
-
 	// Draw the various inventory equipment slots.
 	var/has_hidden_gear
 	for(var/gear_slot in hud_data.gear)

@@ -1,24 +1,4 @@
-//church outfits
-/decl/hierarchy/outfit/job/arbiter
-	name = OUTFIT_JOB_NAME("Arbiter")
-	l_ear = null
-	uniform = null
-	shoes = null
-	head = null
-	suit = null
-	id_type = /obj/item/weapon/card/id/arbiter
-	pda_type = /obj/item/device/pda/lawyer
 
-
-/decl/hierarchy/outfit/job/supreme_arbiter
-	name = OUTFIT_JOB_NAME("Supreme Arbiter")
-	l_ear = null
-	uniform = null
-	shoes = null
-	head = null
-	suit = null
-	id_type = /obj/item/weapon/card/id/arbiter
-	pda_type = /obj/item/device/pda/lawyer
 
 /decl/hierarchy/outfit/job/medical/undertaker
 	name = OUTFIT_JOB_NAME("Undertaker")

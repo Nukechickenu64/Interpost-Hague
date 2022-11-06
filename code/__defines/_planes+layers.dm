@@ -231,9 +231,16 @@ What is the naming convention for planes or layers?
 
 /obj/screen/plane_master/pain
 	plane = DEFAULT_PLANE
+	filters = filter(type = "ripple", size = 1)
+	filters = filter(type = "wave", size = 2)
+	filters = filter(type = "outline", size = 1)
+
+/obj/screen/plane_master/pain_extreme
+	plane = DEFAULT_PLANE
 	filters = filter(type = "ripple", size = 2)
 	filters = filter(type = "wave", size = 4)
 	filters = filter(type = "outline", size = 1)
+	filters = filter(type = "bloom", size = 1)
 
 /obj/screen/plane_master/borg
 	plane = DEFAULT_PLANE
