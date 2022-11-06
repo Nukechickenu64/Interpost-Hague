@@ -266,7 +266,7 @@
 	if(istype(src, /mob/new_player))
 		var/lobby = ""
 		if(GAME_STATE <= RUNLEVEL_LOBBY)
-			lobby += "Time to Start: <span id='timestart'>[SSticker.pregame_timeleft]</span>$"
+			lobby += "Time to Start: <span style='color:#0e3b0e'>[SSticker.pregame_timeleft]</span>$"
 			for(var/client/C)
 				var/religioncheck = ""
 				var/gendercheck = "M"
@@ -281,7 +281,7 @@
 
 				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [familycheck][religioncheck]$"
 			lobby += "$$<i>! - Pagan </i>$<i>* - Family</i>"
-			newHTML += {"<span style='color:#600; font-weight:bold;'>[lobby]</span>"}
+			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
 		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee"), list(".asktostop", "Stop")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")), 2)]</span>"}
 	return newHTML
