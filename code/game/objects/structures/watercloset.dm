@@ -222,6 +222,12 @@
 	mouse_opacity = 0
 
 /obj/structure/hygiene/shower/attack_hand(mob/M as mob)
+/*
+	var/obj/machinery/waterchip_holder/waterchip_holder
+	if(!waterchip_holder.installed)
+		to_chat("<span class='info'>There's no waterchip installed.</span>")
+		return
+*/
 	var/showersound = "sound/machines/shower_mid[rand(1,3)].ogg"
 	on = !on
 	update_icon()
@@ -385,6 +391,13 @@
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
 
+/*
+	var/obj/machinery/waterchip_holder/waterchip_holder
+	if(!waterchip_holder.installed)
+		to_chat("<span class='info'>There's no waterchip installed.</span>")
+		return
+*/
+
 	if (ishuman(user))
 		var/mob/living/carbon/human/H = user
 		if(H.thirst <= THIRST_LEVEL_THIRSTY)
@@ -419,6 +432,12 @@
 	if(busy)
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
+
+/*
+	if(!waterchip_holder.installed)
+		to_chat("<span class='info'>There's no waterchip installed.</span>")
+		return
+*/
 
 	var/obj/item/weapon/reagent_containers/RG = O
 	if (istype(RG) && RG.is_open_container() && RG.reagents)

@@ -193,7 +193,6 @@
 		buttonTimes++;
 		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Craft\" class=\"button\" /></div></a>"
 		buttonTimes++;
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'GPC.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"GPC\" class=\"button\" /></div></a>"
 
 /*
 		if(H.isVampire)
@@ -246,7 +245,6 @@
 
 	client.changebuttoncontent("#note", noteUpdate())
 	client.changebuttoncontent("#Verb", verbUpdate())
-	client.changebuttoncontent("#GPC", spiderUpdate())
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh"), list("Clearthroat", "Clear Throat"), list("mob_rest", "Collapse")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Kiss", "Kiss"), list("LickLips", "Lick Lips"), list("Cough", "Cough"), list("SpitonSomeone", "Spit on Someone"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Cry", "Cry"), list("Hem", "Hem"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("Furniture", "Furniture"), list("Cult", "Cult"), list("Items", "Items"), list("Leather", "Leather"), list("Mason", "Mason"), list("Tanning", "Tanning"), list("Signs", "Signs")))]</span><span class='segment2'>[generateVerbList(list(list("Weapons", "Weapons"), list("Other", "Other")), 2)]</span>"})
 
@@ -263,24 +261,24 @@
 
 /mob/proc/verbUpdate()
 	var/newHTML = ""
+	var/mob/new_player/player = usr
 	if(istype(src, /mob/new_player))
 		var/lobby = ""
 		if(GAME_STATE <= RUNLEVEL_LOBBY)
 			lobby += "Time to Start: <span style='color:#0e3b0e'>[SSticker.pregame_timeleft]</span>$"
 			for(var/client/C)
 				var/religioncheck = ""
-				var/gendercheck = "M"
-				var/familycheck = ""
+				var/gendercheck = "MALE"
+				var/readycheck = "NOT READY"
 
 				if(C.prefs.religion != LEGAL_RELIGION)
-					religioncheck = "!"
-				if(C.prefs.family)
-					familycheck = "*"
+					religioncheck = "THEIST"
 				if(C.prefs.gender != MALE)
-					gendercheck = "F"
+					gendercheck = "FEMALE"
+				if(player.ready)
+					readycheck = "READY"
 
-				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [familycheck][religioncheck]$"
-			lobby += "$$<i>! - Pagan </i>$<i>* - Family</i>"
+				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [religioncheck] <b>[readycheck]</b>$"
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
 		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee"), list(".asktostop", "Stop")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")), 2)]</span>"}

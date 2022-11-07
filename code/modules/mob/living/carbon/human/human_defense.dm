@@ -188,7 +188,7 @@ meteor_act
 		return null
 
 	if(!user.skillcheck(user.skills["melee"], 30, null, "melee") || !user.combat_mode)
-		if(prob(user.skills["melee"] - 65))
+		if(prob(user.skills["melee"]/3))
 			visible_message("<span class='danger'>[user] botches the attack on [src]!</span>")
 			return null
 
@@ -201,13 +201,7 @@ meteor_act
 		to_chat(user, "<span class='danger'>They are missing that limb!</span>")
 		return null
 
-
-	if(user.skillcheck(user.skills["melee"], 60, null,"melee") == CRIT_FAILURE)
-		user.resolve_critical_miss(I)
-		return null
-
 	var/blocked = run_armor_check(hit_zone, "melee", I.armor_penetration, "Your armor has protected your [affecting.name].", "Your armor has softened the blow to your [affecting.name].")
-
 
 	if(blocked == 100)
 		visible_message("<span class='danger'>[user] [I.get_attack_name()] [src]'s [affecting.name] with the [I], but it does no damage!")
@@ -296,11 +290,7 @@ meteor_act
 	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
 	else if(I.sharp && I.edge)
 		if(I.sharpness >= 1 && user.statcheck(user.stats[STAT_ST], 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
-			if(!hit_zone == BP_HEAD && prob(4)) //shouldnt instantly dismember limbs due to a stat check...
-				log_debug("Sharpness: [I.sharpness].  StrMod: [strToDamageModifier(user.stats[STAT_ST])])") //Debugging
-				affecting.droplimb(0, DROPLIMB_EDGE)
-			else if(hit_zone == BP_HEAD && prob(1)) // VERY LOW PROB TO DISMEMBER HEAD DUE TO EVENTUAL RESPAWN REMOVAL
-				log_debug("Sharpness: [I.sharpness].  StrMod: [strToDamageModifier(user.stats[STAT_ST])])") //Debugging
+			if(prob(I.sharpness * strToDamageModifier(user.stats[STAT_ST])))
 				affecting.droplimb(0, DROPLIMB_EDGE)
 
 	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in src.organs
@@ -319,7 +309,7 @@ meteor_act
 					apply_effect(20, PARALYZE, blocked)
 			else if(hit_zone == (BP_L_LEG || BP_R_LEG || BP_L_FOOT || BP_R_FOOT))
 				//Easier to score a stun but lasts less time
-				if(prob(effective_force + 10 - stat_to_modifier(user.stats[STAT_HT])))
+				if(prob(effective_force + 15 - stat_to_modifier(user.stats[STAT_HT])))
 					visible_message("<span class='danger'>[src] has been knocked down!</span>")
 					apply_effect(6, WEAKEN, blocked)
 		//Apply blood

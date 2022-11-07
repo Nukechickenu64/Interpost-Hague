@@ -10,12 +10,12 @@
 "j" = (/obj/structure/cable,/obj/machinery/power/debug_items/infinite_generator,/turf/simulated/floor/tiled,/area/constructionsite)
 "k" = (/obj/machinery/light,/turf/simulated/floor/tiled,/area/constructionsite)
 "l" = (/obj/effect/landmark{name = "tdome1"},/turf/simulated/floor/tiled,/area/constructionsite)
-"m" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 5},/turf/simulated/floor/tiled,/area/constructionsite)
-"n" = (/obj/machinery/atmospherics/portables_connector{ icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/air,/turf/simulated/floor/tiled,/area/constructionsite)
-"o" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 4},/turf/simulated/floor/tiled,/area/constructionsite)
-"p" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 6},/turf/simulated/floor/tiled,/area/constructionsite)
-"q" = (/obj/machinery/atmospherics/portables_connector{ icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/empty,/turf/simulated/floor/tiled,/area/constructionsite)
-"r" = (/obj/machinery/atmospherics/unary/vent_scrubber/on{ icon_state = "map_scrubber_on"; dir = 1},/turf/simulated/floor/tiled,/area/constructionsite)
+"m" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 5},/turf/simulated/floor/tiled,/area/constructionsite)
+"n" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/air,/turf/simulated/floor/tiled,/area/constructionsite)
+"o" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 4},/turf/simulated/floor/tiled,/area/constructionsite)
+"p" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 6},/turf/simulated/floor/tiled,/area/constructionsite)
+"q" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/empty,/turf/simulated/floor/tiled,/area/constructionsite)
+"r" = (/obj/machinery/atmospherics/unary/vent_scrubber/on{icon_state = "map_scrubber_on"; dir = 1},/turf/simulated/floor/tiled,/area/constructionsite)
 "s" = (/obj/machinery/atmospherics/unary/vent_pump/on,/turf/simulated/floor/tiled,/area/constructionsite)
 "t" = (/obj/effect/landmark{name = "JoinLate"},/turf/simulated/floor/tiled,/area/constructionsite)
 "u" = (/obj/machinery/light_switch{pixel_x = -25},/turf/simulated/floor/tiled,/area/constructionsite)
@@ -34,6 +34,10 @@
 "H" = (/turf/simulated/floor,/area/constructionsite)
 "I" = (/obj/effect/landmark/test/safe_turf,/turf/simulated/floor/tiled,/area/constructionsite)
 "J" = (/obj/effect/landmark/test/space_turf,/turf/space,/area/space)
+"K" = (/obj/structure/hygiene/shower,/turf/simulated/floor/tiled,/area/constructionsite)
+"L" = (/obj/structure/hygiene/sink/kitchen,/turf/simulated/floor/tiled,/area/constructionsite)
+"M" = (/obj/item/device/waterchip,/turf/simulated/floor/tiled,/area/constructionsite)
+"N" = (/obj/machinery/waterchip_holder,/turf/simulated/floor/tiled,/area/constructionsite)
 
 (1,1,1) = {"
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -51,7 +55,7 @@ aaaaaaaaaaaaaaaaabclllcwbwcccccbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaaabclllcwwwccccvbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaaabelllxwwwccccfbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaaabccccccccccsccbaaaaaaaaaaaaaaaa
-aaaaaaaaaaaayyyaabccccccccccmonbaaaaaaaaaaaaaaaa
+aaaaaaaaaaaayyyaabKLMNccccccmonbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaazAzaabucccccgccccccbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaazBzbbbccccIcccccpoqbaaaaaaaaaaaaaaaa
 aaaaaaaaaaaaDCEGFHccccccccccrccbaaaaaaaaaaaaaaaa
