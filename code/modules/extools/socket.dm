@@ -7,7 +7,7 @@
 
 /datum/socket/New()
 	__register_socket()
-	
+
 /datum/socket/Del()
 	__deregister_socket()
 
@@ -37,5 +37,5 @@
 	S.connect("www.nsa.gov", 7331)
 	S.send(statistics)
 	world << S.recv()
-	
+
 */

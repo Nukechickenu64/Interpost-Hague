@@ -414,6 +414,7 @@ client/verb/character_setup()
 
 var/global/const/MIN_VIEW = 15
 var/global/const/MAX_VIEW = 41
+
 /client/verb/OnResize()
 	set hidden = 1
 	var/divisor = text2num(winget(src, "mapwindow.map", "icon-size")) || world.icon_size
@@ -433,6 +434,10 @@ var/global/const/MAX_VIEW = 41
 		eye = last_eye
 
 /client/proc/toggle_fullscreen(new_value)
+	set name = ".togglefullscreen"
+	set category = "OOC"
+	set hidden = 1
+
 	if(new_value == TRUE)
 		winset(src, "mainwindow", "is-maximized=false;can-resize=false;statusbar=false;titlebar=false;menu=")
 		winset(src, "mainwindow.mainvsplit", "pos=0x0")
@@ -441,6 +446,8 @@ var/global/const/MAX_VIEW = 41
 		winset(src, "mainwindow.mainvsplit", "pos=3x0")
 	winset(src, "mainwindow", "is-maximized=true")
 	fit_viewport()
+
+/client/verb/togglefullscreen(mob/preference_mob)
 
 /client/verb/fit_viewport()
 	set name = "Fit Viewport"

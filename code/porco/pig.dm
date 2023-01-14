@@ -28,7 +28,7 @@
 /mob/new_player/Login()
 	..()
 	spawn while(client)
-		sleep(35)
+		sleep(10)
 		updateTimeToStart()
 		updatePig()
 
@@ -362,7 +362,7 @@
 	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=411x330;")
 
 /mob/proc/defaultButton()
-	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list(".togglegraphics", "Graphics Settings"), list(".addeffects", "(EXPERIMENTAL) Add Effects"), list(".togglefullscreen", "Toggle Fullscreen"), list("LobbyMusic", "Toggle Lobby Music"), list("Midis", "Toggle Midis"), list("AmbiVolume", "Ambience Volume (0-255)"), list("MusicVolume", "Music Volume (0, 255)"))) + "</span>")
+	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list(".togglefullscreen", "Toggle Fullscreen"))) + "</span>")
 
 /client/proc/setDefaultButtons()
 	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee"), list(".asktostop", "Stop")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")))]</span>"})
@@ -438,54 +438,3 @@
 	heartporcao()
 	updatePig()
 	startPig()
-
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣧⠀⠀⠀⢰⡿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡟⡆⠀⠀⣿⡇⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠀⣿⠀⢰⣿⡇⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡄⢸⠀⢸⣿⡇⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡇⢸⡄⠸⣿⡇⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⢸⡅⠀⣿⢠⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣥⣾⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⡿⡿⣿⣿⡿⡅⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠉⠀⠉⡙⢔⠛⣟⢋⠦⢵⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣄⠀⠀⠁⣿⣯⡥⠃⠀⢳⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡇⠀⠀⠀⠐⠠⠊⢀⠀⢸⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⡿⠀⠀⠀⠀⠀⠈⠁⠀⠀⠘⣿⣄⠀⠀⠀⠀⠀
-//⠀⠀⠀⣠⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣷⡀⠀⠀⠀
-//⠀⠀⣾⣿⣿⣿⣿⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀
-//⠀⡜⣭⠤⢍⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⢛⢭⣗⠀
-//⠀⠁⠈⠀⠀⣀⠝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠠⠀⠀⠰⡅
-//⠀⢀⠀⠀⡀⠡⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠔⠠⡕⠀
-//⠀⠀⣿⣷⣶⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠀⠀⠀⠀
-//⠀⠀⠘⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⠀
-// ⠀⠀⠈⢿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠉⢆⠀⠀⠀⠀
-//⠤⠀⠀⢤⣤⣽⣿⣿⣦⣀⢀⡠⢤⡤⠄⠀⠒⠀⠁⠀⠀⠀⢘⠔⠀⠀⠀⠀
-//⠀⡐⠈⠁⠈⠛⣛⠿⠟⠑⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠉⠑⠒⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-
-// ░░░░░▒░░▄██▄░▒░░░░░░
-// ░░░▄██████████▄▒▒░░░
-// ░▒▄████████████▓▓▒░░
-// ▓███▓▓█████▀▀████▒░░
-// ▄███████▀▀▒░░░░▀█▒░░
-// ████████▄░░░░░░░▀▄░░
-// ▀██████▀░░▄▀▀▄░░▄█▒░
-// ░█████▀░░░░▄▄░░▒▄▀░░
-// ░█▒▒██░░░░▀▄█░░▒▄█░░
-// ░█░▓▒█▄░░░░░░░░░▒▓░░
-// ░▀▄░░▀▀░▒░░░░░▄▄░▒░░
-// ░░█▒▒▒▒▒▒▒▒▒░░░░▒░░░
-// ░░░▓▒▒▒▒▒░▒▒▄██▀░░░░
-// ░░░░▓▒▒▒░▒▒░▓▀▀▒░░░░
-// ░░░░░▓▓▒▒░▒░░▓▓░░░░░
-// ░░░░░░░▒▒▒▒▒▒▒░░░░░░
-
-//`7MMF'   `7MF' db      `7MMF'    MMP""MM""YMM   .g8""8q. `7MMM.     ,MMF'      db      `7MM"""Mq.      `7MN.   `7MF' .g8""8q.         .g8"""bgd `7MMF'   `7MF'    `7MN.   `7MF' .g8""8q. `7MM"""Mq.`7MMM.     ,MMF'
-//  `MA     ,V  ;MM:       MM      P'   MM   `7 .dP'    `YM. MMMb    dPMM       ;MM:       MM   `MM.       MMN.    M .dP'    `YM.     .dP'     `M   MM       M        MMN.    M .dP'    `YM. MM   `MM. MMMb    dPMM
-//   VM:   ,V  ,V^MM.      MM           MM      dM'      `MM M YM   ,M MM      ,V^MM.      MM   ,M9        M YMb   M dM'      `MM     dM'       `   MM       M        M YMb   M dM'      `MM MM   ,M9  M YM   ,M MM
-//    MM.  M' ,M  `MM      MM           MM      MM        MM M  Mb  M' MM     ,M  `MM      MMmmdM9         M  `MN. M MM        MM     MM            MM       M        M  `MN. M MM        MM MMmmdM9   M  Mb  M' MM
-//    `MM A'  AbmmmqMA     MM           MM      MM.      ,MP M  YM.P'  MM     AbmmmqMA     MM  YM.         M   `MM.M MM.      ,MP     MM.           MM       M        M   `MM.M MM.      ,MP MM        M  YM.P'  MM
-//     :MM;  A'     VML    MM           MM      `Mb.    ,dP' M  `YM'   MM    A'     VML    MM   `Mb.       M     YMM `Mb.    ,dP'     `Mb.     ,'   YM.     ,M        M     YMM `Mb.    ,dP' MM        M  `YM'   MM
-//      VF .AMA.   .AMMA..JMML.       .JMML.      `"bmmd"' .JML. `'  .JMML..AMA.   .AMMA..JMML. .JMM.    .JML.    YM   `"bmmd"'         `"bmmmd'     `bmmmmd"'      .JML.    YM   `"bmmd"' .JMML.    .JML. `'  .JMML.⠀⠀⠀⠀⠀
