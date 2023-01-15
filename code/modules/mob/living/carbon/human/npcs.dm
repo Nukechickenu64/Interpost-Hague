@@ -298,7 +298,6 @@
 
 /mob/living/carbon/human/raider/New(var/new_loc)
 	..()
-	..()
 	sleep(3)
 	if(!mind)
 		mind = new /datum/mind(src)

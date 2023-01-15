@@ -174,15 +174,17 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 		stats[STAT_ST] -= 2
 	if(has_quirk(/datum/quirk/strong))
 		stats[STAT_ST] += 2
+	if(has_sin(/datum/sin/wrath))
+		stats[STAT_ST] += 2
 	if(gender == FEMALE)
-		stats[STAT_ST] -= (rand(2,4))
+		stats[STAT_ST] -= (rand(1,2))
 	stats[STAT_DX] = rand(dext1, dext2)
 	if(gender == FEMALE)
 		stats[STAT_DX] += (rand(1,2))
 	stats[STAT_IQ] = rand(int1, int2)
 	stats[STAT_HT] = rand(helt1, helt2)
 	if(gender == FEMALE)
-		stats[STAT_HT] -= (rand(2,4))
+		stats[STAT_HT] -= (rand(1,2))
 
 /mob/living/carbon/proc/adjustStrength(var/num)
 	stats[STAT_ST] += num
