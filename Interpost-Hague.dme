@@ -2531,6 +2531,7 @@
 #include "code\modules\tgui\states\physical.dm"
 #include "code\modules\tgui\states\self.dm"
 #include "code\modules\tgui\states\zlevel.dm"
+#include "code\modules\trait\nuisances.dm"
 #include "code\modules\trait\quirks.dm"
 #include "code\modules\trait\sins.dm"
 #include "code\modules\trait\traits.dm"

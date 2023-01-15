@@ -873,3 +873,16 @@
 	var/datum/virtue/chosen_virtue = pick(random_virtues)
 	src.virtue = new chosen_virtue
 	to_chat(src, "<span class='notice'>I have something good in me. My virtue is called [virtue.name].</span>")
+
+/mob/living/proc/assign_random_nuisance()
+	if(prob(80))
+		return
+	var/list/random_nuisances = list()
+	for(var/thing in subtypesof(/datum/nuisance))//Populate possible quirks list.
+		var/datum/nuisance/N = thing
+		random_nuisances += N
+	if(!random_nuisances.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/nuisance/chosen_nuisance = pick(random_nuisances)
+	src.nuisance = new chosen_nuisance
+	to_chat(src, "<span class='notice'>I am a <br>nuisance.</br>. I specialize in [nuisance.name].</span>")

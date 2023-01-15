@@ -5,6 +5,8 @@
 	msg += "<span class='info'>I believe I am </span><font color='red'>[H.age]</font> <span class='info'>years old.</span>\n"
 	msg += "<span class='info'>Everyone knows that I am </span>[get_social_class()].\n"
 	msg += "<span class='info'>I am a </span><font color='blue'>[H.gender]</font>, <span class='info'>as well.</span>\n"
+	if(nuisance)
+		msg += "<br><span class='info'>I specialize in <span class='danger'>[nuisance.name].</span></span>\n"
 	msg += "<hr class='linexd'>"
 	msg += "<span class='info'><EM>Current mood:</EM></span><br>\n"
 	for(var/i in events)

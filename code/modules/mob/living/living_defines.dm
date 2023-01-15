@@ -66,6 +66,8 @@
 
 	var/datum/sin/sin = null
 
+	var/datum/nuisance/nuisance = null
+
 	var/religion = LEGAL_RELIGION
 	var/religion_token = null
 	var/doing_something = 0	//Like pulling teeth?
