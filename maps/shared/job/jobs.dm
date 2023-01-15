@@ -204,6 +204,12 @@
 						///datum/job/chaplain,
 						)
 
+/datum/job/equip(var/mob/living/carbon/human/H)
+	..()
+	H.assign_random_virtue()
+	H.assign_random_sin()
+	H.assign_random_quirk()
+
 /datum/job/assistant
 	title = "Assistant"
 	supervisors = "everyone"
@@ -216,6 +222,7 @@
 	department_flag = CIV
 	spawn_positions = 1
 	access = list(access_maint_tunnels)
+
 	equip(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,11), rand(9,11), rand(7,10))
@@ -844,3 +851,25 @@
 		if(/datum/quirk/alcoholic)
 			var/datum/reagent/new_reagent = new /datum/reagent/ethanol
 			src.reagents.addiction_list.Add(new_reagent)
+
+/mob/living/proc/assign_random_sin()
+	var/list/random_sins = list()
+	for(var/thing in subtypesof(/datum/sin))//Populate possible quirks list.
+		var/datum/sin/S = thing
+		random_sins += S
+	if(!random_sins.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/sin/chosen_sin = pick(random_sins)
+	src.sin = new chosen_sin
+	to_chat(src, "<span class='notice'>I am of a sinful nature. My sin is called [sin.name].</span>")
+
+/mob/living/proc/assign_random_virtue()
+	var/list/random_virtues = list()
+	for(var/thing in subtypesof(/datum/virtue))//Populate possible quirks list.
+		var/datum/virtue/V = thing
+		random_virtues += V
+	if(!random_virtues.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/virtue/chosen_virtue = pick(random_virtues)
+	src.virtue = new chosen_virtue
+	to_chat(src, "<span class='notice'>I have something good in me. My virtue is called [virtue.name].</span>")

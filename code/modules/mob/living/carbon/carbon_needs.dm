@@ -21,7 +21,11 @@
 	if(trait)
 		msg += 	"<br><span class='info'>I am <span class='danger'>[trait.name]</span>. [trait.description]</span>\n"
 	if(quirk)//NOT THE SAME THING AS TRAITS
-		msg += "<span class='info'>Oh lucky, I am also <span class='danger'>[quirk.name]</span>. [quirk.description]</span>\n"
+		msg += "<span class='info'>I am also <span class='danger'>[quirk.name]</span>. [quirk.description]</span>\n"
+	if(sin)
+		msg += 	"<br><span class='info'>My sin is <span class='danger'>[sin.name].</span></span>\n"
+	if(virtue)
+		msg += "<br><span class='info'>But my virtue is <span class='danger'>[virtue.name].</span></span>\n"
 
 	msg += "</div></div>"
 	to_chat(src, msg)
