@@ -186,3 +186,53 @@
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
 	user.visible_message("<span class='warning'>[user]'s hand slips, smearing [tool] in the incision in [target]'s [affected.name]!</span>" , \
 	"<span class='warning'>Your hand slips, smearing [tool] in the incision in [target]'s [affected.name]!</span>")
+
+/datum/surgery_step/fixing_fingers
+	allowed_tools = list(
+	/obj/item/weapon/surgery_tool/bonesetter = 100,	\
+	/obj/item/weapon/wrench = 75		\
+	)
+	can_infect = 0
+	blood_level = 0
+
+	min_duration = 30
+	max_duration = 40
+
+/datum/surgery_step/fixing_fingers/can_use(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	if(!hasorgans(target))
+		return 0
+	var/obj/item/organ/external/affected = target.get_organ(target_zone)
+	if(!affected)
+		return 0
+	if(affected.status & ORGAN_BROKEN)
+		return 0
+	if(affected.parent)
+		if(affected.parent.status & ORGAN_BROKEN)
+			return 0
+	if(!affected.has_finger)
+		return 0
+	if(!(affected.get_fingers()))
+		return 0
+	return affected.get_broken_fingers()
+
+/datum/surgery_step/fixing_fingers/begin_step(mob/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	var/obj/item/organ/external/affected = target.get_organ(target_zone)
+	user.visible_message("[user] is beginning to fix the bone in [target]'s [affected.name] fingers with \the [tool].", \
+	"You are beginning to fix the bone in [target]'s [affected.name] fingers with \the [tool].")
+	..()
+
+/datum/surgery_step/fixing_fingers/end_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	var/obj/item/organ/external/affected = target.get_organ(target_zone)
+	for(var/obj/item/organ/finger/F in affected.fingers)
+		if(F.state == "BROKEN")
+			F.state = "OK"
+			user.visible_message("<span class='passive'> [user] fixed the bone in [target]'s [F.name] with \the [tool].</span>", \
+			"<span class='passive'> You fixed the bone in [target]'s [F.name] with \the [tool].</span>" )
+	..()
+
+/datum/surgery_step/fixing_fingers/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
+	var/obj/item/organ/external/affected = target.get_organ(target_zone)
+	user.visible_message("<span class='combat'>[user] sets the bone in [target]'s [affected.name]\red in the WRONG place with \the [tool].</span>", \
+	"<span class='combat'>You set the bone in [target]'s [affected.name]\red in the WRONG place with \the [tool].</span>")
+	affected.fracture()
+	..()

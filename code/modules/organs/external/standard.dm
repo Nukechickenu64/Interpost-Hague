@@ -146,10 +146,12 @@
 	joint = "left ankle"
 	amputation_point = "left ankle"
 	can_stand = 1
-	has_tendon = TRUE
+	has_finger = 1
+	has_tendon = 1
 	tendon_name = "Achilles tendon"
 	arterial_bleed_severity = 0.5
 	gendered_icon = 1
+	digit_check = list("big toe", "index toe", "middle toe" , "ring toe" , "little toe")
 
 /obj/item/organ/external/foot/stun_act(var/stun_amount, var/agony_amount)
 	if(!owner || agony_amount < 5)
@@ -168,6 +170,7 @@
 	icon_name = "r_foot"
 	body_part = FOOT_RIGHT
 	icon_position = RIGHT
+	has_finger = TRUE
 	parent_organ = BP_R_LEG
 	joint = "right ankle"
 	amputation_point = "right ankle"
@@ -185,10 +188,12 @@
 	joint = "left wrist"
 	amputation_point = "left wrist"
 	can_grasp = 1
-	has_tendon = TRUE
+	has_tendon = 1
+	has_finger = 1
 	tendon_name = "carpal ligament"
 	arterial_bleed_severity = 0.5
 	gendered_icon = 1
+	digit_check = list("thumb", "index finger", "middle finger", "ring finger", "little finger")
 
 /obj/item/organ/external/hand/stun_act(var/stun_amount, var/agony_amount)
 	if(!owner || (agony_amount < 5))
@@ -205,5 +210,54 @@
 	icon_name = "r_hand"
 	body_part = HAND_RIGHT
 	parent_organ = BP_R_ARM
+	has_finger = 1
 	joint = "right wrist"
 	amputation_point = "right wrist"
+
+/obj/item/organ/finger
+	var/nail = 1
+	var/state = "OK" // OK, BROKEN
+
+//dedos normais
+
+/obj/item/organ/finger/thumb
+	name = "thumb"
+	icon_state = "finger3"
+
+/obj/item/organ/finger/index
+	name = "index finger"
+	icon_state = "finger1"
+
+/obj/item/organ/finger/middle
+	name = "middle finger"
+	icon_state = "finger2"
+
+/obj/item/organ/finger/ring
+	name = "ring finger"
+	icon_state = "finger3"
+
+/obj/item/organ/finger/little
+	name = "little finger"
+	icon_state = "sfinger1"
+
+//dedao do pe
+
+/obj/item/organ/finger/big_toe
+	name = "big toe"
+	icon_state = "finger3"
+
+/obj/item/organ/finger/index_toe
+	name = "index toe"
+	icon_state = "finger1"
+
+/obj/item/organ/finger/middle_toe
+	name = "middle toe"
+	icon_state = "finger2"
+
+/obj/item/organ/finger/ring_toe
+	name = "ring toe"
+	icon_state = "finger3"
+
+/obj/item/organ/finger/little_toe
+	name = "little toe"
+	icon_state = "sfinger1"

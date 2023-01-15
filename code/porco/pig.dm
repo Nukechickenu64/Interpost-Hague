@@ -115,9 +115,11 @@
 		text += "Inquisitorial Points: <span id='timepusher'>[Inquisitor_Points]</span>"
 */
 
+/*
 	if(religion)
 		if(religion == HASARD)
 			text += "THOU ARE HASARD'S TOY"
+*/
 
 /*
 	if(src?.mind?.succubus)
@@ -189,9 +191,9 @@
 
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Emotes.png\'); margin-top: -50px; margin-left: [pixelDistancing * buttonTimes]px; \" id=\"Emotes\" class=\"button\" /></div></a>"
+		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Emotes.png\'); margin-top: -45px; margin-left: [pixelDistancing * buttonTimes]px; \" id=\"Emotes\" class=\"button\" /></div></a>"
 		buttonTimes++;
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Craft\" class=\"button\" /></div></a>"
+		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: -35px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Craft\" class=\"button\" /></div></a>"
 		buttonTimes++;
 
 /*
@@ -212,9 +214,9 @@
 			if(H.mind.special_role == "Head Revolutionary")
 				buttonTimes++
 				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Epsilon.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Integralist\" class=\"button\" /></div></a>"
-		if(H?.religion == "Thanati")
+		if(H?.religion != LEGAL_RELIGION)
 			buttonTimes++
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Thanati.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Thanati\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Thanati.png\'); margin-top: -40px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Thanati\" class=\"button\" /></div></a>"
 		if(istype(H.head, /obj/item/clothing/head/caphat))
 			buttonTimes++
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Crown.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Crown\" class=\"button\" /></div></a>"
@@ -245,8 +247,8 @@
 
 	client.changebuttoncontent("#note", noteUpdate())
 	client.changebuttoncontent("#Verb", verbUpdate())
-	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh"), list("Clearthroat", "Clear Throat"), list("mob_rest", "Collapse")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Kiss", "Kiss"), list("LickLips", "Lick Lips"), list("Cough", "Cough"), list("SpitonSomeone", "Spit on Someone"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Cry", "Cry"), list("Hem", "Hem"), list("Smile", "Smile")), 2)]</span>"})
-	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("Furniture", "Furniture"), list("Cult", "Cult"), list("Items", "Items"), list("Leather", "Leather"), list("Mason", "Mason"), list("Tanning", "Tanning"), list("Signs", "Signs")))]</span><span class='segment2'>[generateVerbList(list(list("Weapons", "Weapons"), list("Other", "Other")), 2)]</span>"})
+	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh"), list("ClearThroat", "Clear Throat")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("Smile", "Smile")), 2)]</span>"})
+	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
 	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("Wraith", "Wraith"), list("Ascend", "Ascend"), list("LateParty", "Late Party"), list("ToggleDarkness", "Shroud Thickness"), list("GotoHell", "Go to Hell"), list("Jaunt", "(5) Jaunt"), list("GrueSpawn", "(15) Grue"), list("Ignition", "(30) Ignition"), list("InterveneDreams", "Intervene Dreams"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
 	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Wraith", "Wraith")))]</span>"})
@@ -257,7 +259,7 @@
 	client.changebuttoncontent("#They", {"<span class='segment1'>[generateVerbList(list(list("ExtendTentacles", "Extend Tentacles"), list("AbsorbDNA", "Absorb Victim"), list("Hunt", "Hunt"), list("infest", "Infest the Lifeweb"), list("Lump", "Lump"), list("Learnch", "Learn from the Associates"), list("RegenerativeStasis", "Regenerative Stasis")))]</span>"})
 	client.changebuttoncontent("#Crown", {"<span class='segment1'>[generateVerbList(list(list("DecretodoBarao", "Baron Decree"), list("Abrirtrapdoors", "Open Traps"), list("ColocarTaxas", "Impose Fees"), list("Declararalerta", "Declare Emergency"), list("VendadeDrogas", "Drug Sell"), list("VendadeArmas", "Gun Sell"), list("Expandirpoderesdaigreja", "Expand Church Power"), list("SetHands", "Set Hand")))]</span>"})
 	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("RevConvert", "Convert a Citizen")))]</span>"})
-	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("praisethelord", "Call to the Lord"), list("getWords", "Remember the Words"), list("getBrothers", "Remember the Associates")))]</span>"})
+	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("getWords", "Remember the Words"), list("getBrothers", "Remember the Associates")))]</span>"})
 
 /mob/proc/verbUpdate()
 	var/newHTML = ""
@@ -281,7 +283,7 @@
 				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [religioncheck] <b>[readycheck]</b>$"
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
-		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee"), list(".asktostop", "Stop")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")), 2)]</span>"}
+		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")), 2)]</span>"}
 	return newHTML
 
 /mob/proc/spiderUpdate()

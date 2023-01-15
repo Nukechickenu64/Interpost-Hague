@@ -287,6 +287,9 @@ meteor_act
 		affecting.sever_tendon()
 		src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.tendon_name]!</span>")
 
+	if(I.sharp && affecting.has_finger && prob(rand(10,18)))
+		affecting.ripout_fingers(get_dir(affecting, src), round(rand(28, 38) * ((I.force*1.5)/100)))
+
 	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
 	else if(I.sharp && I.edge)
 		if(I.sharpness >= 1 && user.statcheck(user.stats[STAT_ST], 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool

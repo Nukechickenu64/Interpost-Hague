@@ -318,6 +318,8 @@ var/list/organ_cache = list()
 		. += "Mechanical"
 	if(status & ORGAN_CUT_AWAY)
 		. += "Severed"
+	if(status & ORGAN_BROKEN)
+		. += "Broken"
 	if(status & ORGAN_MUTATED)
 		. += "Genetic Deformation"
 	if(status & ORGAN_DEAD)

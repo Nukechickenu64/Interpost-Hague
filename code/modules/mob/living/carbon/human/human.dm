@@ -46,8 +46,10 @@
 	add_teeth()
 	add_tongue()
 	bodyhair()
+	add_fingers()
 	bladder = rand(0,100)
 	bowels = rand(0, 100)
+	disguise_number = rand(1,length(GLOB.player_list))
 
 	potenzia = (prob(80) ? rand(9, 14) : pick(rand(5, 13), rand(15, 20)))//funny
 	resistenza = (prob(80) ? rand(150, 300) : pick(rand(10, 100), rand(350,600)))
@@ -924,6 +926,7 @@ var/list/rank_prefix = list(\
 	species.create_organs(src) // Reset our organs/limbs.
 	restore_all_organs()       // Reapply robotics/amputated status from preferences.
 	add_teeth()
+	add_fingers()
 	add_tongue()
 
 	if(!client || !key) //Don't boot out anyone already in the mob.
@@ -1228,6 +1231,60 @@ var/list/rank_prefix = list(\
 		W.update_icon()
 		W.message = message
 		W.add_fingerprint(src)
+
+/mob/living/carbon/human/proc/add_fingers() //botar dedo nas maos, sim e tudo manual
+	var/obj/item/organ/external/hand/right/R = locate() in organs
+	if(istype(R))
+		R.fingers.Cut()
+		var/obj/item/organ/finger/thumb/T1 = new
+		var/obj/item/organ/finger/index/I2 = new
+		var/obj/item/organ/finger/middle/M3 = new
+		var/obj/item/organ/finger/ring/R4 = new
+		var/obj/item/organ/finger/little/L5 = new
+		R.fingers.Add(T1)
+		R.fingers.Add(I2)
+		R.fingers.Add(M3)
+		R.fingers.Add(R4)
+		R.fingers.Add(L5)
+	var/obj/item/organ/external/hand/L = locate() in organs
+	if(istype(L))
+		L.fingers.Cut()
+		var/obj/item/organ/finger/thumb/T6 = new
+		var/obj/item/organ/finger/index/I7 = new
+		var/obj/item/organ/finger/middle/M8 = new
+		var/obj/item/organ/finger/ring/R9 = new
+		var/obj/item/organ/finger/little/L10 = new
+		L.fingers.Add(T6)
+		L.fingers.Add(I7)
+		L.fingers.Add(M8)
+		L.fingers.Add(R9)
+		L.fingers.Add(L10)
+	var/obj/item/organ/external/foot/L_PE = locate() in organs
+	if(istype(L_PE))
+		L_PE.fingers.Cut()
+		var/obj/item/organ/finger/big_toe/T11 = new
+		var/obj/item/organ/finger/index_toe/I12 = new
+		var/obj/item/organ/finger/middle_toe/M13 = new
+		var/obj/item/organ/finger/ring_toe/R14 = new
+		var/obj/item/organ/finger/little_toe/L15 = new
+		L_PE.fingers.Add(T11)
+		L_PE.fingers.Add(I12)
+		L_PE.fingers.Add(M13)
+		L_PE.fingers.Add(R14)
+		L_PE.fingers.Add(L15)
+	var/obj/item/organ/external/foot/right/R_PE = locate() in organs
+	if(istype(R_PE))
+		R_PE.fingers.Cut()
+		var/obj/item/organ/finger/big_toe/T16 = new
+		var/obj/item/organ/finger/index_toe/I17 = new
+		var/obj/item/organ/finger/middle_toe/M18 = new
+		var/obj/item/organ/finger/ring_toe/R19 = new
+		var/obj/item/organ/finger/little_toe/L20 = new
+		R_PE.fingers.Add(T16)
+		R_PE.fingers.Add(I17)
+		R_PE.fingers.Add(M18)
+		R_PE.fingers.Add(R19)
+		R_PE.fingers.Add(L20)
 
 #define CAN_INJECT 1
 #define INJECTION_PORT 2
@@ -1590,6 +1647,11 @@ var/list/rank_prefix = list(\
 			status += "<span class='danger'>NECROTIC</span>"
 		if(org.is_dislocated()) //!org.is_usable() ||
 			status += "<span class='danger'>UNUSABLE</span>"
+		if(org.has_finger)
+			var/list/L = org.get_fucked_up()
+			for(var/x in L)
+				status += x
+
 		if(status.len)
 			msg += "<b>[capitalize(org.name)]:</b> [or_sign_list(status)]\n"
 		else
