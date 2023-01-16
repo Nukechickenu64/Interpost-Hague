@@ -1,6 +1,6 @@
 /decl/emote/audible
 	key = "burp"
-	emote_message_3p = "USER burps."
+	emote_message_3p = "<span class='examinebold'>USER</span> burps."
 	message_type = AUDIBLE_MESSAGE
 	var/emote_sound
 
@@ -11,7 +11,7 @@
 
 /decl/emote/audible/deathgasp_alien
 	key = "deathgasp"
-	emote_message_3p = "USER lets out a waning guttural screech, green blood bubbling from its maw."
+	emote_message_3p = "<span class='examinebold'>USER</span> lets out a waning guttural screech, green blood bubbling from its maw."
 
 /decl/emote/audible/whimper
 	key ="whimper"
@@ -35,51 +35,51 @@
 
 /decl/emote/audible/gasp
 	key ="gasp"
-	emote_message_3p = "USER gasps."
+	emote_message_3p = "<span class='examinebold'>USER</span> gasps."
 	conscious = 0
 
 /decl/emote/audible/scretch
 	key ="scretch"
-	emote_message_3p = "USER scretches."
+	emote_message_3p = "<span class='examinebold'>USER</span> scretches."
 
 /decl/emote/audible/choke
 	key ="choke"
-	emote_message_3p = "USER chokes."
+	emote_message_3p = "<span class='examinebold'>USER</span> chokes."
 	conscious = 0
 
 /decl/emote/audible/gnarl
 	key ="gnarl"
-	emote_message_3p = "USER gnarls and shows its teeth.."
+	emote_message_3p = "<span class='examinebold'>USER</span> gnarls and shows its teeth.."
 
 /decl/emote/audible/chirp
 	key ="chirp"
-	emote_message_3p = "USER chirps!"
+	emote_message_3p = "<span class='examinebold'>USER</span> chirps!"
 	emote_sound = 'sound/misc/nymphchirp.ogg'
 
 /decl/emote/audible/alarm
 	key = "alarm"
 	emote_message_1p = "You sound an alarm."
-	emote_message_3p = "USER sounds an alarm."
+	emote_message_3p = "<span class='examinebold'>USER</span> sounds an alarm."
 
 /decl/emote/audible/alert
 	key = "alert"
 	emote_message_1p = "You let out a distressed noise."
-	emote_message_3p = "USER lets out a distressed noise."
+	emote_message_3p = "<span class='examinebold'>USER</span> lets out a distressed noise."
 
 /decl/emote/audible/notice
 	key = "notice"
 	emote_message_1p = "You play a loud tone."
-	emote_message_3p = "USER plays a loud tone."
+	emote_message_3p = "<span class='examinebold'>USER</span> plays a loud tone."
 
 /decl/emote/audible/whistle
 	key = "whistle"
 	emote_message_1p = "You whistle."
-	emote_message_3p = "USER whistles."
+	emote_message_3p = "<span class='examinebold'>USER</span> whistles."
 
 /decl/emote/audible/boop
 	key = "boop"
 	emote_message_1p = "You boop."
-	emote_message_3p = "USER boops."
+	emote_message_3p = "<span class='examinebold'>USER</span> boops."
 
 /decl/emote/audible/sneeze
 	key = "sneeze"
@@ -104,17 +104,22 @@
 
 /decl/emote/audible/sniff
 	key = "sniff"
-	emote_message_3p = "USER sniffs."
+	emote_message_3p = "<span class='examinebold'>USER</span> sniffs."
 	emote_sound = 'sound/voice/emotes/sniff.ogg'
+
+/decl/emote/audible/slap
+	key = "slap"
+	emote_message_3p = "<span class='examinebold'>USER</span> <span class='examine'>slaps his own face.</span>"
+	emote_sound = 'sound/voice/emotes/slap.ogg'
 
 /decl/emote/audible/snore
 	key = "snore"
-	emote_message_3p = "USER snores."
+	emote_message_3p = "<span class='examinebold'>USER</span> snores."
 	conscious = 0
 
 /decl/emote/audible/whimper
 	key = "whimper"
-	emote_message_3p = "USER whimpers."
+	emote_message_3p = "<span class='examinebold'>USER</span> whimpers."
 
 /decl/emote/audible/yawn
 	key = "yawn"
@@ -138,11 +143,11 @@
 
 /decl/emote/audible/clap
 	key = "clap"
-	emote_message_3p = "USER claps."
+	emote_message_3p = "<span class='examinebold'>USER</span> claps."
 
 /decl/emote/audible/chuckle
 	key = "chuckle"
-	emote_message_3p = "USER chuckles."
+	emote_message_3p = "<span class='examinebold'>USER</span> chuckles."
 
 /decl/emote/audible/cough
 	key = "cough"
@@ -167,7 +172,7 @@
 
 /decl/emote/audible/cry
 	key = "cry"
-	emote_message_3p = "USER cries."
+	emote_message_3p = "<span class='examinebold'>USER</span> cries."
 
 /decl/emote/audible/cry/do_emote(var/mob/living/carbon/human/user)
 	var/emotesound = null
@@ -309,12 +314,12 @@
 
 /decl/emote/audible/groan
 	key = "groan"
-	emote_message_3p = "USER groans!"
+	emote_message_3p = "<span class='examinebold'>USER</span> groans!"
 	conscious = 0
 
 /decl/emote/audible/moan
 	key = "moan"
-	emote_message_3p = "USER moans!"
+	emote_message_3p = "<span class='examinebold'>USER</span> moans!"
 	conscious = 0
 
 /decl/emote/audible/giggle
@@ -401,19 +406,19 @@
 
 /decl/emote/audible/grunt
 	key = "grunt"
-	emote_message_3p = "USER grunts."
+	emote_message_3p = "<span class='examinebold'>USER</span> grunts."
 
 /decl/emote/audible/bug_hiss
 	key ="hiss"
-	emote_message_3p = "USER hisses."
+	emote_message_3p = "<span class='examinebold'>USER</span> hisses."
 	emote_sound = 'sound/voice/BugHiss.ogg'
 
 /decl/emote/audible/bug_buzz
 	key ="buzz"
-	emote_message_3p = "USER buzzes its wings."
+	emote_message_3p = "<span class='examinebold'>USER</span> buzzes its wings."
 	emote_sound = 'sound/voice/BugBuzz.ogg'
 
 /decl/emote/audible/bug_chitter
 	key ="chitter"
-	emote_message_3p = "USER chitters."
+	emote_message_3p = "<span class='examinebold'>USER</span> chitters."
 	emote_sound = 'sound/voice/Bug.ogg'

@@ -26,7 +26,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	desc = "We take on the apperance and voice of one we have absorbed."
 	genomecost = 0
 	verbpath = /mob/proc/changeling_transform
-	icon = "ling_transform"  //I'm not re-naming these
 
 /datum/power/changeling/fakedeath
 	name = "Regenerative Stasis"
@@ -35,7 +34,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	genomecost = 0
 	allowduringlesserform = 1
 	verbpath = /mob/proc/changeling_fakedeath
-	icon = "ling_fake"
 
 // Hivemind
 
@@ -45,7 +43,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Allows other changelings to absorb the DNA you channel from the airwaves. Will not help them towards their absorb objectives."
 	genomecost = 0
 	verbpath = /mob/proc/changeling_hiveupload
-	icon = "wiz_mindswap"
 
 /datum/power/changeling/hive_download
 	name = "Hive Absorb"
@@ -53,14 +50,12 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Allows you to absorb a single DNA and use it. Does not count towards your absorb objective."
 	genomecost = 0
 	verbpath = /mob/proc/changeling_hivedownload
-	icon = "wiz_mindswap"
 
 /datum/power/changeling/lesser_form
 	name = "Lesser Form"
 	desc = "We debase ourselves and become lesser.  We become a monkey."
 	genomecost = 4
 	verbpath = /mob/proc/changeling_lesser_form
-	icon = "ling_monkey"
 
 /datum/power/changeling/deaf_sting
 	name = "Deaf Sting"
@@ -68,7 +63,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	genomecost = 1
 	allowduringlesserform = 1
 	verbpath = /mob/proc/changeling_deaf_sting
-	icon = "ling_deaf"
 
 /datum/power/changeling/blind_sting
 	name = "Blind Sting"
@@ -76,7 +70,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	genomecost = 2
 	allowduringlesserform = 1
 	verbpath = /mob/proc/changeling_blind_sting
-	icon = "ling_blind"
 
 /datum/power/changeling/silence_sting
 	name = "Silence Sting"
@@ -85,7 +78,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	genomecost = 3
 	allowduringlesserform = 1
 	verbpath = /mob/proc/changeling_silence_sting
-	icon = "ling_mute"
 
 /datum/power/changeling/mimicvoice
 	name = "Mimic Voice"
@@ -93,7 +85,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Will turn your voice into the name that you enter. We must constantly expend chemicals to maintain our form like this"
 	genomecost = 1
 	verbpath = /mob/proc/changeling_mimicvoice
-	icon = "mimic_voice"
 
 /datum/power/changeling/extractdna
 	name = "Extract DNA"
@@ -101,7 +92,6 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Will give you the DNA of your target, allowing you to transform into them. Does not count towards absorb objectives."
 	genomecost = 2
 	allowduringlesserform = 1
-	icon = "sting_extract"
 	verbpath = /mob/proc/changeling_extract_dna_sting
 
 /datum/power/changeling/transformation_sting
@@ -207,6 +197,7 @@ var/list/datum/power/changeling/powerinstances = list()
 // Modularchangling, totally stolen from the new player panel.  YAYY
 /datum/changeling/proc/EvolutionMenu()//The new one
 	set category = "Changeling"
+	set name = "EvolutionMenu"
 	set desc = "Level up!"
 
 	if(!usr || !usr.mind || !usr.mind.changeling)	return
@@ -216,7 +207,7 @@ var/list/datum/power/changeling/powerinstances = list()
 		for(var/P in powers)
 			powerinstances += new P()
 
-	var/dat = "<html><head><title>Changling Evolution Menu</title></head>"
+	var/dat = "<html><head><title>Changeling Evolution Menu</title></head>"
 
 	//javascript, the part that does most of the work~
 	dat += {"
@@ -522,10 +513,10 @@ var/list/datum/power/changeling/powerinstances = list()
 	if(!M.current.ability_master)
 		M.current.ability_master = new()
 	//If it's a verb, add it.  If it's not, just call it once
-	if(Thepower.isVerb)
-		M.current.ability_master.add_ling_ability(M.current,Thepower.verbpath,Thepower.name,Thepower.icon,null)
-	else
-		call(M.current, Thepower.verbpath)()
+	//if(Thepower.isVerb)
+		//M.current.ability_master.add_ling_ability(M.current,Thepower.verbpath,Thepower.name,Thepower.icon,null)
+	//else
+		//call(M.current, Thepower.verbpath)()
 	/*
 	//What if we just... use ability manager
 	//TODO: Completely replace the add verb part, and move completely to spells

@@ -73,7 +73,7 @@
 		return
 
 	if(use_emote.message_type == AUDIBLE_MESSAGE && muzzled || use_emote.message_type == AUDIBLE_MESSAGE && silent >= 3)
-		audible_message("<b>\The [src]</b> makes a muffled sound.")
+		audible_message("<span class='examinebold'><b>\The [src]</b></span> makes a muffled sound.")
 		playsound(src, "sound/voice/muffled[rand(1,2)].ogg", 50, 0, 1)
 		return
 	else
@@ -132,7 +132,7 @@
 
 	return pretext + nametext + subtext
 
-/mob/proc/custom_emote(var/m_type = VISIBLE_MESSAGE, var/message = null)
+/mob/proc/custom_emote(var/m_type = "<span class='examinebold'>[VISIBLE_MESSAGE]</span>", var/message = null)
 
 	if((usr && stat) || (!use_me && usr == src))
 		to_chat(src, "You are unable to emote.")

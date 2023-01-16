@@ -3,6 +3,7 @@
 	time = 120
 	related_skill = SKILL_ENG
 	tools = list(/obj/item/weapon/weldingtool = 1)
+	int_required = 12
 
 /datum/crafting_recipe/machinery/machine_frame
 	name = "machine frame"
@@ -54,11 +55,12 @@
 	time = 200
 	parts = list(MATERIAL_STEEL_TYPE = 8, /obj/item/stack/material/glass/ = 6)
 
+/*
 /datum/crafting_recipe/machinery/turret_frame
 	name = "turret frame"
 	result = list(/obj/machinery/porta_turret_construct = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 10)
-
+*/
 
 
 //wall or small you know them req only 2 list
@@ -90,3 +92,4 @@
 	result = list(/obj/structure/AIcore = 1)
 	parts = list(/obj/item/stack/material/plasteel/ = 10, /obj/item/stack/material/glass/ = 5)
 	related_skill = list(SKILL_ENG, SKILL_CRAFT)
+	int_required = 15

@@ -1,9 +1,9 @@
 /obj/item/reciever
-	name = "Reciever"
+	name = "Receiver"
 	icon = 'icons/obj/crafting.dmi'
 	w_class = ITEM_SIZE_NORMAL
-	desc = "This is a reciever."
-	icon_state = "reciever"
+	desc = "This is a receiver."
+	icon_state = "receiver"
 	matter = list(DEFAULT_WALL_MATERIAL = 500)
 
 /obj/item/action
@@ -49,7 +49,7 @@
 
 
 /obj/item/metal_shiv
-	name = "Metal shiv"
+	name = "Metal Shiv"
 	icon = 'icons/obj/crafting.dmi'
 	w_class = ITEM_SIZE_NORMAL
 	desc = "This is a metal shiv. It can be made into many things."
@@ -60,14 +60,14 @@
 		return /obj/item/screwdriver_head
 
 /obj/item/screwdriver_head
-	name = "Screwdriver head"
+	name = "Screwdriver Head"
 	icon = 'icons/obj/crafting.dmi'
 	w_class = ITEM_SIZE_NORMAL
 	desc = "This is the top of a screwdriver"
 	icon_state = "screwdriver_head"
 
 /obj/item/wrench_head
-	name = "Top of a wrench"
+	name = "Top of a Wrench"
 	icon = 'icons/obj/crafting.dmi'
 	w_class = ITEM_SIZE_NORMAL
 	desc = "This is a top of a wrench."
@@ -75,7 +75,7 @@
 	matter = list(DEFAULT_WALL_MATERIAL = 800)
 
 /obj/item/glass_handle
-	name = "Glass handle"
+	name = "Glass Handle"
 	icon = 'icons/obj/crafting.dmi'
 	w_class = ITEM_SIZE_NORMAL
 	desc = "This is a piece of glass.  It could be used as a handle"

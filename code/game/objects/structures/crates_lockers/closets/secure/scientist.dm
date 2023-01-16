@@ -19,6 +19,7 @@
 		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/gloves/latex,
 		/obj/item/clothing/gloves/latex,
+		/obj/item/clothing/under/rank/sci,
 		/obj/item/weapon/clipboard
 	)
 
@@ -43,7 +44,7 @@
 	)
 
 /obj/structure/closet/secure_closet/RD
-	name = "research director's locker"
+	name = "head scientist's locker"
 	req_access = list(access_rd)
 	icon_state = "rdsecure1"
 	icon_closed = "rdsecure"
@@ -53,20 +54,14 @@
 
 /obj/structure/closet/secure_closet/RD/WillContain()
 	return list(
-		/obj/item/clothing/suit/bio_suit/scientist = 2,
-		/obj/item/clothing/under/rank/research_director,
-		/obj/item/clothing/under/rank/research_director/rdalt,
-		/obj/item/clothing/under/rank/research_director/dress_rd,
-		/obj/item/clothing/suit/storage/toggle/labcoat,
-		/obj/item/weapon/cartridge/rd,
-		/obj/item/clothing/shoes/white,
+		/obj/item/clothing/suit/bio_suit/scientist,
+		/obj/item/clothing/under/rank/headsciformal,
+		/obj/item/clothing/suit/storage/toggle/labcoat/rd,
 		/obj/item/clothing/shoes/leather,
 		/obj/item/clothing/gloves/latex,
 		/obj/item/device/radio/headset/heads/rd,
 		/obj/item/clothing/mask/gas,
-		/obj/item/device/flash,
-		/obj/item/weapon/clipboard,
-		/obj/item/clothing/suit/storage/toggle/labcoat/rd
+		/obj/item/weapon/clipboard
 	)
 
 /obj/structure/closet/secure_closet/animal

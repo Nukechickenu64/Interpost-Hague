@@ -8,10 +8,12 @@
 	result = list(/obj/item/weapon/material/twohanded/baseballbat = 1)
 	parts = list(MATERIAL_WOOD_TYPE = 6)
 
+/*
 /datum/crafting_recipe/weapon/grenade_casing
 	name = "grenade casing"
 	result = list(/obj/item/weapon/grenade/chem_grenade = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 2)
+*/
 
 /datum/crafting_recipe/weapon/fork
 	name = "fork"
@@ -29,12 +31,12 @@
 	parts = list(MATERIAL_STEEL_TYPE  = 1)
 
 /datum/crafting_recipe/weapon/knife_blade
-	name = "knife blade"
+	name = "butterfly knife blade"
 	result = list(/obj/item/weapon/material/butterflyblade = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 6)
 
 /datum/crafting_recipe/weapon/knife_grip
-	name = "knife grip"
+	name = "butterfly knife grip"
 	result = list(/obj/item/weapon/material/butterflyhandle = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 4)
 
@@ -43,6 +45,7 @@
 	result = list(/obj/item/weapon/crossbowframe = 1)
 	parts = list(MATERIAL_WOOD_TYPE = 5)
 
+/*
 /datum/crafting_recipe/weapon/teleportation_spear
 	name = "telespear"
 	time = 60
@@ -52,9 +55,10 @@
 		/obj/item/weapon/stock_parts/subspace/crystal = 1,
 		/obj/item/device/assembly/igniter = 1,
 		/obj/item/stack/cable_coil = 10)
+*/
 
 /datum/crafting_recipe/weapon/improvised_maul
-	name = "robust maul"
+	name = "maul"
 	result = list(/obj/item/weapon/melee/toolbox_maul = 1)
 	parts = list(
 			/obj/item/weapon/mop = 1,
@@ -77,12 +81,14 @@
 			/obj/item/weapon/tray = 1,
 			/obj/item/weapon/storage/belt = 2)
 
+/*
 /datum/crafting_recipe/weapon/flamethrower
 	name = "flamethrower"
 	time = 100
 	tools = list(/obj/item/weapon/screwdriver = 1)
 	result = list(/obj/item/weapon/flamethrower = 1)
 	parts = list(/obj/item/weapon/weldingtool = 1, /obj/item/device/assembly/igniter = 1, /obj/item/weapon/tank/phoron/ = 1)
+*/
 
 /datum/crafting_recipe/weapon/mechanical_trap
 	name = "makeshift mechanical trap"
@@ -92,13 +98,14 @@
 	parts = list(/obj/item/weapon/saw = 1,  MATERIAL_STEEL_TYPE = 2, /obj/item/stack/cable_coil = 5)
 
 /datum/crafting_recipe/weapon/throwing_knife
-	name = "Throwing knife"
+	name = "throwing knife"
 	result = list(/obj/item/weapon/material/knife/throwing = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 2)
 
 /*
 GUNS
 */
+
 
 /datum/crafting_recipe/weapon/pistol
 	name = "handmade gun"
@@ -110,6 +117,7 @@ GUNS
 				/obj/item/weapon/grenade/chem_grenade = 1,
 				/obj/item/device/assembly/igniter = 1,
 				/obj/item/stack/cable_coil = 2)
+	int_required = 14
 
 /datum/crafting_recipe/weapon/rxd
 	name = "RXD - Rapid Crossbow Device"
@@ -120,3 +128,4 @@ GUNS
 		/obj/item/weapon/rcd = 1,
 		/obj/item/weapon/crossbowframe = 1,
 		/obj/item/stack/cable_coil = 2)
+	int_required = 14

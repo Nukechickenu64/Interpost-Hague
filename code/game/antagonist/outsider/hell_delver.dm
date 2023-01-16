@@ -13,8 +13,8 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	flags = ANTAG_OVERRIDE_JOB | ANTAG_HAS_LEADER | ANTAG_CHOOSE_NAME | ANTAG_RANDOM_EXCEPTED
 	antaghud_indicator = "hudloyalist"
 
-	hard_cap = 25
-	hard_cap_round = 25
+	hard_cap = 10
+	hard_cap_round = 10
 	initial_spawn_req = 1
 	initial_spawn_target = 10
 	show_objectives_on_creation = 0 //we are not antagonists, we do not need the antagonist shpiel/objectives
@@ -49,7 +49,7 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 
 client/verb/JoinHellDelverTeam()
 
-	set name = "Join Hell Delver Squad"
+	set name = "JoinHellDelverSquad"
 	set category = "IC"
 	set hidden = 0
 

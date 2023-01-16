@@ -1,5 +1,5 @@
 /obj/structure/closet/secure_closet/engineering_chief
-	name = "chief engineer's locker"
+	name = "vessel overseer's locker"
 	req_access = list(access_ce)
 	icon_state = "securece1"
 	icon_closed = "securece"
@@ -13,18 +13,12 @@
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/industrial, /obj/item/weapon/storage/backpack/satchel_eng)),
 		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/eng, 50),
 		/obj/item/blueprints,
-		/obj/item/clothing/under/rank/chief_engineer,
-		/obj/item/clothing/head/hardhat/white,
-		/obj/item/clothing/head/welding,
+		/obj/item/clothing/under/rank/vesseloverseer,
 		/obj/item/clothing/gloves/insulated,
 		/obj/item/clothing/shoes/brown,
-		/obj/item/weapon/cartridge/ce,
 		/obj/item/device/radio/headset/heads/ce,
-		/obj/item/weapon/storage/toolbox/mechanical,
 		/obj/item/clothing/suit/storage/hazardvest,
-		/obj/item/clothing/mask/gas,
 		/obj/item/device/multitool,
-		/obj/item/device/flash,
 		/obj/item/taperoll/engineering,
 		/obj/item/weapon/crowbar/brace_jack
 	)
@@ -78,11 +72,9 @@
 		new/datum/atom_creator/weighted(list(/obj/item/clothing/accessory/storage/brown_vest = 70, /obj/item/clothing/accessory/storage/webbing = 30)),
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/industrial, /obj/item/weapon/storage/backpack/satchel_eng)),
 		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/eng, 50),
-		/obj/item/weapon/storage/toolbox/mechanical,
-		/obj/item/device/radio/headset/headset_eng,
 		/obj/item/clothing/suit/storage/hazardvest,
-		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/glasses/meson,
+		/obj/item/clothing/under/rank/eng,
 		/obj/item/weapon/cartridge/engineering,
 		/obj/item/taperoll/engineering
 	)

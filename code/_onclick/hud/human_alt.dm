@@ -309,25 +309,13 @@
 	mymob.stamina_icon.screen_loc = ui_stamina
 	hud_elements |= mymob.stamina_icon
 
-/*
 	mymob.film_grain = new()
 	mymob.film_grain.icon = 'icons/effects/static.dmi'
 	mymob.film_grain.icon_state = "7 moderate"
 	mymob.film_grain.screen_loc = ui_entire_screen
-	mymob.film_grain.alpha = 165
-	mymob.film_grain.layer = FULLSCREEN_LAYER
-	mymob.film_grain.mouse_opacity = 0
-	hud_elements |= mymob.film_grain
-*/
-
-	mymob.film_grain = new /obj/screen()
-	mymob.film_grain.icon = 'icons/misc/fullscreen.dmi'
-	mymob.film_grain.icon_state = "grain"
-	mymob.film_grain.name = " "
-	mymob.film_grain.screen_loc = "1,1"
 	mymob.film_grain.alpha = 140
-	mymob.film_grain.mouse_opacity = 0
 	mymob.film_grain.layer = FULLSCREEN_LAYER
+	mymob.film_grain.mouse_opacity = 0
 	hud_elements |= mymob.film_grain
 
 	mymob.rest = new /obj/screen()

@@ -264,6 +264,7 @@
 	if(my_mob.client)
 		toggle_open(2) //forces the icons to refresh on screen
 
+/*
 //Changeling Abilities
 /obj/screen/ability/verb_based/changeling
 	icon_state = "ling_spell_base"
@@ -288,7 +289,7 @@
 	ability_objects.Add(A)
 	if(my_mob.client)
 		toggle_open(2) //forces the icons to refresh on screen
-
+*/
 
 /////////Obj Abilities////////
 //Buttons to trigger objects//

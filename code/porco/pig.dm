@@ -175,55 +175,43 @@
 	if(!client.pigReady)
 		return
 
-	var/pixelDistancing = 46
-	var/buttonTimes = 1
-
 	var/buttonHTML = ""
 	defaultButton()
 
-	buttonHTML += {"<a href="#"><div style="background-image: url(\'Verbs.png\'); margin-right: 8px;" id="Verb" class="button" /></div></a>"}
+	buttonHTML += {"<a href="#"><div style="background-image: url(\'Heart.png\'); margin-top: -129px; margin-right: 8px;" id="Verb" class="button" /></div></a>"}
 
-	if(isobserver(src) || istype(src, /mob/living/carbon/brain))
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"DeadGhost\" class=\"button\" /></div></a>"
-
-	if(istype(src, /mob/living/carbon/alien) && src.stat == DEAD)
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"DeadGhost\" class=\"button\" /></div></a>"
+	if(src.stat == DEAD && GAME_STATE != RUNLEVEL_LOBBY || isobserver(src) || istype(src, /mob/living/carbon/brain))
+		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -88px; margin-left:46px; \" id=\"DeadGhost\" class=\"button\" /></div></a>"
 
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Emotes.png\'); margin-top: -45px; margin-left: [pixelDistancing * buttonTimes]px; \" id=\"Emotes\" class=\"button\" /></div></a>"
-		buttonTimes++;
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: -35px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Craft\" class=\"button\" /></div></a>"
-		buttonTimes++;
+		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Emotes.png\'); margin-top: -44px; margin-left: 46px; \" id=\"Emotes\" class=\"button\" /></div></a>"
+		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: 2px; margin-left:46px; \" id=\"Craft\" class=\"button\" /></div></a>"
 
 /*
 		if(H.isVampire)
 			buttonTimes++;
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Fangs.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Vampire\" class=\"button\" /></div></a>"
 */
+/*
 		if(H.job == "Francisco's Advisor")
 			buttonTimes++;
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Plot.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Advisor\" class=\"button\" /></div></a>"
 		if(H.job == "Francisco's Bodyguard")
 			buttonTimes++;
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Plot.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Bodyguard\" class=\"button\" /></div></a>"
+*/
 		if(H?.mind)
 			if(H?.mind?.changeling)
-				buttonTimes++
-				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Villain.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"They\" class=\"button\" /></div></a>"
+				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Villain.png\'); margin-top: -132px; margin-left:46px; \" id=\"They\" class=\"button\" /></div></a>"
 			if(H.mind.special_role == "Head Revolutionary")
-				buttonTimes++
-				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Epsilon.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Integralist\" class=\"button\" /></div></a>"
+				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Epsilon.png\'); margin-top: -132px; margin-left:46px; \" id=\"Integralist\" class=\"button\" /></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
-			buttonTimes++
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Thanati.png\'); margin-top: -40px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Thanati\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Thanati.png\'); margin-top: 1px; margin-left:46px; \" id=\"Thanati\" class=\"button\" /></div></a>"
 		if(istype(H.head, /obj/item/clothing/head/caphat))
-			buttonTimes++
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Crown.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Crown\" class=\"button\" /></div></a>"
-		if((H.stat == DEAD) && (!(H.status_flags & FAKEDEATH)))
-			if(H.health < 0 && H.health > -95.0)
-				buttonTimes++
-				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Dead\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Crown.png\'); margin-top: -50px; margin-left:46px; \" id=\"Crown\" class=\"button\" /></div></a>"
+		if(H.stat == DEAD)
+			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -88px; margin-left:46px; \" id=\"Dead\" class=\"button\" /></div></a>"
 
 	client.addbutton(buttonHTML, "#dynamicpanel")
 	updateButtons()
@@ -247,19 +235,19 @@
 
 	client.changebuttoncontent("#note", noteUpdate())
 	client.changebuttoncontent("#Verb", verbUpdate())
-	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh"), list("ClearThroat", "Clear Throat")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("Smile", "Smile")), 2)]</span>"})
+	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
-	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("Wraith", "Wraith"), list("Ascend", "Ascend"), list("LateParty", "Late Party"), list("ToggleDarkness", "Shroud Thickness"), list("GotoHell", "Go to Hell"), list("Jaunt", "(5) Jaunt"), list("GrueSpawn", "(15) Grue"), list("Ignition", "(30) Ignition"), list("InterveneDreams", "Intervene Dreams"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
-	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Wraith", "Wraith")))]</span>"})
+	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
+	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Succumb", "Succumb")))]</span>"})
 
 	client.changebuttoncontent("#Vampire", {"<span class='segment1'>[generateVerbList(list(list("ExposeFangs", "Expose Fangs"), list("BloodStrength", "Blood Strength (50cl)"), list("Fortitude", "Fortitude (50cl)"), list("Heal", "Heal (150cl)"), list("Celerety", "Celerety (250cl)"), list("DeadEyes", "Dead Eyes")))]</span>"})
 	client.changebuttoncontent("#Advisor", {"<span class='segment1'>[generateVerbList(list(list("gradeHygiene", "Grade the Hygiene"), list("gradePeople", "Grade the People"), list("gradeFortress", "Grade the Fortress")))]</span>"})
 	client.changebuttoncontent("#Bodyguard", {"<span class='segment1'>[generateVerbList(list(list("localizeAdvisor", "Localize Advisor")))]</span>"})
-	client.changebuttoncontent("#They", {"<span class='segment1'>[generateVerbList(list(list("ExtendTentacles", "Extend Tentacles"), list("AbsorbDNA", "Absorb Victim"), list("Hunt", "Hunt"), list("infest", "Infest the Lifeweb"), list("Lump", "Lump"), list("Learnch", "Learn from the Associates"), list("RegenerativeStasis", "Regenerative Stasis")))]</span>"})
+	client.changebuttoncontent("#They", {"<span class='segment1'>[generateVerbList(list(list("EvolutionMenu", "Evolve"), list("RangedSting", "Ranged Attack"), list("AbsorbDNA", "Absorb Victim"), list("Transform", "Transform"), list("LesserForm", "Lesser Form"), list("TransformLesser", "Lesser Transform"), list("ReviveLing", "Revive"), list("EpinephrineSacs", "Epinephrine Sacs"), list("ToggleDigitalCamoflague", "Hide from AI"), list("RapidRegeneration", "Rapid Regeneration"), list("HiveChannel", "Hive Channel"), list("HiveAbsorb", "Hive Absorb"), list("MimicVoice", "Mimic Voice"), list("HallucinationSting", "Hallucination Sting"), list("SilenceSting", "Silence Sting"), list("BlindSting", "Blind Sting"), list("ParalysisSting", "Paralysis Sting"), list("DeafSting", "Deaf Sting"), list("TransformationSting", "Transformation Sting"), list("DeathSting", "Death Sting"), list("ExtractDNASting", "Extract DNA Sting"), list("BuffStats", "Enhance ourselves"), list("RegenerativeStasis", "Regenerative Stasis")))]</span>"})
 	client.changebuttoncontent("#Crown", {"<span class='segment1'>[generateVerbList(list(list("DecretodoBarao", "Baron Decree"), list("Abrirtrapdoors", "Open Traps"), list("ColocarTaxas", "Impose Fees"), list("Declararalerta", "Declare Emergency"), list("VendadeDrogas", "Drug Sell"), list("VendadeArmas", "Gun Sell"), list("Expandirpoderesdaigreja", "Expand Church Power"), list("SetHands", "Set Hand")))]</span>"})
-	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("RevConvert", "Convert a Citizen")))]</span>"})
-	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("getWords", "Remember the Words"), list("getBrothers", "Remember the Associates")))]</span>"})
+	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("ConvertBourgeoise", "Convert to our Cause")))]</span>"})
+	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("CreateShrine", "Create a Shrine"), list("getBrothers", "Remember the Associates")))]</span>"})
 
 /mob/proc/verbUpdate()
 	var/newHTML = ""
@@ -283,7 +271,7 @@
 				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [religioncheck] <b>[readycheck]</b>$"
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
-		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")), 2)]</span>"}
+		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo")), 2)]</span>"}
 	return newHTML
 
 /mob/proc/spiderUpdate()
@@ -367,7 +355,7 @@
 	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ToggleFullscreen", "Toggle Fullscreen"))) + "</span>")
 
 /client/proc/setDefaultButtons()
-	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("vomit", "Try to Vomit"), list("Pee", "Pee"), list(".asktostop", "Stop")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("Clean", "Clean"), list("Masturbate", "Masturbate"), list("Poo", "Poo")))]</span>"})
+	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("Poo", "Poo")))]</span>"})
 
 /client/New()
 	..()

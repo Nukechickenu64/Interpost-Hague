@@ -32,39 +32,8 @@
 /obj/structure/closet/secure_closet/hop/WillContain()
 	return list(
 		/obj/item/clothing/glasses/sunglasses,
-		/obj/item/clothing/suit/armor/vest/nt,
-		/obj/item/clothing/head/helmet,
-		/obj/item/weapon/cartridge/hop,
-		/obj/item/device/radio/headset/heads/hop,
-		/obj/item/weapon/storage/box/ids = 2,
-		/obj/item/weapon/gun/projectile/sec/flash,
-		/obj/item/device/flash
-	)
-
-/obj/structure/closet/secure_closet/hop2
-	name = "head of personnel's attire"
-	req_access = list(access_hop)
-	icon_state = "hopsecure1"
-	icon_closed = "hopsecure"
-	icon_locked = "hopsecure1"
-	icon_opened = "hopsecureopen"
-	icon_off = "hopsecureoff"
-
-/obj/structure/closet/secure_closet/hop2/WillContain()
-	return list(
-		/obj/item/clothing/under/rank/head_of_personnel,
-		/obj/item/clothing/under/dress/dress_hop,
-		/obj/item/clothing/under/dress/dress_hr,
-		/obj/item/clothing/under/lawyer/female,
-		/obj/item/clothing/under/lawyer/black,
-		/obj/item/clothing/under/lawyer/red,
-		/obj/item/clothing/under/lawyer/oldman,
-		/obj/item/clothing/shoes/brown,
-		/obj/item/clothing/shoes/black,
-		/obj/item/clothing/shoes/leather,
-		/obj/item/clothing/shoes/white,
-		/obj/item/clothing/under/rank/head_of_personnel_whimsy,
-		/obj/item/clothing/head/caphat/hop
+		/obj/item/clothing/under/rank/eofficer,
+		/obj/item/weapon/storage/box/ids = 2
 	)
 
 /obj/structure/closet/secure_closet/hos
@@ -78,14 +47,13 @@
 
 /obj/structure/closet/secure_closet/hos/WillContain()
 	return list(
-		/obj/item/clothing/head/HoS,
-		/obj/item/clothing/suit/armor/hos,
+		/obj/item/clothing/head/majorberet,
+		/obj/item/clothing/suit/major,
 		/obj/item/taperoll/police,
 		/obj/item/device/flash,
 		/obj/item/weapon/melee/telebaton,
 		/obj/item/device/holowarrant,
-		/obj/item/weapon/material/sword,
-		/obj/item/clothing/under/rank/head_of_security/corp,
+		/obj/item/clothing/under/rank/majorformal,
 		/obj/item/clothing/glasses/eyepatch/hud/security
 	)
 
@@ -102,14 +70,6 @@
 	return list(
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/security, /obj/item/weapon/storage/backpack/satchel_sec)),
 		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/sec, 50),
-		/obj/item/clothing/suit/armor/vest/nt,
-		/obj/item/clothing/suit/storage/vest/nt/warden,
-		/obj/item/clothing/under/rank/warden,
-		/obj/item/clothing/under/rank/warden/corp,
-		/obj/item/clothing/suit/armor/vest/warden,
-		/obj/item/clothing/head/warden,
-		/obj/item/weapon/cartridge/security,
-		/obj/item/device/radio/headset/headset_sec,
 		/obj/item/clothing/glasses/sunglasses/sechud,
 		/obj/item/taperoll/police,
 		/obj/item/weapon/storage/box/flashbangs,
@@ -117,7 +77,6 @@
 		/obj/item/weapon/storage/belt/security,
 		/obj/item/weapon/reagent_containers/spray/pepper,
 		/obj/item/weapon/melee/baton/loaded,
-		/obj/item/weapon/gun/energy/gun,
 		/obj/item/weapon/storage/box/holobadge,
 		/obj/item/clothing/head/beret/sec/corporate/warden,
 		/obj/item/device/holowarrant
@@ -135,18 +94,13 @@
 /obj/structure/closet/secure_closet/security/WillContain()
 	return list(
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/satchel_sec)),
-		/obj/item/device/radio/headset/headset_sec,
 		/obj/item/weapon/storage/belt/security,
-		/obj/item/device/flash,
 		/obj/item/weapon/melee/classic_baton,
 		/obj/item/taperoll/police,
 		/obj/item/device/hailer,
 		/obj/item/clothing/accessory/storage/black_vest,
-		/obj/item/weapon/gun/energy/taser,
 		/obj/item/device/holowarrant,
-		/obj/item/clothing/head/helmet/steelhelm,
-		/obj/item/clothing/under/secdp,
-		/obj/item/clothing/suit/vest/civilian/bulletproof
+		/obj/item/clothing/under/rank/sec
 	)
 
 //INQUISITION LOCKER

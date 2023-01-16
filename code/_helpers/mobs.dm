@@ -218,7 +218,7 @@ proc/ageAndGender2Desc(age, gender)//Used for the radio
 	while (world.time < endtime)
 		stoplag()
 		if (progress)
-			progbar.update(world.time - starttime)
+			progbar.update(world.time - starttime - sin_modifier)
 
 		if(!user || user.incapacitated(incapacitation_flags) || user.loc != original_loc || (same_direction && user.dir != original_dir))
 			. = 0

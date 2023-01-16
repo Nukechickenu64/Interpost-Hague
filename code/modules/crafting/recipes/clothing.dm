@@ -2,6 +2,7 @@
 	category = "Clothing"
 	time = 50
 	result = null
+	int_required = 12
 
 /datum/crafting_recipe/clothing/sandals
 	name = "wooden sandals"

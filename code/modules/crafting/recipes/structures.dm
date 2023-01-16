@@ -40,6 +40,7 @@
 	result = list(/obj/structure/kitchenspike = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 3)
 
+/*
 /datum/crafting_recipe/beehive_assembly
 	name = "beehive assembly"
 	result = list(/obj/item/beehive_assembly = 1)
@@ -49,3 +50,4 @@
 	name = "beehive frame"
 	result = list(/obj/item/honey_frame = 1)
 	parts = list(MATERIAL_WOOD_TYPE  = 1)
+*/

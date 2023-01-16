@@ -12,6 +12,10 @@
 
 /obj/item/organ/internal/guts/Process()
 	..()
+
+	if(!owner)
+		return
+
 	if (germ_level > INFECTION_LEVEL_ONE)
 		if(prob(5))
 			owner.emote("cough")		//respitory tract infection

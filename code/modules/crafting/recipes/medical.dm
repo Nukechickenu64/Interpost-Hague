@@ -4,6 +4,7 @@
 	result = 0
 	time = 30
 	related_skill = SKILL_MED
+	int_required = 11
 
 /datum/crafting_recipe/medical/blood_pack
 	name = "blood pack"

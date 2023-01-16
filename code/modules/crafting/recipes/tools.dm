@@ -4,7 +4,7 @@
 	result = null
 	time = 30 			//time in 1/10th of second
 	base_chance = 100 	//base chance to get it right without skills
-	int_required = 6
+	int_required = 8
 	related_skill = SKILL_CRAFT
 
 /datum/crafting_recipe/tool/ducttape

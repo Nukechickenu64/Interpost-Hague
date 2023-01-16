@@ -57,7 +57,7 @@
 			use_1p = get_emote_message_1p(user, target, extra_params)
 			use_1p = replacetext(use_1p, "TARGET_THEM", target_gender.him)
 			use_1p = replacetext(use_1p, "TARGET_THEIR", target_gender.his)
-			use_1p = replacetext(use_1p, "TARGET", "<b>\the [target]</b>")
+			use_1p = replacetext(use_1p, "TARGET", "<span class='examinebold'><b>\the [target]</b></span>")
 		else
 			use_1p = get_emote_message_1p(user, null, extra_params)
 		use_1p = capitalize(use_1p)
@@ -67,12 +67,12 @@
 			use_3p = get_emote_message_3p(user, target, extra_params)
 			use_3p = replacetext(use_3p, "TARGET_THEM", target_gender.him)
 			use_3p = replacetext(use_3p, "TARGET_THEIR", target_gender.his)
-			use_3p = replacetext(use_3p, "TARGET", "<b>\the [target]</b>")
+			use_3p = replacetext(use_3p, "TARGET", "<span class='examinebold'><b>\the [target]</b></span>")
 		else
 			use_3p = get_emote_message_3p(user, null, extra_params)
 		use_3p = replacetext(use_3p, "USER_THEM", user_gender.him)
 		use_3p = replacetext(use_3p, "USER_THEIR", user_gender.his)
-		use_3p = replacetext(use_3p, "USER", "<b>\the [user]</b>")
+		use_3p = replacetext(use_3p, "USER", "<span class='examinebold'><b>\the [user]</b></span>")
 		use_3p = capitalize(use_3p)
 
 	if(message_type == AUDIBLE_MESSAGE)

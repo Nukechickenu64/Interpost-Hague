@@ -63,18 +63,11 @@
 	return list(
 		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/medic, /obj/item/weapon/storage/backpack/satchel_med)),
 		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/med, 50),
-		/obj/item/clothing/under/rank/nursesuit,
-		/obj/item/clothing/head/nursehat,
-		/obj/item/clothing/under/rank/medical,
-		/obj/item/clothing/under/rank/nurse,
-		/obj/item/clothing/under/rank/orderly,
+		/obj/item/clothing/under/rank/med,
 		/obj/item/clothing/suit/storage/toggle/labcoat,
 		/obj/item/clothing/shoes/white,
-		/obj/item/device/radio/headset/headset_med,
 		/obj/item/taperoll/medical,
-		/obj/item/weapon/storage/belt/medical/emt,
-		RANDOM_SCRUBS,
-		RANDOM_SCRUBS
+		/obj/item/weapon/storage/belt/medical/emt
 	)
 
 /obj/structure/closet/secure_closet/paramedic
@@ -94,20 +87,12 @@
 	    /obj/item/weapon/reagent_containers/glass/bottle/inaprovaline,
 	    /obj/item/weapon/reagent_containers/glass/bottle/antitoxin,
 	    /obj/item/weapon/storage/belt/medical/emt,
-	    /obj/item/clothing/mask/gas,
-	    /obj/item/clothing/suit/storage/toggle/labcoat,
-	    /obj/item/device/radio/headset/headset_med,
-	    /obj/item/weapon/cartridge/medical,
 	    /obj/item/device/flashlight,
 	    /obj/item/weapon/tank/emergency/oxygen/engi,
 	    /obj/item/clothing/glasses/hud/health,
 	    /obj/item/device/healthanalyzer,
-	    /obj/item/device/radio/off,
-	    /obj/random/medical,
-	    /obj/item/weapon/crowbar,
 	    /obj/item/weapon/extinguisher/mini,
-	    /obj/item/weapon/storage/box/freezer,
-	    /obj/item/clothing/accessory/storage/white_vest,
+	    /obj/item/weapon/storage/box/freezer
 	)
 
 /obj/structure/closet/secure_closet/CMO

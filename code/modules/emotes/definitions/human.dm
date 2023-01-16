@@ -11,7 +11,7 @@
 	key = "deathgasp"
 
 /decl/emote/human/deathgasp/get_emote_message_3p(var/mob/living/carbon/human/user)
-	return "USER [user.species.get_death_message()]"
+	return "<span class='examinebold'>USER</span> [user.species.get_death_message()]"
 
 /decl/emote/human/swish
 	key = "swish"
@@ -70,7 +70,7 @@
 
 /decl/emote/human/dance
 	key ="dance"
-	emote_message_3p = "USER dances around!"
+	emote_message_3p = "<span class='examinebold'>USER</span> dances around!"
 
 /decl/emote/human/dance/do_emote(var/mob/living/carbon/human/user)
 	user.do_dancing_animation()

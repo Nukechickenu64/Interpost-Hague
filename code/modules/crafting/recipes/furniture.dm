@@ -4,6 +4,7 @@
 	tools = list(/obj/item/weapon/screwdriver = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 5)
 	result = null
+	int_required = 11
 
 /datum/crafting_recipe/furniture/chair
 	name = "Chair"
@@ -94,40 +95,3 @@
 	name = "wheelchair"
 	result = list(/obj/structure/bed/chair/wheelchair = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 15)
-
-// Comfy chairs
-/datum/crafting_recipe/furniture/comfy_chair
-	name = "beige comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/beige = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/black
-	name = "black comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/black = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/brown
-	name = "brown comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/brown = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/lime
-	name = "lime comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/lime = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/teal
-	name = "teal comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/teal = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/red
-	name = "red comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/red = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/blue
-	name = "blue comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/blue = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/purple
-	name = "purple comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/purp = 1)
-
-/datum/crafting_recipe/furniture/comfy_chair/green
-	name = "green comfy chair"
-	result = list(/obj/structure/bed/chair/comfy/green = 1)

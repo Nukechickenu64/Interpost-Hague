@@ -1417,7 +1417,6 @@
 #include "code\modules\crafting\crafting_recipe.dm"
 #include "code\modules\crafting\menu.dm"
 #include "code\modules\crafting\parts\lathe_items.dm"
-#include "code\modules\crafting\recipes\airlocks.dm"
 #include "code\modules\crafting\recipes\ammo.dm"
 #include "code\modules\crafting\recipes\clothing.dm"
 #include "code\modules\crafting\recipes\furniture.dm"

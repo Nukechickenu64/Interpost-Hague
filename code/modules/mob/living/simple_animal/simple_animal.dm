@@ -86,9 +86,10 @@
 		death()
 		return
 
+	handle_atmos()
+
 	if(health > maxHealth)
 		health = maxHealth
-
 
 	handle_stunned()
 	handle_weakened()
@@ -105,11 +106,14 @@
 
 	//Movement
 	if(!client && !stop_automated_movement && wander && !anchored)
-		if(isturf(src.loc) && !resting)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
+		if(isturf(src.loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
 			turns_since_move++
 			if(turns_since_move >= turns_per_move)
-				if(!(stop_automated_movement_when_pulled && pulledby)) //Some animals don't move when pulled
-					SelfMove(pick(GLOB.cardinal))
+				if(!(stop_automated_movement_when_pulled && pulledby)) //Soma animals don't move when pulled
+					var/moving_to = 0 // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
+					moving_to = pick(GLOB.cardinal)
+					set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
+					Move(get_step(src,moving_to))
 					turns_since_move = 0
 
 	//Speaking
@@ -152,7 +156,7 @@
 						break
 			if(atmos_suitable && LAZYLEN(max_gas))
 				for(var/gas in max_gas)
-					if(environment.gas[gas] < max_gas[gas])
+					if(environment.gas[gas] > max_gas[gas])
 						atmos_suitable = 0
 						break
 
@@ -168,20 +172,6 @@
 
 	if(!atmos_suitable)
 		adjustBruteLoss(unsuitable_atoms_damage)
-
-	//Atmos effect
-	if(bodytemperature < minbodytemp)
-		fire_alert = 2
-		adjustBruteLoss(cold_damage_per_tick)
-	else if(bodytemperature > maxbodytemp)
-		fire_alert = 1
-		adjustBruteLoss(heat_damage_per_tick)
-	else
-		fire_alert = 0
-
-	if(!atmos_suitable)
-		adjustBruteLoss(unsuitable_atoms_damage)
-	return 1
 
 /mob/living/simple_animal/proc/handle_supernatural()
 	if(purge)

@@ -70,7 +70,14 @@
 	if(b_stat)
 		wires.Interact(user)
 
-	return ui_interact(user)
+	if(!broadcasting)
+		broadcasting = 1
+		playsound(src, 'sound/effects/compbeep4.ogg', 50, 0)
+		to_chat(user, "<span class='info'>I turn the radio</span> <span class='danger'>ON.</span>")
+	else
+		broadcasting = 0
+		playsound(src, 'sound/effects/compbeep5.ogg', 50, 0)
+		to_chat(user, "<span class='info'>I turn the radio</span> <span class='danger'>OFF.</span>")
 
 /obj/item/device/radio/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
 	var/data[0]

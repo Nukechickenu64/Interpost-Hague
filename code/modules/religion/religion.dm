@@ -235,7 +235,7 @@ proc/generate_random_prayer()//This generates a new one.
 
 /mob/living/proc/make_shrine()
 	set category = "Old God Magic"
-	set name = "Create Shrine"
+	set name = "CreateShrine"
 	var/turf/T = get_turf(src)
 	var/datum/religion/user_religion = GLOB.all_religions[religion]
 	//You need your god's item to do this
@@ -260,3 +260,12 @@ proc/generate_random_prayer()//This generates a new one.
 	//If we somehow got here
 	doing_something = 0
 	return 0
+
+/mob/living/proc/getBrothers()
+	set name = "getBrothers"
+	if(src.religion != LEGAL_RELIGION)
+		var/brothers_message = "Your brothers and sisters in faith:<br>"
+		for(var/mob/living/carbon/human/H in SSmobs.mob_list)
+			if(H.religion != LEGAL_RELIGION)
+				brothers_message += "<b> [H.real_name]</b><br>"
+		to_chat(src, brothers_message)

@@ -82,6 +82,7 @@
 		/decl/emote/audible/cry,
 		/decl/emote/audible/sigh,
 		/decl/emote/audible/laugh,
+		/decl/emote/audible/slap,
 		/decl/emote/audible/mumble,
 		/decl/emote/audible/grumble,
 		/decl/emote/audible/groan,
