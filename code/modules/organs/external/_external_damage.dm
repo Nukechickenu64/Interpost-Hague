@@ -287,3 +287,106 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 		status |= ORGAN_TENDON_CUT
 		return TRUE
 	return FALSE
+
+/obj/item/organ/external/proc/get_fingers()
+	var/amt = 0
+	if(!fingers.len)
+		return 0
+	for(var/i = 0; i < fingers.len; i++)
+		amt++
+
+	return amt
+
+/obj/item/organ/external/proc/get_broken_fingers()
+	var/amt = 0
+	if(!fingers.len)
+		return 0
+	for(var/obj/item/organ/finger/F in fingers)
+		if(F.state == "BROKEN")
+			amt++
+
+	return amt
+
+/obj/item/organ/external/proc/get_lost_fingers_number()
+	var/amt = 0
+	if(!fingers.len)
+		return 5
+
+	for(var/x in digit_check)
+		var/test = 1
+		for(var/obj/item/organ/finger/F in fingers)
+			if(F.name != x)
+				test = 0
+				continue
+			test = 1
+			break
+		if(!test)
+			amt ++
+	return amt
+
+/obj/item/organ/external/proc/get_lost_fingers_text()
+	var/list/amt = list()
+
+	if(!fingers.len)
+		return list("ALL FINGERS MISSING!")
+
+	for(var/x in digit_check)
+		var/test = 1
+		for(var/obj/item/organ/finger/F in fingers)
+			if(F.name != x)
+				test = 0
+				continue
+			test = 1
+			break
+		if(!test)
+			amt += x
+
+
+	return amt
+
+/obj/item/organ/external/proc/get_fucked_up()
+	var/amt = list()
+
+	if(!fingers.len)
+		return list("<span class='missingnew'>ALL FINGERS MISSING!</span>")
+
+	for(var/x in digit_check)
+		var/test = 1
+		for(var/obj/item/organ/finger/F in fingers)
+			if(F.name != x)
+				test = 0
+				continue
+			test = 1
+			break
+
+		if(!test)
+			amt += "<span class='missingnew'><big>[uppertext(x)] MISSING</big></span>"
+
+	for(var/obj/item/organ/finger/F in fingers)
+		if(F.state == "BROKEN")
+			amt += "<span class='missingnew'><big>[uppertext(F.name)] BROKEN</big></span>"
+
+	return amt
+
+/obj/item/organ/external/proc/ripout_fingers(throw_dir, num=32) //Won't support knocking teeth out of a dismembered head or anything like that yet.
+	num = Clamp(num, 1, 32)
+	var/done = 0
+	if(fingers && fingers.len) //We still have teeth
+		var/lostfingers = rand(1,3)
+		for(var/i, i <= lostfingers, i++) //Random amount of teeth stacks
+			var/obj/item/organ/finger/F = pick(fingers)
+			fingers -= F
+			playsound(owner, "chop", 50, 1, -1)
+			owner.visible_message("<span class='graytextbold'> [capitalize(owner.name)]'s [F] flies off in bloody arc!</span> ")
+			F.loc = owner.loc
+			var/turf/target = get_turf(owner.loc)
+			var/range = rand(1, 3)
+			for(var/j = 1; j < range; j++)
+				var/turf/new_turf = get_step(target, throw_dir)
+				target = new_turf
+				if(new_turf.density)
+					break
+			F.throw_at(get_edge_target_turf(F,pick(GLOB.alldirs)),rand(1,3),30)
+			F.loc:add_blood(owner)
+			done = 1
+	return done

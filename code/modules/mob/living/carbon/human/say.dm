@@ -121,6 +121,8 @@
 		return mind.changeling.mimicing
 	if(GetSpecialVoice())
 		return GetSpecialVoice()
+	if(disguising_voice)
+		return "[ageAndGender2Desc(src.age, src.gender)] #[disguise_number]"
 	return real_name
 
 /mob/living/carbon/human/proc/SetSpecialVoice(var/new_voice)
@@ -255,3 +257,13 @@
 			return L
 
 	return null
+
+/mob/living/carbon/human/verb/disguiseVoice()
+	set name = "disguiseVoice"
+	set background = 1
+	if(disguising_voice)
+		to_chat(src, "You're no longer trying to disguise your voice.")
+		disguising_voice = FALSE
+	else
+		to_chat(src, "You're now trying to disguise your voice.")
+		disguising_voice = TRUE

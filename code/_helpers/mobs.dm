@@ -204,7 +204,15 @@ proc/ageAndGender2Desc(age, gender)//Used for the radio
 	if (progress)
 		progbar = new(user, delay, target)
 
-	var/endtime = world.time + delay
+	var/sin_modifier = 0
+
+	for(var/mob/living/M in GLOB.player_list)
+		if(M.has_sin(/datum/sin/sloth))
+			sin_modifier += 20
+		else if(M.has_virtue(/datum/virtue/diligence))
+			sin_modifier += -20
+
+	var/endtime = world.time + delay + sin_modifier
 	var/starttime = world.time
 	. = 1
 	while (world.time < endtime)

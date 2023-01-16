@@ -323,6 +323,7 @@
 		mind.show_memory(src)
 	else
 		to_chat(src, "The game appears to have misplaced your mind datum, so we can't show you your notes.")
+
 /mob/verb/add_memory(msg as message)
 	set name = "Add Note"
 	set category = "IC"
@@ -333,6 +334,14 @@
 		mind.store_memory(msg)
 	else
 		to_chat(src, "The game appears to have misplaced your mind datum, so we can't show you your notes.")
+
+/mob/verb/AddNote()
+	if(!client) return
+	var/input = sanitize(input(usr, "What do I want to remember?", "Memories", "") as message|null, list("\t"="#","ÿ"="&#255;"))
+	if(!input) return
+	if(mind)
+		mind.store_memory(input)
+
 /mob/proc/store_memory(msg as message, popup, sane = 1)
 	msg = copytext(msg, 1, MAX_MESSAGE_LEN)
 

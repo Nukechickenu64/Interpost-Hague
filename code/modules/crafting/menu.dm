@@ -3,7 +3,7 @@
 
 //this one is called when you need just a regular CM, without strick tab opened
 /mob/living/verb/craft_menu()
-	set name = "Craft Menu"
+	set name = "CraftMenu"
 	set category = "IC"
 	src.open_craft_menu()
 
@@ -57,7 +57,7 @@
 			"desc" = user.stats[STAT_IQ] >= 8 ? CR.get_description() : "I'm not even sure what this does... <br>",
 			"ingredients" = user.stats[STAT_IQ] >= 10 ?  CR.get_ingredients() : "I'm not sure what this would be made out of... <br>",
 			"tool" = user.stats[STAT_IQ] >= 10 ? CR.get_tools() : "What tool would do I even need? <br>",
-		)	
+		)
 	var/list/items = list()
 	for(var/datum/crafting_recipe/recipe in SScraft.categories[curr_category])
 		if(recipe.result)

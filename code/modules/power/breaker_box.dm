@@ -29,7 +29,7 @@
 
 /obj/machinery/power/breakerbox/examine(mob/user)
 	. = ..()
-	to_chat(user, "Large machine with heavy duty switching circuits used for advanced grid control")
+	to_chat(user, "Large machine with heavy duty switching circuits used for advanced grid control.")
 	if(on)
 		to_chat(user, "<span class='good'>It seems to be online.</span>")
 	else

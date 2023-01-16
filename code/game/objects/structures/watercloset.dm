@@ -6,6 +6,8 @@
 	var/drainage = 0.5
 	var/last_gurgle = 0
 
+	var/obj/machinery/waterchip_holder/installed
+
 /obj/structure/hygiene/New()
 	..()
 	SSfluids.hygiene_props += src
@@ -221,13 +223,11 @@
 	anchored = 1
 	mouse_opacity = 0
 
-/obj/structure/hygiene/shower/attack_hand(mob/M as mob)
-/*
-	var/obj/machinery/waterchip_holder/waterchip_holder
-	if(!waterchip_holder.installed)
+/obj/structure/hygiene/shower/attack_hand(mob/M as mob, var/obj/machinery/waterchip_holder)
+	if(installed == FALSE)
 		to_chat("<span class='info'>There's no waterchip installed.</span>")
 		return
-*/
+
 	var/showersound = "sound/machines/shower_mid[rand(1,3)].ogg"
 	on = !on
 	update_icon()
@@ -371,7 +371,7 @@
 	thing.reagents.clear_reagents()
 	thing.update_icon()
 
-/obj/structure/hygiene/sink/attack_hand(mob/user as mob)
+/obj/structure/hygiene/sink/attack_hand(mob/user as mob, var/obj/machinery/waterchip_holder)
 	if (ishuman(user))
 		var/mob/living/carbon/human/H = user
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
@@ -391,12 +391,9 @@
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
 
-/*
-	var/obj/machinery/waterchip_holder/waterchip_holder
-	if(!waterchip_holder.installed)
+	if(installed == FALSE)
 		to_chat("<span class='info'>There's no waterchip installed.</span>")
 		return
-*/
 
 	if (ishuman(user))
 		var/mob/living/carbon/human/H = user

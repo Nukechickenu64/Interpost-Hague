@@ -203,7 +203,7 @@
 	emote("scream",1)
 
 /mob/living/carbon/human/verb/emoteclearthroat()
-	set name = "Clear Throat"
+	set name = "ClearThroat"
 	set category = "Emotes"
 
 	emote("clearthroat",1)

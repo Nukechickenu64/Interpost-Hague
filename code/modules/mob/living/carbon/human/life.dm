@@ -885,7 +885,7 @@
 /mob/living/carbon/human/handle_random_events()
 	// Puke if toxloss is too high
 	var/vomit_score = 0
-	for(var/tag in list(BP_LIVER,BP_KIDNEYS))
+	for(var/tag in list(BP_LIVER,BP_KIDNEYS,BP_GUTS))
 		var/obj/item/organ/internal/I = internal_organs_by_name[tag]
 		if(I)
 			vomit_score += I.damage

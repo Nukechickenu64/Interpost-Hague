@@ -434,7 +434,7 @@ var/global/const/MAX_VIEW = 41
 		eye = last_eye
 
 /client/proc/toggle_fullscreen(new_value)
-	set name = ".togglefullscreen"
+	set name = "ToggleFullscreen"
 	set category = "OOC"
 	set hidden = 1
 
@@ -446,8 +446,6 @@ var/global/const/MAX_VIEW = 41
 		winset(src, "mainwindow.mainvsplit", "pos=3x0")
 	winset(src, "mainwindow", "is-maximized=true")
 	fit_viewport()
-
-/client/verb/togglefullscreen(mob/preference_mob)
 
 /client/verb/fit_viewport()
 	set name = "Fit Viewport"

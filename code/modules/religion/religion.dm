@@ -69,6 +69,11 @@ proc/generate_random_prayer()//This generates a new one.
 
 	say(mind.prayer)
 
+/mob/living/verb/recite_prayer_hotkey()
+	set name = ".praiselord"
+
+	recite_prayer()
+
 //Try to reveal a random heretic
 /mob/living/proc/interrogate()
 	set category = "Religion"
@@ -184,7 +189,7 @@ proc/generate_random_prayer()//This generates a new one.
 
 /mob/living/proc/praise_god()
 	set category = "Old God Magic"
-	set name = "Praise your God"
+	set name = "PraiseyourGod"
 
 	var/datum/religion/user_religion = GLOB.all_religions[religion]
 	var/timer = 30

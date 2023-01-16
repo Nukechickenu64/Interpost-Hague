@@ -54,6 +54,9 @@
 	var/list/implants = list()         // Currently implanted objects.
 	var/base_miss_chance = 20          // Chance of missing.
 	var/genetic_degradation = 0
+	var/has_finger = 0
+	var/list/fingers = list()
+	var/list/digit_check = list()
 
 	//Forensics stuff
 	var/list/autopsy_data = list()    // Trauma data for forensics.
@@ -1103,7 +1106,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 	return 0
 
 /obj/item/organ/external/is_usable()
-	return ..() && !(status & ORGAN_TENDON_CUT) && (!can_feel_pain() || get_pain() < pain_disability_threshold) && brute_ratio < 1 && burn_ratio < 1
+	return ..() && !(status & ORGAN_TENDON_CUT) && (!can_feel_pain() || get_pain() < pain_disability_threshold) || (fingers.len && get_fingers() < 2) || (fingers.len && get_broken_fingers()) && brute_ratio < 1 && burn_ratio < 1
 
 /obj/item/organ/external/proc/is_malfunctioning()
 	return ((robotic >= ORGAN_ROBOT) && (brute_dam + burn_dam) >= 10 && prob(brute_dam + burn_dam))

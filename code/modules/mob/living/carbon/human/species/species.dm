@@ -163,6 +163,7 @@
 		BP_KIDNEYS =  /obj/item/organ/internal/kidneys,
 		BP_BRAIN =    /obj/item/organ/internal/brain,
 		BP_APPENDIX = /obj/item/organ/internal/appendix,
+		BP_GUTS = /obj/item/organ/internal/guts,
 		BP_EYES =     /obj/item/organ/internal/eyes
 		)
 	var/vision_organ              // If set, this organ is required for vision. Defaults to "eyes" if the species has them.

@@ -62,6 +62,9 @@
 
 	var/used_skillpoints = 0
 
+	var/disguising_voice = FALSE
+	var/disguise_number = 1
+
 	var/icon/stand_icon = null
 	var/icon/lying_icon = null
 
