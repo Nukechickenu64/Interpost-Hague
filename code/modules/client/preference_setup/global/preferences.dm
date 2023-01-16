@@ -185,11 +185,11 @@ var/list/_client_preferences_by_type
 /datum/client_preference/fullscreen_mode
 	description = "Fullscreen Mode"
 	key = "FULLSCREEN"
-	default_value = GLOB.PREF_NO
+	default_value = GLOB.PREF_YES
 
 /datum/client_preference/fullscreen_mode/changed(mob/preference_mob, new_value)
 	if(preference_mob.client)
-		preference_mob.client.toggle_fullscreen(new_value == GLOB.PREF_YES)
+		preference_mob.client.toggle_fullscreen(new_value == GLOB.PREF_NO)
 
 /datum/client_preference/automousemove
 	description = "Auto Mouse Move"
