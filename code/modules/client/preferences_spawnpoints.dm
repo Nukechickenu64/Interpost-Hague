@@ -86,7 +86,7 @@ GLOBAL_VAR(spawntypes)
 		L.flicker(10)
 
 /datum/spawnpoint/cryocaptain
-	display_name = "Cryogenic Storage"
+	display_name = "Cryogenic Storage Captain"
 	msg = "has completed cryogenic awakening"
 	restrict_job = list("Captain")
 
