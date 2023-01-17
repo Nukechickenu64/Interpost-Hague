@@ -238,7 +238,7 @@
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
-	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
+	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("MoveUp", "Move Upwards"), list("MoveDown", "Move Down"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
 	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Succumb", "Succumb")))]</span>"})
 
 	client.changebuttoncontent("#Vampire", {"<span class='segment1'>[generateVerbList(list(list("ExposeFangs", "Expose Fangs"), list("BloodStrength", "Blood Strength (50cl)"), list("Fortitude", "Fortitude (50cl)"), list("Heal", "Heal (150cl)"), list("Celerety", "Celerety (250cl)"), list("DeadEyes", "Dead Eyes")))]</span>"})
@@ -271,7 +271,7 @@
 				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) [religioncheck] <b>[readycheck]</b>$"
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
-		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo")), 2)]</span>"}
+		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("LookUp", "Look Up"), list("MoveUp", "Move Upwards")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo"), list("LookDown", "Look Down"), list("MoveDown", "Move Down")), 2)]</span>"}
 	return newHTML
 
 /mob/proc/spiderUpdate()

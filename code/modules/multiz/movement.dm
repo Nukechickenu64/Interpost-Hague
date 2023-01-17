@@ -1,12 +1,12 @@
 /mob/verb/up()
-	set name = "Move Upwards"
+	set name = "MoveUp"
 	set category = "IC"
 
 	if(zMove(UP))
 		to_chat(src, "<span class='notice'>You move upwards.</span>")
 
 /mob/verb/down()
-	set name = "Move Down"
+	set name = "MoveDown"
 	set category = "IC"
 
 	if(zMove(DOWN))
@@ -301,7 +301,7 @@
 		return TRUE
 
 /mob/living/verb/lookup()
-	set name = "Look Up"
+	set name = "LookUp"
 	set desc = "If you want to know what's above."
 	set category = "IC"
 
@@ -322,7 +322,7 @@
 		to_chat(src, "<span class='notice'>You can't look up right now.</span>")
 
 /mob/living/verb/lookdown()
-	set name = "Look Down"
+	set name = "LookDown"
 	set desc = "If you want to know what's below."
 	set category = "IC"
 

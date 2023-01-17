@@ -106,7 +106,6 @@ GLOBAL_VAR(spawntypes)
 			give_advice()
 			give_effect()
 			victim.add_event("cryo", /datum/happiness_event/cryo)
-			sleep(10)
 			C.eject()
 			return
 	for(var/obj/machinery/light/L in A)
