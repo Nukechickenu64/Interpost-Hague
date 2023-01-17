@@ -64,6 +64,7 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 
 	verbs += /datum/changeling/proc/EvolutionMenu
 	add_language("Changeling")
+	updatePig()
 
 	var/lesser_form = !ishuman(src)
 
