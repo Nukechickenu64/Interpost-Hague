@@ -244,6 +244,12 @@
 	power = 2
 	meltdose = 10
 
+/datum/reagent/acid/stomach
+	name = "stomach acid"
+	taste_description = "coppery foulness"
+	power = 1
+	color = "#d8ff00"
+
 /datum/reagent/toxin/skewium
 	name = "Skewium"
 	description = "A strange, dull coloured liquid that appears to warp back and forth inside its container. Causes any consumer to experience a visual phenomena similar to said warping."

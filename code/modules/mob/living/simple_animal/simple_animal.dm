@@ -385,3 +385,6 @@
 				var/matrix/M = new()
 				B.transform = M.Scale(scale)
 				B.update_icon()
+
+/mob/living/simple_animal/get_digestion_product()
+	return /datum/reagent/nutriment

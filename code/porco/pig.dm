@@ -235,7 +235,7 @@
 
 	client.changebuttoncontent("#note", noteUpdate())
 	client.changebuttoncontent("#Verb", verbUpdate())
-	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list(".praiselord", "Cross"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
+	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
 	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("MoveUp", "Move Upwards"), list("MoveDown", "Move Down"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
@@ -352,7 +352,7 @@
 	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=411x330;")
 
 /mob/proc/defaultButton()
-	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ToggleFullscreen", "Toggle Fullscreen"))) + "</span>")
+	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("togglefullscreen", "Toggle Fullscreen"), list("playlobbymusic", "Play Lobby Music"))) + "</span>")
 
 /client/proc/setDefaultButtons()
 	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("Poo", "Poo")))]</span>"})

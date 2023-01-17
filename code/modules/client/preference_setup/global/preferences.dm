@@ -98,6 +98,12 @@ var/list/_client_preferences_by_type
 	else
 		sound_to(preference_mob, sound(null, repeat = 0, wait = 0, volume = 85, channel = 1))
 
+/client/verb/play_lobby_music()
+	set name = "playlobbymusic"
+
+	var/datum/client_preference/play_lobby_music/PLM
+	PLM.changed()
+
 /datum/client_preference/show_item_names
 	description ="Show item labels"
 	key = "SHOW_ITEMS"
@@ -190,6 +196,12 @@ var/list/_client_preferences_by_type
 /datum/client_preference/fullscreen_mode/changed(mob/preference_mob, new_value)
 	if(preference_mob.client)
 		preference_mob.client.toggle_fullscreen(new_value == GLOB.PREF_NO)
+
+/client/verb/verb_toggle_fullscreen()
+	set name = "togglefullscreen"
+
+	var/datum/client_preference/fullscreen_mode/FM
+	FM.changed()
 
 /datum/client_preference/automousemove
 	description = "Auto Mouse Move"

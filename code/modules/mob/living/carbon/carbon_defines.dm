@@ -1,7 +1,6 @@
 /mob/living/carbon/
 	gender = MALE
 	var/datum/species/species //Contains icon generation and language information, set during New().
-	var/list/stomach_contents = list()
 	var/list/datum/disease2/disease/virus2 = list()
 	var/list/antibodies = list()
 	var/datum/happiness_event/list/events = list()
@@ -16,7 +15,6 @@
 	var/list/chem_effects = list()
 	var/list/chem_doses = list()
 	var/datum/reagents/metabolism/bloodstr = null
-	var/datum/reagents/metabolism/ingested = null
 	var/datum/reagents/metabolism/touching = null
 	var/losebreath = 0 //if we failed to breathe last tick
 

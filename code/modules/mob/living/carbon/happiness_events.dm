@@ -7,7 +7,7 @@
 
 //thirst
 /datum/happiness_event/thirst/filled
-	description = "<span class='binfo'>I've had enough to drink for a while!</span>\n"
+	description = "<span class='info'>I've had enough to drink for a while!</span>\n"
 	happiness = 4
 
 /datum/happiness_event/thirst/watered
@@ -15,15 +15,15 @@
 	happiness = 2
 
 /datum/happiness_event/thirst/thirsting
-	description = "<span class='warning'>I'm starting to get thirsty.</span>\n"
+	description = "<span class='danger'>I'm starting to get thirsty.</span>\n"
 	happiness = -3
 
 /datum/happiness_event/thirst/thirsty
-	description = "<span class='warning'>I'm getting a bit thirsty.</span>\n"
+	description = "<span class='danger'>I'm getting a bit thirsty.</span>\n"
 	happiness = -7
 
 /datum/happiness_event/thirst/verythirsty
-	description = "<span class='warning'>I'm getting thirsty!</span>\n"
+	description = "<span class='danger'>I'm getting thirsty!</span>\n"
 	happiness = -10
 
 /datum/happiness_event/thirst/dehydrated
@@ -32,11 +32,11 @@
 
 //nutrition
 /datum/happiness_event/nutrition/fat
-	description = "<span class='warning'><B>I'm so fat..</B></span>\n" //muh fatshaming
+	description = "<span class='danger'><B>I'm so fat..</B></span>\n" //muh fatshaming
 	happiness = -4
 
 /datum/happiness_event/nutrition/wellfed
-	description = "<span class='binfo'>My belly feels round and full.</span>\n"
+	description = "<span class='info'>My belly feels round and full.</span>\n"
 	happiness = 4
 
 /datum/happiness_event/nutrition/fed
@@ -44,15 +44,15 @@
 	happiness = 2
 
 /datum/happiness_event/nutrition/lilhungry
-	description = "<span class='warning'>I'm getting a bit hungry.</span>\n"
+	description = "<span class='danger'>I'm getting a bit hungry.</span>\n"
 	happiness = -2
 
 /datum/happiness_event/nutrition/hungry
-	description = "<span class='warning'>I'm getting hungry...</span>\n"
+	description = "<span class='danger'>I'm getting hungry...</span>\n"
 	happiness = -5
 
 /datum/happiness_event/nutrition/veryhungry
-	description = "<span class='warning'>I'm getting really hungry!</span>\n"
+	description = "<span class='danger'>I'm getting really hungry!</span>\n"
 	happiness = -8
 
 /datum/happiness_event/nutrition/starving
@@ -66,11 +66,11 @@
 	happiness = 2
 
 /datum/happiness_event/hygiene/smelly
-	description = "<span class='warning'>I smell like shit.\n"
+	description = "<span class='danger'>I smell like shit.\n"
 	happiness = -5
 
 /datum/happiness_event/hygiene/vomitted
-	description = "<span class='warning'>Ugh, I've vomitted.\n"
+	description = "<span class='danger'>Ugh, I've vomitted.\n"
 	happiness = -5
 	timeout = 1800
 
@@ -81,12 +81,12 @@
 
 //Disgust
 /datum/happiness_event/disgust/gross
-	description = "<span class='warning'>That was gross.</span>\n"
+	description = "<span class='danger'>That was gross.</span>\n"
 	happiness = -2
 	timeout = 1800
 
 /datum/happiness_event/disgust/verygross
-	description = "<span class='warning'>I think I'm going to puke...</span>\n"
+	description = "<span class='danger'>I think I'm going to puke...</span>\n"
 	happiness = -4
 	timeout = 1800
 
@@ -107,7 +107,7 @@
 	timeout = 1800
 
 /datum/happiness_event/handcuffed
-	description = "<span class='warning'>I guess my antics finally caught up with me..</span>\n"
+	description = "<span class='danger'>I guess my antics finally caught up with me..</span>\n"
 	happiness = -1
 
 /datum/happiness_event/hot_food //Hot food feels good!
@@ -139,19 +139,19 @@
 
 //And when you've seen someone branded
 /datum/happiness_event/punished_heretic
-	description = "<span class='binfo'>I've seen a punished heretic.</span>\n"
+	description = "<span class='info'>I've seen a punished heretic.</span>\n"
 	happiness = 10
 	timeout = 1800
 
 //When you fulfill an AI request
 /datum/happiness_event/request_fulfilled
-	description = "<span class='binfo'>My god is pleased with me!</span>\n"
+	description = "<span class='info'>My god is pleased with me!</span>\n"
 	happiness = 10
 	timeout = 1800
 
 //When you fulfill an AI request
 /datum/happiness_event/request_failed
-	description = "<span class='binfo'>My god is disappointed with me!</span>\n"
+	description = "<span class='danger'>My god is disappointed with me!</span>\n"
 	happiness = -20
 	timeout = 1800
 
@@ -197,7 +197,7 @@
 	timeout = 1800
 
 /datum/happiness_event/cryo
-	description = "<span class='info'>Being in a metal coffin for so long doesn't feel good.</span>\n"
+	description = "<span class='danger'>Being in a metal coffin for so long doesn't feel good.</span>\n"
 	happiness = -6
 	timeout = 1800
 
@@ -220,12 +220,12 @@
 	timeout = FALSE
 
 /datum/happiness_event/addiction/withdrawal_medium
-	description = "<span class='danger'>I don't indulge in my addiction, that makes me unhappy!.</span>\n"
+	description = "<span class='danger'>I don't indulge in my addiction, that makes me unhappy!</span>\n"
 	happiness = -5
 	timeout = FALSE
 
 /datum/happiness_event/addiction/withdrawal_large
-	description = "<span class='danger'>I don't indulge in my addiction, that makes me very unhappy!.</span>\n"
+	description = "<span class='danger'>I don't indulge in my addiction, that makes me very unhappy!</span>\n"
 	happiness = -10
 	timeout = FALSE
 

@@ -46,11 +46,12 @@ var/list/ventcrawl_machinery = list(
 		return !get_inventory_slot(carried_item)
 
 /mob/living/carbon/is_allowed_vent_crawl_item(var/obj/item/carried_item)
-	if((carried_item in internal_organs) || (carried_item in stomach_contents))
-		return 1
-	return ..()
+	return (carried_item in internal_organs) || ..()
 
 /mob/living/carbon/human/is_allowed_vent_crawl_item(var/obj/item/carried_item)
+	var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
+	if(stomach && (carried_item in stomach.contents))
+		return TRUE
 	if(carried_item in organs)
 		return 1
 	if(carried_item in list(w_uniform, gloves, glasses, wear_mask, l_ear, r_ear, belt, l_store, r_store))

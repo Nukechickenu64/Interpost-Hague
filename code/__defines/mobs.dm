@@ -210,6 +210,7 @@
 #define BP_VCHORDS  "vocal chords"
 #define BP_TONGUE	"tongue"
 #define BP_GUTS     "guts"
+#define BP_STOMACH  "stomach"
 
 // Robo Organs.
 #define BP_POSIBRAIN	"posibrain"
@@ -321,6 +322,7 @@
 #define NUTRITION_LEVEL_FED 250
 #define NUTRITION_LEVEL_HUNGRY 150
 #define NUTRITION_LEVEL_STARVING 100
+#define HUNGER_FACTOR 0.3
 
 //Thirst levels for humans
 #define THIRST_LEVEL_MAX 500

@@ -85,7 +85,9 @@
 		admin_attack_log(src, victim, "Devoured.", "Was devoured by.", "devoured")
 	else
 		src.drop_from_inventory(victim)
-	victim.forceMove(src)
-	src.stomach_contents.Add(victim)
+	move_to_stomach(victim)
 
 	return TRUE
+
+/mob/living/carbon/proc/move_to_stomach(atom/movable/victim)
+	victim.forceMove(src)

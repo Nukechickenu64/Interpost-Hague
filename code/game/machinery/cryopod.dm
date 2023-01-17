@@ -560,6 +560,20 @@
 	icon_state = base_icon_state
 	add_fingerprint(usr)
 
+	SetName("[name]")
+	return
+
+/obj/machinery/cryopod/proc/manual_eject()
+	//Eject any items that aren't meant to be in the pod.
+	var/list/items = src.contents
+	if(occupant) items -= occupant
+	if(announce) items -= announce
+
+	for(var/obj/item/W in items)
+		W.forceMove(get_turf(src))
+	src.go_out()
+	icon_state = base_icon_state
+	add_fingerprint(usr)
 
 	SetName("[name]")
 	return
@@ -615,6 +629,25 @@
 		set_occupant(null)
 
 		icon_state = base_icon_state
+
+	return
+
+/obj/machinery/cryopod/proc/go_out_forced()
+
+	if(!occupant)
+		playsound(src, 'sound/machines/button11.ogg', 40)
+		return
+
+	sleep(10)
+	if(occupant.client)
+		occupant.client.eye = src.occupant.client.mob
+		occupant.client.perspective = MOB_PERSPECTIVE
+
+	occupant.forceMove(get_turf(src))
+	playsound(src, 'sound/machines/cryoexit.ogg', 40)
+	set_occupant(null)
+
+	icon_state = base_icon_state
 
 	return
 

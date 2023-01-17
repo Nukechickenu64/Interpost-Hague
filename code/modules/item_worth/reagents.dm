@@ -45,6 +45,9 @@
 /datum/reagent/mercury
 	value = 0.02
 
+/datum/reagent/acid/stomach
+	value = 0
+
 /datum/reagent/phosphorus
 	value = 0.4
 

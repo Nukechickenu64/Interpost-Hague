@@ -68,14 +68,17 @@
 	if(GAME_STATE <= RUNLEVEL_LOBBY)
 		if(!player.ready)
 			player.ready = 1
+			usr.updatePig()
 			to_chat(player, "<span class='info'>You are now ready.</span>")
 			icon_state = "ready"
 		else
 			player.ready = 0
+			usr.updatePig()
 			to_chat(player, "<span class='info'>You are no longer ready. Coward.</span>")
 			icon_state = "unready"
 	else
 		icon_state = "joingame"
+		usr.updatePig()
 		player.join_game()
 
 /obj/screen/new_player/selection/manifest/Click()

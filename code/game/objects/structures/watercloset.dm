@@ -287,22 +287,6 @@
 			for(var/obj/effect/E in tile)
 				if(istype(E,/obj/effect/decal/cleanable) || istype(E,/obj/effect/overlay))
 					qdel(E)
-
-		if(isliving(O))
-			var/mob/living/L = O
-			L.ExtinguishMob()
-			L.fire_stacks = -20 //Douse ourselves with water to avoid fire more easily
-
-		var/mob/living/carbon/M = O
-
-		if(ishuman(M))
-			var/mob/living/carbon/human/H = M
-			if(check_clothes(H))
-				if(H.hygiene <= 75)
-					to_chat(H, "<span class='warning'>You have to remove your clothes to get clean!</span>")
-			else
-				H.set_hygiene(HYGIENE_LEVEL_CLEAN)
-				H.add_event("shower", /datum/happiness_event/hygiene/shower)
 	reagents.splash(washing, 10)
 
 /obj/structure/hygiene/shower/Process()
@@ -327,22 +311,6 @@
 	T.clean(src)
 	spawn(100)
 		is_washing = 0
-
-/obj/structure/hygiene/shower/proc/check_clothes(mob/living/carbon/human/H)
-	if(H.wear_suit)
-		// Do not check underclothing if the over-suit is suitable.
-		// This stops people feeling dumb if they're showering
-		// with a radiation suit on.
-		return FALSE
-	. = FALSE
-	if(H.wear_suit)
-		. = TRUE
-	else if(H.w_uniform)
-		. = TRUE
-	else if(H.wear_mask)
-		. = TRUE
-	else if(H.head)
-		. = TRUE
 
 /obj/structure/hygiene/shower/proc/process_heat(mob/living/M)
 	if(!on || !istype(M)) return

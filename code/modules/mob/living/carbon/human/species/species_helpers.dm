@@ -7,3 +7,6 @@ var/list/stored_shock_by_ref = list()
 
 /datum/species/proc/water_act(var/mob/living/carbon/human/H, var/depth)
 	return
+
+/datum/species/proc/get_digestion_product()
+	return /datum/reagent/nutriment

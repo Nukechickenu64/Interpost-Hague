@@ -116,7 +116,7 @@
 
 
 //#####LIFE PROCS#####
-
+/*
 //poo and pee counters. This is called in human/handle_stomach.
 /mob/living/carbon/human/proc/handle_excrement()
 	if(bowels <= 0)
@@ -261,4 +261,4 @@
 	GLOB.piss_left++
 	src.bladder -= 50
 	visible_message("[message]")
-
+*/

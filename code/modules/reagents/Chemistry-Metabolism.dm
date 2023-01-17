@@ -11,13 +11,15 @@
 
 /datum/reagents/metabolism/proc/metabolize()
 
-	var/metabolism_type = 0 //non-human mobs
-	if(ishuman(parent))
-		var/mob/living/carbon/human/H = parent
-		metabolism_type = H.species.reagent_tag
+	if(parent)
+		var/metabolism_type = 0 //non-human mobs
+		if(ishuman(parent))
+			var/mob/living/carbon/human/H = parent
+			metabolism_type = H.species.reagent_tag
 
-	for(var/datum/reagent/current in reagent_list)
-		current.on_mob_life(parent, metabolism_type, metabolism_class)
+		for(var/datum/reagent/current in reagent_list)
+			current.on_mob_life(parent, metabolism_type, metabolism_class)
+		update_total()
 
 	if(istype(parent, /mob/living/carbon/human))
 		for(var/A in parent.reagents.addiction_list)

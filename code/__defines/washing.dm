@@ -87,3 +87,25 @@
 		if(H.belt.clean_blood())
 			H.update_inv_belt(0)
 	H.clean_blood(washshoes)
+	if(check_clothes(H))
+		if(H.hygiene <= 75)
+			to_chat(H, "<span class='warning'>You have to remove your clothes to get clean!</span>")
+	else
+		H.set_hygiene(HYGIENE_LEVEL_CLEAN)
+		H.add_event("shower", /datum/happiness_event/hygiene/shower)
+
+/proc/check_clothes(mob/living/carbon/human/H)
+	if(H.wear_suit)
+		// Do not check underclothing if the over-suit is suitable.
+		// This stops people feeling dumb if they're showering
+		// with a radiation suit on.
+		return FALSE
+	. = FALSE
+	if(H.wear_suit)
+		. = TRUE
+	else if(H.w_uniform)
+		. = TRUE
+	else if(H.wear_mask)
+		. = TRUE
+	else if(H.head)
+		. = TRUE

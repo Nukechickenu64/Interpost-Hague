@@ -74,15 +74,6 @@
 		using.alpha = ui_alpha
 		src.adding += using
 
-	if(ishuman(mymob))
-		var/mob/living/carbon/human/H = mymob
-		H.hovertext = new /obj/screen/text/atm
-		H.hovertext.maptext = ""
-		H.hovertext.maptext_height = 100
-		H.hovertext.maptext_width = 480
-		H.hovertext.screen_loc = "CENTER-7, CENTER+7"
-		hud_elements |= H.hovertext
-
 	// Draw the attack intent dialogue.
 	if(hud_data.has_a_intent)
 
@@ -288,7 +279,7 @@
 		hud_elements |= target.cells
 
 	else if(hud_data.has_nutrition)
-		mymob.nutrition_icon = new /obj/screen()
+		mymob.nutrition_icon = new /obj/screen/food()
 		mymob.nutrition_icon.icon = ui_style
 		mymob.nutrition_icon.icon_state = "nutrition1"
 		mymob.nutrition_icon.name = "nutrition"

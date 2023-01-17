@@ -169,3 +169,6 @@
 
 /obj/is_fluid_pushable(var/amt)
 	return ..() && w_class <= round(amt/20)
+
+/obj/proc/can_embed()
+	return is_sharp(src)
