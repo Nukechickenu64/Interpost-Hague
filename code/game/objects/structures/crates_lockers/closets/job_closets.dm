@@ -16,11 +16,7 @@
 
 /obj/structure/closet/chefcloset/WillContain()
 	return list(
-		/obj/item/clothing/under/sundress,
-		/obj/item/clothing/under/waiter = 2,
-		/obj/item/device/radio/headset/headset_service = 2,
 		/obj/item/weapon/storage/box/mousetraps = 2,
-		/obj/item/clothing/under/rank/chef,
 		/obj/item/clothing/head/chefhat
 	)
 
@@ -35,9 +31,6 @@
 
 /obj/structure/closet/jcloset/WillContain()
 	return list(
-		/obj/item/clothing/under/rank/janitor,
-		/obj/item/device/radio/headset/headset_service,
-		/obj/item/weapon/cartridge/janitor,
 		/obj/item/clothing/gloves/thick,
 		/obj/item/clothing/head/beret/purple,
 		/obj/item/device/flashlight,

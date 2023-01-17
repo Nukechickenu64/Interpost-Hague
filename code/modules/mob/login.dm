@@ -88,6 +88,8 @@
 	if(eyeobj)
 		eyeobj.possess(src)
 
+	updatePig()
+
 	refresh_client_images()
 	reload_fullscreen() // Reload any fullscreen overlays this mob has.
 	add_click_catcher()

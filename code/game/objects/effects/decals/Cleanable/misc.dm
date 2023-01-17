@@ -101,6 +101,13 @@
 	generic_filth = TRUE
 	var/list/viruses = list()
 
+/obj/effect/decal/cleanable/vomit/Crossed(AM as mob|obj)
+	if (istype(AM, /mob/living))
+		var/mob/living/M = AM
+
+		if(prob(5))
+			M.slip("the vomit",4)
+
 /obj/effect/decal/cleanable/tomato_smudge
 	name = "tomato smudge"
 	desc = "It's red."

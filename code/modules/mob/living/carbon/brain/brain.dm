@@ -11,6 +11,7 @@
 
 /mob/living/carbon/brain/New()
 	create_reagents(1000)
+	updatePig()
 	..()
 
 /mob/living/carbon/brain/Destroy()

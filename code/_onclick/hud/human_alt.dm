@@ -299,7 +299,7 @@
 		mymob.hydration_icon.icon = ui_style
 		mymob.hydration_icon.icon_state = "hydration1"
 		mymob.hydration_icon.SetName("hydration")
-		mymob.hydration_icon.screen_loc = ui_nutrition
+		mymob.hydration_icon.screen_loc = ui_hydration
 		hud_elements |= mymob.hydration_icon
 
 	mymob.stamina_icon = new /obj/screen()//STAMINA

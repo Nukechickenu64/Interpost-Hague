@@ -7,3 +7,6 @@
 		ghost_image.filters = filter(type = "blur", size = 3)
 	updateghostimages()
 	add_client_color(/datum/client_color/noir)
+	heartporcao()
+	updatePig()
+	startPig()

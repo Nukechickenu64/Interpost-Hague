@@ -30,6 +30,13 @@
 //The Y pixel offset of this matrix
 /matrix/proc/get_y_shift()
 	. = f
+
+//As Rotation is defined as a scale+skew, these procs will break any existing rotation
+//Unless the result is multiplied against the current matrix
+/matrix/proc/set_skew(x = 0, y = 0)
+	b = x
+	d = y
+
 // Color matrices:
 
 //Luma coefficients suggested for HDTVs. If you change these, make sure they add up to 1.

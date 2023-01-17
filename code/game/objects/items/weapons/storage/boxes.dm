@@ -27,6 +27,7 @@
 	storage_slots_w = 6
 	storage_slots_h = 4
 	var/foldable = /obj/item/stack/material/cardboard	// BubbleWrap - if set, can be folded (when empty) into a sheet of cardboard
+	close_sound = 'sound/effects/rustle4.ogg'
 
 /obj/item/weapon/storage/box/large
 	name = "large box"

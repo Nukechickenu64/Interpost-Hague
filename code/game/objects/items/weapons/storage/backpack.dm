@@ -20,6 +20,7 @@
 	w_class = ITEM_SIZE_HUGE
 	slot_flags = SLOT_BACK
 	open_sound = 'sound/effects/unzip.ogg'
+	close_sound = 'sound/items/zip.ogg'
 	storage_slots_w = 10
 	storage_slots_h = 6
 

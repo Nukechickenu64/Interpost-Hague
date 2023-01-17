@@ -375,6 +375,12 @@
 	catalysts = list(/datum/reagent/toxin/phoron = 5)
 	result_amount = 1
 
+/datum/chemical_reaction/skewium
+	name = "Skewium"
+	result = /datum/reagent/toxin/skewium
+	required_reagents = list(/datum/reagent/water = 2, /datum/reagent/toxin = 1)
+	result_amount = 1
+
 /datum/chemical_reaction/coolant
 	name = "Coolant"
 	result = /datum/reagent/coolant

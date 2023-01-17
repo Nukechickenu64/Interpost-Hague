@@ -279,7 +279,7 @@
 				ismist = 0
 
 //Yes, showers are super powerful as far as washing goes.
-/obj/structure/hygiene/shower/proc/wash(var/atom/movable/washing)
+/obj/structure/hygiene/shower/proc/wash(var/atom/movable/washing, atom/movable/O as obj|mob)
 	if(on)
 		wash_mob(washing)
 		if(isturf(loc))
@@ -287,7 +287,23 @@
 			for(var/obj/effect/E in tile)
 				if(istype(E,/obj/effect/decal/cleanable) || istype(E,/obj/effect/overlay))
 					qdel(E)
-		reagents.splash(washing, 10)
+
+		if(isliving(O))
+			var/mob/living/L = O
+			L.ExtinguishMob()
+			L.fire_stacks = -20 //Douse ourselves with water to avoid fire more easily
+
+		var/mob/living/carbon/M = O
+
+		if(ishuman(M))
+			var/mob/living/carbon/human/H = M
+			if(check_clothes(H))
+				if(H.hygiene <= 75)
+					to_chat(H, "<span class='warning'>You have to remove your clothes to get clean!</span>")
+			else
+				H.set_hygiene(HYGIENE_LEVEL_CLEAN)
+				H.add_event("shower", /datum/happiness_event/hygiene/shower)
+	reagents.splash(washing, 10)
 
 /obj/structure/hygiene/shower/Process()
 	if(!on) return

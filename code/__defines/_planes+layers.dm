@@ -251,6 +251,18 @@ What is the naming convention for planes or layers?
 	plane = OVER_OPENSPACE_PLANE
 	filters = filter(type = "blur", size = 1)
 
+/obj/screen/plane_master/skewium
+	plane = DEFAULT_PLANE
+
+/obj/screen/plane_master/skewium2
+	plane = LIGHTING_PLANE
+
+/obj/screen/plane_master/skewium3
+	plane = EMISSIVE_PLANE
+
+/obj/screen/plane_master/skewium4
+	plane = DEFAULT_PLANE
+
 /obj/screen/plane_master/ghost_dummy
 	// this avoids a bug which means plane masters which have nothing to control get angry and mess with the other plane masters out of spite
 	alpha = 0

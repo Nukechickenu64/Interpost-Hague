@@ -16,6 +16,8 @@
 	animation.icon = 'icons/mob/mob.dmi'
 	animation.master = src
 
+	updatePig()
+
 	flick(anim, animation)
 	if(do_gibs) gibs(loc, dna)
 
@@ -38,6 +40,8 @@
 	animation.icon_state = "blank"
 	animation.icon = 'icons/mob/mob.dmi'
 	animation.master = src
+
+	updatePig()
 
 	flick(anim, animation)
 	new remains(loc)
@@ -62,6 +66,8 @@
 	set_stat(DEAD)
 	reset_plane_and_layer()
 	update_canmove()
+
+	updatePig()
 
 	dizziness = 0
 	jitteriness = 0

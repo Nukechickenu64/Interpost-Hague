@@ -60,13 +60,41 @@ GLOBAL_VAR(spawntypes)
 /datum/spawnpoint/cryo
 	display_name = "Cryogenic Storage"
 	msg = "has completed cryogenic awakening"
-	disallow_job = list("Robot")
+	disallow_job = list("Robot", "Captain")
 
 /datum/spawnpoint/cryo/New()
 	..()
 	turfs = GLOB.latejoin_cryo
 
-/datum/spawnpoint/cryo/after_join(mob/living/carbon/human/victim)
+/datum/spawnpoint/cryo/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+	if(!istype(victim))
+		return
+	var/area/A = get_area(victim)
+	var/role_alt_title = victim.mind ? victim.mind.role_alt_title : "Unknown"
+	for(var/obj/machinery/cryopod/C in A)
+		if(control_computer)
+			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
+		if(!C.occupant)
+			C.set_occupant(victim, 1)
+			victim.Sleeping(7)
+			victim.resting = 0
+			give_advice()
+			give_effect()
+			victim.add_event("cryo", /datum/happiness_event/cryo)
+			return
+	for(var/obj/machinery/light/L in A)
+		L.flicker(10)
+
+/datum/spawnpoint/cryocaptain
+	display_name = "Cryogenic Storage"
+	msg = "has completed cryogenic awakening"
+	restrict_job = list("Captain")
+
+/datum/spawnpoint/cryocaptain/New()
+	..()
+	turfs = GLOB.latejoin_cryocaptain
+
+/datum/spawnpoint/cryocaptain/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -75,12 +103,15 @@ GLOBAL_VAR(spawntypes)
 			C.set_occupant(victim, 1)
 			victim.Sleeping(7)
 			victim.resting = 0
+			give_advice()
+			give_effect()
 			victim.add_event("cryo", /datum/happiness_event/cryo)
+			sleep(10)
+			C.eject()
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
-	give_advice()
-	give_effect()
+
 
 /datum/spawnpoint/cyborg
 	display_name = "Cyborg Storage"

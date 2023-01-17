@@ -72,6 +72,22 @@ SUBSYSTEM_DEF(ticker)
 			to_world("<B>Unable to choose playable game mode.</B> Restarting world.")
 			world.Reboot("Failure to select gamemode. Tried [english_list(bad_modes)].")
 			return
+
+/*
+	if (src.mode.isStartRequirementsSatisfied())
+		var/captain = "badmood"
+		var/eofficer = "badmood"
+		var/major = "badmood"
+		for(var/mob/new_player/player in GLOB.player_list)
+			if(!player.client.prefs.job_high == "Captain" && !player.ready)
+				captain = "hit"
+			else if(!player.client.prefs.job_high == "Executive Officer" && !player.ready)
+				eofficer = "hit"
+			else if(!player.client.prefs.job_high == "Major" && !player.ready)
+				major = "hit"
+				to_chat(world,"<b><span class='hitbold'>This won't do.</span></b><span class='hit'> We need an </span><span class='[eofficer]'><b>Executive Officer,</b></span>,<span class='hit'> a witty </span><span class='[captain]'><b>Captain</b></span><span class='hit'> and a brave </span><span class='[major]'><b>Major</b></span><span class='hit'>.</span>")
+		return
+*/
 	// This means we succeeded in picking a game mode.
 	GLOB.using_map.setup_economy()
 	Master.SetRunLevel(RUNLEVEL_GAME)

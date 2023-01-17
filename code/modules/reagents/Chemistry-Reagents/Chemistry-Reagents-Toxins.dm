@@ -244,6 +244,31 @@
 	power = 2
 	meltdose = 10
 
+/datum/reagent/toxin/skewium
+	name = "Skewium"
+	description = "A strange, dull coloured liquid that appears to warp back and forth inside its container. Causes any consumer to experience a visual phenomena similar to said warping."
+	taste_description = "skewing"
+	reagent_state = LIQUID
+	color = "#ADBDCD"
+	strength = 0.25
+
+/datum/reagent/toxin/skewium/affect_blood(mob/living/carbon/M)
+	if(M.hud_used)
+		var/list/screens = list(/obj/screen/plane_master/skewium, /obj/screen/plane_master/skewium2, /obj/screen/plane_master/skewium3)
+		var/matrix/skew = matrix()
+		var/intensity = 8
+		skew.set_skew(rand(-intensity,intensity), rand(-intensity,intensity))
+		var/matrix/newmatrix = skew
+
+		if(prob(33)) // 1/3rd of the time, let's make it stack with the previous matrix! Mwhahahaha!
+			var/obj/screen/plane_master/skewium4 = new
+			newmatrix = skew * skewium4.transform
+
+		for(var/whole_screen in screens)
+			animate(whole_screen, transform = newmatrix, time = 5, easing = QUAD_EASING, loop = -1)
+			animate(transform = -newmatrix, time = 5, easing = QUAD_EASING)
+	return ..()
+
 /datum/reagent/lexorin
 	name = "Lexorin"
 	description = "Lexorin temporarily stops respiration. Causes tissue damage."

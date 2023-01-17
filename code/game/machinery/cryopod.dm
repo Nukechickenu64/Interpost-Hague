@@ -27,6 +27,12 @@
 	var/storage_type = "crewmembers"
 	var/storage_name = "Cryogenic Oversight Control"
 	var/allow_items = 1
+	var/obj/machinery/cryopod/cryopod = null
+	var/list/cryopods = list() //Linked cloning pods.
+
+/obj/machinery/computer/cryopod/Initialize()
+	..()
+	update_module()
 
 /obj/machinery/computer/cryopod/robot
 	name = "robotic storage console"
@@ -38,6 +44,70 @@
 	storage_type = "cyborgs"
 	storage_name = "Robotic Storage Control"
 	allow_items = 0
+
+/obj/machinery/computer/cryopod/proc/update_module()
+	src.cryopod = findcryo()
+	releasecryo()
+	findcryo()
+
+/obj/machinery/computer/cryopod/proc/findcryo()
+	var/obj/machinery/cryopod/cryopodf = null
+
+	//Try to find scanner on adjacent tiles first
+	for(dir in list(NORTH,EAST,SOUTH,WEST))
+		cryopodf = locate(/obj/machinery/cryopod, get_step(src, dir))
+		if (cryopodf)
+			return cryopodf
+
+	//Then look for a free one in the area
+	if(!cryopodf)
+		var/area/A = get_area(src)
+		for(var/obj/machinery/cryopod/C in A.get_contents())
+			return C
+
+	return
+
+/obj/machinery/computer/cryopod/proc/releasecryo()
+	for(var/obj/machinery/cryopod/C in cryopods)
+		C.connected = null
+		C.name = initial(C.name)
+	cryopods.Cut()
+
+/obj/machinery/computer/cryopod/proc/connect_cryopod(var/obj/machinery/cryopod/C)
+	if(C in cryopods)
+		return 0
+
+	if(C.connected)
+		C.connected.release_cryopod(C)
+	C.connected = src
+	cryopods += C
+	rename_cryopods()
+
+	return 1
+
+/obj/machinery/computer/cryopod/proc/release_cryopod(var/obj/machinery/cryopod/C)
+	if(!(C in cryopods))
+		return
+
+	C.connected = null
+	C.name = initial(C.name)
+	cryopods -= C
+	rename_cryopods()
+	return 1
+
+/obj/machinery/computer/cryopod/proc/rename_cryopods()
+	for(var/i = 1 to cryopods.len)
+		var/atom/C = cryopods[i]
+		C.name = "[initial(C.name)] #[i]"
+
+/obj/machinery/computer/cryopod/proc/findcryopod()
+	var/num = 1
+	var/area/A = get_area(src)
+	for(var/obj/machinery/cryopod/C in A.get_contents())
+		if(!C.connected)
+			cryopods += C
+			C.connected = src
+			C.name = "[initial(C.name)] #[num++]"
 
 /obj/machinery/computer/cryopod/attack_ai()
 	src.attack_hand()
@@ -54,6 +124,7 @@
 	dat += "<hr/><br/><b>[storage_name]</b><br/>"
 	dat += "<i>Welcome, [user.real_name].</i><br/><br/><hr/>"
 	dat += "<a href='?src=\ref[src];log=1'>View storage log</a>.<br>"
+	dat += "<a href='?src=\ref[src];exit=1'>Eject the occupants</a>.<br>"
 	if(allow_items)
 		dat += "<a href='?src=\ref[src];view=1'>View objects</a>.<br>"
 		dat += "<a href='?src=\ref[src];item=1'>Recover object</a>.<br>"
@@ -79,8 +150,18 @@
 			dat += "[I.name]<br/>"
 		dat += "<hr/>"
 
-		show_browser(user, dat, "window=cryoitems")
-		. = TOPIC_HANDLED
+	else if(href_list["exit"])
+
+		var/area/A = get_area(cryopod)
+
+		for(cryopod in A)
+			if(!cryopod.occupant)
+				to_chat(user, "<span class='notice'>There is nothing to exit the storage.</span>")
+				return
+			else
+				cryopod.eject()
+
+		. = TOPIC_REFRESH
 
 	else if(href_list["item"])
 		if(!allow_items) return
@@ -131,7 +212,6 @@
 
 //Decorative structures to go alongside cryopods.
 /obj/structure/cryofeed
-
 	name = "cryogenic feed"
 	desc = "A bewildering tangle of machinery and pipes."
 	icon = 'icons/obj/Cryogenic2.dmi'
@@ -164,6 +244,7 @@
 	var/obj/item/device/radio/intercom/announce //
 
 	var/obj/machinery/computer/cryopod/control_computer
+	var/obj/machinery/computer/cryopod/connected = null //So we remember the connected cryopod.
 	var/last_no_computer_message = 0
 	var/applies_stasis = 1
 
@@ -463,6 +544,7 @@
 /obj/machinery/cryopod/verb/eject()
 	set name = "Eject Pod"
 	set category = "Object"
+	set hidden = 1
 	set src in oview(1)
 	if(usr.stat != 0)
 		return
