@@ -263,9 +263,13 @@ proc/generate_random_prayer()//This generates a new one.
 
 /mob/living/proc/getBrothers()
 	set name = "getBrothers"
-	if(src.religion != LEGAL_RELIGION)
-		var/brothers_message = "Your brothers and sisters in faith:<br>"
-		for(var/mob/living/carbon/human/H in SSmobs.mob_list)
-			if(H.religion != LEGAL_RELIGION)
-				brothers_message += "<b> [H.real_name]</b><br>"
-		to_chat(src, brothers_message)
+	for(var/old_god in GLOB.all_religions)
+		if(old_god != LEGAL_RELIGION)
+			if(GLOB.all_religions[old_god].followers.len > 0)
+				var/brothers_message = "<span class='info'>Your brothers are:<br></span>"
+				for(var/H in GLOB.all_religions[old_god].followers)
+					brothers_message += "<span class='danger'><b>[H], who loves [religion].</b></span>\n"
+				to_chat(src, brothers_message)
+			else if(GLOB.all_religions[old_god].followers.len <= 1)
+				var/brothers_message = "<span class='info'>I'll have to do this alone.<br></span>"
+				to_chat(src, brothers_message)

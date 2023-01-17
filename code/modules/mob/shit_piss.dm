@@ -50,18 +50,6 @@
 	icon_state = "drip1"
 	random_icon_states = list("drip1", "drip2", "drip3", "drip4", "drip5")
 
-//This proc is really deprecated.
-/*/obj/effect/decal/cleanable/poo/proc/streak(var/list/directions)
-	spawn (0)
-		var/direction = pick(directions)
-		for (var/i = 0, i < pick(1, 200; 2, 150; 3, 50; 4), i++)
-			sleep(3)
-			if (i > 0)
-				new /obj/effect/decal/cleanable/poo(src.loc)
-			if (step_to(src, get_step(src, direction), 0))
-				break
-*/
-
 /obj/effect/decal/cleanable/poo/Crossed(AM as mob|obj, var/forceslip = 0)
 	if (istype(AM, /mob/living/carbon) && src.dried == 0)
 		var/mob/living/carbon/M = AM
@@ -198,7 +186,7 @@
 		//Poo in the loo.
 		var/obj/structure/hygiene/toilet/T = locate() in src.loc
 		var/mob/living/M = locate() in src.loc
-		if(T && T.open)
+		if(T && T.open && M.buckled)
 			message = "<B>[src]</B> defecates into \the [T]."
 
 		else if(w_uniform)

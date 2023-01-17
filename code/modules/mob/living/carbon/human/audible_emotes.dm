@@ -101,12 +101,11 @@
 			if(H.isMonkey())
 				return
 
-			message = "freaks the hell out!"
+			message = "loses his mind!"
 		else
 			message = "makes a loud noise!"
 
 		screamsound = "sound/voice/gagscream[rand(1,3)].wav"
-
 
 	if(screamsound)
 		playsound(src, screamsound, 50, 0, 1)

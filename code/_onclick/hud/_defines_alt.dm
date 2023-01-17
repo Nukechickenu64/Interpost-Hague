@@ -106,6 +106,7 @@
 #define ui_health "EAST+1, NORTH-13"
 #define ui_happiness "EAST+1, NORTH-14"
 #define ui_nutrition "EAST+1, NORTH-9"
+#define ui_hydration "EAST+1, NORTH-9"
 #define ui_internal "EAST+1, NORTH-3"
 									//borgs
 #define ui_borg_health "EAST-1:28,CENTER-1:13" //borgs have the health display where humans have the pressure damage indicator.

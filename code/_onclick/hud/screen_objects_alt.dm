@@ -42,6 +42,7 @@
 	if(master)
 		if(istype(master, /obj/item/weapon/storage))
 			var/obj/item/weapon/storage/S = master
+			playsound(loc, S.close_sound, 75, 1)
 			S.close(usr)
 	return 1
 

@@ -723,9 +723,9 @@ var/global/datum/controller/occupations/job_master
 
 	proc/SetCombatMusic(var/mob/living/carbon/human/H, var/rank)
 		switch(rank)
-			if("Count" || "Viscount")
+			if("Captain" || "Executive Officer")
 				H.combat_music = GLOB.command_combat_music
-			if("Head of Security" || "Security Officer")
+			if("Major" || "Enforcer")
 				H.combat_music = GLOB.security_combat_music
 			if("Supreme Arbiter" || "Arbiter")
 				H.combat_music = GLOB.religion_combat_music
@@ -745,7 +745,6 @@ var/global/datum/controller/occupations/job_master
 	if(!C)
 		CRASH("Null client passed to get_spawnpoint_for() proc!")
 
-	var/mob/H = C.mob
 	var/spawnpoint = C.prefs.spawnpoint
 	var/datum/spawnpoint/spawnpos
 
@@ -754,15 +753,15 @@ var/global/datum/controller/occupations/job_master
 
 	if(spawnpoint)
 		if(!(spawnpoint in GLOB.using_map.allowed_spawns))
-			if(H)
-				to_chat(H, "<span class='warning'>Your chosen spawnpoint ([C.prefs.spawnpoint]) is unavailable for the current map. Spawning you at one of the enabled spawn points instead. To resolve this error head to your character's setup and choose a different spawn point.</span>")
+			//if(H)
+				//to_chat(H, "<span class='warning'>Your chosen spawnpoint ([C.prefs.spawnpoint]) is unavailable for the current map. Spawning you at one of the enabled spawn points instead. To resolve this error head to your character's setup and choose a different spawn point.</span>")
 			spawnpos = null
 		else
 			spawnpos = spawntypes()[spawnpoint]
 
 	if(spawnpos && !spawnpos.check_job_spawning(rank))
-		if(H)
-			to_chat(H, "<span class='warning'>Your chosen spawnpoint ([spawnpos.display_name]) is unavailable for your chosen job ([rank]). Spawning you at another spawn point instead.</span>")
+		//if(H)
+			//to_chat(H, "<span class='warning'>Your chosen spawnpoint ([spawnpos.display_name]) is unavailable for your chosen job ([rank]). Spawning you at another spawn point instead.</span>")
 		spawnpos = null
 
 	if(!spawnpos)

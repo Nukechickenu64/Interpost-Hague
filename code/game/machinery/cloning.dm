@@ -140,6 +140,7 @@
 
 	H.set_cloned_appearance()
 	update_icon()
+	H.newgeneratestats(7,9,6,9,7,8,6,7)
 
 	for(var/datum/language/L in R.languages)
 		H.add_language(L.name)

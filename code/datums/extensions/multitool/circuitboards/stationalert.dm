@@ -1,8 +1,8 @@
-/datum/extension/interactive/multitool/circuitboards/stationalert/get_interact_window(var/obj/item/device/multitool/M, var/mob/user)
+/datum/extension/interactive/multitool/circuitboards/stationalert/get_interact_window(obj/item/device/multitool/M, mob/user)
 	var/obj/item/weapon/circuitboard/stationalert/SA = holder
 	. += "<b>Alarm Sources</b><br>"
 	. += "<table>"
-	for(var/datum/alarm_handler/AH in SSalarm.all_handlers)
+	for(var/datum/alarm_handler/AH as anything in SSalarm.all_handlers)
 		. += "<tr>"
 		. += "<td>[AH.category]</td>"
 		if(AH in SA.alarm_handlers)

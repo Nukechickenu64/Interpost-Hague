@@ -94,32 +94,33 @@
 	return
 
 /mob/living/OnSimulatedTurfEntered(turf/simulated/T, atom/A)
-	var/mob/living/M = A
-	var/mob/living/carbon/human/H = M
+	. = ..()
+	if (istype(A,/mob/living))
+		var/mob/living/M = A
 
-	T.update_dirt()
+		T.update_dirt()
 
-	HandleBloodTrail(T)
+		HandleBloodTrail(T)
 
-	if(lying || !T.wet)
-		return
+		if(M.lying || !T.wet)
+			return
 
-	if(H.buckled || (H.m_intent == "walk" && prob(min(100, 100/(T.wet/10))) ) )
-		return
+		if(M.buckled || (M.m_intent == "walk" && prob(min(100, 100/(T.wet/10))) ) )
+			return
 
-	var/slip_dist = 1
-	var/slip_stun = 6
-	var/floor_type = "wet"
+		var/slip_dist = 1
+		var/slip_stun = 6
+		var/floor_type = "wet"
 
-	if(2 <= T.wet) // Lube
-		floor_type = "slippery"
-		slip_dist = 4
-		slip_stun = 10
+		if(2 <= T.wet) // Lube
+			floor_type = "slippery"
+			slip_dist = 4
+			slip_stun = 10
 
-	if(slip("the [floor_type] floor", slip_stun))
-		for(var/i = 1 to slip_dist)
-			step(src, dir)
-			sleep(1)
+		if(slip("the [floor_type] floor", slip_stun))
+			for(var/i = 1 to slip_dist)
+				step(src, dir)
+				sleep(1)
 
 /mob/proc/slip_handler(dir, dist, delay)
 	if (dist > 0)
