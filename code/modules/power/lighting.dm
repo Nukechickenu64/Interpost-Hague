@@ -220,6 +220,7 @@
 		if(WEST)
 			pixel_x = -2
 
+/*
 /obj/machinery/light/Process()
 	..()
 
@@ -228,6 +229,7 @@
 		if(POWER_USE_ACTIVE)
 			if(prob(1))
 				flicker(10)
+*/
 
 /obj/machinery/light/Destroy()
 	QDEL_NULL(lightbulb)
@@ -419,7 +421,7 @@
 				if(get_status() != LIGHT_OK) break
 				on = !on
 				update_icon(0)
-				sleep(rand(1, 6))
+				sleep(rand(5, 12))
 			on = (get_status() == LIGHT_OK)
 			update_icon(0)
 		flickering = 0

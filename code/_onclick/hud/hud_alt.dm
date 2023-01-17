@@ -284,3 +284,12 @@
 		var/obj/screen/plane_master/blurs/B = new
 		B.plane = OPENTURF_MAX_PLANE + i - 7
 		client.screen += B
+
+/mob/proc/add_cryo_filter_effect()
+	var/obj/screen/plane_master/cryo/C = new
+	C.plane = FULLSCREEN_PLANE
+	client.screen += C
+
+/mob/proc/remove_cryo_filter_effect()
+	var/obj/screen/plane_master/cryo/C
+	client.screen -= C

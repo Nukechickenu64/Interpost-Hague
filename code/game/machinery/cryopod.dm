@@ -638,7 +638,6 @@
 		playsound(src, 'sound/machines/button11.ogg', 40)
 		return
 
-	sleep(10)
 	if(occupant.client)
 		occupant.client.eye = src.occupant.client.mob
 		occupant.client.perspective = MOB_PERSPECTIVE

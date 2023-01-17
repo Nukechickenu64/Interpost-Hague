@@ -251,6 +251,10 @@ What is the naming convention for planes or layers?
 	plane = OVER_OPENSPACE_PLANE
 	filters = filter(type = "blur", size = 1)
 
+/obj/screen/plane_master/cryo
+	plane = DEFAULT_PLANE
+	filters = list(filter(type = "blur", size = 1), filter(type = "ripple", size = 1), filter(type = "bloom", size = 1))
+
 /obj/screen/plane_master/skewium
 	plane = DEFAULT_PLANE
 
