@@ -15,6 +15,7 @@ stopserver
 reboot_called
 atupdate
 __pycache__
+.vscode
 
 # ignore config, but not subdirs
 !config/*/
