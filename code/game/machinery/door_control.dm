@@ -61,6 +61,30 @@
 		icon_state = "[initial(icon_state)]"
 
 /*
+	Door control with id
+*/
+
+/obj/machinery/button/remote/id 
+	name = "remote door control"
+	desc = "It controls doors, remotely. Using an id."
+	icon_state = "doorctrlid"
+	var/id = null
+
+	/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user)
+		if(stat & (NOPOWER|BROKEN))
+			return
+		// if id then id check
+
+	/obj/machinery/button/remote/id/attack_hand(mob/user as mob)
+		to_chat(user, "<span class='warning'>Beep boop! No id detected!</span>")
+		//playsound(src.loc, "sparks", 100, 1) // - DENY SOUND????
+
+	/obj/machinery/button/remote/id/update_icon()
+		if(stat & NOPOWER)
+			icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
+		else
+			icon_state = "[initial(icon_state)]"
+/*
 	Airlock remote control
 */
 
