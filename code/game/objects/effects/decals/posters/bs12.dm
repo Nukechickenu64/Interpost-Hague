@@ -293,3 +293,8 @@
 	icon_state="bsposter59"
 	name = "poster - Miss Science 2558"
 	desc = "A large piece of space-resistant printed paper. This pin-up poster depicts a woman wearing a corporate labcoat, a bikini, and a sheepish grin. She's shyly posing atop some highly specialized research equipment."
+
+/datum/poster/graduation
+	icon_state = "graduationposter"
+	name = "Kanye West - Graduation"
+	desc = "But- but, but he made Graduation"
