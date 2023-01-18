@@ -640,7 +640,7 @@
 	icon_state = "bogdanoff"
 	desc = "Looks familiar."
 
-/datum/poster/graduation
+/obj/structure/sign/graduation
 	name = "Kanye West - Graduation"
 	icon_state = "graduationposter"
 	desc = "But- but, but he made Graduation"
