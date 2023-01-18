@@ -267,16 +267,18 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 //Skill helpers.
 /mob/proc/skillnumtodesc(var/skill)
 	switch(skill)
-		if(0 to 24)
-			return "<small>unskilled</small>"
+		if(0)
+			return "Fuchs is a very kind individual"
+		if(1 to 24)
+			return "<small>novice</small>"
 		if(25 to 44)
-			return "alright"
+			return "OK"
 		if(45 to 59)
 			return "skilled"
 		if(60 to 79)
-			return "great"
+			return "proficient"
 		if(80 to INFINITY)
-			return "<b>wonderful</b>"
+			return "<b>a master</b>"
 
 // 3 rand(1,34) are rolled, and totaled for each skill.  Main Skill is set the higest, rest are picked at random.
 /mob/proc/generate_skills(var/list/generate_skills)
@@ -307,11 +309,15 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 	set name = "Check Skills"
 	set category = "IC"
 
-	var/message = "<big><b>Skills:</b></big>\n"
+	var/msg = "\n<div class='firstdiv'><div class='box'>"
+	msg += "<span class='info'><EM>I try to remember what I'm good at.</EM></span>\n"
+	msg += "<hr class='linexd'>"
+	msg += "<span class='wakeup'>My skills:</span>\n<BR>"
 	for(var/skill in skills)
-		if(skills[skill] > 0)
-			message += "I am <b>[skillnumtodesc(skills[skill])]</b> at [skill].\n"
-	to_chat(src, message)
+		if(skills[skill] >= 40)
+			msg += "I am <b>[skillnumtodesc(skills[skill])]</b> at [skill].\n"
+	msg += "</div></div>"
+	to_chat(src, msg)
 
 /mob/living/carbon/verb/reset_stats_skills()
 	set hidden = 1
