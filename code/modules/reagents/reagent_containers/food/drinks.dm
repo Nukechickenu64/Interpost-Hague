@@ -52,7 +52,9 @@
 	if(!is_open_container())
 		to_chat(user, "<span class='notice'>You need to open \the [src]!</span>")
 		return 1
-	return ..()
+
+	if(user.zone_sel.selecting == BP_MOUTH)
+		return ..()
 
 /obj/item/weapon/reagent_containers/food/drinks/standard_dispenser_refill(var/mob/user, var/obj/structure/reagent_dispensers/target)
 	if(!is_open_container())

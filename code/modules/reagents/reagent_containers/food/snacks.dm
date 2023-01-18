@@ -49,7 +49,7 @@
 		//TODO: replace with standard_feed_mob() call.
 		var/mob/living/carbon/C = M
 		var/fullness = C.get_fullness()
-		if(C == user)								//If you're eating it yourself
+		if(C == user && user.zone_sel.selecting == BP_MOUTH)								//If you're eating it yourself
 			if(istype(C,/mob/living/carbon/human))
 				var/mob/living/carbon/human/H = M
 				if(!H.check_has_mouth())
@@ -61,19 +61,23 @@
 					return
 
 			user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN) //puts a limit on how fast people can eat/drink things
+			C.add_event("food", /datum/happiness_event/disgust/nocutlery)
 			if (fullness <= 50)
-				to_chat(C, "<span class='danger'>You hungrily chew out a piece of [src] and gobble it!</span>")
+				to_chat(C, "<span class='danger'>I hungrily chew out a piece of [src] and gobble it!</span>")
 			if (fullness > 50 && fullness <= 150)
-				to_chat(C, "<span class='notice'>You hungrily begin to eat [src].</span>")
+				to_chat(C, "<span class='notice'>I hungrily begin to eat [src].</span>")
 			if (fullness > 150 && fullness <= 350)
-				to_chat(C, "<span class='notice'>You take a bite of [src].</span>")
+				to_chat(C, "<span class='notice'>I take a bite of [src].</span>")
 			if (fullness > 350 && fullness <= 550)
-				to_chat(C, "<span class='notice'>You unwillingly chew a bit of [src].</span>")
+				to_chat(C, "<span class='notice'>I unwillingly chew a bit of [src].</span>")
 			if (fullness > 550)
-				to_chat(C, "<span class='danger'>You cannot force any more of [src] to go down your throat.</span>")
+				to_chat(C, "<span class='danger'>I cannot force any more of [src] to go down your throat.</span>")
 				return 0
 		else
 			if(!M.can_force_feed(user, src))
+				return
+
+			if(user.zone_sel.selecting != BP_MOUTH)
 				return
 
 			if (fullness <= 550)

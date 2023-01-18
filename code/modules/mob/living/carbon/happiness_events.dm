@@ -79,6 +79,11 @@
 	happiness = 5
 	timeout = 1800
 
+/datum/happiness_event/disgust/nocutlery
+	description = "<span class='danger'>Did I really have to eat without any utensils?\n"
+	happiness = -4
+	timeout = 1800
+
 //Disgust
 /datum/happiness_event/disgust/gross
 	description = "<span class='danger'>That was gross.</span>\n"
@@ -198,7 +203,7 @@
 
 /datum/happiness_event/cryo
 	description = "<span class='danger'>Being in a metal coffin for so long doesn't feel good.</span>\n"
-	happiness = -6
+	happiness = -3
 	timeout = 1800
 
 //For when you see someone die and you're not hardcore.
