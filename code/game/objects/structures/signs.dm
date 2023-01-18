@@ -640,6 +640,11 @@
 	icon_state = "bogdanoff"
 	desc = "Looks familiar."
 
+/datum/poster/graduation
+	name = "Kanye West - Graduation"
+	icon_state = "graduationposter"
+	desc = "But- but, but he made Graduation"
+
 /obj/structure/sign/flag
 	var/ripped = FALSE
 
