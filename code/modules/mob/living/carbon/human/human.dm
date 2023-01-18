@@ -740,8 +740,10 @@ var/list/rank_prefix = list(\
 
 /mob/living/carbon/human/proc/vomit(var/toxvomit = 0, var/timevomit = 1, var/level = 3)
 	set waitfor = 0
+
 	if(!check_has_mouth() || isSynthetic() || !timevomit || !level)
 		return
+
 	level = clamp(level, 1, 3)
 	timevomit = clamp(timevomit, 1, 10)
 	if(stat == DEAD)
@@ -757,24 +759,21 @@ var/list/rank_prefix = list(\
 				Stun(3)
 				var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
 				if(should_have_organ(BP_STOMACH) && (!istype(stomach) || (stomach.ingested.total_volume <= 5 && stomach.contents.len == 0)))
-					custom_emote(1,"dry heaves.")
-				else
-					if(stomach)
-						for(var/a in stomach.contents)
-							var/atom/movable/A = a
-							A.dropInto(get_turf(src))
-							if(species.gluttonous & GLUT_PROJECTILE_VOMIT)
-								A.throw_at(get_edge_target_turf(src,dir),7,7,src)
-					src.visible_message("<span class='warning'>[src] throws up!</span>","<span class='warning'>I throw up!</span>")
-					playsound(loc, 'sound/effects/splat.ogg', 50, 1)
+					for(var/a in stomach.contents)
+						var/atom/movable/A = a
+						A.dropInto(get_turf(src))
+						if(species.gluttonous & GLUT_PROJECTILE_VOMIT)
+							A.throw_at(get_edge_target_turf(src,dir),7,7,src)
+				src.visible_message("<span class='warning'>[src] throws up!</span>","<span class='warning'>I throw up!</span>")
+				playsound(loc, 'sound/effects/splat.ogg', 50, 1)
 
-					adjust_hygiene(-25)
-					add_event("hygiene", /datum/happiness_event/hygiene/vomitted)
+				adjust_hygiene(-25)
+				add_event("hygiene", /datum/happiness_event/hygiene/vomitted)
 
-					var/turf/location = loc
-					if (istype(location, /turf/simulated))
-						location.add_vomit_floor(src, toxvomit, stomach.ingested)
-					nutrition -= 30
+				var/turf/location = loc
+				if (istype(location, /turf/simulated))
+					location.add_vomit_floor(src, toxvomit, stomach.ingested)
+				nutrition -= 30
 		sleep(350)	//wait 35 seconds before next volley
 		lastpuke = 0
 

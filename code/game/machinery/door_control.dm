@@ -77,20 +77,18 @@
 	if(stat & (NOPOWER|BROKEN))
 		return
 	// if id then id check
-	//var/obj/item/weapon/card/id/idcard = GetAccess()
-
-/*
-	if(!(req_access & idcard.access))
-		return
-*/
+	var/obj/item/weapon/card/id/idcard = GetAccess()
 
 	if(istype(I, /obj/item/weapon/card/id) && allowed(user))
-		use_power_oneoff(5)
-		icon_state = "[initial(icon_state)]1"
-		desiredstate = !desiredstate
-		trigger(user)
-		spawn(15)
-		update_icon() // this is ass
+		if(idcard.access >= req_access)
+			use_power_oneoff(5)
+			icon_state = "[initial(icon_state)]1"
+			desiredstate = !desiredstate
+			trigger(user)
+			spawn(15)
+			update_icon() // this is ass
+		else
+			to_chat(user, "You do not have the required access.")
 
 /obj/machinery/button/remote/id/trigger()
 	for(var/obj/machinery/door/blast/iddoor/ID in world)
