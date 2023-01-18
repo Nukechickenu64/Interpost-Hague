@@ -59,7 +59,7 @@
 		if(player.ready)
 			icon_state = "ready"
 		else
-			icon_state = "ready"
+			icon_state = "unready"
 	else
 		icon_state = "joingame"
 
