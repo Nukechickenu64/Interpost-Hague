@@ -164,8 +164,8 @@
 				to_chat(owner, "<span class='danger'><font size = 3>There's no food...anywhere...</span></font>")
 				take_internal_damage(1)
 
-#define BLADDER_FACTOR 0.3
-#define BOWEL_FACTOR 0.1
+#define BLADDER_FACTOR 0.03
+#define BOWEL_FACTOR 0.01
 /obj/item/organ/internal/stomach/proc/handle_excrement()
 	if(owner.has_quirk(/datum/quirk/no_bathroom))//You'll never have to use the restroom now.
 		owner.bladder = 0
