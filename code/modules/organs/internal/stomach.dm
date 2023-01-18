@@ -175,24 +175,24 @@
 	if(owner.bowels >= 250)
 		switch(owner.bowels)
 			if(250 to 400)
+				to_chat(src, "<b>You need to use the bathroom.</b>")
 				if(prob(25))
-					to_chat(src, "<b>You need to use the bathroom.</b>")
 					owner.bowels += 15
 			if(400 to 450)
+				to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 				if(prob(35))
-					to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 					owner.bowels += 15
 			if(450 to 500)
+				to_chat(src, "<span class='danger'>You're about to shit yourself!</span>")
 				if(prob(2))
 					owner.handle_shit()
 				else if(prob(45))
-					to_chat(src, "<span class='danger'>You're about to shit yourself!</span>")
 					owner.bowels += 25
 			if(500 to 550)
+				to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO SHIT!</span>")
 				if(prob(15))
 					owner.handle_shit()
 				else if(prob(60))
-					to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO SHIT!</span>")
 					owner.bowels += 35
 			if(550 to INFINITY)
 				owner.handle_shit()
@@ -201,24 +201,24 @@
 	if(owner.bladder >= 100)//Your bladder is smaller than your colon
 		switch(owner.bladder)
 			if(100 to 250)
+				to_chat(src, "<b>You need to use the bathroom.</b>")
 				if(prob(25))
-					to_chat(src, "<b>You need to use the bathroom.</b>")
 					owner.bladder += 15
 			if(250 to 400)
+				to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 				if(prob(25))
-					to_chat(src, "<span class='danger'>You really need to use the restroom!</span>")
 					owner.bladder += 15
 			if(400 to 500)
-				if(prob(45))
+				to_chat(src, "<span class='danger'>You're about to piss yourself!</span>")
+				if(prob(25))
 					owner.handle_piss()
 				else if(prob(10))
-					to_chat(src, "<span class='danger'>You're about to piss yourself!</span>")
 					owner.bladder += 25
 			if(500 to 550)
+				to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO PEE!</span>")
 				if(prob(60))
 					owner.handle_piss()
 				else if(prob(30))
-					to_chat(src, "<span class='danger'>OH MY GOD YOU HAVE TO PEE!</span>")
 					owner.bladder += 35
 			if(550 to INFINITY)
 				owner.handle_piss()

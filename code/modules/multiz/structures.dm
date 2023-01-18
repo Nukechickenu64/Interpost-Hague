@@ -64,24 +64,26 @@
 	if(!M.may_climb_ladders(src))
 		return
 
-	add_fingerprint(M)
 	var/obj/structure/ladder/target_ladder = getTargetLadder(M)
+
 	if(!target_ladder)
 		return
+
 	if(!M.Move(get_turf(src)))
-		to_chat(M, "<span class='notice'>You fail to reach \the [src].</span>")
+		to_chat(M, "<span class='notice'>I fail to reach \the [src].</span>")
 		return
+
+	add_fingerprint(M)
 
 	for (var/obj/item/grab/G in M)
 		G.adjust_position()
 
 	var/direction = target_ladder == target_up ? "up" : "down"
-
 	M.visible_message("<span class='notice'>\The [M] begins climbing [direction] \the [src]!</span>",
-	"You begin climbing [direction] \the [src]!",
-	"You hear the grunting and clanging of a metal ladder being used.")
+	"I begin climbing [direction] \the [src]!",
+	"I hear the grunting and clanging of a metal ladder being used.")
 
-	target_ladder.audible_message("<span class='notice'>You hear something coming [direction] \the [src]</span>")
+	target_ladder.audible_message("<span class='notice'>I hear something coming [direction] \the [src]</span>")
 
 	if(do_after(M, climb_time, src))
 		climbLadder(M, target_ladder)
@@ -114,21 +116,21 @@
 
 /mob/proc/may_climb_ladders(var/ladder)
 	if(!Adjacent(ladder))
-		to_chat(src, "<span class='warning'>You need to be next to \the [ladder] to start climbing.</span>")
+		to_chat(src, "<span class='warning'>I need to be next to \the [ladder] to start climbing.</span>")
 		return FALSE
 	if(incapacitated())
-		to_chat(src, "<span class='warning'>You are physically unable to climb \the [ladder].</span>")
+		to_chat(src, "<span class='warning'>I am physically unable to climb \the [ladder].</span>")
 		return FALSE
 
 	var/carry_count = 0
 	for(var/obj/item/grab/G in src)
 		if(!G.ladder_carry())
-			to_chat(src, "<span class='warning'>You can't carry [G.affecting] up \the [ladder].</span>")
+			to_chat(src, "<span class='warning'>I can't carry [G.affecting] up \the [ladder].</span>")
 			return FALSE
 		else
 			carry_count++
 	if(carry_count > 1)
-		to_chat(src, "<span class='warning'>You can't carry more than one person up \the [ladder].</span>")
+		to_chat(src, "<span class='warning'>I can't carry more than one person up \the [ladder].</span>")
 		return FALSE
 
 	return TRUE

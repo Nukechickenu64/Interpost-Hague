@@ -8,62 +8,66 @@ SUBSYSTEM_DEF(atoms)
 	init_order = INIT_ORDER_ATOMS
 	flags = SS_NO_FIRE | SS_NEEDS_SHUTDOWN
 
-	initialized = INITIALIZATION_INSSATOMS
-	var/old_initialized
+	// override and GetArguments() exists for mod-override/downstream hook functionality.
+	// Useful for total-overhaul type modifications.
+	var/adjust_init_arguments = FALSE
+
+	var/atom_init_stage = INITIALIZATION_INSSATOMS
+	var/old_init_stage
 
 	var/list/late_loaders
-	var/list/created_atoms
+	var/list/created_atoms = list()
 
 	var/list/BadInitializeCalls = list()
 
 /datum/controller/subsystem/atoms/Initialize(timeofday)
-
-	initialized = INITIALIZATION_INNEW_MAPLOAD
+	atom_init_stage = INITIALIZATION_INNEW_MAPLOAD
 	InitializeAtoms()
 	return ..()
 
-/datum/controller/subsystem/atoms/proc/InitializeAtoms(list/atoms)
-	if(initialized == INITIALIZATION_INSSATOMS)
+/datum/controller/subsystem/atoms/proc/InitializeAtoms()
+	if(atom_init_stage <= INITIALIZATION_INSSATOMS_LATE)
 		return
 
-	initialized = INITIALIZATION_INNEW_MAPLOAD
+	atom_init_stage = INITIALIZATION_INNEW_MAPLOAD
 
 	LAZYINITLIST(late_loaders)
 
-	var/count
 	var/list/mapload_arg = list(TRUE)
-	if(atoms)
-		created_atoms = list()
-		count = atoms.len
-		for(var/I in atoms)
-			var/atom/A = I
-			if(!(A.atom_flags & ATOM_FLAG_INITIALIZED))
-				if(InitAtom(I, mapload_arg))
-					atoms -= I
-				CHECK_TICK
-	else
-		count = 0
+
+	var/count = created_atoms.len
+	while(created_atoms.len)
+		var/atom/A = created_atoms[created_atoms.len]
+		var/list/atom_args = created_atoms[A]
+		created_atoms.len--
+		if(!QDELETED(A) && !(A.atom_flags & ATOM_FLAG_INITIALIZED))
+			if(atom_args)
+				atom_args.Insert(1, TRUE)
+				InitAtom(A, atom_args)
+			else
+				InitAtom(A, mapload_arg)
+			CHECK_TICK
+
+	// If wondering why not just store all atoms in created_atoms and use the block above: that turns out unbearably expensive.
+	// Instead, atoms without extra arguments in New created on server start are fished out of world directly.
+	// We do this exactly once.
+	if(!initialized)
 		for(var/atom/A in world)
-			if(!(A.atom_flags & ATOM_FLAG_INITIALIZED))
+			if(!QDELETED(A) && !(A.atom_flags & ATOM_FLAG_INITIALIZED))
 				InitAtom(A, mapload_arg)
 				++count
 				CHECK_TICK
 
-	message_admins("Initialized [count] atom\s")
-	pass(count)
+	report_progress("Initialized [count] atom\s")
 
-	initialized = INITIALIZATION_INNEW_REGULAR
+	atom_init_stage = INITIALIZATION_INNEW_REGULAR
 
 	if(late_loaders.len)
 		for(var/I in late_loaders)
 			var/atom/A = I
-			A.LateInitialize(arglist(mapload_arg))
-		message_admins("Late initialized [late_loaders.len] atom\s")
+			A.LateInitialize(arglist(late_loaders[A]))
+		report_progress("Late initialized [late_loaders.len] atom\s")
 		late_loaders.Cut()
-
-	if(atoms)
-		. = created_atoms + atoms
-		created_atoms = null
 
 /datum/controller/subsystem/atoms/proc/InitAtom(atom/A, list/arguments)
 	var/the_type = A.type
@@ -84,10 +88,11 @@ SUBSYSTEM_DEF(atoms)
 		switch(result)
 			if(INITIALIZE_HINT_LATELOAD)
 				if(arguments[1])	//mapload
-					late_loaders += A
+					late_loaders[A] = arguments
 				else
 					A.LateInitialize(arglist(arguments))
 			if(INITIALIZE_HINT_QDEL)
+				A.atom_flags |= ATOM_FLAG_INITIALIZED // never call EarlyDestroy if we return this hint
 				qdel(A)
 				qdeleted = TRUE
 			else
@@ -104,17 +109,17 @@ SUBSYSTEM_DEF(atoms)
 	..("Bad Initialize Calls:[BadInitializeCalls.len]")
 
 /datum/controller/subsystem/atoms/proc/map_loader_begin()
-	old_initialized = initialized
-	initialized = INITIALIZATION_INSSATOMS
+	old_init_stage = atom_init_stage
+	atom_init_stage = INITIALIZATION_INSSATOMS_LATE
 
 /datum/controller/subsystem/atoms/proc/map_loader_stop()
-	initialized = old_initialized
+	atom_init_stage = old_init_stage
 
 /datum/controller/subsystem/atoms/Recover()
-	initialized = SSatoms.initialized
-	if(initialized == INITIALIZATION_INNEW_MAPLOAD)
+	atom_init_stage = SSatoms.atom_init_stage
+	if(atom_init_stage == INITIALIZATION_INNEW_MAPLOAD)
 		InitializeAtoms()
-	old_initialized = SSatoms.old_initialized
+	old_init_stage = SSatoms.old_init_stage
 	BadInitializeCalls = SSatoms.BadInitializeCalls
 
 /datum/controller/subsystem/atoms/proc/InitLog()
@@ -135,8 +140,3 @@ SUBSYSTEM_DEF(atoms)
 	var/initlog = InitLog()
 	if(initlog)
 		text2file(initlog, "[GLOB.log_directory]/initialize.log")
-
-#undef BAD_INIT_QDEL_BEFORE
-#undef BAD_INIT_DIDNT_INIT
-#undef BAD_INIT_SLEPT
-#undef BAD_INIT_NO_HINT

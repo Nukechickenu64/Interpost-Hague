@@ -68,7 +68,7 @@
 	floor_type = /turf/simulated/floor/fixed/alium
 
 /turf/simulated/wall/alium/New(var/newloc)
-	..(newloc,"rusty steel")
+	..(newloc,"alium")
 
 /turf/simulated/wall/alium/ex_act(severity)
 	if(prob(explosion_resistance))
@@ -80,4 +80,4 @@
 	icon_state = "rusty"
 
 /turf/simulated/wall/rusty/New(var/newloc)
-	..(newloc,"rustysteel")
+	..(newloc,"rusty steel")

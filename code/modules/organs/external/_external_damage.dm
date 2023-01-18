@@ -103,7 +103,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 
 	// If the limbs can break, make sure we don't exceed the maximum damage a limb can take before breaking
 	var/datum/wound/created_wound
-	var/block_cut = !(brute > 15 || !(species.species_flags & SPECIES_FLAG_NO_MINOR_CUT))
+	var/block_cut = (species.species_flags & SPECIES_FLAG_NO_MINOR_CUT) && brute <= 15
 
 	if(brute)
 		var/to_create = BRUISE

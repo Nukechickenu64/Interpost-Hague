@@ -30,16 +30,19 @@
 	if(GLOB.use_preloader && (src.type == GLOB._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
 		GLOB._preloader.load(src)
 
-	var/do_initialize = SSatoms.initialized
-	if(do_initialize != INITIALIZATION_INSSATOMS)
+	var/do_initialize = SSatoms.atom_init_stage
+	var/list/created = SSatoms.created_atoms
+	if(do_initialize > INITIALIZATION_INSSATOMS_LATE)
 		args[1] = do_initialize == INITIALIZATION_INNEW_MAPLOAD
 		if(SSatoms.InitAtom(src, args))
 			//we were deleted
 			return
-
-	var/list/created = SSatoms.created_atoms
-	if(created)
-		created += src
+	else if(created)
+		var/list/argument_list
+		if(length(args) > 1)
+			argument_list = args.Copy(2)
+		if(argument_list || do_initialize == INITIALIZATION_INSSATOMS_LATE)
+			created[src] = argument_list
 
 	if(atom_flags & ATOM_FLAG_CLIMBABLE)
 		verbs += /atom/proc/climb_on
@@ -73,8 +76,25 @@
 
 /atom/Destroy()
 	QDEL_NULL(reagents)
-	QDEL_NULL(proximity_monitor)
+
+	LAZYCLEARLIST(our_overlays)
+	LAZYCLEARLIST(priority_overlays)
+
+	QDEL_NULL(light)
+
+	if(opacity)
+		updateVisibility(src)
+
+	return ..()
+
+/atom/movable/Initialize(ml, ...)
 	. = ..()
+	if (!follow_repository.excluded_subtypes[type] && follow_repository.followed_subtypes_tcache[type])
+		follow_repository.add_subject(src)
+
+	// Fire Entered events for freshly created movables.
+	if (!ml && loc)
+		loc.Entered(src, null)
 
 // Byond seemingly calls stat, each tick.
 // Calling things each tick can get expensive real quick.
@@ -416,7 +436,7 @@ its easier to just keep the beam vertical.
 // Use for objects performing visible actions
 // message is output to anyone who can see, e.g. "The [src] does something!"
 // blind_message (optional) is what blind people will hear e.g. "You hear something!"
-/atom/proc/visible_message(var/message, var/blind_message, var/range = world.view, var/checkghosts = null)
+/atom/proc/visible_message(var/message, var/self_message, var/blind_message, var/range = world.view, var/checkghosts = null)
 	var/turf/T = get_turf(src)
 	var/list/mobs = list()
 	var/list/objs = list()

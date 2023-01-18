@@ -35,10 +35,6 @@
 	return text("#[][][]", textr, textg, textb)
 	return
 
-/mob/dview/Destroy()
-	crash_with("Prevented attempt to delete dview mob: [log_info_line(src)]")
-	return QDEL_HINT_LETMELIVE // Prevents destruction
-
 //Returns the middle-most value
 /proc/dd_range(var/low, var/high, var/num)
 	return max(low,min(high,num))
@@ -1064,42 +1060,36 @@ var/list/WALLITEMS = list(
 			colour += temp_col
 	return "#[colour]"
 
-GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
-
-//Version of view() which ignores darkness, because BYOND doesn't have it.
-/proc/dview(var/range = world.view, var/center, var/invis_flags = 0)
-	if(!center)
-		return
-
-	GLOB.dview_mob.loc = center
-	GLOB.dview_mob.see_invisible = invis_flags
-	. = view(range, GLOB.dview_mob)
-	GLOB.dview_mob.loc = null
+var/global/mob/dview/dview_mob = new
 
 /mob/dview
-	invisibility = 101
-	density = 0
-
-	anchored = 1
-	simulated = 0
-
+	anchored = TRUE
+	density = FALSE
+	invisibility = INVISIBILITY_ABSTRACT
 	see_in_dark = 1e6
-
+	simulated = FALSE
 	virtual_mob = null
 
-/mob/dview/Destroy()
-	crash_with("Prevented attempt to delete dview mob: [log_info_line(src)]")
-	return QDEL_HINT_LETMELIVE // Prevents destruction
+/mob/dview/Destroy(force = FALSE)
+	SHOULD_CALL_PARENT(FALSE)
+	//crash_with("Someone [force ? "force-" : ""]qdeleted the dview mob.")
+	if (!force)
+		return QDEL_HINT_LETMELIVE
 
-/atom/proc/get_light_and_color(var/atom/origin)
-	if(origin)
-		color = origin.color
-		set_light(origin.light_range, origin.light_power, origin.light_color)
+	to_world_log("Dview was force-qdeleted, this should never happen!")
+
+	dview_mob = new
+	return QDEL_HINT_QUEUE
 
 /mob/dview/Initialize()
 	. = ..()
 	// We don't want to be in any mob lists; we're a dummy not a mob.
 	STOP_PROCESSING(SSmobs, src)
+
+/atom/proc/get_light_and_color(var/atom/origin)
+	if(origin)
+		color = origin.color
+		set_light(origin.light_range, origin.light_power, origin.light_color)
 
 // call to generate a stack trace and print to runtime logs
 /proc/crash_with(msg)

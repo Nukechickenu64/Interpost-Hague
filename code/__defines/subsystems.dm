@@ -15,6 +15,11 @@
 #define INITIALIZE_HINT_LATELOAD 1  //Call LateInitialize
 #define INITIALIZE_HINT_QDEL     2  //Call qdel on the atom
 
+#define INITIALIZATION_INSSATOMS      0	//New should not call Initialize
+#define INITIALIZATION_INSSATOMS_LATE 1	//New should not call Initialize; after the first pass is complete (handled differently)
+#define INITIALIZATION_INNEW_MAPLOAD  2	//New should call Initialize(TRUE)
+#define INITIALIZATION_INNEW_REGULAR  3	//New should call Initialize(FALSE)
+
 //type and all subtypes should always call Initialize in New()
 #define INITIALIZE_IMMEDIATE(X) ##X/New(loc, ...){\
 	..();\

@@ -270,8 +270,8 @@
 	return .
 
 /proc/get_mobs_and_objs_in_view_fast(var/turf/T, var/range, var/list/mobs, var/list/objs, var/checkghosts = null)
-
-	var/list/hear = dview(range,T,INVISIBILITY_MAXIMUM)
+	var/list/hear = list()
+	DVIEW(hear, range, T, INVISIBILITY_MAXIMUM)
 	var/list/hearturfs = list()
 
 	for(var/atom/movable/AM in hear)
@@ -287,8 +287,6 @@
 			mobs |= M
 		else if(get_turf(M) in hearturfs)
 			mobs |= M
-			//Things in thier hands should hear too
-			GLOB.listening_objects += M.get_active_hand()
 
 	for(var/obj/O in GLOB.listening_objects)
 		if(get_turf(O) in hearturfs)

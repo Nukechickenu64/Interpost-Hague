@@ -252,3 +252,18 @@
 
 #define GREEN_CODE 1
 #define RED_CODE 2
+
+#define DVIEW(output, range, center, invis_flags) \
+	global.dview_mob.loc = center; \
+	global.dview_mob.see_invisible = invis_flags; \
+	output = view(range, dview_mob); \
+	global.dview_mob.loc = null;
+
+#define FOR_DVIEW(type, range, center, invis_flags) \
+	global.dview_mob.loc = center; \
+	global.dview_mob.see_invisible = invis_flags; \
+	for(type in view(range, dview_mob))
+
+#define END_FOR_DVIEW dview_mob.loc = null
+
+#define subtypesof(prototype) (typesof(prototype) - prototype)

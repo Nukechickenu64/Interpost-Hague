@@ -477,8 +477,6 @@
 			return global.image_repository;
 		if("inactive_keys")
 			return global.inactive_keys;
-		if("init")
-			return global.init;
 		if("integrated_circuit_blacklist")
 			return global.integrated_circuit_blacklist;
 		if("intents")
@@ -1438,8 +1436,6 @@
 			global.image_repository=newval;
 		if("inactive_keys")
 			global.inactive_keys=newval;
-		if("init")
-			global.init=newval;
 		if("integrated_circuit_blacklist")
 			global.integrated_circuit_blacklist=newval;
 		if("intents")

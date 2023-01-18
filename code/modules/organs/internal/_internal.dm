@@ -128,8 +128,6 @@ obj/item/organ/internal/take_general_damage(var/amount, var/silent = FALSE)
 	take_internal_damage(amount, silent)
 
 /obj/item/organ/internal/proc/take_internal_damage(amount, var/silent=0)
-	if(!(src in owner.bad_internal_organs))
-		owner.bad_internal_organs += src
 	if(isrobotic())
 		damage = between(0, src.damage + (amount * 0.8), max_damage)
 	else
