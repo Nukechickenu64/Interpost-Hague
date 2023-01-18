@@ -627,7 +627,7 @@
 "mc" = (/turf/simulated/floor/wood,/area/arbiter/fake_office)
 "md" = (/obj/structure/lattice,/obj/machinery/atmospherics/pipe/simple/hidden/supply,/obj/machinery/light/small{dir = 8},/turf/simulated/open,/area/engineering/atmos)
 "me" = (/obj/structure/lattice,/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,/obj/machinery/light/small{dir = 4},/turf/simulated/open,/area/engineering/atmos)
-"mf" = (/obj/machinery/door/firedoor/border_only,/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4; icon_state = "intact-supply"},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/machinery/door/airlock/engineering{name = "Vessel Overseer"},/turf/simulated/floor/tiled/bunker/polar,/area/engineering/engine_monitoring)
+"mf" = (/obj/machinery/door/firedoor/border_only,/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4; icon_state = "intact-supply"},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/machinery/door/airlock/engineering{name = "Vessel Overseer"; req_access = list(56)},/turf/simulated/floor/tiled/bunker/polar,/area/engineering/engine_monitoring)
 "mg" = (/obj/structure/disposalpipe/junction/yjunction,/obj/machinery/light/small{dir = 1},/obj/structure/sign/tetracorp{pixel_y = 32},/turf/simulated/floor/tiled,/area/hallway/primary/central_two)
 "mh" = (/obj/machinery/atmospherics/unary/vent_scrubber/on{dir = 4},/obj/machinery/alarm{dir = 4; icon_state = "alarm0"; pixel_x = -22; pixel_y = 0},/turf/simulated/floor/tiled/bunker/polar_blue,/area/bridge)
 "mi" = (/obj/effect/floor_decal/industrial/warning{icon_state = "warning"; dir = 4},/obj/effect/floor_decal/rustyborder{dir = 4},/turf/simulated/floor/tiled/bunker/polar,/area/hallway/primary/central_two)

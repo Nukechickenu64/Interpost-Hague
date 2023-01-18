@@ -449,8 +449,8 @@
 	spawn_positions = 2
 	department_flag = SUP
 	rankprefix  = "Vessel Overseer"
-	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
-	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
+	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
+	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
 
 	equip(var/mob/living/carbon/human/H)
 		..()
