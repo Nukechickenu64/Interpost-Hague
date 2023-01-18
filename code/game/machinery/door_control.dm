@@ -69,26 +69,26 @@
 	desc = "It controls doors, remotely. Using an id."
 	icon_state = "doorctrlid"
 
-/obj/machinery/button/remote/attack_hand(mob/user as mob)
+/obj/machinery/button/remote/id/proc/CanToggleButton(var/mob/user, var/obj/item/weapon/card/id/id_card)
+	return allowed(user) || (istype(id_card) && check_access_list(id_card.GetAccess()))
+
+/obj/machinery/button/remote/id/attack_hand(mob/user as mob)
 	to_chat(user, "<span class='info'>Maybe, if I use an ID this would work?</span>")
 	return
 
-/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user)
+/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user, var/obj/item/weapon/card/id/id_card)
 	if(stat & (NOPOWER|BROKEN))
 		return
-	// if id then id check
-	var/obj/item/weapon/card/id/idcard = GetAccess()
 
-	if(istype(I, /obj/item/weapon/card/id) && allowed(user))
-		if(idcard.access >= req_access)
-			use_power_oneoff(5)
-			icon_state = "[initial(icon_state)]1"
-			desiredstate = !desiredstate
-			trigger(user)
-			spawn(15)
-			update_icon() // this is ass
-		else
-			to_chat(user, "You do not have the required access.")
+	if(CanToggleButton(user, id_card) && istype(I, /obj/item/weapon/card/id/))
+		use_power_oneoff(5)
+		icon_state = "[initial(icon_state)]1"
+		desiredstate = !desiredstate
+		trigger(user)
+		spawn(15)
+		update_icon() // this is ass
+	else
+		to_chat(user, "You do not have the required access.")
 
 /obj/machinery/button/remote/id/trigger()
 	for(var/obj/machinery/door/blast/iddoor/ID in world)
