@@ -145,8 +145,6 @@
 			else
 				to_chat(usr, "<span class='warning'>You don't have enough sheets to repair this! You need at least [amt] sheets.</span>")
 
-
-
 // Proc: open()
 // Parameters: None
 // Description: Opens the door. Does necessary checks. Automatically closes if autoclose is true
@@ -209,4 +207,16 @@
 	close_sound = 'sound/machines/shutters_close.ogg'
 
 /obj/machinery/door/blast/shutters/open
+	begins_closed = FALSE
+
+/obj/machinery/door/blast/iddoor
+	icon = 'icons/obj/doors/door4.dmi'
+	icon_state_open = "door_open"
+	icon_state_opening = "door_opening"
+	icon_state_closed = "door_closed"
+	icon_state_closing = "door_closing"
+	icon_state = "door_off"
+	block_air_zones = 1
+
+/obj/machinery/door/blast/iddoor/open
 	begins_closed = FALSE
