@@ -102,11 +102,6 @@
 					ID.close()
 					return
 
-/obj/machinery/button/remote/id/attack_hand(mob/user as mob)
-	to_chat(user, "<span class='warning'>No ID detected.</span>")
-	//playsound(src.loc, "sparks", 100, 1) // - DENY SOUND????
-	return
-
 /obj/machinery/button/remote/id/update_icon()
 	if(stat & NOPOWER)
 		icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
