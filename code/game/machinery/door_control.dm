@@ -64,26 +64,56 @@
 	Door control with id
 */
 
-/obj/machinery/button/remote/id 
+/obj/machinery/button/remote/id
 	name = "remote door control"
 	desc = "It controls doors, remotely. Using an id."
 	icon_state = "doorctrlid"
-	var/id = null
 
-	/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user)
-		if(stat & (NOPOWER|BROKEN))
-			return
-		// if id then id check
+/obj/machinery/button/remote/attack_hand(mob/user as mob)
+	to_chat(user, "<span class='info'>Maybe, if I use an ID this would work?</span>")
+	return
 
-	/obj/machinery/button/remote/id/attack_hand(mob/user as mob)
-		to_chat(user, "<span class='warning'>Beep boop! No id detected!</span>")
-		//playsound(src.loc, "sparks", 100, 1) // - DENY SOUND????
+/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user)
+	if(stat & (NOPOWER|BROKEN))
+		return
+	// if id then id check
+	//var/obj/item/weapon/card/id/idcard = GetAccess()
 
-	/obj/machinery/button/remote/id/update_icon()
-		if(stat & NOPOWER)
-			icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
-		else
-			icon_state = "[initial(icon_state)]"
+/*
+	if(!(req_access & idcard.access))
+		return
+*/
+
+	if(istype(I, /obj/item/weapon/card/id) && allowed(user))
+		use_power_oneoff(5)
+		icon_state = "[initial(icon_state)]1"
+		desiredstate = !desiredstate
+		trigger(user)
+		spawn(15)
+		update_icon() // this is ass
+
+/obj/machinery/button/remote/id/trigger()
+	for(var/obj/machinery/door/blast/iddoor/ID in world)
+		if(ID.id == src.id)
+			if(ID.density)
+				spawn(0)
+					ID.open()
+					return
+			else
+				spawn(0)
+					ID.close()
+					return
+
+/obj/machinery/button/remote/id/attack_hand(mob/user as mob)
+	to_chat(user, "<span class='warning'>No ID detected.</span>")
+	//playsound(src.loc, "sparks", 100, 1) // - DENY SOUND????
+	return
+
+/obj/machinery/button/remote/id/update_icon()
+	if(stat & NOPOWER)
+		icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
+	else
+		icon_state = "[initial(icon_state)]"
 /*
 	Airlock remote control
 */

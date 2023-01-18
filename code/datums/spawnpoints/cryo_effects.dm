@@ -1,10 +1,10 @@
 /mob/living/carbon/human/proc/give_cryo_effect()
 	var/message = ""
-	if(prob(40)) //starvation
+	if(prob(20)) //starvation
 		message += "<span class='info'>It seems like you forgot to eat before getting 'buried' in the chamber...\n</span>"
 		set_nutrition(rand(0,200))
 		set_thirst(rand(0,200))
-	if(prob(25)) //stutterting and jittering (because of cold?)
+	if(prob(15)) //stutterting and jittering (because of cold?)
 		message += "<span class='info'>This cold is making me jittery... </span>\n"
 		make_jittery(120)
 		stuttering = 20
@@ -20,11 +20,11 @@
 
 /mob/living/carbon/human/proc/give_cryo_captain_effect()
 	var/message = ""
-	if(prob(40)) //starvation
+	if(prob(20)) //starvation
 		message += "<span class='info'>It seems like I forgot to eat before getting 'buried' in the chamber...[rand(20,60)] years of working as a Captain and still no brain. </span>"
 		set_nutrition(rand(0,200))
 		set_thirst(rand(0,200))
-	if(prob(25)) //stutterting and jittering (because of cold?)
+	if(prob(15)) //stutterting and jittering (because of cold?)
 		message += "<span class='info'>This cold is making me jittery... </span>"
 		make_jittery(120)
 		stuttering = 20
