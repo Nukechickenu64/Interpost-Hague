@@ -41,11 +41,11 @@
 		if (DIFF_HARD)
 			H = "red"
 	if (A.announced)
-		to_world("<b>Achievement Unlocked! [src.key] unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>")
+		to_world("<b>Congratulations! [src.key] unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>")
 	else
-		to_chat(src, "<b>Achievement Unlocked! You unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>")
+		to_chat(src, "<b>Hell yeah. I unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>\n")
 	if(A.description)
-		to_chat(src, "<i>[A.description]</i>")
+		to_chat(src, "\n<i>[A.description]</i>")
 
 /mob/proc/unlock_achievement(var/datum/achievement/A)// use is 	mob.unlock_achievement(new/datum/achievement/achievement())
 	if(client)
