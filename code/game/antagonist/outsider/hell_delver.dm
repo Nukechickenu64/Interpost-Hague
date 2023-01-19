@@ -5,8 +5,8 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	role_text = "Hell Delver"
 	role_text_plural = "Hell Delvers"
 	welcome_text = "A destitute individual, doomed to wander the wastes in search of death."
-	antag_text = "You are a<b>survivor.</b> Wander the wastes and try not to die"
-	leader_welcome_text = "You shouldn't see this"
+	antag_text = "You are a <b>survivor.</b> Wander the wastes and try not to die."
+	leader_welcome_text = "Welcome."
 	landmark_id = "Hell Spawn"
 	id_type = /obj/item/weapon/card/id/centcom/ERT
 
@@ -25,7 +25,7 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 
 /datum/antagonist/delver/Initialize()
 	..()
-	leader_welcome_text = "You have no leaders"
+	leader_welcome_text = "You have no leaders."
 
 /datum/antagonist/delver/greet(var/datum/mind/player)
 	if(!..())
