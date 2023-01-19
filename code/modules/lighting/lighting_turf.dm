@@ -2,11 +2,11 @@
 	var/dynamic_lighting = TRUE    // Does the turf use dynamic lighting?
 	luminosity           = 1
 
-	var/tmp/lighting_corners_initialised = FALSE
+	var/lighting_corners_initialised = FALSE
 
-	var/tmp/list/datum/light_source/affecting_lights       // List of light sources affecting this turf.
-	var/tmp/atom/movable/lighting_overlay/lighting_overlay // Our lighting overlay.
-	var/tmp/list/datum/lighting_corner/corners
+	var/list/datum/light_source/affecting_lights       // List of light sources affecting this turf.
+	var/atom/movable/lighting_overlay/lighting_overlay // Our lighting overlay.
+	var/list/datum/lighting_corner/corners
 	var/opaque_counter
 
 /turf/set_opacity(new_opacity)

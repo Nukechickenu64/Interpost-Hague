@@ -31,7 +31,7 @@ obj/reflection/New(loc,mob/owner)
 atom/movable
 	var/has_reflection = 0
 	var/reflection_offset = -11
-	var/tmp/obj/reflection
+	var/obj/reflection
 
 atom/movable/New()
 	..()

@@ -1,13 +1,13 @@
 /turf
 	// Reference to any open turf that might be above us to speed up atom Entered() updates.
-	var/tmp/turf/above
-	var/tmp/turf/below
-	var/tmp/atom/movable/openspace/turf_overlay/bound_overlay
-	var/tmp/atom/movable/openspace/multiplier/shadower		// Overlay used to multiply color of all OO overlays at once.
-	var/tmp/z_queued = 0	// How many times this turf is currently queued - multiple queue occurrences are allowed to ensure update consistency
-	var/tmp/z_eventually_space = FALSE
+	var/turf/above
+	var/turf/below
+	var/atom/movable/openspace/turf_overlay/bound_overlay
+	var/atom/movable/openspace/multiplier/shadower		// Overlay used to multiply color of all OO overlays at once.
+	var/z_queued = 0	// How many times this turf is currently queued - multiple queue occurrences are allowed to ensure update consistency
+	var/z_eventually_space = FALSE
 	var/z_flags = 0
-	var/tmp/z_depth
+	var/z_depth
 
 /turf/Entered(atom/movable/thing, turf/oldLoc)
 	. = ..()

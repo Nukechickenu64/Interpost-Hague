@@ -3,10 +3,10 @@
 
 /turf
 	var/permit_ao = TRUE
-	var/tmp/list/ao_overlays	// Current ambient occlusion overlays. Tracked so we can reverse them without dropping all priority overlays.
-	var/tmp/ao_neighbors
-	var/tmp/list/ao_overlays_mimic
-	var/tmp/ao_neighbors_mimic
+	var/list/ao_overlays	// Current ambient occlusion overlays. Tracked so we can reverse them without dropping all priority overlays.
+	var/ao_neighbors
+	var/list/ao_overlays_mimic
+	var/ao_neighbors_mimic
 	var/ao_queued = AO_UPDATE_NONE
 
 /turf/Initialize(mapload)

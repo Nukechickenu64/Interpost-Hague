@@ -14,7 +14,7 @@ SUBSYSTEM_DEF(shuttle)
 	var/list/landmarks_still_needed = list()     //Stores landmark_tags that need to be assigned to the sector (landmark_tag = sector) when registered.
 	var/list/shuttles_to_initialize              //A queue for shuttles that were asked to initialize too early.
 
-	var/tmp/list/working_shuttles
+	var/list/working_shuttles
 
 /datum/controller/subsystem/shuttle/Initialize()
 	last_landmark_registration_time = world.time

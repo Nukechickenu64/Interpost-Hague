@@ -1,5 +1,5 @@
 /atom/movable
-	var/tmp/atom/movable/openspace/overlay/bound_overlay	// The overlay that is directly mirroring us that we proxy movement to.
+	var/atom/movable/openspace/overlay/bound_overlay	// The overlay that is directly mirroring us that we proxy movement to.
 	/// Movable-level Z-Mimic flags. This uses ZMM_* flags, not ZM_* flags.
 	var/z_flags = 0
 

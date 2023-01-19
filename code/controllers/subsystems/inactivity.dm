@@ -3,7 +3,7 @@ SUBSYSTEM_DEF(inactivity)
 	wait = 1 MINUTE
 	priority = SS_PRIORITY_INACTIVITY
 	flags = SS_NO_INIT
-	var/tmp/list/client_list
+	var/list/client_list
 	var/number_kicked = 0
 
 /datum/controller/subsystem/inactivity/fire(resumed = FALSE)

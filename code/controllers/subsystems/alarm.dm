@@ -12,8 +12,8 @@ SUBSYSTEM_DEF(alarm)
 	priority = SS_PRIORITY_ALARM
 	init_order = SS_INIT_ALARM
 	var/list/datum/alarm/all_handlers
-	var/tmp/list/current = list()
-	var/tmp/list/active_alarm_cache = list()
+	var/list/current = list()
+	var/list/active_alarm_cache = list()
 
 /datum/controller/subsystem/alarm/Initialize()
 	all_handlers = list(atmosphere_alarm, camera_alarm, fire_alarm, motion_alarm, power_alarm)

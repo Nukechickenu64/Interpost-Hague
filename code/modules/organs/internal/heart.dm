@@ -7,7 +7,7 @@
 	var/pulse = PULSE_NORM
 	var/heartbeat = 0
 	var/beat_sound = 'sound/effects/singlebeat.ogg'
-	var/tmp/next_blood_squirt = 0
+	var/next_blood_squirt = 0
 	relative_size = 15
 	max_damage = 45
 	var/open

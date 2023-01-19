@@ -8,7 +8,7 @@ SUBSYSTEM_DEF(tgui)
 	var/list/tg_open_uis = list()    // A list of open UIs, grouped by src_object and ui_key.
 	var/list/processing_uis = list() // A list of processing UIs, ungrouped.
 
-	var/tmp/list/current_run = list()
+	var/list/current_run = list()
 
 /datum/controller/subsystem/tgui/Initialize()
 	. = ..()
