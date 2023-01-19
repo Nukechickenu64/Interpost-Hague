@@ -163,7 +163,7 @@
 
 
 //Mining shuttle
-/*/datum/shuttle/autodock/ferry/mining
+/datum/shuttle/autodock/ferry/mining
 	name = "Mining"
 	location = 0
 	warmup_time = 10
@@ -182,7 +182,7 @@
 	landmark_tag = "nav_mining_asteroid"
 	docking_controller = "mining_outpost_airlock"
 	base_turf = /turf/simulated/floor/asteroid
-*/
+
 //Emergency shuttle
 
 /datum/shuttle/autodock/ferry/emergency/centcom
