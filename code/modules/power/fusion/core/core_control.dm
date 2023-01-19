@@ -7,7 +7,7 @@
 	active_power_usage = 500
 
 	var/id_tag
-	var/scan_range = 25
+	var/const/can_range = 25
 	var/list/connected_devices = list()
 	var/obj/machinery/power/fusion_core/cur_viewed_device
 
