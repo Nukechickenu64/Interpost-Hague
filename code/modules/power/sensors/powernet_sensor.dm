@@ -97,7 +97,6 @@
 		out = "# SYSTEM ERROR - NO POWERNET #"
 		return out
 
-
 	var/list/L = find_apcs()
 	var/total_apc_load = 0
 	if(L.len <= 0) 	// No APCs found.

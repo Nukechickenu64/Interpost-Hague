@@ -268,7 +268,8 @@
 	else
 		update_use_power(POWER_USE_OFF)
 		if(!on)
-			playsound(get_turf(src),sound_off, 30, 0)
+			if(!(LIGHT_BROKEN || LIGHT_BURNED || LIGHT_EMPTY))
+				playsound(get_turf(src),sound_off, 30, 0)
 		set_light(0)
 	change_power_consumption((light_range * light_power) * LIGHTING_POWER_FACTOR, POWER_USE_ACTIVE)
 

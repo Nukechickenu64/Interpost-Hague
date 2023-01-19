@@ -44,6 +44,7 @@
 		to_world("<b>Congratulations! [src.key] unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>")
 	else
 		to_chat(src, "<b>Hell yeah. I unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>\n")
+		playsound(src, 'sound/ported/ACHIEVEMENT_BLIP.ogg', 30, 0)
 	if(A.description)
 		to_chat(src, "\n<i>[A.description]</i>")
 
@@ -79,11 +80,9 @@
 				H = "green"
 			if (DIFF_HARD)
 				H = "red"
-		msg += "<b>[count]:<font color = [H]> [A.name]</font color></b></font>"
+		msg += "<b>[count]:<font color = [H]> [A.name]</font color>\n</b>\n</font>"
 		if(A.description)
-			msg += "<i>[A.description]</i>\n"
-		else
-			msg += "\n"
+			msg += "\n<b>[A.description]</b>\n"
 	if(count)
 		msg += "<hr class='linexd'>"
 		msg += "---\n<b>TOTAL ACHIEVEMENTS: [count]</b>"
