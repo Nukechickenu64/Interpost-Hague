@@ -98,12 +98,6 @@ var/list/_client_preferences_by_type
 	else
 		sound_to(preference_mob, sound(null, repeat = 0, wait = 0, volume = 85, channel = 1))
 
-/client/verb/play_lobby_music()
-	set name = "playlobbymusic"
-
-	var/datum/client_preference/play_lobby_music/PLM
-	PLM.changed()
-
 /datum/client_preference/show_item_names
 	description ="Show item labels"
 	key = "SHOW_ITEMS"
@@ -196,17 +190,6 @@ var/list/_client_preferences_by_type
 	if(preference_mob.client)
 		preference_mob.client.toggle_fullscreen(new_value == GLOB.PREF_YES)
 
-/client/verb/verb_toggle_fullscreen()
-	set name = "togglefullscreen"
-
-	var/datum/client_preference/fullscreen_mode/FM
-	FM.changed()
-
-/datum/client_preference/automousemove
-	description = "Auto Mouse Move"
-	key = "AMM"
-	default_value = GLOB.PREF_NO
-
 /datum/client_preference/autohiss
 	description = "Autohiss"
 	key = "AUTOHISS"
@@ -227,12 +210,6 @@ var/list/_client_preferences_by_type
 	description = "Show Departmental Goals"
 	key = "DEPT_GOALS"
 	options = list(GLOB.PREF_SHOW, GLOB.PREF_HIDE)
-
-/datum/client_preference/smooth_zoom
-	description = "Smooth Zooming"
-	key = "SMOOTH_ZOOM"
-	options = list(GLOB.PREF_YES, GLOB.PREF_NO)
-	default_value = GLOB.PREF_YES
 
 /********************
 * General Staff Preferences *

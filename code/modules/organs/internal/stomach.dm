@@ -241,11 +241,13 @@
 				reagents.trans_to(V, rand(1,5))
 			adjust_hygiene(-25)
 			add_event("shitself", /datum/happiness_event/hygiene/shit)
+			unlock_achievement(new/datum/achievement/shit_pants())
 
 		//Poo on the face.
 		else if(M != src && M.lying)//Can only shit on them if they're lying down.
 			message = "<span class='danger'><b>[src]</b> shits right on <b>[M]</b>'s face!</span>"
 			M.reagents.add_reagent(/datum/reagent/poo, 10)
+			M.unlock_achievement(new/datum/achievement/shit_on())
 
 		//Poo on the floor.
 		else
@@ -296,6 +298,7 @@
 		message = "<B>[src]</B> pisses \his pants."
 		adjust_hygiene(-25)
 		add_event("pissedself", /datum/happiness_event/hygiene/pee)
+		unlock_achievement(new/datum/achievement/pissed())
 
 	else//On the floor.
 		var/turf/TT = src.loc

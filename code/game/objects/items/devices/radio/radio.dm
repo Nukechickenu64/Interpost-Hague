@@ -59,6 +59,14 @@
 			radio_controller.remove_object(src, radiochannels[ch_name])
 	return ..()
 
+
+/obj/item/device/radio/AltClick(mob/user as mob)
+	var/freq = num2text(frequency)
+	if(has_channel_access(usr, freq))
+		set_frequency(text2num(freq))
+		to_chat(user, "<span class='info'>I switch the</span> <span class='danger'>channel.</span>")
+	. = 1
+
 /obj/item/device/radio/attack_self(mob/user as mob)
 	user.set_machine(src)
 	interact(user)

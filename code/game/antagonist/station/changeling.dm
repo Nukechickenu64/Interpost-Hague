@@ -13,6 +13,8 @@ GLOBAL_DATUM_INIT(changelings, /datum/antagonist/changeling, new)
 
 	faction = "changeling"
 
+/datum/antagonist/changeling/create_antagonist(var/datum/mind/target)
+	target.current.unlock_achievement(new/datum/achievement/changeling())
 
 /datum/antagonist/changeling/get_special_objective_text(var/datum/mind/player)
 	return "<br><b>Changeling ID:</b> [player.changeling.changelingID].<br><b>Genomes Absorbed:</b> [player.changeling.absorbedcount]"

@@ -369,6 +369,8 @@
 
 		var/device_energy = power * REACTION_POWER_MODIFIER
 
+		playsound(src.loc, "sound/ported/RIF_INSTALLER.OGG", 30, 0)
+
 		//Release reaction gasses
 		var/heat_capacity = removed.heat_capacity()
 		removed.adjust_multi("phoron", max(device_energy / PHORON_RELEASE_MODIFIER, 0), \

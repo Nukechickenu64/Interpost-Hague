@@ -733,8 +733,8 @@ menu "menu"
 		name = "&Point Sampling"
 		command = ".winset \"mapwindow.map.zoom-mode=normal\""
 		category = "&Scaling"
-		can-check = true
 		is-checked = true
+		can-check = true
 		group = "scale"
 		saved-params = "is-checked"
 	elem 
@@ -758,20 +758,24 @@ window "mainwindow"
 		type = MAIN
 		pos = 372,0
 		size = 1001x720
-		anchor1 = none
-		anchor2 = none
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
 		is-default = true
 		saved-params = "pos;size;is-minimized;is-maximized"
 		is-maximized = true
 		icon = 'icons\\ss13_64.png'
 		macro = "macro"
 		menu = "menu"
+		outer-size = 1936x1056
+		inner-size = 1920x997
 	elem "asset_cache_browser"
 		type = BROWSER
 		pos = 424,208
 		size = 1x1
-		anchor1 = none
-		anchor2 = none
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
 		is-visible = false
 		saved-params = ""
 	elem "mainvsplit"
@@ -815,8 +819,9 @@ window "mapwindow"
 		type = MAIN
 		pos = 281,0
 		size = 640x480
-		anchor1 = none
-		anchor2 = none
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
 		saved-params = "pos;size;is-minimized;is-maximized"
 		titlebar = false
 		statusbar = false
@@ -824,6 +829,7 @@ window "mapwindow"
 		can-minimize = false
 		can-resize = false
 		is-pane = true
+		outer-size = 654x494
 	elem "map"
 		type = MAP
 		pos = 0,0
@@ -842,6 +848,7 @@ window "mapwindow"
 		size = 640x480
 		anchor1 = 0,0
 		anchor2 = 100,100
+		background-color = none
 		is-visible = false
 		is-disabled = true
 		saved-params = ""
@@ -850,9 +857,10 @@ window "outputwindow"
 	elem "outputwindow"
 		type = MAIN
 		pos = 281,0
-		size = 640x714
+		size = 640x1017
 		anchor1 = -1,-1
 		anchor2 = -1,-1
+		background-color = none
 		saved-params = "pos;size;is-minimized;is-maximized"
 		titlebar = false
 		statusbar = false
@@ -861,6 +869,8 @@ window "outputwindow"
 		can-resize = false
 		is-pane = true
 		image = 'code\\porco\\chatbg.png'
+		outer-size = 654x1031
+		inner-size = 640x1017
 	elem "browser"
 		type = BROWSER
 		pos = 0,0
@@ -872,7 +882,7 @@ window "outputwindow"
 	elem "browseroutput"
 		type = BROWSER
 		pos = 0,316
-		size = 640x348
+		size = 640x651
 		anchor1 = 0,0
 		anchor2 = 100,100
 		background-color = #ffffff
@@ -880,19 +890,19 @@ window "outputwindow"
 		saved-params = ""
 	elem "input"
 		type = INPUT
-		pos = 0,665
-		font-size = 12
-		text-color = #aaff6c
-		background-color = #000000
+		pos = 0,968
 		size = 640x23
 		anchor1 = 0,100
 		anchor2 = 100,100
+		font-size = 12
+		text-color = #aaff6c
+		background-color = #000000
 		is-default = true
-		command = "say"
 		saved-params = "command"
+		command = "say"
 	elem "csay"
 		type = INPUT
-		pos = 0,645
+		pos = 0,177
 		size = 640x23
 		anchor1 = 0,100
 		anchor2 = 100,100
@@ -912,15 +922,19 @@ window "rpane"
 		background-color = #262222
 		saved-params = "pos;size;is-minimized;is-maximized"
 		is-pane = true
+		outer-size = 656x538
+		inner-size = 640x499
 	elem "rpanewindow"
 		type = CHILD
 		pos = 0,0
 		size = 640x506
 		anchor1 = 0,0
 		anchor2 = 100,100
+		background-color = none
 		saved-params = "splitter"
 		left = "infowindow"
 		right = "outputwindow"
 		is-vert = false
 		splitter = 30
 		show-splitter = false
+

@@ -687,15 +687,16 @@ its easier to just keep the beam vertical.
 			H.hovertext.maptext = ""  // ui is blank
 */
 
+/*
 /atom/MouseMove(location, control, params)
 	..()
-	if(get_dist(usr,src) <= 10 && usr.get_preference_value(/datum/client_preference/automousemove) == GLOB.PREF_YES) return usr.face_atom(src)
-	if(usr.get_preference_value(/datum/client_preference/automousemove) == GLOB.PREF_NO)
-		return 0
+	if(get_dist(usr,src) <= 10)
+		return usr.face_atom(src)
 	if(usr.resting || usr.lying)
 		return 0
 	if(usr.facing_dir)
 		return 0
+*/
 
 /atom/proc/create_bullethole(var/obj/item/projectile/Proj)
 	var/p_x = Proj.p_x + pick(0,0,0,0,0,-1,1) // really ugly way of coding "sometimes offset Proj.p_x!"

@@ -42,6 +42,8 @@
 			params["roundid"] = game_id
 			params["name"] = real_name || name
 			world.Export("[config.login_export_addr]?[list2params(params)]", null, 1)
+	var/savefile/F = new /savefile("data/player_saves/[copytext(ckey, 1, 2)]/[ckey]/achievements.sav")
+	client.achievement_holder.Read(F)
 
 /mob/proc/maybe_send_staffwarns(var/action)
 	if(client.staffwarn)

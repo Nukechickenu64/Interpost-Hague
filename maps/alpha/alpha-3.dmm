@@ -1,5 +1,5 @@
 "aa" = (/turf/space,/area/space)
-"ab" = (/obj/machinery/button/remote/airlock{desc = "A remote control-switch for the office door."; id = "captaindoor"; name = "Office Door Control"; pixel_x = 0; pixel_y = -30; req_access = list(20)},/obj/structure/cable{d1 = 4; d2 = 8; icon_state = "4-8"; pixel_x = 0},/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4; icon_state = "intact-supply"},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/structure/bed/chair/comfy/black{dir = 4},/turf/simulated/floor/tiled/bunker/polar,/area/crew_quarters/captain)
+"ab" = (/obj/structure/cable{d1 = 4; d2 = 8; icon_state = "4-8"; pixel_x = 0},/obj/machinery/atmospherics/pipe/simple/hidden/supply{dir = 4; icon_state = "intact-supply"},/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{dir = 4},/obj/structure/bed/chair/comfy/black{dir = 4},/turf/simulated/floor/tiled/bunker/polar,/area/crew_quarters/captain)
 "ac" = (/obj/effect/shuttle_landmark/merc/north,/turf/space,/area/space)
 "ad" = (/turf/simulated/mineral,/area/mine/explored)
 "ae" = (/turf/simulated/floor/asteroid,/area/mine/explored)

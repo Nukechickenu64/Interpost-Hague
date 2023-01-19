@@ -71,6 +71,10 @@
 #define MAX_DESC_LEN          128
 #define MAX_TEXTFILE_LENGTH 128000		// 512GQ file
 
+#define DIFF_EASY		"easy"	//Used in achievements.
+#define DIFF_MEDIUM		"medium"
+#define DIFF_HARD		"hard"
+
 // Event defines.
 #define EVENT_LEVEL_MUNDANE  1
 #define EVENT_LEVEL_MODERATE 2

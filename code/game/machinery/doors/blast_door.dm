@@ -216,6 +216,8 @@
 	icon_state_closed = "door_closed"
 	icon_state_closing = "door_closing"
 	icon_state = "door_off"
+	open_sound = 'sound/ported/GARRISON_UNLOCK.ogg'
+	close_sound = 'sound/ported/GARRISON_SEAL.ogg'
 	block_air_zones = 1
 
 /obj/machinery/door/blast/iddoor/open

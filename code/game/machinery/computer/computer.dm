@@ -103,3 +103,8 @@
 
 /obj/machinery/computer/attack_ghost(var/mob/ghost)
 	attack_hand(ghost)
+
+/obj/machinery/computer/retro //same shit but cooler
+	name = "computer"
+	icon = 'icons/obj/computer.dmi'
+	icon_state = "retrosmall"

@@ -68,6 +68,7 @@
 	name = "remote door control"
 	desc = "It controls doors, remotely. Using an id."
 	icon_state = "doorctrlid"
+	var/image/overlay
 
 /obj/machinery/button/remote/id/proc/CanToggleButton(var/mob/user, var/obj/item/weapon/card/id/id_card)
 	return allowed(user) || (istype(id_card) && check_access_list(id_card.GetAccess()))
@@ -87,7 +88,7 @@
 		trigger(user)
 		spawn(12)
 		update_icon() // this is ass - Turret. No you're ass - Mclovin
-		playsound(src, 'sound/machines/defib_ready.ogg', 40)
+		playsound(src, 'sound/ported/BUILD_TRAP.ogg', 40)
 	else if(!CanToggleButton(user, id_card))
 		to_chat(user, "<span class='danger'>No, wrong access.</span>")
 		playsound(src, 'sound/machines/button11.ogg', 40)
@@ -108,10 +109,19 @@
 					return
 
 /obj/machinery/button/remote/id/update_icon()
+	if(!overlay)
+		overlay = image(icon, "doorctrlid1-overlay")
+		overlay.plane = ABOVE_LIGHTING_PLANE
+		overlay.layer = ABOVE_LIGHTING_LAYER
+
+	overlays.Cut()
 	if(stat & NOPOWER)
 		icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
+		overlay.icon_state = "doorctrliddeny-overlay"
 	else
 		icon_state = "[initial(icon_state)]"
+		overlay.icon_state = "doorctrlid0-overlay"
+		overlays += overlay
 /*
 	Airlock remote control
 */

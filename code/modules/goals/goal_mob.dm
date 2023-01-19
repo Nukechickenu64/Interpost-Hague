@@ -8,7 +8,7 @@
 
 /mob/verb/show_goals_verb()
 
-	set name = "Show Goals"
+	set name = "ShowGoals"
 	set desc = "Shows your round goals."
 	set category = "IC"
 
@@ -20,11 +20,10 @@
 		to_chat(src, SPAN_WARNING("You are mindless and cannot have goals."))
 		return
 
-	to_chat(src, "<hr>")
 	if(LAZYLEN(mind.goals))
 		to_chat(src, SPAN_NOTICE("<b>This round, you have the following personal goals:</b><br>[jointext(mind.summarize_goals(show_success, allow_modification), "<br>")]"))
 	else
-		to_chat(src, SPAN_NOTICE("<b>You have no personal goals this round.</b>"))
+		to_chat(src, SPAN_NOTICE("<b>I have no personal goals this round.</b>"))
 
 	if(mind.assigned_job && mind.assigned_job.department_flag && SSgoals.departments["[mind.assigned_job.department_flag]"])
 		to_chat(src, " ")
@@ -36,5 +35,3 @@
 
 	if(LAZYLEN(mind.goals))
 		to_chat(mind.current, SPAN_NOTICE("<br><br>You can check your round goals with the <b>Show Goals</b> verb."))
-
-	to_chat(src, "<hr>")
