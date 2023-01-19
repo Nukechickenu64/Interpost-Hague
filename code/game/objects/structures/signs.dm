@@ -645,6 +645,25 @@
 	icon_state = "graduationposter"
 	desc = "But- but, but he made Graduation"
 
+/obj/structure/sign/propaganda
+	name = "Soviet poster"
+	desc = "Old soviet propaganda"
+
+/obj/structure/sign/propaganda/poster1
+	icon_state = "sovietpaper"
+
+/obj/structure/sign/propaganda/poster2
+	icon_state = "sovietnyet"
+
+/obj/structure/sign/propaganda/poster3
+	icon_state = "sovietmilk"
+
+/obj/structure/sign/propaganda/poster4
+	icon_state = "sovietgrain"
+
+/obj/structure/sign/propaganda/poster5
+	icon_state = "sovietfamily"
+
 /obj/structure/sign/flag
 	var/ripped = FALSE
 
