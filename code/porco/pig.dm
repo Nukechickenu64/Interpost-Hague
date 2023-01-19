@@ -352,7 +352,7 @@
 	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=411x330;")
 
 /mob/proc/defaultButton()
-	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("togglefullscreen", "Toggle Fullscreen"), list("playlobbymusic", "Play Lobby Music"))) + "</span>")
+	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), /*list("togglefullscreen", "Toggle Fullscreen"),*/ list("playlobbymusic", "Play Lobby Music"))) + "</span>")
 
 /client/proc/setDefaultButtons()
 	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("Poo", "Poo")))]</span>"})
