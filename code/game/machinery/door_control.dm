@@ -85,20 +85,24 @@
 		icon_state = "[initial(icon_state)]1"
 		desiredstate = !desiredstate
 		trigger(user)
-		spawn(15)
+		spawn(12)
 		update_icon() // this is ass
+	else if(!CanToggleButton(user, id_card))
+		to_chat(user, "<span class='danger'>No, wrong access.</span>")
+		playsound(src, 'sound/machines/button11.ogg', 40)
 	else
-		to_chat(user, "You do not have the required access.")
+		to_chat(user, "<span class='danger'>I can't do this like that.</span>")
+		playsound(src, 'sound/machines/button11.ogg', 40)
 
 /obj/machinery/button/remote/id/trigger()
 	for(var/obj/machinery/door/blast/iddoor/ID in world)
 		if(ID.id == src.id)
 			if(ID.density)
-				spawn(0)
+				spawn(5)
 					ID.open()
 					return
 			else
-				spawn(0)
+				spawn(5)
 					ID.close()
 					return
 

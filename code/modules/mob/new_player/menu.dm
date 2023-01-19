@@ -39,12 +39,12 @@
 /obj/screen/new_player/selection/settings
 	name = "Setup"
 	icon_state = "setup"
-	screen_loc = "LEFT+6.8,CENTER-5"
+	screen_loc = "LEFT+11,CENTER-5"
 
 /obj/screen/new_player/selection/observe
 	name = "Observe"
 	icon_state = "observe"
-	screen_loc = "LEFT+11,CENTER-5"
+	screen_loc = "LEFT+6.8,CENTER-5"
 
 
 //SELECTION

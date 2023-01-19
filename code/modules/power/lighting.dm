@@ -165,6 +165,9 @@
 
 	var/current_mode = null
 
+	var/sound_on = 'sound/machines/lightson.ogg'
+	var/sound_off = 'sound/machines/lightsoff.ogg'
+
 // the smaller bulb light fixture
 /obj/machinery/light/small
 	icon_state = "bulb1"
@@ -264,6 +267,8 @@
 			switch_check()
 	else
 		update_use_power(POWER_USE_OFF)
+		if(!on)
+			playsound(get_turf(src),sound_off, 30, 0)
 		set_light(0)
 	change_power_consumption((light_range * light_power) * LIGHTING_POWER_FACTOR, POWER_USE_ACTIVE)
 
