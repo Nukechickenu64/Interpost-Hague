@@ -86,7 +86,8 @@
 		desiredstate = !desiredstate
 		trigger(user)
 		spawn(12)
-		update_icon() // this is ass
+		update_icon() // this is ass - Turret. No you're ass - Mclovin
+		playsound(src, 'sound/machines/defib_ready.ogg', 40)
 	else if(!CanToggleButton(user, id_card))
 		to_chat(user, "<span class='danger'>No, wrong access.</span>")
 		playsound(src, 'sound/machines/button11.ogg', 40)
