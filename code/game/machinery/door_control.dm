@@ -84,6 +84,7 @@
 	if(CanToggleButton(user, id_card) && istype(I, /obj/item/weapon/card/id/))
 		use_power_oneoff(5)
 		icon_state = "[initial(icon_state)]1"
+		overlay.icon_state = "doorctrlid0-overlay"
 		desiredstate = !desiredstate
 		trigger(user)
 		spawn(12)
@@ -120,8 +121,6 @@
 		overlay.icon_state = "doorctrliddeny-overlay"
 	else
 		icon_state = "[initial(icon_state)]"
-		overlay.icon_state = "doorctrlid0-overlay"
-		overlays += overlay
 /*
 	Airlock remote control
 */
