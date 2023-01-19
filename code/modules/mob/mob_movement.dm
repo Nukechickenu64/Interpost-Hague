@@ -253,6 +253,10 @@
 					if(b.zoom)
 						b.zoom()
 
+	// Running prevents you from looking into the distance
+	if(mob.m_intent == "run" && mob.zoomed == 1)
+		mob.do_zoom()
+
 	if(Process_Grab())	return
 
 	if(!mob.canmove)

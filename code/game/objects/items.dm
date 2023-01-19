@@ -723,6 +723,9 @@ var/list/global/slot_flags_enumeration = list(
 	if(user.defense_intent != I_PARRY)//If you're not on parry intent, you won't parry.
 		return 0
 
+	if(user.zoomed == 1)//If you're looking in the distance, you're not parrying.
+		return 0
+
 	user.adjustStaminaLoss(10)
 
 	if(!user.skillcheck(user.skills["melee"], 45 - defense_mode_modifier, 0, "Melee")) //Need to be decent at melee fighting to parry everything
