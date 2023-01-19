@@ -25,12 +25,12 @@ GLOBAL_DATUM_INIT(sound_player, /decl/sound_player, new)
 	taken_channels = list()
 	source_id_uses = list()
 
-/decl/sound_player/proc/PlayLoopingSound(var/atom/source, var/sound_id, var/sound, var/volume, var/range, var/falloff, var/prefer_mute, var/ignore_vis = FALSE, var/streaming)
+/decl/sound_player/proc/PlayLoopingSound(var/atom/source, var/sound_id, var/sound, var/volume, var/range, var/falloff, var/echo, var/frequency, var/prefer_mute, var/ignore_vis = FALSE, var/streaming)
 	var/channel = PrivGetChannel(sound_id)
 	if(!channel)
 		log_warning("All available sound channels are in active use.")
 		return
-	return new/datum/sound_token(source, sound_id, sound, volume, channel, range, falloff, prefer_mute, ignore_vis, streaming)
+	return new/datum/sound_token(source, sound_id, sound, volume, channel, range, falloff, echo, frequency, prefer_mute, ignore_vis, streaming)
 
 /decl/sound_player/proc/PrivStopSound(var/datum/sound_token/sound_token)
 	var/channel = sound_token.channel
@@ -72,6 +72,8 @@ GLOBAL_DATUM_INIT(sound_player, /decl/sound_player, new)
 	var/prefer_mute    // If sound should be muted instead of stopped when mob moves out of range. In the general case this should be avoided because listeners will remain tracked.
 	var/sound          // Sound file, not sound datum
 	var/sound_id       // The associated sound id, used for cleanup
+	var/frequency
+	var/echo
 	var/status = 0     // Paused, muted, running? Global for all listeners
 	var/listener_status// Paused, muted, running? Specific for the given listener.
 	var/volume         // Take a guess
@@ -82,7 +84,7 @@ GLOBAL_DATUM_INIT(sound_player, /decl/sound_player, new)
 	var/list/can_be_heard_from
 	var/ignore_vis = FALSE
 
-/datum/sound_token/New(var/atom/source, var/sound_id, var/sound, var/volume, var/channel, var/range = 4, var/falloff = 1, var/prefer_mute = FALSE, var/ignore_vis = FALSE, var/streaming)
+/datum/sound_token/New(var/atom/source, var/sound_id, var/sound, var/volume, var/channel, var/range = 4, var/falloff = 1, var/frequency, var/echo, var/prefer_mute = FALSE, var/ignore_vis = FALSE, var/streaming)
 	..()
 	listeners = list()
 	listener_status = list()
@@ -94,6 +96,8 @@ GLOBAL_DATUM_INIT(sound_player, /decl/sound_player, new)
 	src.sound = sound
 	src.sound_id = sound_id
 	src.source = source
+	src.frequency = frequency
+	src.echo = echo
 	src.volume = volume
 	src.ignore_vis = ignore_vis
 

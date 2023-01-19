@@ -1,4 +1,4 @@
-/obj/machinery/computer/shuttle
+/obj/machinery/computer/retro/shuttle
 	name = "Shuttle"
 	desc = "For shuttle control."
 	icon_keyboard = "tech_key"
