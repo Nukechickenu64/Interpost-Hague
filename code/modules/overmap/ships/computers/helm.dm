@@ -2,7 +2,7 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 /obj/machinery/computer/helm
 	name = "helm control console"
-	icon_state = "thick"
+	icon_state = "retrosmall"
 	icon_keyboard = "teleport_key"
 	icon_screen = "helm"
 	light_color = "#7faaff"

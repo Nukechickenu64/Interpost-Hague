@@ -61,7 +61,6 @@
 	msg += "<br>"
 
 
-
 	if((!skipface || wear_id || wear_amulet) && src != user)
 		var/mob/living/carbon/human/H = user
 		var/classdesc = get_social_description(H)
@@ -246,13 +245,13 @@
 	var/mhealth = (getBruteLoss() + getFireLoss())//How injured they look. Not not nescessarily how hurt they actually are.
 
 	if(mhealth >= 25 && mhealth < 50)//Is the person a little hurt?
-		msg += "<span class='warning'><b>[T.He] looks somewhat injured.\n</b></span>"
+		msg += "<span class='warning'><b>[T.He] looks a bit hurt.\n</b></span>"
 
 	if(mhealth >= 50 && mhealth < 75)//Hurt.
-		msg += "<span class='warning'><b>[T.He] looks injured.</b></span>\n"
+		msg += "<span class='warning'><b>[T.He] looks hurt.</b></span>\n"
 
 	if(mhealth >= 75)//Or incredibly hurt.
-		msg += "<span class='warning'><b>[T.He] looks incredibly injured.</b>\n</span>"
+		msg += "<span class='warning'><b>[T.He] looks deadly hurt.</b>\n</span>"
 
 	var/list/wound_flavor_text = list()
 	var/applying_pressure = ""
@@ -294,21 +293,25 @@
 				var/wounddesc = E.get_wounds_desc()
 				if(wounddesc != "nothing")
 					wound_flavor_text[E.name] += "[T.He] [T.has] [wounddesc] on [T.his] [E.name].<br>"
+/*
 		if(!hidden || distance <=1)
 			if(E.dislocated > 0)
 				wound_flavor_text[E.name] += "[T.His] [E.joint] is dislocated!<br>"
 			if(((E.status & ORGAN_BROKEN) && E.brute_dam > E.min_broken_damage) || (E.status & ORGAN_MUTATED))
 				wound_flavor_text[E.name] += "[T.His] [E.name] is broken!<br>"
+*/
 
 		for(var/datum/wound/wound in E.wounds)
 			if(wound.embedded_objects.len)
 				shown_objects += wound.embedded_objects
 				wound_flavor_text["[E.name]"] += "The [wound.desc] on [T.his] [E.name] has \a [english_list(wound.embedded_objects, and_text = " and \a ", comma_text = ", \a ")] sticking out of it!<br>"
 
+/*
 	msg += "<span class='warning'>"
 	for(var/limb in wound_flavor_text)
 		msg += wound_flavor_text[limb]
 	msg += "</span>"
+*/
 
 	for(var/obj/implant in get_visible_implants(0))
 		if(implant in shown_objects)

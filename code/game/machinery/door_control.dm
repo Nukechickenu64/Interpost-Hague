@@ -68,7 +68,11 @@
 	name = "remote door control"
 	desc = "It controls doors, remotely. Using an id."
 	icon_state = "doorctrlid"
-	var/image/overlay
+	var/deny = 0
+
+/obj/machinery/button/remote/id/Initialize()
+	. = ..()
+	update_icon()
 
 /obj/machinery/button/remote/id/proc/CanToggleButton(var/mob/user, var/obj/item/weapon/card/id/id_card)
 	return allowed(user) || (istype(id_card) && check_access_list(id_card.GetAccess()))
@@ -84,7 +88,6 @@
 	if(CanToggleButton(user, id_card) && istype(I, /obj/item/weapon/card/id/))
 		use_power_oneoff(5)
 		icon_state = "[initial(icon_state)]1"
-		overlay.icon_state = "doorctrlid0-overlay"
 		desiredstate = !desiredstate
 		trigger(user)
 		spawn(12)
@@ -93,9 +96,13 @@
 	else if(!CanToggleButton(user, id_card))
 		to_chat(user, "<span class='danger'>No, wrong access.</span>")
 		playsound(src, 'sound/machines/button11.ogg', 40)
+		deny = 1
+		update_icon()
 	else
 		to_chat(user, "<span class='danger'>I can't do this like that.</span>")
 		playsound(src, 'sound/machines/button11.ogg', 40)
+		deny = 1
+		update_icon()
 
 /obj/machinery/button/remote/id/trigger()
 	for(var/obj/machinery/door/blast/iddoor/ID in world)
@@ -103,24 +110,30 @@
 			if(ID.density)
 				spawn(5)
 					ID.open()
+					overlays += overlay_image(icon, "doorctrlid0-overlay", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+					update_icon()
 					return
 			else
 				spawn(5)
 					ID.close()
+					overlays += overlay_image(icon, "doorctrlid0-overlay", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+					update_icon()
 					return
 
 /obj/machinery/button/remote/id/update_icon()
-	if(!overlay)
-		overlay = image(icon, "doorctrlid1-overlay")
-		overlay.plane = ABOVE_LIGHTING_PLANE
-		overlay.layer = ABOVE_LIGHTING_LAYER
-
 	overlays.Cut()
+
+	icon_state = "[initial(icon_state)]"
+	overlays += overlay_image(icon, "doorctrlid1-overlay", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+
 	if(stat & NOPOWER)
-		icon_state = "[initial(icon_state)]-denied" // Dunno but I guess denying it when there's no power makes sense. Rather just make another sprite.
-		overlay.icon_state = "doorctrliddeny-overlay"
-	else
-		icon_state = "[initial(icon_state)]"
+		flick("[initial(icon_state)]-denied", src)
+		overlays += overlay_image(icon, "doorctrliddeny-overlay", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+	if(deny)
+		flick("[initial(icon_state)]-denied", src)
+		overlays += overlay_image(icon, "doorctrliddeny-overlay", plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+		deny = 0
+
 /*
 	Airlock remote control
 */

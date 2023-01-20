@@ -97,7 +97,6 @@
 		out = "# SYSTEM ERROR - NO POWERNET #"
 		return out
 
-
 	var/list/L = find_apcs()
 	var/total_apc_load = 0
 	if(L.len <= 0) 	// No APCs found.
@@ -186,8 +185,3 @@
 		data["load_percentage"] = 100
 	data["alarm"] = powernet.problem ? 1 : 0
 	return data
-
-
-
-
-

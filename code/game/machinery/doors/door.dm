@@ -75,18 +75,20 @@
 	update_nearby_tiles(need_rebuild=1)
 	return
 
-/obj/machinery/door/proc/handle_multidoor()
+/obj/machinery/door/proc/handle_multidoor(var/client/C)
 	if(width > 1)
 		if(dir in list(EAST, WEST))
 			bound_width = width * world.icon_size
 			bound_height = world.icon_size
 			filler = get_step(src,EAST)
 			filler.set_opacity(opacity)
+			//C.update_opacity_image()
 		else
 			bound_width = world.icon_size
 			bound_height = width * world.icon_size
 			filler = get_step(src,NORTH)
 			filler.set_opacity(opacity)
+			//C.update_opacity_image()
 
 /obj/machinery/door/Destroy()
 	set_density(0)
@@ -249,6 +251,8 @@
 			to_chat(user, "<span class='notice'>You start to fix dents and weld \the [repairing] into place.</span>")
 			playsound(src, 'sound/items/Welder.ogg', 100, 1)
 			if(do_after(user, 5 * repairing.amount, src) && welder && welder.isOn())
+				if (!repairing)
+					return //the materials in the door have been removed before welding was finished.
 				to_chat(user, "<span class='notice'>You finish repairing the damage to \the [src].</span>")
 				health = between(health, health + repairing.amount*DOOR_REPAIR_AMOUNT, maxhealth)
 				update_icon()

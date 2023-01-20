@@ -58,6 +58,7 @@
 	overlays.Cut()
 	if(stat & NOPOWER)
 		set_light(0)
+		icon_state = "[icon_state]_off"
 		if(icon_keyboard)
 			overlays += image(icon,"[icon_keyboard]_off", overlay_layer)
 		return

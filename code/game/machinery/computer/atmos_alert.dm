@@ -42,7 +42,7 @@ var/global/list/minor_air_alarms = list()
 
 	if(major_alarms.len)
 		for(var/zone in major_alarms)
-			msg += "<FONT color='red'><B>[zone]</B></FONT>  <A href='?src=\ref[src];priority_clear=[ckey(zone)]'>X</A><BR>"
+			msg += "<FONT color='red'><B>[zone]</B></FONT> <A href='?src=\ref[src];priority_clear=[ckey(zone)]'>X</A><BR>"
 	else
 		msg += "No priority alerts detected.<BR>"
 
@@ -50,7 +50,7 @@ var/global/list/minor_air_alarms = list()
 
 	if(minor_alarms.len)
 		for(var/zone in minor_alarms)
-			msg += "<B>[zone]</B>  <A href='?src=\ref[src];minor_clear=[ckey(zone)]'>X</A><BR>"
+			msg += "<B>[zone]</B> <A href='?src=\ref[src];minor_clear=[ckey(zone)]'>X</A><BR>"
 	else
 		msg += "No minor alerts detected.<BR>"
 
@@ -76,3 +76,83 @@ var/datum/topic_state/air_alarm_topic/air_alarm_topic = new()
 	extra_href["remote_access"] = 1
 
 	return extra_href
+
+/obj/machinery/computer/totalpower // so true queen
+	name = "total power computer"
+	desc = "Used to know information about the power grid."
+	//circuit = /obj/item/weapon/circuitboard/totalpower //later
+	icon_screen = "power_screen"
+	light_color = "#e6ffff"
+	var/datum/powernet/powernet = null
+
+/obj/machinery/computer/totalpower/Process()
+	..()
+
+// Proc: reading_to_text()
+// Parameters: 1 (amount - Power in Watts to be converted to W, kW or MW)
+// Description: Helper proc that converts reading in Watts to kW or MW (returns string version of amount parameter)
+/obj/machinery/computer/totalpower/proc/reading_to_text(var/amount = 0)
+	var/units = ""
+	// 10kW and less - Watts
+	if(amount < 10000)
+		units = "W"
+	// 10MW and less - KiloWatts
+	else if(amount < 10000000)
+		units = "kW"
+		amount = (round(amount/100) / 10)
+	// More than 10MW - MegaWatts
+	else
+		units = "MW"
+		amount = (round(amount/10000) / 100)
+	if (units == "W")
+		return "[amount] W"
+	else
+		return "~[amount] [units]" //kW and MW are only approximate readings, therefore add "~"
+
+// Proc: find_apcs()
+// Parameters: None
+// Description: Searches powernet for APCs and returns them in a list.
+/obj/machinery/computer/totalpower/proc/find_apcs()
+	if(!powernet)
+		return
+
+	var/list/L = list()
+	for(var/obj/machinery/power/terminal/term in powernet.nodes)
+		if(istype(term.master, /obj/machinery/power/apc))
+			var/obj/machinery/power/apc/A = term.master
+			L += A
+
+	return L
+
+
+// Proc: return_reading_text()
+// Parameters: None
+// Description: Generates string which contains HTML table with reading data.
+/obj/machinery/computer/totalpower/proc/return_reading_text()
+	var/msg = "\n<div class='firstdiv'><div class='box'>"
+
+	var/total_apc_load = 0
+
+	// Split to multiple lines to make it more readable
+	for(var/obj/machinery/power/apc/A in world)
+		var/load = A.lastused_total // Load.
+		total_apc_load += load
+		load = reading_to_text(load)
+		msg += "<br>[load]"
+
+	msg += "<br>POWER GRID STATUS:\n"
+	msg += "<hr class='linexd'>"
+	msg += "<br><b>TOTAL AVAILABLE: [reading_to_text(powernet.avail)]</b>\n"
+	msg += "<br><b>APC LOAD: [reading_to_text(total_apc_load)]</b>\n"
+	msg += "<br><b>OTHER LOAD: [reading_to_text(max(powernet.load - total_apc_load, 0))]</b>\n"
+	msg += "<br><b>TOTAL GRID LOAD: [reading_to_text(powernet.viewload)] ([round((powernet.load / powernet.avail) * 100)]%)</b>\n"
+
+	if(powernet.problem)
+		msg += "<br><b>WARNING: Abnormal grid activity detected!</b>"
+	msg += "</div></div>"
+	to_chat(src, msg)
+
+/obj/machinery/computer/totalpower/attack_hand(mob/user)
+	..()
+	if(ishuman(src))
+		return_reading_text()

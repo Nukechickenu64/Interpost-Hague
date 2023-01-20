@@ -10,6 +10,9 @@
 	var/germ_level = GERM_LEVEL_AMBIENT // The higher the germ level, the more germ on the atom.
 	var/simulated = 1 //filter for actions - used by lighting overlays
 	var/fluorescent // Shows up under a UV light.
+	var/list/filter_data
+
+	appearance_flags = TILE_BOUND|LONG_GLIDE
 
 	///Proximity monitor associated with this atom
 	var/datum/proximity_monitor/proximity_monitor

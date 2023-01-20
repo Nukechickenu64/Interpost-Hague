@@ -60,7 +60,6 @@
 	req_one_access = list(access_atmospherics, access_engine_equip)
 	clicksound = "button"
 	clickvol = 30
-	appearance_flags = TILE_BOUND
 	luminosity = 1
 
 	layer = ABOVE_WINDOW_LAYER
