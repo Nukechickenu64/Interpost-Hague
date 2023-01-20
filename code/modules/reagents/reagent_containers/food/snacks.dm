@@ -136,6 +136,10 @@
 			if(!U.reagents)
 				U.create_reagents(5)
 
+			if(src.reagents.total_volume < 1)
+				to_chat(user, SPAN_WARNING("There's nothing in the [src]"))
+				return
+
 			if (U.reagents.total_volume > 0)
 				to_chat(user, SPAN_WARNING("You already have something on your [U]."))
 				return
@@ -3355,6 +3359,9 @@
 		return ..()
 	if (is_path_in_list(item.type, /obj/item/weapon/reagent_containers/food/snacks/custombowl))
 		return ..()
+	if(item.reagents.total_volume <1)
+		to_chat(user, SPAN_DANGER("Wait, is this fake food?"))
+		return
 	var/obj/item/weapon/reagent_containers/food/snacks/custombowl/bowl = new (get_turf(src), item)
 	bowl.pixel_x = pixel_x
 	bowl.pixel_y = pixel_y
@@ -3389,6 +3396,9 @@
 		return ..()
 	if (is_path_in_list(item.type, /obj/item/weapon/reagent_containers/food/snacks/custombowl))
 		return ..()
+	if(item.reagents.total_volume <1)
+		to_chat(user, SPAN_DANGER("Wait, is this fake food?"))
+		return
 	if (ingredients_left < 1)
 		to_chat(user, SPAN_WARNING("There's no room for any more ingredients in \the [src]."))
 		return
