@@ -109,6 +109,7 @@
 	sharp = 1
 	edge = 1
 	var/blade_color
+	var/sword_light_color
 
 /obj/item/weapon/melee/energy/sword/dropped(var/mob/user)
 	..()
@@ -120,15 +121,19 @@
 
 /obj/item/weapon/melee/energy/sword/green/New()
 	blade_color = "green"
+	sword_light_color = COLOR_GREEN
 
 /obj/item/weapon/melee/energy/sword/red/New()
 	blade_color = "red"
+	sword_light_color = COLOR_RED
 
 /obj/item/weapon/melee/energy/sword/blue/New()
 	blade_color = "blue"
+	sword_light_color = COLOR_BLUE
 
 /obj/item/weapon/melee/energy/sword/purple/New()
 	blade_color = "purple"
+	sword_light_color = COLOR_PURPLE
 
 /obj/item/weapon/melee/energy/sword/activate(mob/living/user)
 	if(!active)
@@ -136,6 +141,7 @@
 	..()
 	attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
 	icon_state = "sword[blade_color]"
+	set_light(2, 1, sword_light_color)
 
 /obj/item/weapon/melee/energy/sword/deactivate(mob/living/user)
 	if(active)
@@ -143,6 +149,7 @@
 	..()
 	attack_verb = list()
 	icon_state = initial(icon_state)
+	set_light(0)
 
 /obj/item/weapon/melee/energy/sword/handle_shield(mob/user, var/damage, atom/damage_source = null, mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
 	if(active && default_parry_check(user, attacker, damage_source))
@@ -159,11 +166,12 @@
 	name = "energy cutlass"
 	desc = "Arrrr matey."
 	icon_state = "cutlass0"
+	sword_light_color = COLOR_RED
 
 /obj/item/weapon/melee/energy/sword/pirate/activate(mob/living/user)
 	..()
 	icon_state = "cutlass1"
-
+	set_light(2, 1, sword_light_color)
 
 /obj/item/weapon/melee/energy/sword/bogsword
 	name = "alien sword"
