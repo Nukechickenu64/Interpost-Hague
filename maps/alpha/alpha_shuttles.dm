@@ -443,3 +443,31 @@
 	icon_keyboard = "tiny_keyboard"
 	icon_screen = "lift"
 	density = 0
+
+
+/obj/turbolift_map_holder/alpha
+	icon = 'icons/obj/turbolift_preview_3x3.dmi'
+	depth = 2
+	lift_size_x = 4
+	lift_size_y = 4
+
+/obj/turbolift_map_holder/alpha/freight_elevator
+	name = "Alpha turbolift map placeholder"
+	areas_to_use = list(
+		/area/turbolift/first,
+		/area/turbolift/second
+		)
+
+// Elevator areas.
+/area/turbolift/first
+	name = "First Floor"
+	lift_floor_label = "Sector A"
+	lift_floor_name = "Under"
+	lift_announce_str = "Arrived to the Lower Floor."
+	base_turf = /turf/simulated/floor
+
+/area/turbolift/second
+	name = "Second Floor"
+	lift_floor_label = "Sector B"
+	lift_floor_name = "Upper"
+	lift_announce_str = "Arrived to the Upper Floor."

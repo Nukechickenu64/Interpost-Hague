@@ -13,8 +13,8 @@
 	icon_state = "firstaid"
 	throw_speed = 2
 	throw_range = 8
-	storage_slots_w = 6
-	storage_slots_h = 4
+	storage_slots_w = 8
+	storage_slots_h = 6
 
 /obj/item/weapon/storage/firstaid/empty
 	icon_state = "firstaid"

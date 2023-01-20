@@ -22,6 +22,8 @@
 	name = "box of glasses"
 	var/glass_type = /obj/item/weapon/reagent_containers/food/drinks/glass2
 	can_hold = list(/obj/item/weapon/reagent_containers/food/drinks/glass2)
+	storage_slots_w = 14
+	storage_slots_h = 4
 
 /obj/item/weapon/storage/box/glasses/Initialize()
 	. = ..()
@@ -67,6 +69,7 @@
 	var/extra_type = /obj/item/weapon/glass_extra
 	can_hold = list(/obj/item/weapon/glass_extra)
 	storage_slots_w = 14
+	storage_slots_h = 4
 
 /obj/item/weapon/storage/box/glass_extras/Initialize()
 	for(var/i = 1 to 14)

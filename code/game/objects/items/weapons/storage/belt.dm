@@ -4,8 +4,8 @@
 	icon = 'icons/obj/clothing/belts.dmi'
 	icon_state = "utilitybelt"
 	item_state = "utility"
-	storage_slots_w = 15
-	storage_slots_h = 3
+	storage_slots_w = 10
+	storage_slots_h = 10
 	slot_flags = SLOT_BELT
 	attack_verb = list("whipped", "lashed", "disciplined")
 	var/show_above_suit = 0
