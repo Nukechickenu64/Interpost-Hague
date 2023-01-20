@@ -1000,7 +1000,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 
 	if(owner)
 		owner.visible_message(\
-			"<span class='combat'><big>[owner]'s [name] shatters!</big></span>",\
+			"<span class='tetracorp'><big>[owner]'s [name] shatters!</big></span>",\
 			"<span class='combat'><big>Something feels like it shattered in your [name]!</big></span>",\
 			"<span class='combat'>You hear a sickening crack.</span>")
 		jostle_bone()
