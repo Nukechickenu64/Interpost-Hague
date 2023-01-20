@@ -24,8 +24,8 @@
 	desc = "It's just an ordinary box."
 	icon_state = "box"
 	item_state = "syringe_kit"
-	storage_slots_w = 6
-	storage_slots_h = 4
+	storage_slots_w = 8
+	storage_slots_h = 8
 	var/foldable = /obj/item/stack/material/cardboard	// BubbleWrap - if set, can be folded (when empty) into a sheet of cardboard
 	close_sound = 'sound/effects/rustle4.ogg'
 
@@ -33,8 +33,8 @@
 	name = "large box"
 	icon_state = "largebox"
 	w_class = ITEM_SIZE_LARGE
-	storage_slots_w = 9
-	storage_slots_h = 5
+	storage_slots_w = 12
+	storage_slots_h = 8
 
 // BubbleWrap - A box can be folded up to make card
 /obj/item/weapon/storage/box/attack_self(mob/user as mob)
