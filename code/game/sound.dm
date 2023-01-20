@@ -399,7 +399,7 @@ var/const/FALLOFF_SOUNDS = 0.5
 		S.wait = 0 //No queue
 		S.channel = 0 //Any channel
 		S.volume = vol
-		S.environment = -1
+		S.environment = HALLWAY
 		if(frequency)
 			S.frequency = frequency
 		else if (vary)
@@ -461,7 +461,9 @@ var/const/FALLOFF_SOUNDS = 0.5
 				S.environment = DIZZY
 			else if (M.stat == UNCONSCIOUS)
 				S.environment = UNDERWATER
-			else if (pressure_factor < 0.5)
+			else if (pressure_factor <= 0.5)
+				S.environment = CARPETED_HALLWAY
+			else if (pressure_factor <= 0.25)
 				S.environment = SPACE
 				S.volume = 0
 			else if (override_env)

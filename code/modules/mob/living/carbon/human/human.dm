@@ -1527,22 +1527,27 @@ var/list/rank_prefix = list(\
 	else
 		return H.pulse
 
-/mob/living/carbon/human/can_devour(atom/movable/victim)
+/mob/living/carbon/human/can_devour(atom/movable/victim, silent = FALSE)
 
 	if(!should_have_organ(BP_STOMACH))
 		return ..()
 
 	var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
 	if(!stomach || !stomach.is_usable())
-		to_chat(src, SPAN_WARNING("Your stomach is not functional!"))
+		if(!silent)
+			to_chat(src, SPAN_WARNING("My stomach is not functional!"))
 		return FALSE
 
+/*
 	if(!stomach.can_eat_atom(victim))
-		to_chat(src, SPAN_WARNING("You are not capable of eating \the [victim]!"))
+		if(!silent)
+			//to_chat(src, SPAN_WARNING("You are not capable of eating \the [victim]!"))
 		return FALSE
+*/
 
 	if(stomach.is_full(victim))
-		to_chat(src, SPAN_WARNING("Your [stomach.name] is full!"))
+		if(!silent)
+			to_chat(src, SPAN_WARNING("My [stomach.name] is full!"))
 		return FALSE
 
 	. = stomach.get_devour_time(victim) || ..()

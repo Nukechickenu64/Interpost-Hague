@@ -101,7 +101,7 @@
 	for(var/obj/item/grab/G in affecting.grabbed_by)
 		if(G.assailant == assailant && G.target_zone == target_zone)
 			var/obj/O = G.get_targeted_organ()
-			to_chat(assailant, "<span class='notice'>You already grabbed [affecting]'s [O.name].</span>")
+			to_chat(assailant, "<span class='notice'>I already grabbed [affecting]'s [O.name].</span>")
 			return 0
 
 	return 1
@@ -116,7 +116,7 @@
 
 
 	if(assailant.get_active_hand())
-		to_chat(assailant, "<span class='notice'>You can't grab someone if your hand is full.</span>")
+		to_chat(assailant, "<span class='notice'>I can't grab someone if my hand is full.</span>")
 		return 0
 
 
@@ -150,7 +150,7 @@
 
 /obj/item/grab/proc/upgrade(var/bypass_cooldown = FALSE)
 	if(!check_upgrade_cooldown() && !bypass_cooldown)
-		to_chat(assailant, "<span class='danger'>It's too soon to upgrade.</span>")
+		to_chat(assailant, "<span class='combat'>It's too soon to upgrade.</span>")
 		return
 
 	var/datum/grab/upgrab = current_grab.upgrade(src)
