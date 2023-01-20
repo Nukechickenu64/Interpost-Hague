@@ -176,7 +176,11 @@ What is the naming convention for planes or layers?
   #define BLIND_LAYER              3
   #define CRIT_LAYER               4
 
-#define HUD_PLANE                6
+#define SHADOWCASTING_REFLECTOR_PLANE 6
+
+#define SHADOWCASTING_PLANE 7
+
+#define HUD_PLANE                8
   #define UNDER_HUD_LAYER          0
   #define HUD_BASE_LAYER           2
   #define HUD_ITEM_LAYER           3
@@ -267,11 +271,21 @@ What is the naming convention for planes or layers?
 /obj/screen/plane_master/skewium4
 	plane = DEFAULT_PLANE
 
+/obj/screen/plane_master/shadowcasting
+	name = "shadowcasting plane master"
+	plane = SHADOWCASTING_PLANE
+	render_target = "all3"
+
+/obj/screen/plane_master/shadowcasting/New()
+	. = ..()
+	add_filter("blur", 4, list("type" = "blur", size=2))
+
 /obj/screen/plane_master/ghost_dummy
 	// this avoids a bug which means plane masters which have nothing to control get angry and mess with the other plane masters out of spite
 	alpha = 0
 	appearance_flags = 0
 	plane = OBSERVER_PLANE
+
 
 GLOBAL_LIST_INIT(ghost_master, list(
 	new /obj/screen/plane_master/ghost_master(),

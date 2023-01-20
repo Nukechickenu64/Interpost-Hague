@@ -212,6 +212,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	// Loop.
 	Master.StartProcessing(0)
 
+	shadowcasting_controller.initialized = TRUE
+
 	if(!accepted_prayer)
 		accepted_prayer = generate_random_prayer()  //Should probably datum-ize this, but don't want to now(nor do I)
 
