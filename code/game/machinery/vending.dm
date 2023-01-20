@@ -965,11 +965,12 @@
 	icon_vend = "dinnerware-vend"
 	products = list(
 	/obj/item/weapon/tray = 8,
-	/obj/item/weapon/material/kitchen/utensil/fork = 6,
-	/obj/item/weapon/material/kitchen/utensil/knife = 6,
-	/obj/item/weapon/material/kitchen/utensil/spoon = 6,
+	/obj/item/weapon/material/kitchen/utensil/fork = 16,
+	/obj/item/weapon/material/kitchen/utensil/knife = 8,
+	/obj/item/weapon/material/kitchen/utensil/spoon = 16,
 	/obj/item/weapon/material/knife = 3,
 	/obj/item/weapon/material/kitchen/rollingpin = 2,
+	/obj/item/serving_bowl = 16,
 	/obj/item/weapon/reagent_containers/food/drinks/pitcher = 2,
 	/obj/item/weapon/reagent_containers/food/drinks/coffeecup = 8,
 	/obj/item/weapon/reagent_containers/food/drinks/glass2/carafe = 2,

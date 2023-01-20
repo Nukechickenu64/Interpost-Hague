@@ -3370,6 +3370,7 @@
 	var/list/ingredients = list()
 	var/ingredients_left = 4
 	var/fullname
+	drop_sound = 'sound/items/drop_glass.ogg'
 
 /obj/item/weapon/reagent_containers/food/snacks/custombowl/Destroy()
 	ingredients.Cut()
