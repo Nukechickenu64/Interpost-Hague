@@ -1006,7 +1006,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 		jostle_bone()
 		if(can_feel_pain())
 			pain += 150
-			if(prob(50))
+			if(rand(1, owner.stats[STAT_HT]*10) < 60)
 				owner.agony_scream()
 
 	playsound(owner, "trauma", 75, 0)

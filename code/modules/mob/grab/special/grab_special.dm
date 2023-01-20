@@ -87,12 +87,15 @@
 		return
 
 
-	if(!O.is_broken()) // The limb is broken and we're grabbing it in both hands.
+	if(!O.is_broken())
 		var/break_chance = (assailant.stats[STAT_ST]*10) - 80 // let's not make it too easy
 		if(break_chance <= 0)
-			break_chance = 10
+			break_chance = 0 //you're not gonna do it laddie
+
 		if(prob(break_chance))
 			O.fracture()
+			if(O == affecting.get_organ(BP_HEAD))
+				affecting.adjustBrainLoss(150) //if you're getting your head wrenched you're gonna die lol
 
 	assailant.doing_something = FALSE
 
