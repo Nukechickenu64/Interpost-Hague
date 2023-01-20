@@ -12,8 +12,10 @@
 	var/dry = 0
 	var/nutriment_amt = 0
 	var/list/nutriment_desc = list("food" = 1)
+	var/list/eat_sound = 'sound/items/eatfood.ogg'
 	center_of_mass = "x=16;y=16"
 	w_class = ITEM_SIZE_SMALL
+	var/obj/item/trash
 
 /obj/item/weapon/reagent_containers/food/snacks/New()
 	..()
@@ -89,12 +91,16 @@
 			user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 			if(!do_mob(user, M)) return
 
+			if (user.get_active_hand() != src)
+				return
+
 			var/contained = reagentlist()
 			admin_attack_log(user, M, "Fed the victim with [name] (Reagents: [contained])", "Was fed [src] (Reagents: [contained])", "used [src] (Reagents: [contained]) to feed")
 			user.visible_message("<span class='danger'>[user] feeds [M] [src].</span>")
 
 		if(reagents)								//Handle ingestion of the reagent.
-			playsound(M.loc,'sound/items/eatfood.ogg', rand(10,50), 1)
+			if(eat_sound)
+				playsound(M, pick(eat_sound), rand(10, 50), 1)
 			if(reagents.total_volume)
 				if(reagents.total_volume > bitesize)
 					reagents.trans_to_mob(M, bitesize, CHEM_INGEST)
@@ -131,13 +137,10 @@
 				U.create_reagents(5)
 
 			if (U.reagents.total_volume > 0)
-				to_chat(user, "<span class='warning'>You already have something on your [U].</span>")
+				to_chat(user, SPAN_WARNING("You already have something on your [U]."))
 				return
 
-			user.visible_message( \
-				"\The [user] scoops up some [src] with \the [U]!", \
-				"<span class='notice'>You scoop up some [src] with \the [U]!</span>" \
-			)
+			to_chat(user, SPAN_NOTICE("You scoop up some [src] with \the [U]!"))
 
 			src.bitecount++
 			U.overlays.Cut()
@@ -146,10 +149,17 @@
 			I.color = src.filling_color
 			U.overlays += I
 
-			reagents.trans_to_obj(U, min(reagents.total_volume,5))
-
-			if (reagents.total_volume <= 0)
-				qdel(src)
+			if(!reagents)
+				crash_with("A snack [type] failed to have a reagent holder when attacked with a [W.type]. It was [QDELETED(src) ? "" : "not"] being deleted.")
+			else
+				reagents.trans_to_obj(U, min(reagents.total_volume,5))
+				if (reagents.total_volume <= 0)
+					if (loc && trash)
+						if (ispath(trash))
+							trash = new trash
+						trash.dropInto(loc)
+						trash = null
+					qdel(src)
 			return
 
 	if (is_sliceable())

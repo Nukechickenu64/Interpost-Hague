@@ -11,3 +11,7 @@ PROCESSING_SUBSYSTEM_DEF(mobs)
 
 /datum/controller/subsystem/processing/mobs/PreInit()
 	mob_list = processing // Simply setups a more recognizable var name than "processing"
+
+/mob/dview/Initialize()
+	. = ..()
+	STOP_PROCESSING(SSmobs, src)

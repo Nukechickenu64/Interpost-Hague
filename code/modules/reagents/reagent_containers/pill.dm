@@ -40,6 +40,10 @@
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		if(!do_mob(user, M))
 			return
+
+		if (user.get_active_hand() != src)
+			return
+
 		user.drop_from_inventory(src) //icon update
 		user.visible_message("<span class='warning'>[user] forces [M] to swallow \the [src].</span>")
 		var/contained = reagentlist()
