@@ -220,7 +220,7 @@
 
 /datum/round_event/whereaccess
 	id = "whereaccess"
-	event_message = "As you arrive, you notice that the whole station has all access. Oh God."
+	event_message = "As you arrive, you notice that the whole station has all access. Oh Science."
 
 /datum/round_event/whereaccess/apply_event()
 	for(var/obj/machinery/door/airlock/A in world)

@@ -317,13 +317,13 @@
 			info += t // Oh, he wants to edit to the end of the file, let him.
 			updateinfolinks()
 
-		playsound(pick(write_sounds), 50)
+		playsound(loc, pick(write_sounds), 50)
 
 		update_space(t)
 
 		usr << browse("<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY bgcolor='[color]'>[info_links][stamps]</BODY></HTML>", "window=[name]") // Update the window
 
-		playsound(pick(write_sounds), 50)
+		playsound(loc, pick(write_sounds), 50)
 
 		update_icon()
 
