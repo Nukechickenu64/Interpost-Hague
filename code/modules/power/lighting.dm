@@ -613,7 +613,7 @@
 	broken_chance = 1
 	matter = list("glass" = 100)
 
-	brightness_range = 3
+	brightness_range = 4
 	brightness_power = 4
 	brightness_color = "#a5afc7"//"#a0a080"
 	lighting_modes = list(

@@ -133,6 +133,7 @@
 	unregister_radio(src, frequency)
 	qdel(wires)
 	wires = null
+	set_light(0)
 	if(alarm_area && alarm_area.master_air_alarm == src)
 		alarm_area.master_air_alarm = null
 		elect_master(exclude_self = TRUE)
@@ -173,6 +174,7 @@
 	set_frequency(frequency)
 	if (!master_is_operating())
 		elect_master()
+	set_light(2, 2, COLOR_BLUE_LIGHT)
 
 /obj/machinery/alarm/Process()
 	if((stat & (NOPOWER|BROKEN)) || shorted || buildstage != 2)
