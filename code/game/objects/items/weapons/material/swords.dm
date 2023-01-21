@@ -56,6 +56,8 @@
 			return
 		if(SLASH)
 			atk_mode = SLASH
+			edge = 1
+			sharp = 1
 			to_chat(user, "You will now slash.")
 			attack_verb = list("slashed", "diced")
 			hitsound = "slash_sound"
