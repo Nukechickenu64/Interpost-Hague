@@ -2,6 +2,7 @@
 
 	#include "frontier_announcements.dm"
 	#include "frontier_areas.dm"
+	#include "alpha_areas.dm"
 
 
 	//CONTENT
