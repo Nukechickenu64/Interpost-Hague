@@ -230,8 +230,9 @@
 
 		//Poo in the loo.
 		var/obj/structure/hygiene/toilet/T = locate() in src.loc
+		var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
 		var/mob/living/M = locate() in src.loc
-		if(T && T.open && M.buckled)
+		if(T && T.open) //&& M.buckled removed until buckling is actually fixed
 			message = "<B>[src]</B> defecates into \the [T]."
 
 		else if(w_uniform)
@@ -248,6 +249,16 @@
 			message = "<span class='danger'><b>[src]</b> shits right on <b>[M]</b>'s face!</span>"
 			M.reagents.add_reagent(/datum/reagent/poo, 10)
 			M.unlock_achievement(new/datum/achievement/shit_on())
+
+		//Poo in the food.
+		else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
+			if(RC.is_open_container())
+				//Inside a beaker, glass, drink, etc.
+				message = "<B>[src]</B> shits in \the [RC]."
+				var/amount = rand(4,12)
+				RC.reagents.add_reagent(/datum/reagent/poo, amount)
+				if(reagents)
+					reagents.trans_to(RC, amount)
 
 		//Poo on the floor.
 		else
