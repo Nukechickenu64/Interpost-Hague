@@ -18,7 +18,7 @@
 		/obj/item/clothing/suit/capsuit,
 		/obj/item/clothing/gloves/captain,
 		/obj/item/weapon/gun/energy/gun,
-		/obj/item/device/flashlight/upgraded,
+		/obj/item/device/flashlight,
 		/obj/item/weapon/melee/telebaton)
 
 /obj/structure/closet/secure_closet/hop
