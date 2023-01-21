@@ -10,7 +10,7 @@
 	path = /obj/item/toy/balloon
 
 /datum/uplink_item/item/badassery/balloon/NT
-	name = "For showing that you love NT SOO much (Useless Balloon)"
+	name = "For showing that you love TC SOO much (Useless Balloon)"
 	path = /obj/item/toy/balloon/nanotrasen
 
 /datum/uplink_item/item/badassery/balloon/random

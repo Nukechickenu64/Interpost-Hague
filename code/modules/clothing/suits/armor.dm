@@ -245,11 +245,6 @@
 	armor = list(melee = 25, bullet = 30, laser = 30, energy = 10, bomb = 25, bio = 0, rad = 0)
 	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 
-/obj/item/clothing/suit/armor/vest/nt
-	name = "\improper NanoTrasen armored vest"
-	desc = "A synthetic armor vest. This one is marked with the crest of NanoTrasen."
-	icon_state = "ntvest"
-
 /obj/item/clothing/suit/armor/vest/detective
 	name = "brown armored vest"
 	desc = "An synthetic armor vest colored in a vintage brown."

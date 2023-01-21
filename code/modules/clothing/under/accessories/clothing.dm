@@ -9,15 +9,6 @@
 	desc = "They suspend the illusion of the mime's play."
 	icon_state = "suspenders"
 
-/obj/item/clothing/accessory/nt_tunic
-	name = "\improper Corporate tunic"
-	desc = "A fashionable tunic that the Corporation sometimes gives to its lab workers."
-	icon_state = "nttunic"
-
-/obj/item/clothing/accessory/nt_tunic/exec
-	name = "\improper NanoTrasen executive tunic"
-	icon_state = "nttunicblack"
-
 /obj/item/clothing/accessory/dashiki
 	name = "black dashiki"
 	desc = "An ornately embroidered pullover garmant sporting a v-shaped collar. This one is green and black."
@@ -152,8 +143,8 @@
 	icon_state = "checkered_jacket"
 
 /obj/item/clothing/accessory/toggleable/nanotrasen_jacket
-	name = "\improper NanoTrasen suit jacket"
-	desc = "A jacket that NanoTrasen has its executives wear."
+	name = "\improper TetraCorp suit jacket"
+	desc = "A jacket that TetraCorp has its executives wear."
 	icon_state = "nt_jacket"
 
 /obj/item/clothing/accessory/toggleable/hawaii

@@ -34,20 +34,20 @@
 
 /obj/item/clothing/accessory/medal/gold/nanotrasen
 	name = "\improper NanoTrasen command medal"
-	desc = "A gold medal awarded to the Count for being so great in ruling over the station, or vessel."
+	desc = "A gold medal awarded to the Captain for being so great in managing the station, or vessel."
 	icon_state = "gold_nt"
 
 /obj/item/clothing/accessory/medal/silver/nanotrasen
-	name = "\improper NanoTrasen service medal"
-	desc = "A silver medal awarded to the folk for distinguished service in support of the Kingdom's interests."
+	name = "\improper TetraCorp service medal"
+	desc = "A silver medal awarded to the folk for distinguished service in support of TetraCorp's interests."
 	icon_state = "silver_nt"
 
 /obj/item/clothing/accessory/medal/bronze/nanotrasen
-	name = "\improper NanoTrasen sciences medal"
+	name = "\improper TetraCorp sciences medal"
 	desc = "A bronze medal awarded to the folk for significant contributions to the fields of science or engineering."
 	icon_state = "bronze_nt"
 
 /obj/item/clothing/accessory/medal/iron/nanotrasen
-	name = "\improper NanoTrasen merit medal"
+	name = "\improper TetraCorp merit medal"
 	desc = "An iron medal awarded to the folk for merit."
 	icon_state = "iron_nt"

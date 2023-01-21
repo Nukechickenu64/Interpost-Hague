@@ -5,8 +5,8 @@
 	var
 		round_time // time of the round at which this should be announced, in seconds
 		message // body of the message
-		author = "NanoTrasen Editor"
-		channel_name = "Nyx Daily"
+		author = "TetraCorp Editor"
+		channel_name = "Ishimskaya Pravda"
 		can_be_redacted = 0
 		message_type = "Story"
 
@@ -106,11 +106,11 @@
 			channel_name = "Nyx Daily"
 			author = "Reporter Ro'kii Ar-Raqis"
 
-			message = {"More on the Refuge food riots: The Refuge Council has condemned NanoTrasen's withdrawal from
-			the colony, claiming \"there has been no increase in anti-NanoTrasen activity\", and \"\[the only] reason
+			message = {"More on the Refuge food riots: The Refuge Council has condemned TetraCorp's withdrawal from
+			the colony, claiming \"there has been no increase in anti-TetraCorp activity\", and \"\[the only] reason
 			NanoTrasen withdrew was because the \[Tenebrae Lupus] system's Phoron deposits have been completely mined out.
 			We have little to trade with them now\". NanoTrasen officials have denied these allegations, calling them
-			\"further proof\" of the colony's anti-NanoTrasen stance. Meanwhile, Refuge Security has been unable to quell
+			\"further proof\" of the colony's anti-TetraCorp stance. Meanwhile, Refuge Security has been unable to quell
 			the riots. More on this at 6."}
 			round_time = 60 * 60
 

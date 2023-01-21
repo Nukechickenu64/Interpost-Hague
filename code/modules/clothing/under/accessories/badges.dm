@@ -114,12 +114,6 @@
 	icon_state = "intelbadge"
 	badge_string = "Office of Interstellar Intelligence"
 
-/obj/item/clothing/accessory/badge/nanotrasen
-	name = "\improper Corporate badge"
-	desc = "A leather-backed plastic badge with a variety of information printed on it. Belongs to a Corporate executive."
-	icon_state = "ntbadge"
-	badge_string = "NanoTrasen"
-
 /obj/item/clothing/accessory/badge/marshal
 	name = "colonial marshal's badge"
 	desc = "A leather-backed gold badge displaying the crest of the Colonial Marshals."
