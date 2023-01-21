@@ -27,8 +27,8 @@
 	use_dynamic_slowdown = 1
 
 /obj/item/weapon/storage/backpack/equipped()
-	if(!has_extension(src, /datum/extension/appearance))
-		set_extension(src, /datum/extension/appearance)
+	if (!has_extension(src, /datum/extension/appearance))
+		set_extension(src, /datum/extension/appearance/cardborg)
 	..()
 
 /obj/item/weapon/storage/backpack/attackby(obj/item/weapon/W as obj, mob/user as mob)
