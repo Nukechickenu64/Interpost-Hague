@@ -88,10 +88,15 @@
 
 
 	if(!O.is_broken())
-		var/break_chance = (assailant.stats[STAT_ST]*10) - 80 // let's not make it too easy
-		if(break_chance <= 0)
-			break_chance = 0 //you're not gonna do it laddie
-
+		var/break_chance
+		if(O == affecting.get_organ(BP_HEAD))
+			break_chance = (assailant.stats[STAT_ST]*10) - affecting.stats[STAT_HT]*8
+		else if(O == affecting.get_organ(BP_L_ARM) || O == affecting.get_organ(BP_R_ARM) || O == affecting.get_organ(BP_R_LEG)|| O == affecting.get_organ(BP_R_LEG))
+			break_chance = (assailant.stats[STAT_ST]*10) - affecting.stats[STAT_HT]*6
+		else
+			break_chance = (assailant.stats[STAT_ST]*10) - affecting.stats[STAT_HT]*5
+		if (break_chance <= 0)
+			break_chance = 5 //for good luck :)
 		if(prob(break_chance))
 			O.fracture()
 			if(O == affecting.get_organ(BP_HEAD))
