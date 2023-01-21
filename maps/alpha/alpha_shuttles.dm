@@ -471,3 +471,13 @@
 	lift_floor_label = "Sector B"
 	lift_floor_name = "Upper"
 	lift_announce_str = "Arrived to the Upper Floor."
+
+/obj/turbolift_map_holder/alpha/cargo
+	icon = 'icons/obj/turbolift_preview_2x2.dmi'
+	depth = 2
+	lift_size_x = 3
+	lift_size_y = 3
+	areas_to_use = list(
+		/area/turbolift/first,
+		/area/turbolift/second
+		)

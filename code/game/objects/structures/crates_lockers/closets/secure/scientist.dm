@@ -9,16 +9,14 @@
 
 /obj/structure/closet/secure_closet/scientist/WillContain()
 	return list(
-		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/messenger/tox, /obj/item/weapon/storage/backpack/satchel_tox)),
 		/obj/item/clothing/suit/storage/toggle/labcoat/blue,
 		/obj/item/clothing/suit/storage/toggle/labcoat/blue,
 		/obj/item/clothing/shoes/white,
 		/obj/item/clothing/shoes/white,
-		/obj/item/device/radio/headset/headset_sci,
-		/obj/item/device/radio/headset/headset_sci,
 		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/gloves/latex,
 		/obj/item/clothing/gloves/latex,
+		/obj/item/clothing/under/rank/sci,
 		/obj/item/clothing/under/rank/sci,
 		/obj/item/weapon/clipboard
 	)
@@ -34,10 +32,8 @@
 
 /obj/structure/closet/secure_closet/xenobio/WillContain()
 	return list(
-		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/messenger/tox, /obj/item/weapon/storage/backpack/satchel_tox)),
 		/obj/item/clothing/suit/storage/toggle/labcoat,
 		/obj/item/clothing/shoes/white,
-		/obj/item/device/radio/headset/headset_sci,
 		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/gloves/latex,
 		/obj/item/weapon/clipboard

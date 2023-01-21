@@ -300,9 +300,9 @@ its easier to just keep the beam vertical.
 	if(desc)
 		if(ishuman(usr))
 			var/mob/living/carbon/human/H = usr
-			if(H.stats[STAT_IQ] <= 5)
+			if(H.stats[STAT_IQ] <= 6)
 				var/randtext = pick("Yoh!","Doh!","Haha")
-				to_chat(usr, "<span class='statustext'>That's [f_name]</span>, [randtext]")
+				to_chat(usr, "<span class='statustext'>That's SUMTHING!!!</span>, [randtext]")
 			else
 				to_chat(usr, "<span class='uppertext'>That's [f_name]</span>\n<span class='statustext'>[desc]</span>")
 
@@ -311,7 +311,7 @@ its easier to just keep the beam vertical.
 			var/mob/living/carbon/human/H = usr
 			if(H.stats[STAT_IQ] <= 5)
 				var/randtext = pick("Yoh!","Doh!","Haha")
-				to_chat(usr, "<span class='statustext'>That's [f_name]</span>, <span class='uppertext'>[randtext]</span>")
+				to_chat(usr, "<span class='statustext'>That's SUMTHING!!!</span>, <span class='uppertext'>[randtext]</span>")
 			else
 				to_chat(usr, "<span class='statustext'>That's</span> <span class='uppertext'>[f_name]</span>")
 

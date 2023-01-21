@@ -137,14 +137,14 @@
 				U.create_reagents(5)
 
 			if(src.reagents.total_volume < 1)
-				to_chat(user, SPAN_WARNING("There's nothing in the [src]"))
+				to_chat(user, SPAN_WARNING("There's nothing in the [src]."))
 				return
 
 			if (U.reagents.total_volume > 0)
-				to_chat(user, SPAN_WARNING("You already have something on your [U]."))
+				to_chat(user, SPAN_WARNING("I already have something on my [U]."))
 				return
 
-			to_chat(user, SPAN_NOTICE("You scoop up some [src] with \the [U]!"))
+			to_chat(user, SPAN_NOTICE("I scoop up some [src] with \the [U]!"))
 
 			src.bitecount++
 			U.overlays.Cut()
@@ -175,7 +175,7 @@
 			if (W.w_class >= src.w_class || is_robot_module(W))
 				return
 
-			to_chat(user, "<span class='warning'>You slip \the [W] inside \the [src].</span>")
+			to_chat(user, "<span class='warning'>I slip \the [W] inside \the [src].</span>")
 			user.drop_from_inventory(W, src)
 			add_fingerprint(user)
 			contents += W
@@ -183,15 +183,15 @@
 
 		if (has_edge(W))
 			if (!can_slice_here)
-				to_chat(user, "<span class='warning'>You cannot slice \the [src] here! You need a table or at least a tray to do it.</span>")
+				to_chat(user, "<span class='warning'>I cannot slice \the [src] here! You need a table or at least a tray to do it.</span>")
 				return
 
 			var/slices_lost = 0
 			if (W.w_class > 3)
-				user.visible_message("<span class='notice'>\The [user] crudely slices \the [src] with [W]!</span>", "<span class='notice'>You crudely slice \the [src] with your [W]!</span>")
+				user.visible_message("<span class='notice'>\The [user] crudely slices \the [src] with [W]!</span>", "<span class='notice'>I crudely slice \the [src] with my [W]!</span>")
 				slices_lost = rand(1,min(1,round(slices_num/2)))
 			else
-				user.visible_message("<span class='notice'>\The [user] slices \the [src]!</span>", "<span class='notice'>You slice \the [src]!</span>")
+				user.visible_message("<span class='notice'>\The [user] slices \the [src]!</span>", "<span class='notice'>I slice \the [src]!</span>")
 
 			var/reagents_per_slice = reagents.total_volume/slices_num
 			for(var/i=1 to (slices_num-slices_lost))
@@ -215,7 +215,7 @@
 /obj/item/weapon/reagent_containers/food/snacks/attack_generic(var/mob/living/user)
 	if(!isanimal(user) && !isalien(user))
 		return
-	user.visible_message("<b>[user]</b> nibbles away at \the [src].","You nibble away at \the [src].")
+	user.visible_message("<b>[user]</b> nibbles away at \the [src].","I nibble away at \the [src].")
 	bitecount++
 	if(reagents && user.reagents)
 		reagents.trans_to_mob(user, bitesize, CHEM_INGEST)
@@ -3359,9 +3359,11 @@
 		return ..()
 	if (is_path_in_list(item.type, /obj/item/weapon/reagent_containers/food/snacks/custombowl))
 		return ..()
+
 	if(item.reagents.total_volume <1)
 		to_chat(user, SPAN_DANGER("Wait, is this fake food?"))
 		return
+
 	var/obj/item/weapon/reagent_containers/food/snacks/custombowl/bowl = new (get_turf(src), item)
 	bowl.pixel_x = pixel_x
 	bowl.pixel_y = pixel_y

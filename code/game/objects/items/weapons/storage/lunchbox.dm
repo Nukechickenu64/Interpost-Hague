@@ -45,15 +45,6 @@
 /obj/item/weapon/storage/lunchbox/cat/filled
 	filled = TRUE
 
-/obj/item/weapon/storage/lunchbox/nt
-	name = "NanoTrasen brand lunchbox"
-	icon_state = "lunchbox_nanotrasen"
-	item_state = "toolbox_blue"
-	desc = "A little lunchbox. This one is branded with the Nanotrasen logo!"
-
-/obj/item/weapon/storage/lunchbox/nt/filled
-	filled = TRUE
-
 /obj/item/weapon/storage/lunchbox/mars
 	name = "\improper Mariner University lunchbox"
 	icon_state = "lunchbox_marsuniversity"

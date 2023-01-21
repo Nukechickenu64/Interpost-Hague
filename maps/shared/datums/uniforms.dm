@@ -39,10 +39,6 @@
 */
 /decl/hierarchy/outfit/job/dreyfus/inge/inge
 	name = OUTFIT_JOB_NAME("Ingenieur")
-	head = /obj/item/clothing/head/hardhat
-	uniform = /obj/item/clothing/under/hazard
-	r_pocket = /obj/item/device/t_scanner
-	l_ear = /obj/item/device/radio/headset/headset_eng
 	id_type = /obj/item/weapon/card/id/engineering
 	pda_type = /obj/item/device/pda/engineering
 
