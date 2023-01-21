@@ -1250,10 +1250,10 @@
 			return
 		if(has_trait(/datum/trait/death_tolerant))//Hardcore people don't care about bodies nor shit.
 			return
-		if(prob(20))
+		if(prob(5))
 			to_chat(src, "<spawn class='warning'>Something smells like shit...")
 			add_event("disgust", /datum/happiness_event/disgust/verygross)
-			if(prob(50 - stats[STAT_HT]))
+			if(prob(25 - stats[STAT_HT]))
 				vomit()
 
 	for(var/obj/item/weapon/reagent_containers/food/snacks/poo/P in range(5, src))
@@ -1263,10 +1263,10 @@
 			return
 		if(has_trait(/datum/trait/death_tolerant))//Hardcore people don't care about bodies nor shit.
 			continue
-		if(prob(20))
+		if(prob(5))
 			to_chat(src, "<spawn class='warning'>Something smells like shit...")
 			add_event("disgust", /datum/happiness_event/disgust/verygross)
-			if(prob(50 - stats[STAT_HT]))
+			if(prob(25 - stats[STAT_HT]))
 				vomit()
 
 

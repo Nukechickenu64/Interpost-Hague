@@ -38,7 +38,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 	//If limb took enough damage, try to cut or tear it off
 	if(owner && loc == owner && !is_stump())
 		if(!cannot_amputate && config.limbs_can_break)
-			var/statht = owner.stats[STAT_HT] * 8
+			var/statht = owner.stats[STAT_HT] * 10
 			var/instance = 0
 			var/instonce = 0
 			instance = brute_dam - instance
@@ -49,21 +49,17 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 				force_droplimb = 1
 			if(instonce >= statht)
 				force_droplimbburn = 1
-			var/edge_eligible = 0
-			if(edge)
-				if(istype(used_weapon,/obj/item))
-					var/obj/item/W = used_weapon
-					if(W.w_class >= w_class)
-						edge_eligible = 1
-				else
-					edge_eligible = 1
 			brute = pure_brute
-			if(edge_eligible && brute >= 60 / DROPLIMB_THRESHOLD_EDGE)
+			to_chat(world, brute)
+			if(edge && brute >= 60 / DROPLIMB_THRESHOLD_EDGE)
 				if(prob(brute) || force_droplimb)
 					droplimb(0, DROPLIMB_EDGE)
 					return
 			if(brute_dam >= (100 + statht))
-				droplimb(0, DROPLIMB_BLUNT)
+				if(edge)
+					droplimb(0, DROPLIMB_EDGE)
+				else
+					droplimb(0, DROPLIMB_BLUNT)
 			if(burn_dam >= (100 + statht))
 				droplimb(0, DROPLIMB_BURN)
 			if(force_droplimb)

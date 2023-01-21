@@ -691,10 +691,11 @@ its easier to just keep the beam vertical.
 
 /atom/MouseMove(location, control, params)
 	..()
-	if(ishuman(usr)) //this is vile shitcode but for some reason adding a var to the mob wasn't working
-		var/mob/living/carbon/human/C = usr
-		if(C.fixeye.icon_state == "fixeye")
-			return 0
+	if(!ishuman(usr)) //this is vile shitcode but for some reason adding a var to the mob wasn't working
+		return 0
+	var/mob/living/carbon/human/C = usr
+	if(C.fixeye.icon_state == "fixeye")
+		return 0
 	if(get_dist(usr,src) <= 10)
 		return usr.face_atom(src)
 	if(usr.resting || usr.lying)
