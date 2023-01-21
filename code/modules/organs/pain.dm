@@ -13,6 +13,7 @@ mob/proc/flash_pain(var/target)
 		pain.transform = M
 		animate(pain, alpha = target, time = 15, easing = ELASTIC_EASING)
 		animate(pain, alpha = 0, time = 20)
+
 mob/var/last_pain_message
 mob/var/next_pain_time = 0
 

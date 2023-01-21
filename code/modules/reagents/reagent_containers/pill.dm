@@ -23,7 +23,7 @@
 		if(ishuman(usr))
 			var/mob/living/carbon/human/H = usr
 			if(H.stats[STAT_IQ] <= 8 || H.skillcheck(H.skills[SKILL_MED], 60, null, "Medical"))
-				to_chat(usr, "<span class='uppertext'>That's a pill.</span>'n<span class='statustext'>Don't know what's in it.</span>")
+				to_chat(usr, "<span class='uppertext'>That's a pill.</span>\n<span class='statustext'>Don't know what's in it.</span>")
 			else
 				to_chat(usr, "<span class='uppertext'>That's [name].</span>\n<span class='statustext'>[desc]</span>")
 

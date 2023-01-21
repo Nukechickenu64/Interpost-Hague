@@ -4,6 +4,16 @@ var/const/NETWORK_MAINTENANCE         = "Maintenance Deck"
 var/const/NETWORK_PRISON              = "Prison"
 var/const/NETWORK_RESEARCH_OUTPOST    = "Research Outpost"
 var/const/NETWORK_TELECOM             = "Tcomsat"
+var/const/NETWORK_COMMAND 			  = "Command"
+var/const/NETWORK_ENGINE  			  = "Engine"
+var/const/NETWORK_ENGINEERING_OUTPOST = "Engineering Outpost"
+
+/datum/map/proc/get_shared_network_access(var/network)
+	switch(network)
+		if(NETWORK_COMMAND)
+			return access_heads
+		if(NETWORK_ENGINE, NETWORK_ENGINEERING_OUTPOST)
+			return access_engine
 
 /datum/map/frontier/get_network_access(var/network)
 	switch(network)
