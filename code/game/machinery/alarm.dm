@@ -174,7 +174,7 @@
 	set_frequency(frequency)
 	if (!master_is_operating())
 		elect_master()
-	set_light(2, 2, COLOR_BLUE_LIGHT)
+	set_light(0.5, 1, COLOR_BLUE_LIGHT)
 
 /obj/machinery/alarm/Process()
 	if((stat & (NOPOWER|BROKEN)) || shorted || buildstage != 2)
