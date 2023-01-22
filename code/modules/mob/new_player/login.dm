@@ -41,12 +41,14 @@
 	my_client = client
 	set_sight(sight|SEE_TURFS|SEE_OBJS)
 	GLOB.player_list |= src
-	to_chat(src, "\n<div class='firstdivmood'><div class='moodbox'><span class='graytext'>This is a proof of concept.</span>\n<span class='feedback'><a href='?src=\ref[src];action=agreeconcept'>This sucks ass.</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=refuseconcept'>No, it doesn't.</a></span></div></div>")
+	//to_chat(src, "\n<div class='firstdivmood'><div class='moodbox'><span class='graytext'>This is a proof of concept.</span>\n<span class='feedback'><a href='?src=\ref[src];action=agreeconcept'>This sucks ass.</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=refuseconcept'>No, it doesn't.</a></span></div></div>")
 
 	client.playtitlemusic()
 
+/*
 /client/Topic(href, href_list, hsrc)
 	..()
 	switch(href_list["action"])
 		if("agreeconcept")
 			to_chat(src, "Eurika!")
+*/
