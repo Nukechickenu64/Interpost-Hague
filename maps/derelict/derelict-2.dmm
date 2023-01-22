@@ -2020,7 +2020,7 @@
 	input_tag = "cooling_in";
 	name = "Generator Coolant Control";
 	output_tag = "cooling_out";
-	sensors = list("engine_sensor" = "Engine Core")
+	sensors = list("engine_sensor"="Engine Core")
 	},
 /turf/simulated/floor/tiled/airless,
 /area/engineering/foyer)
@@ -21533,10 +21533,6 @@
 /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers,
 /turf/simulated/floor/airless,
 /area/constructionsite/hallway/aft)
-"rbr" = (
-/obj/structure/girder,
-/turf/simulated/floor/plating,
-/area/security/main)
 "rbN" = (
 /obj/structure/table/woodentable,
 /obj/item/device/flashlight/lamp/green,
@@ -26554,10 +26550,6 @@
 	},
 /turf/simulated/floor/airless,
 /area/constructionsite/hallway/aft)
-"viM" = (
-/obj/structure/girder,
-/turf/simulated/floor/plating,
-/area/space)
 "viO" = (
 /obj/effect/floor_decal/newcorner/black{
 	dir = 4;
@@ -65135,8 +65127,8 @@ mFn
 mFn
 mFn
 mFn
-viM
-rbr
+mFn
+lWE
 lWE
 lWE
 lWE
