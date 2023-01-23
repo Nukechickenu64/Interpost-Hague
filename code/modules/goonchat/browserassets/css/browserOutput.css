@@ -423,6 +423,8 @@ a:hover {
 .cult					{color: #aa1c1c;}
 .wakeup					{color: #8ebf92; text-shadow: 0 0 2px #8ebf92;}
 .tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
+.manifest				{color: #505050; text-shadow: 0 0 4px #505050;}
+.manifesttext			{color: #008a37; text-shadow: 0 0 4px #008a37;}
 
 /* Languages */
 .alien					{color: #855d85;}

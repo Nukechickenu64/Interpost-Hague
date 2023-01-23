@@ -139,3 +139,85 @@
 		"civ" = filtered_nano_crew_manifest(GLOB.civilian_positions),\
 		"misc" = filtered_nano_crew_manifest(GLOB.unsorted_positions)\
 		)
+
+// Generates a simple HTML crew manifest for use in various places
+/proc/chat_crew_manifest(var/monochrome, var/OOC)
+	var/list/dept_data = list(
+		list("names" = list(), "header" = "Heads of Staff", "flag" = COM),
+		list("names" = list(), "header" = "Command", "flag" = SPT),
+		list("names" = list(), "header" = "Research", "flag" = SCI),
+		list("names" = list(), "header" = "Security", "flag" = SEC),
+		list("names" = list(), "header" = "Medical", "flag" = MED),
+		list("names" = list(), "header" = "Engineering", "flag" = ENG),
+		list("names" = list(), "header" = "Supply", "flag" = SUP),
+		list("names" = list(), "header" = "Exploration", "flag" = EXP),
+		list("names" = list(), "header" = "Service", "flag" = SRV),
+		list("names" = list(), "header" = "Civilian", "flag" = CIV),
+		list("names" = list(), "header" = "Miscellaneous", "flag" = MSC),
+		list("names" = list(), "header" = "Silicon")
+	)
+	var/list/misc //Special departments for easier access
+	var/list/bot
+	for(var/list/department in dept_data)
+		if(department["flag"] == MSC)
+			misc = department["names"]
+		if(isnull(department["flag"]))
+			bot = department["names"]
+
+	var/list/isactive = new()
+	var/list/mil_ranks = list() // HTML to prepend to name
+	var/msg = "<div class='firstdivexamineplyr'><div class='boxexamineplyr'><span class='manifest'>I still remember who I'm working with.</span>\n"
+	msg += "<hr class='linexd'>"
+	// sort mobs
+	for(var/datum/computer_file/crew_record/CR in GLOB.all_crew_records)
+		var/name = CR.get_name()
+		var/rank = CR.get_job()
+		mil_ranks[name] = ""
+
+		if(GLOB.using_map.flags & MAP_HAS_RANK)
+			var/datum/mil_branch/branch_obj = mil_branches.get_branch(CR.get_branch())
+			var/datum/mil_rank/rank_obj = mil_branches.get_rank(CR.get_branch(), CR.get_rank())
+
+			if(branch_obj && rank_obj)
+				mil_ranks[name] = "<span class='manifesttext'>[rank_obj.name], [branch_obj.name], [rank_obj.name_short]</span>"
+
+		if(OOC)
+			var/active = 0
+			for(var/mob/M in GLOB.player_list)
+				if(M.real_name == name && M.client && M.client.inactivity <= 10 * 60 * 10)
+					active = 1
+					break
+			isactive[name] = active ? "Active" : "Inactive"
+		else
+			isactive[name] = CR.get_status()
+
+		var/datum/job/job = job_master.occupations_by_title[rank]
+		var/found_place = 0
+		if(job)
+			for(var/list/department in dept_data)
+				var/list/names = department["names"]
+				if(job.department_flag & department["flag"])
+					names[name] = rank
+					found_place = 1
+		if(!found_place)
+			misc[name] = rank
+
+	// Synthetics don't have actual records, so we will pull them from here.
+	for(var/mob/living/silicon/ai/ai in SSmobs.mob_list)
+		bot[ai.name] = "Artificial Intelligence"
+
+	for(var/mob/living/silicon/robot/robot in SSmobs.mob_list)
+		// No combat/syndicate cyborgs, no drones.
+		if(robot.module && robot.module.hide_on_manifest)
+			continue
+
+		bot[robot.name] = "[robot.modtype] [robot.braintype]"
+
+	for(var/list/department in dept_data)
+		var/list/names = department["names"]
+		if(names.len > 0)
+			for(var/name in names)
+				msg += "<span class='manifesttext'>[mil_ranks[name]][name], [names[name]]</span>"
+
+	msg += "</div></div>"
+	to_chat(usr, msg)
