@@ -285,7 +285,6 @@
 		B.plane = OPENTURF_MAX_PLANE + i - 7
 		client.screen += B
 
-/*
 	if(!client) return
 	var/obj/screen/plane_master/shadowcasting/p3 = new
 
@@ -294,7 +293,6 @@
 	p3.render_target = "all3"
 
 	client.screen.Add(p3)
-*/
 
 /mob/proc/add_cryo_filter_effect()
 	var/obj/screen/plane_master/cryo/C = new
