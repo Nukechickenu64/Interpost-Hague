@@ -208,9 +208,9 @@ proc/ageAndGender2Desc(age, gender)//Used for the radio
 
 	for(var/mob/living/M in GLOB.player_list)
 		if(M.has_sin(/datum/sin/sloth))
-			sin_modifier += 20
+			sin_modifier += 10
 		else if(M.has_virtue(/datum/virtue/diligence))
-			sin_modifier += -20
+			sin_modifier += -10
 
 	var/endtime = world.time + delay + sin_modifier
 	var/starttime = world.time
