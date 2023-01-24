@@ -1168,7 +1168,9 @@ About the new airlock wires panel:
 				to_chat(user, "<span class='notice'>You removed the airlock electronics!</span>")
 				deconstruct(user)
 				return
-		else if(arePowerSystemsOn())
+	playsound(src.loc, 'sound/machines/airlock_creaking.ogg', 100, 1)
+	if(do_after(user, 50, src))
+		if(arePowerSystemsOn())
 			to_chat(user, "<span class='notice'>The airlock's motors resist your efforts to force it.</span>")
 		else if(locked)
 			to_chat(user, "<span class='notice'>The airlock's bolts prevent it from being forced.</span>")
