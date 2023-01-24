@@ -79,7 +79,7 @@ SUBSYSTEM_DEF(ticker)
 			if(player.client.prefs.job_high == "Captain" && player.ready)
 				iswegood = 1
 		if(iswegood == 0)
-			to_chat(world, "<span class='tetracorp'><b>Tetracorp</span></b>does not authorize the cryogenic revival procedure without an active <span class='rose'>Captain</span>.")
+			to_chat(world, "<span class='tetracorp'><b>TetraCorp</span></b>does not authorize the cryogenic revival procedure without an active <span class='rose'>Captain</span>.")
 			pregame_timeleft = 60 SECONDS
 			Master.SetRunLevel(RUNLEVEL_LOBBY)
 			return
