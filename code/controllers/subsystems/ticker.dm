@@ -73,21 +73,17 @@ SUBSYSTEM_DEF(ticker)
 			world.Reboot("Failure to select gamemode. Tried [english_list(bad_modes)].")
 			return
 
-/*
-	if (src.mode.isStartRequirementsSatisfied())
-		var/captain = "badmood"
-		var/eofficer = "badmood"
-		var/major = "badmood"
+	if(src.mode.isStartRequirementsSatisfied())
+		var/iswegood = 0
 		for(var/mob/new_player/player in GLOB.player_list)
-			if(!player.client.prefs.job_high == "Captain" && !player.ready)
-				captain = "hit"
-			else if(!player.client.prefs.job_high == "Executive Officer" && !player.ready)
-				eofficer = "hit"
-			else if(!player.client.prefs.job_high == "Major" && !player.ready)
-				major = "hit"
-				to_chat(world,"<b><span class='hitbold'>This won't do.</span></b><span class='hit'> We need an </span><span class='[eofficer]'><b>Executive Officer,</b></span>,<span class='hit'> a witty </span><span class='[captain]'><b>Captain</b></span><span class='hit'> and a brave </span><span class='[major]'><b>Major</b></span><span class='hit'>.</span>")
-		return
-*/
+			if(player.client.prefs.job_high == "Captain" && player.ready)
+				iswegood = 1
+		if(iswegood == 0)
+			to_chat(world, "<span class='tetracorp'><b>Tetracorp</span></b>does not authorize the cryogenic revival procedure without an active <span class='rose'>Captain</span>.")
+			pregame_timeleft = 60 SECONDS
+			Master.SetRunLevel(RUNLEVEL_LOBBY)
+			return
+
 	// This means we succeeded in picking a game mode.
 	GLOB.using_map.setup_economy()
 	Master.SetRunLevel(RUNLEVEL_GAME)
