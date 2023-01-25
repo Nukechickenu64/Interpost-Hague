@@ -284,7 +284,7 @@
 		return
 
 	var/obj/structure/hygiene/urinal/U = locate() in src.loc
-	var/obj/structure/hygiene/toilet/T = locate() in src.loc
+	var/obj/structure/hygiene/toilet/TT = locate() in src.loc
 	//var/obj/structure/toilet/T2 = locate() in src.loc
 	var/obj/structure/hygiene/sink/S = locate() in src.loc
 	var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
@@ -292,8 +292,8 @@
 		message = "<B>[src]</B> urinates into [U ? U : S]."
 		reagents.remove_any(rand(1,8))
 
-	else if(T && T.open)//In the toilet.
-		message = "<B>[src]</B> urinates into [T]."
+	else if(TT && TT.open)//In the toilet.
+		message = "<B>[src]</B> urinates into [TT]."
 		reagents.remove_any(rand(1,8))
 
 	else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
@@ -312,10 +312,10 @@
 		unlock_achievement(new/datum/achievement/pissed())
 
 	else//On the floor.
-		var/turf/TT = src.loc
-		var/obj/effect/decal/cleanable/urine/D = new/obj/effect/decal/cleanable/urine(src.loc)
-		if(reagents)
-			reagents.trans_to(D, rand(1,8))
+		var/mob/user = usr
+		for(var/thing in trange(1, get_turf(user)))
+			var/turf/T = thing
+			T.add_fluid(10, /datum/reagent/urine)
 		message = "<B>[src]</B> pisses on the [TT.name]."
 	GLOB.piss_left++
 	src.bladder -= 50
