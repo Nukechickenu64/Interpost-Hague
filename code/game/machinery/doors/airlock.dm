@@ -1168,19 +1168,19 @@ About the new airlock wires panel:
 				to_chat(user, "<span class='notice'>You removed the airlock electronics!</span>")
 				deconstruct(user)
 				return
-	playsound(src.loc, 'sound/machines/airlock_creaking.ogg', 100, 1)
-	if(do_after(user, 50, src))
-		if(arePowerSystemsOn())
-			to_chat(user, "<span class='notice'>The airlock's motors resist your efforts to force it.</span>")
-		else if(locked)
-			to_chat(user, "<span class='notice'>The airlock's bolts prevent it from being forced.</span>")
-		else if(brace)
-			to_chat(user, "<span class='notice'>The airlock's brace holds it firmly in place.</span>")
-		else if(user.statcheck(user.stats[STAT_ST], 7, "Gah, I'm not strong enough to open the door. Maybe if I try again.", STAT_ST))//Gotta be strong to get that door open.
-			if(density)
-				spawn(0)	open(1)
-			else
-				spawn(0)	close(1)
+		playsound(src.loc, 'sound/machines/airlock_creaking.ogg', 100, 1)
+		if(do_after(user, 50, src))
+			if(arePowerSystemsOn())
+				to_chat(user, "<span class='notice'>The airlock's motors resist your efforts to force it.</span>")
+			else if(locked)
+				to_chat(user, "<span class='notice'>The airlock's bolts prevent it from being forced.</span>")
+			else if(brace)
+				to_chat(user, "<span class='notice'>The airlock's brace holds it firmly in place.</span>")
+			else if(user.statcheck(user.stats[STAT_ST], 7, "Gah, I'm not strong enough to open the door. Maybe if I try again.", STAT_ST))//Gotta be strong to get that door open.
+				if(density)
+					spawn(0)	open(1)
+				else
+					spawn(0)	close(1)
 
 			//if door is unbroken, but at half health or less, hit with fire axe using harm intent
 	else if (istype(C, /obj/item/weapon/material/twohanded/fireaxe) && !(stat & BROKEN) && (src.health <= src.maxhealth / 2) && user.a_intent == I_HURT)

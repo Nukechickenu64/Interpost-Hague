@@ -88,6 +88,7 @@ GLOBAL_LIST_INIT(music_tracks, list(
 		"Chris Columbo" = 'sound/jukebox/barsong5.ogg',
 		"Exploding Hearts" = 'sound/jukebox/barsong6.ogg',
 		"Pebble Man" = 'sound/jukebox/barsong7.ogg',
+		"Whirling Cafe" = 'sound/jukebox/barsong8.ogg',
 ))
 
 /proc/setup_music_tracks(list/tracks)

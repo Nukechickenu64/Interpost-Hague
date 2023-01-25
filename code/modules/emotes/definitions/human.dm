@@ -87,8 +87,8 @@
 	var/final_pixel_x = get_standard_pixel_x_offset(lying)
 	var/final_pixel_y = get_standard_pixel_y_offset(lying)
 	var/final_pixel_z = get_standard_pixel_z_offset(lying)
-	animate(src, pixel_x = pixel_x + pixel_x_diff + 1, pixel_y = pixel_y + pixel_y_diff + 3 , pixel_z = pixel_z + pixel_z_diff + 2, time = 4, loop = 9)
-	animate(pixel_x = final_pixel_x , pixel_y = final_pixel_y , pixel_z = final_pixel_z , time = 4)
+	animate(src, pixel_x = pixel_x + pixel_x_diff + 1, pixel_y = pixel_y + pixel_y_diff + 3 , pixel_z = pixel_z + pixel_z_diff + 2, time = 3, loop = 9)
+	animate(pixel_x = final_pixel_x , pixel_y = final_pixel_y , pixel_z = final_pixel_z , time = 3)
 
 /mob/living/proc/get_standard_pixel_x_offset()
 	return initial(pixel_x)
