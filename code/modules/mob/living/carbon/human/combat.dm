@@ -46,9 +46,9 @@
 
 /mob/living/proc/attempt_dodge()//Handle parry is an object proc and it's, its own thing.
 	var/dodge_modifier = c_intent == I_DEFEND ? 4 : 0 //If they are in defend mode, they dodge more
-	if (defense_intent != I_DODGE || lying && !buckled && !stat == 0 || zoomed == 1)  // If they are not trying to dodge, lying down, not buckled, or zoomed in.
+	if (defense_intent != I_DODGE || buckled || resting || lying || zoomed)  // If they are not trying to dodge, lying down, not buckled, or zoomed in.
 		return 0
-	if(combat_mode || prob(35))//Todo, make use of the check_shield_arc proc to make sure you can't dodge from behind.
+	if(combat_mode || prob(25))//Todo, make use of the check_shield_arc proc to make sure you can't dodge from behind.
 		if(staminaloss < 50 && statcheck(stats[STAT_DX], 10 - dodge_modifier, "We couldn't dodge in time!", "dex"))//You gotta be the master of dexterity to dodge every time.
 			do_dodge()
 			return	1
