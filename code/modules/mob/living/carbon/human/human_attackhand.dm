@@ -125,6 +125,9 @@
 					to_chat(H, "There is nothing to grab!")
 					return
 
+				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+					return
+
 				switch(H.zone_sel.selecting)
 					//Strangling
 					if(BP_THROAT)
@@ -156,12 +159,8 @@
 					if(BP_GROIN)
 						return H.make_grab(H, src, GRAB_TAKEDOWN)
 
-
-
 			return H.make_grab(H, src)
 
-			if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
-				return
 
 		if(I_HURT)
 			M.adjustStaminaLoss(rand(12,18))//No more spamming disarm without consequences.
