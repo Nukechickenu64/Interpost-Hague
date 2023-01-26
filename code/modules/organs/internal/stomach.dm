@@ -228,15 +228,17 @@
 	var/message = null
 	if (src.bowels >= 30)
 
+		var/mob/living/carbon/human/H = usr
+
 		//Poo in the loo.
 		var/obj/structure/hygiene/toilet/T = locate() in src.loc
 		var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
 		var/mob/living/M = locate() in src.loc
 		if(T && T.open) //&& M.buckled removed until buckling is actually fixed
-			message = "<B>[src]</B> defecates into \the [T]."
+			message = "<B>[H]</B><span class='hygiene'> defecates into \the [T].</span>"
 
 		else if(w_uniform)
-			message = "<B>[src]</B> shits \his pants."
+			message = "<B>[H]</B><span class='hygiene'> shits \his pants.</span>"
 			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
@@ -246,7 +248,7 @@
 
 		//Poo on the face.
 		else if(M != src && M.lying)//Can only shit on them if they're lying down.
-			message = "<span class='danger'><b>[src]</b> shits right on <b>[M]</b>'s face!</span>"
+			message = "<span class='combatbold'>[H]</span><span class='hygiene'> shits right on </span><span class='combatbold'>[M]'s</span><span class='hygiene'> face!</span>"
 			M.reagents.add_reagent(/datum/reagent/poo, 10)
 			M.unlock_achievement(new/datum/achievement/shit_on())
 
@@ -254,7 +256,7 @@
 		else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
 			if(RC.is_open_container())
 				//Inside a beaker, glass, drink, etc.
-				message = "<B>[src]</B> shits in \the [RC]."
+				message = "<B>[H]</B><span class='hygiene'> shits in \the [RC].</span>"
 				var/amount = rand(4,12)
 				RC.reagents.add_reagent(/datum/reagent/poo, amount)
 				if(reagents)
@@ -262,7 +264,7 @@
 
 		//Poo on the floor.
 		else
-			message = "<B>[src]</B> [pick("shits", "craps", "poops")]."
+			message = "<B>[H]</B> [pick("shits", "craps", "poops")]."
 			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
@@ -271,7 +273,7 @@
 		bowels -= rand(60,80)
 		GLOB.shit_left++
 	else
-		to_chat(src, "You don't have to.")
+		to_chat(src, "<span class='hygiene'>I don't have to.</span>")
 		return
 
 	visible_message("[message]")
@@ -280,8 +282,10 @@
 /mob/living/carbon/human/proc/handle_piss()
 	var/message = null
 	if (bladder < 30)
-		to_chat(src, "You don't have to.")
+		to_chat(src, "<span class='hygiene'>I don't have to.</span>")
 		return
+
+	var/mob/living/carbon/human/H = usr
 
 	var/obj/structure/hygiene/urinal/U = locate() in src.loc
 	var/obj/structure/hygiene/toilet/TT = locate() in src.loc
@@ -289,24 +293,24 @@
 	var/obj/structure/hygiene/sink/S = locate() in src.loc
 	var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
 	if((U || S) && gender != FEMALE)//In the urinal or sink.
-		message = "<B>[src]</B> urinates into [U ? U : S]."
+		message = "<B>[H]</B><span class='hygiene'> urinates into [U ? U : S].</span>"
 		reagents.remove_any(rand(1,8))
 
 	else if(TT && TT.open)//In the toilet.
-		message = "<B>[src]</B> urinates into [TT]."
+		message = "<B>[H]</B><span class='hygiene'> urinates into [TT].</span>"
 		reagents.remove_any(rand(1,8))
 
 	else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
 		if(RC.is_open_container())
 			//Inside a beaker, glass, drink, etc.
-			message = "<B>[src]</B> urinates into [RC]."
+			message = "<B>[H]</B><span class='hygiene'> urinates into [RC].</span>"
 			var/amount = rand(1,8)
 			RC.reagents.add_reagent(/datum/reagent/urine, amount)
 			if(reagents)
 				reagents.trans_to(RC, amount)
 
 	else if(w_uniform)//In your pants.
-		message = "<B>[src]</B> pisses \his pants."
+		message = "<B>[H]</B><span class='hygiene'> pisses \his pants.</span>"
 		adjust_hygiene(-25)
 		add_event("pissedself", /datum/happiness_event/hygiene/pee)
 		unlock_achievement(new/datum/achievement/pissed())
@@ -315,8 +319,8 @@
 		var/mob/user = usr
 		for(var/thing in trange(1, get_turf(user)))
 			var/turf/T = thing
-			T.add_fluid(10, /datum/reagent/urine)
-		message = "<B>[src]</B> pisses on the [TT.name]."
+			T.add_fluid(1, /datum/reagent/urine)
+		message = "<B>[H]</B><span class='hygiene'> pisses on the [TT.name].</span>"
 	GLOB.piss_left++
 	src.bladder -= 50
 	visible_message("[message]")

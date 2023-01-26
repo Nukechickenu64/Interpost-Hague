@@ -5,9 +5,10 @@
 	simulated = 0
 	opacity = 0
 	mouse_opacity = 0
-	layer = FLY_LAYER
+	layer = DEEP_FLUID_LAYER
+	plane = OBSERVER_PLANE
 	alpha = 0
-	color = COLOR_OCEAN
+	color = COLOR_OCEAN // ill get to it
 
 	var/temperature = T20C
 	var/fluid_amount = 0

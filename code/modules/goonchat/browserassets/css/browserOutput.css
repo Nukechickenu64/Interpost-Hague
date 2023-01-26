@@ -3,6 +3,11 @@
 * GLOBAL STYLES
 *
 ******************************************/
+@font-face {
+    font-family: tablichka;
+    src: url(Tablichka.ttf);
+}
+
 html, body {
     padding: 0;
     white-space: normal;
@@ -328,8 +333,8 @@ em						{font-style: normal;	font-weight: bold;}
 .inqradio				{color: #696969;}
 /* Miscellaneous */
 .alert					{color: #d82020; text-shadow: 0 0 4px #d82020;}
-h1.alert, h2.alert		{color: #a4bad6; text-shadow: 0 0 8px #a4bad6;}
-h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00;}
+h1.alert, h2.alert		{color: #2e852e; text-shadow: 0 0 2px #2e852e; font-family: tablichka;}
+h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00; font-family: tablichka;}
 
 .emote					{font-style: italic; color: #454a52;}
 
@@ -389,7 +394,7 @@ a {
     float: top;
     font-family: cond, sans-serif;
     text-shadow: 0px 0px 3px #4d661a;
-    color: #384521;
+    color: #9acf32;
     font-weight: bold;
     text-decoration: none;
     outline: none;
@@ -425,6 +430,7 @@ a:hover {
 .tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
 .manifest				{color: #505050; text-shadow: 0 0 4px #505050;}
 .manifesttext			{color: #008a37; text-shadow: 0 0 4px #008a37;}
+.hygiene				{color: #8f9779; text-shadow: 0 0 1px #8f9779;}
 
 /* Languages */
 .alien					{color: #855d85;}

@@ -370,7 +370,7 @@
 	name = "urine"
 	description = "It's pee."
 	reagent_state = LIQUID
-	color = COLOR_YELLOW
+	color = "#ffdb8b"
 	taste_description = "urine"
 
 /datum/reagent/urine/touch_turf(var/turf/T)
