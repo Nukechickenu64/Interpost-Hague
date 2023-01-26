@@ -522,6 +522,13 @@ var/list/flooring_types
 	has_damage_range = null
 	flags = TURF_REMOVE_CROWBAR
 
+/decl/flooring/tiling/bathroom
+	name = "floor"
+	desc = "Don't slip."
+	icon_base = "bathroom"
+	has_damage_range = null
+	flags = TURF_REMOVE_CROWBAR
+
 /decl/flooring/tiling/bunker/polar_green
 	name = "floor"
 	desc = "Don't slip."
