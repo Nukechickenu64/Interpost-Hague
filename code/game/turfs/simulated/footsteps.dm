@@ -73,6 +73,7 @@
 /decl/flooring/tiling/freezer/footstep_type = FOOTSTEP_TILE
 /decl/flooring/tiling/bunker/footstep_type = FOOTSTEP_TILE
 /decl/flooring/tiling/mono/footstep_type = FOOTSTEP_TILE
+/decl/flooring/tiling/bathroom/footstep_type = FOOTSTEP_TILE
 
 /turf/simulated/floor/proc/get_footstep_sound()
 	if(check_fluid_depth(10) && !is_flooded(TRUE))

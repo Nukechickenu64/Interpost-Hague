@@ -515,6 +515,11 @@
 	icon_state = "kafel_full"
 	initial_flooring = /decl/flooring/tiling/new_tile/kafel
 
+/turf/simulated/floor/tiled/bathroom
+	name = "floor"
+	icon_state = "bathroom"
+	initial_flooring = /decl/flooring/tiling/bathroom
+
 /turf/simulated/floor/tiled/techfloor/grid
 	name = "floor"
 	icon_state = "techfloor_grid"
