@@ -123,32 +123,34 @@ Please contact me on #coderbus IRC. ~Carn x
 #define BODYHAIR_LAYER			4
 #define SURGERY_LEVEL			5		//bs12 specific.
 #define UNDERWEAR_LAYER         6
-#define UNIFORM_LAYER			7
-#define ID_LAYER				8
-#define AMULET_LAYER			9
-#define SHOES_LAYER				10
-#define GLOVES_LAYER			11
-#define BELT_LAYER				12
-#define SUIT_LAYER				13
-#define TAIL_LAYER				14		//bs12 specific. this hack is probably gonna come back to haunt me
-#define GLASSES_LAYER			15
-#define BELT_LAYER_ALT			16
-#define SUIT_STORE_LAYER		17
-#define BACK_LAYER				18
-#define HAIR_LAYER				19		//TODO: make part of head layer?
-#define GOGGLES_LAYER			20
-#define EARS_LAYER				21
-#define FACEMASK_LAYER			22
-#define HEAD_LAYER				23
-#define COLLAR_LAYER			24
-#define HANDCUFF_LAYER			25
-#define L_HAND_LAYER			26
-#define R_HAND_LAYER			27
-#define FIRE_LAYER				28		//If you're on fire
-#define TARGETED_LAYER			29		//BS12: Layer for the target overlay from weapon targeting system
-#define BANDAGES_LAYER			30
-#define BLEEDING_LAYER			31
-#define TOTAL_LAYERS			32
+#define BANDAGES_LAYER			7
+#define UNIFORM_LAYER			8
+#define ID_LAYER				9
+#define AMULET_LAYER			10
+#define SHOES_LAYER				11
+#define GLOVES_LAYER			12
+#define BELT_LAYER				13
+#define SUIT_LAYER				14
+#define TAIL_LAYER				15		//bs12 specific. this hack is probably gonna come back to haunt me
+#define GLASSES_LAYER			16
+#define BELT_LAYER_ALT			17
+#define SUIT_STORE_LAYER		18
+#define BACK_LAYER				19
+#define HAIR_LAYER				20		//TODO: make part of head layer?
+#define GOGGLES_LAYER			21
+#define EARS_LAYER				22
+#define FACEMASK_LAYER			23
+#define HEAD_LAYER				24
+#define COLLAR_LAYER			25
+#define HANDCUFF_LAYER			26
+#define L_HAND_LAYER			27
+#define R_HAND_LAYER			28
+#define BLEEDING_LAYER			29
+#define FIRE_LAYER				30		//If you're on fire
+#define TARGETED_LAYER			31		//BS12: Layer for the target overlay from weapon targeting system
+#define FLIES_LAYER				32
+#define COLDBREATH_LAYER		33
+#define TOTAL_LAYERS			33
 //////////////////////////////////
 
 /mob/living/carbon/human
@@ -772,7 +774,6 @@ var/global/list/damage_icon_parts = list()
 
 	if(update_icons)   update_icons()
 
-
 /mob/living/carbon/human/update_fire(var/update_icons=1)
 	overlays_standing[FIRE_LAYER] = null
 	if(on_fire)
@@ -804,6 +805,35 @@ var/global/list/damage_icon_parts = list()
 				continue
 	overlays_standing[BANDAGES_LAYER] = DD
 	if (update_icons)   update_icons()
+
+/mob/living/carbon/human/proc/add_coldbreath(var/update_icons=1)
+	if(coldbreath)	return //We alreayd have coldbreath don't add it again.
+	if(wear_mask)	return //Don't need this if we're wearing a mask.
+	if(stat == DEAD)	return //Don't need this if we're dead
+	overlays_standing[COLDBREATH_LAYER] = null
+	var/image/standing = overlay_image('icons/mob/cold_breath.dmi', "breath")
+	overlays_standing[COLDBREATH_LAYER] = standing
+	coldbreath = TRUE
+
+	if(update_icons)	update_icons()
+
+/mob/living/carbon/human/proc/remove_coldbreath(var/update_icons=1)
+	overlays_standing[COLDBREATH_LAYER] = null
+	coldbreath = FALSE
+
+	if(update_icons)	update_icons()
+
+/mob/living/carbon/human/proc/add_flies(var/update_icons=1)
+	overlays_standing[FLIES_LAYER] = null
+	var/image/standing = overlay_image('icons/effects/effects.dmi', "flies")
+	overlays_standing[FLIES_LAYER] = standing
+
+	if(update_icons)	update_icons()
+
+/mob/living/carbon/human/proc/remove_flies(var/update_icons=1)
+	overlays_standing[FLIES_LAYER] = null
+
+	if(update_icons)	update_icons()
 
 /mob/living/carbon/human/proc/update_bleeding(var/update_icons=1)
 	overlays_standing[BLEEDING_LAYER] = null
@@ -847,30 +877,36 @@ var/global/list/damage_icon_parts = list()
 
 //Human Overlays Indexes/////////
 #undef MUTATIONS_LAYER
+#undef SKIN_LAYER
 #undef DAMAGE_LAYER
+#undef BODYHAIR_LAYER
 #undef SURGERY_LEVEL
+#undef UNDERWEAR_LAYER
+#undef BANDAGES_LAYER
 #undef UNIFORM_LAYER
 #undef ID_LAYER
 #undef AMULET_LAYER
 #undef SHOES_LAYER
 #undef GLOVES_LAYER
-#undef EARS_LAYER
+#undef BELT_LAYER
 #undef SUIT_LAYER
 #undef TAIL_LAYER
 #undef GLASSES_LAYER
-#undef FACEMASK_LAYER
-#undef BELT_LAYER
+#undef BELT_LAYER_ALT
 #undef SUIT_STORE_LAYER
 #undef BACK_LAYER
 #undef HAIR_LAYER
+#undef GOGGLES_LAYER
+#undef EARS_LAYER
+#undef FACEMASK_LAYER
 #undef HEAD_LAYER
 #undef COLLAR_LAYER
 #undef HANDCUFF_LAYER
-#undef LEGCUFF_LAYER
 #undef L_HAND_LAYER
 #undef R_HAND_LAYER
-#undef TARGETED_LAYER
-#undef FIRE_LAYER
-#undef BANDAGES_LAYER
 #undef BLEEDING_LAYER
+#undef FIRE_LAYER
+#undef TARGETED_LAYER
+#undef FLIES_LAYER
+#undef COLDBREATH_LAYER
 #undef TOTAL_LAYERS

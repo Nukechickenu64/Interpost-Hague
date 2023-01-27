@@ -34,6 +34,8 @@
 	var/fluid_blocked_dirs = 0
 	var/flooded // Whether or not this turf is absolutely flooded ie. a water source.
 
+	var/has_coldbreath = FALSE
+
 /turf/Initialize(mapload, ...)
 	. = ..()
 	for(var/atom/movable/AM as mob|obj in src)
@@ -200,6 +202,26 @@ var/const/enterloopsanity = 100
 		else
 			M.inertia_dir = 0
 			M.make_floating(0) //we know we're not on solid ground so skip the checks to save a bit of processing
+
+	var/objects = 0
+	if(A && (A.movable_flags & MOVABLE_FLAG_PROXMOVE))
+		for(var/atom/movable/thing in range(1))
+			if(objects > enterloopsanity) break
+			objects++
+			spawn(0)
+				if(A)
+					A.HasProximity(thing, 1)
+					if ((thing && A) && (thing.movable_flags & MOVABLE_FLAG_PROXMOVE))
+						thing.HasProximity(A, 1)
+
+	if(ishuman(atom))
+		var/mob/living/carbon/human/H = atom
+		if(has_coldbreath)
+			H.add_coldbreath()
+		else
+			H.remove_coldbreath()
+
+	return
 
 /turf/proc/adjacent_fire_act(turf/simulated/floor/source, temperature, volume)
 	return

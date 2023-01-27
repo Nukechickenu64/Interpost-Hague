@@ -906,7 +906,7 @@
 	if(client && world.time >= client.played + 600)
 		A.play_ambience(src)
 	if(stat == UNCONSCIOUS && world.time - l_move_time < 5 && prob(10))
-		to_chat(src,"<span class='notice'>You feel like you're [pick("moving","flying","floating","falling","hovering")].</span>")
+		to_chat(src,"<span class='notice'>I feel like I'm [pick("moving","flying","floating","falling","hovering")].</span>")
 
 /mob/living/carbon/human/proc/handle_changeling()
 	if(mind && mind.changeling)
@@ -939,7 +939,7 @@
 		// Please be very careful when calling custom_pain() from within code that relies on pain/trauma values. There's the
 		// possibility of a feedback loop from custom_pain() being called with a positive power, incrementing pain on a limb,
 		// which triggers this proc, which calls custom_pain(), etc. Make sure you call it with 0 power in these cases!
-		custom_pain("[pick("It hurts so much", "You really need some painkillers", "Dear god, the pain")]!", 10, nohalloss = 0)
+		custom_pain("[pick("It hurts so much", "I really need some painkillers", "Dear god, the pain")]!", 10, nohalloss = 0)
 
 	if(shock_stage >= 50)
 		if(shock_stage == 50)
@@ -949,7 +949,7 @@
 			stuttering = max(stuttering, 5)
 
 	if(shock_stage == 70)
-		custom_pain("[pick("The pain is excruciating", "Please, just end the pain", "Your whole body is going numb")]!", 0)
+		custom_pain("[pick("The pain is excruciating", "Please, just end the pain", "My whole body is going numb")]!", 0)
 		src.agony_moan()
 		emote("moan")
 
@@ -971,7 +971,7 @@
 
 	if(shock_stage >= 180)
 		if (prob(2))
-			custom_pain("[pick("You black out", "You feel like you could die any moment now", "You're about to lose consciousness")].", shock_stage, nohalloss = 0)
+			custom_pain("[pick("I'm blacking out", "I feel like you could die any moment now", "I think I'm about to lose consciousness")]...", shock_stage, nohalloss = 0)
 			Paralyse(5)
 			flash_pain()
 			stuttering = max(stuttering, 5)
@@ -1198,32 +1198,31 @@
 
 /mob/living/carbon/human/proc/handle_decay()
 	var/decaytime = world.time - timeofdeath
-	var/image/flies = image('icons/effects/effects.dmi', "rotten")//This is a hack, there has got to be a safer way to do this but I don't know it at the moment.
 
 	if(isSynthetic())
 		return
 
-	if(decaytime <= 3000) //10 minutes for decaylevel1 -- stinky
+	if(decaytime < 5 MINUTES) //10 minutes for decaylevel1 -- stinky
 		return
 
-	if(decaytime > 3000 && decaytime <= 9000)//20 minutes for decaylevel2 -- bloated and very stinky
+	if(decaytime >= 5 MINUTES && decaytime < 10 MINUTES)//20 minutes for decaylevel2 -- bloated and very stinky
 		decaylevel = 1
-		overlays -= flies
-		overlays += flies
+		add_flies()
 
-	if(decaytime > 9000 && decaytime <= 15000)//30 minutes for decaylevel3 -- rotting and gross
+	if(decaytime >= 10 MINUTES && decaytime < 20 MINUTES)//30 minutes for decaylevel3 -- rotting and gross
 		decaylevel = 2
 
-	if(decaytime > 15000 && decaytime <= 24000)//45 minutes for decaylevel4 -- skeleton
+	if(decaytime >= 25 MINUTES && decaytime < 30 MINUTES)//45 minutes for decaylevel4 -- skeleton
 		decaylevel = 3
 
-	if(decaytime > 24000)
+	if(decaytime > 30 MINUTES)
 		decaylevel = 4
-		overlays -= flies
-		flies = null
+		remove_flies()
 		ChangeToSkeleton()
 		return //No puking over skeletons, they don't smell at all!
 
+	if(decaylevel && prob(5))
+		playsound(src, 'sound/effects/buzz.ogg', 25, 1)
 
 	for(var/mob/living/carbon/human/H in range(decaylevel, src))
 		if(prob(7))
