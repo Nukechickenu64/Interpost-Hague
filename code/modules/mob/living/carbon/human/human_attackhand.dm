@@ -124,9 +124,9 @@
 				if(!affecting || affecting.is_stump())
 					to_chat(H, "There is nothing to grab!")
 					return
-
-				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
-					return
+				if(M != src)
+					if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+						return
 
 				switch(H.zone_sel.selecting)
 					//Strangling
@@ -195,8 +195,9 @@
 				to_chat(M, "<span class='danger'>You cannot attack something the enemy doesn't have.</span>")
 				return 1
 
-			if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
-				return 1
+			if(M != src)
+				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+					return
 
 			switch(src.combat_mode)
 				if(0)
@@ -297,8 +298,9 @@
 				admin_attack_log(M, src, "Disarmed their victim.", "Was disarmed.", "disarmed")
 				H.species.disarm_attackhand(H, src)
 
-			if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
-				return
+			if(M != src)
+				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+					return
 
 	return
 

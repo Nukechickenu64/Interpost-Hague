@@ -82,7 +82,7 @@
 	assailant.doing_something = TRUE
 	assailant.visible_message("<span class='danger'>[assailant] tries to break [affecting]'s [O.name]!</span>")
 
-	if(!do_after(assailant, 20, affecting))
+	if(!do_after(assailant, 15, affecting))
 		assailant.doing_something = FALSE
 		return
 

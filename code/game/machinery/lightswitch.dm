@@ -65,6 +65,8 @@
 
 /obj/machinery/light_switch/attack_hand(mob/user)
 	playsound(src, "switch", 30)
+	if(stat & (NOPOWER|BROKEN))
+		return
 	set_state(!on)
 
 /obj/machinery/light_switch/powered()

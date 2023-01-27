@@ -755,6 +755,8 @@ default behaviour is:
 
 /mob/living/proc/resist_grab()
 	var/resisting = 0
+	if(grabbed_by == src)
+		return
 	for(var/obj/item/grab/G in grabbed_by)
 		resisting++
 		G.handle_resist()

@@ -317,10 +317,10 @@
 
 	else//On the floor.
 		var/mob/user = usr
+		message = "<B>[H]</B><span class='hygiene'> pisses on the floor.</span>"
 		for(var/thing in trange(1, get_turf(user)))
 			var/turf/T = thing
 			T.add_fluid(1, /datum/reagent/urine)
-		message = "<B>[H]</B><span class='hygiene'> pisses on the [TT.name].</span>"
 	GLOB.piss_left++
 	src.bladder -= 50
 	visible_message("[message]")
