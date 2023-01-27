@@ -41,7 +41,7 @@ mob/var/next_pain_time = 0
 					if(has_quirk(/datum/quirk/tough))
 						return 0
 					flash_weakest_pain()
-					make_jittery(-2000)
+					make_jittery(0)
 					add_event("pain", /datum/happiness_event/verymildpain)
 					remove_all_pain()
 					remove_all_pain_extreme()
@@ -64,7 +64,7 @@ mob/var/next_pain_time = 0
 					flash_pain()
 					if(stuttering < 10)
 						stuttering += 10
-					make_jittery(1000)
+					make_jittery(400)
 					if(prob(4))
 						Stun(5)//makes you drop what you're holding.
 						shake_camera(src, 20, 3)
