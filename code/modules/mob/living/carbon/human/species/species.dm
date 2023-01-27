@@ -634,5 +634,13 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 		return
 	client.screen -= pain_effect_extreme
 
+/mob/living/proc/add_cryo_filter_effect()
+	var/obj/screen/plane_master/cryo/C = new
+	client.screen += C
+
+/mob/living/proc/remove_cryo_filter_effect()
+	var/obj/screen/plane_master/cryo/C
+	client.screen -= C
+
 /datum/species/proc/post_organ_rejuvenate(var/obj/item/organ/org)
 	return

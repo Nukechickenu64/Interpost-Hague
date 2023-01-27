@@ -320,7 +320,7 @@
 		message = "<B>[H]</B><span class='hygiene'> pisses on the floor.</span>"
 		for(var/thing in trange(1, get_turf(user)))
 			var/turf/T = thing
-			T.add_fluid(1, /datum/reagent/urine)
+			T.add_fluid_piss(1, /datum/reagent/urine)
 	GLOB.piss_left++
 	src.bladder -= 50
 	visible_message("[message]")

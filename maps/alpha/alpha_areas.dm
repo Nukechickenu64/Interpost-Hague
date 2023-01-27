@@ -1309,11 +1309,13 @@ area/rnd/test_area
 	name = "Atmospherics Storage"
 	icon_state = "atmos_storage"
 	sound_env = SMALL_ENCLOSED
+	forced_ambience = list('sound/ambience/FAC.ogg')
 
 /area/engineering/engine_room
 	name = "Engine Room"
 	icon_state = "engine"
 	sound_env = LARGE_ENCLOSED
+	forced_ambience = list('sound/ambience/AC0.ogg')
 
 /area/engineering/drone_fabrication
 	name = "Engineering Drone Fabrication"

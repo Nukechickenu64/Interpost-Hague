@@ -123,3 +123,14 @@
 	icon = 'icons/effects/effects.dmi'
 	layer = ABOVE_HUMAN_LAYER
 	icon_state = "scorch"
+
+/obj/effect/overlay/temp/bullet_impact
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "impact_bullet"
+	randomdir = FALSE
+	duration = 5
+
+/obj/effect/overlay/temp/bullet_impact/New(x,y)
+	..()
+	pixel_x = x
+	pixel_y = y

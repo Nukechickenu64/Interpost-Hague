@@ -49,7 +49,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 			if(instonce >= statht)
 				force_droplimbburn = 1
 			brute = pure_brute
-			to_chat(world, brute)
+			//to_chat(world, brute)
 			if(edge && brute >= 60 / DROPLIMB_THRESHOLD_EDGE)
 				if(prob(brute) || force_droplimb)
 					droplimb(0, DROPLIMB_EDGE)

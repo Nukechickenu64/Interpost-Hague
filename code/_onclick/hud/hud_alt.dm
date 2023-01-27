@@ -293,12 +293,3 @@
 	p3.render_target = "all3"
 
 	client.screen.Add(p3)
-
-/mob/proc/add_cryo_filter_effect()
-	var/obj/screen/plane_master/cryo/C = new
-	C.plane = FULLSCREEN_PLANE
-	client.screen += C
-
-/mob/proc/remove_cryo_filter_effect()
-	var/obj/screen/plane_master/cryo/C
-	client.screen -= C
