@@ -18,6 +18,9 @@
 	var/equalize_avg_temp = 0
 	var/flow_amount = 0
 
+/obj/effect/fluid/urine
+	color = COLOR_YELLOW
+
 /obj/effect/fluid/ex_act()
 	return
 
