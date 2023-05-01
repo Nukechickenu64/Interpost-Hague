@@ -58,7 +58,7 @@
 	if(!user || !user.client)
 		return
 
-	var/dat = "<html><head><title>Lobby Menu</title>"
+	var/dat = "<html><head><title>TERMINAL CONNECTION</title>"
 	dat += "<style type='text/css'>html {overflow: auto;};"
 	dat += "body {"
 	dat += "overflow:hidden;"

@@ -44,7 +44,7 @@ datum/preferences
 
 /datum/category_item/player_setup_item/general/basic/content()
 	. = list()
-	. += "<b>Gender:</b> <a href='?src=\ref[src];gender=1'><b>[gender2text(pref.gender)]</b></a><br>"
+	. += "<b>Gender:</b> <a href='?src=\ref[src];gender=1'><b>[pref.gender == MALE ? "Male" : "Female"]</b></a><br>"
 	. += "<b>Age:</b> <a href='?src=\ref[src];age=1'>[pref.age]</a><br>"
 	//. += "<b>Spawn Point</b>: <a href='?src=\ref[src];spawnpoint=1'>[pref.spawnpoint]</a><br>"
 	. += "<b>RELIGION</b> "
