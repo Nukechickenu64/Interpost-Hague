@@ -7,9 +7,9 @@
 	density = 0
 
 
-/obj/effect/shield_impact/New()
-	spawn(2 SECONDS)
-		qdel(src)
+/obj/effect/shield_impact/Initialize()
+	. = ..()
+	QDEL_IN(src, 2 SECONDS)
 
 
 /obj/effect/shield
@@ -45,8 +45,8 @@
 	return 0
 
 
-/obj/effect/shield/New()
-	..()
+/obj/effect/shield/Initialize()
+	. = ..()
 	update_nearby_tiles()
 
 
@@ -60,7 +60,7 @@
 		gen = null
 	update_nearby_tiles()
 	forceMove(null, 1)
-
+	return ..()
 
 // Temporarily collapses this shield segment.
 /obj/effect/shield/proc/fail(var/duration)

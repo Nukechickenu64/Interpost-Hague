@@ -82,11 +82,6 @@
 /obj/item/projectile/Destroy()
 	return ..()
 
-/obj/item/projectile/forceMove()
-	..()
-	if(istype(loc, /turf/space/) && istype(loc.loc, /area/space))
-		qdel(src)
-
 //TODO: make it so this is called more reliably, instead of sometimes by bullet_act() and sometimes not
 /obj/item/projectile/proc/on_hit(var/atom/target, var/blocked = 0, var/def_zone = null)
 	var/turf/target_loca = get_turf(target)
@@ -436,9 +431,9 @@
 
 /obj/item/projectile/proc/impact_effect(var/matrix/M)
 	if(ispath(impact_type))
-		var/obj/effect/projectile/P = new impact_type(location.loc)
+		var/obj/effect/projectile/P = new impact_type(location ? location.loc : get_turf(src))
 
-		if(istype(P))
+		if(istype(P) && location)
 			P.set_transform(M)
 			P.pixel_x = round(location.pixel_x, 1)
 			P.pixel_y = round(location.pixel_y, 1)
@@ -489,6 +484,9 @@
 
 		trajectory.increment()	// increment the current location
 		location = trajectory.return_location(location)		// update the locally stored location data
+
+		if(!location)
+			return FALSE
 
 		Move(location.return_turf())
 

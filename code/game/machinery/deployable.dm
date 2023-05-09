@@ -87,6 +87,10 @@ for reference:
 	maxhealth = material.integrity
 	health = maxhealth
 
+/obj/structure/barricade/Destroy()
+	material = null
+	return ..()
+
 /obj/structure/barricade/get_material()
 	return material
 
@@ -117,7 +121,6 @@ for reference:
 		if (src.health <= 0)
 			visible_message("<span class='danger'>The barricade is smashed apart!</span>")
 			dismantle()
-			qdel(src)
 			return
 		..()
 

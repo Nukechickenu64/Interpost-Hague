@@ -1212,7 +1212,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			var/obj/old_id = id
 			I.loc = src
 			id = I
-			user.put_in_hands(old_id)
+			if(old_id)
+				user.put_in_hands(old_id)
 			return 1
 	return 0
 

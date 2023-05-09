@@ -133,6 +133,8 @@
 
 	// Keeping broken up for readability
 	for(var/datum/mind/player in mode.get_players_for_role(id))
+		if(!player.current?.client)
+			continue
 		if(ghosts_only && !(isghostmind(player) || isnewplayer(player.current)))
 		else if(config.use_age_restriction_for_antags && player.current.client.player_age < minimum_player_age)
 		else if(player.special_role)
