@@ -8,9 +8,9 @@
 	var/leaking = 0		// Do not set directly, use set_leaking(TRUE/FALSE)
 	use_power = POWER_USE_OFF
 
-	var/maximum_pressure = 350 * ONE_ATMOSPHERE
-	var/fatigue_pressure = 230 * ONE_ATMOSPHERE
-	var/alert_pressure = 230 * ONE_ATMOSPHERE
+	var/maximum_pressure = 180 * ONE_ATMOSPHERE
+	var/fatigue_pressure = 120 * ONE_ATMOSPHERE
+	var/alert_pressure = 120 * ONE_ATMOSPHERE
 	var/in_stasis = 0
 		//minimum pressure before check_pressure(...) should be called
 
