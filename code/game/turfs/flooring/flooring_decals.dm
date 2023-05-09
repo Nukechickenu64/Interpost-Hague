@@ -831,3 +831,30 @@ var/list/floor_decals = list()
 
 /obj/effect/floor_decal/rustyborder
 	icon_state = "border_rust"
+
+/obj/effect/floor_decal/kover
+	name = "kovrik"
+	icon = 'icons/obj/kovri1.dmi'
+	icon_state = "1"
+	appearance_flags = RESET_COLOR
+
+/obj/effect/floor_decal/kover/two
+	icon_state = "2"
+
+/obj/effect/floor_decal/kover/three
+	icon_state = "3"
+
+/obj/effect/floor_decal/kover/four
+	icon_state = "4"
+
+/obj/effect/floor_decal/kover/five
+	icon_state = "5"
+
+/obj/effect/floor_decal/kover/six
+	icon_state = "6"
+
+/obj/effect/floor_decal/kover/seven
+	icon_state = "7"
+
+/obj/effect/floor_decal/kover/eight
+	icon_state = "8"

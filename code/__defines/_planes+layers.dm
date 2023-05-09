@@ -117,8 +117,8 @@ What is the naming convention for planes or layers?
 	#define ABOVE_WINDOW_LAYER          3.06
 	//LYING MOB AND HUMAN
 	#define LYING_MOB_LAYER             3.07
-	#define LYING_HUMAN_LAYER           3.08
-	#define BASE_ABOVE_OBJ_LAYER        3.09
+	#define LYING_HUMAN_LAYER           3.09
+	#define BASE_ABOVE_OBJ_LAYER        3.08
 	//HUMAN
 	#define BASE_HUMAN_LAYER            3.10
 	//MOB
