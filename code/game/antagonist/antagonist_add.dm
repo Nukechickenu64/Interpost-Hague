@@ -36,14 +36,6 @@
 	if(config.objectives_disabled == CONFIG_OBJECTIVE_VERB)
 		player.current.verbs += /mob/proc/add_objectives
 
-	if(player.current.client)
-		player.current.client.verbs += /client/proc/aooc
-
-	//spawn(1 SECOND) //Added a delay so that this should pop up at the bottom and not the top of the text flood the new antag gets.
-		//to_chat(player.current, "<span class='notice'>Once you decide on a goal to pursue, you can optionally display it to \
-		//	everyone at the end of the shift with the <b>Set Ambition</b> verb, located in the IC tab.  You can change this at any time, \
-		//	and it otherwise has no bearing on your round.</span>")
-	//player.current.verbs += /mob/living/proc/set_ambition
 
 	// Handle only adding a mind and not bothering with gear etc.
 	if(nonstandard_role_type)

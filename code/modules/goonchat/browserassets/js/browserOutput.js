@@ -25,13 +25,13 @@ var $messages, $subTheme, $subOptions, $subFont, $selectedSub, $contextMenu, $fi
 var opts = {
 	//General
 	'messageCount': 0, //A count...of messages...
-	'messageLimit': 5000, //A limit...for the messages...
+	'messageLimit': 196, //A limit...for the messages...
 	'scrollSnapTolerance': 10, //If within x pixels of bottom
 	'clickTolerance': 10, //Keep focus if outside x pixels of mousedown position on mouseup
 	'imageRetryDelay': 50, //how long between attempts to reload images (in ms)
 	'imageRetryLimit': 50, //how many attempts should we make?
 	'popups': 0, //Amount of popups opened ever
-	'wasd': false, //Is the user in wasd mode?
+	'wasd': true, //Is the user in wasd mode?
 	'priorChatHeight': 0, //Thing for height-resizing detection
 	'restarting': false, //Is the round restarting?
 	'iconsize': 14,

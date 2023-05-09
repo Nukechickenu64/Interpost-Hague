@@ -66,7 +66,7 @@
 /atom/movable/proc/forceMove(atom/destination)
 	if(QDELETED(src) && !QDESTROYING(src) && !isnull(destination))
 		CRASH("Attempted to forceMove a QDELETED [src] out of nullspace! Destination: [destination].")
-		return 0
+		return
 	if(loc == destination)
 		return FALSE
 	var/is_origin_turf = isturf(loc)

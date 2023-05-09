@@ -117,6 +117,6 @@
 		if(M.stat == DEAD && M.get_preference_value(/datum/client_preference/ghost_ears) == GLOB.PREF_ALL_SPEECH)
 			listening|=M
 
-	for(var/mob/M in listening)
+	for(var/mob/M in range(6, src))
 		to_chat(M, "\icon[holder_atom] <b>[holder_atom]</b> reverberates, <span class='notice'>\"[msg]\"</span>")
 	last_talk_time = world.time
