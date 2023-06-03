@@ -344,3 +344,57 @@
 	..()
 	if(istype(loc, /turf))
 		SSradiation.radiate(src, max(1,ceil(radioactivity/30))) //I'm not sure how OP this is...
+
+/obj/structure/vent_gas
+	desc = "A large ventilation panel with an ungodly stench coming out of it."
+	name = "vent"
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "obj37"
+	density = 0
+	anchored = 1
+	layer = ABOVE_WINDOW_LAYER
+
+/obj/structure/vent_gas/New()
+	..()
+	processing()
+
+/obj/structure/vent_gas/proc/processing()
+	INITIALIZE
+	sleep(20)
+	spawn(45)
+		playsound(src.loc, 'sound/machines/loop_vent2.ogg', 10, 0, 3)
+	for(var/i = 0; 6 > i; i++)
+		var/obj/effect/gas_particle/O = new(src.loc)
+		animate(O, pixel_y = rand(50, 98), time=rand(14,20))
+		sleep(5)
+		spawn(20)
+			animate(O, alpha = 0, time = 20)
+			spawn(20)
+				qdel(O)
+	goto INITIALIZE
+
+/obj/effect/gas_particle
+	name = "gas particles"
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "smoke2"
+	opacity = 0
+	anchored = 1
+	layer = 4.1
+	plane = 15
+	alpha = 120
+	mouse_opacity = 0
+
+/obj/effect/gas_particle/New()
+	..()
+	src.pixel_x = rand(-5,5)
+	src.pixel_y = rand(-5, 2)
+	src.icon = turn(src.icon,rand(0,90))
+
+/obj/structure/vent_gas_deactivated
+	desc = "A large ventilation panel which used to have an ungodly stench come out of it."
+	name = "vent"
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "obj37"
+	density = 0
+	anchored = 1
+	layer = ABOVE_WINDOW_LAYER

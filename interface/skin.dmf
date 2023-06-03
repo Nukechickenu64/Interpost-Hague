@@ -871,6 +871,20 @@ window "outputwindow"
 		image = 'code\\porco\\chatbg.png'
 		outer-size = 654x1031
 		inner-size = 640x1017
+		link-color = #198300
+		visited-color = #198300
+	elem "output"
+		type = OUTPUT
+		pos = 0,0
+		size = 640x469
+		anchor1 = 0,0
+		anchor2 = 100,100
+		text-color = #dddddd
+		background-color = #1c1c1c
+		is-default = true
+		saved-params = ""
+		link-color = #198300
+		visited-color = #198300
 	elem "browser"
 		type = BROWSER
 		pos = 0,0
@@ -888,6 +902,8 @@ window "outputwindow"
 		background-color = #ffffff
 		is-visible = false
 		saved-params = ""
+		link-color = #198300
+		visited-color = #198300
 	elem "input"
 		type = INPUT
 		pos = 0,968

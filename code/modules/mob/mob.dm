@@ -969,9 +969,54 @@ mob/proc/yank_out_object()
 
 	fixeye_proc()
 
+/obj/targeting_overlay
+	name = ""
+	icon = 'icons/effects/Targeted.dmi'
+	icon_state = "locking"
+	anchored = 1
+	density = 0
+	opacity = 0
+	layer = ABOVE_HUMAN_LAYER
+	simulated = 0
+	mouse_opacity = 0
+
+	var/mob/owner       // Who do we belong to?
+
+/obj/targeting_overlay/New(var/newowner)
+	..()
+	owner = newowner
+
+/obj/targeting_overlay/Process()
+	if(!owner)
+		qdel(src)
+		return
+	..()
+	update_target()
+
+/mob/MiddleClick(mob/M)
+	var/mob/targeted = M
+	var/mob/targeting = usr
+	var/obj/targeting_overlay/TO
+	if (!(targeted in able_mobs_in_oview(M)))
+		to_chat(targeting, "<span class='warning'>I can't focus on [M].</span>")
+		qdel(TO)
+		return
+	else
+		start_targeting(targeted)
+
+/mob/proc/start_targeting(mob/M)
+	var/mob/targeted = M
+	var/obj/targeting_overlay/TO
+	if(get_dist(usr,src) <= 10)
+		usr.face_atom(targeted)
+		TO.update_target()
+
+/obj/targeting_overlay/proc/update_target(mob/M)
+	var/mob/targeted = M
+	var/obj/targeting_overlay = new(targeted.loc)
+
 /mob/proc/face_direction()
 	set_face_dir()
-
 
 /mob/proc/set_face_dir(var/newdir)
 	if(!isnull(facing_dir) && newdir == facing_dir)

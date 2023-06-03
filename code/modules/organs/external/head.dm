@@ -149,7 +149,6 @@
 			done = 1
 	return done
 
-
 /obj/item/stack/teeth
 	name = "teeth"
 	singular_name = "tooth"
@@ -165,6 +164,7 @@
 
 /obj/item/stack/teeth/New()
 	..()
+	update_icon()
 	icon_state = "tooth[rand(1,3)]"
 
 /obj/item/stack/teeth/human
