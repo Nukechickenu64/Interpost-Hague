@@ -71,14 +71,8 @@ What is the naming convention for planes or layers?
 #define BLACKNESS_PLANE                 0 //Blackness plane as per DM documentation.
 
 #define DEFAULT_PLANE                   1
-
-#define PLATING_PLANE                   2
 	#define PLATING_LAYER               1
 	//ABOVE PLATING
-
-
-#define ABOVE_PLATING_PLANE             2
-
 	#define HOLOMAP_LAYER               1.01
 	#define DECAL_PLATING_LAYER         1.02
 	#define DISPOSALS_PIPE_LAYER        1.03
@@ -89,12 +83,9 @@ What is the naming convention for planes or layers?
 	#define ABOVE_WIRE_LAYER            1.08
 	//TURF PLANE
 	//TURF_LAYER = 2
-
-#define TURF_PLANE                      3
 	#define TURF_DETAIL_LAYER           2.01
 	#define TURF_SHADOW_LAYER           2.02
-
-#define ABOVE_TURF_PLANE                4
+	//ABOVE TURF
 	#define DECAL_LAYER                 2.03
 	#define RUNE_LAYER                  2.04
 	#define AO_LAYER                    2.045
@@ -107,14 +98,10 @@ What is the naming convention for planes or layers?
 	#define MOUSETRAP_LAYER             2.11
 	#define PLANT_LAYER                 2.12
 	//HIDING MOB
-
-#define HIDING_MOB_PLANE                5
 	#define HIDING_MOB_LAYER            2.14
 	#define SHALLOW_FLUID_LAYER         2.15
 	#define MOB_SHADOW_LAYER            2.16
 	//OBJ
-
-#define OBJ_PLANE                       6
 	#define BELOW_DOOR_LAYER            2.17
 	#define OPEN_DOOR_LAYER             2.18
 	#define BELOW_TABLE_LAYER           2.19
@@ -128,20 +115,11 @@ What is the naming convention for planes or layers?
 	#define SIDE_WINDOW_LAYER           3.04
 	#define FULL_WINDOW_LAYER           3.05
 	#define ABOVE_WINDOW_LAYER          3.06
-
-
-#define LYING_MOB_PLANE                 7
 	//LYING MOB AND HUMAN
 	#define LYING_MOB_LAYER             3.07
 	#define LYING_HUMAN_LAYER           3.09
-
-
-#define ABOVE_OBJ_PLANE                 8
 	#define BASE_ABOVE_OBJ_LAYER        3.08
 	//HUMAN
-
-
-#define HUMAN_PLANE                     9
 	#define BASE_HUMAN_LAYER            3.10
 	//MOB
 	#define MECH_UNDER_LAYER            3.11
@@ -154,19 +132,14 @@ What is the naming convention for planes or layers?
 	#define MECH_ARM_LAYER              4.06
 	#define MECH_GEAR_LAYER             4.07
 	//ABOVE HUMAN
-
-#define ABOVE_HUMAN_PLANE               10
 	#define ABOVE_HUMAN_LAYER           4.08
 	#define VEHICLE_LOAD_LAYER          4.09
 	#define CAMERA_LAYER                4.10
 	//BLOB
-#define BLOB_PLANE                      11
 	#define BLOB_SHIELD_LAYER           4.11
 	#define BLOB_NODE_LAYER             4.12
 	#define BLOB_CORE_LAYER	            4.13
 	//EFFECTS BELOW LIGHTING
-
-#define EFFECTS_BELOW_LIGHTING_PLANE    12
 	#define BELOW_PROJECTILE_LAYER      4.14
 	#define DEEP_FLUID_LAYER            4.15
 	#define FIRE_LAYER                  4.16

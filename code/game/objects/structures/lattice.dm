@@ -7,7 +7,6 @@
 	anchored = 1.0
 	w_class = ITEM_SIZE_NORMAL
 	layer = LATTICE_LAYER
-	plane = ABOVE_PLATING_PLANE
 	obj_flags = OBJ_FLAG_CONDUCTIBLE | OBJ_FLAG_NOFALL
 
 /obj/structure/lattice/Initialize(mapload, var/new_material)
