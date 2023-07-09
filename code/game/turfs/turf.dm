@@ -2,7 +2,7 @@
 	icon = 'icons/turf/floors.dmi'
 	level = 1
 
-	plane = DEFAULT_PLANE
+	plane = PLATING_PLANE
 	layer = TURF_LAYER
 
 	var/turf_flags

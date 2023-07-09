@@ -7,6 +7,7 @@ var/global/list/navbeacons = list()
 	desc = "A radio beacon used for bot navigation."
 	level = 1
 	layer = ABOVE_WIRE_LAYER
+	plane = ABOVE_PLATING_PLANE
 	anchored = 1
 
 	var/open = 0		// true if cover is open
