@@ -92,11 +92,12 @@
 // Preset types - left here for the code that uses them
 /obj/item/weapon/material/shrapnel
 	name = "shrapnel"
-	default_material = MATERIAL_NULLGLASS
+	default_material = "steel"
+	icon_state = "shrapnellarge"
 	w_class = ITEM_SIZE_TINY	//it's real small
 
 /obj/item/weapon/material/shard/shrapnel/New(loc)
-	..(loc, MATERIAL_NULLGLASS)
+	..(loc, "steel")
 
 /obj/item/weapon/material/shard/phoron/New(loc)
 	..(loc, "phglass")

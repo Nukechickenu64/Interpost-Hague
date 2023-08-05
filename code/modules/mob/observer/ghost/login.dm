@@ -7,6 +7,7 @@
 		ghost_image.filters = filter(type = "blur", size = 3)
 	updateghostimages()
 	add_client_color(/datum/client_color/noir)
+	src.overlay_fullscreen("deathscreen",/obj/screen/fullscreen/dead)
 	heartporcao()
 	updatePig()
 	startPig()

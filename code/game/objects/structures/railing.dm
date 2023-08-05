@@ -328,3 +328,48 @@
 	if(!anchored)	take_damage(maxhealth) // Fatboy
 	climbers -= user
 
+/obj/structure/railing/smallwall
+	name = "small wall"
+	desc = "A small wall, designed to keep intruders out."
+	icon = 'icons/obj/railing.dmi'
+	density = 1
+	throwpass = 0
+	layer = ABOVE_HUMAN_LAYER
+	anchored = 1
+	atom_flags = ATOM_FLAG_CHECKS_BORDER
+	icon_state = "smallwall0"
+	broken = 0
+	opacity = 1
+	health= 600
+	maxhealth= 600
+	//var/LeftSide = list(0,0,0)// Íóæíû äëÿ õðàíåíèÿ äàííûõ
+	//var/RightSide = list(0,0,0)
+	check = 0
+
+/obj/structure/railing/smallwall/do_climb(var/mob/living/user)
+	return FALSE
+
+/obj/structure/railing/smallwall/rotate()
+	set name = "Rotate Railing Counter-Clockwise"
+	set category = "Object"
+	set hidden = 1
+
+/obj/structure/railing/smallwall/revrotate()
+	set name = "Rotate Railing Clockwise"
+	set category = "Object"
+	set hidden = 1
+
+/obj/structure/railing/smallwall/flip() // This will help push railing to remote places, such as open space turfs
+	set name = "Flip Railing"
+	set category = "Object"
+	set hidden = 1
+
+/obj/structure/railing/smallwall/CheckExit(atom/movable/O as mob|obj, target as turf)
+	return 0
+
+/obj/structure/railing/smallwall/attackby(obj/item/W as obj, mob/user as mob)
+	playsound(loc, 'sound/effects/grillehit.ogg', 50, 1)
+	take_damage(W.force)
+
+	return ..()
+

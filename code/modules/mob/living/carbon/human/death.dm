@@ -82,6 +82,8 @@
 		playsound(src.loc, death_sound, 50, 0)
 	handle_hud_list()
 
+	src.overlay_fullscreen("deathscreen",/obj/screen/fullscreen/dead)
+
 	var/death_sound2 = 'sound/effects/death.ogg'
 	sound_to(src, sound(death_sound2,0,0,0,50))
 

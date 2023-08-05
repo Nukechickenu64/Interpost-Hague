@@ -112,6 +112,10 @@
 	icon_state = "blackimageoverlay"
 	layer = BLIND_LAYER
 
+/obj/screen/fullscreen/dead
+	icon_state = "deathscreen"
+	layer = FULLSCREEN_LAYER
+
 /obj/screen/fullscreen/blackout
 	icon = 'icons/mob/screen1.dmi'
 	icon_state = "black"

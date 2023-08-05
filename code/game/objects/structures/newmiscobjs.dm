@@ -379,9 +379,9 @@
 	icon_state = "smoke2"
 	opacity = 0
 	anchored = 1
-	layer = 4.1
-	plane = 15
-	alpha = 120
+	layer = ABOVE_PROJECTILE_LAYER
+	plane = 2
+	alpha = 130
 	mouse_opacity = 0
 
 /obj/effect/gas_particle/New()

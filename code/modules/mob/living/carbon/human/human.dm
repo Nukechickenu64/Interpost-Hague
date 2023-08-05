@@ -51,6 +51,8 @@
 	bowels = rand(0, 100)
 	disguise_number = rand(1,length(GLOB.player_list))
 
+	clear_fullscreen("deathscreen")
+
 	potenzia = (prob(80) ? rand(9, 14) : pick(rand(5, 13), rand(15, 20)))//funny
 	resistenza = (prob(80) ? rand(150, 300) : pick(rand(10, 100), rand(350,600)))
 
