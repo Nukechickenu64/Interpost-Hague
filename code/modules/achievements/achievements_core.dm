@@ -80,9 +80,9 @@
 				H = "green"
 			if (DIFF_HARD)
 				H = "red"
-		msg += "<b>[count]:<font color = [H]> [A.name]</font color>\n</b>\n</font>"
+		msg += "\n<b>[count]:<font color = [H]> [A.name]</font color>\n</b>\n</font>"
 		if(A.description)
-			msg += "\n<b>[A.description]</b>\n"
+			msg += "\n<b>[A.description]\n</b>"
 	if(count)
 		msg += "<hr class='linexd'>"
 		msg += "---\n<b>TOTAL ACHIEVEMENTS: [count]</b>"

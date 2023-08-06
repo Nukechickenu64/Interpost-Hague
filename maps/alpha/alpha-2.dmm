@@ -1072,7 +1072,7 @@
 "uF" = (/obj/effect/floor_decal/industrial/warning{icon_state = "warning"; dir = 6},/obj/machinery/atmospherics/unary/vent_pump/on{dir = 8},/turf/simulated/floor/tiled,/area/hallway/secondary/exit)
 "uG" = (/obj/machinery/light/small/red,/obj/effect/floor_decal/rustyborder{dir = 8},/turf/simulated/floor/reinforced,/area/engineering/engine_room)
 "uH" = (/turf/simulated/floor/tiled/chesssteel,/area/engineering/engine_monitoring)
-"uI" = (/obj/machinery/door/blast/regular{dir = 4; id = "SupermatterEntrance"},/turf/space,/area/engineering/engine_monitoring)
+"uI" = (/obj/machinery/door/blast/regular{dir = 4; id = "SupermatterEntrance"},/turf/simulated/floor/tiled/bunker/polar,/area/engineering/engine_monitoring)
 "uJ" = (/obj/machinery/air_sensor{frequency = 1438; id_tag = "engine_sensor"; output = 63},/obj/effect/floor_decal/industrial/warning{icon_state = "warning"; dir = 1},/obj/structure/disposalpipe/segment{dir = 4},/obj/structure/window/phoronreinforced,/turf/simulated/floor/reinforced{name = "engine floor"},/area/engineering/engine_room)
 "uK" = (/obj/machinery/door/firedoor/border_only,/obj/structure/grille,/obj/structure/window/phoronreinforced/full,/obj/structure/disposalpipe/segment{dir = 4},/obj/machinery/door/blast/regular/open{density = 0; dir = 8; id = "SupermatterPort"; name = "Reactor Blast Door"},/turf/simulated/floor/plating,/area/engineering/engine_room)
 "uL" = (/obj/structure/cable/yellow{d1 = 1; d2 = 2; icon_state = "1-2"},/obj/structure/cable/yellow{d1 = 2; d2 = 8; icon_state = "2-8"},/turf/simulated/floor/tiled/dark,/area/engineering/engine_room)
