@@ -6,8 +6,6 @@
 	var/drainage = 0.5
 	var/last_gurgle = 0
 
-	var/obj/machinery/waterchip_holder/installed
-
 /obj/structure/hygiene/New()
 	..()
 	SSfluids.hygiene_props += src
@@ -224,8 +222,8 @@
 	mouse_opacity = 0
 
 /obj/structure/hygiene/shower/attack_hand(mob/M as mob, var/obj/machinery/waterchip_holder)
-	if(installed == FALSE)
-		to_chat("<span class='info'>There's no waterchip installed.</span>")
+	if(!GLOB.waterchip_installed)
+		to_chat(usr, "<span class='info'>The [name] makes a sad gurgle. The water chip is not installed.</span>")
 		return
 
 	var/showersound = "sound/machines/shower_mid[rand(1,3)].ogg"
@@ -375,8 +373,8 @@
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
 
-	if(installed == FALSE)
-		to_chat("<span class='info'>There's no waterchip installed.</span>")
+	if(!GLOB.waterchip_installed)
+		to_chat(user, "<span class='info'>The [name] makes a sad gurgle. The water chip is not installed.</span>")
 		return
 
 	if (ishuman(user))
