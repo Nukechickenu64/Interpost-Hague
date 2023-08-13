@@ -13,7 +13,7 @@
 	wielded_item_state = "gun_wielded"
 
 	projectile_type = /obj/item/projectile/temp
-	cell_type = /obj/item/weapon/cell/high
+	power_supply = /obj/item/weapon/cell/high
 	combustion = 0
 
 
