@@ -187,9 +187,11 @@
 	var/intent = I_HELP
 
 /obj/screen/intent/Click(var/location, var/control, var/params)
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/P = params2list(params)
 	var/icon_x = text2num(P["icon-x"])
 	var/icon_y = text2num(P["icon-y"])
+	playsound(usr, pick(clicksound), 30, 0)
 	intent = I_GRAB
 	if(icon_x <= world.icon_size/2)
 		if(icon_y <= world.icon_size/2)
@@ -212,9 +214,11 @@
 	var/intent = I_STRONG
 
 /obj/screen/combat/Click(var/location, var/control, var/params)
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/P = params2list(params)
 	var/icon_x = text2num(P["icon-x"])
 	var/icon_y = text2num(P["icon-y"])
+	playsound(usr, pick(clicksound), 30, 0)
 	intent = I_STRONG
 	if(icon_x <= world.icon_size/2)
 		if(icon_y <= world.icon_size/2)
@@ -236,8 +240,10 @@
 	screen_loc = ui_skills_family//ui_acti
 
 /obj/screen/skills_family/Click(var/location, var/control, var/params)
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/P = params2list(params)
 	var/icon_y = text2num(P["icon-y"])
+	playsound(usr, pick(clicksound), 30, 0)
 	if(icon_y <= world.icon_size/2)
 		if(ishuman(usr))
 			var/mob/living/carbon/human/H = usr
@@ -248,6 +254,7 @@
 
 /obj/screen/Click(location, control, params)
 	if(!usr)	return 1
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	switch(name)
 		if("toggle")
 			if(usr.hud_used.inventory_shown)
@@ -257,6 +264,7 @@
 				usr.hud_used.inventory_shown = 1
 				usr.client.screen += usr.hud_used.other
 
+			playsound(usr, pick(clicksound), 30, 0)
 			usr.hud_used.hidden_inventory_update()
 
 		if("equip")
@@ -265,13 +273,17 @@
 			if(ishuman(usr))
 				var/mob/living/carbon/human/H = usr
 				H.quick_equip()
+			playsound(usr, pick(clicksound), 30, 0)
 
 		if("resist")
 			if(isliving(usr))
 				var/mob/living/L = usr
 				L.resist()
+			playsound(usr, pick(clicksound), 30, 0)
+
 
 		if("mov_intent")
+			playsound(usr, pick(clicksound), 30, 0)
 			switch(usr.m_intent)
 				if("run")
 					usr.m_intent = "walk"
@@ -287,11 +299,15 @@
 			if(ishuman(usr))
 				var/mob/living/carbon/human/X = usr
 				X.exam_self()
+				playsound(usr, pick(clicksound), 30, 0)
+
 
 		if("surrender")
 			if(ishuman(usr))
 				var/mob/living/carbon/human/S = usr
 				S.surrender()
+				playsound(usr, pick(clicksound), 30, 0)
+
 
 		if("internal")
 			if(iscarbon(usr))
@@ -389,19 +405,26 @@
 								to_chat(C, "<span class='notice'>You don't have a[breathes=="oxygen" ? "n oxygen" : addtext(" ",breathes)] tank.</span>")
 		if("act_intent")
 			usr.a_intent_change("right")
+			playsound(usr, pick(clicksound), 30, 0)
 
 		if("pull")
 			usr.stop_pulling()
+			playsound(usr, pick(clicksound), 30, 0)
+
 
 		if("rest")
 			usr.mob_rest()
+			playsound(usr, pick(clicksound), 30, 0)
+
 
 		if("throw")
 			if(!usr.stat && isturf(usr.loc) && !usr.restrained())
 				usr:toggle_throw_mode()
+				playsound(usr, pick(clicksound), 30, 0)
 		if("drop")
 			if(usr.client)
 				usr.client.drop_item()
+				playsound(usr, pick(clicksound), 30, 0)
 		if("wield")
 			if(!ishuman(usr)) return
 			var/mob/living/carbon/human/HH = usr
@@ -409,7 +432,9 @@
 			if(!I)
 				return
 			I.attempt_wield(HH)
+			playsound(usr, pick(clicksound), 30, 0)
 		if("kick")
+			playsound(usr, pick(clicksound), 30, 0)
 			if(usr.middle_click_intent == "kick")
 				usr.middle_click_intent = null
 				usr.kick_icon.icon_state = "kick"
@@ -418,6 +443,7 @@
 				usr.kick_icon.icon_state = "kick_on"
 				usr.jump_icon.icon_state = "jump"
 		if("jump")
+			playsound(usr, pick(clicksound), 30, 0)
 			if(usr.middle_click_intent == "jump")
 				usr.middle_click_intent = null
 				usr.jump_icon.icon_state = "jump"
@@ -438,6 +464,7 @@
 
 		if("dodge intent")
 			if(ishuman(usr))
+				playsound(usr, pick(clicksound), 30, 0)
 				var/mob/living/carbon/human/E = usr
 				if(E.defense_intent == I_PARRY)
 					E.defense_intent = I_DODGE
@@ -447,16 +474,19 @@
 					E.dodge_intent_icon.icon_state = "parry"
 		if("fixeye")
 			usr.face_direction()
+			playsound(usr, pick(clicksound), 30, 0)
 			if(usr.facing_dir)
 				usr.fixeye.icon_state = "fixeye_on"
 			else
 				usr.fixeye.icon_state = "fixeye"
 
 		if("mood")
+			playsound(usr, pick(clicksound), 30, 0)
 			var/mob/living/carbon/C = usr
 			C.print_happiness(C)
 
 		if("stamina")
+			playsound(usr, pick(clicksound), 30, 0)
 			var/mob/living/M = usr
 			M.report_stamina()
 

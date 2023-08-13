@@ -38,6 +38,12 @@
 			GLOB.latejoin_cryocaptain += loc
 			delete_me = 1
 			return
+/*
+		if("JoinLateCryoEngineering")
+			GLOB.latejoin_cryocaptain += loc
+			delete_me = 1
+			return
+*/
 		if("JoinLateCyborg")
 			GLOB.latejoin_cyborg += loc
 			delete_me = 1

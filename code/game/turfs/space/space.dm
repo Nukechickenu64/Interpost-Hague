@@ -18,8 +18,8 @@
 
 	appearance = SSskybox.space_appearance_cache[(((x + y) ^ ~(x * y) + z) % 25) + 1]
 
-	var/radiation_count = rand(0.2, 2.4)
-	SSradiation.radiate(src, radiation_count)
+	var/radiation_count = rand(45, 85)
+	SSradiation.flat_radiate(src, radiation_count, 1)
 
 	if(!HasBelow(z))
 		return

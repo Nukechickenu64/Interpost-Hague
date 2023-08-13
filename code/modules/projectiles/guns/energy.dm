@@ -118,14 +118,27 @@
 			icon_state = "[initial(icon_state)][ratio]"
 
 //For removable cells.
-/obj/item/weapon/gun/energy/attack_hand(mob/user)
-	if(isnull(accepts_cell_type) || isnull(power_supply) )
+/obj/item/weapon/gun/energy/MouseDrop(mob/user, var/obj/over_object)
+	if(isnull(power_supply))
 		return ..()
-	user.put_in_hands(power_supply)
-	power_supply = null
-	user.visible_message(SPAN_NOTICE("\The [user] unloads \the [src]."))
-	playsound(src,'sound/weapons/guns/interaction/smg_magout.ogg' , 50)
-	update_icon()
+	if (!over_object || !(ishuman(usr) || issmall(usr)))
+		return
+	if (!(src.loc == usr))
+		return
+
+	switch(over_object.name)
+		if("r_hand")
+			user.put_in_hands(power_supply)
+			power_supply = null
+			user.visible_message(SPAN_NOTICE("\The [user] unloads \the [src]."))
+			playsound(src,'sound/weapons/guns/interaction/smg_magout.ogg' , 50)
+			update_icon()
+		if("l_hand")
+			user.put_in_hands(power_supply)
+			power_supply = null
+			user.visible_message(SPAN_NOTICE("\The [user] unloads \the [src]."))
+			playsound(src,'sound/weapons/guns/interaction/smg_magout.ogg' , 50)
+			update_icon()
 
 /obj/item/weapon/gun/energy/attackby(var/obj/item/A, mob/user)
 

@@ -312,6 +312,16 @@
 	volume = 60
 	center_of_mass = "x=15;y=4"
 
+/obj/item/weapon/reagent_containers/food/drinks/metalcup
+	name = "metal cup"
+	desc = "A very brutal metal cup."
+	icon_state = "cup"
+	volume = 40
+	center_of_mass = "x=15;y=13"
+	filling_states = "40;80;100"
+	base_name = "cup"
+	base_icon = "cup"
+
 /obj/item/weapon/reagent_containers/food/drinks/coffeecup
 	name = "coffee cup"
 	desc = "A plain white coffee cup."

@@ -43,6 +43,7 @@
 /obj/item/device/multitool/hacktool/proc/attempt_hack(var/mob/user, var/atom/target)
 	if(is_hacking)
 		to_chat(user, "<span class='warning'>You are already hacking!</span>")
+		playsound(usr, 'sound/misc/denied.ogg', 30, 0)
 		return 1
 	if(!is_type_in_list(target, supported_types))
 		to_chat(user, "\icon[src] <span class='warning'>Unable to hack this target.</span>")

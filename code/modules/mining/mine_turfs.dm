@@ -1,6 +1,12 @@
 var/list/mining_walls = list()
 var/list/mining_floors = list()
 
+proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just making a proc
+	if(!T) return FALSE
+	if(istype(T, /turf/simulated/floor) || istype(T,  /turf/space))
+		return TRUE //heterosexual turf
+	return FALSE //homosexual turf
+
 /**********************Mineral deposits**************************/
 /turf/unsimulated/mineral
 	name = "impassable rock"
@@ -35,6 +41,8 @@ var/list/mining_floors = list()
 	var/datum/artifact_find/artifact_find
 	var/image/ore_overlay
 
+	var/list/attachedoverlays = list()
+
 	has_resources = 1
 
 /turf/simulated/mineral/New()
@@ -66,24 +74,65 @@ var/list/mining_floors = list()
 
 	overlays.Cut()
 
-	for(var/direction in GLOB.cardinal)
-		var/turf/turf_to_check = get_step(src,direction)
-		if(update_neighbors && istype(turf_to_check,/turf/simulated/floor/asteroid))
-			var/turf/simulated/floor/asteroid/T = turf_to_check
-			T.updateMineralOverlays()
-		else if(istype(turf_to_check,/turf/space) || istype(turf_to_check,/turf/simulated/floor))
-			var/image/rock_side = image('icons/turf/walls.dmi', "rock_side", dir = turn(direction, 180))
-			rock_side.layer = DECAL_LAYER
-			switch(direction)
-				if(NORTH)
-					rock_side.pixel_y += world.icon_size
-				if(SOUTH)
-					rock_side.pixel_y -= world.icon_size
-				if(EAST)
-					rock_side.pixel_x += world.icon_size
-				if(WEST)
-					rock_side.pixel_x -= world.icon_size
-			overlays += rock_side
+	spawn(1)
+		var/turf/T
+		var/image/theoverlay
+		if(mineral_overlay_elegibility(get_step(src, NORTH)))
+			T = get_step(src, NORTH)
+			if (T)
+				theoverlay = image('icons/turf/walls.dmi', "rock_side_s", pixel_y = -3)
+				T.overlays += theoverlay
+				attachedoverlays += theoverlay
+		if(mineral_overlay_elegibility(get_step(src, SOUTH)))
+			T = get_step(src, SOUTH)
+			if (T)
+				theoverlay = image('icons/turf/walls.dmi', "rock_side_n", layer = 6)
+				overlays += theoverlay
+				attachedoverlays += theoverlay
+		if(mineral_overlay_elegibility(get_step(src, EAST)))
+			T = get_step(src, EAST)
+			if (T)
+				theoverlay = image('icons/turf/walls.dmi', "rock_side_w", pixel_x = -10, layer = 5)
+				T.overlays += theoverlay
+				attachedoverlays += theoverlay
+		if(mineral_overlay_elegibility(get_step(src, WEST)))
+			T = get_step(src, WEST)
+			if (T)
+				theoverlay = image('icons/turf/walls.dmi', "rock_side_e", pixel_x = 10, layer = 5)
+				T.overlays += theoverlay
+				attachedoverlays += theoverlay
+
+		var/iscorner = TRUE // Yes I know this is shitcode, I coded this at 4 fucking AM
+		if(!mineral_overlay_elegibility(get_step(src, WEST)) && !mineral_overlay_elegibility(get_step(src, EAST)))
+			iscorner = FALSE
+		if(!mineral_overlay_elegibility(get_step(src, NORTH)) && !mineral_overlay_elegibility(get_step(src, SOUTH)))
+			iscorner = FALSE
+
+		if(iscorner == TRUE)
+			if(mineral_overlay_elegibility(get_step(src, WEST)) && mineral_overlay_elegibility(get_step(src, NORTH)))
+				T = get_step(src, NORTHWEST)
+				if (T)
+					theoverlay = image('icons/turf/walls.dmi', "rock_corner_sw", pixel_x = 28, pixel_y = -3, layer = 7)
+					T.overlays += theoverlay
+					attachedoverlays += theoverlay
+			if(mineral_overlay_elegibility(get_step(src, EAST)) && mineral_overlay_elegibility(get_step(src, NORTH)))
+				T = get_step(src, NORTHEAST)
+				if (T)
+					theoverlay = image('icons/turf/walls.dmi', "rock_corner_se", pixel_x = -28, pixel_y = -3, layer = 7)
+					T.overlays += theoverlay
+					attachedoverlays += theoverlay
+			if(mineral_overlay_elegibility(get_step(src, EAST)) && mineral_overlay_elegibility(get_step(src, SOUTH)))
+				T = get_step(src, SOUTHEAST)
+				if (T)
+					theoverlay = image('icons/turf/walls.dmi', "rock_corner_nw", pixel_x = 24, layer = 7)
+					overlays += theoverlay
+					attachedoverlays += theoverlay
+			if(mineral_overlay_elegibility(get_step(src, WEST)) && mineral_overlay_elegibility(get_step(src, SOUTH)))
+				T = get_step(src, SOUTHWEST)
+				if (T)
+					theoverlay = image('icons/turf/walls.dmi', "rock_corner_ne", pixel_x = -24, layer = 7)
+					overlays += theoverlay
+					attachedoverlays += theoverlay
 
 	if(ore_overlay)
 		overlays += ore_overlay

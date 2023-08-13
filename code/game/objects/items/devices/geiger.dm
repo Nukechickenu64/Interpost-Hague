@@ -23,14 +23,6 @@
 	radiation_count = SSradiation.get_rads_at_turf(get_turf(src))
 	update_icon()
 
-/obj/item/device/geiger/examine(mob/user)
-	. = ..(user)
-	var/msg = "[scanning ? "ambient" : "stored"] Radiation level: [radiation_count ? radiation_count : "0"] Bq."
-	if(radiation_count > RAD_LEVEL_LOW)
-		to_chat(user, "<span class='warning'>[msg]</span>")
-	else
-		to_chat(user, "<span class='notice'>[msg]</span>")
-
 /obj/item/device/geiger/attack_self(var/mob/user)
 	scanning = !scanning
 	if(scanning)
@@ -39,6 +31,18 @@
 		STOP_PROCESSING(SSobj, src)
 	update_icon()
 	to_chat(user, "<span class='notice'>\icon[src] You switch [scanning ? "on" : "off"] [src].</span>")
+
+/obj/item/device/geiger/resolve_attackby(var/atom/A)
+	var/turf/T = A
+	if(!istype(T))
+		to_chat(usr, "<span class='warning'>\The [src] only scans the surrounding area.</span>")
+		playsound(usr, 'sound/misc/denied.ogg', 30, 0)
+		return
+	if(!scanning)
+		return
+	. = ..(usr)
+	var/msg = "[scanning ? "Ambient" : "Stored"] radiation level: [radiation_count ? radiation_count : "0"] Bq."
+	to_chat(usr, "<span class='notice'>[msg]</span>")
 
 /obj/item/device/geiger/update_icon()
 	if(!scanning)

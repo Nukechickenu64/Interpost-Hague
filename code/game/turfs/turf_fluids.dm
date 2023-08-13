@@ -21,7 +21,6 @@
 		if(!FU) FU = new(src)
 		SET_FLUID_DEPTH(FU, FU.fluid_amount + amount)
 
-
 /turf/proc/remove_fluid(var/amount = 0)
 	var/obj/effect/fluid/F = locate() in src
 	if(F) LOSE_FLUID(F, amount)
