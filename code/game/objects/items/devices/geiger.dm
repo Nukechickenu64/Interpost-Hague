@@ -34,14 +34,15 @@
 
 /obj/item/device/geiger/resolve_attackby(var/atom/A)
 	var/turf/T = A
-	if(!istype(T))
+	if(!istype(T) && if(scanning))
 		to_chat(usr, "<span class='warning'>\The [src] only scans the surrounding area.</span>")
-		playsound(usr, 'sound/misc/denied.ogg', 30, 0)
+		playsound(usr, 'sound/misc/denied.ogg', 50, 0)
 		return
 	if(!scanning)
 		return
 	. = ..(usr)
 	var/msg = "[scanning ? "Ambient" : "Stored"] radiation level: [radiation_count ? radiation_count : "0"] Bq."
+	playsound(usr, 'sound/misc/accepted.ogg', 50, 0)
 	to_chat(usr, "<span class='notice'>[msg]</span>")
 
 /obj/item/device/geiger/update_icon()

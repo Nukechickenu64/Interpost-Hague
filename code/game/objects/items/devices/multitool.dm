@@ -68,5 +68,6 @@
 		return ..(A, user)
 
 	user.AddTopicPrint(src)
+	playsound(usr, 'sound/misc/accepted.ogg', 50, 0)
 	MT.interact(src, user)
 	return 1

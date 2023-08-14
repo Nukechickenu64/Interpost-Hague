@@ -14,6 +14,7 @@ GLOBAL_VAR_INIT (waterchip_installed,0)
 	name = "water chip holder"
 	desc = "This is where you hold the water chip. It provides water. Hold it."
 	density = 1
+	anchored = 1
 	icon = 'icons/obj/waterchip.dmi'
 	icon_state = "holder1"
 
