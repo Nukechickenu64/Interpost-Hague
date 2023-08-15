@@ -37,8 +37,6 @@
 		operating = 1
 		setmove()
 
-
-
 /obj/machinery/conveyor/proc/setmove()
 	if(operating == 1)
 		movedir = forwards
@@ -66,6 +64,7 @@
 	if(!operating)
 		return
 	use_power_oneoff(100)
+	playsound(src.loc, 'sound/effects/assembly_loop.ogg', 10, 0, 0)
 
 	affecting = loc.contents - src		// moved items will be all in loc
 	spawn(1)	// slight delay to prevent infinite propagation due to map order	//TODO: please no spawn() in process(). It's a very bad idea
@@ -210,6 +209,8 @@
 		last_pos = position
 		position = 0
 
+	var/leversound = list('sound/effects/lever1.ogg', 'sound/effects/lever2.ogg')
+	playsound(src.loc, pick(leversound), 40, 0, 0)
 	operated = 1
 	update_icon()
 

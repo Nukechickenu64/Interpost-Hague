@@ -66,8 +66,6 @@
 
 /obj/item/weapon/paper/examine(mob/user)
 	. = ..()
-	if(name != "sheet of paper")
-		to_chat(user, "It's titled '[name]'.")
 	if(in_range(user, src) || isghost(user))
 		show_content(usr)
 	else
