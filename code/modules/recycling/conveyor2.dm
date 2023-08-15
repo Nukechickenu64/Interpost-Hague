@@ -13,6 +13,7 @@
 	var/forwards		// this is the default (forward) direction, set by the map dir
 	var/backwards		// hopefully self-explanatory
 	var/movedir			// the actual direction to move stuff in
+	var/exhumessound = 0 	//this is the weirdest var ever but if you don't do this each conveyor starts playing a sound
 
 	var/list/affecting	// the list of all items that will be moved this ptick
 	var/id = ""			// the control ID	- must match controller ID
@@ -64,7 +65,9 @@
 	if(!operating)
 		return
 	use_power_oneoff(100)
-	playsound(src.loc, 'sound/effects/assembly_loop.ogg', 10, 0, 0)
+
+	if(exhumessound)
+		playsound(src.loc, 'sound/effects/assembly_loop.ogg', 10, 0, 0)
 
 	affecting = loc.contents - src		// moved items will be all in loc
 	spawn(1)	// slight delay to prevent infinite propagation due to map order	//TODO: please no spawn() in process(). It's a very bad idea
