@@ -1270,6 +1270,10 @@
 
 
 /mob/living/carbon/human/proc/handle_gas_mask_sound()
+	if(wear_mask)
+		remove_coldbreath()
+	if(stat == DEAD)
+		return
 	//var/soundcooldown = world.time
 	if(istype(wear_mask, /obj/item/clothing/mask/gas))
 		//if((world.time - soundcooldown) >= 300)

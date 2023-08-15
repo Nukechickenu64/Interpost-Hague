@@ -38,6 +38,8 @@
 	//Handle species-specific deaths.
 	species.handle_death(src)
 
+	remove_coldbreath()
+
 	animate_tail_stop()
 
 	//Handle brain slugs.

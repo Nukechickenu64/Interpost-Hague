@@ -5,12 +5,13 @@
 	name = "\proper space"
 	icon_state = "fake"
 	dynamic_lighting = 0
-	temperature = T20C
+	temperature = 193.0
 	thermal_conductivity = OPEN_HEAT_TRANSFER_COEFFICIENT
 	var/static/list/dust_cache
 	permit_ao = FALSE
 	appearance_flags = TILE_BOUND | PIXEL_SCALE | TILE_MOVER
 	var/dirt = 0
+	has_coldbreath = FALSE
 
 /turf/space/Initialize()
 	. = ..()
@@ -18,8 +19,10 @@
 
 	appearance = SSskybox.space_appearance_cache[(((x + y) ^ ~(x * y) + z) % 25) + 1]
 
+	var/turf/space/S
+	var/turf/T = S
 	var/radiation_count = rand(45, 85)
-	SSradiation.flat_radiate(src, radiation_count, 1)
+	SSradiation.flat_radiate(T, radiation_count, 1, 1)
 
 	if(!HasBelow(z))
 		return

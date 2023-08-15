@@ -85,7 +85,7 @@
 	var/area/alarm_area
 	var/buildstage = 2 //2 is built, 1 is building, 0 is frame.
 
-	var/target_temperature = T0C+20
+	var/target_temperature = 263.5
 	var/regulating_temperature = 0
 
 	var/datum/radio_frequency/radio_connection

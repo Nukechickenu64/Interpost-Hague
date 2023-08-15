@@ -53,9 +53,12 @@
 
 /turf/simulated/Initialize()
 	. = ..()
+	var/coldbreath_temp = 263.5
 	if(istype(loc, /area/chapel))
 		holy = 1
 	levelupdate()
+	if(temperature <= coldbreath_temp)
+		has_coldbreath = TRUE
 
 /turf/simulated/Destroy()
 	if (zone)

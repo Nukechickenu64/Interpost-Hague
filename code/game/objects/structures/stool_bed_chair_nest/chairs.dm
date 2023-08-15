@@ -7,6 +7,7 @@
 	buckle_lying = 0 //force people to sit up in chairs when buckled
 	var/propelled = 0 // Check for fire-extinguisher-driven chairs
 	buckling_sound = 'sound/effects/metal_close.ogg'
+	material_alteration = MATERIAL_ALTERATION_NONE
 
 /obj/structure/bed/chair/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
