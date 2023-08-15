@@ -61,6 +61,8 @@ meteor_act
 
 	projectile_hit_bloody(P, P.damage*blocked_mult(blocked), def_zone)
 
+	shake_camera(src, 3, 1)
+
 	return blocked
 
 /mob/living/carbon/human/stun_effect_act(var/stun_amount, var/agony_amount, var/def_zone)
@@ -243,6 +245,8 @@ meteor_act
 		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]!</span>")
 
 	receive_damage()
+
+	shake_camera(src, 3, 1)
 
 	standard_weapon_hit_effects(I, user, effective_force, blocked, hit_zone)
 
@@ -514,6 +518,8 @@ meteor_act
 				//Thrown sharp objects have some momentum already and have a small chance to embed even if the damage is below the threshold
 				if((sharp && prob(damage/(10*I.w_class)*100)) || (damage > embed_threshold && prob(embed_chance)))
 					affecting.embed(I, supplied_wound = created_wound)
+
+		shake_camera(src, 3, 1)
 
 		// Begin BS12 momentum-transfer code.
 		var/mass = 1.5
