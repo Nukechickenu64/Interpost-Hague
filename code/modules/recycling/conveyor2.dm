@@ -209,8 +209,7 @@
 		last_pos = position
 		position = 0
 
-	var/leversound = list('sound/effects/lever1.ogg', 'sound/effects/lever2.ogg')
-	playsound(src.loc, pick(leversound), 40, 0, 0)
+	playsound(src.loc, 'sound/effects/lever1.ogg', 40, 0, 0)
 	operated = 1
 	update_icon()
 
