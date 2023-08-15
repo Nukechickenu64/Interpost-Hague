@@ -401,7 +401,7 @@
 		src.spread_disease_to(AM, "Contact")
 
 /mob/living/carbon/slip(var/slipped_on,stun_duration=8)
-	if(buckled)
+	if(buckled||lying)
 		return 0
 	stop_pulling()
 	to_chat(src, "<span class='warning'>You slipped on [slipped_on]!</span>")
