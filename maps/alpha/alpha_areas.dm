@@ -893,6 +893,10 @@
 	name = "Toxins Storage"
 	icon_state = "toxstorage"
 
+/area/rnd/cryo
+	name = "Cryogenic Storage"
+	icon_state = "cryostoragesci"
+
 area/rnd/test_area
 	name = "Toxins Test Area"
 	icon_state = "toxtest"

@@ -34,7 +34,7 @@
 
 /obj/item/device/geiger/resolve_attackby(var/atom/A)
 	var/turf/T = A
-	if(!istype(T) && if(scanning))
+	if(!istype(T) && (!scanning))
 		to_chat(usr, "<span class='warning'>\The [src] only scans the surrounding area.</span>")
 		playsound(usr, 'sound/misc/denied.ogg', 50, 0)
 		return

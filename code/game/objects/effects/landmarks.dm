@@ -38,12 +38,26 @@
 			GLOB.latejoin_cryocaptain += loc
 			delete_me = 1
 			return
-/*
 		if("JoinLateCryoEngineering")
-			GLOB.latejoin_cryocaptain += loc
+			GLOB.latejoin_cryoengineering += loc
 			delete_me = 1
 			return
-*/
+		if("JoinLateCryoScience")
+			GLOB.latejoin_cryoscience += loc
+			delete_me = 1
+			return
+		if("JoinLateCryoSecurity")
+			GLOB.latejoin_cryosecurity += loc
+			delete_me = 1
+			return
+		if("JoinLateCryoMedical")
+			GLOB.latejoin_cryomedical += loc
+			delete_me = 1
+			return
+		if("JoinLateCryoHOP")
+			GLOB.latejoin_cryohop += loc
+			delete_me = 1
+			return
 		if("JoinLateCyborg")
 			GLOB.latejoin_cyborg += loc
 			delete_me = 1

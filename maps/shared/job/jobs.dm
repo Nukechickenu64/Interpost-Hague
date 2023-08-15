@@ -308,7 +308,7 @@
 /datum/job/scientist
 	selection_color = "#006BCA"
 	title = "General Researcher"
-	supervisors = "the Scientific Overseer"
+	supervisors = "the Head Scientist"
 	minimal_player_age = 19
 	economic_modifier = 2
 	ideal_character_age = 30
