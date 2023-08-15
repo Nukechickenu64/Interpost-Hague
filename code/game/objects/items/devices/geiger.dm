@@ -30,15 +30,16 @@
 	else
 		STOP_PROCESSING(SSobj, src)
 	update_icon()
+	playsound(usr, 'sound/effects/mechanic_enable.ogg', 50, 0)
 	to_chat(user, "<span class='notice'>\icon[src] You switch [scanning ? "on" : "off"] [src].</span>")
 
 /obj/item/device/geiger/resolve_attackby(var/atom/A)
 	var/turf/T = A
-	if(!istype(T) && (!scanning))
+	if(!scanning)
+		return
+	if(!istype(T))
 		to_chat(usr, "<span class='warning'>\The [src] only scans the surrounding area.</span>")
 		playsound(usr, 'sound/misc/denied.ogg', 50, 0)
-		return
-	if(!scanning)
 		return
 	. = ..(usr)
 	var/msg = "[scanning ? "Ambient" : "Stored"] radiation level: [radiation_count ? radiation_count : "0"] Bq."

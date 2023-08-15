@@ -23,12 +23,31 @@ REAGENT SCANNER
 	matter = list(DEFAULT_WALL_MATERIAL = 200)
 	origin_tech = list(TECH_MAGNET = 1, TECH_BIO = 1)
 	var/mode = 1
+	var/enabled = 0
 
 /obj/item/device/healthanalyzer/do_surgery(mob/living/M, mob/living/user)
 	if(user.a_intent != I_HELP) //in case it is ever used as a surgery tool
 		return ..()
 	scan_mob(M, user) //default surgery behaviour is just to scan as usual
 	return 1
+
+/obj/item/device/healthanalyzer/update_icon()
+	if(enabled)
+		icon_state = "health"
+	else
+		icon_state = "health_off"
+
+/obj/item/device/healthanalyzer/AltClick(var/mob/user)
+	if(CanPhysicallyInteract(user))
+		if(enabled)
+			enabled = 0
+			playsound(usr, 'sound/effects/mechanic_enable.ogg', 50, 0)
+			to_chat(user, "<span class='warning'>I turn off the [name].</span>")
+		else
+			enabled = 1
+			playsound(usr, 'sound/effects/mechanic_enable.ogg', 50, 0)
+			to_chat(user, "<span class='warning'>I enable the [name].</span>")
+		update_icon()
 
 /obj/item/device/healthanalyzer/attack(mob/living/M, mob/living/user)
 	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
@@ -43,11 +62,15 @@ REAGENT SCANNER
 	if ((CLUMSY in user.mutations) && prob(50))
 		user.visible_message("<span class='notice'>\The [user] runs \the [src] over the floor.")
 		to_chat(user, "<span class='notice'><b>Scan results for the floor:</b></span>")
-		to_chat(user, "Overall Status: Healthy</span>")
+		to_chat(user, "Overall Status: Floored</span>")
 		return
 
 	if (!istype(H) || H.isSynthetic())
 		to_chat(user, "<span class='warning'>\The [src] is designed for organic humanoid patients only.</span>")
+		return
+
+	if(!enabled)
+		to_chat(user, "<span class='warning'>How clumsy! I forgot that the [name] is not enabled.</span>")
 		return
 
 	if(user.skillcheck(user.skills[SKILL_MED], 70, null, "Medical") || user.statcheck(user.stats[STAT_IQ], 12, null, STAT_IQ))
