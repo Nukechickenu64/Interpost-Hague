@@ -12,7 +12,7 @@ REAGENT SCANNER
 /obj/item/device/healthanalyzer
 	name = "health analyzer"
 	desc = "A hand-held body scanner able to distinguish vital signs of the subject."
-	icon_state = "health"
+	icon_state = "health_off"
 	item_state = "analyzer"
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
@@ -84,8 +84,8 @@ REAGENT SCANNER
 proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	. = list()
 	. += "<div class='firstdiv'><div class='box'>"
-	. += "<span class='notice'><b>Scan results for \the [H]:</b></span>"
-
+	. += "<span class='notice'><b>Scan results for \the [H]:</b></span>\n"
+	. += "<hr class='linexd'>"
 	// Brain activity.
 	var/brain_result = "normal"
 	if(H.should_have_organ(BP_BRAIN))
@@ -111,13 +111,13 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 						brain_result = "<span class='danger'>ERROR - Hardware fault</span>"
 	else
 		brain_result = "<span class='danger'>ERROR - Nonstandard biology</span>"
-	. += "<span class='notice'>Brain activity:</span> [brain_result]."
+	. += "<span class='notice'>Brain activity:</span> [brain_result].\n"
 
 	if(H.stat == DEAD || (H.status_flags & FAKEDEATH))
-		. += "<span class='notice'><b>Time of Death:</b> [time2text(worldtime2stationtime(H.timeofdeath), "hh:mm")]</span>"
+		. += "\n<span class='notice'><b>Time of Death:</b> [time2text(worldtime2stationtime(H.timeofdeath), "hh:mm")]</span>"
 
 	if (H.internal_organs_by_name[BP_STACK])
-		. += "<span class='notice'>Subject has a neural lace implant.</span>"
+		. += "\n<span class='notice'>Subject has a neural lace implant.</span>"
 
 	// Pulse rate.
 	var/pulse_result = "normal"
@@ -129,48 +129,48 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	else
 		pulse_result = "<span class='danger'>ERROR - Nonstandard biology</span>"
 
-	. += "<span class='notice'>Pulse rate: [pulse_result]bpm.</span>"
+	. += "\n<span class='notice'>Pulse rate: [pulse_result]bpm.</span>"
 
 	// Blood pressure. Based on the idea of a normal blood pressure being 120 over 80.
 	if(H.get_blood_volume() <= 70)
-		. += "<span class='danger'>Severe blood loss detected.</span>"
-	. += "<b>Blood pressure:</b> [H.get_blood_pressure()] ([H.get_blood_oxygenation()]% blood oxygenation)"
+		. += "\n<span class='danger'>Severe blood loss detected.</span>"
+	. += "\n<b>Blood pressure:</b> [H.get_blood_pressure()] ([H.get_blood_oxygenation()]% blood oxygenation)"
 
 	// Body temperature.
-	. += "<span class='notice'>Body temperature: [H.bodytemperature-T0C]&deg;C ([H.bodytemperature*1.8-459.67]&deg;F)</span>"
+	. += "\n<span class='notice'>Body temperature: [H.bodytemperature-T0C]&deg;C ([H.bodytemperature*1.8-459.67]&deg;F)</span>"
 
 	// Radiation.
 	switch(H.radiation)
 		if(-INFINITY to 0)
-			. += "<span class='notice'>No radiation detected.</span>"
+			. += "\n<span class='notice'>No radiation detected.</span>"
 		if(1 to 30)
-			. += "<span class='notice'>Patient shows minor traces of radiation exposure.</span>"
+			. += "\n<span class='notice'>Patient shows minor traces of radiation exposure.</span>"
 		if(31 to 60)
-			. += "<span class='notice'>Patient is suffering from mild radiation poisoning.</span>"
+			. += "\n<span class='notice'>Patient is suffering from mild radiation poisoning.</span>"
 		if(61 to 90)
-			. += "<span class='warning'>Patient is suffering from advanced radiation poisoning.</span>"
+			. += "\n<span class='warning'>Patient is suffering from advanced radiation poisoning.</span>"
 		if(91 to 120)
-			. += "<span class='warning'>Patient is suffering from severe radiation poisoning.</span>"
+			. += "\n<span class='warning'>Patient is suffering from severe radiation poisoning.</span>"
 		if(121 to 240)
-			. += "<span class='danger'>Patient is suffering from extreme radiation poisoning. Immediate treatment recommended.</span>"
+			. += "\n<span class='danger'>Patient is suffering from extreme radiation poisoning. Immediate treatment recommended.</span>"
 		if(241 to INFINITY)
-			. += "<span class='danger'>Patient is suffering from acute radiation poisoning. Immediate treatment recommended.</span>"
+			. += "\n<span class='danger'>Patient is suffering from acute radiation poisoning. Immediate treatment recommended.</span>"
 
 	// Traumatic shock.
 	if(H.is_asystole())
-		. += "<span class='danger'>Patient is suffering from cardiovascular shock. Administer CPR immediately.</span>"
+		. += "\n<span class='danger'>Patient is suffering from cardiovascular shock. Administer CPR immediately.</span>"
 	else if(H.shock_stage > 80)
-		. += "<span class='warning'>Patient is at serious risk of going into shock. Pain relief recommended.</span>"
+		. += "\n<span class='warning'>Patient is at serious risk of going into shock. Pain relief recommended.</span>"
 
 	// Other general warnings.
 	if(H.getOxyLoss() > 50)
-		. += "<font color='blue'><b>Severe oxygen deprivation detected.</b></font>"
+		. += "\n<font color='blue'><b>Severe oxygen deprivation detected.</b></font>"
 	if(H.getToxLoss() > 50)
-		. += "<font color='green'><b>Major systemic organ failure detected.</b></font>"
+		. += "\n<font color='green'><b>Major systemic organ failure detected.</b></font>"
 	if(H.getFireLoss() > 50)
-		. += "<font color='#ffa500'><b>Severe burn damage detected.</b></font>"
+		. += "\n<font color='#ffa500'><b>Severe burn damage detected.</b></font>"
 	if(H.getBruteLoss() > 50)
-		. += "<font color='red'><b>Severe anatomical damage detected.</b></font>"
+		. += "\n<font color='red'><b>Severe anatomical damage detected.</b></font>"
 
 	for(var/name in H.organs_by_name)
 		var/obj/item/organ/external/e = H.organs_by_name[name]
@@ -179,14 +179,14 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 		var/limb = e.name
 		if(e.status & ORGAN_BROKEN)
 			if(((e.name == BP_L_ARM) || (e.name == BP_R_ARM) || (e.name == BP_L_LEG) || (e.name == BP_R_LEG)) && (!e.splinted))
-				. += "<span class='warning'>Unsecured fracture in subject [limb]. Splinting recommended for transport.</span>"
+				. += "<span class='warning'>\nUnsecured fracture in subject [limb]. Splinting recommended for transport.</span>"
 		if(e.has_infected_wound())
-			. += "<span class='warning'>Infected wound detected in subject [limb]. Disinfection recommended.</span>"
+			. += "<span class='warning'>\nInfected wound detected in subject [limb]. Disinfection recommended.</span>"
 
 	for(var/name in H.organs_by_name)
 		var/obj/item/organ/external/e = H.organs_by_name[name]
 		if(e && e.status & ORGAN_BROKEN)
-			. += "<span class='warning'>Bone fractures detected. Advanced scanner required for location.</span>"
+			. += "\n<span class='warning'>Bone fractures detected. Advanced scanner required for location.</span>"
 			break
 
 	var/found_bleed
@@ -195,13 +195,13 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	for(var/obj/item/organ/external/e in H.organs)
 		if(e)
 			if(!found_disloc && e.dislocated == 2)
-				. += "<span class='warning'>Dislocation detected. Advanced scanner required for location.</span>"
+				. += "\n<span class='warning'>Dislocation detected. Advanced scanner required for location.</span>"
 				found_disloc = TRUE
 			if(!found_bleed && (e.status & ORGAN_ARTERY_CUT))
-				. += "<span class='warning'>Arterial bleeding detected. Advanced scanner required for location.</span>"
+				. += "\n<span class='warning'>Arterial bleeding detected. Advanced scanner required for location.</span>"
 				found_bleed = TRUE
 			if(!found_tendon && (e.status & ORGAN_TENDON_CUT))
-				. += "<span class='warning'>Tendon or ligament damage detected. Advanced scanner required for location.</span>"
+				. += "\n<span class='warning'>Tendon or ligament damage detected. Advanced scanner required for location.</span>"
 				found_tendon = TRUE
 		if(found_disloc && found_bleed && found_tendon)
 			break
@@ -209,24 +209,24 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	if(verbose)
 
 		// Limb status.
-		. += "<span class='notice'><b>Specific limb damage:</b></span>"
+		. += "\n<span class='notice'><b>Specific limb damage:</b></span>"
 
 		var/list/damaged = H.get_damaged_organs(1,1)
 		if(damaged.len)
 			for(var/obj/item/organ/external/org in damaged)
-				var/limb_result = "[capitalize(org.name)][(org.robotic >= ORGAN_ROBOT) ? " (Cybernetic)" : ""]:"
+				var/limb_result = "\n[capitalize(org.name)][(org.robotic >= ORGAN_ROBOT) ? " (Cybernetic)" : ""]:"
 				if(org.brute_dam > 0)
-					limb_result = "[limb_result] \[<font color = 'red'><b>[get_wound_severity(org.brute_ratio, org.vital)] physical trauma</b></font>\]"
+					limb_result = "\n[limb_result] \[<font color = 'red'><b>[get_wound_severity(org.brute_ratio, org.vital)] physical trauma</b></font>\]"
 				if(org.burn_dam > 0)
-					limb_result = "[limb_result] \[<font color = '#ffa500'><b>[get_wound_severity(org.burn_ratio, org.vital)] burns</b></font>\]"
+					limb_result = "\n[limb_result] \[<font color = '#ffa500'><b>[get_wound_severity(org.burn_ratio, org.vital)] burns</b></font>\]"
 				if(org.status & ORGAN_BLEEDING)
-					limb_result = "[limb_result] \[<span class='danger'>bleeding</span>\]"
+					limb_result = "\n[limb_result] \[<span class='danger'>bleeding</span>\]"
 				. += limb_result
 		else
-			. += "No detectable limb injuries."
+			. += "\nNo detectable limb injuries."
 
 	// Reagent data.
-	. += "<span class='notice'><b>Reagent scan:</b></span>"
+	. += "\n<span class='notice'><b>Reagent scan:</b></span>"
 
 	var/print_reagent_default_message = TRUE
 	if(H.reagents.total_volume)
@@ -236,17 +236,17 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 			var/datum/reagent/R = A
 			if(R.scannable)
 				print_reagent_default_message = FALSE
-				reagentdata[R.type] = "<span class='notice'>    [round(H.reagents.get_reagent_amount(R.type), 1)]u [R.name]</span>"
+				reagentdata[R.type] = "\n<span class='notice'>    [round(H.reagents.get_reagent_amount(R.type), 1)]u [R.name]</span>"
 			else
 				unknown++
 		if(reagentdata.len)
 			print_reagent_default_message = FALSE
-			. += "<span class='notice'>Beneficial reagents detected in subject's blood:</span>"
+			. += "\n<span class='notice'>Beneficial reagents detected in subject's blood:</span>"
 			for(var/d in reagentdata)
 				. += reagentdata[d]
 		if(unknown)
 			print_reagent_default_message = FALSE
-			. += "<span class='warning'>Warning: Unknown substance[(unknown>1)?"s":""] detected in subject's blood.</span>"
+			. += "\n<span class='warning'>Warning: Unknown substance[(unknown>1)?"s":""] detected in subject's blood.</span>"
 
 	var/datum/reagents/ingested = H.get_ingested_reagents()
 	if(ingested && ingested.total_volume)
@@ -254,31 +254,31 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 		for(var/datum/reagent/R in ingested.reagent_list)
 			if(R.scannable)
 				print_reagent_default_message = FALSE
-				. += "<span class='notice'>[R.name] found in subject's stomach.</span>"
+				. += "\n<span class='notice'>[R.name] found in subject's stomach.</span>"
 			else
 				++unknown
 		if(unknown)
 			print_reagent_default_message = FALSE
-			. += "<span class='warning'>Non-medical reagent[(unknown > 1)?"s":""] found in subject's stomach.</span>"
+			. += "\n<span class='warning'>Non-medical reagent[(unknown > 1)?"s":""] found in subject's stomach.</span>"
 
 	if(H.chem_doses.len)
 		var/list/chemtraces = list()
 		for(var/T in H.chem_doses)
 			var/datum/reagent/R = T
 			if(initial(R.scannable))
-				chemtraces += "[initial(R.name)] ([H.chem_doses[T]])"
+				chemtraces += "\n[initial(R.name)] ([H.chem_doses[T]])"
 		if(chemtraces.len)
-			. += "<span class='notice'>Metabolism products of [english_list(chemtraces)] found in subject's system.</span>"
+			. += "\n<span class='notice'>Metabolism products of [english_list(chemtraces)] found in subject's system.</span>"
 
 	if(H.virus2.len)
 		for (var/ID in H.virus2)
 			if (ID in virusDB)
 				print_reagent_default_message = FALSE
 				var/datum/computer_file/data/virus_record/V = virusDB[ID]
-				. += "<span class='warning'>Warning: Pathogen [V.fields["name"]] detected in subject's blood. Known antigen : [V.fields["antigen"]]</span>"
+				. += "\n<span class='warning'>Warning: Pathogen [V.fields["name"]] detected in subject's blood. Known antigen : [V.fields["antigen"]]</span>"
 
 	if(print_reagent_default_message)
-		. += "No results."
+		. += "\nNo results."
 
 	. += "</div></div>"
 	. = jointext(.,"")

@@ -132,6 +132,12 @@
 	icon = 'icons/obj/singularity.dmi'
 	icon_state = "singularity_s1"
 
+/obj/item/toy/amogus
+	name = "suspicious TetraCorp gift"
+	desc = "It spins and dances."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "amogus"
+
 /*
  * Toy crossbow
  */

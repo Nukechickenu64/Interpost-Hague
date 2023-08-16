@@ -66,8 +66,8 @@
 		return
 	use_power_oneoff(100)
 
-	if(exhumessound)
-		playsound(src.loc, 'sound/effects/assembly_loop.ogg', 10, 0, 0)
+	if(exhumessound && operating)
+		playsound(src.loc, 'sound/effects/assembly_loop.ogg', 30, 0, 0)
 
 	affecting = loc.contents - src		// moved items will be all in loc
 	spawn(1)	// slight delay to prevent infinite propagation due to map order	//TODO: please no spawn() in process(). It's a very bad idea

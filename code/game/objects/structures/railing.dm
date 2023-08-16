@@ -332,7 +332,7 @@
 	name = "small wall"
 	desc = "A small wall, designed to keep intruders out."
 	icon = 'icons/obj/railing.dmi'
-	density = 1
+	density = 0
 	throwpass = 0
 	layer = ABOVE_HUMAN_LAYER
 	anchored = 1

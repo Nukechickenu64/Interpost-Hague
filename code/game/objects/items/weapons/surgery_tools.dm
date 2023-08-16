@@ -25,6 +25,7 @@
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	w_class = ITEM_SIZE_SMALL
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
+	operation_sound = 'sound/effects/retractor.ogg'
 
 /*
  * Hemostat
@@ -39,6 +40,7 @@
 	w_class = ITEM_SIZE_SMALL
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
 	attack_verb = list("attacked", "pinched")
+	operation_sound = 'sound/effects/hemostat.ogg'
 
 /*
  * Cautery
@@ -53,6 +55,7 @@
 	w_class = ITEM_SIZE_SMALL
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
 	attack_verb = list("burnt")
+	operation_sound = 'sound/effects/cautery.ogg'
 
 /*
  * Surgical Drill
@@ -69,6 +72,7 @@
 	w_class = ITEM_SIZE_NORMAL
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
 	attack_verb = list("drilled")
+	operation_sound = 'sound/effects/surgicaldrill.ogg'
 
 /*
  * Scalpel
@@ -92,6 +96,7 @@
 	origin_tech = list(TECH_MATERIAL = 1, TECH_BIO = 1)
 	matter = list(DEFAULT_WALL_MATERIAL = 10000, "glass" = 5000)
 	attack_verb = list("slashed", "stabbed")
+	operation_sound = 'sound/effects/scalpel.ogg'
 
 /*
  * Researchable Scalpels
@@ -161,6 +166,7 @@
 	attack_verb = list("slashed")
 	sharp = 1
 	edge = 1
+	operation_sound = 'sound/effects/circular_saw.ogg'
 
 //misc, formerly from code/defines/weapons.dm
 /obj/item/weapon/surgery_tool/bonegel
