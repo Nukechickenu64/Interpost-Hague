@@ -674,7 +674,7 @@ default behaviour is:
 /mob/living/proc/Exhaust()//Called when you run out of stamina.
 	var/gaspsound = null
 	if(gender == MALE)
-		gaspsound = "sound/voice/gasp_male[rand(1,7)].ogg"
+		gaspsound = "sound/voice/gasp_male[rand(1,5)].ogg"
 
 	if(gender == FEMALE)
 		gaspsound = "sound/voice/gasp_female[rand(1,7)].ogg"
