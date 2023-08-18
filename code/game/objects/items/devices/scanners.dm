@@ -137,12 +137,12 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	. += "\n<b>Blood pressure:</b> [H.get_blood_pressure()] ([H.get_blood_oxygenation()]% blood oxygenation)"
 
 	// Body temperature.
-	. += "\n<span class='notice'>Body temperature: [H.bodytemperature-T0C]&deg;C ([H.bodytemperature*1.8-459.67]&deg;F)</span>"
+	//. += "\n<span class='notice'>Body temperature: [H.bodytemperature-T0C]&deg;C ([H.bodytemperature*1.8-459.67]&deg;F)</span>"
 
 	// Radiation.
 	switch(H.radiation)
-		if(-INFINITY to 0)
-			. += "\n<span class='notice'>No radiation detected.</span>"
+		//if(-INFINITY to 0)
+			//. += "\n<span class='notice'>No radiation detected.</span>"
 		if(1 to 30)
 			. += "\n<span class='notice'>Patient shows minor traces of radiation exposure.</span>"
 		if(31 to 60)
@@ -209,7 +209,7 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	if(verbose)
 
 		// Limb status.
-		. += "\n<span class='notice'><b>Specific limb damage:</b></span>"
+		//. += "\n<span class='notice'><b>Specific limb damage:</b></span>"
 
 		var/list/damaged = H.get_damaged_organs(1,1)
 		if(damaged.len)
@@ -225,6 +225,7 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 		else
 			. += "\nNo detectable limb injuries."
 
+/*
 	// Reagent data.
 	. += "\n<span class='notice'><b>Reagent scan:</b></span>"
 
@@ -279,6 +280,7 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 
 	if(print_reagent_default_message)
 		. += "\nNo results."
+*/
 
 	. += "</div></div>"
 	. = jointext(.,"")

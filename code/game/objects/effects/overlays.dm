@@ -135,3 +135,21 @@
 	..()
 	pixel_x = x
 	pixel_y = y
+
+/obj/effect/overlay/temp/bullet_impact_flesh
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "impact_flesh"
+	randomdir = FALSE
+	duration = 5
+
+/obj/effect/overlay/temp/bullet_impact_flesh/New(x,y)
+	..()
+	pixel_x = x
+	pixel_y = y
+
+/obj/effect/overlay/bullet_hole
+	name = "bullet hole"
+	desc = "A bullet hole big enough to be seen easily."
+	icon = 'icons/effects/effects.dmi'
+	layer = ABOVE_HUMAN_LAYER
+	icon_state = "bhole_flesh"

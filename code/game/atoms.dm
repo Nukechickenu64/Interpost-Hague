@@ -738,3 +738,37 @@ this doesn't work anymore lol
 /atom/proc/clear_bulletholes()
 	for(var/obj/effect/overlay/bmark/BM in src)
 		qdel(BM)
+
+/atom/proc/create_bullethole_flesh(var/obj/item/projectile/Proj)
+	var/p_x = Proj.p_x + pick(0,0,0,0,0,-1,1) // really ugly way of coding "sometimes offset Proj.p_x!"
+	var/p_y = Proj.p_y + pick(0,0,0,0,0,-1,1) // Used for bulletholes
+	var/decaltype = 1 // 1 - scorch, 2 - bullet
+	var/obj/effect/overlay/bullet_hole/BM = new(src)
+
+	new /obj/effect/overlay/temp/bullet_impact(src, BM.pixel_x, BM.pixel_y)
+
+	BM.pixel_x = p_x
+	BM.pixel_y = p_y
+
+	if(istype(/obj/item/projectile/bullet, Proj))
+		decaltype = 2
+
+	if(decaltype == 1)
+
+		// offset correction
+		BM.pixel_x--
+		BM.pixel_y--
+
+		if(Proj.damage >= 20 || istype(Proj, /obj/item/projectile/beam/practice))
+			BM.icon_state = "dent_flesh"//"scorch"
+			BM.set_dir(pick(NORTH,SOUTH,EAST,WEST)) // random scorch design
+		else //Otherwise it's a light dent.
+			BM.icon_state = "scorch_flesh"
+	else
+
+		// Bullets are hard. They make dents!
+		BM.icon_state = "bhole_flesh"
+
+/atom/proc/clear_bulletholes_flesh()
+	for(var/obj/effect/overlay/bullet_hole/BM in src)
+		qdel(BM)

@@ -219,6 +219,15 @@ What is the naming convention for planes or layers?
 /obj/screen/plane_master/blurs
 	filters = filter(type = "blur", size = 2)
 
+/obj/screen/plane_master/lighting
+	name = "lighting plane master"
+	plane = LIGHTING_PLANE
+	render_target = "light"
+
+/obj/screen/plane_master/lighting/New()
+	. = ..()
+	add_filter("bloom", 4, list("type" = "bloom", size = 2, offset = 4, alpha = 150))
+
 /obj/screen/plane_master/drugabuse
 	plane = DEFAULT_PLANE
 	filters = filter(type = "wave", size = 10)

@@ -287,9 +287,14 @@
 
 	if(!client) return
 	var/obj/screen/plane_master/shadowcasting/p3 = new
+//	var/obj/screen/plane_master/lighting/p4 = new
 
 	p3.plane = SHADOWCASTING_PLANE
 	p3.add_filter("turf_blocker", 5, list("type" = "alpha", render_source="all4", flags=MASK_INVERSE))
 	p3.render_target = "all3"
 
+	//p4.plane = LIGHTING_PLANE
+	//p4.render_target = "light"
+
 	client.screen.Add(p3)
+	//client.screen.Add(p4)

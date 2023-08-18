@@ -106,7 +106,6 @@
 		if(prob(50))
 			target_loca.add_blood(L)
 
-
 	L.apply_effects(0, weaken, paralyze, 0, stutter, eyeblur, drowsy, agony, blocked)
 	L.stun_effect_act(stun, agony, def_zone, src)
 	//radiation protection is handled separately from other armour types.

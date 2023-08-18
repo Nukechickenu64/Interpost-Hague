@@ -92,6 +92,8 @@
 		apply_damage(damage, P.damage_type, def_zone, absorb, flags, P)
 	P.on_hit(src, absorb, def_zone)
 
+	create_bullethole_flesh(P)//Potentially infinite bullet holes but most walls don't last long enough for this to be a problem.
+
 	return absorb
 
 // For visuals and blood splatters etc
