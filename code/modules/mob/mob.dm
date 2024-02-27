@@ -1012,8 +1012,9 @@ mob/proc/yank_out_object()
 		TO.update_target()
 
 /obj/targeting_overlay/proc/update_target(mob/M)
-	var/mob/targeted = M
-	var/obj/targeting_overlay = new(targeted.loc)
+	return
+	//var/mob/targeted = M
+	//var/obj/targeting_overlay = new(targeted.loc)
 
 /mob/proc/face_direction()
 	set_face_dir()
