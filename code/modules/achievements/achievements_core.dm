@@ -43,7 +43,7 @@
 	if (A.announced)
 		to_world("<b>Congratulations! [src.key] unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>")
 	else
-		to_chat(src, "<b>Hell yeah. I unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>\n")
+		to_chat(src, "<b>I unlocked the '<font color = [H]>[A.name]</font color>' achievement.</b></font>\n")
 		playsound(src, 'sound/ported/ACHIEVEMENT_BLIP.ogg', 30, 0)
 	if(A.description)
 		to_chat(src, "\n<i>[A.description]</i>")
@@ -83,8 +83,8 @@
 		msg += "\n<b>[count]:<font color = [H]> [A.name]</font color>\n</b>\n</font>"
 		if(A.description)
 			msg += "\n<b>[A.description]\n</b>"
+			msg += "<hr class='linexd'>"
 	if(count)
-		msg += "<hr class='linexd'>"
 		msg += "---\n<b>TOTAL ACHIEVEMENTS: [count]</b>"
 
 	msg += "</div></div>"

@@ -96,6 +96,7 @@
 	var/selecting = BP_CHEST
 
 /obj/screen/zone_sel/Click(location, control,params)
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/PL = params2list(params)
 	var/icon_x = text2num(PL["icon-x"])
 	var/icon_y = text2num(PL["icon-y"])
@@ -162,6 +163,7 @@
 
 	if(old_selecting != selecting)
 		update_icon()
+	playsound(usr, pick(clicksound), 30, 0)
 	return 1
 
 /obj/screen/zone_sel/proc/set_selected_zone(bodypart)

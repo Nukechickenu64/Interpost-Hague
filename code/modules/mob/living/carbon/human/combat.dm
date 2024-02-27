@@ -93,6 +93,7 @@
 
 	else
 		resting = TRUE
+		playsound(get_turf(src), "bodyfall", 50, 1)
 		update_canmove()
 		//For stopping runtimes with NPCs
 		rest?.icon_state = "rest1"
