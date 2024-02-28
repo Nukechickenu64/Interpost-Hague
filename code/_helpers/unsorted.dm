@@ -1191,3 +1191,8 @@ var/global/mob/dview/dview_mob = new
 /atom/proc/get_filter(name)
 	if(filter_data && filter_data[name])
 		return filters[filter_data.Find(name)]
+
+// Round up
+proc/n_ceil(var/num)
+	if(isnum_safe(num))
+		return round(num)+1
