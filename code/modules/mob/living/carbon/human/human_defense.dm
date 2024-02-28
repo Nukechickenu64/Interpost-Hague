@@ -324,7 +324,7 @@ meteor_act
 	if(user.skillcheck(user.skills["melee"], 0, null,"melee") == CRIT_SUCCESS)
 		resolve_critical_hit()
 
-	if(user.stats[STAT_HT] >= src.stats.[STAT_HT]+4 && !lying)
+	if(user.stats[STAT_HT] >= src.stats[STAT_HT]+4 && !lying)
 		Weaken(1)
 		var/turf/target = get_turf(src.loc)
 		var/range = src.throw_range

@@ -484,7 +484,7 @@
 "jp" = (/obj/effect/decal/cleanable/mucus,/obj/machinery/atmospherics/unary/vent_scrubber/on{dir = 8},/turf/simulated/floor/tiled,/area/rnd/lab)
 "jq" = (/obj/machinery/door/airlock/glass_chemistry{name = "Chemistry Laboratory"; req_access = list(7)},/obj/machinery/door/firedoor,/turf/simulated/floor/tiled,/area/rnd/lab)
 "jr" = (/obj/structure/table/glass,/obj/effect/floor_decal/snow,/obj/item/weapon/reagent_containers/glass/bottle/chloralhydrate,/turf/simulated/floor/tiled,/area/rnd/lab)
-"js" = (/obj/structure/table/glass,/obj/effect/floor_decal/snow,/obj/item/weapon/reagent_containers/chem_disp_cartridge/lithium,/obj/machinery/light/small{dir = 4},/turf/simulated/floor/tiled,/area/rnd/lab)
+"js" = (/obj/structure/table/glass,/obj/effect/floor_decal/snow,/obj/machinery/light/small{dir = 4},/turf/simulated/floor/tiled,/area/rnd/lab)
 "jt" = (/obj/structure/extinguisher_cabinet{pixel_x = 30},/obj/structure/cable{d1 = 1; d2 = 2; icon_state = "1-2"; pixel_y = 0},/obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers{dir = 4},/obj/machinery/atmospherics/pipe/simple/hidden/supply,/turf/simulated/floor/plating,/area/hallway/primary/port)
 "ju" = (/obj/item/clothing/suit/armor/bulletproof,/turf/simulated/floor/reinforced,/area/rnd/xenobiology)
 "jv" = (/obj/machinery/door/window{base_state = "right"; dir = 4; icon_state = "right"; name = "Brig"; req_access = list(150)},/turf/simulated/floor/reinforced,/area/rnd/xenobiology)

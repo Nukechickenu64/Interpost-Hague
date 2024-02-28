@@ -185,7 +185,7 @@ proc/generate_random_prayer()//This generates a new one.
 			var/S = pick(GLOB.all_spells)
 			var/reward = pick(GLOB.all_spells[S].requirments)
 			var/obj/reward_obj = GLOB.all_spells[S].requirments[reward]
-				new reward_obj(T)
+			new reward_obj(T)
 
 /mob/living/proc/praise_god()
 	set category = "Old God Magic"
