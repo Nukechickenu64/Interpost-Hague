@@ -1,6 +1,6 @@
 /lobby_music/lobby1
-	song = 'sound/music/Worlock.ogg'
-
+	song = 'sound/music/main.ogg'
+/*
 /lobby_music/lobby2
 	song = 'sound/music/Rodent.ogg'
 
@@ -12,3 +12,5 @@
 
 /lobby_music/lobby5
 	song = 'sound/music/dyuna3.ogg'
+
+*/
