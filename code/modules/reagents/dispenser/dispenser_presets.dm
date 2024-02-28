@@ -1,3 +1,5 @@
+/*
+
 /obj/machinery/chemical_dispenser/full
 	spawn_cartridges = list(
 			/obj/item/weapon/reagent_containers/chem_disp_cartridge/hydrazine,
@@ -143,3 +145,5 @@
 			/obj/item/weapon/reagent_containers/chem_disp_cartridge/carbon,
 			/obj/item/weapon/reagent_containers/chem_disp_cartridge/sugar
 		)
+
+*/

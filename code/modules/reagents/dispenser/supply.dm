@@ -9,7 +9,7 @@
 	cost = 25
 	containertype = /obj/structure/largecrate
 	containername = "reagent dispenser crate"
-
+/*
 /decl/hierarchy/supply_pack/reagents/beer_dispenser
 	name = "Booze dispenser"
 	contains = list(
@@ -119,7 +119,7 @@
 	cost = 50
 	containertype = /obj/structure/closet/crate
 	containername = "coffee drinks crate"
-
+*/
 /decl/hierarchy/supply_pack/reagents/dispenser_cartridges
 	name = "Empty dispenser cartridges"
 	contains = list(
@@ -137,6 +137,7 @@
 	cost = 15
 	containertype = /obj/structure/closet/crate
 	containername = "dispenser cartridge crate"
+
 
 /decl/hierarchy/supply_pack/dispenser_cartridges
 	name = "Dispenser Cartridges"
@@ -162,6 +163,7 @@
 			contains = list( _type , _type );\
 		}\
 	}
+/*
 
 // Chemistry-restricted (raw reagents excluding sugar/water)
 //      Datum path  Contents type                                                       Supply pack name                  Container name                         Cost  Container access
@@ -223,6 +225,6 @@ PACK(soy_latte,  /obj/item/weapon/reagent_containers/chem_disp_cartridge/soy_lat
 PACK(hot_coco,   /obj/item/weapon/reagent_containers/chem_disp_cartridge/hot_coco,   "Reagent refill - Hot Coco",            "hot coco reagent cartridge crate",                      15)
 PACK(milk,       /obj/item/weapon/reagent_containers/chem_disp_cartridge/milk,       "Reagent refill - Milk",                "milk reagent cartridge crate",                          15)
 PACK(cream,      /obj/item/weapon/reagent_containers/chem_disp_cartridge/cream,      "Reagent refill - Cream",               "cream reagent cartridge crate",                         15)
-
+*/
 #undef SEC_PACK
 #undef PACK
