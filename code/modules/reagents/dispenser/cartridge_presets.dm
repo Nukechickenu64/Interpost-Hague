@@ -1,5 +1,3 @@
-/*
-
 /obj/item/weapon/reagent_containers/chem_disp_cartridge
 	small
 		volume = CARTRIDGE_VOLUME_SMALL
@@ -99,5 +97,3 @@
 	chloral		spawn_reagent = /datum/reagent/chloralhydrate
 	cryoxadone	spawn_reagent = /datum/reagent/cryoxadone
 	clonexadone	spawn_reagent = /datum/reagent/clonexadone
-
-*/
