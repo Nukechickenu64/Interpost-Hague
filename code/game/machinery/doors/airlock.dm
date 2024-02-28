@@ -117,7 +117,7 @@
 
 /obj/machinery/door/airlock/medical
 	name = "Airlock"
-	icon = 'icons/obj/doors/Doormed.dmi'
+	icon = 'icons/obj/doors/Doormaint_med.dmi'
 	assembly_type = /obj/structure/door_assembly/door_assembly_med
 
 	open_sound_powered = list('sound/machines/med_door1.ogg','sound/machines/med_door2.ogg')
