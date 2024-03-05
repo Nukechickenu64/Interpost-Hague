@@ -7,11 +7,11 @@
 	possible_transfer_amounts = null
 	volume = 50 //Sets the default container amount for all food items.
 	var/filling_color = "#ffffff" //Used by sandwiches.
-	var/trash = null
+	var/obj/item/trash
 
 /obj/item/weapon/reagent_containers/food/snacks/poo
 	icon = 'icons/obj/poop.dmi'
-	
+
 /obj/item/weapon/reagent_containers/food/snacks/poo/New()
 	..()
 	icon_state = pick("poop1", "poop2", "poop3", "poop4", "poop5", "poop6", "poop7")

@@ -15,7 +15,6 @@
 	var/list/eat_sound = 'sound/items/eatfood.ogg'
 	center_of_mass = "x=16;y=16"
 	w_class = ITEM_SIZE_SMALL
-	var/obj/item/trash
 
 /obj/item/weapon/reagent_containers/food/snacks/New()
 	..()
