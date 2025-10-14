@@ -589,7 +589,7 @@
 			animate_tail_reset()
 			adjustHalLoss(-3)
 
-			if(sleeping)
+			if(sleeping > 0)
 				handle_dreams()
 				if (mind)
 					//Are they SSD? If so we'll keep them asleep but work off some of that sleep var in case of stoxin or similar.

@@ -113,7 +113,7 @@
 
 	if(is_mature())
 		if(!buckled_mob)
-			var/mob/living/list/targets = targets_in_range()
+			var/list/mob/living/targets = targets_in_range()
 			if(targets && targets.len && prob(round(seed.get_trait(TRAIT_POTENCY)/4)))
 				entangle(pick(targets))
 

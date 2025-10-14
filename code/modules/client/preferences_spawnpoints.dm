@@ -76,7 +76,6 @@ GLOBAL_VAR(spawntypes)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -104,7 +103,6 @@ GLOBAL_VAR(spawntypes)
 	for(var/obj/machinery/cryopod/C in A)
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_captain_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -135,7 +133,6 @@ GLOBAL_VAR(spawntypes)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -166,7 +163,6 @@ GLOBAL_VAR(spawntypes)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -197,7 +193,6 @@ GLOBAL_VAR(spawntypes)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -228,7 +223,6 @@ GLOBAL_VAR(spawntypes)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
@@ -258,8 +252,8 @@ GLOBAL_VAR(spawntypes)
 		if(control_computer)
 			control_computer.frozen_crew += "[victim.real_name], [role_alt_title] - [stationtime2text()]"
 		if(!C.occupant)
+			//TODO fix sleep start
 			C.set_occupant(victim, 1)
-			victim.Sleeping(7)
 			victim.resting = 0
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)

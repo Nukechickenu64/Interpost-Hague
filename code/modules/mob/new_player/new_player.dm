@@ -445,6 +445,8 @@
 	new_character.update_eyes()
 	new_character.regenerate_icons()
 
+	new_character.name = new_character.real_name
+
 	new_character.key = key		//Manually transfer the key to log them in
 	return new_character
 

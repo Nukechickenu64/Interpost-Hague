@@ -32,12 +32,13 @@ SUBSYSTEM_DEF(processing)
 				thing.is_processing = null
 			processing -= thing
 		if (MC_TICK_CHECK)
+			thing.Process()
 			return
+		thing.Process()
 
 /datum/controller/subsystem/processing/proc/toggle_debug()
 	if(!check_rights(R_DEBUG))
 		return
-
 	if(debug_original_process_proc)
 		process_proc = debug_original_process_proc
 		debug_original_process_proc = null

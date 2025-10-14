@@ -15,6 +15,9 @@
 	var/busy_state                                      // Used for controller processing.
 	var/next_process
 
+/datum/turbolift/New()
+	. = ..()
+
 /datum/turbolift/proc/emergency_stop()
 	queued_floors.Cut()
 	target_floor = null
@@ -136,10 +139,11 @@
 /datum/turbolift/proc/queue_move_to(var/datum/turbolift_floor/floor)
 	if(!floor || !(floor in floors) || (floor in queued_floors))
 		return // STOP PRESSING THE BUTTON.
+	control_panel_interior.visible_message("The elevator chimes softly.")
 	floor.pending_move(src)
 	queued_floors |= floor
 	busy_state = LIFT_MOVING
-	START_PROCESSING(SSprocessing, src)
+	START_PROCESSING(SSfastprocess, src)
 
 // TODO: dummy machine ('lift mechanism') in powered area for functionality/blackout checks.
 /datum/turbolift/proc/is_functional()

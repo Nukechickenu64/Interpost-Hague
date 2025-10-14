@@ -326,10 +326,11 @@ proc/TextPreview(var/string,var/len=40)
 /var/icon/text_tag_icons = new('./icons/chattags.dmi')
 /proc/create_text_tag(tagname, tagdesc = tagname, client/C = null)
 	return tagdesc //Fuck this shit
+	/*
 	if(!(C && C.get_preference_value(/datum/client_preference/chat_tags) == GLOB.PREF_SHOW))
 		return tagdesc
 	return "<IMG src='\ref[text_tag_icons.icon]' class='text_tag' iconstate='[tagname]'" + (tagdesc ? " alt='[tagdesc]'" : "") + ">"
-
+*/
 /proc/contains_az09(var/input)
 	for(var/i=1, i<=length(input), i++)
 		var/ascii_char = text2ascii(input,i)
