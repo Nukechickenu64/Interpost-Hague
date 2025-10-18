@@ -5,7 +5,13 @@
 	base_icon = "chair"
 	buckle_dir = 0
 	buckle_lying = 0 //force people to sit up in chairs when buckled
+	density = TRUE
 	var/propelled = 0 // Check for fire-extinguisher-driven chairs
+
+	atom_flags = ATOM_FLAG_CHECKS_BORDER
+
+	atmos_canpass = TRUE
+
 	buckling_sound = 'sound/effects/metal_close.ogg'
 	material_alteration = MATERIAL_ALTERATION_NONE
 
@@ -185,6 +191,23 @@
 			victim.apply_effect(6, STUTTER, blocked)
 			victim.apply_damage(10, BRUTE, def_zone, blocked)
 		occupant.visible_message("<span class='danger'>[occupant] crashed into \the [A]!</span>")
+
+/obj/structure/bed/chair/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
+	if(istype(mover) && mover.checkpass(PASS_FLAG_GLASS))
+		return 1
+	if(get_dir(loc, target) & turn(dir, 180))
+		return !density
+	else
+		return 1
+
+
+/obj/structure/bed/chair/CheckExit(atom/movable/O as mob|obj, target as turf)
+	if(istype(O) && O.checkpass(PASS_FLAG_GLASS))
+		return 1
+	if(get_dir(O.loc, target) == turn(dir, 180))
+		return 0
+	return 1
+
 
 /obj/structure/bed/chair/office/light
 	base_icon = "officechair_white"

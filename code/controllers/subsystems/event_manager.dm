@@ -60,7 +60,9 @@ SUBSYSTEM_DEF(event)
 
 	while (pos <= EVENT_LEVEL_MAJOR)
 		var/list/datum/event_container/EC = event_containers[pos]
-		EC.process()
+		for (var/datum/event_container/EG in EC)
+			if (EG.next_event_time < EC.next_event_time)
+				EG.process()
 		pos++
 
 		if (MC_TICK_CHECK)
@@ -88,7 +90,8 @@ SUBSYSTEM_DEF(event)
 
 /datum/controller/subsystem/event/proc/delay_events(var/severity, var/delay)
 	var/list/datum/event_container/EC = event_containers[severity]
-	EC.next_event_time += delay
+	for(var/datum/event_container/EG in EC)
+		EG.next_event_time += delay
 
 /datum/controller/subsystem/event/proc/Interact(var/mob/living/user)
 

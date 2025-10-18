@@ -924,7 +924,7 @@ GLOBAL_LIST_INIT(standing_objects, list(/obj/item/weapon/stool, /obj/structure/h
 	current_area = get_area(src)
 
 /obj/structure/noose/Destroy()
-	STOP_PROCESSING(SSprocessing, src)
+	STOP_PROCESSING(SSmiscproc, src)
 	QDEL_NULL(over)
 	QDEL_NULL(coil)
 	current_area = null
@@ -936,9 +936,9 @@ GLOBAL_LIST_INIT(standing_objects, list(/obj/item/weapon/stool, /obj/structure/h
 		overlays.Add(over)
 		M.pixel_y = initial(M.pixel_y) + 8
 		M.dir = SOUTH
-		START_PROCESSING(SSprocessing, src)
+		START_PROCESSING(SSmiscproc, src)
 	else
-		STOP_PROCESSING(SSprocessing, src)
+		STOP_PROCESSING(SSmiscproc, src)
 		layer = initial(layer)
 		overlays.Cut()
 		pixel_x = initial(pixel_x)

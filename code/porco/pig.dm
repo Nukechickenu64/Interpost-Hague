@@ -178,15 +178,15 @@
 	var/buttonHTML = ""
 	defaultButton()
 
-	buttonHTML += {"<a href="#"><div style="background-image: url(\'Heart.png\'); margin-top: -129px; margin-right: 8px;" id="Verb" class="button" /></div></a>"}
+	buttonHTML += {"<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-right:1px;\"><div style=\"background-image: url('Heart.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Verb\" class=\"button\"></div></a>"}
 
 	if(src.stat == DEAD && GAME_STATE != RUNLEVEL_LOBBY || isobserver(src) || istype(src, /mob/living/carbon/brain))
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -88px; margin-left:46px; \" id=\"DeadGhost\" class=\"button\" /></div></a>"
+		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-175px;\" id=\"DeadGhost\" class=\"button\"></div></a>"
 
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Emotes.png\'); margin-top: -44px; margin-left: 46px; \" id=\"Emotes\" class=\"button\" /></div></a>"
-		buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Craft.png\'); margin-top: 2px; margin-left:46px; \" id=\"Craft\" class=\"button\" /></div></a>"
+		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Emotes.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Emotes\" class=\"button\"></div></a>"
+		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Craft.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-87px;\" id=\"Craft\" class=\"button\"></div></a>"
 
 /*
 		if(H.isVampire)
@@ -207,7 +207,7 @@
 			if(H.mind.special_role == "Head Revolutionary")
 				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Epsilon.png\'); margin-top: -132px; margin-left:46px; \" id=\"Integralist\" class=\"button\" /></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Thanati.png\'); margin-top: 1px; margin-left:46px; \" id=\"Thanati\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Thanati.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-42px;\" id=\"Craft\" class=\"button\"></div></a>" //TODO: the rest of the buttons
 		if(istype(H.head, /obj/item/clothing/head/caphat))
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Crown.png\'); margin-top: -50px; margin-left:46px; \" id=\"Crown\" class=\"button\" /></div></a>"
 		if(H.stat == DEAD)

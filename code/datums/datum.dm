@@ -61,7 +61,6 @@
 
 /datum/proc/Process()
 	set waitfor = 0
-	return PROCESS_KILL
 
 // Mutable appearances are an inbuilt byond datastructure. Read the documentation on them by hitting F1 in DM.
 // Basically use them instead of images for overlays/underlays and when changing an object's appearance if you're doing so with any regularity.

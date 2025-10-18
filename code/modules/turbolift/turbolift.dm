@@ -14,9 +14,11 @@
 	var/busy
 	var/busy_state                                      // Used for controller processing.
 	var/next_process
+	var/processing = FALSE
 
 /datum/turbolift/New()
 	. = ..()
+	floors = list()
 
 /datum/turbolift/proc/emergency_stop()
 	queued_floors.Cut()
@@ -44,13 +46,12 @@
 #define LIFT_WAITING_B 3
 
 /datum/turbolift/Process()
-	if(world.time < next_process)
-		return
+	. = PROCESS_CONTINUE
 	switch(busy_state)
 		if(LIFT_MOVING)
 			if(!do_move())
 				queued_floors.Cut()
-				return PROCESS_KILL
+				STOP_PROCESSING(SSprocessing, src)
 			else if(!next_process)
 				next_process = world.time + move_delay
 		if(LIFT_WAITING_A)
@@ -63,7 +64,8 @@
 				busy_state = LIFT_MOVING
 			else
 				busy_state = null
-				return PROCESS_KILL
+				STOP_PROCESSING(SSprocessing, src)
+	return PROCESS_CONTINUE
 
 /datum/turbolift/proc/do_move()
 	next_process = null
@@ -74,6 +76,7 @@
 		if(!queued_floors || !queued_floors.len)
 			return 0
 		target_floor = queued_floors[1]
+		queue_move_to(target_floor) // Re-queue in case we failed to move
 		queued_floors -= target_floor
 		if(current_floor_index < floors.Find(target_floor))
 			moving_upwards = 1
@@ -138,12 +141,19 @@
 
 /datum/turbolift/proc/queue_move_to(var/datum/turbolift_floor/floor)
 	if(!floor || !(floor in floors) || (floor in queued_floors))
-		return // STOP PRESSING THE BUTTON.
+		message_admins("Turbolift [src] failed to queue move to [floor]")
+		if(!floor)
+			message_admins("... because the floor was null")
+		else if(!(floor in floors))
+			message_admins("... because the floor was not in the lift's floor list")
+		else
+			message_admins("... because the floor was already queued")
 	control_panel_interior.visible_message("The elevator chimes softly.")
 	floor.pending_move(src)
 	queued_floors |= floor
 	busy_state = LIFT_MOVING
-	START_PROCESSING(SSfastprocess, src)
+	processing = TRUE
+	START_PROCESSING(SSprocessing, src)
 
 // TODO: dummy machine ('lift mechanism') in powered area for functionality/blackout checks.
 /datum/turbolift/proc/is_functional()

@@ -15,9 +15,8 @@ PROCESSING_SUBSYSTEM_DEF(mobs)
 /mob/dview/Initialize()
 	. = ..()
 	STOP_PROCESSING(SSmobs, src)
-/*
+
 /datum/controller/subsystem/processing/mobs/fire(resumed)
 	. = ..()
 	for(var/mob/M in mob_list)
 		M.Life()
-*/

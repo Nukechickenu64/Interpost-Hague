@@ -21,7 +21,7 @@
 	<img src="Panel.png" id="panel">
         <a href="#" id="pig" class="side"><img src="button_pig.png" id="pig" /></a>
         <br>
-        <a href="#" id="chromie" class="side"><img src="button_chrome.png"/></a>
+        <a href="#" id="chromie" class="side"><img src="button_chrome.pzng"/></a>
         <br>
         <a href="#" id="options" class="side"><img src="button_options.png"/></a>
         <br>
@@ -87,7 +87,7 @@
 	let scrollup = function(){scrollbar.scrollBy(-24);};
 	let scrolldown = function(){scrollbar.scrollBy(24);};
 
-    
+
 	$('scrollbtndown').observe('mousedown',function(event){
 		scrollbar.scrollBy(24);
 		if(cureval!=0)
@@ -123,7 +123,7 @@
 		}
 		event.stop();
 	});
-    
+
     segmentOne.innerHTML = "<h3 id='first'> ST: -ST- <br/> HT: -HT- <br/> IN: -INT- <br/>DX: -DX- <br/>TIME: -time-</h3>"
     segmentTwo.innerHTML = "<h3 id='second'>CR: -CR- <br/></h3>"
     scrollbar.recalculateLayout();
@@ -132,7 +132,7 @@
         segmentOne.innerHTML = "<h3 id='first'> ST: -ST- <br/> HT: -HT- <br/> IN: -INT- <br/>DX: -DX- <br/>TIME: -time-</h3>"
         segmentTwo.innerHTML = "<h3 id='second'>CR: -CR- <br/></h3>"
         scrollbar.recalculateLayout();
-        
+
     })
 
     verbs.addEventListener("click", function(){
