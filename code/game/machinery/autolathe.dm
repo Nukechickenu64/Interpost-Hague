@@ -58,8 +58,8 @@
 
 	if(shocked)
 		shock(user, 50)
-
-	var/dat = "<center><h1>Autolathe Control Panel</h1><hr/>"
+	var/dat = "<html>"
+	dat += "<center><h1>Autolathe Control Panel</h1><hr/>"
 
 	if(!disabled)
 		dat += "<table width = '100%'>"
@@ -119,8 +119,9 @@
 		dat += wires.GetInteractWindow()
 
 		dat += "<hr>"
+	dat += "</html>"
 
-	user << browse(dat, "window=autolathe")
+	usr << browse(dat, "window=autolathe")
 	onclose(user, "autolathe")
 
 /obj/machinery/autolathe/attackby(var/obj/item/O as obj, var/mob/user as mob)

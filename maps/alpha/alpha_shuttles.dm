@@ -163,23 +163,52 @@
 
 
 //Mining shuttle
-/datum/shuttle/autodock/ferry/mining
+/datum/shuttle/autodock/multi/mining
 	name = "Mining"
-	location = 0
 	warmup_time = 10
 	shuttle_area = /area/shuttle/mining/station
 	dock_target = "mining_shuttle"
-	waypoint_offsite = "nav_mining_start"
-	waypoint_station = "nav_mining_asteroid"
+	current_location = "nav_mining_start"
+	landmark_transition = "mining_transition"
+	destination_tags = list(
+		"nav_mining_start",
+		"nav_mining_space"
+		)
+
+/datum/shuttle/autodock/multi/mining/build_destinations_cache()
+	last_cache_rebuild_time = world.time
+	destinations_cache.Cut()
+	switch(current_location.landmark_tag)
+		if("nav_mining_space")
+			for(var/destination in SSshuttle.registered_shuttle_landmarks)
+				var/static/regex/token_finder = regex("^nav_mining_")
+				var/destinmark = SSshuttle.get_landmark(destination)
+				if(token_finder.Find(destination) != 0)
+					destinations_cache["[destinmark]"] = destinmark
+			if(!destinations_cache["Station"])
+				destinations_cache["Station"] = SSshuttle.get_landmark("nav_mining_start")
+		else
+			destinations_cache["Space"] = SSshuttle.get_landmark("nav_mining_space")
+
+/datum/shuttle/autodock/multi/mining/get_destinations()
+	build_destinations_cache()
+	return destinations_cache
 
 /obj/effect/shuttle_landmark/mining/station
 	name = "Station"
 	landmark_tag = "nav_mining_start"
 	docking_controller = "mining_dock_airlock"
+	base_turf = /turf/space
 
 /obj/effect/shuttle_landmark/mining/asteroid
 	name = "Asteroid"
 	landmark_tag = "nav_mining_asteroid"
+	docking_controller = "mining_outpost_airlock"
+	base_turf = /turf/simulated/floor/asteroid
+
+/obj/effect/shuttle_landmark/mining/derelict
+	name = "Derelict Outpost"
+	landmark_tag = "nav_mining_derelict"
 	docking_controller = "mining_outpost_airlock"
 	base_turf = /turf/simulated/floor/asteroid
 
@@ -432,6 +461,7 @@
 	waypoint_offsite = "nav_cryo_lift_bottom"
 	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
 	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
+	current_location = "nav_cryo_lift_top"
 	ceiling_type = null
 	knockdown = 0
 

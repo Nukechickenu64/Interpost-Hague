@@ -38,13 +38,11 @@
 	..()
 
 /obj/structure/dispenser/attack_hand(mob/user as mob)
-	user.set_machine(src)
-	var/dat = "[src]<br><br>"
-	dat += "Oxygen tanks: [oxygentanks] - [oxygentanks ? "<A href='?src=\ref[src];oxygen=1'>Dispense</A>" : "empty"]<br>"
-	dat += "Phoron tanks: [phorontanks] - [phorontanks ? "<A href='?src=\ref[src];phoron=1'>Dispense</A>" : "empty"]"
-	user << browse(dat, "window=dispenser")
-	onclose(user, "dispenser")
-	return
+	if(oxygentanks || phorontanks)
+		to_chat(user, "\n<div class='firstdivmood'><div class='moodbox'><span class='graytext'>Pick a tank</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=oxygen;align='right'>TAKE OXYGEN</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=phoron;align='right'>TAKE PHORON</a></span>\n</div></div>")
+	else
+		to_chat(user, "<span class='warning'>The tank dispenser beeps softly, indicating that it is empty.</span>")
+
 
 
 /obj/structure/dispenser/attackby(obj/item/I as obj, mob/user as mob)
@@ -84,11 +82,11 @@
 		return
 
 /obj/structure/dispenser/Topic(href, href_list)
-	if(usr.stat || usr.restrained())
+	usr.set_machine(src)
+	if(get_dist(src, usr) > 1)
 		return
-	if(Adjacent(usr))
-		usr.set_machine(src)
-		if(href_list["oxygen"])
+	switch(href_list["action"])
+		if("oxygen")
 			if(oxygentanks > 0)
 				var/obj/item/weapon/tank/oxygen/O
 				if(oxytanks.len == oxygentanks)
@@ -100,7 +98,7 @@
 				to_chat(usr, "<span class='notice'>You take [O] out of [src].</span>")
 				oxygentanks--
 				update_icon()
-		if(href_list["phoron"])
+		if("phoron")
 			if(phorontanks > 0)
 				var/obj/item/weapon/tank/phoron/P
 				if(platanks.len == phorontanks)
@@ -112,9 +110,6 @@
 				to_chat(usr, "<span class='notice'>You take [P] out of [src].</span>")
 				phorontanks--
 				update_icon()
-		add_fingerprint(usr)
-		updateUsrDialog()
-	else
-		usr << browse(null, "window=dispenser")
-		return
-	return
+		else
+			return
+	add_fingerprint(usr)

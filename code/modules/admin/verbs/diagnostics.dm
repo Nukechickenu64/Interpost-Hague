@@ -139,3 +139,13 @@
 	for(var/t in jobban_keylist)
 		if(findtext(t, filter))
 			to_chat(usr, "[t]")
+
+/client/proc/cmd_admin_view_master_vars()
+	set name = "View Master Variables"
+	set desc = "View the master variables for debugging purposes."
+	set category = "Debug"
+
+	if(!check_rights(R_SERVER)) return
+
+	src.debug_variables(Master)
+

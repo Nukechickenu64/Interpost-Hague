@@ -48,7 +48,7 @@
 "bd" = (/obj/structure/largecrate,/turf/simulated/floor/tiled/airless,/area/djstation)
 "be" = (/obj/random/maintenance,/turf/simulated/floor/asteroid,/area/mine/explored)
 "bf" = (/obj/effect/overmap/sector/cluster,/turf/simulated/floor/asteroid,/area/mine/explored)
-"cb" = (/obj/effect/shuttle_landmark/cluster/nav5,/turf/simulated/floor/asteroid,/area/mine/explored)
+"cb" = (/obj/effect/shuttle_landmark/cluster/nav5{landmark_tag = "nav_mining_asteroid"},/turf/simulated/floor/asteroid,/area/mine/explored)
 "db" = (/obj/effect/shuttle_landmark/cluster/nav6,/turf/space,/area/space)
 "eb" = (/obj/effect/shuttle_landmark/cluster/nav4,/turf/space,/area/space)
 "fb" = (/obj/effect/shuttle_landmark/cluster/nav2,/turf/space,/area/space)

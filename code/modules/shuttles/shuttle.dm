@@ -46,7 +46,7 @@
 	else
 		current_location = SSshuttle.get_landmark(current_location)
 	if(!istype(current_location))
-		CRASH("Shuttle \"[name]\" could not find its starting location.")
+		CRASH("Shuttle \"[name]\" could not find its starting location. it was given: [current_location].")
 
 	if(src.name in SSshuttle.shuttles)
 		CRASH("A shuttle with the name '[name]' is already defined.")
@@ -117,6 +117,7 @@
 				sleep(5)
 			if(!attempt_move(destination))
 				attempt_move(start_location) //try to go back to where we started. If that fails, I guess we're stuck in the interim location
+				message_admins("Shuttle [src.name] failed to arrive at its destination and could not return to its origin.")
 
 		moving_status = SHUTTLE_IDLE
 
@@ -169,8 +170,8 @@
 			for(var/mob/M in A)
 				if(M.client)
 					spawn(0)
-						if(M.buckled)
-							to_chat(M, "<span class='warning'>Sudden acceleration presses you into your chair!</span>")
+						if(M.buckled && !istype(M.buckled, /obj/structure/handrai))
+							to_chat(M, "<span class='warning'>Sudden acceleration presses you into your seat!</span>")
 							shake_camera(M, 3, 1)
 						else
 							to_chat(M, "<span class='warning'>The floor lurches beneath you!</span>")

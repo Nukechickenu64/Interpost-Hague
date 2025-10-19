@@ -444,6 +444,15 @@
 		H.fov.layer = UNDER_HUD_LAYER
 		hud_elements |= H.fov
 
+	if(ishuman(mymob))
+		var/mob/living/carbon/human/H = mymob
+		H.hovertext = new /obj/screen/text/atm
+		H.hovertext.maptext = ""
+		H.hovertext.maptext_height = 100
+		H.hovertext.maptext_width = 480
+		H.hovertext.screen_loc = "CENTER-7, CENTER+7"
+		hud_elements |= H.hovertext
+
 	mymob.client.screen = list()
 
 	mymob.client.screen += hud_elements

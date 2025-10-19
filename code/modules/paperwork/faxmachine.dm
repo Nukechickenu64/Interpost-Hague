@@ -33,8 +33,8 @@ GLOBAL_LIST_EMPTY(adminfaxes)	//cache for faxes that have been sent to admins
 
 /obj/machinery/photocopier/faxmachine/attack_hand(mob/user as mob)
 	user.set_machine(src)
-
-	var/dat = "Fax Machine<BR>"
+	var/dat = "<html>"
+	dat += "<center><h1>Fax Machine Control Panel</h1><hr/><BR>"
 
 	var/scan_name
 	if(scan)
@@ -78,6 +78,8 @@ GLOBAL_LIST_EMPTY(adminfaxes)	//cache for faxes that have been sent to admins
 
 		if(copyitem)
 			dat += "<a href ='byond://?src=\ref[src];remove=1'>Remove Item</a><br>"
+
+	dat += "</html>"
 
 	user << browse(dat, "window=copier")
 	onclose(user, "copier")

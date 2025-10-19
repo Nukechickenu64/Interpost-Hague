@@ -1,5 +1,8 @@
 /mob/living
 	var/datum/nano_module/craft/CM
+	var/_lean_prev_pixel_x
+	var/_lean_prev_pixel_y
+
 
 //this one is called when you need just a regular CM, without strick tab opened
 /mob/living/verb/craft_menu()
@@ -54,9 +57,9 @@
 			"name" = CR.name,
 			"icon" = getAtomCacheFilename(CR.result[1]),
 			"ref"  = "\ref[CR]",
-			"desc" = user.statcheck(user.stats[STAT_IQ]) >= 8 ? CR.get_description() : "I'm not even sure what this does... <br>",
-			"ingredients" = user.statcheck(user.stats[STAT_IQ]) >= 10 ?  CR.get_ingredients() : "I'm not sure what this would be made out of... <br>",
-			"tool" = user.statcheck(user.stats[STAT_IQ]) >= 10 ? CR.get_tools() : "What tool would do I even need? <br>",
+			"desc" = user.statcheck(user.stats[STAT_IQ]) >= 8 ? "I'm not even sure what this does... <br>" : CR.get_description(),
+			"ingredients" = user.statcheck(user.stats[STAT_IQ]) >= 10 ? "I'm not sure what this would be made out of... <br>" : CR.get_ingredients(),
+			"tool" = user.statcheck(user.stats[STAT_IQ]) >= 10 ? "What tool do I even need? <br>" : CR.get_tools(),
 		)
 	var/list/items = list()
 	for(var/datum/crafting_recipe/recipe in SScraft.categories[curr_category])
