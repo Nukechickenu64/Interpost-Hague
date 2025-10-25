@@ -53,7 +53,7 @@ This is /obj/machinery level code to properly manage power usage from the area.
 			return 0
 
 // This will have this machine have its area eat this much power next tick, and not afterwards. Do not use for continued power draw.
-/obj/machinery/proc/use_power_oneoff(var/amount, var/chan = POWER_CHAN)
+/obj/machinery/proc/use_power_oneoff(var/amount, var/chan = POWER_CHAN, var/return_false = FALSE)
 	var/area/A = get_area(src)		// make sure it's in an area
 	if(!A)
 		return

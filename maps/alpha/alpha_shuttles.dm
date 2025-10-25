@@ -461,7 +461,7 @@
 	waypoint_offsite = "nav_cryo_lift_bottom"
 	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
 	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
-	current_location = "nav_cryo_lift_top"
+	current_location = "nav_cryo_lift_bottom"
 	ceiling_type = null
 	knockdown = 0
 

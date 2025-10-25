@@ -776,7 +776,7 @@ this doesn't work anymore lol
 /client/MouseEntered(var/atom/a)
 	if(mob && ishuman(mob) && mob.get_preference_value(/datum/client_preference/show_item_names) == GLOB.PREF_YES)
 		var/mob/living/carbon/human/H = mob
-		if(a.mouse_opacity)  // i spread this out to make it more "readable"
+		if(a.mouse_opacity && !istype(a, /turf))  // i spread this out to make it more "readable"
 			H.hovertext.maptext = "<center><span style=\"\
 			color: #535AB2; \
 			font-weight: bold; \

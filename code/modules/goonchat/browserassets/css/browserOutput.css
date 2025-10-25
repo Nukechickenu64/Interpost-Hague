@@ -472,7 +472,7 @@ a:visited {
     border: 1px ridge #151319;
     padding: 10px;
     font-size: 15px;
-    vertical-align: middle;   
+    vertical-align: middle;
     background: rgba(40, 40, 40, 0.5);
     *zoom: 1;
     *display: inline;
@@ -637,6 +637,20 @@ a:visited {
     vertical-align: middle;
     background-color: rgba(50, 50, 50, 0.3);
     border: 1px solid rgba(50, 50, 50, 0.3);
+    *zoom: 1;
+    *display: inline;
+}
+
+.compbox {
+    display: inline-block;
+    min-width: 10px;
+    width: 280px;
+    text-align: left;
+    padding: 10px;
+    font-size: 15px;
+    vertical-align: middle;
+    background-color: rgb(0, 0, 0);
+    border: 1px solid rgba(65, 65, 65, 0.3);
     *zoom: 1;
     *display: inline;
 }

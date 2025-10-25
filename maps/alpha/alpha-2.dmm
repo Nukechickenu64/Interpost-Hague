@@ -12,7 +12,7 @@
 "al" = (/obj/structure/hospitaltech4{name = "bridge server"},/turf/simulated/floor/tiled/no0,/area/bridge)
 "am" = (/obj/effect/floor_decal/spline/plain{dir = 8},/obj/effect/floor_decal/spline/plain{dir = 4},/obj/structure/sign/tetracorp{pixel_y = 32},/obj/structure/bed/chair/office/dark{dir = 4},/obj/machinery/light{dir = 1},/turf/simulated/floor/tiled/no0,/area/bridge)
 "an" = (/obj/item/modular_computer/console/preset/command,/turf/simulated/floor/tiled/f2,/area/bridge)
-"ao" = (/obj/structure/window/reinforced{dir = 4},/obj/structure/window/reinforced{dir = 8},/obj/machinery/alarm{pixel_y = 22},/obj/machinery/computer/testing,/turf/simulated/floor/tiled/no0,/area/bridge)
+"ao" = (/obj/structure/window/reinforced{dir = 4},/obj/structure/window/reinforced{dir = 8},/obj/machinery/alarm{pixel_y = 22},/obj/machinery/computer/bridge,/turf/simulated/floor/tiled/no0,/area/bridge)
 "ap" = (/obj/structure/hospitaltech3{name = "bridge server"},/turf/simulated/floor/tiled/f2,/area/bridge)
 "aq" = (/obj/effect/floor_decal/spline/plain{dir = 8},/obj/effect/floor_decal/spline/plain{dir = 4},/obj/structure/sign/tetracorp{pixel_y = 32},/obj/structure/bed/chair/office/dark{dir = 8},/obj/machinery/light{dir = 1},/turf/simulated/floor/tiled/no0,/area/bridge)
 "ar" = (/obj/structure/hospitaltech4{name = "bridge server"},/turf/simulated/floor/tiled/f2,/area/bridge)

@@ -20,8 +20,8 @@
 
 /obj/machinery/photocopier/attack_hand(mob/user as mob)
 	user.set_machine(src)
-
-	var/dat = "Photocopier<BR><BR>"
+	var/dat = "<html>"
+	dat += "Photocopier<BR><BR>"
 	if(copyitem)
 		dat += "<a href='byond://?src=\ref[src];remove=1'>Remove Item</a><BR>"
 		if(toner)
@@ -36,6 +36,7 @@
 	dat += "Current toner level: [toner]"
 	if(!toner)
 		dat +="<BR>Please insert a new toner cartridge!"
+	dat += "</html>"
 	user << browse(dat, "window=copier")
 	onclose(user, "copier")
 	return

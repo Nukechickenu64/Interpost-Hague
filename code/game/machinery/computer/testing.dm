@@ -1,5 +1,5 @@
-/obj/machinery/computer/testing
-	name = "testing computer"
+/obj/machinery/computer/bridge
+	name = "bridge computer"
 	desc = "I fucking hate you."
 	var/dispensed = 0 //why yes, I am stealing this from the nano code, how could you t-ACK!
 	var/centcomm_message_cooldown = 0
@@ -10,7 +10,7 @@
 	var/new_sound = 'sound/machines/announce_alarm.ogg'
 	var/new_sound_red = 'sound/machines/announce_alarm_red.ogg'
 
-/obj/machinery/computer/testing/Topic(href, href_list, hsrc)
+/obj/machinery/computer/bridge/Topic(href, href_list, hsrc)
 	..()
 	if(get_dist(src, usr) > 1)
 		return
@@ -61,8 +61,12 @@
 			spawn(600)//One minute cooldown
 				announcment_cooldown = 0
 
-/obj/machinery/computer/testing/attack_hand(mob/user)
+/obj/machinery/computer/brige/attack_hand(mob/living/carbon/human/user)
 	..()
 	if(stat & (BROKEN|NOPOWER))
 		return
-	to_chat(user, "\n<div class='firstdivmood'><div class='moodbox'><span class='graytext'>The computer's nearly burned out screen shows you the following commands:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT LATEST COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>SEND AN ANNOUNCEMENT</a></span></div></div>")
+	if(!user.GetAccess(ACCESS_REGION_COMMAND))
+		to_chat(user, "<span class='warning'>The computer beeps at you insistently, refusing to respond to your input. It seems you lack the necessary access rights.</span>")
+		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+		return
+	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The computer's nearly burned out screen shows you the following commands:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT LATEST COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>SEND AN ANNOUNCEMENT</a></span></div></div>")

@@ -6,7 +6,7 @@
 	layer = ABOVE_OBJ_LAYER
 
 	var/datum/topic_state/remote/remote_state
-	var/obj/machinery/embedded_controller/radio/airlock/master_controller
+	var/obj/machinery/embedded_controller/radio/airlock/access_controller/master_controller
 	var/id_tag
 
 /obj/machinery/dummy_airlock_controller/Process()

@@ -61,8 +61,7 @@ SUBSYSTEM_DEF(event)
 	while (pos <= EVENT_LEVEL_MAJOR)
 		var/list/datum/event_container/EC = event_containers[pos]
 		for (var/datum/event_container/EG in EC)
-			if (EG.next_event_time < EC.next_event_time)
-				EG.process()
+			EG.process()
 		pos++
 
 		if (MC_TICK_CHECK)
