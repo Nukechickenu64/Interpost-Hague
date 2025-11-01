@@ -36,8 +36,14 @@
 			if(climb_target)
 				break
 
-	//if(climb_target)
-		//climb_up(climb_target)
+	if(climb_target)
+		if(istype(src, /mob/living/carbon/human))
+			var/mob/living/carbon/human/H = src
+			switch(direction)
+				if(UP)
+					H.climb_up(climb_target)
+				if(DOWN)
+					H.climb_down(climb_target)
 
 /mob/proc/zPull(direction)
 	//checks and handles pulled items across z levels
@@ -300,6 +306,25 @@
 			visible_message("<span class='warning'>[src] gives up on trying to climb onto \the [A]!</span>", "<span class='warning'>You give up on trying to climb onto \the [A]!</span>")
 		return TRUE
 
+/mob/living/carbon/human/proc/climb_down(atom/A)
+	if(!isturf(loc) || !bound_overlay || bound_overlay.destruction_timer || is_physically_disabled())	// This destruction_timer check ideally wouldn't be required, but I'm not awake enough to refactor this to not need it.
+		return FALSE
+
+	var/turf/T = get_turf(A)
+	var/turf/below = GetBelow(src)
+	if(below && T.Adjacent(bound_overlay) && below.CanZPass(src, DOWN)) //Certain structures will block passage from below, others not
+		var/area/location = get_area(loc)
+		if(location.has_gravity && !can_overcome_gravity())
+			return FALSE
+
+		visible_message("<span class='notice'>[src] starts climbing onto \the [A]!</span>", "<span class='notice'>You start climbing onto \the [A]!</span>")
+		if(do_after(src, 50, A))
+			visible_message("<span class='notice'>[src] climbs onto \the [A]!</span>", "<span class='notice'>You climb onto \the [A]!</span>")
+			src.Move(T)
+		else
+			visible_message("<span class='warning'>[src] gives up on trying to climb onto \the [A]!</span>", "<span class='warning'>You give up on trying to climb onto \the [A]!</span>")
+		return TRUE
+
 /mob/living/verb/lookup()
 	set name = "LookUp"
 	set desc = "If you want to know what's above."
@@ -357,6 +382,11 @@
 	owner = user
 	follow()
 	GLOB.moved_event.register(owner, src, /atom/movable/z_observer/proc/follow)
+
+mob/living/Move(var/turf/destination)
+	. = ..()
+	if(z_eye)
+		z_eye.follow()
 
 /atom/movable/z_observer/proc/follow()
 

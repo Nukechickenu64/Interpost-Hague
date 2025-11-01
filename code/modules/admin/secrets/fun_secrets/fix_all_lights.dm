@@ -8,3 +8,6 @@
 
 	for(var/obj/machinery/light/L in world)
 		L.fix()
+		if(istype(L.loc, /area))
+			var/area/A = L.loc
+			A.set_lightswitch(0)

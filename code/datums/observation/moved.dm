@@ -18,7 +18,7 @@ GLOBAL_DATUM_INIT(moved_event, /decl/observ/moved, new)
 	. = ..()
 
 	// Listen to the parent if possible.
-	if(. && istype(mover.loc, expected_type))
+	if(src && istype(mover.loc, expected_type))
 		register(mover.loc, mover, /atom/movable/proc/recursive_move)
 /********************
 * Movement Handling *
