@@ -85,3 +85,25 @@ if(loc != old_loc) {\
 /obj/item/dropped()
 	. = ..()
 	update_light()
+
+
+/proc/lighting_tile_distance(atom/A, atom/B)
+    if(!A || !B) return 0
+    var/dx = A.x - B.x
+    var/dy = A.y - B.y
+    if(LIGHTING_FALLOFF == 1)
+        // Euclidean: circular falloff
+        return sqrt(dx*dx + dy*dy)
+    else if(LIGHTING_FALLOFF == 2)
+        // Manhattan: diamond falloff
+        return abs(dx) + abs(dy)
+    else
+        // Chebyshev: square falloff
+        return max(abs(dx), abs(dy))
+
+/proc/lighting_falloff_weight(dist, range)
+    if(range <= 0) return 0
+    var/w = 1 - (dist / range)
+    if(w < 0) return 0
+    if(w > 1) return 1
+    return w

@@ -190,18 +190,20 @@
 		. * applied_lum_b            \
 	);
 
-//Original lighting falloff calculation. This looks the best out of the three. However, this is also the most expensive.
-//#define LUM_FALLOFF(C, T) (1 - CLAMP01(sqrt((C.x - T.x) ** 2 + (C.y - T.y) ** 2 + LIGHTING_HEIGHT) / max(1, light_range)))
+//Original/Euclidean (circular) lighting falloff. This looks the best and gives a circular light shape.
+// Uses LIGHTING_HEIGHT to simulate pseudo-z falloff.
+#if LIGHTING_FALLOFF == 1
+#define LUM_FALLOFF(C, T) (1 - CLAMP01(sqrt((C.x - T.x) ** 2 + (C.y - T.y) ** 2 + LIGHTING_HEIGHT) / max(1, light_range)))
 
-//Cubic lighting falloff. This has the *exact* same range as the original lighting falloff calculation, down to the exact decimal, but it looks a little unnatural due to the harsher falloff and how it's generally brighter across the board.
-//#define LUM_FALLOFF(C, T) (1 - CLAMP01((((C.x - T.x) * (C.x - T.x)) + ((C.y - T.y) * (C.y - T.y)) + LIGHTING_HEIGHT) / max(1, light_range*light_range)))
-
-//Linear lighting falloff. This resembles the original lighting falloff calculation the best, but results in lights having a slightly larger range, which is most noticable with large light sources. This also results in lights being diamond-shaped, fuck. This looks the darkest out of the three due to how lights are brighter closer to the source compared to the original falloff algorithm. This falloff method also does not at all take into account lighting height, as it acts as a flat reduction to light range with this method.
-//#define LUM_FALLOFF(C, T) (1 - CLAMP01(((abs(C.x - T.x) + abs(C.y - T.y))) / max(1, light_range+1)))
-
-//Linear lighting falloff but with an octagonal shape in place of a diamond shape. Lummox JR please add pointer support.
-#define GET_LUM_DIST(DISTX, DISTY) (DISTX + DISTY + abs(DISTX - DISTY)*0.4)
+//Manhattan (diamond) falloff. Kept for compatibility if toggled via LIGHTING_FALLOFF define.
+#elif LIGHTING_FALLOFF == 2
 #define LUM_FALLOFF(C, T) (1 - CLAMP01(((abs(C.x - T.x) + abs(C.y - T.y))) / max(1, light_range+1)))
+
+//Chebyshev/Octagonal approximation (square-ish). Alternative option if desired.
+#else
+#define GET_LUM_DIST(DISTX, DISTY) (DISTX + DISTY + abs(DISTX - DISTY)*0.4)
+#define LUM_FALLOFF(C, T) (1 - CLAMP01((GET_LUM_DIST(abs(C.x - T.x), abs(C.y - T.y))) / max(1, light_range+1)))
+#endif
 
 /datum/light_source/proc/apply_lum()
 	var/static/update_gen = 1

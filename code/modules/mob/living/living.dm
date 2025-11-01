@@ -13,7 +13,7 @@
 	if(AM.Adjacent(src))
 		src.start_pulling(AM)
 
-	return
+		return
 
 //mob verbs are faster than object verbs. See above.
 /mob/living/pointed(atom/A as mob|obj|turf in view())
