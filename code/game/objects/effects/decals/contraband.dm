@@ -58,7 +58,22 @@
 	to_chat(user, "<span class='notice'>You start placing the poster on the wall...</span>")//Looks like it's uncluttered enough. Place the poster.
 
 
-	var/obj/structure/sign/poster/P = new(user.loc, placement_dir=get_dir(user, W), serial=serial_number)
+	var/obj/structure/sign/poster/P = new(user.loc)
+	// Apply desired serial and placement after creation (Initialize does not accept these as New() keyword args)
+	P.serial_number = serial_number
+	switch (placement_dir)
+		if (NORTH)
+			P.pixel_x = 0
+			P.pixel_y = 32
+		if (SOUTH)
+			P.pixel_x = 0
+			P.pixel_y = -32
+		if (EAST)
+			P.pixel_x = 32
+			P.pixel_y = 0
+		if (WEST)
+			P.pixel_x = -32
+			P.pixel_y = 0
 
 	flick("poster_being_set", P)
 	var/oldsrc = src //get a reference to src so we can delete it after detaching ourselves

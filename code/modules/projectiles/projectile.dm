@@ -255,7 +255,8 @@
 
 	return 1
 
-/obj/item/projectile/Bump(atom/A as mob|obj|turf|area, forced=0)
+// 'forced' is a keyword argument to match overrides across the hierarchy
+/obj/item/projectile/Bump(atom/A as mob|obj|turf|area, forced = FALSE)
 	if(A == src)
 		return 0 //no
 
@@ -277,7 +278,7 @@
 			var/obj/item/grab/G = locate() in M
 			if(G && G.shield_assailant())
 				visible_message("<span class='danger'>\The [M] uses [G.affecting] as a shield!</span>")
-				if(Bump(G.affecting, forced=1))
+				if(Bump(G.affecting, TRUE))
 					return //If Bump() returns 0 (keep going) then we continue on to attack M.
 
 			passthrough = !attack_mob(M, distance)
@@ -445,7 +446,7 @@
 	xo = null
 	var/result = 0 //To pass the message back to the gun.
 
-/obj/item/projectile/test/Bump(atom/A as mob|obj|turf|area)
+/obj/item/projectile/test/Bump(atom/A as mob|obj|turf|area, forced = FALSE)
 	if(A == firer)
 		loc = A.loc
 		return //cannot shoot yourself

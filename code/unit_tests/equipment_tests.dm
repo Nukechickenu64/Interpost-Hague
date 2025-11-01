@@ -1,5 +1,9 @@
+#ifndef SUCCESS
 #define SUCCESS 1
+#endif
+#ifndef FAILURE
 #define FAILURE 0
+#endif
 
 
 datum/unit_test/vision_glasses/
@@ -18,8 +22,6 @@ datum/unit_test/vision_glasses/start_test()
 		if(test["result"] == FAILURE)
 			fail(test["msg"])
 			async = 0
-
-			return 0
 
 		H = locate(test["mobref"])
 

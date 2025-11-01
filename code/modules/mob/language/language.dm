@@ -165,7 +165,12 @@
 	if (only_species_language && speaking != all_languages[species_language])
 		return 0
 
-	return (speaking.can_speak_special(src) && (universal_speak || (speaking && speaking.flags & INNATE) || speaking in src.languages))
+	// Avoid any potential '&& in' ambiguity by computing membership via a guarded branch
+	var/can_in_languages = 0
+	if(speaking)
+		if(speaking in src.languages)
+			can_in_languages = 1
+	return (speaking.can_speak_special(src) && (universal_speak || ((speaking && (speaking.flags & INNATE)) || can_in_languages)))
 
 /mob/proc/get_language_prefix()
 	return get_prefix_key(/decl/prefix/language)

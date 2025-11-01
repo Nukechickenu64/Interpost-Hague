@@ -6,8 +6,12 @@
  *
  */
 
+#ifndef FAILURE
 #define FAILURE 0
+#endif
+#ifndef SUCCESS
 #define SUCCESS 1
+#endif
 
 
 /datum/unit_test/apc_area_test

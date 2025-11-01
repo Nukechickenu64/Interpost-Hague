@@ -53,7 +53,7 @@
 	if(!got_sick)
 		got_sick = progress
 		if(got_sick)
-			addtimer(CALLBACK(src, /datum/goal/sickness/on_completion), rand(30,40))
+			addtimer(CALLBACK(src, .proc/on_completion), rand(30,40))
 
 /datum/goal/sickness/on_completion()
 	if(!announced)

@@ -392,7 +392,11 @@ default behaviour is:
 
 /mob/living/proc/get_organ_target()
 	var/mob/shooter = src
-	var/t = shooter:zone_sel.selecting
+	// Access nested selector dynamically without requiring static types
+	var/t = null
+	var/selector = shooter:zone_sel
+	if(selector)
+		t = selector:selecting
 	if ((t in list( BP_EYES, BP_MOUTH )))
 		t = BP_HEAD
 	var/obj/item/organ/external/def_zone = ran_zone(t)

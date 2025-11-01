@@ -384,7 +384,9 @@
 			R.receive_signal(signal)
 
 		// Receiving code can be located in Telecommunications.dm
-		return signal.data["done"] && position.z in signal.data["level"]
+		if(position.z in signal.data["level"]) // level membership check
+			return signal.data["done"]
+		return 0
 
 
   /* ###### Intercoms and station-bounced radios ###### */
@@ -434,9 +436,10 @@
 
 	sleep(rand(10,25)) // wait a little...
 
-	if(signal.data["done"] && position.z in signal.data["level"])
-		// we're done here.
-		return 1
+	if(position.z in signal.data["level"]) // level membership check
+		if(signal.data["done"])
+			// we're done here.
+			return 1
 
 	// Oh my god; the comms are down or something because the signal hasn't been broadcasted yet in our level.
 	// Send a mundane broadcast with limited targets:

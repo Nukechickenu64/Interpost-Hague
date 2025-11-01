@@ -413,9 +413,11 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			var/obj/item/weapon/paper/PR = new/obj/item/weapon/paper
 			PR.name = "fabricator report"
 			PR.info = "<center><b>[station_name()] Fabricator Laboratory</b>"
-			PR.info += "<h2>[ (text2num(href_list["print"]) == 2) ? "Detailed" : ] Fabricator Status Report</h2>"
+			var/is_detailed = (text2num(href_list["print"]) == 2)
+			var/title_str = is_detailed ? "Detailed" : ""
+			PR.info += "<h2>[title_str] Fabricator Status Report</h2>"
 			PR.info += "<i>report prepared at [stationtime2text()] local time</i></center><br>"
-			if(text2num(href_list["print"]) == 2)
+			if(is_detailed)
 				PR.info += GetResearchListInfo()
 			else
 				PR.info += GetResearchLevelsInfo()
@@ -423,7 +425,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			PR.icon_state = "paper_words"
 			PR.dropInto(loc)
 			spawn(10)
-				screen = ((text2num(href_list["print"]) == 2) ? 5.0 : 1.1)
+				screen = (is_detailed ? 5.0 : 1.1)
 				attack_hand(user)
 
 	if(. == TOPIC_REFRESH)

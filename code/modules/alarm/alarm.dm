@@ -145,4 +145,6 @@
 /mob/living/silicon/robot/syndicate/get_alarm_cameras()
 	return list()
 
+#if defined(ALARM_LOSS_DELAY)
 #undef ALARM_LOSS_DELAY
+#endif
