@@ -69,6 +69,23 @@
 	pressure_checks = 2
 	pressure_checks_default = 2
 
+// Ensure vent pumps can connect to mains pipes by targeting the supply line component when adjacent to a mains pipe.
+/obj/machinery/atmospherics/unary/vent_pump/atmos_init()
+	..()
+	if(node)
+		return
+	// If no simple pipe neighbor was found, try connecting to mains pipes on our facing side
+	for(var/obj/machinery/atmospherics/mains_pipe/M in get_step(src, dir))
+		// Only connect if the mains pipe faces us
+		if(M.initialize_mains_directions & get_dir(M, src))
+			// Vent pumps release to supply; bind to the supply internal component
+			node = M.supply
+			break
+	// Defer icon/network work to base helpers
+	if(node)
+		update_icon()
+		update_underlays()
+
 /obj/machinery/atmospherics/unary/vent_pump/New()
 	..()
 	air_contents.volume = ATMOS_DEFAULT_VOLUME_PUMP

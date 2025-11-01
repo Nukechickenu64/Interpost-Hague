@@ -59,7 +59,8 @@ SUBSYSTEM_DEF(processing)
 	subsystem.debug_last_thing = src
 	var/start_tick = world.time
 	var/start_tick_usage = world.tick_usage
-	. = call(src, subsystem.debug_original_process_proc)(wait, times_fired)
+	// Call the original process proc with the same argument shape as the normal dispatcher
+	. = call(src, subsystem.debug_original_process_proc)(wait, times_fired, subsystem)
 
 	var/tick_time = world.time - start_tick
 	var/tick_use_limit = world.tick_usage - start_tick_usage - 100 // Current tick use - starting tick use - 100% (a full tick excess)

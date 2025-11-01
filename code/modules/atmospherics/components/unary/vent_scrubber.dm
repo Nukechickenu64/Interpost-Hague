@@ -136,6 +136,19 @@
 			if(g != "oxygen" && g != "nitrogen")
 				scrubbing_gas += g
 
+// Ensure vent scrubbers can connect to mains pipes by targeting the scrubbers line when adjacent to a mains pipe.
+/obj/machinery/atmospherics/unary/vent_scrubber/atmos_init()
+	..()
+	if(node)
+		return
+	for(var/obj/machinery/atmospherics/mains_pipe/M in get_step(src, dir))
+		if(M.initialize_mains_directions & get_dir(M, src))
+			node = M.scrubbers
+			break
+	if(node)
+		update_icon()
+		update_underlays()
+
 /obj/machinery/atmospherics/unary/vent_scrubber/Process()
 	..()
 

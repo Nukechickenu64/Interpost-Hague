@@ -260,11 +260,20 @@ proc/ageAndGender2Desc(age, gender)//Used for the radio
 	if((src in GLOB.living_mob_list_) || (src in GLOB.dead_mob_list_))
 		return FALSE
 	GLOB.living_mob_list_ += src
+	// Register with the mobs processing subsystem so Life() is invoked periodically
+	START_PROCESSING(SSmobs, src)
 	return TRUE
 
 // Returns true if the mob was removed from the living list
 /mob/proc/remove_from_living_mob_list()
 	return GLOB.living_mob_list_.Remove(src)
+
+// For living mobs, also stop processing when removed from the living list
+/mob/living/remove_from_living_mob_list()
+	if(..())
+		STOP_PROCESSING(SSmobs, src)
+		return TRUE
+	return FALSE
 
 // Returns true if the mob was in neither the dead or living list
 /mob/proc/add_to_dead_mob_list()

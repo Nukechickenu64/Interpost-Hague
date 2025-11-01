@@ -930,4 +930,6 @@ default behaviour is:
 	if(auras)
 		for(var/a in auras)
 			remove_aura(a)
+	// Ensure we are no longer processed by the mobs subsystem
+	STOP_PROCESSING(SSmobs, src)
 	return ..()
