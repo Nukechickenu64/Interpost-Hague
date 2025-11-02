@@ -105,7 +105,12 @@
 			. += "</table></td><td width='20%'><table width='100%' cellpadding='1' cellspacing='0'>"
 			index = 0
 
-		. += "<tr bgcolor='[job.selection_color]'><td width='60%' align='right'>"
+		var/tooltip = ""
+		if(job.job_desc)
+			var/desc_text = sanitize(job.job_desc)
+			tooltip = " title='[desc_text]'"
+
+		. += "<tr bgcolor='[job.selection_color]'[tooltip]><td width='60%' align='right'>"
 		var/rank = job.title
 		lastJob = job
 		if((job.sex_lock && job.sex_lock != user.client.prefs.gender) || (job.total_positions == 0 && job.spawn_positions == 0))

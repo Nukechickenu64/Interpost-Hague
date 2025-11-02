@@ -27,6 +27,7 @@ Detective=1
 Security Officer=5
 
 Assistant=-1
+Greyhound=-1
 Atmospheric Technician=4
 Cargo Technician=3
 Chaplain=1

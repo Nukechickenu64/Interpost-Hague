@@ -25,6 +25,7 @@
 						/datum/job/chaplain,
 						//datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -58,6 +59,7 @@
 						/datum/job/engineer,
 						//datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -92,6 +94,7 @@
 						/datum/job/engineer,
 						//datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -127,6 +130,7 @@
 						///datum/job/chaplain,
 						///datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -161,6 +165,7 @@
 						/datum/job/chaplain,
 						//datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -196,6 +201,7 @@
 						/datum/job/chaplain,
 						//datum/job/jester
 						///datum/job/assistant,
+						/datum/job/greyhound,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -229,9 +235,33 @@
 		H.generate_stats(STAT_DX)
 		H.generate_skills(list("crafting","melee","cleaning","mining"))
 
+/datum/job/greyhound
+	title = "Greyhound"
+	job_desc = "You miss your parents, who forgo cryosleep, they taught you well, you love God and the sleepers."
+	supervisors = "the sleepers, and GOD"
+	minimal_player_age = 14
+	selection_color = "#797979"
+	economic_modifier = 15
+	ideal_character_age = 72
+	alt_titles = null
+	social_class = SOCIAL_CLASS_MIN
+	total_positions = 1
+	department_flag = CIV
+	outfit_type = /decl/hierarchy/outfit/shipraiders
+	spawn_positions = 1
+	access = list(access_maint_tunnels)
+
+	equip(var/mob/living/carbon/human/H)
+		..()
+		// Station-born generalist; a touch nimble like assistants
+		H.religion = ILLEGAL_RELIGION //A christian born on a spaceship? what's that flesh mound?
+		H.newgeneratestats(9,14,9,13,9,15,10,16)
+		H.generate_skills(list("crafting","cleaning","mining","medical","cooking","melee", "gardening","ranged"))
+
 /datum/job/captain
 	title = "Captain"
 	supervisors = "your own wits and TetraCorp"
+	job_desc = "Leader of the ship and its crew, responsible for making tough decisions and ensuring the safety of all aboard."
 	minimal_player_age = 41
 	economic_modifier = 10
 	ideal_character_age = 65
@@ -243,7 +273,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		..()
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
 		H.newgeneratestats(9,14,9,13,9,15,10,16)
@@ -251,6 +281,7 @@
 
 /datum/job/hop
 	title = "Executive Officer"
+	job_desc = "Second-in-command on the ship, assisting the Captain in decision-making and management."
 	supervisors = "the Captain"
 	minimal_player_age = 31
 	economic_modifier = 5
@@ -264,7 +295,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		..()
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
 		H.newgeneratestats(8,12,9,13,10,12,7,12)
@@ -273,6 +304,7 @@
 /datum/job/rd
 	selection_color = "#0055A1"
 	title = "Head Scientist"
+	job_desc = "The lead researcher in charge of the science department, overseeing all research projects and experiments."
 	supervisors = "the Captain"
 	minimal_player_age = 21
 	economic_modifier = 9
@@ -298,7 +330,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		//H.set_species("Machine")
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		..()
 		//H.add_stats(rand(5,7), rand(5,8), rand(12,15))
@@ -308,6 +340,7 @@
 /datum/job/scientist
 	selection_color = "#006BCA"
 	title = "General Researcher"
+	job_desc = "A scientist conducting various research projects and experiments to advance knowledge and technology."
 	supervisors = "the Head Scientist"
 	minimal_player_age = 19
 	economic_modifier = 2
@@ -321,7 +354,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		//H.set_species("Machine") //rd only for now - 08.03
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		..()
 		//H.add_stats(rand(5,7), rand(5,8), rand(10,14))
@@ -331,6 +364,7 @@
 /datum/job/doctor
 	selection_color = "#633d63"
 	title = "Medical Officer"
+	job_desc = "The primary medical practitioner on the ship, responsible for treating injuries and illnesses among the crew."
 	department_flag = MED
 	supervisors = "the Captain and Hippocrates"
 	minimal_player_age = 19
@@ -351,6 +385,7 @@
 
 /datum/job/cmo
 	title = "CMO"
+	job_desc = "Chief Medical Officer, overseeing the medical department and ensuring the health and well-being of all crew members."
 	supervisors = "the Captain"
 	selection_color = "#382238"
 	department = "Medical"
@@ -370,6 +405,7 @@
 /datum/job/hos
 	title = "Major"
 	supervisors = "the Captain"
+	job_desc = "Head of the Security Department, responsible for maintaining order and safety aboard the ship."
 	department_flag = SEC
 	total_positions = 1
 	spawn_positions = 1
@@ -399,6 +435,7 @@
 
 /datum/job/officer
 	title = "Enforcer"
+	job_desc = "A security officer responsible for maintaining order and enforcing regulations aboard the ship."
 	department = "Security"
 	supervisors = "The Major"
 	department_flag = SEC
@@ -413,7 +450,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		..()
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		H.newgeneratestats(12,15,10,13,6,14,9,14)
 		H.generate_skills(list("melee","ranged"))
@@ -421,6 +458,7 @@
 /datum/job/detective
 	title = "Detective"
 	department = "Security"
+
 	department_flag = SEC
 	total_positions = 1
 	spawn_positions = 1
@@ -432,7 +470,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		..()
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		//H.add_stats(rand(11,16), rand(10,14), rand(7,10))
 		H.generate_stats(STAT_ST) //detective is getting removed, i'm not bothering to give them stat ranges
@@ -441,6 +479,7 @@
 /datum/job/qm
 	selection_color = "#3d3315"
 	title = "Vessel Overseer"
+	job_desc = "the Vessel Overseer is responsible for managing the station's supplies, cargo, and overall logistics."
 	supervisors = "the Captain"
 	minimal_player_age = 21
 	economic_modifier = 3
@@ -454,7 +493,7 @@
 
 	equip(var/mob/living/carbon/human/H)
 		..()
-		if(!H.religion_is_legal())//So that they can't be heretics.
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
 		//H.add_stats(rand(8,12), rand(9,12), rand(7,10))
 		H.newgeneratestats(8,13,10,14,11,14,8,14)
@@ -462,6 +501,7 @@
 
 /datum/job/engineer
 	title = "Maintainer"
+	job_desc = "Responsible for the upkeep and repair of the ship's systems and infrastructure."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 3
@@ -484,6 +524,7 @@
 /datum/job/mining
 	selection_color = "#7c6a2e"
 	title = "Excavator"
+	job_desc = "Responsible for extracting valuable minerals and resources from asteroids and planetary bodies."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
@@ -504,6 +545,7 @@
 /datum/job/cargo_tech
 	selection_color = "#7c6a2e"
 	title = "Cargo Technician"
+	job_desc = "Responsible for managing and organizing the ship's cargo and supplies."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
@@ -534,6 +576,7 @@
 /datum/job/ouvrier
 	selection_color = "#7c6a2e"
 	title = "Cargo Assistant"
+	job_desc = "A young helper in the cargo department, eager to learn the ropes of managing supplies and logistics."
 	supervisors = "the Cargo Overseer"
 	minimal_player_age = 16
 	economic_modifier = 2
@@ -555,6 +598,7 @@
 /datum/job/chef
 	title = "Nutritionist"
 	supervisors = "the Executive Manager"
+	job_desc = "Responsible for overseeing the nutritional needs and meal planning for the crew."
 	minimal_player_age = 16
 	economic_modifier = 2
 	ideal_character_age = 21
@@ -571,6 +615,7 @@
 /datum/job/bartender
 	title = "Barkeeper"
 	department = "Service"
+	job_desc = "Responsible for serving drinks and managing the bar area."
 	department_flag = SRV
 	total_positions = 1
 	spawn_positions = 1
@@ -604,6 +649,7 @@
 
 /datum/job/janitor
 	title = "Sanitation Technician"
+	job_desc = "Responsible for maintaining cleanliness and hygiene aboard the ship."
 	supervisors = "the Executive Officer"
 	minimal_player_age = 16
 	economic_modifier = 1
@@ -621,6 +667,7 @@
 
 /datum/job/hydro
 	title = "Botanic"
+	job_desc = "Responsible for cultivating and maintaining the ship's hydroponic gardens."
 	department = "Service"
 	department_flag = SRV
 	total_positions = 2
@@ -705,6 +752,7 @@
 /datum/job/medassist
 	selection_color = "#633d63"
 	title = "Medical Assistant"
+	job_desc = "A young helper in the medical department, eager to learn the ropes of healing and care."
 	supervisors = "the Undertaker"
 	minimal_player_age = 16
 	economic_modifier = 2

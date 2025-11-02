@@ -47,6 +47,9 @@
 	var/min_goals = 1
 	var/max_goals = 3
 
+	// Optional short description shown in job selection UI on hover
+	var/job_desc
+
 /datum/job/New()
 	..()
 	if(prob(100-availablity_chance))	//Close positions, blah blah.
