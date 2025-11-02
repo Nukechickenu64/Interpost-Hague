@@ -184,8 +184,8 @@
 		plane = DEFAULT_PLANE
 		invisibility = 0
 		see_invisible = 0
-		sight = SEE_TURFS|SEE_SELF|SEE_BLACKNESS
 		simulated = TRUE
+		update_sight()
 	else
 		// Enter phantom state
 		isblue = TRUE
@@ -194,8 +194,8 @@
 		plane = OBSERVER_PLANE
 		invisibility = INVISIBILITY_OBSERVER
 		see_invisible = SEE_INVISIBLE_OBSERVER
-		sight = SEE_TURFS|SEE_SELF|SEE_BLACKNESS
 		simulated = FALSE
+		update_sight()
 
 /obj/machinery/bluegate/Destroy()
 	if(occupant)
@@ -247,6 +247,7 @@
 	active_power_usage = 250
 
 	var/obj/item/weapon/paper/research/loaded_paper = null
+	var/obj/item/weapon/disk/design_disk/loaded_disk = null
 
 /obj/machinery/research_processor/update_icon()
 	return
@@ -258,22 +259,41 @@
 	lines += "<span class='graytext'>Ideation Condenser</span>"
 	lines += "<hr>"
 	if(loaded_paper)
-		lines += "<span class='notice'>Loaded: [loaded_paper.name] ([loaded_paper.progress]% complete)</span>"
-		lines += "<span class='feedback'><a href='?src=\ref[src];action=process'>PROCESS PAPER</a></span>"
+		lines += "<span class='notice'>Paper: [loaded_paper.name] ([loaded_paper.progress]% complete)</span>"
 		lines += "<span class='feedback'><a href='?src=\ref[src];action=eject'>EJECT PAPER</a></span>"
 	else
 		lines += "<span class='info'>Insert a completed research paper.</span>"
-	to_chat(user, "\n<div class='firstdivmood'><div class='moodbox'>[jointext(lines, "<br>")]</div></div>")
 
-/obj/machinery/research_processor/Topic(href, href_list, hsrc)
-	if(get_dist(src, usr) > 1)
-		return
+	if(loaded_disk)
+		if(loaded_disk.blueprint)
+			lines += "<span class='warning'>Disk: [loaded_disk] already contains a design.</span>"
+		else
+			lines += "<span class='notice'>Disk: [loaded_disk] (empty)</span>"
+		lines += "<span class='feedback'><a href='?src=\ref[src];action=eject_disk'>EJECT DISK</a></span>"
+	else
+		lines += "<span class='info'>Insert an empty design disk.</span>"
+
+	if(loaded_paper && loaded_disk && !loaded_disk.blueprint)
+		lines += "<hr>"
+		lines += "<span class='feedback'><a href='?src=\ref[src];action=process'>PROCESS PAPER → WRITE DISK</a></span>"
+	var/content = jointext(lines, "<br>")
+	to_chat(user, "\n<div class='firstdivmood'><div class='moodbox'>[content]</div></div>")
+
+/obj/machinery/research_processor/Topic(href, href_list)
+	if(..())
+		return 1
+	usr.set_machine(src)
 	switch(href_list["action"])
 		if("eject")
 			if(loaded_paper)
 				loaded_paper.dropInto(loc)
 				loaded_paper = null
 				visible_message("\The [src] clunks and spits out the paper.")
+		if("eject_disk")
+			if(loaded_disk)
+				loaded_disk.dropInto(loc)
+				loaded_disk = null
+				visible_message("\The [src] ejects the design disk.")
 		if("process")
 			if(!loaded_paper)
 				to_chat(usr, "<span class='warning'>No paper loaded.</span>")
@@ -281,26 +301,23 @@
 			if(loaded_paper.progress < 100)
 				to_chat(usr, "<span class='warning'>The research paper is incomplete.</span>")
 				return TOPIC_REFRESH
+			if(!loaded_disk)
+				to_chat(usr, "<span class='warning'>No design disk loaded.</span>")
+				return TOPIC_REFRESH
+			if(loaded_disk.blueprint)
+				to_chat(usr, "<span class='warning'>The loaded design disk is not empty.</span>")
+				return TOPIC_REFRESH
 			// Consume power and produce a weighted random disk based on concept kind
 			use_power_oneoff(active_power_usage)
 			var/kind = (loaded_paper.concept_kind || "")
-			var/tech_bias = 50
-			if(kind == "grief")
-				tech_bias = 70
-			else if(kind == "fulfillment")
-				tech_bias = 30
-
-			if(prob(tech_bias))
-				var/obj/item/weapon/disk/tech_disk/D1 = new(loc)
-				D1.stored = new (pick_weighted_tech(kind))()
-				visible_message("\The [src] condenses the ideas into a fabricator data disk.")
-			else
-				var/obj/item/weapon/disk/design_disk/D2 = new(loc)
-				D2.blueprint = new (pick_weighted_design(kind))()
-				visible_message("\The [src] condenses the ideas into a component design disk.")
+			// Require and write to the inserted empty design disk
+			var/t_design = pick_weighted_design(kind)
+			loaded_disk.blueprint = new t_design()
+			visible_message("\The [src] condenses the ideas into a component design and writes it to [loaded_disk].")
 			qdel(loaded_paper)
 			loaded_paper = null
-	return TOPIC_REFRESH
+	attack_hand(usr)
+	return 1
 
 /obj/machinery/research_processor/attackby(obj/item/W, mob/user)
 	if(istype(W, /obj/item/weapon/paper/research))
@@ -312,6 +329,19 @@
 		R.forceMove(src)
 		loaded_paper = R
 		visible_message("\The [user] feeds \a [R] into \the [src].")
+		return
+	else if(istype(W, /obj/item/weapon/disk/design_disk))
+		if(loaded_disk)
+			to_chat(user, "<span class='warning'>There is already a design disk loaded.</span>")
+			return
+		var/obj/item/weapon/disk/design_disk/D = W
+		if(D.blueprint)
+			to_chat(user, "<span class='warning'>That design disk is not empty.</span>")
+			return
+		user.drop_item()
+		D.forceMove(src)
+		loaded_disk = D
+		visible_message("\The [user] inserts \a [D] into \the [src].")
 		return
 	return ..()
 

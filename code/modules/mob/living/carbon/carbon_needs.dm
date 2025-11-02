@@ -88,19 +88,11 @@
 		if(old_happiness > happiness)
 			to_chat(src, "<span class='warning'>My mood gets worse.</span>")
 			// Spawn a thought concept when mood worsens, with a short cooldown to avoid spam
-			if(world.time - last_concept_spawn > 300)
-				var/turf/T = get_turf(src)
-				if(T)
-					var/has_concept = FALSE
-					for(var/obj/concept/C in T)
-						has_concept = TRUE
-						break
-					if(!has_concept)
-						new /obj/concept/grief(T)
-					last_concept_spawn = world.time
+			spawn_concept_kind("grief")
 		else
 			to_chat(src, "<span class='info'>My mood gets better.</span>")
 			// Positive mood improvement spawns a fulfillment concept (separate cooldown)
+			spawn_concept_kind("fulfillment")
 			if(world.time - last_positive_concept_spawn > 300)
 				var/turf/T2 = get_turf(src)
 				if(T2)
@@ -174,6 +166,29 @@
 		spawn(the_event.timeout)
 			clear_event(category)
 
+	// New: spawn a concept immediately when a negative moodlet is applied, even if the icon didn't change
+	if(the_event && isnum(the_event.happiness) && the_event.happiness < 0)
+		spawn_concept_kind("grief")
+
+/mob/living/carbon/proc/spawn_concept_kind(var/kind)
+	// Helper to spawn a concept on the mob's turf with cooldowns and anti-stacking
+	var/turf/T = get_turf(src)
+	if(!T)
+		return
+	if(kind == "grief")
+		if(world.time - last_concept_spawn <= 300)
+			return
+		for(var/obj/concept/C in T)
+			return // already a concept here, avoid stacking
+		new /obj/concept/grief(T)
+		last_concept_spawn = world.time
+	else if(kind == "fulfillment")
+		if(world.time - last_positive_concept_spawn <= 300)
+			return
+		for(var/obj/concept/C2 in T)
+			return
+		new /obj/concept/fullfillment(T)
+		last_positive_concept_spawn = world.time
 /mob/living/carbon/proc/clear_event(category)
 	var/datum/happiness_event/event = events[category]
 	if(!event)

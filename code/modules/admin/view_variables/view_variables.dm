@@ -21,19 +21,47 @@
 			sprite = icon(A.icon, A.icon_state)
 			usr << browse_rsc(sprite, "view_vars_sprite.png")
 
-	send_rsc(usr,'code/js/view_variables.js', "view_variables.js")
+	// Inline the view variables JS to avoid external resource lookup issues
 
 	var/html = {"
 		<html>
 		<head>
-			<script src='view_variables.js'></script>
+			<script>
+			function updateSearch() {
+				var filter_text = document.getElementById('filter');
+				if (!filter_text) return;
+				var filter = (filter_text.value || "").toLowerCase();
+				var vars_ol = document.getElementById('vars');
+				if (!vars_ol) return;
+				var lis = vars_ol.children;
+				for (var i = 0; i < lis.length; i++) {
+					var li = lis.item(i);
+					var text = (li.textContent || li.innerText || "").toLowerCase();
+					li.style.display = (filter === "" || text.indexOf(filter) !== -1) ? "" : "none";
+				}
+			}
+			function selectTextField() {
+				var filter_text = document.getElementById('filter');
+				if (!filter_text) return;
+				filter_text.focus();
+				filter_text.select();
+			}
+			function loadPage(list) {
+				if (!list || !list.options || list.selectedIndex < 0) return;
+				var opt = list.options.item(list.selectedIndex);
+				var url = opt && opt.value;
+				if (!url) return;
+				window.location.href = url;
+				list.selectedIndex = 0;
+			}
+			</script>
 			<title>[D] (\ref[D] - [D.type])</title>
 			<style>
 				body { font-family: Verdana, sans-serif; font-size: 9pt; }
 				.value { font-family: "Courier New", monospace; font-size: 8pt; }
 			</style>
 		</head>
-		<body onload='selectTextField(); updateSearch()'; onkeyup='updateSearch()'>
+		<body onload='selectTextField(); updateSearch()' onkeyup='updateSearch()'>
 			<div align='center'>
 				<table width='100%'><tr>
 					<td width='50%'>
@@ -52,9 +80,8 @@
 							<form>
 								<select name='file'
 								        size='1'
-								        onchange='loadPage(this.form.elements\[0\])'
-								        target='_parent._top'
-								        onmouseclick='this.focus()'
+								        onchange='loadPage(this)'
+								        onclick='this.focus()'
 								        style='background-color:#ffffff'>
 									<option>Select option</option>
 									<option />
@@ -85,6 +112,8 @@
 					       id='filter'
 					       name='filter_text'
 					       value=''
+					       onkeyup='updateSearch()'
+					       oninput='updateSearch()'
 					       style='width:100%;' />
 				</td>
 			</tr></table>
