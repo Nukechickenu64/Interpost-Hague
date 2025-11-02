@@ -82,7 +82,8 @@
 	name = "phoron beaker"
 	desc = "A beaker filled with highly concentrated phoron fuel."
 
-obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
+
+/obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
 	reagents = new()
 	reagents.add_reagent(/datum/reagent/toxin/phoron, 500)
 
@@ -174,7 +175,9 @@ obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
 /mob/living/carbon/human/equip_to_slot(obj/item/W, slot, redraw_mob)
 
 /mob/living/carbon/human/proc/phantomize_blue()
+	// Toggle phantom state on the target human
 	if(isblue)
+		// Return to normal
 		isblue = FALSE
 		density = 1
 		alpha = 255
@@ -183,36 +186,39 @@ obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
 		see_invisible = 0
 		sight = SEE_TURFS|SEE_SELF|SEE_BLACKNESS
 		simulated = TRUE
-	isblue = TRUE
-	density = 0
-	alpha = 127
-	plane = OBSERVER_PLANE
-	invisibility = INVISIBILITY_OBSERVER
-	see_invisible = SEE_INVISIBLE_OBSERVER
-	sight = SEE_TURFS|SEE_SELF|SEE_BLACKNESS
-	simulated = FALSE
+	else
+		// Enter phantom state
+		isblue = TRUE
+		density = 0
+		alpha = 127
+		plane = OBSERVER_PLANE
+		invisibility = INVISIBILITY_OBSERVER
+		see_invisible = SEE_INVISIBLE_OBSERVER
+		sight = SEE_TURFS|SEE_SELF|SEE_BLACKNESS
+		simulated = FALSE
 
 /obj/machinery/bluegate/Destroy()
 	if(occupant)
 		go_out()
 	. = ..()
 
-	/obj/concept
+/obj/concept
 		name = "thought wave"
 		desc = "A wave of pure thought energy."
+		invisibility = INVISIBILITY_OBSERVER
 
-	/obj/concept/grief
+/obj/concept/grief
 		name = "Grief"
 		desc = "A wave of pure thought energy filled with sorrow and despair."
 
-	/obj/concept/fullfillment
-		name = "Fulfillment"
-		desc = "A wave of pure thought energy filled with joy and satisfaction."
+/obj/concept/fullfillment
+	name = "Fulfillment"
+	desc = "A wave of pure thought energy filled with joy and satisfaction."
 
 
-	/obj/item/weapon/bluescanner
-		name = "bluespace scanner"
-		desc = "A handheld device used to detect and store bluespace anomaly data within a disk. powered by bluespace itself, handy."
+/obj/item/weapon/bluescanner
+	name = "bluespace scanner"
+	desc = "A handheld device used to detect and store bluespace anomaly data within a disk. powered by bluespace itself, handy."
 
 /obj/machinery/phaser
 	name = "Bluespace phaser"
@@ -227,15 +233,257 @@ obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
 	idle_power_usage = 15
 	active_power_usage = 1000
 
+// Machine that turns completed research papers into random research data disks
+/obj/machinery/research_processor
+	name = "Ideation Condenser"
+	desc = "Condenses formalized concepts into useful research data disks. Feed it completed research papers."
+	icon = 'icons/obj/modular_console.dmi'
+	icon_state = "cs_db"
+	density = 1
+	anchored = 1
+	clicksound = 'sound/machines/buttonbeep.ogg'
+	clickvol = 30
+	idle_power_usage = 10
+	active_power_usage = 250
+
+	var/obj/item/weapon/paper/research/loaded_paper = null
+
+/obj/machinery/research_processor/update_icon()
+	return
+
+/obj/machinery/research_processor/attack_hand(mob/user)
+	if(stat & (NOPOWER|BROKEN))
+		return
+	var/list/lines = list()
+	lines += "<span class='graytext'>Ideation Condenser</span>"
+	lines += "<hr>"
+	if(loaded_paper)
+		lines += "<span class='notice'>Loaded: [loaded_paper.name] ([loaded_paper.progress]% complete)</span>"
+		lines += "<span class='feedback'><a href='?src=\ref[src];action=process'>PROCESS PAPER</a></span>"
+		lines += "<span class='feedback'><a href='?src=\ref[src];action=eject'>EJECT PAPER</a></span>"
+	else
+		lines += "<span class='info'>Insert a completed research paper.</span>"
+	to_chat(user, "\n<div class='firstdivmood'><div class='moodbox'>[jointext(lines, "<br>")]</div></div>")
+
+/obj/machinery/research_processor/Topic(href, href_list, hsrc)
+	if(get_dist(src, usr) > 1)
+		return
+	switch(href_list["action"])
+		if("eject")
+			if(loaded_paper)
+				loaded_paper.dropInto(loc)
+				loaded_paper = null
+				visible_message("\The [src] clunks and spits out the paper.")
+		if("process")
+			if(!loaded_paper)
+				to_chat(usr, "<span class='warning'>No paper loaded.</span>")
+				return TOPIC_REFRESH
+			if(loaded_paper.progress < 100)
+				to_chat(usr, "<span class='warning'>The research paper is incomplete.</span>")
+				return TOPIC_REFRESH
+			// Consume power and produce a weighted random disk based on concept kind
+			use_power_oneoff(active_power_usage)
+			var/kind = (loaded_paper.concept_kind || "")
+			var/tech_bias = 50
+			if(kind == "grief")
+				tech_bias = 70
+			else if(kind == "fulfillment")
+				tech_bias = 30
+
+			if(prob(tech_bias))
+				var/obj/item/weapon/disk/tech_disk/D1 = new(loc)
+				D1.stored = new (pick_weighted_tech(kind))()
+				visible_message("\The [src] condenses the ideas into a fabricator data disk.")
+			else
+				var/obj/item/weapon/disk/design_disk/D2 = new(loc)
+				D2.blueprint = new (pick_weighted_design(kind))()
+				visible_message("\The [src] condenses the ideas into a component design disk.")
+			qdel(loaded_paper)
+			loaded_paper = null
+	return TOPIC_REFRESH
+
+/obj/machinery/research_processor/attackby(obj/item/W, mob/user)
+	if(istype(W, /obj/item/weapon/paper/research))
+		if(loaded_paper)
+			to_chat(user, "<span class='warning'>There is already a paper loaded.</span>")
+			return
+		var/obj/item/weapon/paper/research/R = W
+		user.drop_item()
+		R.forceMove(src)
+		loaded_paper = R
+		visible_message("\The [user] feeds \a [R] into \the [src].")
+		return
+	return ..()
+
+// Weighted pick helpers
+/obj/machinery/research_processor/proc/weighted_pick(var/list/L)
+	// L is a list keyed by type with numeric weights
+	var/total = 0
+	for(var/K in L)
+		total += max(1, L[K])
+	if(total <= 0)
+		return null
+	var/r = rand(1, total)
+	var/acc = 0
+	for(var/K in L)
+		acc += max(1, L[K])
+		if(r <= acc)
+			return K
+	return null
+
+/obj/machinery/research_processor/proc/pick_weighted_tech(var/kind)
+	var/list/choices = list()
+	var/list/tech_types = typesof(/datum/tech) - /datum/tech
+	for(var/T in tech_types)
+		var/datum/tech/tmp = new T()
+		var/w = 1
+		if(kind == "grief")
+			if(tmp.id == TECH_ARCANE)
+				w = 5
+			else if(tmp.id == TECH_DATA)
+				w = 3
+			else if(tmp.id == TECH_MAGNET)
+				w = 2
+		else if(kind == "fulfillment")
+			if(tmp.id == TECH_DATA)
+				w = 5
+			else if(tmp.id == TECH_MAGNET)
+				w = 3
+			else if(tmp.id == TECH_ARCANE)
+				w = 1
+		qdel(tmp)
+		choices[T] = w
+	var/choice = weighted_pick(choices)
+	if(!choice)
+		return pick(tech_types)
+	return choice
+
+/obj/machinery/research_processor/proc/pick_weighted_design(var/kind)
+	var/list/design_types = typesof(/datum/design) - /datum/design
+	var/list/choices = list()
+	for(var/Dt in design_types)
+		var/w = 1
+		if(kind == "fulfillment")
+			if(ispath(Dt, /datum/design/item/medical))
+				w = 5
+			else if(ispath(Dt, /datum/design/item/hud))
+				w = 3
+			else if(ispath(Dt, /datum/design/item/optical))
+				w = 3
+		else if(kind == "grief")
+			if(ispath(Dt, /datum/design/item/mining))
+				w = 3
+			else if(ispath(Dt, /datum/design/item/mecha/weapon))
+				w = 3
+			else if(ispath(Dt, /datum/design/item/robot_upgrade))
+				w = 2
+		choices[Dt] = w
+	var/choice = weighted_pick(choices)
+	if(!choice)
+		return pick(design_types)
+	return choice
+
 
 /obj/machinery/phaser/attackby(obj/item/O, mob/user)
+	// Toggle an item's visibility between normal and observer-only (ghost) for phantom users
+	if(!istype(O, /obj/item))
+		return ..()
+
 	if(O.invisibility == INVISIBILITY_OBSERVER)
+		// Make visible to everyone
 		use_power_oneoff(active_power_usage)
 		O.invisibility = 0
-		visible_message("\the [O] Reappears into ordinary existance!")
-		user.drop_item(O)
+		visible_message("\the [O] reappears into ordinary existence!")
+		if(istype(user))
+			user.drop_item()
 	else
-		O.invisibility == INVISIBILITY_OBSERVER
-		visible_message("\the [O] Disappears")
+		// Make visible only to observers/phantoms
 		use_power_oneoff(active_power_usage)
-		user.drop_item(O)
+		O.invisibility = INVISIBILITY_OBSERVER
+		visible_message("\the [O] fades out of phase with reality.")
+		if(istype(user))
+			user.drop_item()
+
+// Research paper produced from concepts
+/obj/item/weapon/paper/research
+	var/progress = 0           // 0..100 percent
+	var/concept_name = ""
+	var/concept_kind = ""      // "grief" or "fulfillment" (from the concept type)
+
+/obj/item/weapon/paper/research/examine(mob/user)
+	. = ..()
+	to_chat(user, "<span class='notice'>Research progress: [progress]%</span>")
+
+// Using paper+pen on concepts to extract research
+/obj/concept
+	// How much insight remains in this concept before it dissipates
+	var/remaining_insight = 100
+
+/obj/concept/proc/has_pen_and_paper(mob/user)
+	if(!user)
+		return FALSE
+	var/obj/item/weapon/pen/pen_in_hands = null
+	var/obj/item/weapon/paper/paper_in_hands = null
+	if(istype(user.get_active_hand(), /obj/item/weapon/pen))
+		pen_in_hands = user.get_active_hand()
+	if(istype(user.get_inactive_hand(), /obj/item/weapon/pen))
+		pen_in_hands = user.get_inactive_hand()
+	if(istype(user.get_active_hand(), /obj/item/weapon/paper))
+		paper_in_hands = user.get_active_hand()
+	if(!paper_in_hands && istype(user.get_inactive_hand(), /obj/item/weapon/paper))
+		paper_in_hands = user.get_inactive_hand()
+	return (pen_in_hands && paper_in_hands)
+
+/obj/concept/proc/get_paper(mob/user)
+	var/obj/item/weapon/paper/P = null
+	if(istype(user.get_active_hand(), /obj/item/weapon/paper))
+		P = user.get_active_hand()
+	else if(istype(user.get_inactive_hand(), /obj/item/weapon/paper))
+		P = user.get_inactive_hand()
+	return P
+
+/obj/concept/proc/extract_step(mob/user)
+	var/obj/item/weapon/paper/P = get_paper(user)
+	if(!P)
+		return FALSE
+	var/obj/item/weapon/paper/research/R
+	if(istype(P, /obj/item/weapon/paper/research))
+		R = P
+	else
+		// Convert plain paper into a research paper tied to this concept
+		var/loc_old = P.loc
+		qdel(P)
+		R = new /obj/item/weapon/paper/research(loc_old)
+		R.name = "research paper: [src.name]"
+		R.concept_name = src.name
+		if(istype(src, /obj/concept/grief))
+			R.concept_kind = "grief"
+		else
+			R.concept_kind = "fulfillment"
+		if(ismob(loc_old))
+			var/mob/M = loc_old
+			// Put into the same hand if possible
+			if(!M.put_in_active_hand(R))
+				M.put_in_inactive_hand(R)
+
+	// Balanced: smaller per-step progress to require more interactions
+	var/prog_gain = rand(12, 20)
+	prog_gain = min(prog_gain, remaining_insight)
+	R.progress = clamp(R.progress + prog_gain, 0, 100)
+	remaining_insight = max(remaining_insight - prog_gain, 0)
+	to_chat(user, "<span class='notice'>You jot down insight from the [src.name] ([prog_gain]% gained, [R.progress]% total).</span>")
+
+	if(R.progress >= 100 || remaining_insight <= 0)
+		visible_message("\The [src] collapses into stray thought motes.")
+		qdel(src)
+	return TRUE
+
+/obj/concept/attackby(obj/item/W, mob/user)
+	if(!Adjacent(user))
+		return ..()
+	if(!has_pen_and_paper(user))
+		to_chat(user, "<span class='warning'>You need both a pen and paper to formalize this concept.</span>")
+		return
+	// Using either item on the concept performs an extraction step
+	extract_step(user)
+	return

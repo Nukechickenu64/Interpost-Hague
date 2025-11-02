@@ -32,6 +32,11 @@
 	msg += "</div></div>"
 	to_chat(src, msg)
 
+// Cooldown for spawning "concept" objects when mood worsens
+/mob/living/carbon
+	var/last_concept_spawn = 0
+	var/last_positive_concept_spawn = 0
+
 /mob/living/carbon/proc/update_happiness()
 	var/old_happiness = happiness
 	var/old_icon = null
@@ -82,8 +87,30 @@
 	if(old_icon && old_icon != happiness_icon.icon_state)
 		if(old_happiness > happiness)
 			to_chat(src, "<span class='warning'>My mood gets worse.</span>")
+			// Spawn a thought concept when mood worsens, with a short cooldown to avoid spam
+			if(world.time - last_concept_spawn > 300)
+				var/turf/T = get_turf(src)
+				if(T)
+					var/has_concept = FALSE
+					for(var/obj/concept/C in T)
+						has_concept = TRUE
+						break
+					if(!has_concept)
+						new /obj/concept/grief(T)
+					last_concept_spawn = world.time
 		else
 			to_chat(src, "<span class='info'>My mood gets better.</span>")
+			// Positive mood improvement spawns a fulfillment concept (separate cooldown)
+			if(world.time - last_positive_concept_spawn > 300)
+				var/turf/T2 = get_turf(src)
+				if(T2)
+					var/has_concept2 = FALSE
+					for(var/obj/concept/C2 in T2)
+						has_concept2 = TRUE
+						break
+					if(!has_concept2)
+						new /obj/concept/fullfillment(T2)
+					last_positive_concept_spawn = world.time
 
 /mob/proc/flash_sadness()
 	if(prob(2))
