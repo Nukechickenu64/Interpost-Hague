@@ -168,27 +168,27 @@
 	warmup_time = 10
 	shuttle_area = /area/shuttle/mining/station
 	dock_target = "mining_shuttle"
-	current_location = "nav_mining_start"
+	current_location = "mining_start"
 	landmark_transition = "mining_transition"
 	destination_tags = list(
-		"nav_mining_start",
-		"nav_mining_space"
+		"mining_start",
+		"mining_space"
 		)
 
 /datum/shuttle/autodock/multi/mining/build_destinations_cache()
 	last_cache_rebuild_time = world.time
 	destinations_cache.Cut()
 	switch(current_location.landmark_tag)
-		if("nav_mining_space")
+		if("mining_space")
 			for(var/destination in SSshuttle.registered_shuttle_landmarks)
 				var/static/regex/token_finder = regex("^nav_mining_")
-				var/destinmark = SSshuttle.get_landmark(destination)
+				var/destinmark = SSshuttle.get_landmark(destination).name
 				if(token_finder.Find(destination) != 0)
 					destinations_cache["[destinmark]"] = destinmark
 			if(!destinations_cache["Station"])
-				destinations_cache["Station"] = SSshuttle.get_landmark("nav_mining_start")
+				destinations_cache["Station"] = SSshuttle.get_landmark("mining_start")
 		else
-			destinations_cache["Space"] = SSshuttle.get_landmark("nav_mining_space")
+			destinations_cache["Space"] = SSshuttle.get_landmark("mining_space")
 
 /datum/shuttle/autodock/multi/mining/get_destinations()
 	build_destinations_cache()

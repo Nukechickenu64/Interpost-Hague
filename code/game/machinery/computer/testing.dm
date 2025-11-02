@@ -60,8 +60,34 @@
 				announcment_cooldown = 1
 			spawn(600)//One minute cooldown
 				announcment_cooldown = 0
+		if("scan_for_beacons")
+			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>The computer beeps at you insistently, refusing to respond to your input. It seems you lack the necessary access rights.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
+			var/list/all = get_distress_beacons()
+			// Compute minutes since world boot (fallback if a dedicated round_start_time isn't tracked)
+			var/minutes = round(max(0, world.time / 600))
+			var/list/available = list()
+			for(var/datum/distress_beacon/B in all)
+				if(B.can_spawn(minutes))
+					available[B.name] = B
+			if(!available.len)
+				to_chat(usr, "<span class='notice'>No distress beacons detected at this time.</span>")
+				return
+			var/choice = input(usr, "Detected distress beacons (round [minutes] min):", "Beacon Scan") as null|anything in available
+			if(!choice || get_dist(src, usr) > 1)
+				return
+			var/datum/distress_beacon/sel = available[choice]
+			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1)
+			var/turf/center = sel.generate()
+			if(center)
+				to_chat(usr, "<span class='notice'>Distress coordinates triangulated: ([center.x], [center.y], [center.z]).</span>")
+			else
+				to_chat(usr, "<span class='warning'>Unable to resolve a safe insertion site. Try again later.</span>")
 
-/obj/machinery/computer/brige/attack_hand(mob/living/carbon/human/user)
+
+/obj/machinery/computer/bridge/attack_hand(mob/living/carbon/human/user)
 	..()
 	if(stat & (BROKEN|NOPOWER))
 		return
@@ -69,4 +95,4 @@
 		to_chat(user, "<span class='warning'>The computer beeps at you insistently, refusing to respond to your input. It seems you lack the necessary access rights.</span>")
 		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 		return
-	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The computer's nearly burned out screen shows you the following commands:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT LATEST COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>SEND AN ANNOUNCEMENT</a></span></div></div>")
+	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The computer's nearly burned out screen shows you the following commands:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT LATEST COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>SEND AN ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>SCAN FOR BEACONS</a></span></div></div>")

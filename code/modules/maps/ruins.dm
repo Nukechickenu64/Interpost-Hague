@@ -87,3 +87,229 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 			T.turf_flags |= TURF_FLAG_NORUINS
 
 	return TRUE
+
+// ===== Global helpers to generate ruins on arbitrary turf lists =====
+
+/proc/safe_mineral_turf_path()
+	var/path = text2path("/turf/simulated/mineral")
+	if(path)
+		return path
+	return /turf/simulated/wall/sandstone
+
+/proc/ruins_fade(var/t)
+	return t*t*t*(t*(t*6 - 15) + 10)
+
+/proc/ruins_lerp(var/a, var/b, var/t)
+	return a + (b - a) * t
+
+/proc/ruins_hash2(var/x, var/y, var/seed)
+	var/i = x * 374761393
+	i = (i ^ (y * 668265263))
+	i = (i ^ (seed * 1274126177))
+	i = (i * 1597334677)
+	if(i < 0) i = -i
+	return i
+
+/proc/ruins_grad2(var/h)
+	switch(h & 7)
+		if(0) return list( 1, 0)
+		if(1) return list(-1, 0)
+		if(2) return list( 0, 1)
+		if(3) return list( 0,-1)
+		if(4) return list( 1, 1)
+		if(5) return list(-1, 1)
+		if(6) return list( 1,-1)
+		else return list(-1,-1)
+
+/proc/ruins_dot2(var/list/g, var/x, var/y)
+	return g[1]*x + g[2]*y
+
+/proc/ruins_perlin2d_raw(var/seed, var/freq, var/x, var/y)
+	var/X = x * freq
+	var/Y = y * freq
+	var/x0 = floor(X)
+	var/y0 = floor(Y)
+	var/x1 = x0 + 1
+	var/y1 = y0 + 1
+	var/xf = X - x0
+	var/yf = Y - y0
+	var/list/g00 = ruins_grad2(ruins_hash2(x0, y0, seed))
+	var/list/g10 = ruins_grad2(ruins_hash2(x1, y0, seed))
+	var/list/g01 = ruins_grad2(ruins_hash2(x0, y1, seed))
+	var/list/g11 = ruins_grad2(ruins_hash2(x1, y1, seed))
+	var/n00 = ruins_dot2(g00, xf    , yf    )
+	var/n10 = ruins_dot2(g10, xf-1  , yf    )
+	var/n01 = ruins_dot2(g01, xf    , yf-1  )
+	var/n11 = ruins_dot2(g11, xf-1  , yf-1  )
+	var/u = ruins_fade(xf)
+	var/v = ruins_fade(yf)
+	var/xLerp1 = ruins_lerp(n00, n10, u)
+	var/xLerp2 = ruins_lerp(n01, n11, u)
+	var/nxy = ruins_lerp(xLerp1, xLerp2, v)
+	return (nxy + 1) / 2
+
+/proc/ruins_perlin2d(var/seed, var/base_freq, var/octaves, var/persistence, var/lacunarity, var/x, var/y)
+	var/amp = 1.0
+	var/freq = base_freq
+	var/sum = 0.0
+	var/max_sum = 0.0
+	for(var/i = 1, i <= octaves, i++)
+		sum += ruins_perlin2d_raw(seed, freq, x, y) * amp
+		max_sum += amp
+		amp *= persistence
+		freq *= lacunarity
+	return sum / (max_sum ? max_sum : 1)
+
+/proc/generate_ruins_on_turfs(var/list/turfs, var/list/config = null, var/list/template_types = null)
+	if(!turfs || !turfs.len)
+		return null
+	// Defaults
+	var/perlin_freq = 0.10
+	var/perlin_octaves = 3
+	var/perlin_persistence = 0.5
+	var/perlin_lacunarity = 2.0
+	var/mineral_threshold = 0.62
+	if(config)
+		if(!isnull(config["perlin_freq"])) perlin_freq = config["perlin_freq"]
+		if(!isnull(config["perlin_octaves"])) perlin_octaves = config["perlin_octaves"]
+		if(!isnull(config["perlin_persistence"])) perlin_persistence = config["perlin_persistence"]
+		if(!isnull(config["perlin_lacunarity"])) perlin_lacunarity = config["perlin_lacunarity"]
+		if(!isnull(config["mineral_threshold"])) mineral_threshold = config["mineral_threshold"]
+
+	// Bounds
+	var/minx =  1<<30
+	var/miny =  1<<30
+	var/maxx = -1
+	var/maxy = -1
+	for(var/turf/T in turfs)
+		if(T.x < minx) minx = T.x
+		if(T.y < miny) miny = T.y
+		if(T.x > maxx) maxx = T.x
+		if(T.y > maxy) maxy = T.y
+	var/width = max(1, maxx - minx)
+	var/height = max(1, maxy - miny)
+	var/seed = rand(1, 1<<30)
+	var/mineral_type = safe_mineral_turf_path()
+
+	for(var/turf/T in turfs)
+		var/nx = (T.x - minx) / width
+		var/ny = (T.y - miny) / height
+		var/noise = ruins_perlin2d(seed, perlin_freq, perlin_octaves, perlin_persistence, perlin_lacunarity, nx * 100, ny * 100)
+		if(noise >= mineral_threshold)
+			if(istype(T, /turf/space) || istype(T, /turf/simulated/floor) || istype(T, /turf/unsimulated))
+				new mineral_type(T)
+
+	// Place a ruin template centered on a random candidate turf
+	var/list/templates = template_types && template_types.len ? template_types : (typesof(/datum/map_template/ruin/space) - /datum/map_template/ruin/space)
+	if(!templates || !templates.len)
+		return pick(turfs)
+	var/path_choice = pick(templates)
+	var/datum/map_template/ruin/space/ruin = new path_choice
+	var/turf/center = pick(turfs)
+	ruin.load(center, centered = TRUE)
+	return center
+
+/proc/find_space_region(var/w = 48, var/h = 48, var/list/z_levels = null, var/tries = 100)
+	var/list/candidate_z = list()
+	if(z_levels && z_levels.len)
+		candidate_z = z_levels.Copy()
+	else
+		if(GLOB.using_map && GLOB.using_map.map_levels && GLOB.using_map.map_levels.len)
+			for(var/z in GLOB.using_map.map_levels)
+				candidate_z += z
+		else
+			for(var/z = 1, z <= world.maxz, z++) candidate_z += z
+
+	while(tries-- > 0)
+		var/z = pick(candidate_z)
+		var/x1 = rand(2, max(2, world.maxx - w))
+		var/y1 = rand(2, max(2, world.maxy - h))
+		var/list/region = list()
+		var/ok = TRUE
+		for(var/x = x1, x < x1 + w, x++)
+			for(var/y = y1, y < y1 + h, y++)
+				var/turf/T = locate(x,y,z)
+				if(!T || !(istype(T, /turf/space)))
+					ok = FALSE; break
+				if(T.turf_flags & TURF_FLAG_NORUINS)
+					ok = FALSE; break
+				region += T
+			if(!ok) break
+		if(ok && region.len)
+			return region
+	return null
+
+// ===== Distress beacon datums and registry =====
+
+/datum/distress_beacon
+	var/name = "Unknown Beacon"
+	var/min_minutes = 0
+	var/max_minutes = -1
+	var/size_w = 48
+	var/size_h = 48
+	var/list/template_types = null
+	var/perlin_freq = null
+	var/perlin_octaves = null
+	var/perlin_persistence = null
+	var/perlin_lacunarity = null
+	var/mineral_threshold = null
+
+	proc/can_spawn(var/mins)
+		if(mins < min_minutes) return FALSE
+		if(max_minutes >= 0 && mins > max_minutes) return FALSE
+		return TRUE
+
+	proc/generate()
+		var/list/turfs = find_space_region(size_w, size_h)
+		if(!turfs) return null
+		var/list/config = list(
+			"perlin_freq" = isnull(perlin_freq) ? 0.10 : perlin_freq,
+			"perlin_octaves" = isnull(perlin_octaves) ? 3 : perlin_octaves,
+			"perlin_persistence" = isnull(perlin_persistence) ? 0.5 : perlin_persistence,
+			"perlin_lacunarity" = isnull(perlin_lacunarity) ? 2.0 : perlin_lacunarity,
+			"mineral_threshold" = isnull(mineral_threshold) ? 0.62 : mineral_threshold
+		)
+		var/turf/center = generate_ruins_on_turfs(turfs, config, template_types)
+		if(!center)
+			return null
+
+		// Drop a landing landmark that the Mining shuttle can use, and clear a safe area around it
+		var/obj/effect/shuttle_landmark/automatic/clearing/LZ = new(center)
+		if(LZ)
+			LZ.landmark_tag = "nav_mining_sos"
+			LZ.shuttle_restricted = "Mining"
+			LZ.SetName("Distress LZ ([center.x],[center.y])")
+			// Best-effort: if the Mining shuttle is a ferry, point its offsite waypoint to this new LZ
+			var/datum/shuttle/autodock/S = null
+			if(SSshuttle && SSshuttle.shuttles)
+				S = SSshuttle.shuttles["Mining"]
+			if(istype(S, /datum/shuttle/autodock/ferry))
+				var/datum/shuttle/autodock/ferry/F = S
+				F.waypoint_offsite = LZ
+				// If it's currently at station, update its next_location so UI can launch immediately
+				if(F.get_location_waypoint() == F.waypoint_station)
+					F.next_location = F.get_location_waypoint(1)
+
+		return center
+
+/datum/distress_beacon/derelict
+	name = "Derelict Signal"
+	min_minutes = 5
+	size_w = 64
+	size_h = 64
+	mineral_threshold = 0.58
+
+/datum/distress_beacon/mining_outpost
+	name = "Mining Outpost SOS"
+	min_minutes = 15
+	size_w = 64
+	size_h = 64
+	perlin_freq = 0.08
+	perlin_octaves = 4
+	perlin_persistence = 0.55
+	perlin_lacunarity = 2.2
+	mineral_threshold = 0.55
+
+// Registry of distress beacons available for scanning
+/proc/get_distress_beacons()
+	return list(new /datum/distress_beacon/derelict, new /datum/distress_beacon/mining_outpost)
