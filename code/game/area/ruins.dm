@@ -171,6 +171,13 @@
 	var/miny = b[2]
 	var/maxx = b[3]
 	var/maxy = b[4]
+	var/zlev = b[5]
+	// For the ruins z-level, expand generation to the full map bounds (fill entire 128x128)
+	if(zlev == 6)
+		minx = 1
+		miny = 1
+		maxx = world.maxx
+		maxy = world.maxy
 	if(maxx <= minx || maxy <= miny) return
 
 	var/width = max(1, maxx - minx)
@@ -205,16 +212,19 @@
 		warp_amp = ruins_profile.warp_amp
 		warp_freq = ruins_profile.warp_freq
 
-	// Precompute domain-warped noise for each turf
+	// Precompute domain-warped noise for each turf within the generation rectangle
 	var/list/noise_of = list() // turf -> noise
-	for(var/turf/T in src)
-		var/nx = (T.x - minx) / width
-		var/ny = (T.y - miny) / height
-		var/warp_x = (perlin2d((nx * perlin_scale) * warp_freq + 123.45, (ny * perlin_scale) * warp_freq + 67.89) - 0.5) * 2
-		var/warp_y = (perlin2d((nx * perlin_scale) * warp_freq + 98.76, (ny * perlin_scale) * warp_freq + 54.32) - 0.5) * 2
-		var/sx = (nx + warp_amp * warp_x) * perlin_scale
-		var/sy = (ny + warp_amp * warp_y) * perlin_scale
-		noise_of[T] = perlin2d(sx, sy)
+	for(var/yy = miny, yy <= maxy, yy++)
+		for(var/xx = minx, xx <= maxx, xx++)
+			var/turf/T = locate(xx, yy, zlev)
+			if(!T) continue
+			var/nx = (xx - minx) / width
+			var/ny = (yy - miny) / height
+			var/warp_x = (perlin2d((nx * perlin_scale) * warp_freq + 123.45, (ny * perlin_scale) * warp_freq + 67.89) - 0.5) * 2
+			var/warp_y = (perlin2d((nx * perlin_scale) * warp_freq + 98.76, (ny * perlin_scale) * warp_freq + 54.32) - 0.5) * 2
+			var/sx = (nx + warp_amp * warp_x) * perlin_scale
+			var/sy = (ny + warp_amp * warp_y) * perlin_scale
+			noise_of[T] = perlin2d(sx, sy)
 
 	// Pick clump centers by greedy selection of highest noise with minimum separation
 	var/target_clumps = rand(ruins_profile ? ruins_profile.clumps_min : 6, ruins_profile ? ruins_profile.clumps_max : 12)
@@ -224,20 +234,23 @@
 	while(centers.len < target_clumps)
 		var/turf/best = null
 		var/bestn = -1.0
-		for(var/turf/T in src)
-			var/n = noise_of[T]
-			if(n <= bestn)
-				continue
-			// Enforce separation from existing centers
-			var/ok = TRUE
-			for(var/turf/C in centers)
-				var/dx = T.x - C.x
-				var/dy = T.y - C.y
-				if(dx*dx + dy*dy < min_sep2)
-					ok = FALSE; break
-			if(!ok) continue
-			best = T
-			bestn = n
+		for(var/yy2 = miny, yy2 <= maxy, yy2++)
+			for(var/xx2 = minx, xx2 <= maxx, xx2++)
+				var/turf/T = locate(xx2, yy2, zlev)
+				if(!T) continue
+				var/n = noise_of[T]
+				if(n <= bestn)
+					continue
+				// Enforce separation from existing centers
+				var/ok = TRUE
+				for(var/turf/C in centers)
+					var/dx = T.x - C.x
+					var/dy = T.y - C.y
+					if(dx*dx + dy*dy < min_sep2)
+						ok = FALSE; break
+				if(!ok) continue
+				best = T
+				bestn = n
 		if(best)
 			centers += best
 		else
@@ -260,25 +273,28 @@
 		floor_r2[C] = r_floor * r_floor
 
 	// Apply classes: 2=mineral inside rock radius; 1=floor inside floor radius; else space
-	for(var/turf/T in src)
-		var/class = 0
-		for(var/turf/C in centers)
-			var/dx = T.x - C.x
-			var/dy = T.y - C.y
-			var/d2 = dx*dx + dy*dy
-			if(d2 <= rock_r2[C])
-				class = 2; break
-			else if(d2 <= floor_r2[C])
-				if(class < 1) class = 1
-		if(class == 2)
-			if(!istype(T, /turf/simulated/mineral) && can_replace_ruins_turf(T))
-				T.ChangeTurf(mineral_type)
-		else if(class == 1)
-			if(!istype(T, /turf/simulated/floor/asteroid) && can_replace_ruins_turf(T))
-				T.ChangeTurf(/turf/simulated/floor/asteroid)
-		else
+	for(var/yy3 = miny, yy3 <= maxy, yy3++)
+		for(var/xx3 = minx, xx3 <= maxx, xx3++)
+			var/turf/T = locate(xx3, yy3, zlev)
+			if(!T) continue
+			var/class = 0
+			for(var/turf/C in centers)
+				var/dx = T.x - C.x
+				var/dy = T.y - C.y
+				var/d2 = dx*dx + dy*dy
+				if(d2 <= rock_r2[C])
+					class = 2; break
+				else if(d2 <= floor_r2[C])
+					if(class < 1) class = 1
+			// Always clear background to space before applying features
 			if(!istype(T, /turf/space) && can_replace_ruins_turf(T))
 				T.ChangeTurf(/turf/space)
+			if(class == 2)
+				if(can_replace_ruins_turf(T))
+					T.ChangeTurf(mineral_type)
+			else if(class == 1)
+				if(can_replace_ruins_turf(T))
+					T.ChangeTurf(/turf/simulated/floor/asteroid)
 
 	// Restore legacy values so future calls that assume area vars aren't impacted
 	perlin_freq = old_perlin_freq
@@ -315,13 +331,17 @@
 			candidates += T
 	if(!candidates.len) return
 	var/turf/center = pick(candidates)
-	// Attempt to load centered; clear non-anchored movables within footprint first
+	// Attempt to load centered; clear the footprint to bare space first to avoid leftovers
 	var/list/affected = ruin.get_affected_turfs(center, 1)
 	if(affected && affected.len)
 		for(var/turf/T in affected)
+			// Remove loose movables
 			for(var/atom/movable/AM in T)
 				if(!AM.anchored)
 					qdel(AM)
+			// Reset ground to space prior to loading
+			if(!istype(T, /turf/space))
+				T.ChangeTurf(/turf/space)
 	ruin.load(center, centered = TRUE)
 	return
 

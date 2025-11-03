@@ -161,6 +161,10 @@
 	prefs.sanitize_preferences()
 	fit_viewport()
 
+	// Capture right-clicks in Click() instead of showing BYOND's default popup.
+	// Shift+Right can be repurposed for a custom context menu.
+	show_popup_menus = FALSE
+
 	set_chat_mode()
 /*
 	//WIDESCREEN STUFF

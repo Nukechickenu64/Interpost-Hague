@@ -45,6 +45,26 @@
 	next_click = world.time + 1
 
 	var/list/modifiers = params2list(params)
+	// If the context menu is open, close it on any map click (click-away behavior)
+	if(tilectx_open)
+		// Close and proceed with normal handling of this click
+		src << browse(null, "window=tilectx")
+		tilectx_open = FALSE
+	// Handle right-clicks first so we can customize RMB behavior
+	if(modifiers["right"]) {
+		if(modifiers["shift"]) {
+			// Shift+Right: open a tile context menu listing all atoms on the clicked turf.
+			var/turf/T = get_turf(A)
+			if(T && src)
+				src.open_tile_context_menu(T, A, params)
+			return 1
+		}
+		// Plain Right-Click -> call the new right-click interaction
+		if(A)
+			A.attack_hand_right(src)
+		return 1
+	}
+
 	if(modifiers["shift"] && modifiers["ctrl"])
 		CtrlShiftClickOn(A)
 		return 1

@@ -25,6 +25,12 @@
 /atom/proc/attack_hand(mob/user as mob)
 	return
 
+// Right-click primary interaction. Default behavior mirrors attack_hand; override on specific types as needed.
+/atom/proc/attack_hand_right(mob/user as mob)
+	if(!Adjacent(user))
+		return
+	return attack_hand(user)
+
 /mob/proc/attack_empty_hand(var/bp_hand)
 	return
 

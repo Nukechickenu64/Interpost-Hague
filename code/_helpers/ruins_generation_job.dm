@@ -34,6 +34,9 @@ var/datum/ruins_generation_job/ruins_gen_job
 		profile_type = profile_path
 	// Make sure the Mining shuttle has a Space waypoint on z=6
 	ensure_mining_space_landmark()
+	// Metrics and signal: announce job configured
+	metrics_inc("ruins.total", total)
+	signal_emit("ruins_generation:started", total)
 	active = TRUE
 	// Kick off background processing
 	spawn(1)
@@ -45,7 +48,7 @@ var/datum/ruins_generation_job/ruins_gen_job
 	if(SSshuttle && SSshuttle.get_landmark("nav_mining_space_ruins"))
 		return
 	var/turf/T = null
-	var/radius = 5 // 10x10 circle (diameter 10 => radius 5)
+	var/radius = 10 // 10x10 circle (diameter 10 => radius 5)
 
 	// First try to find an existing circle of space turfs with the required radius on z=6
 	for(var/yy = 1 + radius, yy <= world.maxy - radius, yy++)
@@ -96,10 +99,14 @@ var/datum/ruins_generation_job/ruins_gen_job
 				last_error = "[e] at area #[done+1]"
 				// continue despite error
 		done++
+		metrics_inc("ruins.done", 1)
+		signal_emit("ruins_generation:area_done", A)
 		// light throttle between areas
 		sleep(sleep_ticks)
 	active = FALSE
 	cancelled = FALSE
+	// Finalize
+	signal_emit("ruins_generation:complete", list(total = total, done = done, error = last_error))
 
 /datum/ruins_generation_job/proc/get_percent()
 	if(total <= 0)

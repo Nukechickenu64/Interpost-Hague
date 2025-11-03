@@ -944,6 +944,39 @@ About the new airlock wires panel:
 		..(user)
 	return
 
+/obj/machinery/door/airlock/attack_hand_right(mob/user as mob)
+	// Human-only RMB: toggle door bolts (lock/unlock) if their ID has access
+	if(!istype(user, /mob/living/carbon/human))
+		return ..() // fallback to default behavior if any
+
+	// Require the current active hand to be empty
+	var/mob/living/carbon/human/H = user
+	if(H && H.get_active_hand())
+		return ..() // fallback to default behavior if item in active hand
+	// Must be adjacent to the door
+	if(!Adjacent(user))
+		return 0
+
+	// Respect electrification like normal hand interaction
+	if(!issilicon(user))
+		if(src.isElectrified())
+			if(src.shock(user, 100))
+				return 1
+
+	// Check access using the user's ID card access list
+	var/list/user_access = user.GetAccess()
+	if(!check_access_list(user_access))
+		// Denied: play the standard deny chirp
+		if(open_failure_access_denied)
+			playsound(src, open_failure_access_denied, 50, 0)
+		return 0
+
+	// Toggle bolts; lock()/unlock() each validate power/wires and play sounds
+	if(locked)
+		return unlock()
+	else
+		return lock()
+
 /obj/machinery/door/airlock/CanUseTopic(var/mob/user)
 	if(operating < 0) //emagged
 		to_chat(user, "<span class='warning'>Unable to interface: Internal error.</span>")

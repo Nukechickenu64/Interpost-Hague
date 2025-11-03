@@ -1,3 +1,5 @@
+/mob/var/tilectx_open = FALSE
+
 /mob/Destroy()//This makes sure that mobs with clients/keys are not just deleted from the game.
 	STOP_PROCESSING(SSmobs, src)
 	GLOB.dead_mob_list_ -= src
@@ -47,6 +49,7 @@
 /mob/Initialize()
 	. = ..()
 	START_PROCESSING(SSmobs, src)
+	tilectx_open = FALSE
 
 /mob/proc/show_message(msg, type, alt, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
 	if(!client)	return
@@ -421,6 +424,20 @@
 		var/t1 = text("window=[href_list["mach_close"]]")
 		unset_machine()
 		src << browse(null, t1)
+		// Track tile context state
+		if(href_list["mach_close"] == "tilectx")
+			tilectx_open = FALSE
+
+	// Shift+Right-Click tile context menu selection
+	if(href_list["tilectx_select"])
+		var/atom/target = locate(href_list["tilectx_select"])
+		if(target)
+			// Dispatch the plain right-click action on the chosen target
+			target.attack_hand_right(src)
+		// Close the context window after selection
+		src << browse(null, "window=tilectx")
+		tilectx_open = FALSE
+		return
 
 	if(href_list["flavor_more"])
 		usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, cp1251_to_utf8(replacetext(flavor_text, "\n", "<BR>"))), text("window=[];size=500x200", name))

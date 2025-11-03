@@ -224,7 +224,7 @@
 
 // Intermediate free-fly waypoint to reach open space before discovering ruins
 /obj/effect/shuttle_landmark/mining/space
-	name = "Space"
+	name = "Space Ruins"
 	landmark_tag = "nav_mining_space_ruins"
 	// No docking controller: this is a free space location
 	base_turf = /turf/space
