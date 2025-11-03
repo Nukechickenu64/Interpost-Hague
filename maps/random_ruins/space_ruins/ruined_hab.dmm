@@ -1,0 +1,22 @@
+"a" = (/turf/space,/area/space)
+"u" = (/turf/simulated/floor/tiled/steel_ridged,/area/space)
+"w" = (/turf/simulated/wall,/area/space)
+"t" = (/obj/structure/table/standard,/turf/simulated/floor/tiled/steel_ridged,/area/space)
+"l" = (/obj/machinery/light/small,/turf/simulated/floor/tiled/steel_ridged,/area/space)
+"c" = (/obj/structure/closet/crate,/turf/simulated/floor/tiled/steel_ridged,/area/space)
+"r" = (/obj/random/maintenance,/turf/simulated/floor/tiled/steel_ridged,/area/space)
+
+(1,1,1) = {"
+ aaaaaaaaaaaaaa
+ aaaaawwwwaaaa
+ aaaawuuuuwaaa
+ aaawutcluwaaa
+ aaawulr.uw.aa
+ aaaawuuuuwaaa
+ aaaaawwwwaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+"}

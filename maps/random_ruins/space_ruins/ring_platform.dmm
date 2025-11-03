@@ -1,0 +1,20 @@
+"a" = (/turf/space,/area/space)
+"." = (/turf/simulated/floor/asteroid,/area/space)
+"m" = (/turf/simulated/mineral,/area/space)
+"l" = (/obj/machinery/light/small,/turf/simulated/floor/asteroid,/area/space)
+"r" = (/obj/random/junk,/turf/simulated/floor/asteroid,/area/space)
+
+(1,1,1) = {"
+ aaaaaaaaaaaaaaaa
+ aaaaaa....aaaaaa
+ aaaa..a.l..a..aa
+ aaa..a..mm..a.aa
+ aa..a..m..m..a.a
+ aa..a..mm..a.a.a
+ aa..a..r...a.a.a
+ aaa..a....a..aaa
+ aaaa..aaaa..aaaa
+ aaaaaa....aaaaaa
+ aaaaaaaaaaaaaaaa
+ aaaaaaaaaaaaaaaa
+"}

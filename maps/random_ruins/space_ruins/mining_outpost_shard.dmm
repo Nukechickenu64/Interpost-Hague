@@ -1,0 +1,24 @@
+"a" = (/turf/space,/area/space)
+"." = (/turf/simulated/floor/asteroid,/area/space)
+"w" = (/turf/simulated/wall,/area/space)
+"m" = (/turf/simulated/mineral,/area/space)
+"c" = (/obj/structure/closet/crate,/turf/simulated/floor/asteroid,/area/space)
+"t" = (/obj/structure/table/standard,/turf/simulated/floor/asteroid,/area/space)
+"l" = (/obj/machinery/light/small,/turf/simulated/floor/asteroid,/area/space)
+"o" = (/obj/structure/ore_box,/turf/simulated/floor/asteroid,/area/space)
+"r" = (/obj/random/maintenance,/turf/simulated/floor/asteroid,/area/space)
+
+(1,1,1) = {"
+ aaaaaaaaaaaaaaaa
+ aaaaaa....aaaaaa
+ aaaa..wwww..aaaa
+ aaa..w.l..w..aaa
+ aaa.w..cT..w.aaa
+ aaa.w.omr..w.aaa
+ aaa..w....w..aaa
+ aaaa..wwww..aaaa
+ aaaaaa....aaaaaa
+ aaaaaaaaaaaaaaaa
+ aaaaaaaaaaaaaaaa
+ aaaaaaaaaaaaaaaa
+"}

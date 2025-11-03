@@ -1,0 +1,21 @@
+"a" = (/turf/space,/area/space)
+"u" = (/turf/simulated/floor/tiled/techfloor/grid,/area/space)
+"w" = (/turf/simulated/wall,/area/space)
+"t" = (/obj/structure/table/standard,/turf/simulated/floor/tiled/techfloor/grid,/area/space)
+"l" = (/obj/machinery/light/small,/turf/simulated/floor/tiled/techfloor/grid,/area/space)
+"r" = (/obj/random/junk,/turf/simulated/floor/tiled/techfloor/grid,/area/space)
+
+(1,1,1) = {"
+ aaaaaaaaaaaaaa
+ aaaaawwwwaaaa
+ aaaawuluuwaaa
+ aaawut..uwaaa
+ aaawul..uwaaa
+ aaaawuuuuwaaa
+ aaaaawwwwaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+"}

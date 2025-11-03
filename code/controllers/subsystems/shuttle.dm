@@ -41,6 +41,12 @@ SUBSYSTEM_DEF(shuttle)
 		registered_shuttle_landmarks[shuttle_landmark_tag] = shuttle_landmark
 		last_landmark_registration_time = world.time
 
+		// Debug: trace mining-related landmark registrations to help diagnose destination discovery
+		if(copytext(shuttle_landmark_tag, 1, 12) == "nav_mining" || shuttle_landmark_tag == "nav_mining_space_ruins" || shuttle_landmark_tag == "mining_space")
+			var/turf/T = get_turf(shuttle_landmark)
+			if(config && config.log_debug)
+				log_debug("SSshuttle.register_landmark: tag=[shuttle_landmark_tag] name=[shuttle_landmark?.name] at=([T ? T.x : null],[T ? T.y : null],[T ? T.z : null]) type=[shuttle_landmark.type]")
+
 		var/obj/effect/overmap/O = landmarks_still_needed[shuttle_landmark_tag]
 		if(O) //These need to be added to sectors, which we handle.
 			try_add_landmark_tag(shuttle_landmark_tag, O)

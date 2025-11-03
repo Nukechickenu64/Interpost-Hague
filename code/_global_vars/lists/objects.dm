@@ -18,3 +18,4 @@ GLOBAL_DATUM_INIT(global_headset, /obj/item/device/radio/announcer/subspace, new
 var/host = null //only here until check @ code\modules\ghosttrap\trap.dm:112 is fixed
 GLOBAL_DATUM_INIT(sun, /datum/sun, new)
 GLOBAL_DATUM_INIT(universe, /datum/universal_state, new)
+// Ruins generation async job controller (singleton)

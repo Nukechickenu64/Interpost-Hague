@@ -1,0 +1,26 @@
+"a" = (/turf/space,/area/space)
+"p" = (/turf/simulated/wall,/area/space)
+"u" = (/turf/simulated/floor/tiled/bright,/area/space)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+aappppppppppppaaaaaa
+auuuuuuuuuuuupaaaaaa
+auuuuuuuuuuuupaaaaaa
+uuuuuuuuuuuuupaaaaaa
+aauuuuuuuuuuupaaaaaa
+aauuuuuuuuuuupaaaaaa
+aauuuuuuuuuuupaaaaaa
+aaauaauauuuuupaaaaaa
+aaaaaauaauuuupaaaaaa
+aaaaaaaaauuuupaaaaaa
+aaaaaaauuuuuupaaaaaa
+aaaaaaaaauuuupaaaaaa
+aaaaaaaaaauaapaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaa
+"}

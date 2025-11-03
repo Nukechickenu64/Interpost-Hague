@@ -98,6 +98,20 @@ GLOBAL_LIST_INIT(is_contact_but_not_space_or_shuttle_area, list(/proc/is_contact
 
 GLOBAL_LIST_INIT(is_player_but_not_space_or_shuttle_area, list(/proc/is_player_area, /proc/is_not_space_area, /proc/is_not_shuttle_area))
 
+// Ghost-teleportable areas include all non-space areas and, specially, space ruins.
+// Excludes shuttle areas to avoid accidental teleports onto moving vessels.
+/proc/is_ghost_teleportable_area(var/area/A)
+	// Allow anything that is NOT space, OR specifically allow space ruins
+	if(istype(A, /area/shuttle))
+		return FALSE
+	if(!istype(A, /area/space))
+		return TRUE
+	if(istype(A, /area/space/ruins))
+		return TRUE
+	return FALSE
+
+GLOBAL_LIST_INIT(is_ghost_teleportable_area, list(/proc/is_ghost_teleportable_area))
+
 
 /*
 	Misc Helpers

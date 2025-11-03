@@ -58,7 +58,19 @@ GLOBAL_LIST_EMPTY(banned_ruin_ids)
 				continue
 			log_world("Ruin \"[ruin.name]\" placed at ([T.x], [T.y], [T.z])")
 
+			// Apply Perlin-based terrain within the footprint prior to loading the ruin
+			var/list/affected = ruin.get_affected_turfs(T,1)
+			if(affected && affected.len)
+				apply_ruins_perlin_terrain(affected, null)
+
 			load_ruin(T, ruin)
+
+			// Drop a Mining-restricted landing zone so the mining shuttle can land at this ruin
+			var/obj/effect/shuttle_landmark/automatic/clearing/LZ = new(T)
+			if(LZ)
+				LZ.landmark_tag = "nav_mining_ruin_[T.x]_[T.y]_[T.z]"
+				LZ.shuttle_restricted = "Mining"
+				LZ.SetName("Ruin LZ ([T.x],[T.y])")
 			if(ruin.cost >= 0)
 				budget -= ruin.cost
 			if(!(ruin.template_flags & TEMPLATE_FLAG_ALLOW_DUPLICATES))
@@ -74,8 +86,13 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 		return FALSE
 	for(var/i in template.get_affected_turfs(central_turf, 1))
 		var/turf/T = i
+		// Clear hostile/simple mobs
 		for(var/mob/living/simple_animal/monster in T)
 			qdel(monster)
+		// Remove non-anchored movables to make room for template
+		for(var/atom/movable/AM in T)
+			if(!AM.anchored)
+				qdel(AM)
 	template.load(central_turf,centered = TRUE)
 	var/datum/map_template/ruin = template
 	if(istype(ruin))
@@ -91,10 +108,26 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 // ===== Global helpers to generate ruins on arbitrary turf lists =====
 
 /proc/safe_mineral_turf_path()
-	var/path = text2path("/turf/simulated/mineral")
+	// Prefer random/high_chance variants for proper visual rock walls, then base mineral
+	var/path
+	path = text2path("/turf/simulated/mineral/random/high_chance")
+	if(path)
+		return path
+	path = text2path("/turf/simulated/mineral/random")
+	if(path)
+		return path
+	path = text2path("/turf/simulated/mineral")
 	if(path)
 		return path
 	return /turf/simulated/wall/sandstone
+
+// Only replace safe, generator-owned terrain: space, asteroid floor, mineral, or unsimulated
+/proc/ruins_can_replace_turf(var/turf/T)
+	if(istype(T, /turf/space)) return TRUE
+	if(istype(T, /turf/simulated/floor/asteroid)) return TRUE
+	if(istype(T, /turf/simulated/mineral)) return TRUE
+	if(istype(T, /turf/unsimulated)) return TRUE
+	return FALSE
 
 /proc/ruins_fade(var/t)
 	return t*t*t*(t*(t*6 - 15) + 10)
@@ -169,12 +202,14 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 	var/perlin_persistence = 0.5
 	var/perlin_lacunarity = 2.0
 	var/mineral_threshold = 0.62
+	var/asteroid_threshold = 0.48
 	if(config)
 		if(!isnull(config["perlin_freq"])) perlin_freq = config["perlin_freq"]
 		if(!isnull(config["perlin_octaves"])) perlin_octaves = config["perlin_octaves"]
 		if(!isnull(config["perlin_persistence"])) perlin_persistence = config["perlin_persistence"]
 		if(!isnull(config["perlin_lacunarity"])) perlin_lacunarity = config["perlin_lacunarity"]
 		if(!isnull(config["mineral_threshold"])) mineral_threshold = config["mineral_threshold"]
+		if(!isnull(config["asteroid_threshold"])) asteroid_threshold = config["asteroid_threshold"]
 
 	// Bounds
 	var/minx =  1<<30
@@ -196,8 +231,17 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 		var/ny = (T.y - miny) / height
 		var/noise = ruins_perlin2d(seed, perlin_freq, perlin_octaves, perlin_persistence, perlin_lacunarity, nx * 100, ny * 100)
 		if(noise >= mineral_threshold)
-			if(istype(T, /turf/space) || istype(T, /turf/simulated/floor) || istype(T, /turf/unsimulated))
-				new mineral_type(T)
+			// High noise: spawn mineral rock walls
+			if(!istype(T, /turf/simulated/mineral) && ruins_can_replace_turf(T))
+				T.ChangeTurf(mineral_type)
+		else if(noise >= asteroid_threshold)
+			// Mid noise: ensure asteroid floor
+			if(!istype(T, /turf/simulated/floor/asteroid) && ruins_can_replace_turf(T))
+				T.ChangeTurf(/turf/simulated/floor/asteroid)
+		else
+			// Low noise: ensure space
+			if(!istype(T, /turf/space) && ruins_can_replace_turf(T))
+				T.ChangeTurf(/turf/space)
 
 	// Place a ruin template centered on a random candidate turf
 	var/list/templates = template_types && template_types.len ? template_types : (typesof(/datum/map_template/ruin/space) - /datum/map_template/ruin/space)
@@ -208,6 +252,52 @@ proc/load_ruin(turf/central_turf, datum/map_template/template)
 	var/turf/center = pick(turfs)
 	ruin.load(center, centered = TRUE)
 	return center
+
+// Apply Perlin-based terrain classification without loading any templates
+/proc/apply_ruins_perlin_terrain(var/list/turfs, var/list/config = null)
+	if(!turfs || !turfs.len)
+		return
+	var/perlin_freq = 0.10
+	var/perlin_octaves = 3
+	var/perlin_persistence = 0.5
+	var/perlin_lacunarity = 2.0
+	var/mineral_threshold = 0.62
+	var/asteroid_threshold = 0.48
+	if(config)
+		if(!isnull(config["perlin_freq"])) perlin_freq = config["perlin_freq"]
+		if(!isnull(config["perlin_octaves"])) perlin_octaves = config["perlin_octaves"]
+		if(!isnull(config["perlin_persistence"])) perlin_persistence = config["perlin_persistence"]
+		if(!isnull(config["perlin_lacunarity"])) perlin_lacunarity = config["perlin_lacunarity"]
+		if(!isnull(config["mineral_threshold"])) mineral_threshold = config["mineral_threshold"]
+		if(!isnull(config["asteroid_threshold"])) asteroid_threshold = config["asteroid_threshold"]
+
+	var/minx =  1<<30
+	var/miny =  1<<30
+	var/maxx = -1
+	var/maxy = -1
+	for(var/turf/T in turfs)
+		if(T.x < minx) minx = T.x
+		if(T.y < miny) miny = T.y
+		if(T.x > maxx) maxx = T.x
+		if(T.y > maxy) maxy = T.y
+	var/width = max(1, maxx - minx)
+	var/height = max(1, maxy - miny)
+	var/seed = rand(1, 1<<30)
+	var/mineral_type = safe_mineral_turf_path()
+
+	for(var/turf/T in turfs)
+		var/nx = (T.x - minx) / width
+		var/ny = (T.y - miny) / height
+		var/noise = ruins_perlin2d(seed, perlin_freq, perlin_octaves, perlin_persistence, perlin_lacunarity, nx * 100, ny * 100)
+		if(noise >= mineral_threshold)
+			if(!istype(T, /turf/simulated/mineral) && ruins_can_replace_turf(T))
+				T.ChangeTurf(mineral_type)
+		else if(noise >= asteroid_threshold)
+			if(!istype(T, /turf/simulated/floor/asteroid) && ruins_can_replace_turf(T))
+				T.ChangeTurf(/turf/simulated/floor/asteroid)
+		else
+			if(!istype(T, /turf/space) && ruins_can_replace_turf(T))
+				T.ChangeTurf(/turf/space)
 
 /proc/find_space_region(var/w = 48, var/h = 48, var/list/z_levels = null, var/tries = 100)
 	var/list/candidate_z = list()

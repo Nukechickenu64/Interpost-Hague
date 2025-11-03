@@ -1,6 +1,8 @@
+// Uses global ruins_gen_job declared in code/_helpers/ruins_generation_job.dm
+
 /obj/machinery/computer/bridge
 	name = "bridge computer"
-	desc = "I fucking hate you."
+	desc = "A battered command console wired into station comms and navigation. The CRT hums faintly."
 	var/dispensed = 0 //why yes, I am stealing this from the nano code, how could you t-ACK!
 	var/centcomm_message_cooldown = 0
 	var/announcment_cooldown = 0
@@ -30,7 +32,7 @@
 				R.stamps += "<HR><i>This paper has been stamped as 'Top Secret'.</i>"
 				dispensed = 1
 			else
-				to_chat(usr, "<span class='warning'>The computer lets out a soft beep as it fails to dispense the status report. Maybe it's out of paper? Piece of shit never gets stocked.</span>")
+				to_chat(usr, "<span class='warning'>The printer chirps and jams; no paper detected.</span>")
 		if("checkstationintegrity")
 			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 			to_chat(usr, "<span class='warning'></b> &@&# ERR### ARRAY OFFLINE, PL333E CONTACT LOCAL ENGINEERING DEPARTMENT HEAD #$$@%) </span></b>")
@@ -62,29 +64,57 @@
 				announcment_cooldown = 0
 		if("scan_for_beacons")
 			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
-				to_chat(usr, "<span class='warning'>The computer beeps at you insistently, refusing to respond to your input. It seems you lack the necessary access rights.</span>")
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
-			var/list/all = get_distress_beacons()
+			// If an async generation job is active, show status and do not start a new one
+			if(!ruins_gen_job)
+				var/path = text2path("/datum/ruins_generation_job")
+				if(path)
+					ruins_gen_job = new path
+			if(ruins_gen_job && call(ruins_gen_job, "is_active")())
+				var/pct = call(ruins_gen_job, "get_percent")()
+				to_chat(usr, "<span class='notice'>Deep-space telemetry sweep in progress — [pct]% complete. Stand by.</span>")
+				return
+			// Safety guard: don't allow generation if the Mining shuttle is at Station or in the Ruins area
+			if(SSshuttle && SSshuttle.shuttles && ("Mining" in SSshuttle.shuttles))
+				var/datum/shuttle/S = SSshuttle.shuttles["Mining"]
+				if(istype(S))
+					var/obj/effect/shuttle_landmark/CL = S.current_location
+					if(istype(CL))
+						var/blocked_reason = null
+						if(CL.landmark_tag == "nav_mining_start")
+							blocked_reason = "Mining shuttle is docked at Station. Relocate to open space to initiate sweep"
+						else
+							var/area/A = get_area(CL)
+							if(istype(A, /area/space/ruins))
+								blocked_reason = "Mining shuttle is amid debris field. Relocate to a clear sector to initiate sweep"
+						if(blocked_reason)
+							to_chat(usr, "<span class='warning'>Unable to sweep: [blocked_reason].</span>")
+							return
+
 			// Compute minutes since world boot (fallback if a dedicated round_start_time isn't tracked)
-			var/minutes = round(max(0, world.time / 600))
-			var/list/available = list()
-			for(var/datum/distress_beacon/B in all)
-				if(B.can_spawn(minutes))
-					available[B.name] = B
-			if(!available.len)
-				to_chat(usr, "<span class='notice'>No distress beacons detected at this time.</span>")
-				return
-			var/choice = input(usr, "Detected distress beacons (round [minutes] min):", "Beacon Scan") as null|anything in available
-			if(!choice || get_dist(src, usr) > 1)
-				return
-			var/datum/distress_beacon/sel = available[choice]
 			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1)
-			var/turf/center = sel.generate()
-			if(center)
-				to_chat(usr, "<span class='notice'>Distress coordinates triangulated: ([center.x], [center.y], [center.z]).</span>")
-			else
-				to_chat(usr, "<span class='warning'>Unable to resolve a safe insertion site. Try again later.</span>")
+			// Prompt for Ruins Profile selection
+			var/list/profile_options = get_ruins_profile_types()
+			var/selected_profile_label = input(usr, "Select sweep parameters:", "Sweep Profile") as null|anything in profile_options
+			if(!selected_profile_label || get_dist(src, usr) > 1)
+				return
+			var/profile_type = profile_options[selected_profile_label]
+			// Start async job instead of generating all at once
+			if(!ruins_gen_job)
+				var/path = text2path("/datum/ruins_generation_job")
+				if(path)
+					ruins_gen_job = new path
+			if(!(ruins_gen_job && call(ruins_gen_job, "start")(profile_type)))
+				to_chat(usr, "<span class='warning'>A deep-space sweep is already underway.</span>")
+				return
+			var/t = 0
+			if(ruins_gen_job)
+				var/list/V = ruins_gen_job:vars
+				if(V && ("total" in V))
+					t = V["total"]
+			to_chat(usr, "<span class='notice'>Initiating deep-space telemetry sweep across [t] sector(s). Profile: [selected_profile_label]. Progress will be reported here.</span>")
 
 
 /obj/machinery/computer/bridge/attack_hand(mob/living/carbon/human/user)
@@ -92,7 +122,15 @@
 	if(stat & (BROKEN|NOPOWER))
 		return
 	if(!user.GetAccess(ACCESS_REGION_COMMAND))
-		to_chat(user, "<span class='warning'>The computer beeps at you insistently, refusing to respond to your input. It seems you lack the necessary access rights.</span>")
+		to_chat(user, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 		return
-	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The computer's nearly burned out screen shows you the following commands:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT LATEST COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>SEND AN ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>SCAN FOR BEACONS</a></span></div></div>")
+	var/scan_label = "SWEEP DEEP SPACE"
+	if(!ruins_gen_job)
+		var/path = text2path("/datum/ruins_generation_job")
+		if(path)
+			ruins_gen_job = new path
+	if(ruins_gen_job && call(ruins_gen_job, "is_active")())
+		var/pct = call(ruins_gen_job, "get_percent")()
+		scan_label = "[pct]% - SWEEPING DEEP SPACE"
+	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The console sputters to life, offering the following functions:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>PRIORITY ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>[scan_label]</a></span></div></div>")

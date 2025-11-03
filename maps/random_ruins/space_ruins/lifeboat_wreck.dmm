@@ -1,0 +1,22 @@
+"a" = (/turf/space,/area/space)
+"u" = (/turf/simulated/floor/tiled,/area/space)
+"p" = (/turf/simulated/wall,/area/space)
+"c" = (/obj/structure/closet/crate,/turf/simulated/floor/tiled,/area/space)
+"t" = (/obj/structure/table/standard,/turf/simulated/floor/tiled,/area/space)
+"l" = (/obj/machinery/light/small,/turf/simulated/floor/tiled,/area/space)
+"r" = (/obj/random/junk,/turf/simulated/floor/tiled,/area/space)
+
+(1,1,1) = {"
+ aaaaaaaaaaaaaa
+ aaaaaapppaaaaa
+ aaaaapuuuupaaa
+ aaaaauutuuuaaa
+ aaaaauuluuaaa
+ aaaaapruuupaaa
+ aaaaaapppaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+ aaaaaaaaaaaaaa
+"}

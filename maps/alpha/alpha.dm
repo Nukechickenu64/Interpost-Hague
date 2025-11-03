@@ -14,6 +14,7 @@
 	#include "alpha-3.dmm"
 	#include "alpha-4.dmm"
 	#include "alpha-5.dmm"
+	#include "ruinsalpha.dmm"
 	#include "../../maps/away/mining/mining.dm"
 
 	//#include "job/jobs.dm"

@@ -232,6 +232,12 @@
 
 #define RADIATION_THRESHOLD_CUTOFF 0.1	// Radiation will not affect a tile when below this value.
 
+// Cosmic background radiation settings for open space
+#define COSMIC_RADS_BASE 2.5           // Baseline background radiation in Bq on /turf/space
+#define COSMIC_RADS_STDDEV 0.75        // Standard deviation for per-ruin variation around the baseline
+#define COSMIC_RADS_MIN 0.0            // Clamp minimum cosmic radiation
+#define COSMIC_RADS_MAX 10.0           // Clamp maximum cosmic radiation
+
 #define LEGACY_RECORD_STRUCTURE(X, Y) GLOBAL_LIST_EMPTY(##X);/datum/computer_file/data/##Y/var/list/fields[0];/datum/computer_file/data/##Y/New(){..();GLOB.##X.Add(src);}/datum/computer_file/data/##Y/Destroy(){. = ..();GLOB.##X.Remove(src);}
 
 #define EDIT_SHORTTEXT 1	// Short (single line) text input field

@@ -19,11 +19,6 @@
 
 	appearance = SSskybox.space_appearance_cache[(((x + y) ^ ~(x * y) + z) % 25) + 1]
 
-	var/turf/space/S
-	var/turf/T = S
-	var/radiation_count = rand(45, 85)
-	SSradiation.flat_radiate(T, radiation_count, 1, 1)
-
 	if(!HasBelow(z))
 		return
 	var/turf/below = GetBelow(src)

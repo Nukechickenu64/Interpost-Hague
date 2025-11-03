@@ -99,6 +99,16 @@ SUBSYSTEM_DEF(radiation)
 		if(. <= RADIATION_THRESHOLD_CUTOFF)
 			. = 0
 
+	// Add cosmic background radiation in open space, with per-ruin Gaussian variation
+	if(istype(T, /turf/space))
+		var/cosmic = COSMIC_RADS_BASE
+		var/area/A = T.loc
+		if(istype(A, /area/space/ruins))
+			var/area/space/ruins/R = A
+			if(isnum(R.space_rads_base))
+				cosmic = R.space_rads_base
+		. = max(., cosmic)
+
 // Add a radiation source instance to the repository.  It will override any existing source on the same turf.
 /datum/controller/subsystem/radiation/proc/add_source(var/datum/radiation_source/S)
 	if(!isturf(S.source_turf))

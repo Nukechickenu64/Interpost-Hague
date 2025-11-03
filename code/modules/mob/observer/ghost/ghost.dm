@@ -252,11 +252,11 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		M.antagHUD = 1
 		to_chat(src, "<span class='notice'>AntagHUD Enabled</span>")
 
-/mob/observer/ghost/verb/dead_tele(A in area_repository.get_areas_by_z_level())
+/mob/observer/ghost/verb/dead_tele(A in area_repository.get_areas_by_z_level(GLOB.is_ghost_teleportable_area))
 	set category = "Ghost"
 	set name = "TeleportGhost"
 
-	var/area/thearea = area_repository.get_areas_by_z_level()[A]
+	var/area/thearea = area_repository.get_areas_by_z_level(GLOB.is_ghost_teleportable_area)[A]
 	if(!thearea)
 		to_chat(src, "No area available.")
 		return
