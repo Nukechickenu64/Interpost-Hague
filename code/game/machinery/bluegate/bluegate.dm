@@ -206,6 +206,7 @@
 		name = "thought wave"
 		desc = "A wave of pure thought energy."
 		invisibility = INVISIBILITY_OBSERVER
+		icon = 'icons/effects/chemsmoke.dmi'
 
 /obj/concept/grief
 		name = "Grief"

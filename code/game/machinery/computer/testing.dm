@@ -11,6 +11,8 @@
 	var/current_viewing_message = null
 	var/new_sound = 'sound/machines/announce_alarm.ogg'
 	var/new_sound_red = 'sound/machines/announce_alarm_red.ogg'
+	// Next world.time (in deciseconds) when a beacon scan may be initiated again
+	var/next_beacon_scan_time = 0
 
 /obj/machinery/computer/bridge/Topic(href, href_list, hsrc)
 	..()
@@ -76,6 +78,14 @@
 				var/pct = call(ruins_gen_job, "get_percent")()
 				to_chat(usr, "<span class='notice'>Deep-space telemetry sweep in progress — [pct]% complete. Stand by.</span>")
 				return
+			// Enforce a 10-minute cooldown between scans
+			var/rem = max(0, next_beacon_scan_time - world.time)
+			if(rem > 0)
+				var/seconds = round(rem/10)
+				var/sec = seconds % 60
+				var/min = (seconds - sec) / 60
+				to_chat(usr, "<span class='warning'>Deep-space telemetry sweep cooldown: [min]m [sec]s remaining.</span>")
+				return
 			// Safety guard: don't allow generation if the Mining shuttle is at Station or in the Ruins area
 			if(SSshuttle && SSshuttle.shuttles && ("Mining" in SSshuttle.shuttles))
 				var/datum/shuttle/S = SSshuttle.shuttles["Mining"]
@@ -109,6 +119,8 @@
 			if(!(ruins_gen_job && call(ruins_gen_job, "start")(profile_type)))
 				to_chat(usr, "<span class='warning'>A deep-space sweep is already underway.</span>")
 				return
+			// Apply 10-minute cooldown (600 seconds => 6000 deciseconds)
+			next_beacon_scan_time = world.time + 6000
 			var/t = 0
 			if(ruins_gen_job)
 				var/list/V = ruins_gen_job:vars
@@ -133,4 +145,11 @@
 	if(ruins_gen_job && call(ruins_gen_job, "is_active")())
 		var/pct = call(ruins_gen_job, "get_percent")()
 		scan_label = "[pct]% - SWEEPING DEEP SPACE"
+	else
+		var/rem = max(0, next_beacon_scan_time - world.time)
+		if(rem > 0)
+			var/seconds = round(rem/10)
+			var/sec = seconds % 60
+			var/min = (seconds - sec) / 60
+			scan_label = "COOLDOWN [min]m [sec]s"
 	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The console sputters to life, offering the following functions:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>PRIORITY ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>[scan_label]</a></span></div></div>")

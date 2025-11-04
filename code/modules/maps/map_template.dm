@@ -127,6 +127,8 @@
 	//initialize things that are normally initialized after map load
 	init_atoms(atoms_to_initialise)
 	init_shuttles()
+	// Ensure lighting overlays are initialized for turfs placed by this template
+	SSlighting.InitializeTurfs(atoms_to_initialise)
 	log_game("[name] loaded at at [T.x],[T.y],[T.z]")
 	loaded++
 
