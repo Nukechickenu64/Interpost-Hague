@@ -86,6 +86,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	return ..()
 
 /mob/observer/ghost/Topic(href, href_list)
+	// Preserve existing ghost-specific handlers
 	if (href_list["track"])
 		if(istype(href_list["track"],/mob))
 			var/mob/target = locate(href_list["track"]) in SSmobs.mob_list
@@ -95,6 +96,10 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 			var/atom/target = locate(href_list["track"])
 			if(istype(target))
 				ManualFollow(target)
+		return
+
+	// Fall through to base /mob/Topic for general-purpose links (e.g., tilectx_*)
+	return ..()
 
 /*
 Transfer_mind is there to check if mob is being deleted/not going to have a body.

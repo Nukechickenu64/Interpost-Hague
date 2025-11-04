@@ -22,6 +22,7 @@
 		- If so, is there any protection against somebody spam-clicking a link?
 	If you have any  questions about this stuff feel free to ask. ~Carn
 	*/
+	// Closing the comment block
 /client/Topic(href, href_list, hsrc)
 	if(!usr || usr != mob)	//stops us calling Topic for somebody else's client. Also helps prevent usr=null
 		return
@@ -36,7 +37,7 @@
 	#endif
 
 	// asset_cache
-	if(href_list["asset_cache_confirm_arrival"])
+	if(href_list["asset_cache_confirm_arrival"])//
 //		to_chat(src, "ASSET JOB [href_list["asset_cache_confirm_arrival"]] ARRIVED.")
 		var/job = text2num(href_list["asset_cache_confirm_arrival"])
 		completed_asset_jobs += job
@@ -50,40 +51,41 @@
 		return
 
 	//Admin PM
-	if(href_list["priv_msg"])
+	if(href_list["priv_msg"]) {
 		var/client/C = locate(href_list["priv_msg"])
 		var/datum/ticket/ticket = locate(href_list["ticket"])
-
-		if(ismob(C)) 		//Old stuff can feed-in mobs instead of clients
+		if(ismob(C)) {
 			var/mob/M = C
 			C = M.client
+		}
 		cmd_admin_pm(C, null, ticket)
 		return
+	}
 
-	if(href_list["irc_msg"])
-		if(!holder && received_irc_pm < world.time - 6000) //Worse they can do is spam IRC for 10 minutes
+	if(href_list["irc_msg"]) {
+		if(!holder && received_irc_pm < world.time - 6000)
 			to_chat(usr, "<span class='warning'>You are no longer able to use this, it's been more then 10 minutes since an admin on IRC has responded to you</span>")
-			return
 		if(mute_irc)
 			to_chat(usr, "<span class='warning'You cannot use this as your client has been muted from sending messages to the admins on IRC</span>")
 			return
 		cmd_admin_irc_pm(href_list["irc_msg"])
 		return
+	}
 
-	if(href_list["close_ticket"])
+	if(href_list["close_ticket"]) {
 		var/datum/ticket/ticket = locate(href_list["close_ticket"])
-
 		if(isnull(ticket))
 			return
-
 		ticket.close(client_repository.get_lite_client(usr.client))
+	}
 
 	if(href_list["_src_"] == "chat") // Oh god the ping hrefs.
 		return chatOutput.Topic(href, href_list)
 
 	//Logs all hrefs
 	if(config && config.log_hrefs && href_logfile)
-		to_chat(href_logfile, "<small>[time2text(world.timeofday,"hh:mm")] [src] (usr:[usr])</small> || [hsrc ? "[hsrc] " : ""][href]<br>")
+		var/hpart = hsrc ? "[hsrc] " : ""
+		to_chat(href_logfile, "<small>[time2text(world.timeofday,"hh:mm")] [src] (usr:[usr])</small> || [hpart][href]<br>")
 
 	switch(href_list["_src_"])
 		if("holder")	hsrc = holder
@@ -95,6 +97,96 @@
 	switch(href_list["action"])
 		if ("openLink")
 			src << link(href_list["link"])
+
+	// Handle client-side fit callback from the embedded browser
+	if(href_list["tilectx_fit"]) {
+		var/w = text2num(href_list["w"])
+		var/h = text2num(href_list["h"])
+		if(w && h)
+			winset(src, "tilectx", "size=[w]x[h]")
+		return
+	}
+
+	// Fast-path tile context actions directly to the player's mob, bypassing mob.Topic if needed
+	if(href_list["tilectx_invoke"] || href_list["tilectx_obj"] || href_list["tilectx_back"] || (href_list["mach_close"] == "tilectx")) {
+		if(!ismob(mob))
+			return
+		// Close window
+		if(href_list["mach_close"] == "tilectx") {
+			mob.unset_machine()
+			mob << browse(null, "window=tilectx")
+			mob:tilectx_open = FALSE
+			return
+		}
+		// Back to tile menu
+		if(href_list["tilectx_back"]) {
+			if(mob:tilectx_last_turf)
+				mob:open_tile_context_menu(mob:tilectx_last_turf, mob:tilectx_last_clicked, null)
+			return
+		}
+		// Open object verbs menu
+		if(href_list["tilectx_obj"]) {
+			var/atom/target_obj = locate(href_list["tilectx_obj"])
+			if(target_obj) {
+				mob:tilectx_last_clicked = target_obj
+				mob:open_object_context_menu(target_obj)
+			}
+			return
+		}
+		// Invoke specific action on object
+		if(href_list["tilectx_invoke"]) {
+			var/atom/target = locate(href_list["tilectx_invoke"])
+			var/procname = href_list["proc"]
+			if(target && procname) {
+				if(procname == "pickup") {
+					if(isatom(target) && !target.Adjacent(mob)) {
+						to_chat(mob, "<span class='warning'>You're too far away to pick that up.</span>")
+						return
+					}
+					if(isobj(target)) {
+						var/obj/O = target
+						if(istype(O, /obj/item)) {
+							var/obj/item/I = O
+							I.attack_hand(mob)
+						} else {
+							O.attack_hand(mob)
+						}
+					} else {
+						target.attack_hand(mob)
+					}
+					mob << browse(null, "window=tilectx")
+					mob:tilectx_open = FALSE
+					return
+				} else if(procname == "examine") {
+					target.examine(mob)
+				} else if(procname == "use") {
+					target.attack_hand(mob)
+				} else if(procname == "use_right") {
+					target.attack_hand_right(mob)
+				} else if(procname == "pull") {
+					if(ismovable(target)) {
+						var/atom/movable/M = target
+						mob:start_pulling(M)
+					}
+				} else {
+					// Only allow calling a verb that exists on this target
+					var/allowed = FALSE
+					if(target:verbs)
+						for(var/V in target:verbs) {
+							var/list/parts = splittext("[V]", "/")
+							if(parts && parts.len && parts[parts.len] == procname) { allowed = TRUE; break }
+						}
+					if(allowed)
+						call(target, procname)()
+				}
+				// Close after invoking to avoid stale state
+				mob << browse(null, "window=tilectx")
+				mob:tilectx_open = FALSE
+				return
+			}
+		}
+	}
+
 	..()	//redirect to hsrc.Topic()
 
 //This stops files larger than UPLOAD_LIMIT being sent from client to server via input(), client.Import() etc.
@@ -187,7 +279,7 @@
 		set_splitter_orientation(0, splitter_value)
 		src.set_widescreen(1, splitter_value)
 		winset( src, "menu", "horiz_split.is-checked=true" )
-*/
+	*/
 
 	GLOB.using_map.map_info(src)
 

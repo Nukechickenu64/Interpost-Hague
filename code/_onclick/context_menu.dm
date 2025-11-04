@@ -80,7 +80,7 @@
 
 	// Precompute dynamic window height based on number of entries
 	var/items_count = max(1, atoms_on_tile.len)
-	var/base_h = 120
+	var/base_h = 90
 	var/row_h = 18
 	var/min_h = 140
 	var/max_h = 720
@@ -95,7 +95,10 @@
 	html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
 	html += ".note{color:#9fd;opacity:0.85;font-size:8pt;} .loc{color:#8fe3ff;} .item{margin:2px 0;}"
 	html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
-	html += "</style></head><body><div class='wrap'>"
+	html += "</style>"
+	// Auto-fit the browser window to the content once it finishes laying out
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "</head><body><div class='wrap'>"
 	html += "<div class='hdr'>Local Context</div>"
 	html += "<div class='accent'></div>"
 	html += "<div class='note'>Select an object to interact.</div>"
@@ -107,14 +110,21 @@
 		for(var/i = atoms_on_tile.len, i >= 1, i--)
 			var/atom/A = atoms_on_tile[i]
 			var/label = sanitizeSafe(A.name, 64, 1, 1, 1)
-			var/id = "\[\ref[A]]"
-			html += "<div class='item'>&#8226; <a href='byond://?src=\\ref[src];tilectx_select=[id]'>[label]</a>"
+			// Skip nameless entries to avoid blank rows
+			if(!label || !length(label))
+				continue
+			// Build links using inline BYOND ref tokens so the engine encodes them properly at compile-time.
+			if(isturf(A))
+				// Don't make the turf itself clickable for pickup
+				html += "<div class='item'>&#8226; [label]"
+			else
+				html += "<div class='item'>&#8226; <a href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label]</a> <span class='note'>(<a href=\"?src=\ref[src];tilectx_obj=\ref[A]\">...</a>)</span>"
 			if(A == clicked)
 				html += " <span class='note'>(clicked)</span>"
 			html += "</div>"
 
 	// Close row and HTML wrapper (always include)
-	html += "<div class='accent'></div><div class='note'><a href=\"byond://?src=\\ref[src];mach_close=tilectx\">Click outside to close</a></div>"
+	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	// Open the menu window: borderless, non-resizable, placed near mouse if possible
@@ -127,6 +137,92 @@
 		winset(src, "tilectx", "pos=[pos_x],[pos_y]")
 
 	// Mark as open for click-away close
+	src.tilectx_open = TRUE
+	// Remember last context for back navigation
+	src.tilectx_last_turf = T
+	src.tilectx_last_clicked = clicked
+
+// Open a verb/action menu for a specific object, with an image preview and a list of available verbs.
+/mob/proc/open_object_context_menu(var/atom/target)
+	if(!client || !target)
+		return
+
+	// Attempt to capture a flat icon of the target
+	var/icon/I = null
+	var/icon_w = 32
+	var/icon_h = 32
+	if(istype(target, /atom))
+		I = getFlatIcon(target)
+		if(istype(I, /icon))
+			icon_w = I.Width()
+			icon_h = I.Height()
+
+	var/rsc_name = "tilectx_obj_[rand(1,1000000)].png"
+	if(I)
+		src << browse_rsc(I, rsc_name)
+
+	// Build verbs list from the object's verbs
+	var/list/verbs_list = list()
+	if(target:verbs)
+		for(var/V in target:verbs)
+			var/pathtext = "[V]" // e.g., /obj/item/verb/toggle
+			var/list/parts = splittext(pathtext, "/")
+			if(!parts || !parts.len) continue
+			var/procname = parts[parts.len]
+			if(!procname || findtext(procname, "..")) continue
+			// Labelize: underscores to spaces, capitalize first letter
+			var/label = capitalize(replacetext(procname, "_", " "))
+			verbs_list += list(list("proc"=procname, "label"=label))
+
+	// Precompute dynamic height
+	var/items_count = verbs_list.len + 4 // include standard actions
+	var/base_h = 150
+	var/row_h = 18
+	var/min_h = 160
+	var/max_h = 800
+	var/dyn_h = clamp(base_h + (items_count * row_h), min_h, max_h)
+
+	var/html = "<html><head><title>Object Actions</title>"
+	html += "<style>"
+	html += "html,body{background:rgba(14,19,27,0.94);color:#d7f6ff;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:9pt;margin:0;padding:0;}"
+	html += ".wrap{padding:8px 10px;min-width:240px;max-width:400px;border:1px solid #3ad;border-radius:6px;box-shadow:0 0 14px rgba(58,173,255,0.25) inset, 0 0 12px rgba(8,18,28,0.6);}"
+	html += ".hdr{font-size:10pt;color:#8fe3ff;letter-spacing:0.06em;margin-bottom:4px;text-transform:uppercase;}"
+	html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
+	html += ".note{color:#9fd;opacity:0.85;font-size:8pt;} .loc{color:#8fe3ff;} .item{margin:2px 0;}"
+	html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
+	html += ".iconwrap{display:flex;align-items:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border-radius:4px;border:1px solid #3ad;background:#091018;}"
+	html += "</style>"
+	// Auto-fit this object actions window to its content after render (icons may change height)
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "</head><body><div class='wrap'>"
+	var/title = sanitizeSafe(target.name, 64, 1, 1, 1)
+	html += "<div class='hdr'>[title]</div>"
+	if(I)
+		html += "<div class='iconwrap'><img src='[rsc_name]' width='[icon_w]' height='[icon_h]'></div>"
+	html += "<div class='accent'></div>"
+
+	// Standard actions
+	// Links below use inline BYOND ref tokens for the target
+	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=examine'>Examine</a></div>"
+	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use'>Use</a></div>"
+	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Right-use</a></div>"
+	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=pull'>Pull</a></div>"
+
+	// Custom verbs
+	if(verbs_list.len)
+		html += "<div class='accent'></div><div class='note'>Verbs</div>"
+		for(var/entry in verbs_list)
+			var/label = entry["label"]
+			var/procname = entry["proc"]
+			html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=[url_encode(procname)]'>[label]</a></div>"
+
+	// Controls
+	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a> | <a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "</div></body></html>"
+
+	var/browse_args = "window=tilectx;border=0;titlebar=0;can_resize=0;can_minimize=0;can_close=1;size=300x[dyn_h]"
+	src.tilectx_last_clicked = target
+	src << browse(html, browse_args)
 	src.tilectx_open = TRUE
 
 // Handle selection in mob/Topic (implemented there) to dispatch right-click action.

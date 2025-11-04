@@ -1,4 +1,6 @@
 /mob/var/tilectx_open = FALSE
+/mob/var/tmp/turf/tilectx_last_turf = null
+/mob/var/tmp/atom/tilectx_last_clicked = null
 
 /mob/Destroy()//This makes sure that mobs with clients/keys are not just deleted from the game.
 	STOP_PROCESSING(SSmobs, src)
@@ -420,8 +422,10 @@
 	reset_view(null)
 
 /mob/Topic(href, href_list)
+
 	if(href_list["mach_close"])
-		var/t1 = text("window=[href_list["mach_close"]]")
+		var/mach = href_list["mach_close"]
+		var/t1 = "window=[mach]"
 		unset_machine()
 		src << browse(null, t1)
 		// Track tile context state
@@ -429,14 +433,80 @@
 			tilectx_open = FALSE
 
 	// Shift+Right-Click tile context menu selection
-	if(href_list["tilectx_select"])
-		var/atom/target = locate(href_list["tilectx_select"])
+	if(href_list["tilectx_obj"]) // Open object-specific verbs menu
+		var/atom/target = locate(href_list["tilectx_obj"])
+		// DEBUG: show what we received from the browser for troubleshooting
+		if(href)
+			var/keyname = "tilectx_obj"
+			message_admins("DEBUG(mob.Topic): [keyname]=[href_list[keyname]] locate=[target]")
 		if(target)
-			// Dispatch the plain right-click action on the chosen target
-			target.attack_hand_right(src)
-		// Close the context window after selection
+			src.tilectx_last_clicked = target
+			src.open_object_context_menu(target)
+		return
+
+	if(href_list["tilectx_back"]) // Return to tile listing
+		if(src.tilectx_last_turf)
+			src.open_tile_context_menu(src.tilectx_last_turf, src.tilectx_last_clicked, null)
+		return
+
+	if(href_list["tilectx_invoke"]) // Invoke a specific action on a selected object
+		var/atom/target = locate(href_list["tilectx_invoke"])
+		var/procname = href_list["proc"]
+		if(target && procname)
+			// Map standard actions
+			if(procname == "pickup")
+				// Require adjacency for pickup; keep menu open if too far
+				if(isatom(target) && !target.Adjacent(src))
+					to_chat(src, "<span class='warning'>You're too far away to pick that up.</span>")
+					return
+				// Prefer item pickup semantics; fallback to general use
+				if(isobj(target))
+					var/obj/O = target
+					if(istype(O, /obj/item))
+						var/obj/item/I = O
+						I.attack_hand(src)
+					else
+						O.attack_hand(src)
+				else
+					target.attack_hand(src)
+				// Close after success
+				src << browse(null, "window=tilectx")
+				src.tilectx_open = FALSE
+				return
+			if(procname == "examine")
+				target.examine(src)
+			else if(procname == "use")
+				target.attack_hand(src)
+			else if(procname == "use_right")
+				target.attack_hand_right(src)
+			else if(procname == "pickup")
+				// Prefer item pickup semantics; fallback to general use
+				if(isobj(target))
+					var/obj/O = target
+					if(istype(O, /obj/item))
+						var/obj/item/I = O
+						I.attack_hand(src)
+					else
+						O.attack_hand(src)
+				else
+					target.attack_hand(src)
+			else if(procname == "pull")
+				if(ismovable(target))
+					var/atom/movable/M = target
+					src.start_pulling(M)
+			else
+				// Only allow calling a verb that exists on this target
+				var/allowed = FALSE
+				if(target:verbs)
+					for(var/V in target:verbs)
+						var/list/parts = splittext("[V]", "/")
+						if(parts && parts.len && parts[parts.len] == procname)
+							allowed = TRUE; break
+				if(allowed)
+					call(target, procname)()
+		// Close after invoking to avoid stale state
 		src << browse(null, "window=tilectx")
-		tilectx_open = FALSE
+		src.tilectx_open = FALSE
 		return
 
 	if(href_list["flavor_more"])
