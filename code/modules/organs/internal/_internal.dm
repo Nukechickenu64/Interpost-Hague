@@ -39,8 +39,10 @@
 /obj/item/organ/Process()
 	if(owner == null)
 		return
-	if(owner.bad_internal_organs && src.damage <= 0 && src in owner.bad_internal_organs)
-		owner.bad_internal_organs -= src
+	if(owner.bad_internal_organs)
+		if(src.damage <= 0)
+			if(src in owner.bad_internal_organs)
+				owner.bad_internal_organs -= src
 	..()
 //disconnected the organ from it's owner but does not remove it, instead it becomes an implant that can be removed with implant surgery
 //TODO move this to organ/internal once the FPB port comes through

@@ -129,7 +129,8 @@
 	set desc = "Drench an object in acid, destroying it over time."
 	set category = "Abilities"
 
-	if(!O in oview(1))
+	// Disambiguate membership test with logical not
+	if(!(O in oview(1)))
 		to_chat(src, "<span class='alium'>[O] is too far away.</span>")
 		return
 

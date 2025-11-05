@@ -152,6 +152,11 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	return ..()
 
 /obj/machinery/computer/rdconsole/OnTopic(user, href_list)
+	if(href_list["ui_close"]) {
+		usr << browse(null, "window=rdconsole")
+		usr.unset_machine()
+		return TOPIC_HANDLED
+	}
 	if(href_list["menu"]) //Switches menu screens. Converts a sent text string into a number. Saves a LOT of code.
 		screen = text2num(href_list["menu"])
 		. = TOPIC_REFRESH
@@ -805,7 +810,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "List of Available Designs:"
 			dat += GetResearchListInfo()
 
-	user << browse("<TITLE>Fabrication Control Console</TITLE><HR>[dat]", "window=rdconsole;size=850x600")
+	// Build diegetic styled body with a Close link
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Fabrication Control Console", body, "window=rdconsole;size=850x620;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "rdconsole")
 
 /obj/machinery/computer/rdconsole/robotics

@@ -281,7 +281,14 @@
 
 
 	user.set_machine(src)
-	user << browse(dat, "window=disposal;size=360x170")
+	// Build diegetic-styled content
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'>"
+	body += "<div><b>Waste Disposal Unit</b></div>"
+	body += "<div><a href='?src=\ref[src];close=1'>Close</a></div>"
+	body += "</div><hr>"
+	body += dat
+	ui_browse_styled(user, "Waste Disposal Unit", body, "window=disposal;size=360x200;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "disposal")
 
 // handle machine interaction

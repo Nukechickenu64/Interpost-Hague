@@ -359,7 +359,7 @@
 	processing()
 
 /obj/structure/vent_gas/proc/processing()
-	INITIALIZE
+	INITIALIZE:
 	sleep(20)
 	spawn(45)
 		playsound(src.loc, 'sound/machines/loop_vent2.ogg', 10, 0, 3)

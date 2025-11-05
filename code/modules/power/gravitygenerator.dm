@@ -54,37 +54,36 @@
 		return
 
 	updatemodules()
+	var/body = ""
+	// Toolbar with a Close control
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
 
-	var/dat = "<h3>Generator Control System</h3>"
-	//dat += "<font size=-1><a href='byond://?src=\ref[src];refresh=1'>Refresh</a></font>"
+	body += "<h3>Generator Control System</h3>"
 	if(gravity_generator)
 		if(gravity_generator.on)
-			dat += "<font color=green><br><tt>Gravity Status: ON</tt></font><br>"
+			body += "<div><tt><span style='color:#4caf50'>Gravity Status: ON</span></tt></div>"
 		else
-			dat += "<font color=red><br><tt>Gravity Status: OFF</tt></font><br>"
+			body += "<div><tt><span style='color:#e57373'>Gravity Status: OFF</span></tt></div>"
 
-		dat += "<br><tt>Currently Supplying Gravitons To:</tt><br>"
+		body += "<br><tt>Currently Supplying Gravitons To:</tt><br>"
 
 		for(var/area/A in gravity_generator.localareas)
 			if(A.has_gravity && gravity_generator.on)
-				dat += "<tt><font color=green>[A]</tt></font><br>"
-
+				body += "<tt><span style='color:#4caf50'>[A]</span></tt><br>"
 			else if (A.has_gravity)
-				dat += "<tt><font color=yellow>[A]</tt></font><br>"
-
+				body += "<tt><span style='color:#ffca28'>[A]</span></tt><br>"
 			else
-				dat += "<tt><font color=red>[A]</tt></font><br>"
+				body += "<tt><span style='color:#e57373'>[A]</span></tt><br>"
 
-		dat += "<br><tt>Maintainence Functions:</tt><br>"
-		if(gravity_generator.on)
-			dat += "<a href='byond://?src=\ref[src];gentoggle=1'><font color=red> TURN GRAVITY GENERATOR OFF. </font></a>"
-		else
-			dat += "<a href='byond://?src=\ref[src];gentoggle=1'><font color=green> TURN GRAVITY GENERATOR ON. </font></a>"
-
+		body += "<br><tt>Maintenance Functions:</tt><br>"
+		body += "<a href='?src=\ref[src];gentoggle=1'>" + (gravity_generator.on ? "<span style='color:#e57373'>TURN GRAVITY GENERATOR OFF.</span>" : "<span style='color:#4caf50'>TURN GRAVITY GENERATOR ON.</span>") + "</a>"
 	else
-		dat += "No local gravity generator detected!"
+		body += "No local gravity generator detected!"
 
-	user << browse(dat, "window=gravgen")
+	ui_browse_styled(user, "Gravity Generator Control", body, "window=gravgen;size=400x500;can_close=0;can_resize=0;border=0;titlebar=0")
+	// Keep legacy onclose in case other code relies on it, though window itself is borderless
 	onclose(user, "gravgen")
 
 
@@ -93,6 +92,12 @@
 	if((. = ..()))
 		usr << browse(null, "window=air_alarm")
 		return
+
+	if(href_list["ui_close"]) {
+		usr << browse(null, "window=gravgen")
+		usr.unset_machine()
+		return
+	}
 
 	if(href_list["gentoggle"])
 		if(gravity_generator.on)

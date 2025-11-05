@@ -103,11 +103,22 @@
 				dat += "<a href='?src=\ref[src];choice=access;access=[A]'>[area]</a><br>"
 		dat += "<br><a href='?src=\ref[src];action=issue'>Issue pass</a><br>"
 
-	user << browse(dat, "window=guestpass;size=400x520")
+	// Styled wrapper with a Close control and borderless window
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Guest Pass Terminal", body, "window=guestpass;size=500x520;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "guestpass")
 
 
 /obj/machinery/computer/guestpass/OnTopic(var/mob/user, href_list, state)
+	if(href_list["ui_close"]) {
+		user << browse(null, "window=guestpass")
+		user.unset_machine()
+		return TOPIC_HANDLED
+	}
 	if (href_list["mode"])
 		mode = text2num(href_list["mode"])
 		. = TOPIC_REFRESH

@@ -1,6 +1,9 @@
 
 #define TIMER_NO_INVOKE_WARNING 600 //number of byond ticks that are allowed to pass before the timer subsystem thinks it hung on something
 
+#ifdef TIMER_ID_NULL
+#undef TIMER_ID_NULL
+#endif
 #define TIMER_ID_NULL -1
 
 //For servers that can't do with any additional lag, set this to none in flightpacks.dm in subsystem/processing.
@@ -15,6 +18,18 @@
 #define INITIALIZE_HINT_LATELOAD 1  //Call LateInitialize
 #define INITIALIZE_HINT_QDEL     2  //Call qdel on the atom
 
+#ifdef INITIALIZATION_INSSATOMS
+#undef INITIALIZATION_INSSATOMS
+#endif
+#ifdef INITIALIZATION_INSSATOMS_LATE
+#undef INITIALIZATION_INSSATOMS_LATE
+#endif
+#ifdef INITIALIZATION_INNEW_MAPLOAD
+#undef INITIALIZATION_INNEW_MAPLOAD
+#endif
+#ifdef INITIALIZATION_INNEW_REGULAR
+#undef INITIALIZATION_INNEW_REGULAR
+#endif
 #define INITIALIZATION_INSSATOMS      0	//New should not call Initialize
 #define INITIALIZATION_INSSATOMS_LATE 1	//New should not call Initialize; after the first pass is complete (handled differently)
 #define INITIALIZATION_INNEW_MAPLOAD  2	//New should call Initialize(TRUE)

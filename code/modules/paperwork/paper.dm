@@ -76,7 +76,9 @@
 	if(!forceshow && istype(user,/mob/living/silicon/ai))
 		var/mob/living/silicon/ai/AI = user
 		can_read = get_dist(src, AI.camera) < 2
-	user << browse("<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY bgcolor='[color]'>[can_read ? info : stars(info)][stamps]</BODY></HTML>", "window=[name]")
+	var/body = "[can_read ? info : stars(info)][stamps]"
+	var/page = ui_build_styled_html(name, body)
+	user << browse(page, "window=[name]")
 	onclose(user, "[name]")
 
 /obj/item/weapon/paper/verb/rename()
@@ -319,7 +321,8 @@
 
 		update_space(t)
 
-		usr << browse("<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY bgcolor='[color]'>[info_links][stamps]</BODY></HTML>", "window=[name]") // Update the window
+		var/page2 = ui_build_styled_html(name, "[info_links][stamps]")
+		usr << browse(page2, "window=[name]") // Update the window
 
 		playsound(loc, pick(write_sounds), 50)
 
@@ -372,7 +375,8 @@
 			RP.RenamePaper(user,src)
 			playsound(pick(write_sounds), 50)
 		else
-			user << browse("<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY bgcolor='[color]'>[info_links][stamps]</BODY></HTML>", "window=[name]")
+			var/page3 = ui_build_styled_html(name, "[info_links][stamps]")
+			user << browse(page3, "window=[name]")
 			playsound(pick(write_sounds), 50)
 		return
 

@@ -157,7 +157,8 @@
 			to_chat(user, SPAN_NOTICE("\The [src] already has \a [power_supply] loaded."))
 			return TRUE
 
-		if(!do_after(user, 5, A, can_move = TRUE))
+		// Standard do_after does not accept a can_move keyword; just block for the delay on the target
+		if(!do_after(user, 5, A))
 			return TRUE
 
 		if(user.unEquip(A, src))

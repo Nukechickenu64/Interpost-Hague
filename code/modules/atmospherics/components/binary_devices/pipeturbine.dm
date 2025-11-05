@@ -1,3 +1,6 @@
+#ifdef ADIABATIC_EXPONENT
+#undef ADIABATIC_EXPONENT
+#endif
 #define ADIABATIC_EXPONENT 0.667 //Actually adiabatic exponent - 1.
 
 /obj/machinery/atmospherics/pipeturbine

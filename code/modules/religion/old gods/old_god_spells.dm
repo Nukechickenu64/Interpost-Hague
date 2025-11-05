@@ -18,7 +18,12 @@
 	var/phrase = "Test Phrase"
 
 /datum/old_god_spell/New()
-	phrase = GLOB.all_religions[old_god].generate_random_phrase()
+	// Provide a static type to help DreamChecker understand method access
+	var/datum/religion/R = GLOB.all_religions[old_god]
+	if(istype(R))
+		phrase = R.generate_random_phrase()
+	else
+		phrase = ""
 	..()
 
 /datum/old_god_spell/proc/spell_effect(var/mob/living/user)

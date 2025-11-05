@@ -190,13 +190,14 @@
 			START_PROCESSING(SSvines, neighbor)
 
 /obj/effect/vine/proc/targets_in_range()
-	var/mob/list/targets = list()
+	// Fix invalid type declaration; use a plain list and populate with mobs
+	var/list/targets = list()
 	for(var/turf/simulated/check_turf in (get_cardinal_neighbors() | get_zlevel_neighbors() | list(loc)))
 		if(!istype(check_turf))
 			continue
 		for(var/mob/living/M in check_turf.contents)
 			targets |= M
-	if(targets.len)
+	if(targets && targets.len)
 		return targets
 
 /obj/effect/vine/proc/die_off()

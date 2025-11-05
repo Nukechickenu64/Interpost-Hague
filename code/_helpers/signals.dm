@@ -6,6 +6,9 @@
 
 var/global/datum/signal_bus/SIGNAL_BUS = new
 
+/**
+ * Simple pub/sub signal bus. Keep list typing explicit to satisfy static analyzer.
+ */
 /datum/signal_bus
 	var/list/subscribers = list() // event -> list of list(d=datum, p=proc_name)
 
@@ -32,7 +35,13 @@ var/global/datum/signal_bus/SIGNAL_BUS = new
 		if(!(event in subscribers))
 			return 0
 		var/count = 0
-		var/list/L = subscribers[event].Copy() // prevent modification during iteration
+		var/list/L
+		var/list/raw = subscribers[event]
+		if(islist(raw))
+			// prevent modification during iteration with a safe typed copy
+			L = raw.Copy()
+		else
+			L = list()
 		for(var/entry in L)
 			var/datum/d = entry["d"]
 			var/proc_name = entry["p"]

@@ -78,7 +78,8 @@
 	for(var/obj/item/weapon/photo/Ph in src)
 		dat += "<A href='?src=\ref[src];remove=\ref[Ph]'>Remove</A> <A href='?src=\ref[src];rename=\ref[Ph]'>Rename</A> - <A href='?src=\ref[src];look=\ref[Ph]'>[Ph.name]</A><BR>"
 
-	user << browse(dat, "window=clipboard")
+	var/page = ui_build_styled_html("Clipboard", dat)
+	user << browse(page, "window=clipboard")
 	onclose(user, "clipboard")
 	add_fingerprint(usr)
 	return
@@ -149,10 +150,12 @@
 			if(P && (P.loc == src) && istype(P, /obj/item/weapon/paper) )
 
 				if(!(istype(usr, /mob/living/carbon/human) || isghost(usr) || istype(usr, /mob/living/silicon)))
-					usr << browse("<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[stars(P.info)][P.stamps]</BODY></HTML>", "window=[P.name]")
+					var/page1 = ui_build_styled_html(P.name, "[stars(P.info)][P.stamps]")
+					usr << browse(page1, "window=[P.name]")
 					onclose(usr, "[P.name]")
 				else
-					usr << browse("<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.info][P.stamps]</BODY></HTML>", "window=[P.name]")
+					var/page2 = ui_build_styled_html(P.name, "[P.info][P.stamps]")
+					usr << browse(page2, "window=[P.name]")
 					onclose(usr, "[P.name]")
 
 		else if(href_list["look"])

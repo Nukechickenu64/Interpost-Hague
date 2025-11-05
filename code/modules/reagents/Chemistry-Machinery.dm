@@ -1,6 +1,4 @@
-#define SOLID 1
-#define LIQUID 2
-#define GAS 3
+// Phase defines are globally provided in __defines/chemistry.dm
 
 #define BOTTLE_SPRITES list("bottle-1", "bottle-2", "bottle-3", "bottle-4") //list of available bottle sprites
 #define REAGENTS_PER_SHEET 20
@@ -103,7 +101,8 @@
 					dat += "<TITLE>Chemmaster 3000</TITLE>Chemical infos:<BR><BR>Name:<BR>[href_list["name"]]<BR><BR>Description:<BR>[href_list["desc"]]<BR><BR><BR><A href='?src=\ref[src];main=1'>(Back)</A>"
 			else
 				dat += "<TITLE>Condimaster 3000</TITLE>Condiment infos:<BR><BR>Name:<BR>[href_list["name"]]<BR><BR>Description:<BR>[href_list["desc"]]<BR><BR><BR><A href='?src=\ref[src];main=1'>(Back)</A>"
-			usr << browse(dat, "window=chem_master;size=575x400")
+			var/body_an = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>" + (condi ? "CondiMaster 3000" : "ChemMaster 3000") + "</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>" + dat
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_an, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
 			return
 
 		else if (href_list["add"])
@@ -203,14 +202,16 @@
 			for(var/i = 1 to MAX_PILL_SPRITE)
 				dat += "<tr><td><a href=\"?src=\ref[src]&pill_sprite=[i]\"><img src=\"pill[i].png\" /></a></td></tr>"
 			dat += "</table>"
-			usr << browse(dat, "window=chem_master")
+			var/body_ps = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>Pill Appearance</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div>" + dat
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_ps, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
 			return
 		else if(href_list["change_bottle"])
 			var/dat = "<table>"
 			for(var/sprite in BOTTLE_SPRITES)
 				dat += "<tr><td><a href=\"?src=\ref[src]&bottle_sprite=[sprite]\"><img src=\"[sprite].png\" /></a></td></tr>"
 			dat += "</table>"
-			usr << browse(dat, "window=chem_master")
+			var/body_bs = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>Bottle Appearance</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div>" + dat
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_bs, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
 			return
 		else if(href_list["pill_sprite"])
 			pillsprite = href_list["pill_sprite"]
@@ -305,9 +306,11 @@
 		else
 			dat += "<A href='?src=\ref[src];createbottle=1'>Create bottle (50 units max)</A>"
 	if(!condi)
-		user << browse("<TITLE>Chemmaster 3000</TITLE>Chemmaster menu:<BR><BR>[dat]", "window=chem_master;size=575x400")
+		var/body_main_c = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>ChemMaster 3000</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>Chemmaster menu:<BR><BR>" + dat
+		ui_browse_styled(user, "ChemMaster 3000", body_main_c, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
 	else
-		user << browse("<TITLE>Condimaster 3000</TITLE>Condimaster menu:<BR><BR>[dat]", "window=chem_master;size=575x400")
+		var/body_main_cm = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>CondiMaster 3000</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>Condimaster menu:<BR><BR>" + dat
+		ui_browse_styled(user, "CondiMaster 3000", body_main_cm, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "chem_master")
 	return
 
@@ -463,12 +466,17 @@
 			dat += "<A href='?src=\ref[src];action=detach'>Detach the beaker</a><BR>"
 	else
 		dat += "Please wait..."
-	user << browse("<HEAD><TITLE>All-In-One Grinder</TITLE></HEAD><TT>[dat]</TT>", "window=reagentgrinder")
+	var/body = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>All-In-One Grinder</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr><TT>" + dat + "</TT>"
+	ui_browse_styled(user, "All-In-One Grinder", body, "window=reagentgrinder;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "reagentgrinder")
 	return
 
 
 /obj/machinery/reagentgrinder/OnTopic(user, href_list)
+	if(href_list["close"]) {
+		close_browser(user, "window=reagentgrinder")
+		return TOPIC_HANDLED
+	}
 	if(href_list["action"])
 		switch(href_list["action"])
 			if ("grind")

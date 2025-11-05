@@ -23,7 +23,11 @@
 		preview += image('icons/turf/overlays.dmi',S,"greenOverlay")
 	usr.client.images += preview
 	if(alert(usr,"Confirm location.","Template Confirm","Yes","No") == "Yes")
-		if(template.load(T, centered = TRUE, clear_contents=clear_contents))
+		if(clear_contents)
+			template.template_flags |= TEMPLATE_FLAG_CLEAR_CONTENTS
+		else
+			template.template_flags &= ~TEMPLATE_FLAG_CLEAR_CONTENTS
+		if(template.load(T, centered = TRUE))
 			log_and_message_admins("has placed a map template ([template.name]).")
 		else
 			to_chat(usr, "Failed to place map")

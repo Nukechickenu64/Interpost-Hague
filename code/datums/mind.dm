@@ -313,9 +313,10 @@
 						possible_targets += possible_target.current
 
 				var/mob/def_target = null
-				var/objective_list[] = list(/datum/objective/assassinate, /datum/objective/protect, /datum/objective/debrain)
-				if (objective&&(objective.type in objective_list) && objective:target)
-					def_target = objective:target.current
+				if (objective && (istype(objective, /datum/objective/assassinate) || istype(objective, /datum/objective/protect) || istype(objective, /datum/objective/debrain)))
+					var/datum/objective/T = objective
+					if (T.target && istype(T.target.current, /mob))
+						def_target = T.target.current
 
 				var/new_target = input("Select target:", "Objective target", def_target) as null|anything in possible_targets
 				if (!new_target) return

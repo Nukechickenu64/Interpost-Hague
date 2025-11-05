@@ -82,7 +82,8 @@ FLOOR SAFES
 			var/obj/item/P = contents[i]
 			dat += "<tr><td><a href='?src=\ref[src];retrieve=\ref[P]'>[P.name]</a></td></tr>"
 		dat += "</table></center>"
-	user << browse("<html><head><title>[name]</title></head><body>[dat]</body></html>", "window=safe;size=350x300")
+	var/page = ui_build_styled_html(name, dat)
+	user << browse(page, "window=safe;size=350x300")
 
 
 /obj/structure/safe/Topic(href, href_list)

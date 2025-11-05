@@ -271,7 +271,8 @@
 		dat += "Moving: <a href='?src=\ref[src];operation=togglemoving'>[moving ? "Enabled":"Disabled"]</a>"
 
 
-		user << browse(dat, "window=magnet;size=400x500")
+		var/page = ui_build_styled_html("Magnetic Control Console", dat)
+		user << browse(page, "window=magnet;size=400x500")
 		onclose(user, "magnet")
 
 	Topic(href, href_list)

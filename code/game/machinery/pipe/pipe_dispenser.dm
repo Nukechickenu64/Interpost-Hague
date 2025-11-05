@@ -75,12 +75,23 @@
 ///// Z-Level stuff
 //What number the make points to is in the define # at the top of construction.dm in same folder
 
-	user << browse("<HEAD><TITLE>[src]</TITLE></HEAD><TT>[dat]</TT>", "window=pipedispenser")
+	// Styled header with Close and borderless browse
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, name, body, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "pipedispenser")
 	return
 
 /obj/machinery/pipedispenser/Topic(href, href_list)
 	if(..())
+		return
+	// Handle in-UI Close
+	if(href_list["ui_close"])
+		usr << browse(null, "window=pipedispenser")
+		usr.unset_machine()
 		return
 	if(unwrenched || !usr.canmove || usr.stat || usr.restrained() || !in_range(loc, usr))
 		usr << browse(null, "window=pipedispenser")
@@ -195,7 +206,12 @@ Nah
 "}
 ///// Z-Level stuff
 
-	user << browse("<HEAD><TITLE>[src]</TITLE></HEAD><TT>[dat]</TT>", "window=pipedispenser")
+	var/body2 = ""
+	body2 += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body2 += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body2 += "</div>"
+	body2 += dat
+	ui_browse_styled(user, name, body2, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")
 	return
 
 // 0=straight, 1=bent, 2=junction-j1, 3=junction-j2, 4=junction-y, 5=trunk
@@ -205,6 +221,11 @@ Nah
 	if(..())
 		return
 	usr.set_machine(src)
+	// Handle in-UI Close
+	if(href_list["ui_close"])
+		usr << browse(null, "window=pipedispenser")
+		usr.unset_machine()
+		return
 	if(href_list["dmake"])
 		if(unwrenched || !usr.canmove || usr.stat || usr.restrained() || !in_range(loc, usr))
 			usr << browse(null, "window=pipedispenser")

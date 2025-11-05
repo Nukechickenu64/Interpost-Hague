@@ -207,8 +207,7 @@
 #define BP_ANCHOR   "anchoring ligament"
 #define BP_PHORON   "phoron filter"
 #define BP_THROAT 	"throat"
-#define BP_VCHORDS  "vocal chords"
-#define BP_TONGUE	"tongue"
+// BP_VCHORDS and BP_TONGUE are defined above; do not redefine here
 #define BP_GUTS     "guts"
 #define BP_STOMACH  "stomach"
 
@@ -217,8 +216,8 @@
 #define BP_VOICE		"vocal synthesiser"
 #define BP_STACK		"stack"
 #define BP_OPTICS		"optics"
-#define BP_VCHORDS  "vocal chords"
-#define BP_TONGUE	"tongue"
+// Duplicate definitions for robo organs are unnecessary; avoid macro redefinition
+// BP_VCHORDS and BP_TONGUE are already defined above for organic organs
 
 // Limbs.
 #define BP_L_FOOT "l_foot"

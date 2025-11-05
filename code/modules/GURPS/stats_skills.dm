@@ -10,9 +10,24 @@
 //////////////////////////////////////////////////////////////////////////
 
 //defines
+#ifdef CRIT_SUCCESS_NORM
+#undef CRIT_SUCCESS_NORM
+#endif
 #define CRIT_SUCCESS_NORM 1
+
+#ifdef CRIT_FAILURE_NORM
+#undef CRIT_FAILURE_NORM
+#endif
 #define CRIT_FAILURE_NORM 1
+
+#ifdef CRIT_SUCCESS
+#undef CRIT_SUCCESS
+#endif
 #define CRIT_SUCCESS 2
+
+#ifdef CRIT_FAILURE
+#undef CRIT_FAILURE
+#endif
 #define CRIT_FAILURE 3
 
 

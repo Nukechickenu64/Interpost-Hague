@@ -55,12 +55,25 @@ Please wait until completion...</TT><BR>
 <A href='?src=\ref[src];make=7'>Robot Frame (75,000 cc metal).<BR>
 "}
 
-	user << browse("<HEAD><TITLE>Robotic Fabricator Control Panel</TITLE></HEAD><TT>[dat]</TT>", "window=robot_fabricator")
+	// Build styled content with a header Close and open as borderless
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Robotic Fabricator", body, "window=robot_fabricator;size=420x520;can_close=0;can_resize=0;border=0;titlebar=0")
+	// Keep legacy onclose hook
 	onclose(user, "robot_fabricator")
 	return
 
 /obj/machinery/robotic_fabricator/Topic(href, href_list)
 	if (..())
+		return
+
+	// Handle in-UI Close
+	if(href_list["ui_close"])
+		usr << browse(null, "window=robot_fabricator")
+		usr.unset_machine()
 		return
 
 	usr.set_machine(src)

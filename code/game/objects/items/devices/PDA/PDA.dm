@@ -368,7 +368,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/auto_update = 1
 	if(mode in no_auto_update)
 		auto_update = 0
-	if(old_ui && (mode == lastmode && ui_tick % 5 && mode in update_every_five))
+	// Clarify precedence for DreamChecker
+	if(old_ui && (mode == lastmode) && (ui_tick % 5) && (mode in update_every_five))
 		return
 
 	lastmode = mode
@@ -1276,7 +1277,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				if (!istype(C:dna, /datum/dna))
 					to_chat(user, "<span class='notice'>No fingerprints found on [C]</span>")
 				else
-					to_chat(user, text("<span class='notice'>\The [C]'s Fingerprints: [md5(C:dna.uni_identity)]</span>"))
+					var/datum/dna/D = C:dna
+					to_chat(user, "<span class='notice'>\\The [C]'s Fingerprints: [md5(D.uni_identity)]</span>")
 				if ( !(C:blood_DNA) )
 					to_chat(user, "<span class='notice'>No blood found on [C]</span>")
 					if(C:blood_DNA)

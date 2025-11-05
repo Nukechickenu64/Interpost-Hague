@@ -6,6 +6,9 @@
     locate(min(CENTER.x+(RADIUS),world.maxx), min(CENTER.y+(RADIUS),world.maxy), CENTER.z) \
   )
 
+#ifdef SIGN
+#undef SIGN
+#endif
 #define SIGN(X) ((X<0)?-1:1)
 
 /proc/dopage(src,target)

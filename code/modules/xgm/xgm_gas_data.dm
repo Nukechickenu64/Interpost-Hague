@@ -78,6 +78,9 @@
 	desc = "You shouldn't be clicking, or seeing this."
 	icon = 'icons/effects/tile_effects.dmi'
 	icon_state = "generic"
+#ifndef FIRE_LAYER
+#define FIRE_LAYER 4.16
+#endif
 	layer = FIRE_LAYER
 	appearance_flags = RESET_COLOR
 	mouse_opacity = 0

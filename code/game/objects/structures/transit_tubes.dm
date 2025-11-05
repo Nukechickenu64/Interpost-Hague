@@ -119,20 +119,24 @@ obj/structure/ex_act(severity)
 			if(pod.contents.len)
 				to_chat(AM, "<span class='notice'>The pod is already occupied.</span>")
 				return
-			else if(!pod.moving && pod.dir in directions())
-				AM.loc = pod
-				return
+			else if(!pod.moving)
+				var/list/dirs = directions()
+				if(pod.dir in dirs)
+					AM.loc = pod
+					return
 
 
 /obj/structure/transit_tube/station/attack_hand(mob/user as mob)
 	if(!pod_moving)
 		for(var/obj/structure/transit_tube_pod/pod in loc)
-			if(!pod.moving && pod.dir in directions())
-				if(icon_state == "closed")
-					open_animation()
+			if(!pod.moving)
+				var/list/dirs = directions()
+				if(pod.dir in dirs)
+					if(icon_state == "closed")
+						open_animation()
 
-				else if(icon_state == "open")
-					close_animation()
+					else if(icon_state == "open")
+						close_animation()
 
 
 
@@ -156,8 +160,10 @@ obj/structure/ex_act(severity)
 
 /obj/structure/transit_tube/station/proc/launch_pod()
 	for(var/obj/structure/transit_tube_pod/pod in loc)
-		if(!pod.moving && pod.dir in directions())
-			spawn(5)
+		if(!pod.moving)
+			var/list/dirs = directions()
+			if(pod.dir in dirs)
+				spawn(5)
 				pod_moving = 1
 				close_animation()
 				sleep(CLOSE_DURATION + 2)

@@ -356,7 +356,6 @@
 	return null
 
 #undef effect_update
-#undef GET_LUM_DIST
 #undef LUM_FALLOFF
 #undef REMOVE_CORNER
 #undef APPLY_CORNER

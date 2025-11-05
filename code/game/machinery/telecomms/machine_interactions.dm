@@ -172,7 +172,8 @@
 
 	dat += "</font>"
 	temp = ""
-	user << browse(dat, "window=tcommachine;size=520x500;can_resize=0")
+	var/page = ui_build_styled_html("Telecomms", dat)
+	user << browse(page, "window=tcommachine;size=520x500;can_resize=0")
 	onclose(user, "dormitory")
 
 

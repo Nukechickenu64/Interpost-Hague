@@ -1,3 +1,8 @@
+// Ensure SIGN macro is available even if global defines haven't been processed yet
+#ifndef SIGN
+#define SIGN(X) ((X) ? ((X) > 0 ? 1 : -1) : 0)
+#endif
+
 /obj/effect/overmap/ship
 	name = "generic ship"
 	desc = "Space faring vessel."

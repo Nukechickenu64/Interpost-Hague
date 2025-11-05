@@ -218,14 +218,14 @@
 						if(can_still_topic())
 							msg_line2 = linput
 					if("message")
-						post_status("message", msg_line1, msg_line2)
+						post_status("message", msg_line1, msg_line2, user)
 					if("image")
-						post_status("image", href_list["image"])
+						post_status("image", href_list["image"], null, user)
 					else
-						post_status(href_list["target"])
+						post_status(href_list["target"], null, null, user)
 		if("setalert")
 			. = 1
-			if(is_autenthicated(user) && !issilicon(usr) && ntn_cont && ntn_comm)
+			if(is_autenthicated(user) && !issilicon(user) && ntn_cont && ntn_comm)
 				var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 				var/decl/security_level/target_level = locate(href_list["target"]) in security_state.standard_security_levels
 				if(target_level && security_state.can_switch_to(target_level))
@@ -299,14 +299,14 @@ var/last_message_id = 0
 /datum/comm_message_listener/proc/Remove(var/list/message)
 	messages -= list(message)
 
-/proc/post_status(var/command, var/data1, var/data2)
+/proc/post_status(var/command, var/data1, var/data2, var/mob/user)
 
 	var/datum/radio_frequency/frequency = radio_controller.return_frequency(1435)
 
 	if(!frequency) return
 
 	var/datum/signal/status_signal = new
-	status_signal.source = src
+	status_signal.source = null
 	status_signal.transmission_method = 1
 	status_signal.data["command"] = command
 
@@ -314,11 +314,14 @@ var/last_message_id = 0
 		if("message")
 			status_signal.data["msg1"] = data1
 			status_signal.data["msg2"] = data2
-			log_admin("STATUS: [key_name(usr)] set status screen message with [src]: [data1] [data2]")
+			if(user)
+				log_admin("STATUS: [key_name(user)] set status screen message: [data1] [data2]")
+			else
+				log_admin("STATUS: <unknown> set status screen message: [data1] [data2]")
 		if("image")
 			status_signal.data["picture_state"] = data1
 
-	frequency.post_signal(src, status_signal)
+	frequency.post_signal(null, status_signal)
 
 /proc/cancel_call_proc(var/mob/user)
 	if (!SSevac.evacuation_controller)

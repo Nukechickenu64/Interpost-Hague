@@ -336,8 +336,8 @@ meteor_act
 				break
 		src.throw_at(target, rand(2,4), src.throw_speed)
 
-	//Blood to gold
-	if(GLOB.all_religions["Gozag Ym Sagoz"].bloodgold)
+	//Blood to gold: trigger when victim follows Gozag Ym Sagoz
+	if(religion == "Gozag Ym Sagoz")
 		var/datum/transaction/T = new("Gozag Ym Sagoz", "Blood money", -effective_force)
 		spawn_money(round(effective_force),src.loc,null)
 		mind.initial_account.do_transaction(T)

@@ -174,8 +174,8 @@
 	icon = null // We want to use the new generated overlay from update_icon.
 	icon_state = null
 
-/obj/item/stack/teeth/human/split()
-	. = ..()
+/obj/item/stack/teeth/human/split(var/tamount, var/force = FALSE)
+	. = ..(tamount, force)
 	update_icon()
 
 /obj/item/stack/teeth/human/add()

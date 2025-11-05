@@ -455,7 +455,14 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 				dat+="I'm sorry to break your immersion. This shit's bugged. Report this bug to Agouri, polyxenitopalidou@gmail.com"
 
 
-		human_or_robot_user << browse(dat, "window=newscaster_main;size=400x600")
+		// Build styled, borderless UI with in-UI Close button
+		var/body = ""
+		body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+		body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+		body += "</div>"
+		body += dat
+		ui_browse_styled(human_or_robot_user, "Newscaster", body, "window=newscaster_main;size=400x600;can_close=0;can_resize=0;border=0;titlebar=0")
+		// Keep legacy onclose hook
 		onclose(human_or_robot_user, "newscaster_main")
 
 /obj/machinery/newscaster/Topic(href, href_list)
@@ -463,6 +470,11 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 		return
 	if ((usr.contents.Find(src) || ((get_dist(src, usr) <= 1) && istype(src.loc, /turf))) || (istype(usr, /mob/living/silicon)))
 		usr.set_machine(src)
+		// Handle in-UI Close
+		if(href_list["ui_close"])
+			usr << browse(null, "window=newscaster_main")
+			usr.unset_machine()
+			return
 		if(href_list["set_channel_name"])
 			src.channel_name = cp1251_to_utf8(sanitizeSafe(input(usr, "Provide a Feed Channel Name", "Network Channel Handler", ""), MAX_LNAME_LEN))
 			src.updateUsrDialog()
@@ -864,7 +876,8 @@ obj/item/weapon/newspaper/attack_self(mob/user)
 				dat+="I'm sorry to break your immersion. This shit's bugged. Report this bug to Agouri, polyxenitopalidou@gmail.com"
 
 		dat+="<BR><HR><div align='center'>[src.curr_page+1]</div>"
-		human_user << browse(dat, "window=newspaper_main;size=300x400")
+		var/page2 = ui_build_styled_html("Newspaper", dat)
+		human_user << browse(page2, "window=newspaper_main;size=300x400")
 		onclose(human_user, "newspaper_main")
 	else
 		to_chat(user, "The paper is full of intelligible symbols!")

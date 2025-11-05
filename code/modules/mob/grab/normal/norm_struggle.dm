@@ -47,7 +47,8 @@
 		affecting.visible_message("<span class='warning'>[affecting] struggles against [assailant]!</span>")
 		spawn(10)
 			handle_resist(G)
-		if(do_after(assailant, upgrade_cooldown, G, can_move = 1))
+		// Remove unsupported keyword; rely on standard do_after semantics
+		if(do_after(assailant, upgrade_cooldown, G))
 			done_struggle = TRUE
 			G.upgrade(TRUE)
 		else

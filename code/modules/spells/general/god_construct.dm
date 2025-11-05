@@ -52,5 +52,7 @@
 	var/turf/T = get_turf(user)
 	new target(T, connected_god)
 #undef CONSTRUCT_SPELL_COST
+#ifdef CONSTRUCT_SPELL_REQ
 #undef CONSTRUCT_SPELL_REQ
+#endif
 #undef CONSTRUCT_SPELL_TYPE

@@ -113,7 +113,7 @@
 		return
 
 	updatemodules()
-	var/dat = "<html>"
+	var/dat = ""
 	dat += "<h3>Cloning System Control</h3>"
 	dat += "<font size=-1><a href='byond://?src=\ref[src];refresh=1'>Refresh</a></font>"
 
@@ -213,15 +213,26 @@
 			dat += "<b><a href='byond://?src=\ref[src];del_rec=1'>Scan card to confirm.</a></b><br>"
 			dat += "<b><a href='byond://?src=\ref[src];menu=3'>No</a></b>"
 
-	dat += "</html>"
-
-	user << browse(dat, "window=cloning")
+	// Add styled header with in-UI Close and open as a borderless window
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Cloning System Control", body, "window=cloning;size=500x600;can_close=0;can_resize=0;border=0;titlebar=0")
+	// Keep legacy onclose hook
 	onclose(user, "cloning")
 	return
 
 /obj/machinery/computer/cloning/Topic(href, href_list)
 	if(..())
 		return 1
+
+	// Handle in-UI Close
+	if(href_list["ui_close"])
+		usr << browse(null, "window=cloning")
+		usr.unset_machine()
+		return
 
 	if(loading)
 		return

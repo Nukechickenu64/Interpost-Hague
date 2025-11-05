@@ -369,11 +369,12 @@
 					return
 			return
 
-		if(parrot_interest && parrot_interest in view(src))
+		// Clarify precedence: evaluate membership explicitly before the &&
+		if((parrot_interest in view(src)) && parrot_interest)
 			parrot_state = PARROT_SWOOP | PARROT_STEAL
 			return
 
-		if(parrot_perch && parrot_perch in view(src))
+		if((parrot_perch in view(src)) && parrot_perch)
 			parrot_state = PARROT_SWOOP | PARROT_RETURN
 			return
 

@@ -95,8 +95,18 @@
 	if(display_message)
 		visible_message("[src] shatters!")
 
-	cast_new(shardtype, is_fulltile() ? 4 : 1, loc)
-	if(reinf) cast_new(/obj/item/stack/rods, is_fulltile() ? 4 : 1, loc)
+	// Avoid macro parsing issues: explicitly spawn shards/rods
+	var/amount = is_full_window() ? 4 : 1
+	if(amount <= 1)
+		new shardtype(loc)
+		if(reinf)
+			new /obj/item/stack/rods(loc)
+	else
+		for(var/i = 1; i <= amount; i++)
+			new shardtype(loc)
+		if(reinf)
+			for(var/j = 1; j <= amount; j++)
+				new /obj/item/stack/rods(loc)
 	qdel(src)
 	return
 

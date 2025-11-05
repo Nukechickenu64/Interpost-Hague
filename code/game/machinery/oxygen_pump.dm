@@ -1,5 +1,9 @@
+#ifndef TANK_MAX_RELEASE_PRESSURE
 #define TANK_MAX_RELEASE_PRESSURE (3*ONE_ATMOSPHERE)
+#endif
+#ifndef TANK_DEFAULT_RELEASE_PRESSURE
 #define TANK_DEFAULT_RELEASE_PRESSURE ONE_ATMOSPHERE
+#endif
 
 /obj/machinery/oxygen_pump
 	name = "emergency oxygen pump"

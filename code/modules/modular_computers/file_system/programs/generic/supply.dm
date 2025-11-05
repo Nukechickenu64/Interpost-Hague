@@ -218,18 +218,21 @@
 
 	if(href_list["refresh_category"])
 		var/key = href_list["refresh_category"] //getting key of category
-		var/category_type = SSsupply.list_avalable_categories[key].type //and getting it type
+		var/datum/sell_order/category = SSsupply.list_avalable_categories[key]
+		var/category_type = category.type //and getting its type
 		for(var/so_key in SSsupply.sell_order_list) //searching orders with this category
 			var/datum/sell_order/so = SSsupply.sell_order_list[so_key]
 			var/so_category = so.get_category_type()
 			if(so_category == category_type) //respawning them
-				SSsupply.respawn(SSsupply.sell_order_list[so_key].type)
+				SSsupply.respawn(so.type)
 		SSsupply.current_refresh_timer = SSsupply.refresh_timer //anti rerolling
 		SSsupply.points -= SSsupply.refresh_cost
 
 	if(href_list["complete_order"])
 		var/key = href_list["complete_order"]
-		SSsupply.sell_order_list[key].reward()
+		var/datum/sell_order/so = SSsupply.sell_order_list[key]
+		if(istype(so))
+			so.reward()
 
 /datum/nano_module/supply/proc/generate_categories()
 	category_names = list()

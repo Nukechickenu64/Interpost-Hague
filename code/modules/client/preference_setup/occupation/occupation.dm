@@ -1,7 +1,13 @@
 //used for pref.alternate_option
+#ifndef GET_RANDOM_JOB
 #define GET_RANDOM_JOB 0
+#endif
+#ifndef BE_ASSISTANT
 #define BE_ASSISTANT 1
+#endif
+#ifndef RETURN_TO_LOBBY
 #define RETURN_TO_LOBBY 2
+#endif
 
 /datum/preferences
 	//Since there can only be 1 high job.

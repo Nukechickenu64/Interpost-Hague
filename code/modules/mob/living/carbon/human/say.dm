@@ -234,11 +234,12 @@
 	var/needs_assist = 0
 	var/can_speak_assist = 0
 
-	if(species && speaking.name in species.assisted_langs)
-		needs_assist = 1
-		for(var/obj/item/organ/internal/I in src.internal_organs)
-			if((speaking in I.assists_languages) && (I.is_usable()))
-				can_speak_assist = 1
+	if(species)
+		if(speaking.name in species.assisted_langs)
+			needs_assist = 1
+			for(var/obj/item/organ/internal/I in src.internal_organs)
+				if((speaking in I.assists_languages) && (I.is_usable()))
+					can_speak_assist = 1
 
 	if(needs_assist && !can_speak_assist)
 		return 0

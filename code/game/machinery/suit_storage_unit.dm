@@ -256,7 +256,8 @@
 			dat+= "<font color='maroon'><B>Unit chamber is too contaminated to continue usage. Please call for a qualified individual to perform maintenance.</font></B><BR><BR>"
 			dat+= text("<HR><A href='?src=\ref[];mach_close=suit_storage_unit'>Close control panel</A>", user)
 
-	user << browse(dat, "window=suit_storage_unit;size=400x500")
+	var/page = ui_build_styled_html("Suit Storage Unit", dat)
+	user << browse(page, "window=suit_storage_unit;size=400x500")
 	onclose(user, "suit_storage_unit")
 	return
 

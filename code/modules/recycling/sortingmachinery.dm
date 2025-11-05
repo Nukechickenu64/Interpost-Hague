@@ -362,7 +362,8 @@
 	openwindow(user)
 
 /obj/item/device/destTagger/OnTopic(user, href_list, state)
-	if(href_list["nextTag"] && href_list["nextTag"] in GLOB.tagger_locations)
+	// Clarify precedence for DreamChecker: check membership first, then other conditions.
+	if((href_list["nextTag"] in GLOB.tagger_locations) && href_list["nextTag"])
 		src.currTag = href_list["nextTag"]
 		. = TOPIC_REFRESH
 	if(href_list["nextTag"] == "CUSTOM")

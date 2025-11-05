@@ -1,5 +1,9 @@
+#ifndef TANK_MAX_RELEASE_PRESSURE
 #define TANK_MAX_RELEASE_PRESSURE (3*ONE_ATMOSPHERE)
+#endif
+#ifndef TANK_DEFAULT_RELEASE_PRESSURE
 #define TANK_DEFAULT_RELEASE_PRESSURE 24
+#endif
 #define TANK_IDEAL_PRESSURE 1015 //Arbitrary.
 
 var/list/global/tank_gauge_cache = list()
@@ -240,9 +244,10 @@ var/list/global/tank_gauge_cache = list()
 		else if(src in location)		// or if tank is in the mobs possession
 			if(!location.internal)		// and they do not have any active internals
 				mask_check = 1
-		else if(istype(loc, /obj/item/weapon/rig) && loc in location)	// or the rig is in the mobs possession
-			if(!location.internal)		// and they do not have any active internals
-				mask_check = 1
+		else if(istype(loc, /obj/item/weapon/rig))	// or the rig is in the mobs possession
+			if(loc in location)
+				if(!location.internal)		// and they do not have any active internals
+					mask_check = 1
 
 		if(mask_check)
 			if(location.wear_mask && (location.wear_mask.item_flags & ITEM_FLAG_AIRTIGHT))
@@ -341,7 +346,7 @@ var/list/global/tank_gauge_cache = list()
 	check_status()
 
 /obj/item/weapon/tank/update_icon()
-	if((atom_flags & ATOM_FLAG_INITIALIZED) && istype(loc, /obj/) && !istype(loc, /obj/item/clothing/suit/) && !override) //So we don't eat up our tick. Every tick, when we're not actually in play.
+	if((atom_flags & ATOM_FLAG_INITIALIZED) && istype(loc, /obj/) && !istype(loc, /obj/item/clothing/suit/)) //So we don't eat up our tick. Every tick, when we're not actually in play.
 		return
 	overlays.Cut()
 	if(proxyassembly.assembly || wired)

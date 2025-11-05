@@ -119,6 +119,9 @@ Please contact me on #coderbus IRC. ~Carn x
 //Human Overlays Indexes/////////
 #define MUTATIONS_LAYER			1
 #define SKIN_LAYER				2
+#ifdef DAMAGE_LAYER
+#undef DAMAGE_LAYER
+#endif
 #define DAMAGE_LAYER			3
 #define BODYHAIR_LAYER			4
 #define SURGERY_LEVEL			5		//bs12 specific.
@@ -146,6 +149,9 @@ Please contact me on #coderbus IRC. ~Carn x
 #define L_HAND_LAYER			27
 #define R_HAND_LAYER			28
 #define BLEEDING_LAYER			29
+#ifdef FIRE_LAYER
+#undef FIRE_LAYER
+#endif
 #define FIRE_LAYER				30		//If you're on fire
 #define TARGETED_LAYER			31		//BS12: Layer for the target overlay from weapon targeting system
 #define FLIES_LAYER				32
@@ -441,7 +447,7 @@ var/global/list/damage_icon_parts = list()
 				add_image = 1
 	for(var/mut in mutations)
 		switch(mut)
-			if(LASER)
+			if(LASER_EYES)
 				standing.overlays	+= "lasereyes_s"
 				add_image = 1
 	if(add_image)

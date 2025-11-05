@@ -254,7 +254,13 @@
 
 	dat += "</body>"
 	message = defaultmsg
-	user << browse(dat, "window=message;size=700x700")
+	// Styled wrapper: add top-right Close and open borderless
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Message Monitor", body, "window=message;size=700x700;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "message")
 	return
 
@@ -284,6 +290,12 @@
 /obj/machinery/computer/message_monitor/Topic(href, href_list)
 	if((. = ..()))
 		return
+
+	if(href_list["ui_close"]) {
+		usr << browse(null, "window=message")
+		usr.unset_machine()
+		return
+	}
 
 	//Authenticate
 	if (href_list["auth"])

@@ -1049,24 +1049,25 @@
 	return
 
 /obj/mecha/proc/moved_inside(var/mob/living/carbon/human/H as mob)
-	if(H && H.client && H in range(1))
-		H.reset_view(src)
-		/*
-		H.client.perspective = EYE_PERSPECTIVE
-		H.client.eye = src
-		*/
-		H.stop_pulling()
-		H.forceMove(src)
-		src.occupant = H
-		src.add_fingerprint(H)
-		src.forceMove(src.loc)
-		src.log_append_to_last("[H] moved in as pilot.")
-		src.icon_state = src.reset_icon()
-		set_dir(dir_in)
-		playsound(src, 'sound/machines/windowdoor.ogg', 50, 1)
-		if(!hasInternalDamage())
-			to_chat(src.occupant, sound('sound/mecha/nominal.ogg',volume=50))
-		return 1
+	if(H && H.client)
+		if(H in range(1))
+			H.reset_view(src)
+			/*
+			H.client.perspective = EYE_PERSPECTIVE
+			H.client.eye = src
+			*/
+			H.stop_pulling()
+			H.forceMove(src)
+			src.occupant = H
+			src.add_fingerprint(H)
+			src.forceMove(src.loc)
+			src.log_append_to_last("[H] moved in as pilot.")
+			src.icon_state = src.reset_icon()
+			set_dir(dir_in)
+			playsound(src, 'sound/machines/windowdoor.ogg', 50, 1)
+			if(!hasInternalDamage())
+				to_chat(src.occupant, sound('sound/mecha/nominal.ogg',volume=50))
+			return 1
 	else
 		return 0
 
@@ -1559,7 +1560,7 @@
 		var/mob/occupant = P.occupant
 
 		user.visible_message("<span class='notice'>\The [user] begins opening the hatch on \the [P]...</span>", "<span class='notice'>You begin opening the hatch on \the [P]...</span>")
-		if (!do_after(user, 40, needhand=0))
+		if (!do_after(user, 40, src))
 			return
 
 		user.visible_message("<span class='notice'>\The [user] opens the hatch on \the [P] and removes [occupant]!</span>", "<span class='notice'>You open the hatch on \the [P] and remove [occupant]!</span>")

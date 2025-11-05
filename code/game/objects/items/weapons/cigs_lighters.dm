@@ -1148,6 +1148,6 @@ obj/item/clothing/mask/chewable/Destroy()
 		extinguish()
 		return
 
-		var/turf/location = get_turf(src)
-		if(location)
-			location.hotspot_expose(700, 5)
+	var/turf/location = get_turf(src)
+	if(location)
+		location.hotspot_expose(700, 5)

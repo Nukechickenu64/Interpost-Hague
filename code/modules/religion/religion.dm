@@ -99,7 +99,9 @@ proc/generate_random_prayer()//This generates a new one.
 		say(NewStutter(msg))
 		return
 	else
-		name = pick(GLOB.all_religions[ILLEGAL_RELIGION].followers)  //Wow the datums saves us an entire for loop
+		var/datum/religion/R_illegal = GLOB.all_religions[ILLEGAL_RELIGION]
+		if(istype(R_illegal))
+			name = pick(R_illegal.followers)  //Wow the datums saves us an entire for loop
 		if(name)
 			say(NewStutter("[name] is one of them!"))
 		else
@@ -107,16 +109,21 @@ proc/generate_random_prayer()//This generates a new one.
 
 /* ILLEGAL RELIGION PROCS */
 /datum/religion/proc/claim_territory(area/territory,var/claiming_religion)
-	GLOB.all_religions[claiming_religion].territories |= territory.name
+	var/datum/religion/R = GLOB.all_religions[claiming_religion]
+	if(istype(R))
+		R.territories |= territory.name
 	return
 
 /datum/religion/proc/lose_territory(area/territory,var/claiming_religion)
-	GLOB.all_religions[claiming_religion].territories -= territory.name
+	var/datum/religion/R = GLOB.all_religions[claiming_religion]
+	if(istype(R))
+		R.territories -= territory.name
 	return
 
 /datum/religion/proc/territory_claimed(area/territory, mob/user)
 	for (var/name in GLOB.all_religions)
-		if(territory.name in GLOB.all_religions[name].territories)
+		var/datum/religion/R = GLOB.all_religions[name]
+		if(istype(R) && (territory.name in R.territories))
 			return name
 	return null
 
@@ -179,13 +186,15 @@ proc/generate_random_prayer()//This generates a new one.
 	var/datum/religion/user_religion = GLOB.all_religions[user.religion]
 	for(var/obj/old_god_shrine/shrine in view(user, 5))
 		//If we can see an allied shrine nearby, we have more chance to spawn a reward.
-		if(shrine.shrine_religion.name == user_religion.name)
+		if(istype(user_religion) && shrine.shrine_religion.name == user_religion.name)
 			divisor = 1
-		if(prob(user_religion.favor * divisor))
+		if(istype(user_religion) && prob(user_religion.favor * divisor))
 			var/S = pick(GLOB.all_spells)
-			var/reward = pick(GLOB.all_spells[S].requirments)
-			var/obj/reward_obj = GLOB.all_spells[S].requirments[reward]
-			new reward_obj(T)
+			var/datum/old_god_spell/OGS = GLOB.all_spells[S]
+			if(istype(OGS) && OGS.requirments)
+				var/reward = pick(OGS.requirments)
+				var/obj/reward_obj = OGS.requirments[reward]
+				new reward_obj(T)
 
 /mob/living/proc/praise_god()
 	set category = "Old God Magic"
@@ -201,7 +210,11 @@ proc/generate_random_prayer()//This generates a new one.
 				var/T =  get_turf(src)
 				playsound(get_turf(src), praise_sound,30,0)
 				to_chat(src, "<span class='danger'>A [user_religion.holy_item] appears at your feet!</span>")
-				var/holy_item_type = GLOB.all_religions[religion].holy_item.type
+				var/datum/religion/R = GLOB.all_religions[religion]
+				var/holy_item_type
+				if(istype(R) && R.holy_item)
+					var/obj/O = R.holy_item
+					holy_item_type = O.type
 				var/new_holy_item = new holy_item_type(T)
 				religion_token = new_holy_item
 		else
@@ -265,11 +278,14 @@ proc/generate_random_prayer()//This generates a new one.
 	set name = "getBrothers"
 	for(var/old_god in GLOB.all_religions)
 		if(old_god != LEGAL_RELIGION)
-			if(GLOB.all_religions[old_god].followers.len > 0)
-				var/brothers_message = "<span class='info'>Your brothers are:<br></span>"
-				for(var/H in GLOB.all_religions[old_god].followers)
-					brothers_message += "<span class='danger'><b>[H], who loves [religion].</b></span>\n"
-				to_chat(src, brothers_message)
-			else if(GLOB.all_religions[old_god].followers.len <= 1)
-				var/brothers_message = "<span class='info'>I'll have to do this alone.<br></span>"
-				to_chat(src, brothers_message)
+			var/datum/religion/R_old = GLOB.all_religions[old_god]
+			if(istype(R_old))
+				var/list/followers = R_old.followers
+				if(islist(followers) && followers.len > 0)
+					var/brothers_message = "<span class='info'>Your brothers are:<br></span>"
+					for(var/H in followers)
+						brothers_message += "<span class='danger'><b>[H], who loves [religion].</b></span>\n"
+					to_chat(src, brothers_message)
+				else if(islist(followers) && followers.len <= 1)
+					var/brothers_message = "<span class='info'>I'll have to do this alone.<br></span>"
+					to_chat(src, brothers_message)

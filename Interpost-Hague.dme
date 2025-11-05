@@ -121,6 +121,7 @@
 #include "code\_helpers\time.dm"
 #include "code\_helpers\turfs.dm"
 #include "code\_helpers\type2type.dm"
+#include "code\_helpers\ui_style.dm"
 #include "code\_helpers\unsorted.dm"
 #include "code\_helpers\vec2.dm"
 #include "code\_helpers\vector.dm"

@@ -1,5 +1,5 @@
 #define CHARS_PER_LINE 5
-#define FONT_SIZE "5pt"
+// FONT_SIZE defined in status_display.dm
 #define FONT_COLOR "#7f59bd"
 #define FONT_STYLE "Arial Black"
 

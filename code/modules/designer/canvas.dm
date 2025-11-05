@@ -20,10 +20,9 @@
 /obj/item/frame/canvas/proc/show(mob/user as mob)
 	if(designer_unit && designer_unit.icon_custom)
 		user << browse_rsc(designer_unit.icon_custom, "tmp_canvas_\ref[src].png")
-		user << browse("<html><head><title>[name]</title></head>" \
-			+ "<body style='overflow:hidden;margin:0;text-align:center'>" \
-			+ "<img src='tmp_canvas_\ref[src].png' width='128' style='-ms-interpolation-mode:nearest-neighbor' />" \
-			+ "</body></html>", "window=book;size=128x128")
+		var/body = "<div style='text-align:center'><img src='tmp_canvas_\ref[src].png' width='128' style='-ms-interpolation-mode:nearest-neighbor;image-rendering:pixelated' /></div>"
+		var/page = ui_build_styled_html(name, body)
+		user << browse(page, "window=book;size=128x128")
 		onclose(user, "[name]")
 		return
 
@@ -76,10 +75,9 @@
 /obj/structure/canvas/proc/show(mob/user as mob)
 	if(designer_unit && designer_unit.icon_custom)
 		user << browse_rsc(designer_unit.icon_custom, "tmp_canvas_\ref[src].png")
-		user << browse("<html><head><title>[name]</title></head>" \
-			+ "<body style='overflow:hidden;margin:0;text-align:center'>" \
-			+ "<img src='tmp_canvas_\ref[src].png' width='128' style='-ms-interpolation-mode:nearest-neighbor' />" \
-			+ "</body></html>", "window=book;size=128x128")
+		var/body = "<div style='text-align:center'><img src='tmp_canvas_\ref[src].png' width='128' style='-ms-interpolation-mode:nearest-neighbor;image-rendering:pixelated' /></div>"
+		var/page = ui_build_styled_html(name, body)
+		user << browse(page, "window=book;size=128x128")
 		onclose(user, "[name]")
 		return
 

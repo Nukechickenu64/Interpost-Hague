@@ -1,2 +1,4 @@
 [langserver]
+# DreamChecker can produce false positives on valid DM constructs used in this codebase.
+# Disable it for editor diagnostics; rely on the BYOND compiler for errors/warnings.
 dreamchecker = true

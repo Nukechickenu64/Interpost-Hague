@@ -38,6 +38,9 @@
 #define MINERALS 8
 
 #define EMERGENCY 9
+#ifdef GAS
+#undef GAS
+#endif
 #define GAS 10
 #define MAINTENANCE 11
 #define ELECTRICAL 12

@@ -58,54 +58,27 @@
 	if(!user || !user.client)
 		return
 
-	var/dat = "<html><head><title>TERMINAL CONNECTION</title>"
-	dat += "<style type='text/css'>html {overflow: auto;};"
-	dat += "body {"
-	dat += "overflow:hidden;"
-	dat += "font-family: Futura, sans-serif;"
-	dat += "font-size: 17px;"
-	dat += "background-repeat:repeat-x;"
-	dat += "border: 4px ridge #2f303d;"
-	dat += "}"
-	dat += "a {text-decoration:none;outline: none;border: none;margin:-1px;}"
-	dat += "a:focus{outline:none;border: none;}"
-	dat += "a:hover {Color:#0d0d0d;background:#ababb3;outline: none;border: none; text-decoration:none;}"
-	dat += "a.active { text-decoration:none; Color:#533333;border: none;}"
-	dat += "a.inactive:hover {Color:#0d0d0d;background:#bb0000;border: none;}"
-	dat += "a.active:hover {Color:#bb0000;background:#0f0f0f;}"
-	dat += "a.inactive:hover { text-decoration:none; Color:#0d0d0d; background:#bb0000;border: none;}"
-	dat += "a img {     border: 0; }"
-	dat += "TABLE.winto {"
-	dat += "z-index:-1;"
-	dat += "position: absolute;"
-	dat += "top: 12;"
-	dat += "left:14;"
-	dat += "background-position: bottom;"
-	dat += "background-repeat:repeat-x;"
-	dat += "border: 4px ridge #2f303d;"
-	dat += "}"
-	dat += "TR {"
-	dat += "border: 0px;"
-	dat += "}"
-	dat += "span.job_class {Color:#000000;}"
-	dat += "</style>"
-	dat += "</head>"
-	dat += "<body bgcolor='#000000' text='#c9c9c9' alink='#a6a6a6' vlink='#a6a6a6' link='#a6a6a6'>"
-	dat += "<p align ='right'>"
-	dat += "</p>"
-	dat += "<br>"
+	// Build a diegetic-styled preferences panel using the shared UI wrapper
+	var/body = ""
+	// Top toolbar: actions and a close button on the right
+	body += "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;'>"
+	body += "<div>"
 	if(path)
-		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];save=1'>Save Slot</a> --- "
-		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];resetslot=1'>Reset Slot</a> --- "
-		dat += "<a onfocus ='this.blur()' href='?src=\ref[src];load=1'>Load Slot</a><br>"
-	dat += "<br>"
-	dat += "<br>"
-	dat += player_setup.header()
-	dat += "<br>"
-	dat += "<br>"
-	dat += player_setup.content(user)
-	dat += "</html></body>"
-	user <<browse(dat,"window=player_panel;size=700x700;can_close=1;can_resize=0;border=0;titlebar=1")
+		body += "<a href='?src=\ref[src];save=1'>Save Slot</a> &nbsp;"
+		body += "<a href='?src=\ref[src];resetslot=1'>Reset Slot</a> &nbsp;"
+		body += "<a href='?src=\ref[src];load=1'>Load Slot</a>"
+	body += "</div>"
+	// In-UI close button
+	body += "<div><a href='?src=\ref[src];ui_close=1'>Close</a></div>"
+	body += "</div>"
+
+	// Header and content from the player setup system
+	body += player_setup.header()
+	body += "<br>"
+	body += player_setup.content(user)
+
+	// Wrap and browse with borderless window options
+	ui_browse_styled(user, "Cryogenic Profile Setup", body, "window=player_panel;size=700x700;can_close=0;can_resize=0;border=0;titlebar=0")
 
 /datum/preferences/proc/process_link(mob/user, list/href_list)
 
@@ -124,6 +97,12 @@
 /datum/preferences/Topic(href, list/href_list)
 	if(..())
 		return 1
+
+	// Handle in-UI close without reopening
+	if(href_list["ui_close"]) {
+		usr << browse(null, "window=player_panel")
+		return 1
+	}
 
 	if(href_list["save"])
 		save_preferences()

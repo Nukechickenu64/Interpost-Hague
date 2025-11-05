@@ -424,9 +424,15 @@
 	query_accesslog.Execute()
 
 
+#ifdef TOPIC_SPAM_DELAY
 #undef TOPIC_SPAM_DELAY
+#endif
+#ifdef UPLOAD_LIMIT
 #undef UPLOAD_LIMIT
+#endif
+#ifdef MIN_CLIENT_VERSION
 #undef MIN_CLIENT_VERSION
+#endif
 
 //checks if a client is afk
 //3000 frames = 5 minutes

@@ -48,6 +48,7 @@
 	if(!machine_recipes)
 		machine_recipes = autolathe_recipes
 
+
 /obj/machinery/autolathe/interact(mob/user as mob)
 
 	update_recipe_list()
@@ -58,7 +59,7 @@
 
 	if(shocked)
 		shock(user, 50)
-	var/dat = "<html>"
+	var/dat = ""
 	dat += "<center><h1>Autolathe Control Panel</h1><hr/>"
 
 	if(!disabled)
@@ -119,9 +120,14 @@
 		dat += wires.GetInteractWindow()
 
 		dat += "<hr>"
-	dat += "</html>"
-
-	usr << browse(dat, "window=autolathe")
+	// Add in-UI Close and open as a borderless styled window
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "Autolathe", body, "window=autolathe;size=700x600;can_close=0;can_resize=0;border=0;titlebar=0")
+	// Keep legacy onclose hook
 	onclose(user, "autolathe")
 
 /obj/machinery/autolathe/attackby(var/obj/item/O as obj, var/mob/user as mob)
@@ -220,6 +226,13 @@
 
 /obj/machinery/autolathe/OnTopic(user, href_list, state)
 	set waitfor = 0
+	if(href_list["ui_close"]) {
+		user << browse(null, "window=autolathe")
+		if(ismob(user))
+			var/mob/M = user
+			M.unset_machine()
+		return TOPIC_HANDLED
+	}
 	if(href_list["change_category"])
 		var/choice = input("Which category do you wish to display?") as null|anything in autolathe_categories+"All"
 		if(!choice || !CanUseTopic(user, state))

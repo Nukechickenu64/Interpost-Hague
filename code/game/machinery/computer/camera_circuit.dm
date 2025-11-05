@@ -55,7 +55,6 @@
 		if (!ishuman(user))
 			return ..(user)
 		var/t = "<B>Circuitboard Console - Camera Monitoring Computer</B><BR>"
-		t += "<A href='?src=\ref[src];close=1'>Close</A><BR>"
 		t += "<hr> Please select a camera network:<br>"
 
 		for(var/curNet in possibleNets)
@@ -71,15 +70,20 @@
 				t += "<A href='?src=\ref[src];auth=1'><b>*Authenticate*</b></A> (Requires an appropriate access ID)<br>"
 		else
 			t += "<A href='?src=\ref[src];auth=1'>*Authenticate*</A> (Requires an appropriate access ID)<BR>"
-		t += "<A href='?src=\ref[src];close=1'>Close</A><BR>"
-		user << browse(t, "window=camcircuit;size=500x400")
-		onclose(user, "camcircuit")
+	// Styled header with Close inside the page and borderless window
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += t
+	ui_browse_styled(user, "Camera Circuit", body, "window=camcircuit;size=500x400;can_close=0;can_resize=0;border=0;titlebar=0")
+	onclose(user, "camcircuit")
 
 	Topic(href, href_list)
 		..()
-		if( href_list["close"] )
+		if( href_list["ui_close"] )
 			usr << browse(null, "window=camcircuit")
-			usr.machine = null
+			usr.unset_machine()
 			return
 		else if(href_list["net"])
 			network = href_list["net"]

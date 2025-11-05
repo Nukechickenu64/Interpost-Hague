@@ -123,21 +123,20 @@
 	if(istype(pages[page], /obj/item/weapon/paper))
 		var/obj/item/weapon/paper/P = W
 		if(!(istype(usr, /mob/living/carbon/human) || isghost(usr) || istype(usr, /mob/living/silicon)))
-			dat+= "<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[stars(P.info)][P.stamps]</BODY></HTML>"
+			dat += "[stars(P.info)][P.stamps]"
 		else
-			dat+= "<HTML><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY>[P.info][P.stamps]</BODY></HTML>"
-		user << browse(dat, "window=[name]")
+			dat += "[P.info][P.stamps]"
+		var/page_html = ui_build_styled_html(name, dat)
+		user << browse(page_html, "window=[name]")
 	else if(istype(pages[page], /obj/item/weapon/photo))
 		var/obj/item/weapon/photo/P = W
 		user << browse_rsc(P.img, "tmp_photo.png")
 		var/back_text = ""
 		if(P && P.scribble)
-			back_text = "<div> Written on the back:<br><i>[P.scribble]</i>"
-		user << browse(dat + "<html><head><title>[P.name]</title></head>" \
-		+ "<body style='overflow:hidden'>" \
-		+ "<div> <img src='tmp_photo.png' width = '180'" \
-		+ "[back_text]"\
-		+ "</body></html>", "window=[name]")
+			back_text = "<div>Written on the back:<br><i>[P.scribble]</i></div>"
+		var/body = dat + "<div style='overflow:hidden'><div><img src='tmp_photo.png' width='180'></div>" + back_text + "</div>"
+		var/page_html2 = ui_build_styled_html(name, body)
+		user << browse(page_html2, "window=[name]")
 
 /obj/item/weapon/paper_bundle/attack_self(mob/user as mob)
 	src.show_content(user)

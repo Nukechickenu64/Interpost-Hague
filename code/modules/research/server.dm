@@ -167,6 +167,11 @@
 	return ..()
 
 /obj/machinery/computer/rdservercontrol/OnTopic(user, href_list, state)
+	if(href_list["ui_close"]) {
+		usr << browse(null, "window=server_control")
+		usr.unset_machine()
+		return TOPIC_HANDLED
+	}
 	if(href_list["main"])
 		screen = 0
 		. = TOPIC_REFRESH
@@ -290,7 +295,13 @@
 			for(var/obj/machinery/r_n_d/server/S in servers)
 				dat += "[S.name] <A href='?src=\ref[src];send_to=[S.server_id]'> (Transfer)</A><BR>"
 			dat += "<HR><A href='?src=\ref[src];main=1'>Main Menu</A>"
-	user << browse("<TITLE>R&D Server Control</TITLE><HR>[dat]", "window=server_control;size=575x400")
+	// Wrap in diegetic styled UI with top-right close
+	var/body = ""
+	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
+	body += "</div>"
+	body += dat
+	ui_browse_styled(user, "R&D Server Control", body, "window=server_control;size=575x420;can_close=0;can_resize=0;border=0;titlebar=0")
 	onclose(user, "server_control")
 	return
 

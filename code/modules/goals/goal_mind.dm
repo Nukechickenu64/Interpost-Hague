@@ -12,7 +12,7 @@
 	if(LAZYLEN(goals))
 		for(var/i = 1 to LAZYLEN(goals))
 			var/datum/goal/goal = goals[i]
-			. += "[i]. [goal.summarize(show_success, admin, position = i)]"
+			. += "[i]. [goal.summarize(show_success, admin = admin, position = i)]"
 
 // Create and display personal goals for this round.
 /datum/mind/proc/generate_goals(var/datum/job/job, var/adding_goals = FALSE, var/add_amount, var/is_spawning = FALSE)

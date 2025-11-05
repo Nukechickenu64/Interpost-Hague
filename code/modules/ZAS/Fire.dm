@@ -8,6 +8,10 @@ If it gains pressure too slowly, it may leak or just rupture instead of explodin
 
 //#define FIREDBG
 
+#ifndef FIRE_LAYER
+#define FIRE_LAYER 4.16
+#endif
+
 /turf/var/obj/fire/fire = null
 
 //Some legacy definitions so fires can be started.

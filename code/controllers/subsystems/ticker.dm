@@ -545,9 +545,11 @@ Helpers
 	round_end_stats += "Total bloodshed: <font color='red'><B>[GLOB.total_deaths]</B></font>.\n"
 	for(var/old_god in GLOB.all_religions)
 		if(old_god != LEGAL_RELIGION)
-			if(GLOB.all_religions[old_god].followers.len > 0)
+			var/datum/religion/R = GLOB.all_religions[old_god]
+			var/list/followers = R ? R.followers : null
+			if(followers && followers.len > 0)
 				round_end_stats += "<b>The [old_god] worshippers were:</b>\n"
-				for(var/H in GLOB.all_religions[old_god].followers)
+				for(var/H in followers)
 					round_end_stats += "<font color='red'><b>[H]</b></font>\n"
 	to_world(round_end_stats)
 

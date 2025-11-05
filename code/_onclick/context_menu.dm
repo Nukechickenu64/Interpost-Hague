@@ -97,7 +97,7 @@
 	html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
 	html += "</style>"
 	// Auto-fit the browser window to the content once it finishes laying out
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
 	html += "</head><body><div class='wrap'>"
 	html += "<div class='hdr'>Local Context</div>"
 	html += "<div class='accent'></div>"
@@ -193,7 +193,7 @@
 	html += ".iconwrap{display:flex;align-items:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border-radius:4px;border:1px solid #3ad;background:#091018;}"
 	html += "</style>"
 	// Auto-fit this object actions window to its content after render (icons may change height)
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
 	html += "</head><body><div class='wrap'>"
 	var/title = sanitizeSafe(target.name, 64, 1, 1, 1)
 	html += "<div class='hdr'>[title]</div>"

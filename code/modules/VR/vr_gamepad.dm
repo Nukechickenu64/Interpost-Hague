@@ -153,6 +153,12 @@
 		move_outside()
 	return ..()
 
+#ifdef RESPAWNS_FOR_PAYMENT
 #undef RESPAWNS_FOR_PAYMENT
+#endif
+#ifdef PRICE_PER_USE
 #undef PRICE_PER_USE
+#endif
+#ifdef POINTS_FOR_CHEATER
 #undef POINTS_FOR_CHEATER
+#endif

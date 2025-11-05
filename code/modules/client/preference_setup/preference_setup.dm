@@ -102,8 +102,9 @@ var/const/CHARACTER_PREFERENCE_INPUT_TITLE = "Character Preference"
 
 	if(href_list["category"])
 		var/category = locate(href_list["category"])
-		if(category && category in categories)
-			selected_category = category
+		if(category)
+			if(category in categories)
+				selected_category = category
 		. = 1
 
 	if(.)
@@ -175,7 +176,8 @@ var/const/CHARACTER_PREFERENCE_INPUT_TITLE = "Character Preference"
 
 /datum/category_item/player_setup_item/New()
 	..()
-	var/datum/category_collection/player_setup_collection/psc = category.collection
+	var/datum/category_group/player_setup_category/G = category
+	var/datum/category_collection/player_setup_collection/psc = G.collection
 	pref = psc.preferences
 
 /datum/category_item/player_setup_item/Destroy()

@@ -129,9 +129,11 @@
 				return TOPIC_REFRESH
 	if(href_list["stasis"])
 		var/nstasis = text2num(href_list["stasis"])
-		if(stasis != nstasis && nstasis in stasis_settings)
-			stasis = text2num(href_list["stasis"])
-			return TOPIC_REFRESH
+		if(stasis != nstasis)
+			// Only update if the requested stasis value is one of the allowed settings
+			if(nstasis in stasis_settings)
+				stasis = nstasis
+				return TOPIC_REFRESH
 
 /obj/machinery/sleeper/attack_ai(var/mob/user)
 	return attack_hand(user)

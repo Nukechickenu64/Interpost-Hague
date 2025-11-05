@@ -1,6 +1,6 @@
-/*  
+/*
 	Requests are weird.
-	Basically each request is "fufilled" by praying somehow.  Examples: Pray in public.  Place required items around shrine then pray.  Kill a specific player, then praise_god  
+	Basically each request is "fufilled" by praying somehow.  Examples: Pray in public.  Place required items around shrine then pray.  Kill a specific player, then praise_god
 	The important thing is prayer is the trigger for a request to be fufilled.  This way, all prayer has to do is call "is_fufilled" for the current request
 	And all types should be handled.
 */
@@ -30,7 +30,12 @@
 	var/offering_item
 
 /datum/request/offering/New(var/religion)
-	offering_item = pick(GLOB.all_religions[religion].offering_items)
+	// Type the religion datum so DreamChecker can see the field
+	var/datum/religion/R = GLOB.all_religions[religion]
+	if(istype(R))
+		offering_item = pick(R.offering_items)
+	else
+		offering_item = null
 	offering_item = new offering_item
 	message += "   Place \the [offering_item] before a shrine and praise your god."
 
@@ -51,7 +56,7 @@
 
 /datum/reward/proc/do_reward()
 	to_world("You should not be seeing this!")
-	
+
 /datum/reward/money
 	name = "Money" //LOADSA EMONE
 	message="You have been graced with a bonus!"
@@ -77,7 +82,7 @@
 	message="You feel an incredible power rising within you."
 
 /datum/reward/str_up/do_reward(var/mob/living/target)
-	var/initial = target.stats[STAT_ST] 
+	var/initial = target.stats[STAT_ST]
 	to_chat(target, message)
 	target.stats[STAT_ST] = 20
 	spawn(1200)
@@ -92,7 +97,7 @@
 
 datum/punishment/proc/do_punishment()
 	to_world("You should not be seeing this!")
-	
+
 datum/punishment/money
 	name = "Money" //LOADSA EMONE
 	message="Your wages have been garnished..."
@@ -119,7 +124,7 @@ datum/punishment/str_up/
 	message="You feel a terrible weakness in your body."
 
 datum/punishment/str_up/do_punishment(var/mob/living/target)
-	var/initial = target.stats[STAT_ST] 
+	var/initial = target.stats[STAT_ST]
 	to_chat(target, message)
 	target.stats[STAT_ST] = 2
 	spawn(1200)

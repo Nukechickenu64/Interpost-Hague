@@ -1,10 +1,24 @@
+#ifndef isWrench
 #define isWrench(A)      (A && A.iswrench())
+#endif
+#ifndef isWelder
 #define isWelder(A)      (A && A.iswelder())
+#endif
+#ifndef isCoil
 #define isCoil(A)        (A && A.iscoil())
+#endif
+#ifndef isWirecutter
 #define isWirecutter(A)  (A && A.iswirecutter())
+#endif
+#ifndef isScrewdriver
 #define isScrewdriver(A) (A && A.isscrewdriver())
+#endif
+#ifndef isMultitool
 #define isMultitool(A)   (A && A.ismultitool())
+#endif
+#ifndef isCrowbar
 #define isCrowbar(A)     (A && A.iscrowbar())
+#endif
 //snowflake code because yes
 /atom/proc/iswrench()
 	return FALSE

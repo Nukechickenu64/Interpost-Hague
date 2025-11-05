@@ -289,10 +289,18 @@ datum/unit_test/robot_module_icons/start_test()
 
 	return 1
 
+#ifdef VULNERABLE
 #undef VULNERABLE
+#endif
+#ifdef IMMUNE
 #undef IMMUNE
+#endif
+#ifdef SUCCESS
 #undef SUCCESS
+#endif
+#ifdef FAILURE
 #undef FAILURE
+#endif
 
 datum/unit_test/species_base_skin
 	name = "MOB: Species base skin presence"

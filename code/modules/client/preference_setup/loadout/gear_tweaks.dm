@@ -1,7 +1,7 @@
 /datum/gear_tweak/proc/get_contents(var/metadata)
 	return
 
-/datum/gear_tweak/proc/get_metadata(var/user, var/metadata)
+/datum/gear_tweak/proc/get_metadata(var/user, var/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
 	return
 
 /datum/gear_tweak/proc/get_default()
@@ -96,7 +96,7 @@
 /datum/gear_tweak/path/get_default()
 	return valid_paths[1]
 
-/datum/gear_tweak/path/get_metadata(var/user, var/metadata)
+/datum/gear_tweak/path/get_metadata(var/user, var/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
 	return input(user, "Choose a type.", CHARACTER_PREFERENCE_INPUT_TITLE, metadata) as null|anything in valid_paths
 
 /datum/gear_tweak/path/tweak_gear_data(var/metadata, var/datum/gear_data/gear_data)
@@ -122,23 +122,26 @@
 	..()
 
 /datum/gear_tweak/contents/get_contents(var/metadata)
-	return "Contents: [english_list(metadata, and_text = ", ")]"
+	return "Contents: [english_list(metadata)]"
 
 /datum/gear_tweak/contents/get_default()
 	. = list()
 	for(var/i = 1 to valid_contents.len)
 		. += "Random"
 
-/datum/gear_tweak/contents/get_metadata(var/user, var/list/metadata)
-	. = list()
-	for(var/i = metadata.len to (valid_contents.len - 1))
-		metadata += "Random"
+
+/datum/gear_tweak/contents/get_metadata(var/user, var/list/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
+	// Start with a copy so we can update choices in place
+	. = islist(metadata) ? metadata.Copy() : list()
+	while(length(.) < valid_contents.len)
+		. += "Random"
 	for(var/i = 1 to valid_contents.len)
-		var/entry = input(user, "Choose an entry.", CHARACTER_PREFERENCE_INPUT_TITLE, metadata[i]) as null|anything in (valid_contents[i] + list("Random", "None"))
-		if(entry)
-			. += entry
-		else
+		var/list/options = valid_contents[i] + list("Random", "None")
+		var/default_choice = .[i]
+		var/choice = input(user, "Choose an entry.", title, default_choice) as null|anything in options
+		if(isnull(choice))
 			return metadata
+		.[i] = choice
 
 /datum/gear_tweak/contents/tweak_item(var/obj/item/I, var/list/metadata)
 	if(metadata.len != valid_contents.len)
@@ -175,7 +178,7 @@
 /datum/gear_tweak/reagents/get_default()
 	return "Random"
 
-/datum/gear_tweak/reagents/get_metadata(var/user, var/list/metadata)
+/datum/gear_tweak/reagents/get_metadata(var/user, var/list/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
 	. = input(user, "Choose an entry.", CHARACTER_PREFERENCE_INPUT_TITLE, metadata) as null|anything in (valid_reagents + list("Random", "None"))
 	if(!.)
 		return metadata
@@ -221,9 +224,9 @@
 	O = ValidTeslaLinks[metadata[7]]
 	if(O)
 		names += initial(O.name)
-	return "[english_list(names, and_text = ", ")]"
+	return "[english_list(names)]"
 
-/datum/gear_tweak/tablet/get_metadata(var/user, var/metadata)
+/datum/gear_tweak/tablet/get_metadata(var/user, var/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
 	. = list()
 
 	var/list/names = list()
