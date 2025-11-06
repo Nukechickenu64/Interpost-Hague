@@ -52,9 +52,10 @@
 		if (A && yes)
 			A.last_bumped = world.time
 			A.Bumped(src)
-		return
-	..()
-	return
+			return
+		else
+			..()
+			return
 
 /atom/movable/proc/set_glide_size(target = 8)
 	SEND_SIGNAL(src, COMSIG_MOVABLE_UPDATE_GLIDE_SIZE, target)
@@ -64,11 +65,15 @@
 		AM.set_glide_size(target)
 
 /atom/movable/proc/forceMove(atom/destination)
+	var/result = TRUE
+	// Fast path: no-op move
+	if(loc == destination)
+		result = FALSE
+		// Skip all movement side-effects when nothing changes
+		return result
+	// Error case last to avoid DC unreachable flags on subsequent code
 	if(QDELETED(src) && !QDESTROYING(src) && !isnull(destination))
 		CRASH("Attempted to forceMove a QDELETED [src] out of nullspace! Destination: [destination].")
-		return
-	if(loc == destination)
-		return FALSE
 	var/is_origin_turf = isturf(loc)
 	var/is_destination_turf = isturf(destination)
 	// It is a new area if:
@@ -95,7 +100,7 @@
 					AM.Crossed(src)
 			if(is_new_area && is_destination_turf)
 				destination.loc.Entered(src, origin)
-	return 1
+	return result
 
 /atom/movable/forceMove(atom/dest)
 	var/old_loc = loc

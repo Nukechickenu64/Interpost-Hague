@@ -319,8 +319,7 @@ THAT STUPID GAME KIT
 			update()
 		user << browse(src.data, "window=game_kit;size=600x748")
 		onclose(user, "game_kit")
-		return
-	return
+		return 1
 
 /obj/item/weapon/game_kit/Topic(href, href_list)
 	..()

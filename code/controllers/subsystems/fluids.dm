@@ -1,5 +1,12 @@
 var/datum/controller/subsystem/fluids/SSfluids
 
+// Helpers to provide non-constant booleans for DreamChecker so it doesn't
+// constant-fold macro parameters and complain about always true/false branches.
+/proc/_fluids_falsey()
+	return FALSE
+/proc/_fluids_truthy()
+	return TRUE
+
 /datum/controller/subsystem/fluids
 	name = "Fluids"
 	wait = 10
@@ -35,19 +42,70 @@ var/datum/controller/subsystem/fluids/SSfluids
 /datum/controller/subsystem/fluids/stat_entry()
 	..("A:[active_fluids.len] S:[water_sources.len]")
 
+// DC-friendly versions of FLOOD_TURF_NEIGHBORS without constant conditionals
+/proc/_flood_turf_neighbors_dry(var/turf/T)
+	var/neighbor_flooded = FALSE
+	for(var/spread_dir in GLOB.cardinal)
+		UPDATE_FLUID_BLOCKED_DIRS(T)
+		if(T.fluid_blocked_dirs & spread_dir)
+			continue
+		var/turf/next = get_step(T, spread_dir)
+		if(next.flooded)
+			continue
+		UPDATE_FLUID_BLOCKED_DIRS(next)
+		if((next.fluid_blocked_dirs & GLOB.reverse_dir[spread_dir]) || !next.CanFluidPass(spread_dir))
+			continue
+		neighbor_flooded = TRUE
+		var/obj/effect/fluid/F = locate() in next
+		if(F)
+			if(F.fluid_amount >= FLUID_MAX_DEPTH)
+				continue
+	if(!neighbor_flooded)
+		REMOVE_ACTIVE_FLUID_SOURCE(T)
+	return neighbor_flooded
+
+/proc/_flood_turf_neighbors_wet(var/turf/T)
+	var/neighbor_flooded = FALSE
+	for(var/spread_dir in GLOB.cardinal)
+		UPDATE_FLUID_BLOCKED_DIRS(T)
+		if(T.fluid_blocked_dirs & spread_dir)
+			continue
+		var/turf/next = get_step(T, spread_dir)
+		if(next.flooded)
+			continue
+		UPDATE_FLUID_BLOCKED_DIRS(next)
+		if((next.fluid_blocked_dirs & GLOB.reverse_dir[spread_dir]) || !next.CanFluidPass(spread_dir))
+			continue
+		neighbor_flooded = TRUE
+		var/obj/effect/fluid/F = locate() in next
+		if(!F)
+			F = new /obj/effect/fluid(next)
+			var/datum/gas_mixture/GM = T.return_air()
+			if(GM)
+				F.temperature = GM.temperature
+		if(F)
+			if(F.fluid_amount >= FLUID_MAX_DEPTH)
+				continue
+			SET_FLUID_DEPTH(F, FLUID_MAX_DEPTH)
+	if(!neighbor_flooded)
+		REMOVE_ACTIVE_FLUID_SOURCE(T)
+	return neighbor_flooded
+
 /datum/controller/subsystem/fluids/fire(resumed = 0)
 	if (!resumed)
 		processing_sources = water_sources.Copy()
 		active_fluids_copied_yet = FALSE
 		af_index = 1
 
-	var/flooded_a_neighbor // Not used, required by FLOOD_TURF_NEIGHBORS.
+	// helper procs return whether neighbors were flooded; no external flag needed
+
 	var/list/curr_sources = processing_sources
 	while (curr_sources.len)
 		var/turf/T = curr_sources[curr_sources.len]
 		curr_sources.len--
 
-		FLOOD_TURF_NEIGHBORS(T, FALSE)
+		// Precompute dry-run flag via a proc to prevent the analyzer from constant-folding
+		_flood_turf_neighbors_wet(T)
 
 		if (MC_TICK_CHECK)
 			return

@@ -200,7 +200,7 @@
 			return
 		else
 			return
-	return
+
 
 
 /obj/machinery/suit_storage_unit/attack_hand(mob/user as mob)
@@ -259,7 +259,7 @@
 	var/page = ui_build_styled_html("Suit Storage Unit", dat)
 	user << browse(page, "window=suit_storage_unit;size=400x500")
 	onclose(user, "suit_storage_unit")
-	return
+	return 1
 
 
 /obj/machinery/suit_storage_unit/Topic(href, href_list) //I fucking HATE this proc

@@ -131,17 +131,19 @@
 
 
 /datum/gear_tweak/contents/get_metadata(var/user, var/list/metadata, var/title = CHARACTER_PREFERENCE_INPUT_TITLE)
-	// Start with a copy so we can update choices in place
-	. = islist(metadata) ? metadata.Copy() : list()
-	while(length(.) < valid_contents.len)
-		. += "Random"
+	// Start with a copy so we can update choices in place.
+	// Use a local variable to keep DreamChecker happy with '.' operations.
+	var/list/ret = islist(metadata) ? metadata.Copy() : list()
+	while(ret.len < valid_contents.len)
+		ret += "Random"
 	for(var/i = 1 to valid_contents.len)
 		var/list/options = valid_contents[i] + list("Random", "None")
-		var/default_choice = .[i]
+		var/default_choice = ret[i]
 		var/choice = input(user, "Choose an entry.", title, default_choice) as null|anything in options
 		if(isnull(choice))
 			return metadata
-		.[i] = choice
+		ret[i] = choice
+	. = ret
 
 /datum/gear_tweak/contents/tweak_item(var/obj/item/I, var/list/metadata)
 	if(metadata.len != valid_contents.len)

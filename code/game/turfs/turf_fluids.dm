@@ -81,9 +81,8 @@
 
 	// Wake up ourself!
 	if(flooded)
-		var/flooded_a_neighbor = 0
-		FLOOD_TURF_NEIGHBORS(src, TRUE)
-		if(flooded_a_neighbor)
+		var/neighbor_flooded = _flood_turf_neighbors_dry(src)
+		if(neighbor_flooded)
 			ADD_ACTIVE_FLUID_SOURCE(src)
 	else
 		REMOVE_ACTIVE_FLUID_SOURCE(src)

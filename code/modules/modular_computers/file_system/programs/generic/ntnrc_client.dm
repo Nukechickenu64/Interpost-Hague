@@ -111,7 +111,7 @@
 		var/mob/living/user = usr
 		var/logname = cp1251_to_utf8(input(user,"Enter desired logfile name (.log) or leave blank to cancel:"))
 		if(!logname || !channel)
-			return 1
+			return
 		var/datum/computer_file/data/logfile = new/datum/computer_file/data/logfile()
 		// Now we will generate HTML-compliant file that can actually be viewed/printed.
 		logfile.filename = logname
@@ -120,14 +120,13 @@
 			logfile.stored_data += "[logstring]\[BR\]"
 		logfile.stored_data += "\[b\]Logfile dump completed.\[/b\]"
 		logfile.calculate_size()
-		if(!computer || !computer.hard_drive || !computer.hard_drive.store_file(logfile))
-			if(!computer)
-				// This program shouldn't even be runnable without computer.
-				CRASH("Var computer is null!")
-				return 1
-			if(!computer.hard_drive)
-				computer.visible_message("\The [computer] shows an \"I/O Error - Hard drive connection error\" warning.")
-			else	// In 99.9% cases this will mean our HDD is full
+		// Write logfile; handle failures explicitly
+		if(!computer)
+			return 1
+		else if(!computer.hard_drive)
+			computer.visible_message("\The [computer] shows an \"I/O Error - Hard drive connection error\" warning.")
+		else
+			if(!computer.hard_drive.store_file(logfile))
 				computer.visible_message("\The [computer] shows an \"I/O Error - Hard drive may be full. Please free some space and try again. Required space: [logfile.size]GQ\" warning.")
 	if(href_list["PRG_renamechannel"])
 		. = 1

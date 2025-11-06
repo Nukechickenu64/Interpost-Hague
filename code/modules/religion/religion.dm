@@ -219,7 +219,7 @@ proc/generate_random_prayer()//This generates a new one.
 				religion_token = new_holy_item
 		else
 			to_chat(src, "<span class='warning'>You can't praise your god without your [user_religion.holy_item]!</span>")
-		return
+		return 0
 	if(!doing_something)
 		var/self = "You raise your [user_religion.holy_item] and chant praise to your god."
 		visible_message("<span class='warning'>\The [src] begins speaking praise for their god.</span>", "<span class='notice'>[self]</span>", "[src] praises their god! .")
@@ -238,12 +238,10 @@ proc/generate_random_prayer()//This generates a new one.
 		else
 			to_chat(src, "<span class='notice'>Your prayer is interrupted.</span>")
 			doing_something = 0
-			return
-		return 0
+			return 0
 	else
 		to_chat(src, "<span class='notice'>You are already doing something.</span>")
 		return 0
-	return 0
 
 
 /mob/living/proc/make_shrine()

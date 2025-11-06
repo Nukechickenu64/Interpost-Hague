@@ -10,7 +10,6 @@
 		custom_lawset.add_inherent_law(law)
 	return custom_lawset
 
-	return gear_list[gear_slot]
 
 /datum/category_item/player_setup_item/law_pref
 	name = "Laws"

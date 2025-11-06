@@ -1051,13 +1051,13 @@
 			return 1
 		else
 			to_chat(user, "The cover is already unlocked.")
-		return
+		return 0
 
 	if(opened)//Cover is open
-		if(emagged)	return//Prevents the X has hit Y with Z message also you cant emag them twice
+		if(emagged)	return 0//Prevents the X has hit Y with Z message also you cant emag them twice
 		if(wiresexposed)
 			to_chat(user, "You must close the panel first")
-			return
+			return 0
 		else
 			sleep(6)
 			if(prob(50))
@@ -1105,4 +1105,3 @@
 				to_chat(user, "You fail to hack [src]'s interface.")
 				to_chat(src, "Hack attempt detected.")
 			return 1
-		return
