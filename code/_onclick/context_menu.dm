@@ -147,6 +147,13 @@
 	if(!client || !target)
 		return
 
+	// Determine if the viewer has admin privileges
+	var/is_admin = (client && client.holder)
+	// Precompute jump target turf for admin jump link
+	var/turf/admin_jump_turf = null
+	if(is_admin)
+		admin_jump_turf = get_turf(target)
+
 	// Attempt to capture a flat icon of the target
 	var/icon/I = null
 	var/icon_w = 32
@@ -176,6 +183,11 @@
 
 	// Precompute dynamic height
 	var/items_count = verbs_list.len + 4 // include standard actions
+	if(is_admin)
+		// Admin section: VV + Jump are always present; PP + Follow only for mobs
+		items_count += 2
+		if(ismob(target))
+			items_count += 2
 	var/base_h = 150
 	var/row_h = 18
 	var/min_h = 160
@@ -215,6 +227,19 @@
 			var/label = entry["label"]
 			var/procname = entry["proc"]
 			html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=[url_encode(procname)]'>[label]</a></div>"
+
+	// Admin-only actions
+	if(is_admin)
+		html += "<div class='accent'></div><div class='note'>Admin</div>"
+		// View Variables (VV)
+		html += "<div class='item'>&#8226; <a href='?_src_=vars;Vars=\ref[target]'>VV</a> <span class='note'>(View Variables)</span></div>"
+		// Player Panel (PP) and Follow, only meaningful for mobs
+		if(ismob(target))
+			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayeropts=\ref[target]'>PP</a> <span class='note'>(Player Panel)</span></div>"
+			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayerobservefollow=\ref[target]'>Follow</a></div>"
+		// Coordinate Jump (JMP) to the target's turf, if available
+		if(admin_jump_turf)
+			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayerobservecoodjump=1;X=[admin_jump_turf.x];Y=[admin_jump_turf.y];Z=[admin_jump_turf.z]'>Jump</a></div>"
 
 	// Controls
 	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a> | <a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
