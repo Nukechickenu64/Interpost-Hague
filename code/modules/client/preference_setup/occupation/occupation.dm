@@ -90,105 +90,207 @@
 
 		. += "Rank: <a href='?src=\ref[src];char_rank=1'>[pref.char_rank]</a>	"
 	. += "<br>"
-	. += "<table width='100%' cellpadding='1' cellspacing='0'><tr><td width='20%'>" // Table within a table for alignment, also allows you to easily add more columns.
-	. += "<table width='100%' cellpadding='1' cellspacing='0'>"
-	var/index = -1
-	if(splitLimit)
-		limit = round((job_master.occupations.len+1)/2)
 
-	//The job before the current job. I only use this to get the previous jobs color when I'm filling in blank rows.
-	var/datum/job/lastJob
-	if (!job_master)		return
-	for(var/datum/job/job in job_master.occupations)
-
-		index += 1
-		if((index >= limit) || (job.title in splitJobs))
-			if((index < limit) && (lastJob != null))
-				//If the cells were broken up by a job in the splitJob list then it will fill in the rest of the cells with
-				//the last job's selection color. Creating a rather nice effect.
-				for(var/i = 0, i < (limit - index), i += 1)
-					. += "<tr bgcolor='[lastJob.selection_color]'><td width='60%' align='right'><a>&nbsp</a></td><td><a>&nbsp</a></td></tr>"
-			. += "</table></td><td width='20%'><table width='100%' cellpadding='1' cellspacing='0'>"
-			index = 0
-
-		var/tooltip = ""
-		if(job.job_desc)
-			var/desc_text = sanitize(job.job_desc)
-			tooltip = " title='[desc_text]'"
-
-		. += "<tr bgcolor='[job.selection_color]'[tooltip]><td width='60%' align='right'>"
-		var/rank = job.title
-		lastJob = job
-		if((job.sex_lock && job.sex_lock != user.client.prefs.gender) || (job.total_positions == 0 && job.spawn_positions == 0))
-			. += "<del>[rank]</del></td><td><b> \[UNAVAILABLE]</b></td></tr>"
-			continue
-		if(jobban_isbanned(user, rank))
-			. += "<del>[rank]</del></td><td><b> \[BANNED]</b></td></tr>"
-			continue
-		if(!job.player_old_enough(user.client))
-			var/available_in_days = job.available_in_days(user.client)
-			. += "<del>[rank]</del></td><td> \[IN [(available_in_days)] DAYS]</td></tr>"
-			continue
-		if(job.minimum_character_age && user.client && (user.client.prefs.age < job.minimum_character_age))
-			. += "<del>[rank]</del></td><td> \[MINIMUM CHARACTER AGE: [job.minimum_character_age]]</td></tr>"
-			continue
-
-		if(!job.is_species_allowed(S))
-			. += "<del>[rank]</del></td><td><b> \[SPECIES RESTRICTED]</b></td></tr>"
-			continue
-
-		if(job.allowed_branches)
-			if(!player_branch)
-				. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> \[BRANCH RESTRICTED]</b></a></td></tr>"
-				continue
-			if(!is_type_in_list(player_branch, job.allowed_branches))
-				. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> \[NOT FOR [player_branch.name_short]]</b></a></td></tr>"
-				continue
-
-		if(job.allowed_ranks)
-			if(!player_rank)
-				. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> \[RANK RESTRICTED]</b></a></td></tr>"
-				continue
-
-			if(!is_type_in_list(player_rank, job.allowed_ranks))
-				. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> \[NOT FOR [player_rank.name_short || player_rank.name]]</b></a></td></tr>"
-				continue
-
-		if(("Assistant" in pref.job_low) && (rank != "Assistant"))
-			. += "<font color=grey>[rank]</font></td><td></td></tr>"
-			continue
-		if((rank in GLOB.command_positions) || (rank == "AI"))//Bold head jobs
-			. += "<b>[rank]</b>"
+	// Split jobs by opposition flag
+	var/list/crew_jobs = list()
+	var/list/opposition_jobs = list()
+	for(var/datum/job/j in job_master.occupations)
+		if(j && j.opposition)
+			opposition_jobs += j
 		else
-			. += "[rank]"
+			crew_jobs += j
 
-		. += "</td><td width='40%'>"
+	// Render crew section
+	if(crew_jobs.len)
+		. += "<h3>the crew</h3>"
+		. += "<table width='100%' cellpadding='1' cellspacing='0'><tr><td width='20%'>"
+		. += "<table width='100%' cellpadding='1' cellspacing='0'>"
+		var/index = -1
+		var/local_limit = splitLimit ? round((crew_jobs.len+1)/2) : limit
+		var/datum/job/lastJob
+		for(var/datum/job/job in crew_jobs)
+			index += 1
+			if((index >= local_limit) || (job.title in splitJobs))
+				if((index < local_limit) && (lastJob != null))
+					for(var/i = 0, i < (local_limit - index), i += 1)
+						. += "<tr bgcolor='[lastJob.selection_color]'><td width='60%' align='right'><a>&nbsp</a></td><td><a>&nbsp</a></td></tr>"
+				. += "</table></td><td width='20%'><table width='100%' cellpadding='1' cellspacing='0'>"
+				index = 0
 
-		. += "<a href='?src=\ref[src];set_job=[rank]'>"
+			var/tooltip = ""
+			if(job.job_desc)
+				var/desc_text = sanitize(job.job_desc)
+				tooltip = " title='[desc_text]'"
 
-		if(rank == "Assistant")//Assistant is special
-			if("Assistant" in pref.job_low)
-				. += " <font color=55cc55>\[Yes]</font>"
+			. += "<tr bgcolor='[job.selection_color]'[tooltip]><td width='60%' align='right'>"
+			var/rank = job.title
+			lastJob = job
+			if((job.sex_lock && job.sex_lock != user.client.prefs.gender) || (job.total_positions == 0 && job.spawn_positions == 0))
+				. += "<del>[rank]</del></td><td><b> (UNAVAILABLE)</b></td></tr>"
+				continue
+			if(jobban_isbanned(user, rank))
+				. += "<del>[rank]</del></td><td><b> (BANNED)</b></td></tr>"
+				continue
+			if(!job.player_old_enough(user.client))
+				var/available_in_days = job.available_in_days(user.client)
+				. += "<del>[rank]</del></td><td> (IN [available_in_days] DAYS)</td></tr>"
+				continue
+			if(job.minimum_character_age && user.client && (user.client.prefs.age < job.minimum_character_age))
+				. += "<del>[rank]</del></td><td> (MINIMUM CHARACTER AGE: [job.minimum_character_age])</td></tr>"
+				continue
+
+			if(!job.is_species_allowed(S))
+				. += "<del>[rank]</del></td><td><b> (SPECIES RESTRICTED)</b></td></tr>"
+				continue
+
+			if(job.allowed_branches)
+				if(!player_branch)
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> (BRANCH RESTRICTED)</b></a></td></tr>"
+					continue
+				if(!is_type_in_list(player_branch, job.allowed_branches))
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> (NOT FOR [player_branch.name_short])</b></a></td></tr>"
+					continue
+
+			if(job.allowed_ranks)
+				if(!player_rank)
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> (RANK RESTRICTED)</b></a></td></tr>"
+					continue
+
+				if(!is_type_in_list(player_rank, job.allowed_ranks))
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> (NOT FOR [player_rank.name_short || player_rank.name])</b></a></td></tr>"
+					continue
+
+			if(("Assistant" in pref.job_low) && (rank != "Assistant"))
+				. += "<font color=grey>[rank]</font></td><td></td></tr>"
+				continue
+			if((rank in GLOB.command_positions) || (rank == "AI"))
+				. += "<b>[rank]</b>"
 			else
-				. += " <font color=black>\[No]</font>"
-			if(job.alt_titles) //Blatantly cloned from a few lines down.
-				. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>\[[pref.GetPlayerAltTitle(job)]\]</a></td></tr>"
-			. += "</a></td></tr>"
-			continue
+				. += "[rank]"
 
-		if(pref.job_high == job.title)
-			. += " <font color=55cc55>\[High]</font>"
-		else if(job.title in pref.job_medium)
-			. += " <font color=eecc22>\[Medium]</font>"
-		else if(job.title in pref.job_low)
-			. += " <font color=cc5555>\[Low]</font>"
-		else
-			. += " <font color=black>\[NEVER]</font>"
-		if(job.alt_titles)
-			. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>\[[pref.GetPlayerAltTitle(job)]\]</a></td></tr>"
-		. += "</a></td></tr>"
-	. += "</td'></tr></table>"
-	. += "</center></table><center>"
+			. += "</td><td width='40%'>"
+
+			. += "<a href='?src=\ref[src];set_job=[rank]'>"
+
+			if(rank == "Assistant")
+				if("Assistant" in pref.job_low)
+					. += " <font color=55cc55>(Yes)</font>"
+				else
+					. += " <font color=black>(No)</font>"
+				if(job.alt_titles)
+					. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>([pref.GetPlayerAltTitle(job)])</a></td></tr>"
+				. += "</a></td></tr>"
+				continue
+
+			if(pref.job_high == job.title)
+				. += " <font color=55cc55>(High)</font>"
+			else if(job.title in pref.job_medium)
+				. += " <font color=eecc22>(Medium)</font>"
+			else if(job.title in pref.job_low)
+				. += " <font color=cc5555>(Low)</font>"
+			else
+				. += " <font color=black>(NEVER)</font>"
+			if(job.alt_titles)
+				. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>([pref.GetPlayerAltTitle(job)])</a></td></tr>"
+			. += "</a></td></tr>"
+		. += "</td'></tr></table>"
+		. += "</center></table><center>"
+
+	// Render opposition section
+	if(opposition_jobs.len)
+		. += "<h3>the opposition</h3>"
+		. += "<table width='100%' cellpadding='1' cellspacing='0'><tr><td width='20%'>"
+		. += "<table width='100%' cellpadding='1' cellspacing='0'>"
+		var/index = -1
+		var/local_limit = splitLimit ? round((opposition_jobs.len+1)/2) : limit
+		var/datum/job/lastJob = null
+		for(var/datum/job/job in opposition_jobs)
+			index += 1
+			if((index >= local_limit) || (job.title in splitJobs))
+				if((index < local_limit) && (lastJob != null))
+					for(var/i = 0, i < (local_limit - index), i += 1)
+						. += "<tr bgcolor='[lastJob.selection_color]'><td width='60%' align='right'><a>&nbsp</a></td><td><a>&nbsp</a></td></tr>"
+				. += "</table></td><td width='20%'><table width='100%' cellpadding='1' cellspacing='0'>"
+				index = 0
+
+			var/tooltip = ""
+			if(job.job_desc)
+				var/desc_text2 = sanitize(job.job_desc)
+				tooltip = " title='[desc_text2]'"
+
+			. += "<tr bgcolor='[job.selection_color]'[tooltip]><td width='60%' align='right'>"
+			var/rank = job.title
+			lastJob = job
+			if((job.sex_lock && job.sex_lock != user.client.prefs.gender) || (job.total_positions == 0 && job.spawn_positions == 0))
+				. += "<del>[rank]</del></td><td><b> (UNAVAILABLE)</b></td></tr>"
+				continue
+			if(jobban_isbanned(user, rank))
+				. += "<del>[rank]</del></td><td><b> (BANNED)</b></td></tr>"
+				continue
+			if(!job.player_old_enough(user.client))
+				var/available_in_days2 = job.available_in_days(user.client)
+				. += "<del>[rank]</del></td><td> (IN [available_in_days2] DAYS)</td></tr>"
+				continue
+			if(job.minimum_character_age && user.client && (user.client.prefs.age < job.minimum_character_age))
+				. += "<del>[rank]</del></td><td> (MINIMUM CHARACTER AGE: [job.minimum_character_age])</td></tr>"
+				continue
+
+			if(!job.is_species_allowed(S))
+				. += "<del>[rank]</del></td><td><b> (SPECIES RESTRICTED)</b></td></tr>"
+				continue
+
+			if(job.allowed_branches)
+				if(!player_branch)
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> (BRANCH RESTRICTED)</b></a></td></tr>"
+					continue
+				if(!is_type_in_list(player_branch, job.allowed_branches))
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_branches=[rank]'><b> (NOT FOR [player_branch.name_short])</b></a></td></tr>"
+					continue
+
+			if(job.allowed_ranks)
+				if(!player_rank)
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> (RANK RESTRICTED)</b></a></td></tr>"
+					continue
+
+				if(!is_type_in_list(player_rank, job.allowed_ranks))
+					. += "<del>[rank]</del></td><td><a href='?src=\ref[src];show_ranks=[rank]'><b> (NOT FOR [player_rank.name_short || player_rank.name])</b></a></td></tr>"
+					continue
+
+			if(("Assistant" in pref.job_low) && (rank != "Assistant"))
+				. += "<font color=grey>[rank]</font></td><td></td></tr>"
+				continue
+			if((rank in GLOB.command_positions) || (rank == "AI"))
+				. += "<b>[rank]</b>"
+			else
+				. += "[rank]"
+
+			. += "</td><td width='40%'>"
+
+			. += "<a href='?src=\ref[src];set_job=[rank]'>"
+
+			if(rank == "Assistant")
+				if("Assistant" in pref.job_low)
+					. += " <font color=55cc55>(Yes)</font>"
+				else
+					. += " <font color=black>(No)</font>"
+				if(job.alt_titles)
+					. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>([pref.GetPlayerAltTitle(job)])</a></td></tr>"
+				. += "</a></td></tr>"
+				continue
+
+			if(pref.job_high == job.title)
+				. += " <font color=55cc55>(High)</font>"
+			else if(job.title in pref.job_medium)
+				. += " <font color=eecc22>(Medium)</font>"
+			else if(job.title in pref.job_low)
+				. += " <font color=cc5555>(Low)</font>"
+			else
+				. += " <font color=black>(NEVER)</font>"
+			if(job.alt_titles)
+				. += "</a></td></tr><tr bgcolor='[lastJob.selection_color]'><td width='60%' align='center'>&nbsp</td><td><a href='?src=\ref[src];select_alt_title=\ref[job]'>([pref.GetPlayerAltTitle(job)])</a></td></tr>"
+			. += "</a></td></tr>"
+		. += "</td'></tr></table>"
+		. += "</center></table><center>"
 
 	switch(pref.alternate_option)
 		if(GET_RANDOM_JOB)
@@ -198,7 +300,7 @@
 		if(RETURN_TO_LOBBY)
 			. += "<u><a href='?src=\ref[src];job_alternative=1'>Return to lobby if preference unavailable</a></u>"
 
-	. += "<a href='?src=\ref[src];reset_jobs=1'>\[Reset\]</a></center>"
+	. += "<a href='?src=\ref[src];reset_jobs=1'>(Reset)</a></center>"
 	. += "</tt>"
 	. = jointext(.,null)
 

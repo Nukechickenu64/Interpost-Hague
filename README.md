@@ -24,3 +24,17 @@ See tgui/LICENSE.md for the MIT license.
 See tgui/assets/fonts/SIL-OFL-1.1-LICENSE.md for the SIL Open Font License.
 
 All assets including icons and sound are under a [Creative Commons 3.0 BY-SA license](http://creativecommons.org/licenses/by-sa/3.0/) unless otherwise indicated.
+
+## Admin testing: Mid-round job spawn
+
+Admins can test how any job spawns mid-round using the new verb:
+
+- Admin > Test Job Latejoin
+
+What it does:
+- Prompts you to pick a job and then runs the standard latejoin flow (same as a normal player joining mid-round), including spawnpoint selection, job equipment, custom items, records, and mode hooks.
+
+Usage tips:
+- Best used while you are a ghost or in the lobby. If you are in a normal body, the verb will prompt to ghost you first.
+- This does not bypass normal blockers (e.g., round ended, administrative join lock). If a job is unavailable, the spawn will fail and you will be restored to your previous mob.
+

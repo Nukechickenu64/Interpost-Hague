@@ -95,6 +95,7 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/paralyze_mob,
 	/client/proc/fixatmos,
 	/datum/admins/proc/sendFax
+    ,/client/proc/test_job_latejoin
 )
 var/list/admin_verbs_ban = list(
 	/client/proc/unban_panel,

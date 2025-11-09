@@ -50,6 +50,9 @@
 	// Optional short description shown in job selection UI on hover
 	var/job_desc
 
+	// Whether this job is considered part of the opposition (non-crew) for UI grouping
+	var/opposition = FALSE
+
 /datum/job/New()
 	..()
 	if(prob(100-availablity_chance))	//Close positions, blah blah.

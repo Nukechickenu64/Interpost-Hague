@@ -492,6 +492,83 @@ Traitors and the like can also be revived with the previous role mostly intact.
 	SSstatistics.add_field_details("admin_verb","RSPCH") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	return new_character
 
+/*
+Admin tool to test how specific jobs spawn mid-round.
+This uses the standard latejoin flow by temporarily moving the admin into a lobby mob
+and calling AttemptLateSpawn(), ensuring gear, spawnpoints, records, and hooks behave identically.
+*/
+/client/proc/test_job_latejoin()
+	set category = "Admin"
+	set name = "Test Job Latejoin"
+	set desc = "Spawn yourself mid-round as a selected job using the normal latejoin flow (use as ghost or from lobby)."
+
+	if(!holder)
+		to_chat(src, "Only administrators may use this command.")
+		return
+
+	if(GAME_STATE != RUNLEVEL_GAME)
+		to_chat(src, "<span class='warning'>The round is either not ready, or has already finished.</span>")
+		return
+
+	// Ensure the caller is a ghost or lobby player; offer to ghost if not.
+	if(!isghost(mob) && !istype(mob, /mob/new_player))
+		var/choice = alert(src, "You are not a ghost or in the lobby. Ghost now and proceed?", "Test Job Latejoin", "No", "Yes")
+		if(choice != "Yes")
+			return
+		var/mob/body = mob
+		if(body)
+			var/mob/observer/ghost/G = body.ghostize(1)
+			if(G)
+				G.admin_ghosted = 1
+
+	// Build a list of available job titles to choose from.
+	var/list/job_titles = list()
+	for(var/datum/job/J in job_master.occupations)
+		if(J && J.title)
+			job_titles += J.title
+
+	if(!job_titles || !job_titles.len)
+		to_chat(src, "<span class='warning'>No jobs are available to select.</span>")
+		return
+
+	var/selected = input(src, "Pick a job to test latejoin spawn for:", "Test Job Latejoin") as null|anything in job_titles
+	if(!selected)
+		return
+
+	var/datum/job/job = job_master.GetJob(selected)
+	if(!job)
+		to_chat(src, "<span class='warning'>That job no longer exists.</span>")
+		return
+
+	var/confirm = alert(src, "Spawn now as [selected]? This will create a new character for you.", "Confirm", "No", "Yes")
+	if(confirm != "Yes")
+		return
+
+	// Preserve our current mob (likely a ghost) to restore if spawn fails.
+	var/mob/old_mob = mob
+
+	// Create a temporary lobby mob and transfer client to it.
+	var/mob/new_player/np = new()
+	np.key = key
+
+	// Try the standard latejoin spawn using player spawnpoint preference.
+	// On success, AttemptLateSpawn() will qdel(np) and move the client to the new character.
+	// On failure, np will remain; restore the previous mob and clean up.
+	np.AttemptLateSpawn(job, src.prefs ? src.prefs.spawnpoint : null)
+
+	if(np && np.client)
+		// Spawn failed, put the client back and delete the temp lobby mob.
+		to_chat(src, "<span class='warning'>Latejoin spawn failed for [selected]. Restoring your previous mob.</span>")
+		if(old_mob)
+			old_mob.key = key
+		qdel(np)
+		return
+
+	// Success; log it for admin records.
+	log_admin("[key_name(usr)] used Test Job Latejoin as [selected].")
+	SSstatistics.add_field_details("admin_verb","TJLS")
+	return
+
 /client/proc/cmd_admin_add_freeform_ai_law()
 	set category = "Fun"
 	set name = "Add Custom AI law"

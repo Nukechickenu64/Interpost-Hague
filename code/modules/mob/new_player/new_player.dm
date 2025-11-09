@@ -353,32 +353,56 @@
 
 	dat += "Choose from the following open/valid positions:<br>"
 	dat += "<a href='byond://?src=\ref[src];invalid_jobs=1'>[show_invalid_jobs ? "Hide":"Show"] unavailable jobs.</a><br>"
-	dat += "<table>"
 
-	for(var/datum/job/job in job_master.occupations)
-		//Suprisingly, get_announcement_frequency is perfect for getting the name from the depratment_flag var
+	// Split into crew and opposition sections
+	var/list/crew_jobs = list()
+	var/list/opposition_jobs = list()
+	for(var/datum/job/j in job_master.occupations)
+		if(j && j.opposition)
+			opposition_jobs += j
+		else
+			crew_jobs += j
+
+	// Crew section
+	dat += "<h3>the crew</h3>"
+	dat += "<table>"
+	department = null
+	for(var/datum/job/job in crew_jobs)
 		if(department != get_department_names(job))
 			department = get_department_names(job)
 			dat += "<tr><td>[department]</td></tr>"
 		if(job && IsJobAvailable(job))
 			if(job.minimum_character_age && (client.prefs.age < job.minimum_character_age))
 				continue
-
 			if(job.sex_lock && job.sex_lock != src.client.prefs.gender)
 				continue
-
 			var/active = 0
-			// Only players with the job assigned and AFK for less than 10 minutes count as active
 			for(var/mob/M in GLOB.player_list) if(M.mind && M.client && M.mind.assigned_role == job.title && M.client.inactivity <= 10 * 60 * 10)
 				active++
-
 			if(job.is_restricted(client.prefs))
 				if(show_invalid_jobs)
 					dat += "<tr bgcolor='[job.selection_color]'><td><a style='text-decoration: line-through' href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title]</a></td><td>[job.current_positions]</td><td>(Active: [active])</td></tr>"
 			else
 				dat += "<tr bgcolor='[job.selection_color]'><td><a href='byond://?src=\ref[src];SelectedJob=[job.title]'>[job.title]</a></td><td>[job.current_positions]</td><td>(Active: [active])</td></tr>"
+	dat += "</table>"
 
-	dat += "</table></center>"
+	// Opposition section
+	if(opposition_jobs.len)
+		dat += "<h3>the opposition</h3>"
+		dat += "<table>"
+		for(var/datum/job/oj in opposition_jobs)
+			if(oj && IsJobAvailable(oj))
+				var/active2 = 0
+				for(var/mob/M2 in GLOB.player_list) if(M2.mind && M2.client && M2.mind.assigned_role == oj.title && M2.client.inactivity <= 10 * 60 * 10)
+					active2++
+				if(oj.is_restricted(client.prefs))
+					if(show_invalid_jobs)
+						dat += "<tr bgcolor='[oj.selection_color]'><td><a style='text-decoration: line-through' href='byond://?src=\ref[src];SelectedJob=[oj.title]'>[oj.title]</a></td><td>[oj.current_positions]</td><td>(Active: [active2])</td></tr>"
+				else
+					dat += "<tr bgcolor='[oj.selection_color]'><td><a href='byond://?src=\ref[src];SelectedJob=[oj.title]'>[oj.title]</a></td><td>[oj.current_positions]</td><td>(Active: [active2])</td></tr>"
+		dat += "</table>"
+
+	dat += "</center>"
 	//src << browse(jointext(dat, null), "window=latechoices;size=450x640;can_close=1")
 	var/datum/browser/popup = new(src, "Character Latejoin","Character Latejoin", 450, 640, src)
 	popup.set_content(dat)
