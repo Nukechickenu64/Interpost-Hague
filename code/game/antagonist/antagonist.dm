@@ -81,8 +81,13 @@
 
 /datum/antagonist/New()
 	GLOB.all_antag_types_[id] = src
-	GLOB.all_antag_spawnpoints_[landmark_id] = list()
-	GLOB.antag_names_to_ids_[role_text] = id
+	// Only initialize spawnpoint list if a landmark_id is defined, and avoid clobbering existing lists
+	if(landmark_id)
+		if(!islist(GLOB.all_antag_spawnpoints_[landmark_id]))
+			GLOB.all_antag_spawnpoints_[landmark_id] = list()
+	// Map display name to id if available
+	if(role_text)
+		GLOB.antag_names_to_ids_[role_text] = id
 	..()
 
 /datum/antagonist/proc/Initialize()
@@ -218,9 +223,14 @@
 	if(GAME_STATE >= RUNLEVEL_GAME && (isghostmind(player) || isnewplayer(player.current)) && !(player in SSticker.antag_pool))
 		log_debug("[player.key] was selected for [role_text] by lottery, but they are a ghost not in the antag pool.")
 		return 0
-	if(H.religion != LEGAL_RELIGION)
+	// If a human mob wasn't provided, attempt to use the player's current mob
+	var/mob/living/carbon/human/HH = H
+	if(!HH)
+		if(player && player.current && istype(player.current, /mob/living/carbon/human))
+			HH = player.current
+	if(HH && HH.religion != LEGAL_RELIGION)
 		log_debug("[player.key] was selected for [role_text] by lottery, but they are not of the legal religion.")
-		return
+		return 0
 
 	pending_antagonists |= player
 	log_debug("[player.key] has been selected for [role_text] by lottery.")

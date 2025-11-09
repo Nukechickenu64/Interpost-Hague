@@ -37,13 +37,16 @@
 		var/datum/antagonist/antag = all_antag_types[antag_type]
 		. += "<tr><td>[antag.role_text]: </td><td>"
 		if(jobban_isbanned(preference_mob(), antag.id) || (antag.id == MODE_MALFUNCTION && jobban_isbanned(preference_mob(), "AI")))
-			. += "<span class='danger'>\[BANNED\]</span><br>"
-		else if(antag.role_type in pref.be_special_role)
-			. += "<span class='linkOn'>High</span> <a href='?src=\ref[src];add_never=[antag.role_type]'>Never</a></br>"
-		else if(antag.role_type in pref.never_be_special_role)
-			. += "<span class='linkOn'>High</span> <a href='?src=\ref[src];add_never=[antag.role_type]'>Never</a></br>"
+			. += "<span class='danger'>&#91;BANNED&#93;</span><br>"
+		else if(antag.id in pref.be_special_role)
+			// Opted-in (High) — can switch to Low (neutral) or Never
+			. += "<span class='linkOn'>High</span> <a href='?src=\\ref[src];del_special=[antag.id]'>Low</a> <a href='?src=\\ref[src];add_never=[antag.id]'>Never</a><br>"
+		else if(antag.id in pref.never_be_special_role)
+			// Opted-out (Never) — can switch to High (opt-in) or Low (neutral)
+			. += "<a href='?src=\\ref[src];add_special=[antag.id]'>High</a> <a href='?src=\\ref[src];del_special=[antag.id]'>Low</a> <span class='linkOn'>Never</span><br>"
 		else
-			. += "<span class='linkOn'>High</span> <a href='?src=\ref[src];add_never=[antag.role_type]'>Never</a></br>"
+			// Neutral (Low) — can switch to High or Never
+			. += "<a href='?src=\\ref[src];add_special=[antag.id]'>High</a> <span class='linkOn'>Low</span> <a href='?src=\\ref[src];add_never=[antag.id]'>Never</a><br>"
 		. += "</td></tr>"
 
 /*
@@ -74,21 +77,24 @@
 	return 0
 
 /datum/category_item/player_setup_item/antagonism/candidacy/OnTopic(var/href,var/list/href_list, var/mob/user)
+	// Ensure the user can interact with this preferences page
+	if(!CanUseTopic(user))
+		return TOPIC_HANDLED
+
 	if(href_list["add_special"])
-		if(!(href_list["add_special"] in valid_special_roles()))
-			return TOPIC_HANDLED
+		// Opt-in (High): add to be_special, remove from never
 		pref.be_special_role |= href_list["add_special"]
 		pref.never_be_special_role -= href_list["add_special"]
 		return TOPIC_REFRESH
 
 	if(href_list["del_special"])
-		if(!(href_list["del_special"] in valid_special_roles()))
-			return TOPIC_HANDLED
+		// Neutral (Low): remove from both lists
 		pref.be_special_role -= href_list["del_special"]
 		pref.never_be_special_role -= href_list["del_special"]
 		return TOPIC_REFRESH
 
 	if(href_list["add_never"])
+		// Opt-out (Never): remove from be_special, add to never
 		pref.be_special_role -= href_list["add_never"]
 		pref.never_be_special_role |= href_list["add_never"]
 		return TOPIC_REFRESH
@@ -101,7 +107,7 @@
 	var/list/all_antag_types = GLOB.all_antag_types_
 	for(var/antag_type in all_antag_types)
 		var/datum/antagonist/antag = all_antag_types[antag_type]
-		private_valid_special_roles += antag.role_type
+		private_valid_special_roles += antag.id
 
 	var/list/ghost_traps = get_ghost_traps()
 	for(var/ghost_trap_key in ghost_traps)

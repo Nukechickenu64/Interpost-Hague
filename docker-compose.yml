@@ -1,18 +1,23 @@
-version: "3"
+version: "3.8"
+
 services:
   db:
     build: ./sql
-    image: bs12-db:latest
+    image: marrow-db:latest
+    restart: unless-stopped
     networks:
       - internal
     volumes:
-      - "./sql/test_db:/var/lib/mysql"
+      - ./sql/test_db:/var/lib/mysql
+
   game:
     build: .
-    image: bs12:latest
+    image: marrow:latest
+    restart: unless-stopped
     networks:
       - internal
     ports:
       - "8000:8000"
+
 networks:
   internal:

@@ -1,30 +1,37 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
-RUN mkdir /bs12
+# Create workspace
+RUN mkdir -p /marrow
 
-RUN dpkg --add-architecture i386
+# Enable 32-bit architecture for BYOND
+RUN dpkg --add-architecture i386 \
+ && apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	 unzip make wget ca-certificates \
+	 libc6:i386 libstdc++6:i386 libmariadb3:i386 \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update
+# Download and install BYOND (pinned)
+WORKDIR /marrow
+RUN wget -q https://www.byond.com/download/build/516/516.1669_byond_linux.zip \
+ && unzip -q 516.1669_byond_linux.zip \
+ && rm 516.1669_byond_linux.zip
 
-RUN apt-get install -y unzip make wget libmariadb2:i386
+# Copy source
+COPY . /marrow/Marrow
 
-RUN apt-get install -y libc6:i386 libstdc++6:i386
-
-# we are not using ADD here to download it because this file should never change
-# and thus, strictly caching it is okay
-RUN cd /bs12/ && wget -q https://www.byond.com/download/build/511/511.1385_byond_linux.zip
-
-RUN cd /bs12/ && unzip -q 511.1385_byond_linux.zip
-
-COPY . /bs12/Baystation12
-
-RUN /bin/bash -c '\
-cd /bs12/byond; \
+# Build BYOND userland and compile the game
+RUN /bin/bash -lc '\
+cd /marrow/byond; \
 make here >/dev/null; \
 source bin/byondsetup; \
-cd ../Baystation12; \
-ln -s /usr/lib/i386-linux-gnu/libmariadb.so.2 libmariadb.so; \
-DreamMaker baystation12.dme; \
+cd ../Marrow; \
+ln -sf /usr/lib/i386-linux-gnu/libmariadb.so.3 libmariadb.so || true; \
+DreamMaker Marrow.dme; \
 '
 
-ENTRYPOINT cd /bs12/Baystation12 && . /bs12/byond/bin/byondsetup && DreamDaemon baystation12.dmb 8000 -invisible -trusted
+# Default port (override with -p in docker run / compose)
+EXPOSE 8000
+
+# Run DreamDaemon
+ENTRYPOINT bash -lc ". /marrow/byond/bin/byondsetup && cd /marrow/Marrow && DreamDaemon Marrow.dmb 8000 -invisible -trusted -logself"

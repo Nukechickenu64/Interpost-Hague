@@ -1,6 +1,6 @@
 # Compile the BYOND project and summarize errors/warnings
 param(
-    [string]$DME = "Interpost-Hague.dme",
+    [string]$DME = "Marrow.dme",
     [string]$DmPath = "C:\\Program Files (x86)\\BYOND\\bin\\dm.exe"
 )
 

@@ -1,4 +1,4 @@
-/var/server_name = "Interpost: Marrow"
+/var/server_name = "Marrow"
 
 /var/game_id = null
 /hook/global_init/proc/generate_gameid()

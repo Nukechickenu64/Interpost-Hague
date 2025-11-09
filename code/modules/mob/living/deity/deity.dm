@@ -74,29 +74,66 @@
 /mob/living/deity/verb/choose_form()
 	set name = "Choose Form"
 	set category = "Godhood"
+	// Build a styled HTML window that looks like a divine tablet
+	var/list/html = list()
+	var/header = ""
+	header += "<html><head>"
+	header += "<meta http-equiv='X-UA-Compatible' content='IE=edge' />"
+	header += "<meta charset='utf-8' />"
+	header += "<style>"
+	header += "body { margin:0; padding:0; background:#0b0a0f; color:#e6e0d0; font-family: Segoe UI, Tahoma, Arial, sans-serif; }"
+	header += ".tablet { max-width: 760px; margin: 12px auto; padding: 16px 18px; background: radial-gradient(ellipse at top, #1b171f 0%, #0c0a0e 70%) no-repeat; border: 2px solid #3a2b40; border-radius: 14px; box-shadow: 0 0 16px rgba(170, 120, 255, 0.35), inset 0 0 12px rgba(170, 120, 255, 0.15); }"
+	header += ".tablet h1 { font-size: 22px; margin: 0 0 4px 0; text-align:center; letter-spacing: 1px; }"
+	header += ".tablet .subtitle { display:block; text-align:center; color:#cbbfd9; margin-bottom: 10px; font-size: 12px; }"
+	header += "table { width:100%; border-collapse: collapse; }"
+	header += "th, td { padding: 8px 10px; vertical-align: middle; }"
+	header += "th { background: #251f29; color:#e6e0d0; border-bottom: 1px solid #3a2b40; text-align:left; }"
+	header += "tr:nth-child(even) { background: rgba(255,255,255,0.03); }"
+	header += "tr:hover { background: rgba(170,120,255,0.10); }"
+	header += ".name a { color:#d7b6ff; text-decoration:none; font-weight:600; }"
+	header += ".name a:hover { text-decoration:underline; }"
+	header += ".icon { text-align:center; }"
+	header += ".desc { color:#d9d3c6; }"
+	header += ".footer { text-align:center; color:#b7a9c7; margin-top:10px; font-size:11px; }"
+	header += "img { image-rendering: pixelated; }"
+	header += "</style>"
+	header += "</head><body><div class='tablet'>"
+	header += "<h1>Choose a Form</h1>"
+	header += "<span class='subtitle'>This choice is permanent. Choose carefully, but quickly.</span>"
+	header += "<table>"
+	header += "<tr><th style='width:30%'>Name</th><th style='width:20%'>Theme</th><th style='width:50%'>Description</th></tr>"
 
-	var/dat = {"<h3><center><b>Choose a Form</b></h3>
-	<i>This choice is permanent. Choose carefully, but quickly.</i></center>
-	<table border="1" style="width:100%;border-collapse:collapse;">
-	<tr>
-		<th>Name</th>
-		<th>Theme</th>
-		<th>Description</th>
-	</tr>"}
+	html += header
+
 	var/list/forms = subtypesof(/datum/god_form)
+	for(var/T in forms)
+		var/datum/god_form/G = T
+		var/god_name_raw = initial(G.name)
+		var/god_name = escape_html(god_name_raw)
+		var/god_info = escape_html(initial(G.info))
 
-	for(var/form in forms)
-		var/datum/god_form/G = form
-		var/god_name = initial(G.name)
+		// Prepare icon resource with name-based handle
 		var/icon/god_icon = icon('icons/mob/mob.dmi', initial(G.pylon_icon_state))
-		send_rsc(src,god_icon, "[god_name].png")
-		dat += {"<tr>
-					<td><a href="?src=\ref[src];form=[G]">[god_name]</a></td>
-					<td><img src="[god_name].png"></td>
-					<td>[initial(G.info)]</td>
-				</tr>"}
-	dat += "</table>"
-	show_browser(src, dat, "window=godform;can_close=0")
+		send_rsc(src, god_icon, "[god_name_raw].png")
+
+		html += "<tr><td class='name'><a href='?src=\ref[src];form=[G]'>[god_name]</a></td><td class='icon'><img src='[god_name_raw].png'></td><td class='desc'>[god_info]</td></tr>"
+
+	html += "</table><div class='footer'>Tap a name to embody its essence.</div></div></body></html>"
+
+	var/dat = jointext(html, "")
+	show_browser(src, dat, "window=godform;title=Divine Tablet;size=780x560;can_close=0;noresize=1")
+
+/mob/living/deity/proc/escape_html(var/text)
+	if(isnull(text))
+		return ""
+	var/t = "[text]"
+	// Replace ampersand first to avoid double-encoding
+	t = replacetext(t, "&", "&amp;")
+	t = replacetext(t, "<", "&lt;")
+	t = replacetext(t, ">", "&gt;")
+	t = replacetext(t, "\"", "&quot;")
+	t = replacetext(t, "'", "&#39;")
+	return t
 
 /mob/living/deity/proc/set_form(var/type)
 	form = new type(src)

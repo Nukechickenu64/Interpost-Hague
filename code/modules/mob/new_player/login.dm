@@ -1,7 +1,7 @@
 /var/obj/effect/lobby_image = new/obj/effect/lobby_image()
 
 /obj/effect/lobby_image
-	name = "Interpost: Marrow" // god bless us
+	name = "Marrow" // renamed project
 	desc = "This shouldn't be read."
 	screen_loc = "WEST,SOUTH"
 	mouse_opacity = 0

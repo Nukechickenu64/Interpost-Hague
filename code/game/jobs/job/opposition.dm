@@ -16,8 +16,8 @@
     minimal_access = list()
     access = list()
 
-    // Give a simple outfit; can be customized later with a proper decl outfit
-    outfit_type = /decl/hierarchy/outfit/job/assistant
+    // Assign dedicated outfit datum
+    outfit_type = /decl/hierarchy/outfit/job/revolutionary
 
     equip(var/mob/living/carbon/human/H)
         ..()
