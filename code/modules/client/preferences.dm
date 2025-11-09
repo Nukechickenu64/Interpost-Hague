@@ -30,6 +30,10 @@
 	var/datum/category_collection/player_setup_collection/player_setup
 	var/datum/browser/panel
 
+	// morality profile selections
+	var/selected_sin
+	var/selected_virtue
+
 /datum/preferences/New(client/C)
 	if(istype(C))
 		client = C
@@ -270,6 +274,12 @@
 	character.citizenship = citizenship
 	character.personal_faction = faction
 	character.religion = religion
+
+	// Apply morality selections to the character
+	if(istype(character, /mob/living/carbon/human))
+		var/mob/living/carbon/human/H = character
+		H.moral_sin = selected_sin
+		H.moral_virtue = selected_virtue
 
 	if(!character.isSynthetic())
 		character.set_nutrition(rand(140,360))

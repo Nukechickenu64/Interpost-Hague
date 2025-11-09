@@ -2,6 +2,8 @@
 	var/level = 2
 	var/atom_flags = ATOM_FLAG_NO_TEMP_CHANGE
 	var/list/blood_DNA
+	var/moral_sin
+	var/moral_virtue
 	var/was_bloodied
 	var/blood_color
 	var/last_bumped = 0

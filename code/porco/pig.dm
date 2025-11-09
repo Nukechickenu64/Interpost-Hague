@@ -57,11 +57,11 @@
 */
 	switch(job)
 		if("Bishop")
-			text += "<a href='#'' id='Excommunicate'>Excommunicate<br></a><a href='#'' id='BannishtheUndead'>Banish Undead</a><a href='#'' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia''>Epitemia<br></a><a href='#'' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#'' id='Coronation'><br>Coronation</a><a href='#'' id='Eucharisty'><br>Eucharisty<br></a><a href='#'' id='BannishSpirits'>Banish Spirits<br></a><a href='#'' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage''>Marriage!<br></a><a href='#' id='ClearName''>Clear Name<br></a>"
+			text += "<a href='#' id='Excommunicate'>Excommunicate<br></a><a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia'>Epitemia<br></a><a href='#' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#' id='Coronation'><br>Coronation</a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage'>Marriage!<br></a><a href='#' id='ClearName'>Clear Name<br></a>"
 		if("Priest")
-			text += "<a href='#'' id='Excommunicate'>Excommunicate<br></a><a href='#'' id='BannishtheUndead'>Banish Undead</a><a href='#'' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia''>Epitemia<br></a><a href='#'' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#'' id='Coronation'><br>Coronation</a><a href='#'' id='Eucharisty'><br>Eucharisty<br></a><a href='#'' id='BannishSpirits'>Banish Spirits<br></a><a href='#'' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage''>Marriage!<br></a><a href='#' id='ClearName''>Clear Name<br></a>"
+			text += "<a href='#' id='Excommunicate'>Excommunicate<br></a><a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia'>Epitemia<br></a><a href='#' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#' id='Coronation'><br>Coronation</a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage'>Marriage!<br></a><a href='#' id='ClearName'>Clear Name<br></a>"
 		if("Monk")
-			text += "<a href='#'' id='BannishtheUndead'>Banish Undead</a><a href='#'' id='RobofSins'><br>Rob of Sins<br></a><a href='#'' id='Eucharisty'><br>Eucharisty<br></a><a href='#'' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='Marriage!''>Marriage<br></a>"
+			text += "<a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='Marriage'>Marriage<br></a>"
 		if("Expedition Leader")
 			text += "<a href='#' id='SetMigSpawn'>Set Migrant Arrival<br></a><a href='#' id='announceEx'>Announce (14 TILES)<br></a>"
 		if("Bum")
@@ -90,9 +90,9 @@
 */
 	if(src.job == "Jester")
 		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='nickname'>Give a nickname!<br></a>"
-		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='juggle'>Juggle!<br></a>"
-		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='rememberjoke'>Remember Joke!<br></a>"
-		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='joke'>Joke!<br></a>"
+		text += "<a href='#' id='juggle'>Juggle!<br></a>"
+		text += "<a href='#' id='rememberjoke'>Remember Joke!<br></a>"
+		text += "<a href='#' id='joke'>Joke!<br></a>"
 
 	for(var/T in text)
 		fulltext += "[T]"
@@ -100,55 +100,14 @@
 
 /mob/living/carbon/human/proc/updateSmalltext()
 	if(!client)
-		return
-
-	var/list/text = list()
-	var/fulltext = ""
-
-/*
-	if(job == "Pusher")
-		if(mind)
-			text += "TIME TO PAY: <span id='timepusher'>[secondsToMintues(mind.time_to_pay)]</span>"
-	if(job == "Inquisitor")
-		if(mind && Inquisitor_Type == "Month's Inquisitor")
-			text += "Avowals of Guilt sent: (<span id='timepusher'>[secondsToMintues(mind.avowals_of_guilt_sent)] / 6)</span>"
-		text += "Inquisitorial Points: <span id='timepusher'>[Inquisitor_Points]</span>"
-*/
-
-/*
-	if(religion)
-		if(religion == HASARD)
-			text += "THOU ARE HASARD'S TOY"
-*/
-
-/*
-	if(src?.mind?.succubus)
-		text += "Slaves : [src.mind.succubus.succubusSlaves.len]"
-*/
-
-/*
-	if(ticker.mode.config_tag == "siege" && siegesoldier)
-		var/datum/game_mode/siege/S = ticker.mode
-		text += "Losses: [S.losses]/[S.max_losses]"
-
-	else if(ticker.mode.config_tag == "miniwar" && mini_war)
-		var/datum/game_mode/miniwar/M = ticker.mode
-		switch(mini_war)
-			if("Northner")
-				text += "Losses: [M.north_count]/[M.max_count]"
-			if("Southner")
-				text += "Losses: [M.south_count]/[M.max_count]"
-*/
-
-	for(var/T in text)
-		fulltext += "[T]<br>"
-
-	return fulltext
+		return ""
+	return ""
 
 /proc/generateVerbHtml(var/verbname = "", var/displayname = "", var/number = 1)
 	if(number % 2)
-		return {"<a href='#' class='verb dim' onclick='window.location = "byond://winset?command=[verbname]"'>[displayname]</a>"}
-	return {"<a href='#' class='verb' onclick='window.location = "byond://winset?command=[verbname]"'>[displayname]</a>"}
+		return {"<a href='byond://winset?command=[verbname]' class='verb dim'>[displayname]</a>"}
+	else
+		return {"<a href='byond://winset?command=[verbname]' class='verb'>[displayname]</a>"}
 
 /proc/generateVerbList(var/list/verbs = list(), var/count = 1)
 	var/html = ""
@@ -156,7 +115,6 @@
 	for(var/list/L in verbs)
 		counter++
 		html += generateVerbHtml(L[1], L[2], counter) + "$"
-
 	return html
 
 /client/proc/newtext(var/newcontent = "")
@@ -178,15 +136,17 @@
 	var/buttonHTML = ""
 	defaultButton()
 
-	buttonHTML += {"<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-right:1px;\"><div style=\"background-image: url('Heart.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Verb\" class=\"button\"></div></a>"}
+	// Main heart/menu button
+	buttonHTML += {"<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-right:1px;\"><div style=\"background-image: url('Heart.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Verb\" class=\"button\"></div></a>"}
 
-	if(src.stat == DEAD && GAME_STATE != RUNLEVEL_LOBBY || isobserver(src) || istype(src, /mob/living/carbon/brain))
-		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-175px;\" id=\"DeadGhost\" class=\"button\"></div></a>"
+	// Dead/ghost controls
+	if((src.stat == DEAD && GAME_STATE != RUNLEVEL_LOBBY) || isobserver(src) || istype(src, /mob/living/carbon/brain))
+		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-175px;\" id=\"DeadGhost\" class=\"button\"></div></a>"
 
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Emotes.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Emotes\" class=\"button\"></div></a>"
-		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Craft.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-87px;\" id=\"Craft\" class=\"button\"></div></a>"
+		buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Craft.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-87px;\" id=\"Craft\" class=\"button\"></div></a>"
 
 /*
 		if(H.isVampire)
@@ -203,15 +163,16 @@
 */
 		if(H?.mind)
 			if(H?.mind?.changeling)
-				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Villain.png\'); margin-top: -132px; margin-left:46px; \" id=\"They\" class=\"button\" /></div></a>"
+				buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Villain.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"They\" class=\"button\"></div></a>"
 			if(H.mind.special_role == "Head Revolutionary")
-				buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Epsilon.png\'); margin-top: -132px; margin-left:46px; \" id=\"Integralist\" class=\"button\" /></div></a>"
+				buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Epsilon.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Integralist\" class=\"button\"></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
-			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Thanati.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-42px;\" id=\"Craft\" class=\"button\"></div></a>" //TODO: the rest of the buttons
+			// Fix: this button should use the Thanati id, not Craft
+			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Thanati.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-42px;\" id=\"Thanati\" class=\"button\"></div></a>"
 		if(istype(H.head, /obj/item/clothing/head/caphat))
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Crown.png\'); margin-top: -50px; margin-left:46px; \" id=\"Crown\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Crown.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-50px;\" id=\"Crown\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
-			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Dead.png\'); margin-top: -88px; margin-left:46px; \" id=\"Dead\" class=\"button\" /></div></a>"
+			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-88px;\" id=\"Dead\" class=\"button\"></div></a>"
 
 	client.addbutton(buttonHTML, "#dynamicpanel")
 	updateButtons()
