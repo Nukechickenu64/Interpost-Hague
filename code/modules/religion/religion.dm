@@ -1,6 +1,5 @@
 //PUTTING RELIGIOUS RELATED STUFF IN IT'S ON MODULES FOLDER FROM NOW ON. - Matt
-
-//PROCS
+/* (Legacy commented example removed) */
 
 /datum/religion
 	var/name = "NONE"
@@ -15,6 +14,18 @@
 	var/selectable_punishments = list()
 	var/whisper_lines = list()
 	var/offering_items = list(/obj/item/weapon/paper)
+// Cult-specific religion aligned with Nar-Sie
+/datum/religion/narsie
+	name = NARSIE_RELIGION
+	holy_item = /obj/item/weapon/book/tome
+	favor = 0
+	whisper_lines = list(
+		"The geometer must be completed.",
+		"Blood is the ink of revelation.",
+		"Carve the angles. Open the way.",
+		"The veil thins with every stroke."
+	)
+	offering_items = list(/obj/item/weapon/book/tome, /obj/item/weapon/material/knife/ritual)
 
 /datum/religion/New()
 	selectable_requests =  subtypesof(/datum/request)

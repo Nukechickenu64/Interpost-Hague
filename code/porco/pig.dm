@@ -232,19 +232,6 @@
 	if(ishuman(src))
 		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("LookUp", "Look Up"), list("MoveUp", "Move Upwards"), list("ShowGoals", "Show Goals")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo"), list("LookDown", "Look Down"), list("MoveDown", "Move Down")), 2)]</span>"}
 		// Append spells segment if any learned spells
-		var/mob/living/carbon/human/HS = src
-		if(HS?.mind && HS?.mind?.learned_spells && HS.mind.learned_spells.len)
-			var/list/spellverbpairs = list()
-			for(var/spell/S in HS.mind.learned_spells)
-				var/display = S.name ? S.name : "Spell"
-				// Remove spaces for command; keep original display
-				var/command = replacetext(display, " ", "")
-				spellverbpairs += list(list(command, display))
-			if(spellverbpairs.len)
-				newHTML += {"<span class='segment2'>[generateVerbList(spellverbpairs, 2)]</span>"}
-		else if(HS?.mind && GLOB.wizards && GLOB.wizards.is_antagonist(HS.mind))
-			// Wizard with no memorized spells: offer quick access to their spellbook
-			newHTML += {"<span class='segment2'>[generateVerbList(list(list("OpenSpellbook", "Open Spellbook")), 2)]</span>"}
 	return newHTML
 
 /mob/proc/spiderUpdate()

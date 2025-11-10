@@ -633,7 +633,7 @@ var/global/floorIsLava = 0
 /datum/admins/proc/Game()
 	if(!check_rights(0))	return
 
-	var/dat = {"
+	var/dat = {"<html>
 		<center><B>Game Panel</B></center><hr>\n
 		<A href='?src=\ref[src];c_mode=1'>Change Game Mode</A><br>
 		"}
@@ -649,6 +649,7 @@ var/global/floorIsLava = 0
 		<br><A href='?src=\ref[src];vsc=airflow'>Edit Airflow Settings</A><br>
 		<A href='?src=\ref[src];vsc=phoron'>Edit Phoron Settings</A><br>
 		<A href='?src=\ref[src];vsc=default'>Choose a default ZAS setting</A><br>
+		</html>
 		"}
 
 	usr << browse(dat, "window=admin2;size=210x280")

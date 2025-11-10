@@ -95,6 +95,12 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	if(player)
 		player.add_spell(new /spell/rune_write)
 
+	// Assign Nar-Sie's religion specifically
+	if(istype(player, /mob/living/carbon/human))
+		var/mob/living/carbon/human/H = player
+		H.religion = NARSIE_RELIGION
+		to_chat(H, "<span class='cult'>Your faith binds to [NARSIE_RELIGION].</span>")
+
 /datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	if(!..())
 		return 0
@@ -102,6 +108,12 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	player.memory = ""
 	if(show_message)
 		player.current.visible_message("<span class='notice'>[player.current] looks like they just reverted to their old faith!</span>")
+	// Revert to legal religion if they were aligned to Nar-Sie
+	if(player.current && ishuman(player.current))
+		var/mob/living/carbon/human/H = player.current
+		if(H.religion == NARSIE_RELIGION)
+			H.religion = LEGAL_RELIGION
+			to_chat(H, "<span class='notice'>Your faith returns to mundane order.</span>")
 	remove_cult_magic(player.current)
 	remove_cultiness(CULTINESS_PER_CULTIST)
 
@@ -111,6 +123,11 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 		to_chat(player, "<span class='cult'>[conversion_blurb]</span>")
 		if(player.current && !istype(player.current, /mob/living/simple_animal/construct))
 			player.current.add_language(LANGUAGE_CULT)
+			// Assign cult religion on conversion
+			if(ishuman(player.current))
+				var/mob/living/carbon/human/H = player.current
+				H.religion = NARSIE_RELIGION
+				to_chat(H, "<span class='cult'>You embrace the geometer of blood, [NARSIE_RELIGION].</span>")
 
 /datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	. = ..()

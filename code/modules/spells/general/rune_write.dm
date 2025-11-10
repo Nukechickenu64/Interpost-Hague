@@ -137,4 +137,11 @@
 		var/area/A = get_area(T)
 		log_and_message_admins("inscribed a [choice] rune at [A?.name] - [T.x]-[T.y]-[T.z] (blood cost [blood_cost]).", user)
 		to_chat(user, "<span class='cult'>The blood takes shape as the rune forms.</span>")
+		// Cause minor self-inflicted bleeding from carving
+		if(ishuman(user))
+			var/mob/living/carbon/human/H = user
+			var/hand_zone = pick(BP_L_HAND, BP_R_HAND)
+			// Apply tiny sharp damage to start bleeding but not be lethal.
+			H.apply_damage(rand(1,2), BRUTE, hand_zone, 0, (DAM_SHARP|DAM_EDGE), "Rune Carving")
+			to_chat(H, "<span class='warning'>Your carving hand bleeds from the ritual incision.</span>")
 	return
