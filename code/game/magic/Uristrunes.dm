@@ -1,5 +1,6 @@
 
 var/list/word_to_uristrune_table = null
+var/cultwords = list()
 
 /proc/word_to_uristrune_bit(word)
 	if(word_to_uristrune_table == null)

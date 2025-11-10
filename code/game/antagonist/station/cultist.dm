@@ -91,6 +91,10 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	if(istype(S))
 		T.forceMove(S)
 
+	// Ensure cultists always have the rune scribing spell available
+	if(player)
+		player.add_spell(new /spell/rune_write)
+
 /datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	if(!..())
 		return 0
@@ -117,6 +121,15 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	. = ..()
 	add_cultiness(CULTINESS_PER_CULTIST)
 	add_cult_magic(player.current)
+	// Make sure the cult rune scribing spell is present on the mob
+	if(player.current && !istype(player.current, /mob/living/simple_animal/construct))
+		var/has_rune_spell = 0
+		if(player.current.mind && player.current.mind.learned_spells)
+			for(var/spell/rune_write/S in player.current.mind.learned_spells)
+				has_rune_spell = 1
+				break
+		if(!has_rune_spell)
+			player.current.add_spell(new /spell/rune_write)
 
 /datum/antagonist/cultist/proc/add_cultiness(var/amount)
 	cult_rating += amount
@@ -183,3 +196,7 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	M.verbs -= Tier2Runes
 	M.verbs -= Tier3Runes
 	M.verbs -= Tier4Runes
+	// Remove the rune scribing spell if they had it
+	if(M && M.mind && M.mind.learned_spells)
+		for(var/spell/rune_write/S in M.mind.learned_spells)
+			M.remove_spell(S)

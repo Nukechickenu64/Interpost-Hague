@@ -1,3 +1,7 @@
+/obj/item/weapon
+	var/cult_converted = 0
+	var/cult_marked = 0
+
 /obj/item/weapon/material/butterfly
 	name = "butterfly knife"
 	desc = "A basic metal blade concealed in a lightweight plasteel grip. Small enough when folded to fit in a pocket."
@@ -77,6 +81,7 @@
 	icon = 'icons/obj/wizard.dmi'
 	icon_state = "render"
 	applies_material_colour = 0
+	cult_converted = 1
 
 /obj/item/weapon/material/knife/butch
 	name = "butcher's cleaver"

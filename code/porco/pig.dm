@@ -210,6 +210,7 @@
 	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("ConvertBourgeoise", "Convert to our Cause")))]</span>"})
 	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("CreateShrine", "Create a Shrine"), list("getBrothers", "Remember the Associates")))]</span>"})
 
+
 /mob/proc/verbUpdate()
 	var/newHTML = ""
 	var/mob/new_player/player = usr
@@ -230,6 +231,20 @@
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
 		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("LookUp", "Look Up"), list("MoveUp", "Move Upwards"), list("ShowGoals", "Show Goals")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo"), list("LookDown", "Look Down"), list("MoveDown", "Move Down")), 2)]</span>"}
+		// Append spells segment if any learned spells
+		var/mob/living/carbon/human/HS = src
+		if(HS?.mind && HS?.mind?.learned_spells && HS.mind.learned_spells.len)
+			var/list/spellverbpairs = list()
+			for(var/spell/S in HS.mind.learned_spells)
+				var/display = S.name ? S.name : "Spell"
+				// Remove spaces for command; keep original display
+				var/command = replacetext(display, " ", "")
+				spellverbpairs += list(list(command, display))
+			if(spellverbpairs.len)
+				newHTML += {"<span class='segment2'>[generateVerbList(spellverbpairs, 2)]</span>"}
+		else if(HS?.mind && GLOB.wizards && GLOB.wizards.is_antagonist(HS.mind))
+			// Wizard with no memorized spells: offer quick access to their spellbook
+			newHTML += {"<span class='segment2'>[generateVerbList(list(list("OpenSpellbook", "Open Spellbook")), 2)]</span>"}
 	return newHTML
 
 /mob/proc/spiderUpdate()
@@ -341,6 +356,29 @@
 	set name = "heartpig"
 
 	soundbutton()
+
+// Quick command to open the wizard spellbook UI if carried
+/mob/verb/OpenSpellbook()
+	set hidden = 1
+	set name = "OpenSpellbook"
+
+	if(!ishuman(src))
+		return
+	var/mob/living/carbon/human/H = src
+	var/obj/item/weapon/spellbook/B = null
+	// Prefer held item, otherwise any in contents
+	if(istype(H.l_hand, /obj/item/weapon/spellbook))
+		B = H.l_hand
+	else if(istype(H.r_hand, /obj/item/weapon/spellbook))
+		B = H.r_hand
+	else
+		for(var/obj/item/weapon/spellbook/SB in H.contents)
+			B = SB
+			break
+	if(B)
+		B.interact(H)
+	else
+		to_chat(H, "<span class='warning'>You don't have your spellbook on you.</span>")
 
 /mob/proc/updateStatPig()
 	if(!client)

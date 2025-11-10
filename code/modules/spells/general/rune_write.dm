@@ -1,6 +1,7 @@
+// Simplified cult rune scribing spell that creates rune types directly
 /spell/rune_write
 	name = "Scribe a Rune"
-	desc = "Let's you instantly manifest a working rune."
+	desc = "Lets you inscribe a cult rune at your feet."
 
 	school = "evocation"
 	charge_max = 100
@@ -17,163 +18,123 @@
 	return list(user)
 
 /spell/rune_write/cast(null, mob/user = usr)
-	if(!cultwords["travel"])
-		runerandom()
-	var/list/runes = list("Teleport", "Teleport Other", "Spawn a Tome", "Change Construct Type", "Convert", "EMP", "Drain Blood", "See Invisible", "Resurrect", "Hide Runes", "Reveal Runes", "Astral Journey", "Manifest a Ghost", "Imbue Talisman", "Sacrifice", "Wall", "Free Cultist", "Summon Cultist", "Deafen", "Blind", "BloodBoil", "Communicate", "Stun")
-	var/r = input(user, "Choose a rune to scribe", "Rune Scribing") in runes //not cancellable.
+	if(!user)
+		return
+	if(!iscultist(user))
+		to_chat(user, "<span class='warning'>The forbidden knowledge eludes you.</span>")
+		return
+	// Need a sharp implement in either hand
+	var/obj/item/weapon/tool_or_weapon = null
+	for(var/obj/item/I in list(user.l_hand, user.r_hand))
+		if(I && (I.sharp || I.edge))
+			tool_or_weapon = I
+			break
+	if(!tool_or_weapon)
+		to_chat(user, "<span class='warning'>You need something sharp to carve the rune (a knife, shard, or other edged implement).</span>")
+		return
+	if(!istype(user.loc, /turf))
+		to_chat(user, "<span class='warning'>You need a solid surface to inscribe a rune.</span>")
+		return
 	if(locate(/obj/effect/rune) in user.loc)
 		to_chat(user, "<span class='warning'>There is already a rune in this location.</span>")
 		return
 
-	var/obj/effect/rune/R = new /obj/effect/rune(user.loc)
-	if(istype(user.loc,/turf))
-		var/area/A = get_area(user)
-		log_and_message_admins("created \an [r] rune at \the [A.name] - [user.loc.x]-[user.loc.y]-[user.loc.z].", user)
-		switch(r)
-			if("Teleport")
-				if(cast_check(1))
-					var/beacon
-					if(user)
-						beacon = input(user, "Select the last rune", "Rune Scribing") in rnwords
-					R.word1=cultwords["travel"]
-					R.word2=cultwords["self"]
-					R.word3=beacon
-					R.check_icon()
-			if("Teleport Other")
-				if(cast_check(1))
-					var/beacon
-					if(user)
-						beacon = input(user, "Select the last rune", "Rune Scribing") in rnwords
-					R.word1=cultwords["travel"]
-					R.word2=cultwords["other"]
-					R.word3=beacon
-					R.check_icon()
-			if("Spawn a Tome")
-				if(cast_check(1))
-					R.word1=cultwords["see"]
-					R.word2=cultwords["blood"]
-					R.word3=cultwords["hell"]
-					R.check_icon()
-			if("Change Construct Type")
-				if(cast_check(1))
-					R.word1=cultwords["hell"]
-					R.word2=cultwords["destroy"]
-					R.word3=cultwords["other"]
-					R.check_icon()
-			if("Convert")
-				if(cast_check(1))
-					R.word1=cultwords["join"]
-					R.word2=cultwords["blood"]
-					R.word3=cultwords["self"]
-					R.check_icon()
-			if("EMP")
-				if(cast_check(1))
-					R.word1=cultwords["destroy"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["technology"]
-					R.check_icon()
-			if("Drain Blood")
-				if(cast_check(1))
-					R.word1=cultwords["travel"]
-					R.word2=cultwords["blood"]
-					R.word3=cultwords["self"]
-					R.check_icon()
-			if("See Invisible")
-				if(cast_check(1))
-					R.word1=cultwords["see"]
-					R.word2=cultwords["hell"]
-					R.word3=cultwords["join"]
-					R.check_icon()
-			if("Resurrect")
-				if(cast_check(1))
-					R.word1=cultwords["blood"]
-					R.word2=cultwords["join"]
-					R.word3=cultwords["hell"]
-					R.check_icon()
-			if("Hide Runes")
-				if(cast_check(1))
-					R.word1=cultwords["hide"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["blood"]
-					R.check_icon()
-			if("Astral Journey")
-				if(cast_check(1))
-					R.word1=cultwords["hell"]
-					R.word2=cultwords["travel"]
-					R.word3=cultwords["self"]
-					R.check_icon()
-			if("Manifest a Ghost")
-				if(cast_check(1))
-					R.word1=cultwords["blood"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["travel"]
-					R.check_icon()
-			if("Imbue Talisman")
-				if(cast_check(1))
-					R.word1=cultwords["hell"]
-					R.word2=cultwords["technology"]
-					R.word3=cultwords["join"]
-					R.check_icon()
-			if("Sacrifice")
-				if(cast_check(1))
-					R.word1=cultwords["hell"]
-					R.word2=cultwords["blood"]
-					R.word3=cultwords["join"]
-					R.check_icon()
-			if("Reveal Runes")
-				if(cast_check(1))
-					R.word1=cultwords["blood"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["hide"]
-					R.check_icon()
-			if("Wall")
-				if(cast_check(1))
-					R.word1=cultwords["destroy"]
-					R.word2=cultwords["travel"]
-					R.word3=cultwords["self"]
-					R.check_icon()
-			if("Freedom")
-				if(cast_check(1))
-					R.word1=cultwords["travel"]
-					R.word2=cultwords["technology"]
-					R.word3=cultwords["other"]
-					R.check_icon()
-			if("Cultsummon")
-				if(cast_check(1))
-					R.word1=cultwords["join"]
-					R.word2=cultwords["other"]
-					R.word3=cultwords["self"]
-					R.check_icon()
-			if("Deafen")
-				if(cast_check(1))
-					R.word1=cultwords["hide"]
-					R.word2=cultwords["other"]
-					R.word3=cultwords["see"]
-					R.check_icon()
-			if("Blind")
-				if(cast_check(1))
-					R.word1=cultwords["destroy"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["other"]
-					R.check_icon()
-			if("BloodBoil")
-				if(cast_check(1))
-					R.word1=cultwords["destroy"]
-					R.word2=cultwords["see"]
-					R.word3=cultwords["blood"]
-					R.check_icon()
-			if("Communicate")
-				if(cast_check(1))
-					R.word1=cultwords["self"]
-					R.word2=cultwords["other"]
-					R.word3=cultwords["technology"]
-					R.check_icon()
-			if("Stun")
-				if(cast_check(1))
-					R.word1=cultwords["join"]
-					R.word2=cultwords["hide"]
-					R.word3=cultwords["technology"]
-					R.check_icon()
+	var/list/choices = list(
+		"Teleport" = /obj/effect/rune/teleport,
+		"Summon Tome" = /obj/effect/rune/tome,
+		"Convert" = /obj/effect/rune/convert,
+		"Wall" = /obj/effect/rune/wall,
+		"EMP" = /obj/effect/rune/emp,
+		"Drain" = /obj/effect/rune/drain,
+		"Confuse" = /obj/effect/rune/confuse,
+		"Revive" = /obj/effect/rune/revive,
+		"Blood Boil" = /obj/effect/rune/blood_boil,
+		"Tear Reality" = /obj/effect/rune/tearreality,
+		"Weapon" = /obj/effect/rune/weapon,
+		"Shell" = /obj/effect/rune/shell,
+		"Imbue" = /obj/effect/rune/imbue
+	)
+
+	var/choice = input(user, "Choose a rune to scribe (requires cult tome in inventory unless summoning one)", "Rune Scribing") as null|anything in choices
+	if(!choice)
+		return
+
+	var/path = choices[choice]
+	if(!path)
+		return
+
+	// All rune types except Summon Tome require carrying a cult tome
+	if(choice != "Summon Tome")
+		var/has_tome = 0
+		for(var/obj/item/weapon/book/tome/T in user.contents)
+			has_tome = 1; break
+		if(!has_tome)
+			to_chat(user, "<span class='warning'>You need your cult tome on you to recall the words for that rune.</span>")
+			return
+
+	var/turf/T = get_turf(user)
+	if(!T)
+		return
+
+	// Writing takes time; longer for larger or more complex runes
+	var/delay = 30
+	if(choice == "Tear Reality")
+		delay = 80
+	else if(choice == "Teleport" || choice == "Revive")
+		delay = 50
+	else if(choice == "Wall" || choice == "Weapon" || choice == "Shell")
+		delay = 45
+	else if(choice == "Blood Boil")
+		delay = 60
+	else if(choice == "Imbue")
+		delay = 55
+
+	// Massive speed increase when using a converted knife or ritual knife
+	var/converted_knife = 0
+	if(istype(tool_or_weapon, /obj/item/weapon/material/knife/ritual))
+		converted_knife = 1
 	else
-		to_chat(user, "<span class='warning'> You do not have enough space to write a proper rune.</span>")
+		// Some blades may be later flagged as cult-converted
+		if(tool_or_weapon.cult_converted)
+			converted_knife = 1
+
+	if(converted_knife)
+		// Apply a large speed-up; keep a sane floor so do_after still matters
+		delay = max(5, round(delay / 4))
+		// Add a flavorful tell to the knife description once
+		if(!tool_or_weapon.cult_marked)
+			tool_or_weapon.desc += "\nIts edge drinks in the light, a thin sheen of dried blood tracing eldritch angles."
+			tool_or_weapon.cult_marked = 1
+
+	user.visible_message("<span class='notice'>[user] kneels and begins carving a bloody rune with [tool_or_weapon].</span>", "<span class='cult'>You begin carving the rune... stay focused.</span>")
+	if(!do_after(user, delay, T))
+		to_chat(user, "<span class='warning'>Your concentration breaks and the carving fails.</span>")
+		return
+
+	// Determine blood cost per rune, then pay it as the carving completes.
+	// Costs aligned roughly with make_rune() defaults.
+	var/blood_cost = 5
+	if(choice == "Summon Tome")
+		blood_cost = 15
+	else if(choice == "Drain")
+		blood_cost = 10
+	else if(choice == "Weapon" || choice == "Shell")
+		blood_cost = 10
+	else if(choice == "Blood Boil")
+		blood_cost = 20
+	else if(choice == "Revive")
+		blood_cost = 25
+	else if(choice == "Tear Reality")
+		blood_cost = 50
+	else if(choice == "Imbue")
+		blood_cost = 3
+
+	// Pay the blood cost using existing ritual helpers.
+	user.pay_for_rune(blood_cost)
+
+	var/obj/effect/rune/R = new path(T)
+	if(R)
+		var/area/A = get_area(T)
+		log_and_message_admins("inscribed a [choice] rune at [A?.name] - [T.x]-[T.y]-[T.z] (blood cost [blood_cost]).", user)
+		to_chat(user, "<span class='cult'>The blood takes shape as the rune forms.</span>")
 	return
