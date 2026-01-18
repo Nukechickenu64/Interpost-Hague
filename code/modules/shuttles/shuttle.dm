@@ -46,7 +46,8 @@
 	else
 		current_location = SSshuttle.get_landmark(current_location)
 	if(!istype(current_location))
-		CRASH("Shuttle \"[name]\" could not find its starting location. it was given: [current_location].")
+		WARNING("Shuttle \"[name]\" could not find its starting location. it was given: [current_location]. Initialization skipped.")
+		return
 
 	if(src.name in SSshuttle.shuttles)
 		CRASH("A shuttle with the name '[name]' is already defined.")
