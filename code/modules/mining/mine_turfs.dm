@@ -82,27 +82,31 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 			if (T)
 				theoverlay = image('icons/turf/walls.dmi', "rock_side_s", pixel_y = -3)
 				T.overlays += theoverlay
-				attachedoverlays += theoverlay
+				if(istype(src, /turf/simulated/mineral))
+					attachedoverlays += theoverlay
 		if(mineral_overlay_elegibility(get_step(src, SOUTH)))
 			T = get_step(src, SOUTH)
 			if (T)
 				theoverlay = image('icons/turf/walls.dmi', "rock_side_n", layer = 6)
 				overlays += theoverlay
-				attachedoverlays += theoverlay
+				if(istype(src, /turf/simulated/mineral))
+					attachedoverlays += theoverlay
 		if(mineral_overlay_elegibility(get_step(src, EAST)))
 			T = get_step(src, EAST)
 			if (T)
 				theoverlay = image('icons/turf/walls.dmi', "rock_side_w", pixel_x = -10, layer = 5)
 				T.overlays += theoverlay
-				attachedoverlays += theoverlay
+				if(istype(src, /turf/simulated/mineral))
+					attachedoverlays += theoverlay
 		if(mineral_overlay_elegibility(get_step(src, WEST)))
 			T = get_step(src, WEST)
 			if (T)
 				theoverlay = image('icons/turf/walls.dmi', "rock_side_e", pixel_x = 10, layer = 5)
 				T.overlays += theoverlay
-				attachedoverlays += theoverlay
+				if(istype(src, /turf/simulated/mineral))
+					attachedoverlays += theoverlay
 
-		var/iscorner = TRUE // Yes I know this is shitcode, I coded this at 4 fucking AM
+		var/iscorner = TRUE // Yes I know this is shitcode, I coded this at 4 fucking AM TODO fix shitcode
 		if(!mineral_overlay_elegibility(get_step(src, WEST)) && !mineral_overlay_elegibility(get_step(src, EAST)))
 			iscorner = FALSE
 		if(!mineral_overlay_elegibility(get_step(src, NORTH)) && !mineral_overlay_elegibility(get_step(src, SOUTH)))
@@ -114,25 +118,29 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 				if (T)
 					theoverlay = image('icons/turf/walls.dmi', "rock_corner_sw", pixel_x = 28, pixel_y = -3, layer = 7)
 					T.overlays += theoverlay
-					attachedoverlays += theoverlay
+					if(istype(src, /turf/simulated/mineral))
+						attachedoverlays += theoverlay
 			if(mineral_overlay_elegibility(get_step(src, EAST)) && mineral_overlay_elegibility(get_step(src, NORTH)))
 				T = get_step(src, NORTHEAST)
 				if (T)
 					theoverlay = image('icons/turf/walls.dmi', "rock_corner_se", pixel_x = -28, pixel_y = -3, layer = 7)
 					T.overlays += theoverlay
-					attachedoverlays += theoverlay
+					if(istype(src, /turf/simulated/mineral))
+						attachedoverlays += theoverlay
 			if(mineral_overlay_elegibility(get_step(src, EAST)) && mineral_overlay_elegibility(get_step(src, SOUTH)))
 				T = get_step(src, SOUTHEAST)
 				if (T)
 					theoverlay = image('icons/turf/walls.dmi', "rock_corner_nw", pixel_x = 24, layer = 7)
 					overlays += theoverlay
-					attachedoverlays += theoverlay
+					if(istype(src, /turf/simulated/mineral))
+						attachedoverlays += theoverlay
 			if(mineral_overlay_elegibility(get_step(src, WEST)) && mineral_overlay_elegibility(get_step(src, SOUTH)))
 				T = get_step(src, SOUTHWEST)
 				if (T)
 					theoverlay = image('icons/turf/walls.dmi', "rock_corner_ne", pixel_x = -24, layer = 7)
 					overlays += theoverlay
-					attachedoverlays += theoverlay
+					if(istype(src, /turf/simulated/mineral))
+						attachedoverlays += theoverlay
 
 	if(ore_overlay)
 		overlays += ore_overlay
