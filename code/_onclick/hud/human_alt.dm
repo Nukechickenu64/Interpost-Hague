@@ -359,6 +359,17 @@
 	mymob.noise.mouse_opacity = 0
 	hud_elements |= mymob.noise
 
+	// Fatigue vignette overlay (starts invisible, becomes darker with fatigue stages)
+	mymob.fatigue_vignette = new /obj/screen()
+	mymob.fatigue_vignette.icon = 'icons/misc/fullscreen.dmi'
+	mymob.fatigue_vignette.icon_state = "vignette_dark" // Provide multiple states e.g., vignette_dark1..4 in the icon file.
+	mymob.fatigue_vignette.name = "fatigue"
+	mymob.fatigue_vignette.screen_loc = "1,1"
+	mymob.fatigue_vignette.alpha = 0 // Hidden initially
+	mymob.fatigue_vignette.layer = FULLSCREEN_LAYER
+	mymob.fatigue_vignette.mouse_opacity = 0
+	hud_elements |= mymob.fatigue_vignette
+
 	mymob.combat_icon = new /obj/screen()//combat mode
 	mymob.combat_icon.name = "combat mode"
 	mymob.combat_icon.icon = ui_style//'icons/mob/screen/dark.dmi'

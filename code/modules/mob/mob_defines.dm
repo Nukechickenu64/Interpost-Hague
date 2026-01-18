@@ -42,6 +42,7 @@
 	var/obj/screen/kick_icon = null
 	var/obj/screen/jump_icon = null
 	var/obj/screen/noise = null
+	var/obj/screen/fatigue_vignette = null // Darkening overlay that grows with fatigue
 	var/obj/screen/fixeye = null
 	var/obj/screen/rest = null
 	var/obj/screen/combat_icon = null
@@ -108,6 +109,15 @@
 	var/default_pixel_y = 0
 	var/happiness = 0
 	var/staminaloss = 0
+
+	// Fatigue system (0..max_fatigue). Higher fatigue slows movement and hampers stamina recovery.
+	var/fatigue = 0
+	var/max_fatigue = 100
+	var/last_fatigue_stage = 0
+
+	// Concussion system
+	var/concussion_severity = 0		// 0..100 lingering concussion level
+	var/next_concussion_msg_time = 0	// spam guard for messages
 
 	var/shakecamera = 0
 	var/a_intent = I_HELP//Living

@@ -76,6 +76,9 @@
 
 		handle_pain()
 
+		// Lingering concussion effects
+		handle_concussion()
+
 		handle_medical_side_effects()
 
 		handle_eye_blink()
@@ -100,6 +103,50 @@
 	if(life_tick > 5 && timeofdeath && (timeofdeath < 5 || world.time - timeofdeath > 6000))	//We are long dead, or we're junk mobs spawned like the clowns on the clown shuttle
 		return 0
 	return 1
+
+// Applies lingering concussion penalties: vision blur, stutter, occasional blackout, slower actions.
+/mob/living/carbon/human/proc/handle_concussion()
+	if(concussion_severity <= 0 || stat == DEAD)
+		return
+
+	// Natural recovery each tick if not taking further head damage.
+	if(!lying && !resting)
+		concussion_severity = max(concussion_severity - 0.05, 0)
+	else
+		concussion_severity = max(concussion_severity - 0.15, 0) // Resting recovers faster
+
+	// Stage mapping
+	var/stage = (concussion_severity >= 70) ? 3 : (concussion_severity >= 40) ? 2 : (concussion_severity >= 15) ? 1 : 0
+
+	// Sensory penalties
+	if(stage >= 1 && prob(stage * 5))
+		// brief blur
+		eye_blurry = max(eye_blurry, stage)
+
+	// Cognitive penalties: stutter/jitter
+	if(stage >= 2 && stuttering < 5 && prob(10))
+		stuttering += 2
+	if(stage >= 3 && jitteriness < 50 && prob(15))
+		make_jittery(20)
+
+	// Blackout chance at severe concussion while conscious
+	if(stage == 3 && stat == CONSCIOUS && prob(2))
+		visible_message("<span class='warning'><b>[src]</b> staggers from a concussion!</span>")
+		Weaken(2)
+		if(prob(30))
+			set_stat(UNCONSCIOUS)
+			Paralyse(20)
+
+	// Occasional feedback messages
+	if(world.time > next_concussion_msg_time)
+		next_concussion_msg_time = world.time + 300 // ~30 seconds
+		switch(stage)
+			if(1)
+				to_chat(src, "<span class='notice'>You feel a bit dazed.</span>")
+			if(2)
+				to_chat(src, "<span class='warning'>You struggle to focus—your head throbs.</span>")
+			if(3)
+				to_chat(src, "<span class='danger'>Your vision tunnels; you might black out.</span>")
 
 /mob/living/carbon/human/breathe()
 	var/species_organ = species.breathing_organ
@@ -662,7 +709,77 @@
 				to_chat(src, "<span class='notice'>You feel slow and sluggish...</span>")
 
 		CheckStamina()
+		handle_fatigue()
 	return 1
+
+// Fatigue: accumulates from running and actions, recovers while idle/resting.
+/mob/living/carbon/human/proc/handle_fatigue()
+	// Ensure bounds
+	fatigue = Clamp(fatigue, 0, max_fatigue)
+
+	// Accumulation
+	if(m_intent == "run" && canmove && !resting)
+		fatigue = min(max_fatigue, fatigue + 1)
+	else if(combat_mode && canmove)
+		fatigue = min(max_fatigue, fatigue + 1)
+
+	// Recovery
+	var/recovery = 0
+	if(resting || lying)
+		recovery += 2
+	else
+		recovery += 1
+
+	// Better nutrition/hydration speeds recovery slightly
+	if(nutrition_icon && hydration_icon)
+		// We don't have direct values here; use a gentle baseline.
+		recovery += 0
+
+	fatigue = max(0, fatigue - recovery)
+
+	// Adjust stamina regeneration based on fatigue level
+	// We cannot directly change CheckStamina() here, so apply a compensating effect:
+	if(fatigue >= 75)
+		// High fatigue dampens stamina recovery and increases drain
+		adjustStaminaLoss(1)
+	else if(fatigue >= 50)
+		adjustStaminaLoss(0)
+	else if(fatigue >= 25)
+		adjustStaminaLoss(-1)
+	else
+		adjustStaminaLoss(-2)
+
+	// Messaging at thresholds
+	var/current_stage = (fatigue >= 90) ? 4 : (fatigue >= 65) ? 3 : (fatigue >= 35) ? 2 : (fatigue >= 15) ? 1 : 0
+	if(current_stage != last_fatigue_stage)
+		last_fatigue_stage = current_stage
+		switch(current_stage)
+			if(1)
+				to_chat(src, "<span class='notice'>You start to feel winded.</span>")
+			if(2)
+				to_chat(src, "<span class='warning'>Your legs burn with exertion.</span>")
+			if(3)
+				to_chat(src, "<span class='warning'>You're exhausted. Slow down.</span>")
+			if(4)
+				to_chat(src, "<span class='danger'>You're utterly spent! You might collapse.</span>")
+
+	// Update HUD vignette intensity
+	if(fatigue_vignette)
+		// Choose alpha scaling by stage; optionally switch icon_state if multiple variants exist
+		var/desired_alpha = 0
+		switch(current_stage)
+			if(0)
+				desired_alpha = 0
+			if(1)
+				desired_alpha = 40
+			if(2)
+				desired_alpha = 80
+			if(3)
+				desired_alpha = 130
+			if(4)
+				desired_alpha = 180
+		// Smooth transition: minor lerp instead of abrupt change
+		fatigue_vignette.alpha = Clamp(round((fatigue_vignette.alpha * 0.6) + (desired_alpha * 0.4)), 0, 255)
 
 /mob/living/carbon/human/handle_regular_hud_updates()
 	if(hud_updateflag) // update our mob's hud overlays, AKA what others see flaoting above our head

@@ -1,0 +1,19 @@
+<div class="uiContent">
+  <h2>BBS Client</h2>
+  {{#error}}
+  <div class="uiError">{{error}}</div>
+  {{/error}}
+  <div class="uiRow">
+    <div>Host:</div>
+    <div><a href='?src={{UID}};PRG_sethost=1'>{{host}}</a></div>
+  </div>
+  <div class="uiRow">
+    <div>Port:</div>
+    <div><a href='?src={{UID}};PRG_setport=1'>{{port}}</a></div>
+  </div>
+  <div class="uiRow">
+    <a class="uiButton" href='?src={{UID}};PRG_connect=1'>Connect</a>
+    <a class="uiButton" href='?src={{UID}};PRG_disconnect=1'>Disconnect</a>
+  </div>
+  <div class="uiHint">Connecting opens a new window with an embedded fTelnet session.</div>
+</div>

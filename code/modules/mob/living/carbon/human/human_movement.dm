@@ -79,6 +79,14 @@
 	if(staminaloss >= 75)
 		tally += 2
 
+	// Fatigue slowdown layers onto existing stamina slowdown.
+	if(fatigue >= 90)
+		tally += 3
+	else if(fatigue >= 65)
+		tally += 2
+	else if(fatigue >= 35)
+		tally += 1
+
 	if(mRun in mutations)
 		tally = 0
 	//good dex means you run slightly faster, so delay goes down

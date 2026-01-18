@@ -29,11 +29,12 @@ SUBSYSTEM_DEF(event)
 	if(!all_events)
 		all_events = subtypesof(/datum/event)
 	if(!event_containers)
+		// Positional indexes 1..3 map to EVENT_LEVEL_* constants
 		event_containers = list(
-				EVENT_LEVEL_MUNDANE 	= new/datum/event_container/mundane,
-				EVENT_LEVEL_MODERATE	= new/datum/event_container/moderate,
-				EVENT_LEVEL_MAJOR 		= new/datum/event_container/major
-			)
+			list(new /datum/event_container/mundane),
+			list(new /datum/event_container/moderate),
+			list(new /datum/event_container/major)
+		)
 	if(GLOB.using_map.use_overmap)
 		overmap_event_handler.create_events(GLOB.using_map.overmap_z, GLOB.using_map.overmap_size, GLOB.using_map.overmap_event_areas)
 	. = ..()

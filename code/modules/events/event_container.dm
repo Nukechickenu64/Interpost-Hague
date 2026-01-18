@@ -8,7 +8,8 @@
 #define ASSIGNMENT_SCIENTIST "Scientist"
 #define ASSIGNMENT_SECURITY "Security"
 
-var/global/list/severity_to_string = list(EVENT_LEVEL_MUNDANE = "Mundane", EVENT_LEVEL_MODERATE = "Moderate", EVENT_LEVEL_MAJOR = "Major")
+// Positional mapping by severity (1=Mundane,2=Moderate,3=Major)
+var/global/list/severity_to_string = list("Mundane", "Moderate", "Major")
 
 /datum/event_container
 	var/severity = -1

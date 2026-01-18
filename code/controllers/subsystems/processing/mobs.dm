@@ -3,7 +3,7 @@ PROCESSING_SUBSYSTEM_DEF(mobs)
 	priority = SS_PRIORITY_MOB
 	flags = SS_KEEP_TIMING|SS_NO_INIT
 	runlevels = RUNLEVEL_GAME|RUNLEVEL_POSTGAME
-	wait = 2 SECONDS
+	wait = 5 SECONDS
 
 	process_proc = /mob/proc/Life
 

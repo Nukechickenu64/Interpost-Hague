@@ -388,10 +388,18 @@ This function restores all organs.
 		make_adrenaline(round(damage/10))
 	var/datum/wound/created_wound
 	damageoverlaytemp = 20
+
+	// Determine if this is a "significant" new hit for pain flash purposes
+	var/significant_hit = (damage >= 8) // threshold for flashing pain
+	var/head_trauma = FALSE
+	var/obj/item/organ/internal/brain/brain_ref = internal_organs_by_name[BP_BRAIN]
+
 	switch(damagetype)
 		if(BRUTE)
 			damage = damage*species.brute_mod
 			created_wound = organ.take_external_damage(damage, 0, damage_flags, used_weapon)
+			if(significant_hit && organ && organ.name == "head")
+				head_trauma = TRUE
 		if(BURN)
 			damage = damage*species.burn_mod
 			created_wound = organ.take_external_damage(0, damage, damage_flags, used_weapon)
@@ -403,6 +411,38 @@ This function restores all organs.
 	// Will set our damageoverlay icon to the next level, which will then be set back to the normal level the next mob.Life().
 	updatehealth()
 	BITSET(hud_updateflag, HEALTH_HUD)
+
+	// Flash pain on significant first-impact hits (brute/burn) if conscious and can feel pain
+	if(!significant_hit)
+		return created_wound
+	if(!(damagetype in list(BRUTE, BURN)))
+		return created_wound
+	if(can_feel_pain() && stat == CONSCIOUS)
+		// Use organ damage + severity to decide flash intensity
+		var/flash_power = round(damage)
+		custom_pain("I reel from the sudden pain!", flash_power, force = TRUE, affecting = organ, flash_pain = flash_power)
+
+	// If the head was struck hard enough AND brain took notable damage, knock out.
+	if(head_trauma && brain_ref)
+		// Head brute just applied is 'damage'; scale brain shock chance
+		if(damage >= 12)
+			// Helmet mitigation: if wearing protective headgear reduce effective damage and concussion gain.
+			var/helmet_block = 0
+			if(head && istype(head, /obj/item/clothing/head))
+				var/obj/item/clothing/head/Hh = head
+				helmet_block = Hh.armor ? (Hh.armor["melee"] / 100) : 0 // assume armor datum holds melee %
+			var/effective_head_damage = round(damage * (1 - min(helmet_block, 0.75))) // cap mitigation at 75%
+			// Accumulate concussion severity scaled by effective damage.
+			concussion_severity = min(100, concussion_severity + effective_head_damage)
+			var/brain_damage_ratio = (brain_ref.damage / max(1, brain_ref.species.total_health))
+			// Knockout thresholds consider helmet mitigation.
+			if(effective_head_damage >= 22 || brain_damage_ratio >= 0.3)
+				if(stat == CONSCIOUS)
+					visible_message("<span class='danger'><b>[src]</b> collapses from the massive head trauma!</span>")
+					set_stat(UNCONSCIOUS)
+					Paralyse(rand(30,60))
+					Weaken(rand(15,35))
+					shake_camera(src, 25, 4)
 	return created_wound
 
 // Find out in how much pain the mob is at the moment.
