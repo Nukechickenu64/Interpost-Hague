@@ -40,7 +40,7 @@
 
 	return b_init_order - a_init_order	//uses initial() so it can be used on types
 
-/proc/cmp_subsystem_priority(datum/controller/subsystem/a, datum/controller/subsystem/b)
+/proc/cmp_subsystem_priority(var/datum/controller/subsystem/a, var/datum/controller/subsystem/b)
 	return a.priority - b.priority
 
 /proc/cmp_text_asc(a,b)

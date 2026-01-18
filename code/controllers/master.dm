@@ -255,6 +255,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	var/list/tickersubsystems = list()
 	var/list/runlevel_sorted_subsystems = list(list())	//ensure we always have at least one runlevel
 	var/timer = world.time
+	var/list/filtered_tickersubsystems = list()
+	var/list/filtered_I = list()
 	for (var/thing in subsystems)
 		var/datum/controller/subsystem/SS = thing
 		if (SS.flags & SS_NO_FIRE)
@@ -284,10 +286,25 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	queue_tail = null
 	//these sort by lower priorities first to reduce the number of loops needed to add subsequent SS's to the queue
 	//(higher subsystems will be sooner in the queue, adding them later in the loop means we don't have to loop thru them next queue add)
+	// Only sort valid subsystem objects
+	filtered_tickersubsystems.Cut()
+	filtered_I.Cut()
+	for(var/ss in tickersubsystems)
+		if(istype(ss, /datum/controller/subsystem))
+			filtered_tickersubsystems += ss
+	tickersubsystems = filtered_tickersubsystems
 	sortTim(tickersubsystems, /proc/cmp_subsystem_priority)
 	for(var/I in runlevel_sorted_subsystems)
-		sortTim(runlevel_sorted_subsystems, /proc/cmp_subsystem_priority)
-		I += tickersubsystems
+		filtered_I.Cut()
+		if(islist(I))
+			for(var/ss in I)
+				if(istype(ss, /datum/controller/subsystem))
+					filtered_I += ss
+			// Removed I.Cut() as it is not always safe
+			for(var/ss in filtered_I)
+				I += ss
+			sortTim(I, /proc/cmp_subsystem_priority)
+			I += tickersubsystems
 
 	var/cached_runlevel = current_runlevel
 	var/list/current_runlevel_subsystems = runlevel_sorted_subsystems[cached_runlevel]

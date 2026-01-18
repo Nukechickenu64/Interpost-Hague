@@ -21,9 +21,11 @@
 
 /datum/shuttle/autodock/New(var/_name, var/obj/effect/shuttle_landmark/start_waypoint)
 	..(_name, start_waypoint)
-
 	//Initial dock
-	active_docking_controller = current_location.docking_controller
+	if(current_location && current_location.docking_controller)
+		active_docking_controller = current_location.docking_controller
+	else
+		active_docking_controller = null
 	update_docking_target(current_location)
 	if(active_docking_controller)
 		set_docking_codes(active_docking_controller.docking_codes)
@@ -32,7 +34,6 @@
 		if(location && location.docking_codes)
 			set_docking_codes(location.docking_codes)
 	dock()
-
 	//Optional transition area
 	if(landmark_transition)
 		landmark_transition = SSshuttle.get_landmark(landmark_transition)
