@@ -109,6 +109,8 @@
 		game_log("ADMINSAY", text)
 
 /proc/log_adminwarn(text)
+	if (isnull(config))
+		return
 	if (config.log_adminwarn)
 		game_log("ADMINWARN", text)
 
