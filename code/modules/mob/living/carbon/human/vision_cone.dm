@@ -142,18 +142,13 @@ proc/cone(atom/center = usr, dir = NORTH, list/list = oview(center))
 mob/proc/update_vision_cone()
 	return
 
-/mob/living/proc/clear_cone_effect(var/image/I)
-	if(I)
-		qdel(I)
-
 mob/living/carbon/human/update_vision_cone()
-	var/delay = 10
 	if(src.client)
 		var/image/I = null
+		// Batch clear cone effects without delayed timers
 		for(I in src.client.hidden_atoms)
 			I.override = 0
-			addtimer(CALLBACK(src, .proc/clear_cone_effect, I), delay)
-			delay += 10
+			qdel(I)
 		check_fov()
 		src.client.hidden_atoms = list()
 		src.client.hidden_mobs = list()

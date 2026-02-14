@@ -19,7 +19,6 @@ SUBSYSTEM_DEF(metrics)
 	return counters[key]
 
 /datum/controller/subsystem/metrics/fire(resumed)
-	. = ..()
 	if(!config || !config.log_debug)
 		return
 	if(world.time - last_log >= log_interval)

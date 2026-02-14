@@ -37,10 +37,16 @@
 
 /mob/living/carbon/proc/get_breath_from_internal(var/volume_needed=BREATH_VOLUME) //hopefully this will allow overrides to specify a different default volume without breaking any cases where volume is passed in.
 	if(internal)
-		if (!contents.Find(internal))
+		// Check if tank is accessible and there's an airtight seal
+		// Need BOTH tank in contents AND airtight equipment
+		var/has_airtight_seal = (wear_mask && (wear_mask.item_flags & ITEM_FLAG_AIRTIGHT))
+		if(ishuman(src))
+			var/mob/living/carbon/human/H = src
+			has_airtight_seal = has_airtight_seal || (H.head && (H.head.item_flags & ITEM_FLAG_AIRTIGHT))
+
+		if(!contents.Find(internal) || !has_airtight_seal)
 			internal = null
-		if (!(wear_mask && (wear_mask.item_flags & ITEM_FLAG_AIRTIGHT)))
-			internal = null
+
 		if(internal)
 			if (internals)
 				internals.icon_state = "internal1"
