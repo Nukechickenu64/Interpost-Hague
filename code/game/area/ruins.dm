@@ -21,8 +21,8 @@
 			else
 				ruins_profile = pick_ruins_profile()
 		generate_ruins_turfs()
-		place_random_ruin_object()
-		place_mining_lz()
+		var/turf/ruin_center = place_random_ruin_object()
+		place_mining_lz(ruin_center)
 
 // Approximate Gaussian sampler for per-area radiation, clamped to sane bounds
 /area/space/ruins/proc/sample_space_rads()
@@ -320,7 +320,7 @@
 	if(!templates || !templates.len)
 		// Fallback: specific known DMM if template list isn't available
 		// If the map_template system isn't present, safely do nothing
-		return
+		return null
 
 	var/path_choice = pick(templates)
 	var/datum/map_template/ruin/space/ruin = new path_choice
@@ -329,7 +329,7 @@
 	for(var/turf/T in src)
 		if(!(T.turf_flags & TURF_FLAG_NORUINS))
 			candidates += T
-	if(!candidates.len) return
+	if(!candidates.len) return null
 	var/turf/center = pick(candidates)
 	// Attempt to load centered; clear the footprint to bare space first to avoid leftovers
 	var/list/affected = ruin.get_affected_turfs(center, 1)
@@ -343,20 +343,25 @@
 			if(!istype(T, /turf/space))
 				T.ChangeTurf(/turf/space)
 	ruin.load(center, centered = TRUE)
-	return
+	return center
 
 // Create a mining shuttle landing landmark within the ruins area
-/area/space/ruins/proc/place_mining_lz()
-	var/list/b = get_area_bounds()
-	if(!b || b.len < 5) return
-	var/minx = b[1]
-	var/miny = b[2]
-	var/maxx = b[3]
-	var/maxy = b[4]
-	var/zlev = b[5]
-	var/cx = round((minx + maxx) / 2)
-	var/cy = round((miny + maxy) / 2)
-	var/turf/T = locate(cx, cy, zlev)
+/area/space/ruins/proc/place_mining_lz(var/turf/preferred_center = null)
+	var/turf/T = preferred_center
+	
+	// If no preferred location, use area center
+	if(!T)
+		var/list/b = get_area_bounds()
+		if(!b || b.len < 5) return
+		var/minx = b[1]
+		var/miny = b[2]
+		var/maxx = b[3]
+		var/maxy = b[4]
+		var/zlev = b[5]
+		var/cx = round((minx + maxx) / 2)
+		var/cy = round((miny + maxy) / 2)
+		T = locate(cx, cy, zlev)
+	
 	if(!T || get_area(T) != src)
 		// Fallback: pick any turf in area
 		for(var/turf/TT in src)
@@ -365,12 +370,12 @@
 
 	var/obj/effect/shuttle_landmark/automatic/clearing/LZ = new(T)
 	if(LZ)
-		LZ.radius = 6 // smaller clearing so we don't wipe large portions of the ruin
+		LZ.radius = 8 // clearing radius for shuttle landing
 		// Give each ruin a unique, readable name so multiple landing options appear distinctly
 		LZ.name = "Ruin [T.x],[T.y]"
 		LZ.landmark_tag = "nav_mining_ruin_[T.x]_[T.y]_[T.z]"
 		LZ.shuttle_restricted = "Mining"
 		LZ.SetName("Ruin [T.x],[T.y]")
-		SSshuttle.register_landmark(LZ)
+		// Note: The landmark auto-registers in its Initialize() proc
 
 

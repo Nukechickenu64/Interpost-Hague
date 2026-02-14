@@ -2,6 +2,10 @@
 "a" = (
 /turf/space,
 /area/space/ruins)
+"T" = (
+/obj/effect/shuttle_landmark/mining/space,
+/turf/space,
+/area/space/ruins)
 
 (1,1,1) = {"
 a
@@ -5648,7 +5652,7 @@ a
 a
 a
 a
-a
+T
 a
 a
 a
