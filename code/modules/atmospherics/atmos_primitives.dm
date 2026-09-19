@@ -465,6 +465,9 @@
 	var/list/status = list()
 	if(!atmosphere)
 		status.Add("No atmosphere present.")
+		if(returntext)
+			return jointext(status, " ")
+		return status.len
 
 	// Temperature check
 	if((atmosphere.temperature > (T0C + 50)) || (atmosphere.temperature < (T0C - 10)))

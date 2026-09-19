@@ -40,13 +40,13 @@
 			. += "<span class='danger'>&#91;BANNED&#93;</span><br>"
 		else if(antag.id in pref.be_special_role)
 			// Opted-in (High) — can switch to Low (neutral) or Never
-			. += "<span class='linkOn'>High</span> <a href='?src=\\ref[src];del_special=[antag.id]'>Low</a> <a href='?src=\\ref[src];add_never=[antag.id]'>Never</a><br>"
+			. += "<span class='linkOn'>High</span> <a href='?src=\ref[src];del_special=[antag.id]'>Low</a> <a href='?src=\ref[src];add_never=[antag.id]'>Never</a><br>"
 		else if(antag.id in pref.never_be_special_role)
 			// Opted-out (Never) — can switch to High (opt-in) or Low (neutral)
-			. += "<a href='?src=\\ref[src];add_special=[antag.id]'>High</a> <a href='?src=\\ref[src];del_special=[antag.id]'>Low</a> <span class='linkOn'>Never</span><br>"
+			. += "<a href='?src=\ref[src];add_special=[antag.id]'>High</a> <a href='?src=\ref[src];del_special=[antag.id]'>Low</a> <span class='linkOn'>Never</span><br>"
 		else
 			// Neutral (Low) — can switch to High or Never
-			. += "<a href='?src=\\ref[src];add_special=[antag.id]'>High</a> <span class='linkOn'>Low</span> <a href='?src=\\ref[src];add_never=[antag.id]'>Never</a><br>"
+			. += "<a href='?src=\ref[src];add_special=[antag.id]'>High</a> <span class='linkOn'>Low</span> <a href='?src=\ref[src];add_never=[antag.id]'>Never</a><br>"
 		. += "</td></tr>"
 
 /*

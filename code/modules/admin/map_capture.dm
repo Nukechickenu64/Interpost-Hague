@@ -17,12 +17,15 @@
 		to_chat(usr, "Capturing range is incorrect, it must be within 1-32.")
 		return
 
-	if(locate(tx,ty,tz))
+	var/clamped_x = clamp(tx, 1, world.maxx)
+	var/clamped_y = clamp(ty, 1, world.maxy)
+	var/clamped_z = clamp(tz, 1, world.maxz)
+	if(locate(clamped_x, clamped_y, clamped_z))
 		var/ligths = 0
 		if(alert("Do you want lighting to be included in capture?", "Map Capture", "No", "Yes") == "Yes")
 			ligths = 1
-		var/cap = generate_image(tx ,ty ,tz ,range, CAPTURE_MODE_PARTIAL, null, ligths, 1)
-		var/file_name = "map_capture_x[tx]_y[ty]_z[tz]_r[range].png"
+		var/cap = generate_image(clamped_x ,clamped_y ,clamped_z ,range, CAPTURE_MODE_PARTIAL, null, ligths, 1)
+		var/file_name = "map_capture_x[clamped_x]_y[clamped_y]_z[clamped_z]_r[range].png"
 		to_chat(usr, "Saved capture in cache as [file_name].")
 		usr << browse_rsc(cap, file_name)
 	else

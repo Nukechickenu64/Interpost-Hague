@@ -26,27 +26,31 @@
 /obj/machinery/sleeper/Process()
 	if(stat & (NOPOWER|BROKEN))
 		return
+	if(occupant && QDELETED(occupant))
+		occupant = null
+		filtering = 0
+		pump = 0
+		update_use_power(POWER_USE_IDLE)
+		update_icon()
 
-	if(filtering > 0)
-		if(beaker)
-			if(beaker.reagents.total_volume < beaker.reagents.maximum_volume)
-				var/pumped = 0
-				for(var/datum/reagent/x in occupant.reagents.reagent_list)
-					occupant.reagents.trans_to_obj(beaker, 3)
-					pumped++
-				if(ishuman(occupant))
-					occupant.vessel.trans_to_obj(beaker, pumped + 1)
-		else
-			toggle_filter()
-	if(pump > 0)
-		if(beaker && istype(occupant))
-			if(beaker.reagents.total_volume < beaker.reagents.maximum_volume)
-				var/datum/reagents/ingested = occupant.get_ingested_reagents()
-				if(ingested)
-					for(var/datum/reagent/x in ingested.reagent_list)
-						ingested.trans_to_obj(beaker, 3)
-		else
-			toggle_pump()
+	if(filtering > 0 && occupant && beaker)
+		if(beaker.reagents.total_volume < beaker.reagents.maximum_volume)
+			var/pumped = 0
+			for(var/datum/reagent/x in occupant.reagents.reagent_list)
+				occupant.reagents.trans_to_obj(beaker, 3)
+				pumped++
+			if(ishuman(occupant))
+				occupant.vessel.trans_to_obj(beaker, pumped + 1)
+	else if(filtering > 0)
+		toggle_filter()
+	if(pump > 0 && beaker && istype(occupant))
+		if(beaker.reagents.total_volume < beaker.reagents.maximum_volume)
+			var/datum/reagents/ingested = occupant.get_ingested_reagents()
+			if(ingested)
+				for(var/datum/reagent/x in ingested.reagent_list)
+					ingested.trans_to_obj(beaker, 3)
+	else if(pump > 0)
+		toggle_pump()
 
 	if(iscarbon(occupant) && stasis > 1)
 		occupant.SetStasis(stasis)
@@ -119,7 +123,7 @@
 			toggle_filter()
 			return TOPIC_REFRESH
 	if(href_list["pump"])
-		if(filtering != text2num(href_list["pump"]))
+		if(pump != text2num(href_list["pump"]))
 			toggle_pump()
 			return TOPIC_REFRESH
 	if(href_list["chemical"] && href_list["amount"])

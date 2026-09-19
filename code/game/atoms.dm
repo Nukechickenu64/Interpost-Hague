@@ -35,6 +35,9 @@
 	if(GLOB.use_preloader && (src.type == GLOB._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
 		GLOB._preloader.load(src)
 
+	if(!SSatoms || isnull(SSatoms.atom_init_stage))
+		return Initialize(FALSE)
+
 	var/do_initialize = SSatoms.atom_init_stage
 	var/list/created = SSatoms.created_atoms
 	if(do_initialize > INITIALIZATION_INSSATOMS_LATE)

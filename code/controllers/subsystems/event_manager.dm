@@ -73,6 +73,8 @@ SUBSYSTEM_DEF(event)
 
 //Actual event handling
 /datum/controller/subsystem/event/proc/event_complete(var/datum/event/E)
+	if(!E || QDELETED(E))
+		return
 	active_events -= E
 
 	if(!E.event_meta || !E.severity)	// datum/event is used here and there for random reasons, maintaining "backwards compatibility"
@@ -81,10 +83,16 @@ SUBSYSTEM_DEF(event)
 	finished_events += E
 
 	// Add the event back to the list of available events
-	var/datum/event_container/EC = event_containers[E.severity]
 	var/datum/event_meta/EM = E.event_meta
 	if(EM.add_to_queue)
-		EC.available_events += EM
+		var/list/datum/event_container/containers = event_containers[E.severity]
+		if(!islist(containers))
+			return
+		for(var/datum/event_container/EC in containers)
+			if(!islist(EC.available_events))
+				EC.available_events = list()
+			EC.available_events += EM
+			break
 
 	log_debug("Event '[EM.name]' has completed at [worldtime2stationtime(world.time)].")
 

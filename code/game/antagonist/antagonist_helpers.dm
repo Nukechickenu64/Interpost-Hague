@@ -22,6 +22,8 @@
 
 /datum/antagonist/proc/antags_are_dead()
 	for(var/datum/mind/antag in current_antagonists)
+		if(!antag || !antag.current)
+			continue
 		if(mob_path && !istype(antag.current,mob_path))
 			continue
 		if(antag.current.stat==2)

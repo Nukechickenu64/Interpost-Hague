@@ -1,6 +1,6 @@
 /datum/religion/messiah
 	name = MESSIAH
-	holy_item = new /obj/item/crucifix()
+	holy_item = /obj/item/crucifix
 	shrine = /obj/old_god_shrine/messiah_shrine
 	whisper_lines = list("Father, son, ghost.", "Peace be with you, my humble servant.", "Turn the other cheek.")
 	offering_items = list(/obj/item/weapon/flame/candle/, /obj/effect/decal/cleanable/blood/)

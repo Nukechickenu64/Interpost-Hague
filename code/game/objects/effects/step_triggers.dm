@@ -9,7 +9,7 @@
 /obj/effect/step_trigger/proc/Trigger(var/atom/movable/A)
 	return 0
 
-/obj/effect/step_trigger/Crossed(H as mob|obj)
+/obj/effect/step_trigger/Crossed(atom/movable/H)
 	..()
 	if(!H)
 		return
@@ -35,13 +35,16 @@
 		return
 	var/curtiles = 0
 	var/stopthrow = 0
+	var/mob/M
+	var/previous_canmove
 	for(var/obj/effect/step_trigger/thrower/T in orange(2, src))
 		if(AM in T.affecting)
 			return
 
 	if(ismob(AM))
-		var/mob/M = AM
+		M = AM
 		if(immobilize)
+			previous_canmove = M.canmove
 			M.canmove = 0
 
 	affecting.Add(AM)
@@ -55,6 +58,8 @@
 		curtiles++
 
 		sleep(speed)
+		if(QDELETED(AM) || !AM.loc || AM.z != src.z)
+			break
 
 		// Calculate if we should stop the process
 		if(!nostop)
@@ -68,18 +73,19 @@
 
 		if(AM)
 			var/predir = AM.dir
-			step(AM, direction)
-			if(!facedir)
+			if(!step(AM, direction))
+				break
+			if(facedir)
+				AM.set_dir(direction)
+			else
 				AM.set_dir(predir)
 
 
 
 	affecting.Remove(AM)
 
-	if(ismob(AM))
-		var/mob/M = AM
-		if(immobilize)
-			M.canmove = 1
+	if(M && !QDELETED(M) && immobilize)
+		M.canmove = previous_canmove
 
 /* Stops things thrown by a thrower, doesn't do anything */
 
@@ -93,11 +99,17 @@
 	var/teleport_z = 0
 
 /obj/effect/step_trigger/teleporter/Trigger(var/atom/movable/A)
-	if(teleport_x && teleport_y && teleport_z)
-		var/turf/T = locate(teleport_x, teleport_y, teleport_z)
-		if(T)
-			A.forceMove(T)
-	return 1
+	if(!A || isnull(teleport_x) || isnull(teleport_y) || isnull(teleport_z))
+		return 0
+
+	var/new_x = clamp(teleport_x, 1, world.maxx)
+	var/new_y = clamp(teleport_y, 1, world.maxy)
+	var/new_z = clamp(teleport_z, 1, world.maxz)
+	var/turf/T = locate(new_x, new_y, new_z)
+	if(!T)
+		return 0
+
+	return A.forceMove(T)
 
 /* Random teleporter, teleports atoms to locations ranging from teleport_x - teleport_x_offset, etc */
 
@@ -108,8 +120,25 @@
 	var/teleport_z_offset = 0
 
 /obj/effect/step_trigger/teleporter/random/Trigger(var/atom/movable/A)
-	if(teleport_x && teleport_x_offset && teleport_y && teleport_y_offset && teleport_z && teleport_z_offset)
-		var/turf/T = locate(rand(teleport_x, teleport_x_offset), rand(teleport_y, teleport_y_offset), rand(teleport_z, teleport_z_offset))
-		if(T)
-			A.forceMove(T)
-	return 1
+	if(!A || isnull(teleport_x) || isnull(teleport_x_offset) || isnull(teleport_y) || isnull(teleport_y_offset) || isnull(teleport_z) || isnull(teleport_z_offset))
+		return 0
+
+	// offset is treated as a radius around the configured center coordinate.
+	var/min_x = max(1, teleport_x - teleport_x_offset)
+	var/max_x = min(world.maxx, teleport_x + teleport_x_offset)
+	var/min_y = max(1, teleport_y - teleport_y_offset)
+	var/max_y = min(world.maxy, teleport_y + teleport_y_offset)
+	var/min_z = max(1, teleport_z - teleport_z_offset)
+	var/max_z = min(world.maxz, teleport_z + teleport_z_offset)
+
+	// Preserve the existing "choose a random coordinate between these two values" behavior,
+	// but clamp the result to valid world bounds so invalid map config entries cannot
+	// generate impossible or null targets.
+	var/new_x = clamp(rand(min_x, max_x), 1, world.maxx)
+	var/new_y = clamp(rand(min_y, max_y), 1, world.maxy)
+	var/new_z = clamp(rand(min_z, max_z), 1, world.maxz)
+	var/turf/T = locate(new_x, new_y, new_z)
+	if(!T)
+		return 0
+
+	return A.forceMove(T)

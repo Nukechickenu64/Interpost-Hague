@@ -3,9 +3,7 @@
 	#include "example_shuttles.dm"
 	#include "example_unit_testing.dm"
 
-	#include "example-1.dmm"
-	#include "example-2.dmm"
-	#include "example-3.dmm"
+	#include "example.dmm"
 
 	#include "../shared/job/jobs.dm"
 	#include "../../code/modules/lobby_music/absconditus.dm"

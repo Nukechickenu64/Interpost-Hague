@@ -9,11 +9,7 @@
 	#include "alpha_presets.dm"
 	#include "alpha_shuttles.dm"
 
-	#include "alpha-1.dmm"
-	#include "alpha-2.dmm"
-	#include "alpha-3.dmm"
-	#include "alpha-4.dmm"
-	#include "alpha-5.dmm"
+	#include "alpha.dmm"
 	#include "ruinsalpha.dmm"
 	#include "../../maps/away/mining/mining.dm"
 

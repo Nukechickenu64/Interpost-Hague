@@ -55,6 +55,7 @@
 		if("activate")
 			if(!occupant)
 				to_chat(usr, "<span class='warning'>There is no occupant in the sleeper.</span>")
+				return TOPIC_REFRESH
 
 			if(stat & (NOPOWER|BROKEN))
 				to_chat(usr, "<span class='warning'>The [src] is not powered.</span>")
@@ -136,6 +137,8 @@
 	if(do_after(user, 20, src))
 		if(occupant)
 			to_chat(user, "<span class='warning'>\The [src] is already occupied.</span>")
+			return
+		if(QDELETED(M) || !M.Adjacent(src) || !user.Adjacent(src) || M.buckled)
 			return
 		M.stop_pulling()
 		if(M.client)
@@ -486,6 +489,7 @@
 		qdel(P)
 		R = new /obj/item/weapon/paper/research(loc_old)
 		R.name = "research paper: [src.name]"
+		R.info = "Formalized research notes on [src.name].\n\nThis paper captures a fragment of the underlying idea."
 		R.concept_name = src.name
 		if(istype(src, /obj/concept/grief))
 			R.concept_kind = "grief"
@@ -502,6 +506,7 @@
 	prog_gain = min(prog_gain, remaining_insight)
 	R.progress = clamp(R.progress + prog_gain, 0, 100)
 	remaining_insight = max(remaining_insight - prog_gain, 0)
+	R.info += "\n\nProgress: [R.progress]%."
 	to_chat(user, "<span class='notice'>You jot down insight from the [src.name] ([prog_gain]% gained, [R.progress]% total).</span>")
 
 	if(R.progress >= 100 || remaining_insight <= 0)

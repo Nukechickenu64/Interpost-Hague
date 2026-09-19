@@ -152,16 +152,18 @@
 
 		if("Location")
 			var/locationx = input(usr, "Please input the x coordinate to search for.", "Location?" , "") as num
-			if(!locationx || !(usr in view(1,src)))
+			if(!isnum(locationx) || !(usr in view(1,src)))
 				return
 			var/locationy = input(usr, "Please input the y coordinate to search for.", "Location?" , "") as num
-			if(!locationy || !(usr in view(1,src)))
+			if(!isnum(locationy) || !(usr in view(1,src)))
 				return
 
 			var/turf/Z = get_turf(src)
-			var/turf/location = locate(locationx,locationy,Z.z)
+			var/clamped_x = clamp(locationx, 1, world.maxx)
+			var/clamped_y = clamp(locationy, 1, world.maxy)
+			var/turf/location = locate(clamped_x, clamped_y, Z.z)
 
-			to_chat(usr, "You set the pinpointer to locate [locationx],[locationy]")
+			to_chat(usr, "You set the pinpointer to locate [clamped_x],[clamped_y]")
 
 			target = weakref(location)
 

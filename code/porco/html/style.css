@@ -103,6 +103,18 @@ background-image:url('button_pig.png');
 {
 background-image:url('button_options.png');
 }
+#reloadpig
+{
+color: #ccc;
+font-size: 22px;
+line-height: 42px;
+text-align: center;
+background-color: rgba(0,0,0,0.35);
+}
+#reloadpig:hover
+{
+color: #fff;
+}
 
 #statpanel {
     position:absolute;

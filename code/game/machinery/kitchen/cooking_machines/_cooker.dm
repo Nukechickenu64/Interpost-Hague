@@ -99,7 +99,8 @@
 	sleep(cook_time)
 
 	// Sanity checks.
-	check_cooking_obj()
+	if(!check_cooking_obj())
+		return
 
 	// RIP slow-moving held mobs.
 	if(istype(cooking_obj, /obj/item/weapon/holder))
@@ -149,7 +150,6 @@
 		while(1)
 			//Before we wait to see if we burn it, let's do a skillcheck
 			if(!user.skillcheck(user.skills["cooking"], 50, "You forgot a crucial step, and the [food_item.name] is going to be ruined!", "cooking"))
-				overcook_period = 0 //If you fuck up that check, you're gonna fuck up your food.  Ideally this can be saved by a robust player
 				burn_chance = 50
 			sleep(overcook_period)
 			if(!cooking || !result || result.loc != src)
@@ -176,7 +176,8 @@
 		cooking_obj = null
 		icon_state = off_icon
 		cooking = 0
-		return
+		return FALSE
+	return TRUE
 
 /obj/machinery/cooker/attack_hand(var/mob/user)
 

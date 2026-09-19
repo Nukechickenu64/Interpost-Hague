@@ -242,7 +242,7 @@ var/const/CHARACTER_PREFERENCE_INPUT_TITLE = "Character Preference"
 	if(. & TOPIC_UPDATE_PREVIEW)
 		pref_mob.client.prefs.preview_icon = null
 	if(. & TOPIC_REFRESH)
-		pref_mob.client.prefs.ShowChoices(usr)
+		pref_mob.client.prefs.ShowChoices(pref_mob)
 
 /datum/category_item/player_setup_item/CanUseTopic(var/mob/user)
 	return 1

@@ -36,6 +36,8 @@
 						)
 
 /datum/map/utopia
+	full_name = "Utopia"
+	path = "utopia"
 	allowed_jobs = list(
 						/datum/job/captain,
 						/datum/job/hop,
@@ -144,6 +146,8 @@
 						)
 
 /datum/map/bearcat
+	full_name = "Bearcat"
+	path = "bearcat"
 	allowed_jobs = list(
 						/datum/job/captain,
 						/datum/job/hop,
@@ -180,6 +184,8 @@
 						)
 
 /datum/map/torch
+	full_name = "Torch"
+	path = "torch"
 	allowed_jobs = list(
 						/datum/job/captain,
 						//datum/job/countess,

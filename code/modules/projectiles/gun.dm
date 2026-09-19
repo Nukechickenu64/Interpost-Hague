@@ -545,6 +545,20 @@
 		else
 			user.client.mouse_pointer_icon = initial(user.client.mouse_pointer_icon)
 
+/obj/item/weapon/gun/attack_hand_right(mob/user as mob)
+	if(!Adjacent(user))
+		return
+	if(user.incapacitated())
+		to_chat(user, "<span class='warning'>You can't do that right now!</span>")
+		return
+	if(src != user.get_active_hand())
+		return
+	if(safety)
+		safety = 0
+		playsound(user, 'sound/weapons/guns/interact/selector.ogg', 50, 1)
+		to_chat(user, "<span class='notice'>You toggle the safety off.</span>")
+		user.client.mouse_pointer_icon = file("icons/misc/pointer.dmi")
+
 //Gun pointer
 /obj/item/weapon/gun/pickup(mob/user)
 	..()

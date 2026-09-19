@@ -414,14 +414,98 @@ var/global/list/damage_icon_parts = list()
 		if(update_icons)   update_icons()
 		return
 
-	//masks and helmets can obscure our hair.
-	if( (head && (head.flags_inv & BLOCKHAIR)) || (wear_mask && (wear_mask.flags_inv & BLOCKHAIR)))
-		if(update_icons)   update_icons()
-		return
+	var/image/hair_icon = head_organ.get_hair_icon()
 
-	overlays_standing[HAIR_LAYER]	= head_organ.get_hair_icon()
+	//masks and helmets can obscure our hair.
+	if((head && (head.flags_inv & BLOCKHAIR)) || (wear_mask && (wear_mask.flags_inv & BLOCKHAIR)))
+		hair_icon = get_masked_hair_icon(hair_icon)
+		if(!hair_icon)
+			if(update_icons)   update_icons()
+			return
+
+	overlays_standing[HAIR_LAYER]	= hair_icon
 
 	if(update_icons)   update_icons()
+
+/mob/living/carbon/human/proc/get_masked_hair_icon(var/image/hair_icon)
+	if(!hair_icon)
+		return null
+
+	var/icon/occlusion_mask
+	if(head && (head.flags_inv & BLOCKHAIR))
+		occlusion_mask = head.get_mob_icon(src, slot_head_str)
+	if(wear_mask && (wear_mask.flags_inv & BLOCKHAIR))
+		var/icon/mask_icon = wear_mask.get_mob_icon(src, slot_wear_mask_str)
+		if(occlusion_mask)
+			occlusion_mask.Blend(mask_icon, ICON_OR)
+		else
+			occlusion_mask = mask_icon
+
+	if(!occlusion_mask)
+		return null
+
+	var/icon/window_mask = new('icons/effects/effects.dmi', "nothing")
+	var/mask_width = occlusion_mask.Width()
+	var/mask_height = occlusion_mask.Height()
+	var/list/outside = list()
+	var/list/queue = list()
+
+	for(var/x = 1, x <= mask_width, x++)
+		for(var/y in list(1, mask_height))
+			var/pixel = occlusion_mask.GetPixel(x, y)
+			var/alpha = pixel ? ((length(pixel) > 7) ? hex2num(copytext(pixel, 8, 10)) : 255) : 0
+			if(alpha <= 0)
+				var/key = "[x],[y]"
+				if(!outside[key])
+					outside[key] = TRUE
+					queue[++queue.len] = list(x, y)
+
+	for(var/y = 1, y <= mask_height, y++)
+		for(var/x in list(1, mask_width))
+			var/pixel = occlusion_mask.GetPixel(x, y)
+			var/alpha = pixel ? ((length(pixel) > 7) ? hex2num(copytext(pixel, 8, 10)) : 255) : 0
+			if(alpha <= 0)
+				var/key = "[x],[y]"
+				if(!outside[key])
+					outside[key] = TRUE
+					queue[++queue.len] = list(x, y)
+
+	var/queue_index = 1
+	while(queue_index <= queue.len)
+		var/list/point = queue[queue_index++]
+		for(var/list/neighbor in list(list(point[1] + 1, point[2]), list(point[1] - 1, point[2]), list(point[1], point[2] + 1), list(point[1], point[2] - 1)))
+			var/x = neighbor[1]
+			var/y = neighbor[2]
+			if(x < 1 || x > mask_width || y < 1 || y > mask_height)
+				continue
+			var/key = "[x],[y]"
+			if(outside[key])
+				continue
+			var/pixel = occlusion_mask.GetPixel(x, y)
+			var/alpha = pixel ? ((length(pixel) > 7) ? hex2num(copytext(pixel, 8, 10)) : 255) : 0
+			if(alpha <= 0)
+				outside[key] = TRUE
+				queue[++queue.len] = list(x, y)
+
+	var/has_window = FALSE
+	for(var/x = 1, x <= mask_width, x++)
+		for(var/y = 1, y <= mask_height, y++)
+			var/pixel = occlusion_mask.GetPixel(x, y)
+			var/alpha = pixel ? ((length(pixel) > 7) ? hex2num(copytext(pixel, 8, 10)) : 255) : 0
+			if(alpha >= 255 || outside["[x],[y]"])
+				continue
+			window_mask.DrawBox(rgb(255, 255, 255), x, y)
+			has_window = TRUE
+
+	if(!has_window)
+		return null
+
+	var/icon/masked_hair = getFlatIcon(hair_icon)
+	masked_hair.AddAlphaMask(window_mask)
+	var/image/ret = image(masked_hair)
+	ret.color = hair_icon.color
+	ret.appearance_flags = hair_icon.appearance_flags
+	return ret
 
 /mob/living/carbon/human/proc/update_skin(var/update_icons=1)
 	overlays_standing[SKIN_LAYER] = species.update_skin(src)

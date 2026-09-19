@@ -16,11 +16,7 @@
 	#include "testmap_shuttles.dm"
 	#include "testmap_elevator.dm"
 
-	#include "testmap-1.dmm"
-	#include "testmap-2.dmm"
-	#include "testmap-3.dmm"
-	#include "testmap-4.dmm"
-	#include "testmap-5.dmm"
+	#include "testmap.dmm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

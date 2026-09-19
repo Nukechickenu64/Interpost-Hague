@@ -53,12 +53,14 @@
 	if(player.current && faction_verb)
 		player.current.verbs -= faction_verb
 	if(player in current_antagonists)
-		to_chat(player.current, "<span class='danger'><font size = 3>You are no longer a [role_text]!</font></span>")
+		if(player.current)
+			to_chat(player.current, "<span class='danger'><font size = 3>You are no longer a [role_text]!</font></span>")
 		current_antagonists -= player
 		faction_members -= player
 		player.special_role = null
 		update_icons_removed(player)
-		BITSET(player.current.hud_updateflag, SPECIALROLE_HUD)
+		if(player.current)
+			BITSET(player.current.hud_updateflag, SPECIALROLE_HUD)
 
 		if(!is_special_character(player))
 			if(player.current)

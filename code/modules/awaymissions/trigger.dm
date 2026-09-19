@@ -18,8 +18,16 @@
 	var/exitsmoke = 0
 
 /obj/effect/step_trigger/teleport_fancy/Trigger(mob/M as mob)
-	var/dest = locate(locationx, locationy, z)
-	M.Move(dest)
+	if(!M || isnull(locationx) || isnull(locationy))
+		return
+
+	var/new_x = clamp(locationx, 1, world.maxx)
+	var/new_y = clamp(locationy, 1, world.maxy)
+	var/turf/dest = locate(new_x, new_y, z)
+	if(!dest || !M.Move(dest))
+		dest = pick_area_and_turf(list(/proc/is_station_area), list(/proc/not_turf_contains_dense_objects))
+		if(!dest || !M.Move(dest))
+			return
 
 	if(entersparks)
 		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
@@ -39,6 +47,7 @@
 		s.set_up(4, 1, dest, 0)
 		s.start()
 
-	uses--
+	if(uses > 0)
+		uses--
 	if(uses == 0)
 		qdel(src)

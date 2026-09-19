@@ -78,7 +78,7 @@
 	// Styled header with Close and borderless browse
 	var/body = ""
 	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
 	ui_browse_styled(user, name, body, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")
@@ -208,7 +208,7 @@ Nah
 
 	var/body2 = ""
 	body2 += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-	body2 += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body2 += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body2 += "</div>"
 	body2 += dat
 	ui_browse_styled(user, name, body2, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")

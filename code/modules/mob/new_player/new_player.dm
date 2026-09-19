@@ -241,6 +241,7 @@
 
 /mob/new_player/proc/IsJobAvailable(var/datum/job/job)
 	if(!job)	return 0
+	if(SSticker && SSticker.round_started_without_captain && job.title == "Captain") return 0
 	if(!job.is_position_available()) return 0
 	if(jobban_isbanned(src, job.title))	return 0
 	if(!job.player_old_enough(src.client))	return 0
@@ -258,6 +259,8 @@
 /mob/new_player/proc/AttemptLateSpawn(var/datum/job/job, var/spawning_at)
 	if(src != usr)
 		return 0
+	if(!job || !client)
+		return 0
 	if(GAME_STATE != RUNLEVEL_GAME)
 		to_chat(usr, "<span class='warning'>The round is either not ready, or has already finished.</span>")
 		return 0
@@ -272,6 +275,9 @@
 		return
 
 	var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, job.title)
+	if(!spawnpoint || !spawnpoint.turfs || !spawnpoint.turfs.len)
+		to_chat(src, "<span class='warning'>No valid spawnpoint is available for this job.</span>")
+		return 0
 	var/turf/spawn_turf = pick(spawnpoint.turfs)
 	if(job.latejoin_at_spawnpoints)
 		var/obj/S = job_master.get_roundstart_spawnpoint(job.title)
@@ -288,10 +294,14 @@
 		return 0
 
 	character = job_master.EquipRank(character, job.title, 1)					//equips the human
+	if(!character || QDELETED(character) || !character.mind)
+		qdel(character)
+		qdel(src)
+		return 0
 	equip_custom_items(character)
 
 	// AIs don't need a spawnpoint, they must spawn at an empty core
-	if(character.mind.assigned_role == "AI")
+	if(character.mind && character.mind.assigned_role == "AI")
 
 		character = character.AIize(move=0) // AIize the character, but don't move them yet
 

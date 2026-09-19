@@ -77,7 +77,7 @@
 		var/mob/living/silicon/ai/AI = user
 		can_read = get_dist(src, AI.camera) < 2
 	var/body = "[can_read ? info : stars(info)][stamps]"
-	var/page = ui_build_styled_html(name, body)
+	var/page = ui_build_styled_html(name, body, TRUE)
 	user << browse(page, "window=[name]")
 	onclose(user, "[name]")
 
@@ -321,7 +321,7 @@
 
 		update_space(t)
 
-		var/page2 = ui_build_styled_html(name, "[info_links][stamps]")
+		var/page2 = ui_build_styled_html(name, "[info_links][stamps]", TRUE)
 		usr << browse(page2, "window=[name]") // Update the window
 
 		playsound(loc, pick(write_sounds), 50)
@@ -375,7 +375,7 @@
 			RP.RenamePaper(user,src)
 			playsound(pick(write_sounds), 50)
 		else
-			var/page3 = ui_build_styled_html(name, "[info_links][stamps]")
+			var/page3 = ui_build_styled_html(name, "[info_links][stamps]", TRUE)
 			user << browse(page3, "window=[name]")
 			playsound(pick(write_sounds), 50)
 		return

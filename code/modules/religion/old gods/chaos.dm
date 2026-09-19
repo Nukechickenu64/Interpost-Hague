@@ -1,6 +1,6 @@
 /datum/religion/hasard
 	name = HASARD // he travelled many places
-	holy_item = new /obj/item/weapon/bikehorn()
+	holy_item = /obj/item/weapon/bikehorn
 	shrine = /obj/old_god_shrine/hasard_shrine
 	whisper_lines = list("This is a game, just a game!", "TURN THE PC OFF, RIGHT NOW.", "HA-HA-HA-HA-HA!!!")
 	offering_items = list(/obj/item/stack/teeth, /obj/item/weapon/flame/candle/, /obj/item/clothing/head/jester)

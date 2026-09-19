@@ -972,6 +972,34 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 		mob_state = icon_state
 	return mob_state
 
+/obj/item/proc/get_mob_icon(mob/user_mob, slot)
+	var/bodytype = "Default"
+	var/mob/living/carbon/human/user_human
+	if(ishuman(user_mob))
+		user_human = user_mob
+		bodytype = user_human.species.get_bodytype(user_human)
+
+	var/mob_state = get_icon_state(user_mob, slot)
+
+	if(icon_override)
+		if(slot == 	slot_l_hand_str || slot == slot_l_ear_str)
+			mob_state = "[mob_state]_l"
+		if(slot == 	slot_r_hand_str || slot == slot_r_ear_str)
+			mob_state = "[mob_state]_r"
+		return new /icon(icon_override, mob_state)
+	else if(use_spritesheet(bodytype, slot, mob_state))
+		if(slot == slot_l_ear)
+			mob_state = "[mob_state]_l"
+		if(slot == slot_r_ear)
+			mob_state = "[mob_state]_r"
+		return new /icon(sprite_sheets[bodytype], mob_state)
+	else if(item_icons && item_icons[slot])
+		return new /icon(item_icons[slot], mob_state)
+	else
+		if(user_human && user_human.gender == FEMALE && user_human.species.name == SPECIES_HUMAN)
+			return new /icon(slim_onmob_icons[slot], mob_state)
+		return new /icon(default_onmob_icons[slot], mob_state)
+
 /obj/item/proc/dir_shift(var/icon/given_icon, var/dir_given, var/x = 0, var/y = 0)
 	var/icon/I = new(given_icon, dir = dir_given)
 	I.Shift(EAST, x)

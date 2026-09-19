@@ -216,7 +216,7 @@
 	// Add styled header with in-UI Close and open as a borderless window
 	var/body = ""
 	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
 	ui_browse_styled(user, "Cloning System Control", body, "window=cloning;size=500x600;can_close=0;can_resize=0;border=0;titlebar=0")

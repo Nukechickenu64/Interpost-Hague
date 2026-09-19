@@ -64,13 +64,16 @@
 	if(!mob)
 		return
 
-	var/turf/T = locate(tx, ty, tz)
+	var/clamped_x = clamp(tx, 1, world.maxx)
+	var/clamped_y = clamp(ty, 1, world.maxy)
+	var/clamped_z = clamp(tz, 1, world.maxz)
+	var/turf/T = locate(clamped_x, clamped_y, clamped_z)
 	if(!T)
 		return
 	mob.jumpTo(T)
 
 	SSstatistics.add_field_details("admin_verb","JC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
-	log_and_message_admins("jumped to coordinates [tx], [ty], [tz]")
+	log_and_message_admins("jumped to coordinates [clamped_x], [clamped_y], [clamped_z]")
 
 /proc/sorted_client_keys()
 	return sortKey(GLOB.clients.Copy())

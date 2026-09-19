@@ -10,6 +10,24 @@
 	var/id = "default"
 	var/event_message = "You shouldn't have seen this. Yell at a coder."
 
+/datum/round_event/captainless
+	id = "captainless"
+	event_message = "The captain abandoned the crew in their sleep. There will be no law or order on this shift, and the security officers have become roughnecks."
+
+/datum/round_event/captainless/apply_event()
+	for(var/mob/living/carbon/human/H in GLOB.human_mob_list)
+		if(!H.mind || !H.mind.assigned_job || !(H.mind.assigned_job.department_flag & SEC))
+			continue
+		if(H.mind.assigned_role == "Security Officer")
+			H.job = "Security Roughneck"
+
+		var/obj/item/weapon/card/id/id_card = H.wear_id
+		if(istype(H.wear_id, /obj/item/device/pda))
+			var/obj/item/device/pda/pda = H.wear_id
+			id_card = pda.id
+		if(id_card)
+			id_card.access = get_all_accesses()
+
 /datum/round_event/proc/announce_event()
 	to_world("<h1 class='alert'>Round Aspect:</h1>")
 	to_world("<br><b>[event_message]</b><br>")

@@ -17,14 +17,7 @@
 
 	#include "dreyfus_gamemodes.dm"
 
-	#include "dreyfus-01.dmm" // - Abandonné - IA(?), traitement des déchets
-	#include "dreyfus-02.dmm" // - Ingénierie - Moteur. Lifesupport.
-	#include "dreyfus-03.dmm" // - Cargo - Ouvrier, Production et logistique
-	#include "dreyfus-04.dmm" // - Résidentiel - Clinique, bar et good vibes
-	#include "dreyfus-05.dmm" // - Bureaux - Personnel administratif et direction
-	#include "dreyfus-06.dmm" // - Coupole - Jardin, réception des invités
-	#include "dreyfus-07.dmm"
-	#include "dreyfus-08.dmm"
+	#include "dreyfus.dmm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

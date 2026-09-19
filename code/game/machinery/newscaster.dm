@@ -458,7 +458,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 		// Build styled, borderless UI with in-UI Close button
 		var/body = ""
 		body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-		body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+		body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 		body += "</div>"
 		body += dat
 		ui_browse_styled(human_or_robot_user, "Newscaster", body, "window=newscaster_main;size=400x600;can_close=0;can_resize=0;border=0;titlebar=0")

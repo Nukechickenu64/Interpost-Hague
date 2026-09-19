@@ -22,7 +22,11 @@
 	var/turf/start = loc
 	if(!istype(start))
 		to_chat(src, "<span class='notice'>You are unable to move from here.</span>")
-	var/turf/simulated/open/O = GetAbove(src)
+		return
+	var/turf/simulated/open/O = (direction == UP) ? GetAbove(src) : GetBelow(src)
+	if(!O)
+		to_chat(src, "<span class='notice'>There is nothing of interest in this direction.</span>")
+		return
 	var/atom/climb_target
 	if(istype(O))
 		for(var/turf/T in trange(1,O))
@@ -52,6 +56,9 @@
 
 	var/turf/start = pulling.loc
 	var/turf/destination = (direction == UP) ? GetAbove(pulling) : GetBelow(pulling)
+	if(!start || !destination)
+		stop_pulling()
+		return 0
 
 	if(!start.CanZPass(pulling, direction))
 		to_chat(src, "<span class='warning'>\The [start] blocked your pulled object!</span>")

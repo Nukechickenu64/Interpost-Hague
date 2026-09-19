@@ -10,6 +10,28 @@ GLOBAL_VAR(spawntypes)
 				GLOB.spawntypes[display_name] = new S
 	return GLOB.spawntypes
 
+// Several spawnpoint subtypes (job-restricted cryopods) intentionally share a display_name with
+// the generic entry, so spawntypes() only keeps one of them. This cache is keyed by exact type
+// instead, so job-restricted cryopods can still be found reliably.
+GLOBAL_VAR(spawntypes_by_path)
+
+/proc/get_spawnpoint_instance(var/type)
+	if(!GLOB.spawntypes_by_path)
+		GLOB.spawntypes_by_path = list()
+	if(!GLOB.spawntypes_by_path[type])
+		GLOB.spawntypes_by_path[type] = new type
+	return GLOB.spawntypes_by_path[type]
+
+// Finds the spawnpoint subtype (if any) whose restrict_job specifically names this rank.
+/proc/get_job_restricted_spawnpoint(var/rank)
+	for(var/type in typesof(/datum/spawnpoint)-/datum/spawnpoint)
+		var/datum/spawnpoint/S = type
+		var/list/restrict_job = initial(S.restrict_job)
+		if(restrict_job && (rank in restrict_job))
+			return get_spawnpoint_instance(type)
+	return null
+	return null
+
 /datum/spawnpoint
 	var/msg		  //Message to display on the arrivals computer.
 	var/list/turfs   //List of turfs to spawn on.

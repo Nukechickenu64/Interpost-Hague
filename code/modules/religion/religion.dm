@@ -4,7 +4,7 @@
 /datum/religion
 	var/name = "NONE"
 	var/favor = 0
-	var/holy_item = null
+	var/obj/item/holy_item = null
 	var/shrine = null
 	var/followers = list()
 	var/territories = list()
@@ -224,8 +224,11 @@ proc/generate_random_prayer()//This generates a new one.
 				var/datum/religion/R = GLOB.all_religions[religion]
 				var/holy_item_type
 				if(istype(R) && R.holy_item)
-					var/obj/O = R.holy_item
-					holy_item_type = O.type
+					if(ispath(R.holy_item))
+						holy_item_type = R.holy_item
+					else if(istype(R.holy_item))
+						var/obj/item/holy_item = R.holy_item
+						holy_item_type = holy_item.type
 				var/new_holy_item = new holy_item_type(T)
 				religion_token = new_holy_item
 		else

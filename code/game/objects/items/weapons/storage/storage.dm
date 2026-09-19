@@ -268,7 +268,7 @@
 		var/obj/item/device/lightreplacer/LP = W
 		var/amt_inserted = 0
 		var/turf/T = get_turf(user)
-		for(var/obj/item/weapon/light/L in src.contents)
+		for(var/obj/item/weapon/light/L in src.contents.Copy())
 			if(L.status == 0)
 				if(LP.uses < LP.max_uses)
 					LP.AddUses(1)
@@ -362,7 +362,7 @@
 
 	var/turf/T = get_turf(src)
 	hide_from(usr)
-	for(var/obj/item/I in contents)
+	for(var/obj/item/I in contents.Copy())
 		remove_from_storage(I, T, 1)
 	update_ui_after_item_removal()
 

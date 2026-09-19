@@ -44,8 +44,9 @@ var/datum/ruins_generation_job/ruins_gen_job
 	return TRUE
 
 /datum/ruins_generation_job/proc/ensure_mining_space_landmark()
-	// Ensure a mining_space waypoint exists in /area/space/ruins so the Mining shuttle can travel to open space
-	if(SSshuttle && SSshuttle.get_landmark("nav_mining_space_ruins"))
+	// Ensure a mining space waypoint exists in /area/space/ruins so the Mining shuttle can travel to open space.
+	// Accept both the legacy tag and the canonical "nav_mining_*" tag for compatibility.
+	if(SSshuttle && (SSshuttle.get_landmark("nav_mining_space_ruins") || SSshuttle.get_landmark("mining_space")))
 		return
 	
 	var/turf/T = null

@@ -103,6 +103,9 @@ var/global/datum/controller/occupations/job_master
 	proc/CheckLatejoinBlockers(var/mob/new_player/joining, var/datum/job/job)
 		if(!CheckGeneralJoinBlockers(joining, job))
 			return FALSE
+		if(SSticker && SSticker.round_started_without_captain && job.title == "Captain")
+			to_chat(joining, "<span class='warning'>This round began without a Captain, so the position cannot be filled mid-round.</span>")
+			return FALSE
 		if(job.minimum_character_age && (joining.client.prefs.age < job.minimum_character_age))
 			to_chat(joining, "<span class='warning'>Your character's in-game age is too low for this job.</span>")
 			return FALSE
@@ -396,9 +399,9 @@ var/global/datum/controller/occupations/job_master
 
 
 	proc/EquipRank(mob/living/carbon/human/H, rank, joined_late = 0)
-		if(!H)	return null
+		if(!H || QDELETED(H))	return null
 
-		if(SSticker.eof)
+		if(SSticker.eof && H.mind)
 			if(SSticker.eof.id == "assjesters")
 				if(H.mind.assigned_role == "Arbiter")
 					rank = "Jester"
@@ -422,7 +425,7 @@ var/global/datum/controller/occupations/job_master
 
 			// Equip custom gear loadout, replacing any job items
 			var/list/loadout_taken_slots = list()
-			if(H.client.prefs.Gear() && job.loadout_allowed)
+			if(H.client && H.client.prefs && H.client.prefs.Gear() && job.loadout_allowed)
 				for(var/thing in H.client.prefs.Gear())
 					var/datum/gear/G = gear_datums[thing]
 					if(G)
@@ -455,30 +458,39 @@ var/global/datum/controller/occupations/job_master
 						var/list/accessory_args = accessory_data.Copy()
 						accessory_args[1] = src
 						for(var/i in 1 to amt)
-							H.equip_to_slot_or_del(new accessory_path(arglist(accessory_args)), slot_tie)
+							if(ispath(accessory_path, /obj/item))
+								H.equip_to_slot_or_del(new accessory_path(arglist(accessory_args)), slot_tie)
 					else
 						for(var/i in 1 to (isnull(accessory_data)? 1 : accessory_data))
-							H.equip_to_slot_or_del(new accessory_path(src), slot_tie)
+							if(ispath(accessory_path, /obj/item))
+								H.equip_to_slot_or_del(new accessory_path(src), slot_tie)
 
 		else
 			to_chat(H, "Your job is [rank] and the game just can't handle it! Please report this bug to an administrator.")
 
 		H.job = rank
 
-		if(!joined_late || job.latejoin_at_spawnpoints)
+		var/turf/greyhound_turf = (rank == "Greyhound") ? get_greyhound_spawn_turf() : null
+
+		if(greyhound_turf)
+			H.forceMove(greyhound_turf)
+		else if(!joined_late || (job && job.latejoin_at_spawnpoints))
 			var/obj/S = get_roundstart_spawnpoint(rank)
 
 			if(istype(S, /obj/effect/landmark/start) && istype(S.loc, /turf))
 				H.forceMove(S.loc)
 			else
-				var/datum/spawnpoint/spawnpoint = get_spawnpoint_for(H.client, rank)
-				H.forceMove(pick(spawnpoint.turfs))
-				spawnpoint.after_join(H)
+				var/datum/spawnpoint/spawnpoint = H.client ? get_spawnpoint_for(H.client, rank) : null
+				if(spawnpoint && spawnpoint.turfs && spawnpoint.turfs.len)
+					H.forceMove(pick(spawnpoint.turfs))
+					spawnpoint.after_join(H)
+				else
+					WARNING("Could not find an appropriate spawnpoint for job [rank].")
 
-			// Moving wheelchair if they have one
-			if(H.buckled && istype(H.buckled, /obj/structure/bed/chair/wheelchair))
-				H.buckled.forceMove(H.loc)
-				H.buckled.set_dir(H.dir)
+		// Moving wheelchair if they have one
+		if(H.buckled && istype(H.buckled, /obj/structure/bed/chair/wheelchair))
+			H.buckled.forceMove(H.loc)
+			H.buckled.set_dir(H.dir)
 
 		// If they're head, give them the account info for their department
 		if(H.mind && job.head_position)
@@ -504,7 +516,8 @@ var/global/datum/controller/occupations/job_master
 					return H
 		// put any loadout items that couldn't spawn into storage or on the ground
 		for(var/datum/gear/G in spawn_in_storage)
-			G.spawn_in_storage_or_drop(H, H.client.prefs.Gear()[G.display_name])
+			if(H.client && H.client.prefs)
+				G.spawn_in_storage_or_drop(H, H.client.prefs.Gear()[G.display_name])
 
 		if(istype(H)) //give humans wheelchairs, if they need them.
 			var/obj/item/organ/external/l_foot = H.get_organ(BP_L_FOOT)
@@ -523,11 +536,7 @@ var/global/datum/controller/occupations/job_master
 				spawn(50)
 					to_chat(H, "<B>.......<B> ")
 					spawn(50)
-						to_chat(H, "<B><span class = 'wakeup'>Damn these pods, wasted ten minutes shaking off the cryo-sickness and I still feel awful.<B></span>")
-						spawn(50)
-							to_chat(H, "<B>.......<B> ")
-							spawn(50)
-								to_chat(H, "<B><span class = 'wakeup'>I should gather the officers for a meeting.</span> <span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'>'s bound to have sent us some new job to do...<B></span>")
+						to_chat(H, "<B><span class = 'wakeup'>I should gather the officers for a meeting.</span> <span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'>'s bound to have sent us some new job to do...<B></span>")
 		else
 			spawn(20)
 				to_chat(H, "<B><span class = 'wakeup'>Wh-where am I?</B></span>")
@@ -542,7 +551,10 @@ var/global/datum/controller/occupations/job_master
 								spawn(20)
 									to_chat(H, "<B>.......<B> ")
 									spawn(60)
-										to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
+										if(H.mind.special_role == "Revolutionary" || H.mind.special_role == "Head Revolutionary")
+											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm a revolutionary working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'>, but my true cause is Christianity.</span>")
+										else
+											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
 										spawn(20)
 											to_chat(H, "<B>.......<B>")
 											spawn(100)
@@ -625,9 +637,14 @@ var/global/datum/controller/occupations/job_master
 				var/datum/religion/HR = GLOB.all_religions[H.religion]
 				var/obj/item/I = null
 				if(istype(HR))
-					var/holy_type = HR.holy_item
-					I = new holy_type()
-				H.equip_to_storage(I)
+					if(ispath(HR.holy_item))
+						I = new HR.holy_item()
+					else
+						var/obj/item/holy_item = HR.holy_item
+						if(istype(holy_item))
+							I = new holy_item.type()
+				if(I)
+					H.equip_to_storage(I)
 				if(istype(HR))
 					HR.followers += H.mind.name
 				if(prob(5))
@@ -763,14 +780,34 @@ var/global/datum/controller/occupations/job_master
 				break
 
 	if(!spawnpos)
-		// Pick at random from all the (wrong) spawnpoints, just so we have one
+		// Several job-restricted cryopods (Captain's, Executive Officer's, etc.) share a display_name
+		// with the generic entry, so the cache above may resolve to the wrong one. Look up this rank's
+		// own dedicated cryopod directly before falling back to anything shared.
+		spawnpos = get_job_restricted_spawnpoint(rank)
+
+	if(!spawnpos)
+		// Last resort: plain, unrestricted cryogenic storage rather than a random role-specific cryopod.
+		spawnpos = get_spawnpoint_instance(/datum/spawnpoint/cryo)
+
+	if(!spawnpos)
 		warning("Could not find an appropriate spawnpoint for job [rank].")
-		spawnpos = spawntypes()[pick(GLOB.using_map.allowed_spawns)]
+		return null
 
 	return spawnpos
 
 /datum/controller/occupations/proc/GetJobByType(var/job_type)
 	return occupations_by_type[job_type]
+
+// Greyhounds are station-born: drop them on a random habitable station turf.
+/datum/controller/occupations/proc/get_greyhound_spawn_turf()
+	var/list/levels = GLOB.using_map.station_levels
+	if(!LAZYLEN(levels))
+		return null
+	for(var/i = 1 to 200)
+		var/turf/T = locate(rand(1, world.maxx), rand(1, world.maxy), pick(levels))
+		if(T && !T.density && !istype(T, /turf/space) && T.initial_gas)
+			return T
+	return null
 
 /datum/controller/occupations/proc/get_roundstart_spawnpoint(var/rank)
 	var/list/loc_list = list()

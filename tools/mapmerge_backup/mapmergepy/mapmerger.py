@@ -38,15 +38,9 @@ def main(map_folder):
             if index0 >= 0 and index0 <= index1 and index1 < len(list_of_files):
                 valid_indices.extend(range(index0, index1 + 1))
 
-#    if tgm == "1":
-#        print("\nMaps will be converted to tgm.")
-#        tgm = True
-#    else:
-#        print("\nMaps will not be converted to tgm.")
-#        tgm = False
-    tgm = False
+    tgm = True
 
-    print("\nMerging these maps:")
+    print("\nMerging these maps (TGM format):")
     for i in valid_indices:
         print(str(list_of_files[i])[len(map_folder):])
     merge = input("\nPress Enter to merge...")

@@ -1,6 +1,6 @@
 /datum/religion/greed
 	name = GREED
-	holy_item = new /obj/item/weapon/coin/gold()
+	holy_item = /obj/item/weapon/coin/gold
 	shrine = /obj/old_god_shrine/greed_shrine
 	var/bloodgold = FALSE
 	whisper_lines = list("Money is time.", "Invest wisely.", "It can't go tits up.")

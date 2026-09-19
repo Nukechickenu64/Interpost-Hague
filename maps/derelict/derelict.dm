@@ -16,11 +16,7 @@
 	#include "derelict_shuttles.dm"
 	#include "derelict_elevator.dm"
 
-	#include "derelict-1.dmm"
-	#include "derelict-2.dmm"
-	#include "derelict-3.dmm"
-	#include "derelict-4.dmm"
-	#include "derelict-5.dmm"
+	#include "derelict.dmm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

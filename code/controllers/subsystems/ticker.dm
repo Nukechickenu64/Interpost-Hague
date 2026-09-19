@@ -25,6 +25,7 @@ SUBSYSTEM_DEF(ticker)
 	var/list/minds = list()         //Minds of everyone in the game.
 	var/list/antag_pool = list()
 	var/looking_for_antags = 0
+	var/round_started_without_captain = 0
 
 	var/datum/round_event/eof
 
@@ -112,6 +113,8 @@ SUBSYSTEM_DEF(ticker)
 /datum/controller/subsystem/ticker/proc/pregame_tick()
 	if(round_progressing && last_fire)
 		pregame_timeleft -= world.time - last_fire
+	if(!gamemode_vote_results && !SSvote.active_vote && config.allow_vote_mode && pregame_timeleft <= config.vote_autogamemode_timeleft SECONDS)
+		SSvote.initiate_vote(/datum/vote/gamemode, automatic = 1)
 	if(pregame_timeleft <= 0)
 		Master.SetRunLevel(RUNLEVEL_SETUP)
 		return
@@ -138,26 +141,16 @@ SUBSYSTEM_DEF(ticker)
 			world.Reboot("Failure to select gamemode. Tried [english_list(bad_modes)].")
 			return
 
-	if(src.mode.isStartRequirementsSatisfied())
-		var/iswegood = 0
-		for(var/mob/new_player/player in GLOB.player_list)
-			if(player.client.prefs.job_high == "Captain" && player.ready)
-				iswegood = 1
-		if(iswegood == 0)
-			to_chat(world, "<span class='tetracorp'><b>TetraCorp</span></b> does not authorize the cryogenic revival procedure without an active <span class='rose'>Captain</span>.")
-			pregame_timeleft = 60 SECONDS
-			Master.SetRunLevel(RUNLEVEL_LOBBY)
-			return
-
 	// This means we succeeded in picking a game mode.
 	GLOB.using_map.setup_economy()
 	Master.SetRunLevel(RUNLEVEL_GAME)
 	create_characters() //Create player characters and transfer them
 	collect_minds()
 	//matchmaker.do_family_matchmaking()  //Do this before equipping
+	var/captainless = equip_characters()
+	round_started_without_captain = captainless
 	if (config.roundstart_events)
-		eof = pick_round_event()
-	equip_characters()
+		eof = captainless ? new /datum/round_event/captainless : pick_round_event()
 
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
 		if(!H.mind || player_is_antag(H.mind, only_offstation_roles = 1) || !job_master.ShouldCreateRecords(H.mind.assigned_role))
@@ -170,7 +163,7 @@ SUBSYSTEM_DEF(ticker)
 		mode.post_setup()
 		to_world("<span class='blueglow'><B>It is this time once again...or was it?</B></span>")
 		if (eof)
-			if(prob(40))
+			if(captainless || prob(40))
 				eof.apply_event()
 				eof.announce_event()
 		sound_to(world, sound(GLOB.using_map.welcome_sound))
@@ -378,6 +371,7 @@ Helpers
 			if(!player_is_antag(player.mind, only_offstation_roles = 1))
 				job_master.EquipRank(player, player.mind.assigned_role, 0)
 				equip_custom_items(player)
+	return captainless
 
 /datum/controller/subsystem/ticker/proc/attempt_late_antag_spawn(var/list/antag_choices)
 	var/datum/antagonist/antag = antag_choices[1]

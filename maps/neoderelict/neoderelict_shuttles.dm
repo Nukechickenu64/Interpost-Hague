@@ -175,7 +175,7 @@
 /obj/effect/shuttle_landmark/mining/station
 	name = "Station"
 	landmark_tag = "nav_mining_start"
-	docking_controller = "mining_dock_airlock"
+	docking_controller = "mining_airlock"
 
 /obj/effect/shuttle_landmark/mining/asteroid
 	name = "Asteroid"
@@ -426,6 +426,7 @@
 
 /datum/shuttle/autodock/ferry/lift3
 	name = "Cryo Lift"
+	defer_initialisation = TRUE
 	shuttle_area = /area/shuttle/lift3
 	warmup_time = 6	//give those below some time to get out of the way
 	waypoint_station = "nav_cryo_lift_top"

@@ -109,7 +109,7 @@ var/world_topic_spam_protect_ip = "0.0.0.0"
 var/world_topic_spam_protect_time = world.timeofday
 
 /world/Topic(T, addr, master, key)
-	log_topic(T, addr, master, key)
+	log_topic(T, addr, master, key, params2list(T))
 
 	if (T == "ping")
 		var/x = 1
@@ -125,7 +125,6 @@ var/world_topic_spam_protect_time = world.timeofday
 		return n
 
 	else if (copytext(T,1,7) == "status")
-		var/input[] = params2list(T)
 		var/list/s = list()
 		s["version"] = game_version
 		s["mode"] = PUBLIC_GAME_MODE
@@ -144,6 +143,7 @@ var/world_topic_spam_protect_time = world.timeofday
 		var/active = 0
 		var/list/players = list()
 		var/list/admins = list()
+		var/input[] = params2list(T)
 		var/legacy = input["status"] != "2"
 		for(var/client/C in GLOB.clients)
 			if(C.holder)
@@ -558,12 +558,12 @@ var/world_topic_spam_protect_time = world.timeofday
 				D.associate(GLOB.ckey_directory[ckey])
 
 /world/proc/update_status()
-	var/s = ""
+	var/s = "I'm tired, I want it back, y'now, the golden days"
 
 	if (config && config.server_name)
-		s += "<b>[config.server_name]</b> &#8212; "
+		s += " &#8212; <b>[config.server_name]</b>"
 
-	s += "<b>[station_name()]</b>";
+	s += " &#8212; <b>[station_name()]</b>";
 	s += " ("
 	s += "<a href=\"https://discord.gg/ZBAVFnT4w2\">" //Change this to wherever you want the hub to link to.
 	s += "Discord"

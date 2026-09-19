@@ -211,7 +211,10 @@
 				playsound(target, 'sound/effects/stairs_step.ogg', 50)
 			else
 				to_chat(A, "<span class='warning'>Something blocks the path.</span>")
-			return 0
+		// Always deny the engine's own move here: we already relocated A ourselves above.
+		// Letting non-humans fall through to "return 1" let the engine re-run the original
+		// move afterwards and clobber our forceMove, bouncing the mob up/down forever.
+		return 0
 	return 1
 
 /obj/structure/stairs/proc/upperStep(var/turf/T)
@@ -265,9 +268,16 @@
 	return ..()
 
 /obj/structure/stairs/Bumped(atom/movable/A)
+	// Only send A up if it actually bumped into us while walking in our direction.
+	// Without this check, a bump from any direction (including from above) would send
+	// A up again, which is how mobs got bounced between levels endlessly.
+	if(A.dir != dir || !upperStep(A.loc))
+		return
 	var/turf/target = get_step(GetAbove(A), dir)
 	var/turf/source = A.loc
 	var/turf/above = GetAbove(A)
+	if(isnull(above))
+		return
 	playsound(source, 'sound/effects/footsteps/footsteps.ogg', 75)
 	if(above.CanZPass(source, UP) && target.Enter(A, src))
 		A.forceMove(target)

@@ -58,7 +58,7 @@ Please wait until completion...</TT><BR>
 	// Build styled content with a header Close and open as borderless
 	var/body = ""
 	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-	body += "<a href='?src=\\ref[src];ui_close=1'>Close</a>"
+	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
 	ui_browse_styled(user, "Robotic Fabricator", body, "window=robot_fabricator;size=420x520;can_close=0;can_resize=0;border=0;titlebar=0")

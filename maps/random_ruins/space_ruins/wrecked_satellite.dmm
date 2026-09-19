@@ -1,20 +1,202 @@
-"a" = (/turf/space,/area/space)
-"w" = (/turf/simulated/wall,/area/space)
-"g" = (/obj/structure/grille,/turf/simulated/floor/airless,/area/space)
-"f" = (/obj/structure/window/reinforced,/turf/space,/area/space)
-"r" = (/obj/random/maintenance,/turf/simulated/floor/airless,/area/space)
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE 
+"a" = (
+/turf/space,
+/area/space)
+"w" = (
+/turf/simulated/wall,
+/area/space)
+"g" = (
+/obj/structure/grille,
+/turf/simulated/floor/airless,
+/area/space)
+"f" = (
+/obj/structure/window/reinforced,
+/turf/space,
+/area/space)
+"r" = (
+/obj/random/maintenance,
+/turf/simulated/floor/airless,
+/area/space)
 
 (1,1,1) = {"
- aaaaaaaaaaaa
- aaffggggaaaa
- aagwrrwgaaaa
- aagw..wgaaaa
- aagw..wgaaaa
- aagwrrwgaaaa
- aaffggggaaaa
- aaaaaaaaaaaa
- aaaaaaaaaaaa
- aaaaaaaaaaaa
- aaaaaaaaaaaa
- aaaaaaaaaaaa
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+"}
+(2,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(3,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(4,1,1) = {"
+a
+f
+g
+g
+g
+g
+f
+a
+a
+a
+a
+a
+"}
+(5,1,1) = {"
+a
+f
+w
+w
+w
+w
+f
+a
+a
+a
+a
+a
+"}
+(6,1,1) = {"
+a
+g
+r
+.
+.
+r
+g
+a
+a
+a
+a
+a
+"}
+(7,1,1) = {"
+a
+g
+r
+.
+.
+r
+g
+a
+a
+a
+a
+a
+"}
+(8,1,1) = {"
+a
+g
+w
+w
+w
+w
+g
+a
+a
+a
+a
+a
+"}
+(9,1,1) = {"
+a
+g
+g
+g
+g
+g
+g
+a
+a
+a
+a
+a
+"}
+(10,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(11,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(12,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(13,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
 "}

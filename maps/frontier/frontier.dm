@@ -15,11 +15,7 @@
 	#include "frontier_shuttles.dm"
 	#include "frontier_elevator.dm"
 
-	#include "frontier-1.dmm"
-	#include "frontier-2.dmm"
-	#include "frontier-3.dmm"
-	#include "frontier-4.dmm"
-	#include "frontier-5.dmm"
+	#include "frontier.dmm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

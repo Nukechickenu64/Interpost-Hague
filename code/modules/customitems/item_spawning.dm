@@ -34,7 +34,7 @@
 	var/additional_data
 
 /datum/custom_item/proc/is_valid(var/checker)
-	if(!item_path)
+	if(!ispath(item_path, /obj/item))
 		to_chat(checker, "<span class='warning'>The given item path, [item_path_as_string], is invalid and does not exist.</span>")
 		return FALSE
 	if(item_icon && !(item_icon in icon_states(CUSTOM_ITEM_OBJ)))
@@ -197,6 +197,8 @@
 
 //gets the relevant list for the key from the listlist if it exists, check to make sure they are meant to have it and then calls the giving function
 /proc/equip_custom_items(mob/living/carbon/human/M)
+	if(!M || !M.ckey)
+		return
 	var/list/key_list = custom_items[M.ckey]
 	if(!key_list || key_list.len < 1)
 		return

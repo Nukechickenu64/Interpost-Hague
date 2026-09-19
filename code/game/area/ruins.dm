@@ -164,6 +164,7 @@
 	return /turf/simulated/wall/sandstone
 
 /area/space/ruins/proc/generate_ruins_turfs(var/profile_override = null)
+	set background = 1
 	// Generate clumpy terrain by picking 6-8 high-noise clump centers, making rocks at cores and floor around
 	var/list/b = get_area_bounds()
 	if(!b || b.len < 5) return
@@ -176,8 +177,8 @@
 	if(zlev == 6)
 		minx = 1
 		miny = 1
-		maxx = world.maxx
-		maxy = world.maxy
+		maxx = min(world.maxx, 128)
+		maxy = min(world.maxy, 128)
 	if(maxx <= minx || maxy <= miny) return
 
 	var/width = max(1, maxx - minx)
@@ -225,36 +226,35 @@
 			var/sx = (nx + warp_amp * warp_x) * perlin_scale
 			var/sy = (ny + warp_amp * warp_y) * perlin_scale
 			noise_of[T] = perlin2d(sx, sy)
+		CHECK_TICK
 
 	// Pick clump centers by greedy selection of highest noise with minimum separation
 	var/target_clumps = rand(ruins_profile ? ruins_profile.clumps_min : 6, ruins_profile ? ruins_profile.clumps_max : 12)
 	var/min_sep = max(4, round(min(width, height) / 6))
 	var/min_sep2 = min_sep * min_sep
 	var/list/centers = list() // list of turfs
-	while(centers.len < target_clumps)
+	// Select each center with a bounded scan. Sorting an associative turf-to-noise
+	// list can recurse through large map lists on older BYOND runtimes.
+	var/list/candidates = noise_of.Copy()
+	while(centers.len < target_clumps && candidates.len)
 		var/turf/best = null
 		var/bestn = -1.0
-		for(var/yy2 = miny, yy2 <= maxy, yy2++)
-			for(var/xx2 = minx, xx2 <= maxx, xx2++)
-				var/turf/T = locate(xx2, yy2, zlev)
-				if(!T) continue
-				var/n = noise_of[T]
-				if(n <= bestn)
-					continue
-				// Enforce separation from existing centers
-				var/ok = TRUE
-				for(var/turf/C in centers)
-					var/dx = T.x - C.x
-					var/dy = T.y - C.y
-					if(dx*dx + dy*dy < min_sep2)
-						ok = FALSE; break
-				if(!ok) continue
+		for(var/turf/T in candidates)
+			if(candidates[T] > bestn)
 				best = T
-				bestn = n
-		if(best)
+				bestn = candidates[T]
+		if(!best)
+			break
+		candidates -= best
+		var/ok = TRUE
+		for(var/turf/C in centers)
+			var/dx = best.x - C.x
+			var/dy = best.y - C.y
+			if(dx*dx + dy*dy < min_sep2)
+				ok = FALSE
+				break
+		if(ok)
 			centers += best
-		else
-			break // couldn't find more with separation
 
 	// Assign radii per center and classify tiles
 	var/list/rock_r2 = list() // center turf -> rock radius^2
@@ -295,6 +295,7 @@
 			else if(class == 1)
 				if(can_replace_ruins_turf(T))
 					T.ChangeTurf(/turf/simulated/floor/asteroid)
+		CHECK_TICK
 
 	// Restore legacy values so future calls that assume area vars aren't impacted
 	perlin_freq = old_perlin_freq

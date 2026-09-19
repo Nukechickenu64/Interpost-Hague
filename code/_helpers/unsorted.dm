@@ -1055,7 +1055,8 @@ var/list/WALLITEMS = list(
 			colour += temp_col
 	return "#[colour]"
 
-var/global/mob/dview/dview_mob = new
+//Created lazily via GLOBAL_DATUM_INIT so it isn't instanced before Master/SSatoms exist.
+GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
 
 /mob/dview
 	anchored = TRUE
@@ -1073,7 +1074,7 @@ var/global/mob/dview/dview_mob = new
 
 	to_world_log("Dview was force-qdeleted, this should never happen!")
 
-	dview_mob = new
+	GLOB.dview_mob = new
 	return QDEL_HINT_QUEUE
 
 /mob/dview/Initialize()

@@ -41,19 +41,29 @@
         t = replacetext(t, old, repval)
     return t
 
-/proc/ui_build_styled_html(var/title, var/body_html)
-    // Normalize contrast for older inline <font color> use
-    body_html = _ui_remap_colors(body_html)
-    var/html = "<html><head><title>[title]</title>"
+/proc/ui_build_styled_html(var/title, var/body_html, var/paper_style = FALSE)
+    if(!paper_style)
+        // Normalize contrast for older inline <font color> use
+        body_html = _ui_remap_colors(body_html)
+    var/html = "<!DOCTYPE html><html><head><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta charset='utf-8'/><title>[title]</title>"
     html += "<style>"
-    html += "html,body{background:rgba(14,19,27,0.94);color:#d7f6ff;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:9pt;margin:0;padding:0;}"
-    html += ".wrap{padding:10px 12px;min-width:260px;max-width:720px;border:1px solid #3ad;border-radius:6px;box-shadow:0 0 14px rgba(58,173,255,0.25) inset, 0 0 12px rgba(8,18,28,0.6);}"
-    html += ".hdr{font-size:10pt;color:#8fe3ff;letter-spacing:0.06em;margin-bottom:6px;text-transform:uppercase;}"
-    html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
-    html += ".note{color:#9fd;opacity:0.85;font-size:8pt;}"
+    if(paper_style)
+        html += "html,body{background:#fffdf5;color:#171717;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:10pt;margin:0;padding:0;}"
+        html += ".wrap{padding:14px 16px;min-width:260px;max-width:720px;border:1px solid #c9c2ae;border-radius:2px;box-shadow:0 1px 5px rgba(50,40,20,0.18);}"
+        html += ".hdr{font-size:10pt;color:#3b3428;letter-spacing:0.06em;margin-bottom:6px;text-transform:uppercase;}"
+        html += ".accent{height:1px;background:#c9c2ae;margin:6px 0 10px 0;}"
+        html += ".note{color:#514b40;font-size:8pt;}"
+        html += "a{color:#164f82;text-decoration:underline;} a:hover{color:#0b3152;}"
+        html += "table{border-collapse:collapse} td,th{border:1px solid #b8b09e;padding:2px 4px}"
+    else
+        html += "html,body{background:rgba(14,19,27,0.94);color:#d7f6ff;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:9pt;margin:0;padding:0;}"
+        html += ".wrap{padding:10px 12px;min-width:260px;max-width:720px;border:1px solid #3ad;border-radius:6px;box-shadow:0 0 14px rgba(58,173,255,0.25) inset, 0 0 12px rgba(8,18,28,0.6);}"
+        html += ".hdr{font-size:10pt;color:#8fe3ff;letter-spacing:0.06em;margin-bottom:6px;text-transform:uppercase;}"
+        html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
+        html += ".note{color:#9fd;opacity:0.85;font-size:8pt;}"
+        html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
+        html += "table{border-collapse:collapse} td,th{border:1px solid #246;padding:2px 4px}"
     html += ".content{line-height:1.35;}"
-    html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
-    html += "table{border-collapse:collapse} td,th{border:1px solid #246;padding:2px 4px}"
     html += "</style>"
     html += "</head><body><div class='wrap'>"
     if(title)

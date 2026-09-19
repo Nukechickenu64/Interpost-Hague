@@ -177,6 +177,12 @@
 /datum/shuttle/autodock/multi/mining/build_destinations_cache()
 	last_cache_rebuild_time = world.time
 	destinations_cache.Cut()
+	var/space_waypoint_tag = null
+	if(SSshuttle && SSshuttle.get_landmark("nav_mining_space_ruins"))
+		space_waypoint_tag = "nav_mining_space_ruins"
+	else if(SSshuttle && SSshuttle.get_landmark("mining_space"))
+		space_waypoint_tag = "mining_space"
+
 	// Require travelling to the Space waypoint before other nav_mining_* destinations become available
 	// Debug trace: log current location and count of registered nav_mining* waypoints
 	if(config && config.log_debug)
@@ -185,15 +191,15 @@
 		for(var/_tag in SSshuttle.registered_shuttle_landmarks)
 			if(findtext(_tag, "nav_mining_") == 1)
 				nav_count++
-		log_debug("Mining.build_destinations_cache: current=[cl_tag] registered_nav_mining=[nav_count] total_landmarks=[SSshuttle.registered_shuttle_landmarks.len]")
+		log_debug("Mining.build_destinations_cache: current=[cl_tag] registered_nav_mining=[nav_count] total_landmarks=[SSshuttle.registered_shuttle_landmarks.len] space_tag=[space_waypoint_tag]")
 
-	if(current_location && current_location.landmark_tag == "mining_space")
+	if(current_location && (current_location.landmark_tag == "nav_mining_space_ruins" || current_location.landmark_tag == "mining_space"))
 		// At space: discover all mining-related waypoints dynamically, including SOS beacons
 		var/static/regex/token_finder = regex("^nav_mining_")
 		var/included = 0
 		var/skipped = 0
 		for(var/destination_tag in SSshuttle.registered_shuttle_landmarks)
-			if(token_finder.Find(destination_tag))
+			if(token_finder.Find(destination_tag) || destination_tag == "mining_space" || destination_tag == "nav_mining_space_ruins")
 				var/obj/effect/shuttle_landmark/L = SSshuttle.get_landmark(destination_tag)
 				if(istype(L))
 					// If a landmark is restricted, only include it if it's for the Mining shuttle
@@ -205,12 +211,14 @@
 		if(config && config.log_debug)
 			log_debug("Mining.build_destinations_cache: at-space include=[included] skip=[skipped]")
 	else
-		// Not at space: only allow going to 'Space'
-		var/obj/effect/shuttle_landmark/Lspace = SSshuttle.get_landmark("mining_space")
+		// Not at space: only allow going to the available Mining space waypoint.
+		var/obj/effect/shuttle_landmark/Lspace = null
+		if(space_waypoint_tag)
+			Lspace = SSshuttle.get_landmark(space_waypoint_tag)
 		if(istype(Lspace))
 			destinations_cache["Space"] = Lspace
 		if(config && config.log_debug)
-			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(Lspace)] tag=mining_space")
+			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(Lspace)] tag=[space_waypoint_tag]")
 
 /datum/shuttle/autodock/multi/mining/get_destinations()
 	build_destinations_cache()
@@ -219,7 +227,19 @@
 /obj/effect/shuttle_landmark/mining/station
 	name = "Station"
 	landmark_tag = "nav_mining_start"
-	docking_controller = "mining_dock_airlock"
+	docking_controller = "mining_airlock" // matches the airlock docking_port id_tag placed in alpha.dmm
+	base_turf = /turf/space
+
+// Transit and open-space waypoints have no airlock to dock with, so they must not
+// inherit the station's docking controller tag.
+/obj/effect/shuttle_landmark/mining/transit
+	name = "In transit"
+	landmark_tag = "mining_transition"
+	base_turf = /turf/space
+
+/obj/effect/shuttle_landmark/mining/open_space
+	name = "Space"
+	landmark_tag = "mining_space"
 	base_turf = /turf/space
 
 // Intermediate free-fly waypoint to reach open space before discovering ruins
@@ -499,6 +519,7 @@
 
 /datum/shuttle/autodock/ferry/lift3
 	name = "Cryo Lift"
+	defer_initialisation = TRUE
 	shuttle_area = /area/shuttle/lift3
 	warmup_time = 6	//give those below some time to get out of the way
 	waypoint_station = "nav_cryo_lift_top"

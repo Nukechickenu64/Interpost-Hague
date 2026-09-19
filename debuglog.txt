@@ -1,0 +1,189 @@
+*** Begin Log: Tue Sep 15 14:58:59 2026 ***
+Stopped server.
+Tue Sep 15 15:15:17 2026
+World opened on network port 6345.
+runtime error: Cannot read null.atom_init_stage
+proc name: New (/atom/New)
+  usr: (src)
+  src: the dview (/mob/dview)
+  src.loc: null
+  call stack:
+the dview (/mob/dview): New(null)
+world: ()
+Running revision:
+master
+2026-02-14
+4ded9311b67a4d2db9e0a08fc884518c3a92c4b9
+Feedback database connection established.
+SQL database connection established.
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/utopia, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/bearcat, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/torch, path 
+
+Webclient users can visit this address to play:
+http://www.byond.com/play/143.109.231.69:6345
+
+Tue Sep 15 15:15:23 2026
+
+Or this code can be embedded:
+&lt;iframe src="http://www.byond.com/play/embed/143.109.231.69:6345" width=640 height=480&gt;&lt;/iframe&gt;
+
+
+Initialized Antags subsystem within 0.00625 seconds!
+
+Initialized Chemistry subsystem within 0 seconds!
+
+Initialized Plants subsystem within 0.01875 seconds!
+
+Initialized Metrics subsystem within 0 seconds!
+
+Initialized Early Initialization subsystem within 1.64375 seconds!
+Loaded guaranteed away site Mining - Asteroid!
+
+Initialized Mapping subsystem within 2.83125 seconds!
+
+Initialized Space skybox subsystem within 0 seconds!
+## ERROR: Could not find docking controller for shuttle waypoint 'Station (144,112)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'In transit (66,120)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'Space (172,173)', docking tag was 'mining_dock_airlock'.
+Infinite loop suspected--switching proc to background.
+If it is not an infinite loop, either do 'set background=1' or set world.loop_checks=0.
+proc name: generate ruins turfs (/area/space/ruins/proc/generate_ruins_turfs)
+  usr: null
+  src: Space Ruins (/area/space/ruins)
+  call stack:
+Space Ruins (/area/space/ruins): generate ruins turfs(null)
+Space Ruins (/area/space/ruins): Initialize(1)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+Initialized 368549 atoms
+Late initialized 544 atoms
+
+Initialized Atoms subsystem within 31.0187 seconds!
+Initializing atmos machinery
+Initializing atmos machinery
+
+Initialized Machines subsystem within 1.73125 seconds!
+
+Initialized Icon Updates subsystem within 0 seconds!
+SSoverlays: Flushing 2 overlays.
+
+Initialized Overlay subsystem within 0 seconds!
+
+Initialized Evacuation subsystem within 0 seconds!
+
+Initialized Event Manager subsystem within 0 seconds!
+
+Initialized Old God Subsystem subsystem within 0 seconds!
+
+Initialized Psychics subsystem within 0 seconds!
+
+Initialized Supply subsystem within 0 seconds!
+
+Initialized TGUI subsystem within 0 seconds!
+
+Initialized Timer subsystem within 0 seconds!
+
+Initialized Voting subsystem within 0 seconds!
+
+Initialized Air subsystem within 3.1875 seconds!
+
+Initialized Goals subsystem within 0 seconds!
+
+Initialized Late Initialization subsystem within 0.05625 seconds!
+
+Initialized Persistence subsystem within 0 seconds!
+
+Initialized Assets subsystem within 0.14375 seconds!
+
+Initialized Alarm subsystem within 0 seconds!
+## WARNING: Shuttle "Cryo Lift" could not find its starting location. it was given: . Initialization skipped. in code/modules/shuttles/shuttle.dm at line 49 src: Cryo Lift usr: .
+
+Initialized Shuttle subsystem within 0 seconds!
+
+Initialized Lighting subsystem within 7.05625 seconds!
+SSzcopy: Z-Stack maximums: [3,3,3,4,5,6,7,8]
+
+Initialized Z-Copy subsystem within 0.0375 seconds!
+
+Initialized Xenoarch subsystem within 1.1375 seconds!
+
+Initialized Ticker subsystem within 0.00625 seconds!
+
+Initialized Chat subsystem within 0 seconds!
+
+Initialized Craft subsystem within 0 seconds!
+
+Initializations complete within 49.1063 seconds!
+The start-up is finished, the game is ready.
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)

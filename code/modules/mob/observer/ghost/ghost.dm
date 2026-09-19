@@ -88,14 +88,13 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 /mob/observer/ghost/Topic(href, href_list)
 	// Preserve existing ghost-specific handlers
 	if (href_list["track"])
-		if(istype(href_list["track"],/mob))
-			var/mob/target = locate(href_list["track"]) in SSmobs.mob_list
-			if(target)
-				ManualFollow(target)
+		var/mob/target = locate(href_list["track"]) in SSmobs.mob_list
+		if(target)
+			ManualFollow(target)
 		else
-			var/atom/target = locate(href_list["track"])
-			if(istype(target))
-				ManualFollow(target)
+			var/atom/movable/movable_target = locate(href_list["track"])
+			if(movable_target)
+				ManualFollow(movable_target)
 		return
 
 	// Fall through to base /mob/Topic for general-purpose links (e.g., tilectx_*)
@@ -278,7 +277,10 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set name = "Teleport to Coordinate"
 	set desc= "Teleport to a coordinate"
 
-	var/turf/T = locate(tx, ty, tz)
+	var/clamped_x = clamp(tx, 1, world.maxx)
+	var/clamped_y = clamp(ty, 1, world.maxy)
+	var/clamped_z = clamp(tz, 1, world.maxz)
+	var/turf/T = locate(clamped_x, clamped_y, clamped_z)
 	if(T)
 		ghost_to_turf(T)
 	else

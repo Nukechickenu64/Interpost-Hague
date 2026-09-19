@@ -1,24 +1,272 @@
-"a" = (/turf/space,/area/space)
-"." = (/turf/simulated/floor/asteroid,/area/space)
-"w" = (/turf/simulated/wall,/area/space)
-"m" = (/turf/simulated/mineral,/area/space)
-"c" = (/obj/structure/closet/crate,/turf/simulated/floor/asteroid,/area/space)
-"t" = (/obj/structure/table/standard,/turf/simulated/floor/asteroid,/area/space)
-"l" = (/obj/machinery/light/small,/turf/simulated/floor/asteroid,/area/space)
-"o" = (/obj/structure/ore_box,/turf/simulated/floor/asteroid,/area/space)
-"r" = (/obj/random/maintenance,/turf/simulated/floor/asteroid,/area/space)
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE 
+"a" = (
+/turf/space,
+/area/space)
+"." = (
+/turf/simulated/floor/asteroid,
+/area/space)
+"w" = (
+/turf/simulated/wall,
+/area/space)
+"m" = (
+/turf/simulated/mineral,
+/area/space)
+"c" = (
+/obj/structure/closet/crate,
+/turf/simulated/floor/asteroid,
+/area/space)
+"t" = (
+/obj/structure/table/standard,
+/turf/simulated/floor/asteroid,
+/area/space)
+"l" = (
+/obj/machinery/light/small,
+/turf/simulated/floor/asteroid,
+/area/space)
+"o" = (
+/obj/structure/ore_box,
+/turf/simulated/floor/asteroid,
+/area/space)
+"r" = (
+/obj/random/maintenance,
+/turf/simulated/floor/asteroid,
+/area/space)
 
 (1,1,1) = {"
- aaaaaaaaaaaaaaaa
- aaaaaa....aaaaaa
- aaaa..wwww..aaaa
- aaa..w.l..w..aaa
- aaa.w..cT..w.aaa
- aaa.w.omr..w.aaa
- aaa..w....w..aaa
- aaaa..wwww..aaaa
- aaaaaa....aaaaaa
- aaaaaaaaaaaaaaaa
- aaaaaaaaaaaaaaaa
- aaaaaaaaaaaaaaaa
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+"}
+(2,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(3,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(4,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(5,1,1) = {"
+a
+a
+a
+.
+.
+.
+.
+a
+a
+a
+a
+a
+"}
+(6,1,1) = {"
+a
+a
+.
+.
+w
+w
+.
+.
+a
+a
+a
+a
+"}
+(7,1,1) = {"
+a
+a
+.
+w
+.
+.
+w
+.
+a
+a
+a
+a
+"}
+(8,1,1) = {"
+a
+.
+w
+.
+.
+o
+.
+w
+.
+a
+a
+a
+"}
+(9,1,1) = {"
+a
+.
+w
+l
+c
+m
+.
+w
+.
+a
+a
+a
+"}
+(10,1,1) = {"
+a
+.
+w
+.
+T
+r
+.
+w
+.
+a
+a
+a
+"}
+(11,1,1) = {"
+a
+.
+w
+.
+.
+.
+.
+w
+.
+a
+a
+a
+"}
+(12,1,1) = {"
+a
+a
+.
+w
+.
+.
+w
+.
+a
+a
+a
+a
+"}
+(13,1,1) = {"
+a
+a
+.
+.
+w
+w
+.
+.
+a
+a
+a
+a
+"}
+(14,1,1) = {"
+a
+a
+a
+.
+.
+.
+.
+a
+a
+a
+a
+a
+"}
+(15,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(16,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(17,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
 "}

@@ -21,7 +21,13 @@
 		crash_with("log_startup() was called more then once")
 
 /proc/log_topic(T, addr, master, key, var/list/queryparams)
-	WRITE_LOG(diary, "TOPIC: \"[T]\", from:[addr], master:[master], key:[key], auth:[queryparams["auth"] ? queryparams["auth"] : "null"] [log_end]")
+	var/auth = null
+	if(islist(queryparams))
+		for(var/query_key in queryparams)
+			if(query_key == "auth")
+				auth = queryparams[query_key]
+				break
+	WRITE_LOG(diary, "TOPIC: \"[T]\", from:[addr], master:[master], key:[key], auth:[auth ? auth : "null"] [log_end]")
 
 /proc/log_ss(subsystem, text, log_world = TRUE)
 	if (!subsystem)

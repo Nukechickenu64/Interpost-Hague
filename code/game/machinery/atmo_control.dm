@@ -295,41 +295,106 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 	var/input_flow_setting = 700
 	var/pressure_setting = 100
+	var/automatic_management = FALSE
+	var/automatic_flow_setting = 0
+	var/automatic_pressure_setting = 0
 	circuit = /obj/item/weapon/circuitboard/air_management/supermatter_core
 
 
 /obj/machinery/computer/general_air_control/supermatter_core/return_text()
-	var/output = ..()
-	//if(signal.data)
-	//	input_info = signal.data // Attempting to fix intake control -- TLE
+	var/list/core_data = get_core_sensor_data()
+	var/temperature = core_data["temperature"]
+	var/pressure = core_data["pressure"]
+	var/automation_status = automatic_management ? "<span class='sm-good'>AUTOMATIC</span>" : "<span class='sm-muted'>MANUAL</span>"
+	var/automation_button = automatic_management ? "Disable Automatic Management" : "Enable Automatic Management"
+	var/output = {"
+<style>
+.sm-title{color:#8fe3ff;font-size:15px;font-weight:bold;letter-spacing:1px}.sm-subtitle{color:#9fd;font-size:10px}.sm-grid{width:100%;border-collapse:separate;border-spacing:5px}.sm-panel{background:#111d29;border:1px solid #246;padding:7px;vertical-align:top}.sm-panel h3{color:#b9ecff;font-size:10px;margin:0 0 5px}.sm-stat{color:#d7f6ff;font-size:16px;font-weight:bold}.sm-label{color:#9eb6c8;font-size:9px;text-transform:uppercase}.sm-good{color:#9fff9f;font-weight:bold}.sm-warn{color:#ffd866;font-weight:bold}.sm-bad{color:#ff7a7a;font-weight:bold}.sm-muted{color:#b7c2d0;font-weight:bold}.sm-action{display:inline-block;background:#17364b;border:1px solid #3ad;color:#d7f6ff;padding:3px 6px;margin:2px 2px 0 0;text-decoration:none}.sm-action:hover{background:#24536e;text-decoration:none}.sm-control{margin-top:5px;padding-top:5px;border-top:1px solid #246}.sm-value{color:#d7f6ff}
+</style>
+<div class='sm-title'>SUPERMATTER CORE CONTROL</div>
+<div class='sm-subtitle'>COOLANT AND CHAMBER PRESSURE MANAGEMENT</div>
+<table class='sm-grid'><tr>
+<td class='sm-panel'><h3>CHAMBER TELEMETRY</h3>
+<div class='sm-label'>Temperature</div><div class='sm-stat [temperature >= 4250 ? "sm-bad" : temperature >= 3500 ? "sm-warn" : "sm-good"]'>[temperature ? "[round(temperature)] K" : "NO SIGNAL"]</div>
+<div class='sm-label'>Pressure</div><div class='sm-stat [pressure >= 500 ? "sm-warn" : "sm-good"]'>[pressure ? "[round(pressure, 0.1)] kPa" : "NO SIGNAL"]</div>
+</td>
+<td class='sm-panel'><h3>POWER MANAGEMENT</h3>
+<div class='sm-label'>Control Mode</div><div class='sm-stat'>[automation_status]</div>
+<div class='sm-subtitle'>[automatic_management ? "Adaptive coolant flow and pressure retention are active." : "Manual setpoints are active."]</div>
+<a class='sm-action' href='?src=\ref[src];toggle_automatic_management=1'>[automation_button]</a>
+</td>
+</tr><tr><td class='sm-panel'>"}
 
-	output += "<B>Core Cooling Control System</B><BR><BR>"
 	if(input_info)
 		var/power = (input_info["power"])
 		var/volume_rate = round(input_info["volume_rate"], 0.1)
-		output += "<B>Coolant Input</B>: [power?("Injecting"):("On Hold")] <A href='?src=\ref[src];in_refresh_status=1'>Refresh</A><BR>Flow Rate Limit: [volume_rate] L/s<BR>"
-		output += "Command: <A href='?src=\ref[src];in_toggle_injector=1'>Toggle Power</A> <A href='?src=\ref[src];in_set_flowrate=1'>Set Flow Rate</A><BR>"
+		output += "<h3>COOLANT INJECTOR</h3><span class='sm-label'>State</span> <span class='[power ? "sm-good" : "sm-bad"]'>[power ? "INJECTING" : "ON HOLD"]</span><br><span class='sm-label'>Flow Limit</span> <span class='sm-value'>[volume_rate] L/s</span>"
 
 	else
-		output += "<FONT color='red'>ERROR: Can not find input port</FONT> <A href='?src=\ref[src];in_refresh_status=1'>Search</A><BR>"
+		output += "<h3>COOLANT INJECTOR</h3><span class='sm-bad'>NO DEVICE STATUS</span>"
 
-	output += "Flow Rate Limit: <A href='?src=\ref[src];adj_input_flow_rate=-100'>-</A> <A href='?src=\ref[src];adj_input_flow_rate=-10'>-</A> <A href='?src=\ref[src];adj_input_flow_rate=-1'>-</A> <A href='?src=\ref[src];adj_input_flow_rate=-0.1'>-</A> [round(input_flow_setting, 0.1)] L/s <A href='?src=\ref[src];adj_input_flow_rate=0.1'>+</A> <A href='?src=\ref[src];adj_input_flow_rate=1'>+</A> <A href='?src=\ref[src];adj_input_flow_rate=10'>+</A> <A href='?src=\ref[src];adj_input_flow_rate=100'>+</A><BR>"
-
-	output += "<BR>"
+	output += "<div class='sm-control'><span class='sm-label'>Manual Flow Setpoint</span> <span class='sm-value'>[round(input_flow_setting, 0.1)] L/s</span><br><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=-100'>-100</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=-10'>-10</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=10'>+10</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=100'>+100</a><a class='sm-action' href='?src=\ref[src];in_set_flowrate=1'>Apply</a><a class='sm-action' href='?src=\ref[src];in_toggle_injector=1'>Toggle</a><a class='sm-action' href='?src=\ref[src];in_refresh_status=1'>Refresh</a></div></td><td class='sm-panel'>"
 
 	if(output_info)
 		var/power = (output_info["power"])
 		var/pressure_limit = output_info["external"]
-		output += {"<B>Core Outpump</B>: [power?("Open"):("On Hold")] <A href='?src=\ref[src];out_refresh_status=1'>Refresh</A><BR>
-Min Core Pressure: [pressure_limit] kPa<BR>"}
-		output += "Command: <A href='?src=\ref[src];out_toggle_power=1'>Toggle Power</A> <A href='?src=\ref[src];out_set_pressure=1'>Set Pressure</A><BR>"
+		output += "<h3>CORE OUTPUMP</h3><span class='sm-label'>State</span> <span class='[power ? "sm-good" : "sm-bad"]'>[power ? "REGULATING" : "ON HOLD"]</span><br><span class='sm-label'>Minimum Core Pressure</span> <span class='sm-value'>[pressure_limit] kPa</span>"
 
 	else
-		output += "<FONT color='red'>ERROR: Can not find output port</FONT> <A href='?src=\ref[src];out_refresh_status=1'>Search</A><BR>"
+		output += "<h3>CORE OUTPUMP</h3><span class='sm-bad'>NO DEVICE STATUS</span>"
 
-	output += "Min Core Pressure Set: <A href='?src=\ref[src];adj_pressure=-100'>-</A> <A href='?src=\ref[src];adj_pressure=-50'>-</A> <A href='?src=\ref[src];adj_pressure=-10'>-</A> <A href='?src=\ref[src];adj_pressure=-1'>-</A> [pressure_setting] kPa <A href='?src=\ref[src];adj_pressure=1'>+</A> <A href='?src=\ref[src];adj_pressure=10'>+</A> <A href='?src=\ref[src];adj_pressure=50'>+</A> <A href='?src=\ref[src];adj_pressure=100'>+</A><BR>"
+	output += "<div class='sm-control'><span class='sm-label'>Manual Pressure Setpoint</span> <span class='sm-value'>[pressure_setting] kPa</span><br><a class='sm-action' href='?src=\ref[src];adj_pressure=-100'>-100</a><a class='sm-action' href='?src=\ref[src];adj_pressure=-10'>-10</a><a class='sm-action' href='?src=\ref[src];adj_pressure=10'>+10</a><a class='sm-action' href='?src=\ref[src];adj_pressure=100'>+100</a><a class='sm-action' href='?src=\ref[src];out_set_pressure=1'>Apply</a><a class='sm-action' href='?src=\ref[src];out_toggle_power=1'>Toggle</a><a class='sm-action' href='?src=\ref[src];out_refresh_status=1'>Refresh</a></div></td></tr></table>"
 
-	return output
+	return ui_build_styled_html("Supermatter Core Control", output)
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/get_core_sensor_data()
+	var/list/core_data = list("temperature" = 0, "pressure" = 0)
+	for(var/id_tag in sensor_information)
+		var/list/data = sensor_information[id_tag]
+		if(!data)
+			continue
+		if(data["temperature"])
+			core_data["temperature"] = max(core_data["temperature"], text2num(data["temperature"]))
+		if(data["pressure"])
+			core_data["pressure"] = max(core_data["pressure"], text2num(data["pressure"]))
+	return core_data
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/send_core_command(var/device_tag, var/list/command)
+	if(!radio_connection || !device_tag)
+		return
+	command["tag"] = device_tag
+	command["sigtype"] = "command"
+	var/datum/signal/signal = new
+	signal.transmission_method = 1
+	signal.source = src
+	signal.data = command
+	radio_connection.post_signal(src, signal, filter = RADIO_ATMOSIA)
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/run_automatic_management()
+	var/list/core_data = get_core_sensor_data()
+	var/temperature = core_data["temperature"]
+	if(!temperature)
+		return
+
+	automatic_flow_setting = 700
+	automatic_pressure_setting = 100
+	if(temperature >= 4250)
+		automatic_flow_setting = 1200
+		automatic_pressure_setting = 500
+	else if(temperature >= 3500)
+		automatic_flow_setting = 1100
+		automatic_pressure_setting = 300
+	else if(temperature >= 2500)
+		automatic_flow_setting = 900
+		automatic_pressure_setting = 200
+
+	send_core_command(input_tag, list("power" = 1, "set_volume_rate" = "[automatic_flow_setting]"))
+	send_core_command(output_tag, list("power" = 1, "set_external_pressure" = automatic_pressure_setting, "checks" = 1))
+
+/obj/machinery/computer/general_air_control/supermatter_core/Process()
+	if(automatic_management)
+		run_automatic_management()
+	return ..()
 
 /obj/machinery/computer/general_air_control/supermatter_core/receive_signal(datum/signal/signal)
 	if(!signal || signal.encryption) return
@@ -346,6 +411,14 @@ Min Core Pressure: [pressure_limit] kPa<BR>"}
 /obj/machinery/computer/general_air_control/supermatter_core/Topic(href, href_list)
 	if(..())
 		return 1
+	if(href_list["toggle_automatic_management"])
+		automatic_management = !automatic_management
+		spawn(1)
+			src.updateUsrDialog()
+		return 1
+
+	if(href_list["adj_pressure"] || href_list["adj_input_flow_rate"] || href_list["in_toggle_injector"] || href_list["in_set_flowrate"] || href_list["out_toggle_power"] || href_list["out_set_pressure"])
+		automatic_management = FALSE
 
 	if(href_list["adj_pressure"])
 		var/change = text2num(href_list["adj_pressure"])

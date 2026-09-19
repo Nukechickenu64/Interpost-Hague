@@ -256,6 +256,11 @@
 
 /obj/screen/Click(location, control, params)
 	if(!usr)	return 1
+	var/list/modifiers = params2list(params)
+	if(modifiers["right"] && modifiers["shift"]) {
+		usr.ClickOn(src, params, usr, usr.client)
+		return 1
+	}
 	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	switch(name)
 		if("toggle")

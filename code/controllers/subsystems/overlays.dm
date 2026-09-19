@@ -104,11 +104,13 @@ SUBSYSTEM_DEF(overlays)
 /atom/proc/build_appearance_list(atom/new_overlays)
 	var/static/image/appearance_bro = new
 	if (islist(new_overlays))
-		listclearnulls(new_overlays)
-		for (var/i in 1 to length(new_overlays))
-			var/image/cached_overlay = new_overlays[i]
-			APPEARANCEIFY(cached_overlay, new_overlays[i])
-		return new_overlays
+		var/list/overlay_list
+		overlay_list = new_overlays
+		listclearnulls(overlay_list)
+		for (var/i in 1 to length(overlay_list))
+			var/image/cached_overlay = overlay_list[i]
+			APPEARANCEIFY(cached_overlay, overlay_list[i])
+		return overlay_list
 	else
 		APPEARANCEIFY(new_overlays, .)
 

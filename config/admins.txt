@@ -5,5 +5,5 @@
 # Ranks can be anything defined in admin_ranks.txt           ~Carn   #
 ######################################################################
 
-Nukechicken64 - Host
+Nukechicken64 - Owner
 Glennerbean - Host

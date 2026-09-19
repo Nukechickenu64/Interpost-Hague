@@ -9,11 +9,7 @@
 	#include "neoderelict_presets.dm"
 	#include "neoderelict_shuttles.dm"
 
-	#include "neoderelict-1.dmm"
-	#include "neoderelict-2.dmm"
-	#include "neoderelict-3.dmm"
-	#include "neoderelict-4.dmm"
-	#include "neoderelict-5.dmm"
+	#include "neoderelict.dmm"
 
 	//#include "job/jobs.dm"
 	#include "../shared/job/jobs.dm"

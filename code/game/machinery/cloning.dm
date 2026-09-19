@@ -149,8 +149,8 @@
 	return 1
 
 /obj/machinery/clonepod/proc/GetCloneReadiness() // Returns a number between 0 and 100
-	if(!occupant)
-		return
+	if(!occupant || !occupant.maxHealth)
+		return 0
 
 	if(occupant.getCloneLoss() == 0) // Rare case, but theoretically possible
 		return 100
@@ -332,23 +332,23 @@
 /obj/machinery/clonepod/ex_act(severity)
 	switch(severity)
 		if(1.0)
-			for(var/atom/movable/A as mob|obj in src)
+			for(var/atom/movable/A as mob|obj in src.contents.Copy())
 				A.dropInto(loc)
-				ex_act(severity)
+				A.ex_act(severity)
 			qdel(src)
 			return
 		if(2.0)
 			if(prob(50))
-				for(var/atom/movable/A as mob|obj in src)
+				for(var/atom/movable/A as mob|obj in src.contents.Copy())
 					A.dropInto(loc)
-					ex_act(severity)
+					A.ex_act(severity)
 				qdel(src)
 				return
 		if(3.0)
 			if(prob(25))
-				for(var/atom/movable/A as mob|obj in src)
+				for(var/atom/movable/A as mob|obj in src.contents.Copy())
 					A.dropInto(loc)
-					ex_act(severity)
+					A.ex_act(severity)
 				qdel(src)
 				return
 		else

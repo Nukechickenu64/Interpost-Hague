@@ -11,8 +11,8 @@ GLOBAL_DATUM_INIT(_preloader, /dmm_suite/preloader, new)
 	var/list/atoms_to_initialise
 
 /dmm_suite
-		// /"([a-zA-Z]+)" = \(((?:.|\n)*?)\)\n(?!\t)|\((\d+),(\d+),(\d+)\) = \{"([a-zA-Z\n]*)"\}/g
-	var/static/regex/dmmRegex = new/regex({""(\[a-zA-Z]+)" = \\(((?:.|\n)*?)\\)\n(?!\t)|\\((\\d+),(\\d+),(\\d+)\\) = \\{"(\[a-zA-Z\n]*)"\\}"}, "g")
+		// /"([a-zA-Z0-9_.~-]+)"\s*=\s*\(((?:.|\n)*?)\)\s*\n(?!\t)|\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)\s*=\s*\{"([a-zA-Z0-9_.~ \n\t]*)"\}/g
+	var/static/regex/dmmRegex = new/regex({""(\[a-zA-Z0-9_.~-]+)"\\s*=\\s*\\(((?:.|\n)*?)\\)\\s*\n(?!\t)|\\((\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\)\\s*=\\s*\\{"(\[a-zA-Z0-9_.~ \n\t]*)"\\}"}, "g")
 		// /^[\s\n]+"?|"?[\s\n]+$|^"|"$/g
 	var/static/regex/trimQuotesRegex = new/regex({"^\[\\s\n]+"?|"?\[\\s\n]+$|^"|"$"}, "g")
 		// /^[\s\n]+|[\s\n]+$/
@@ -51,6 +51,7 @@ GLOBAL_DATUM_INIT(_preloader, /dmm_suite/preloader, new)
 	var/tfile = dmm_file//the map file we're creating
 	if(isfile(tfile))
 		tfile = file2text(tfile)
+	tfile = replacetext(tfile, ascii2text(13), "")
 
 	if(!x_offset)
 		x_offset = 1

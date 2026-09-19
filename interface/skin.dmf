@@ -222,6 +222,9 @@ macro "borghotkeymode"
 		name = "F8"
 		command = "Invisimin"
 	elem 
+		name = "F9"
+		command = "ReloadPig"
+	elem 
 		name = "F12"
 		command = "F12"
 	elem 
@@ -467,6 +470,9 @@ macro "macro"
 		name = "F8"
 		command = "Invisimin"
 	elem 
+		name = "F9"
+		command = "ReloadPig"
+	elem 
 		name = ","
 		command = "move-upwards"
 	elem 
@@ -636,6 +642,9 @@ macro "borgmacro"
 	elem 
 		name = "F8"
 		command = "Invisimin"
+	elem 
+		name = "F9"
+		command = "ReloadPig"
 	elem 
 		name = "F12"
 		command = "F12"

@@ -222,6 +222,9 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	if(isnull(old_runlevel))
 		old_runlevel = "NULL"
 
+	if(!new_runlevel || (new_runlevel & (new_runlevel - 1)))
+		CRASH("Attempted to set invalid runlevel: [new_runlevel].")
+
 	current_runlevel = log(2, new_runlevel) + 1
 	message_admins("The performance went from [old_runlevel] to [current_runlevel].")
 	if(current_runlevel < 1)
@@ -273,8 +276,11 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 
 		var/ss_runlevels = SS.runlevels
 		var/added_to_any = FALSE
-		for(var/I in 1 to GLOB.bitflags.len)
-			if(ss_runlevels & GLOB.bitflags[I])
+		var/list/runlevel_bitflags = list(RUNLEVEL_LOBBY, RUNLEVEL_SETUP, RUNLEVEL_GAME, RUNLEVEL_POSTGAME)
+		if(GLOB && islist(GLOB.bitflags) && GLOB.bitflags.len)
+			runlevel_bitflags = GLOB.bitflags
+		for(var/I in 1 to runlevel_bitflags.len)
+			if(ss_runlevels & runlevel_bitflags[I])
 				while(runlevel_sorted_subsystems.len < I)
 					runlevel_sorted_subsystems += list(list())
 				runlevel_sorted_subsystems[I] += SS

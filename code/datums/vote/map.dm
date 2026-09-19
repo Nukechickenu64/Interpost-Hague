@@ -4,8 +4,8 @@
 /datum/vote/map/can_run(mob/creator, automatic)
 	if(!config.allow_map_switching)
 		return FALSE
-	if(!automatic && !is_admin(creator))
-		return FALSE // Must be an admin.
+	if(GAME_STATE >= RUNLEVEL_GAME)
+		return FALSE
 	return ..()
 
 /datum/vote/map/setup_vote()

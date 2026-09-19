@@ -1,0 +1,943 @@
+Initialized Assets subsystem within 0.1375 seconds!
+
+Initialized Alarm subsystem within 0 seconds!
+## WARNING: Shuttle "Cryo Lift" could not find its starting location. it was given: . Initialization skipped. in code/modules/shuttles/shuttle.dm at line 49 src: Cryo Lift usr: .
+
+Initialized Shuttle subsystem within 0.009375 seconds!
+
+Initialized Lighting subsystem within 5.15 seconds!
+SSzcopy: Z-Stack maximums: [3,3,3,4,5,6,7,8]
+
+Initialized Z-Copy subsystem within 0.040625 seconds!
+
+Initialized Xenoarch subsystem within 0.45 seconds!
+
+Initialized Ticker subsystem within 0 seconds!
+
+Initialized Chat subsystem within 0 seconds!
+
+Initialized Craft subsystem within 0 seconds!
+
+Initializations complete within 32.9844 seconds!
+The start-up is finished, the game is ready.
+Stopped server.
+World opened on network port 6345.
+runtime error: Cannot read null.atom_init_stage
+proc name: New (/atom/New)
+  usr: (src)
+  src: the dview (/mob/dview)
+  src.loc: null
+  call stack:
+the dview (/mob/dview): New(null)
+world: ()
+Running revision:
+master
+2026-02-14
+4ded9311b67a4d2db9e0a08fc884518c3a92c4b9
+
+Your server failed to establish a connection with the feedback database.
+
+Your server failed to establish a connection with the SQL database.
+
+## ERROR: Failed to connect to database in load_admins(). Reverting to legacy system.
+
+## ERROR: Database connection failed. Reverting to the legacy ban system.
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/utopia, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/bearcat, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/torch, path 
+
+Webclient users can visit this address to play:
+http://www.byond.com/play/143.109.231.69:6345 
+
+
+Or this code can be embedded:
+<iframe src="http://www.byond.com/play/embed/143.109.231.69:6345" width=640 height=480></iframe>
+
+BYOND hub reports port 6345 can be reached by players.
+
+Initialized Antags subsystem within 0 seconds!
+
+Initialized Chemistry subsystem within 0 seconds!
+
+Initialized Plants subsystem within 0.021875 seconds!
+
+Initialized Metrics subsystem within 0 seconds!
+
+Initialized Early Initialization subsystem within 1.35938 seconds!
+One or more map blacklist files are not present in the config directory!
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+Loaded guaranteed away site Mining - Asteroid!
+
+Initialized Mapping subsystem within 2.1875 seconds!
+
+Initialized Space skybox subsystem within 0 seconds!
+## ERROR: Could not find docking controller for shuttle waypoint 'Station (144,112)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'In transit (66,120)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'Space (172,173)', docking tag was 'mining_dock_airlock'.
+runtime error: Undefined model key in DMM.
+Initialized 368661 atoms
+Late initialized 544 atoms
+
+Initialized Atoms subsystem within 19.8031 seconds!
+Initializing atmos machinery
+Initializing atmos machinery
+
+Initialized Machines subsystem within 1.61875 seconds!
+
+Initialized Icon Updates subsystem within 0 seconds!
+SSoverlays: Flushing 2 overlays.
+
+Initialized Overlay subsystem within 0.009375 seconds!
+
+Initialized Evacuation subsystem within 0 seconds!
+
+Initialized Event Manager subsystem within 0 seconds!
+
+Initialized Old God Subsystem subsystem within 0 seconds!
+
+Initialized Psychics subsystem within 0 seconds!
+
+Initialized Supply subsystem within 0 seconds!
+
+Initialized TGUI subsystem within 0 seconds!
+
+Initialized Timer subsystem within 0 seconds!
+
+Initialized Voting subsystem within 0 seconds!
+
+Initialized Air subsystem within 2.42812 seconds!
+
+Initialized Goals subsystem within 0 seconds!
+
+Initialized Late Initialization subsystem within 0.05 seconds!
+
+Initialized Persistence subsystem within 0 seconds!
+
+Initialized Assets subsystem within 0.134375 seconds!
+
+Initialized Alarm subsystem within 0 seconds!
+## WARNING: Shuttle "Cryo Lift" could not find its starting location. it was given: . Initialization skipped. in code/modules/shuttles/shuttle.dm at line 49 src: Cryo Lift usr: .
+
+Initialized Shuttle subsystem within 0.0125 seconds!
+
+Initialized Lighting subsystem within 5.61875 seconds!
+SSzcopy: Z-Stack maximums: [3,3,3,4,5,6,7,8]
+
+Initialized Z-Copy subsystem within 0.028125 seconds!
+
+Initialized Xenoarch subsystem within 0.534375 seconds!
+
+Initialized Ticker subsystem within 0 seconds!
+
+Initialized Chat subsystem within 0 seconds!
+
+Initialized Craft subsystem within 0 seconds!
+
+Initializations complete within 34.2438 seconds!
+The start-up is finished, the game is ready.
+Stopped server.
+World opened on network port 6345.
+runtime error: Cannot read null.atom_init_stage
+proc name: New (/atom/New)
+  usr: (src)
+  src: the dview (/mob/dview)
+  src.loc: null
+  call stack:
+the dview (/mob/dview): New(null)
+world: ()
+Running revision:
+master
+2026-02-14
+4ded9311b67a4d2db9e0a08fc884518c3a92c4b9
+
+Your server failed to establish a connection with the feedback database.
+
+Your server failed to establish a connection with the SQL database.
+
+## ERROR: Failed to connect to database in load_admins(). Reverting to legacy system.
+
+## ERROR: Database connection failed. Reverting to the legacy ban system.
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/utopia, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/bearcat, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/torch, path 
+
+Webclient users can visit this address to play:
+http://www.byond.com/play/143.109.231.69:6345 
+
+
+Or this code can be embedded:
+<iframe src="http://www.byond.com/play/embed/143.109.231.69:6345" width=640 height=480></iframe>
+
+BYOND hub reports port 6345 can be reached by players.
+
+Initialized Antags subsystem within 0.003125 seconds!
+
+Initialized Chemistry subsystem within 0 seconds!
+
+Initialized Plants subsystem within 0.025 seconds!
+
+Initialized Metrics subsystem within 0 seconds!
+
+Initialized Early Initialization subsystem within 1.70625 seconds!
+One or more map blacklist files are not present in the config directory!
+Loaded guaranteed away site Mining - Asteroid!
+
+Initialized Mapping subsystem within 2.81875 seconds!
+
+Initialized Space skybox subsystem within 0 seconds!
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+## ERROR: Could not find docking controller for shuttle waypoint 'Station (144,112)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'In transit (66,120)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'Space (172,173)', docking tag was 'mining_dock_airlock'.
+runtime error: Undefined model key in DMM.
+Initialized 368469 atoms
+Late initialized 545 atoms
+
+Initialized Atoms subsystem within 27.525 seconds!
+Initializing atmos machinery
+Initializing atmos machinery
+Stopped server.
+World opened on network port 6345.
+runtime error: Cannot read null.atom_init_stage
+proc name: New (/atom/New)
+  usr: (src)
+  src: the dview (/mob/dview)
+  src.loc: null
+  call stack:
+the dview (/mob/dview): New(null)
+world: ()
+Running revision:
+master
+2026-02-14
+4ded9311b67a4d2db9e0a08fc884518c3a92c4b9
+Feedback database connection established.
+SQL database connection established.
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/utopia, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/bearcat, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/torch, path 
+
+Webclient users can visit this address to play:
+http://www.byond.com/play/143.109.231.69:6345 
+
+
+Or this code can be embedded:
+<iframe src="http://www.byond.com/play/embed/143.109.231.69:6345" width=640 height=480></iframe>
+
+BYOND hub reports port 6345 can be reached by players.
+
+Initialized Antags subsystem within 0.003125 seconds!
+
+Initialized Chemistry subsystem within 0 seconds!
+
+Initialized Plants subsystem within 0.021875 seconds!
+
+Initialized Metrics subsystem within 0 seconds!
+
+Initialized Early Initialization subsystem within 1.44062 seconds!
+One or more map blacklist files are not present in the config directory!
+Loaded guaranteed away site Mining - Asteroid!
+
+Initialized Mapping subsystem within 2.12188 seconds!
+
+Initialized Space skybox subsystem within 0 seconds!
+## ERROR: Could not find docking controller for shuttle waypoint 'Station (144,112)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'In transit (66,120)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'Space (172,173)', docking tag was 'mining_dock_airlock'.
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: Undefined model key in DMM.
+Initialized 368659 atoms
+Late initialized 545 atoms
+
+Initialized Atoms subsystem within 19.9719 seconds!
+Initializing atmos machinery
+Initializing atmos machinery
+
+Initialized Machines subsystem within 1.64375 seconds!
+
+Initialized Icon Updates subsystem within 0 seconds!
+SSoverlays: Flushing 2 overlays.
+
+Initialized Overlay subsystem within 0.009375 seconds!
+
+Initialized Evacuation subsystem within 0 seconds!
+
+Initialized Event Manager subsystem within 0.003125 seconds!
+
+Initialized Old God Subsystem subsystem within 0 seconds!
+
+Initialized Psychics subsystem within 0 seconds!
+
+Initialized Supply subsystem within 0 seconds!
+
+Initialized TGUI subsystem within 0 seconds!
+
+Initialized Timer subsystem within 0 seconds!
+
+Initialized Voting subsystem within 0 seconds!
+
+Initialized Air subsystem within 2.41875 seconds!
+
+Initialized Goals subsystem within 0 seconds!
+
+Initialized Late Initialization subsystem within 0.0625 seconds!
+
+Initialized Persistence subsystem within 0.003125 seconds!
+
+Initialized Assets subsystem within 0.134375 seconds!
+
+Initialized Alarm subsystem within 0 seconds!
+## WARNING: Shuttle "Cryo Lift" could not find its starting location. it was given: . Initialization skipped. in code/modules/shuttles/shuttle.dm at line 49 src: Cryo Lift usr: .
+
+Initialized Shuttle subsystem within 0.0125 seconds!
+
+Initialized Lighting subsystem within 6.5875 seconds!
+SSzcopy: Z-Stack maximums: [3,3,3,4,5,6,7,8]
+
+Initialized Z-Copy subsystem within 0.034375 seconds!
+
+Initialized Xenoarch subsystem within 0.59375 seconds!
+
+Initialized Ticker subsystem within 0 seconds!
+
+Initialized Chat subsystem within 0 seconds!
+
+Initialized Craft subsystem within 0 seconds!
+
+Initializations complete within 35.5781 seconds!
+The start-up is finished, the game is ready.
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+GC: -- [0x2100003a] | /datum/controller was unable to be GC'd --
+GC: -- [0x200a3b0] | /obj/item/device/assembly/prox_sensor was unable to be GC'd --
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+## WARNING: Could not find an appropriate spawnpoint for job .
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+## WARNING: Could not find an appropriate spawnpoint for job Cargo Technician.
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+Tue Sep 15 07:04:52 2026
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: undefined variable list/var/available_events
+proc name: event complete (/datum/controller/subsystem/event/proc/event_complete)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+Stopped server.
+World opened on network port 6345.
+runtime error: Cannot read null.atom_init_stage
+proc name: New (/atom/New)
+  usr: (src)
+  src: the dview (/mob/dview)
+  src.loc: null
+  call stack:
+the dview (/mob/dview): New(null)
+world: ()
+Running revision:
+master
+2026-02-14
+4ded9311b67a4d2db9e0a08fc884518c3a92c4b9
+Feedback database connection established.
+SQL database connection established.
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/utopia, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/bearcat, path 
+## ERROR: Map 'Unnamed Map' does not have a defined path, not adding to map list!
+## ERROR:  - Unnamed Map, type /datum/map/torch, path 
+
+Webclient users can visit this address to play:
+http://www.byond.com/play/143.109.231.69:6345 
+
+Tue Sep 15 07:25:32 2026
+
+Or this code can be embedded:
+<iframe src="http://www.byond.com/play/embed/143.109.231.69:6345" width=640 height=480></iframe>
+
+BYOND hub reports port 6345 can be reached by players.
+
+Initialized Antags subsystem within 0 seconds!
+
+Initialized Chemistry subsystem within 0 seconds!
+
+Initialized Plants subsystem within 0.01875 seconds!
+
+Initialized Metrics subsystem within 0 seconds!
+
+Initialized Early Initialization subsystem within 1.625 seconds!
+One or more map blacklist files are not present in the config directory!
+Loaded guaranteed away site Mining - Asteroid!
+
+Initialized Mapping subsystem within 2.35625 seconds!
+
+Initialized Space skybox subsystem within 0 seconds!
+## ERROR: Could not find docking controller for shuttle waypoint 'Station (144,112)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'In transit (66,120)', docking tag was 'mining_dock_airlock'.
+## ERROR: Could not find docking controller for shuttle waypoint 'Space (172,173)', docking tag was 'mining_dock_airlock'.
+runtime error: Undefined model key in DMM.
+Initialized 368641 atoms
+Late initialized 545 atoms
+
+Initialized Atoms subsystem within 20.5688 seconds!
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+Initializing atmos machinery
+Initializing atmos machinery
+
+Initialized Machines subsystem within 1.8625 seconds!
+
+Initialized Icon Updates subsystem within 0 seconds!
+SSoverlays: Flushing 3 overlays.
+
+Initialized Overlay subsystem within 0 seconds!
+
+Initialized Evacuation subsystem within 0 seconds!
+
+Initialized Event Manager subsystem within 0 seconds!
+
+Initialized Old God Subsystem subsystem within 0 seconds!
+
+Initialized Psychics subsystem within 0 seconds!
+
+Initialized Supply subsystem within 0 seconds!
+
+Initialized TGUI subsystem within 0 seconds!
+
+Initialized Timer subsystem within 0 seconds!
+
+Initialized Voting subsystem within 0 seconds!
+
+Initialized Air subsystem within 3.575 seconds!
+
+Initialized Goals subsystem within 0 seconds!
+
+Initialized Late Initialization subsystem within 0.0875 seconds!
+
+Initialized Persistence subsystem within 0 seconds!
+
+Initialized Assets subsystem within 0.14375 seconds!
+
+Initialized Alarm subsystem within 0 seconds!
+## WARNING: Shuttle "Cryo Lift" could not find its starting location. it was given: . Initialization skipped. in code/modules/shuttles/shuttle.dm at line 49 src: Cryo Lift usr: .
+
+Initialized Shuttle subsystem within 0.01875 seconds!
+
+Initialized Lighting subsystem within 6.06875 seconds!
+SSzcopy: Z-Stack maximums: [3,3,3,4,5,6,7,8]
+
+Initialized Z-Copy subsystem within 0.053125 seconds!
+
+Initialized Xenoarch subsystem within 0.528125 seconds!
+
+Initialized Ticker subsystem within 0 seconds!
+
+Initialized Chat subsystem within 0 seconds!
+
+Initialized Craft subsystem within 0 seconds!
+
+Initializations complete within 37.4344 seconds!
+The start-up is finished, the game is ready.
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+GC: -- [0x2100003a] | /datum/controller was unable to be GC'd --
+GC: -- [0x200a34f] | /obj/item/device/assembly/prox_sensor was unable to be GC'd --
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+  usr: (src)
+  src: null
+  call stack:
+log topic("status", "172.93.109.46", null, null, null)
+world: Topic("status", "172.93.109.46", null, null)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: undefined variable list/var/available_events
+proc name: event complete (/datum/controller/subsystem/event/proc/event_complete)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: undefined variable list/var/available_events
+proc name: event complete (/datum/controller/subsystem/event/proc/event_complete)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+Tue Sep 15 08:05:09 2026
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+## WARNING: Could not find an appropriate spawnpoint for job Greyhound.
+runtime error: new() called with an object of type /obj/item/crucifix instead of the type path itself
+proc name: EquipRank (/datum/controller/occupations/proc/EquipRank)
+runtime error: Cannot read null.ckey
+proc name: equip custom items (/proc/equip_custom_items)
+runtime error: Cannot read null.mind
+proc name: AttemptLateSpawn (/mob/new_player/proc/AttemptLateSpawn)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+## WARNING: Could not find an appropriate spawnpoint for job Cargo Technician.
+runtime error: undefined variable list/var/available_events
+proc name: event complete (/datum/controller/subsystem/event/proc/event_complete)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: undefined variable list/var/available_events
+proc name: event complete (/datum/controller/subsystem/event/proc/event_complete)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+runtime error: bad index
+proc name: log topic (/proc/log_topic)
+Warning: further proc crash messages are being suppressed to prevent overload...
+Tue Sep 15 10:04:29 2026
+GC: -- [0x200095a] | /obj/machinery/power/supermatter was unable to be GC'd --
+GC: -- [0x2000a52] | /obj/machinery/atmospherics/omni/filter was unable to be GC'd --
+GC: -- [0x2000a50] | /obj/machinery/alarm was unable to be GC'd --
+GC: -- [0x20155c7] | /obj/item/stack/material/steel was unable to be GC'd --
+GC: -- [0x20007a7] | /obj/machinery/atmospherics/binary/circulator was unable to be GC'd --
+GC: -- [0x2000957] | /obj/machinery/atmospherics/unary/outlet_injector was unable to be GC'd --
+GC: -- [0x2000755] | /obj/machinery/atmospherics/pipe/simple/hidden/green was unable to be GC'd --
+GC: -- [0x20008eb] | /obj/structure/bed/chair/office/dark was unable to be GC'd --
+GC: -- [0x2000911] | /obj/machinery/atmospherics/pipe/simple/hidden/supply was unable to be GC'd --
+GC: -- [0x2000912] | /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers was unable to be GC'd --
+GC: -- [0x2000918] | /obj/machinery/atmospherics/pipe/manifold/hidden/scrubbers was unable to be GC'd --
+GC: -- [0x2002ad9] | /obj/machinery/atmospherics/unary/vent_scrubber/on was unable to be GC'd --
+GC: -- [0x2002a4d] | /obj/machinery/atmospherics/unary/vent_pump/on was unable to be GC'd --
+GC: -- [0x2002672] | /obj/machinery/atmospherics/pipe/manifold/hidden/supply was unable to be GC'd --
+GC: -- [0x2002825] | /obj/machinery/camera/autoname was unable to be GC'd --
+GC: -- [0x2001cf9] | /atom/movable/openspace/overlay was unable to be GC'd --
+Tue Sep 15 12:40:12 2026
+## WARNING: Could not find an appropriate spawnpoint for job Enforcer.
+Log Session: Logging to file: C:\Users\nukec\Documents\GitHub\Interpost-Hague\debuglog.txt.

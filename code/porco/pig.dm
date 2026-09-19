@@ -11,12 +11,23 @@
 	set name = "doneRsc"
 
 	pigReady = 1
+	if(mob)
+		mob.updatePig()
 
 /client/verb/unready()
 	set hidden = 1
 	set name = "notdoneRsc"
 
 	pigReady = 0
+
+// Manual fallback for when the pig UI fails to load/render on its own.
+/client/verb/ReloadPig()
+	set hidden = 1
+	set name = "ReloadPig"
+
+	pigReady = 0
+	loadDataPig()
+	lobbyPig()
 
 /mob/new_player/proc/updateTimeToStart()
 	if(!client)

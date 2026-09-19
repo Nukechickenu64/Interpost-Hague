@@ -43,8 +43,16 @@
 
 
 obj/machinery/resleever/Process()
+	if(occupant && QDELETED(occupant))
+		occupant = null
+		occupant_name = null
+		resleeving = 0
+		remaining = 0
+		update_use_power(POWER_USE_OFF)
+		update_icon()
+		return
 
-	if(occupant)
+	if(occupant && !QDELETED(occupant))
 		occupant.Paralyse(4) // We need to always keep the occupant sleeping if they're in here.
 	if(stat & (NOPOWER|BROKEN) || !anchored)
 		update_use_power(POWER_USE_OFF)
@@ -54,7 +62,7 @@ obj/machinery/resleever/Process()
 		if(remaining < timetosleeve)
 			remaining += 1
 
-			if(remaining == 90) // 30 seconds left
+			if(occupant && !QDELETED(occupant) && remaining == 90) // 30 seconds left
 				to_chat(occupant, "<span class='notice'>You feel a wash of sensation as your senses begin to flood your mind. You will come to soon.</span>")
 		else
 			remaining = 0

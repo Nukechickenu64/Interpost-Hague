@@ -21,13 +21,15 @@
 /spell/contract/choose_targets()
 	return list(subject)
 
-/spell/contract/cast(mob/target,mob/user)
+/spell/contract/cast(var/target,mob/user)
 	if(!subject)
 		to_chat(usr, "This spell was not properly given a target. Contact a coder.")
 		return null
 
 	if(istype(target,/list))
-		target = target[1]
+		var/list/targets
+		targets = target
+		target = targets[1]
 	return target
 
 

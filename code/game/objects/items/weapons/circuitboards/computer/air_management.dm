@@ -35,6 +35,7 @@
 
 	var/input_flow_setting = 700
 	var/pressure_setting = 100
+	var/automatic_management = FALSE
 
 /obj/item/weapon/circuitboard/air_management/injector_control
 	name = T_BOARD("injector control")
@@ -78,7 +79,8 @@
 		SC.output_info = output_info.Copy()
 
 		SC.input_flow_setting = input_flow_setting
-		SC.pressure_setting = input_flow_setting
+		SC.pressure_setting = pressure_setting
+		SC.automatic_management = automatic_management
 		return 1
 
 /obj/item/weapon/circuitboard/air_management/injector_control/construct(var/obj/machinery/computer/general_air_control/fuel_injection/FI)
@@ -122,7 +124,8 @@
 		output_info = SC.output_info.Copy()
 
 		input_flow_setting = SC.input_flow_setting
-		pressure_setting = SC.input_flow_setting
+		pressure_setting = SC.pressure_setting
+		automatic_management = SC.automatic_management
 		return 1
 
 /obj/item/weapon/circuitboard/air_management/injector_control/deconstruct(var/obj/machinery/computer/general_air_control/fuel_injection/FI)

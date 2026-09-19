@@ -19,6 +19,12 @@
 	if(get_dist(src, usr) > 1)
 		return
 	switch(href_list["action"])
+		if("wake_station")
+			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
+			wake_station()
 		if("printstatus")
 			if(!dispensed)
 				if(get_dist(src, usr) > 1)
@@ -144,6 +150,24 @@
 					t = V["total"]
 			to_chat(usr, "<span class='notice'>Initiating deep-space telemetry sweep across [t] sector(s). Profile: [selected_profile_label]. Progress will be reported here.</span>")
 
+/obj/machinery/computer/bridge/proc/wake_station()
+	var/light_switches_enabled = 0
+	var/thermostats_reset = 0
+	for(var/obj/machinery/light_switch/L in world)
+		if(!(L.z in GLOB.using_map.station_levels))
+			continue
+		L.set_state(1)
+		light_switches_enabled++
+
+	for(var/obj/machinery/alarm/A in world)
+		if(!(A.z in GLOB.using_map.station_levels))
+			continue
+		A.target_temperature = T20C
+		thermostats_reset++
+
+	playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1)
+	to_chat(usr, "<span class='notice'>Wake station command complete: [light_switches_enabled] light switches enabled and [thermostats_reset] air alarms set to 20°C.</span>")
+
 
 /obj/machinery/computer/bridge/attack_hand(mob/living/carbon/human/user)
 	..()
@@ -168,7 +192,7 @@
 			var/sec = seconds % 60
 			var/min = (seconds - sec) / 60
 			scan_label = "COOLDOWN [min]m [sec]s"
-	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The console sputters to life, offering the following functions:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>PRIORITY ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>[scan_label]</a></span></div></div>")
+	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The console sputters to life, offering the following functions:</span>\n<hr><span class='feedback'><a href='?src=\ref[src];action=printstatus;align='right'>PRINT COMMUNICATION LOGS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity;align='right'>STATION STATUS</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=wake_station;align='right'>WAKE STATION</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=announce;align='right'>PRIORITY ANNOUNCEMENT</a></span>\n<span class='feedback'><a href='?src=\ref[src];action=scan_for_beacons;align='right'>[scan_label]</a></span></div></div>")
 
 // Generate a random mission briefing text for the crew
 /obj/machinery/computer/bridge/proc/generate_random_mission()

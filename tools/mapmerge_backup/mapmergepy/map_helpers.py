@@ -131,9 +131,10 @@ def merge_map(newfile, backupfile, tgm):
         originalDict = sorted_dict
 
     if tgm:
-        with open(newfile, "w") as output:
+        default_key = list(originalDict.keys())[0] if len(originalDict) > 0 else "a"
+        with open(newfile, "w", encoding='latin1', newline='\n') as output:
             write_dictionary_tgm(output, originalDict)
-            write_grid_coord_small(output, mergeGrid)
+            write_grid_coord_small(output, mergeGrid, default_key)
     else:
         with open(newfile, "wt", encoding='cp1252', newline='\n') as output:
             write_dictionary_dmm(output, originalDict)
@@ -185,14 +186,14 @@ def write_dictionary_tgm(output, dictionary):
         output.write(")\n")
 
 #thanks to YotaXP for finding out about this one
-def write_grid_coord_small(output, grid):
+def write_grid_coord_small(output, grid, default_key="a"):
     output.write("\n")
 
     for x in range(1, maxx+1):
         output.write("({},{},1) = {{\"\n".format(x, 1, 1))
         for y in range(1, maxy):
-            output.write("{}\n".format(grid[x,y]))
-        output.write("{}\n\"}}\n".format(grid[x,maxy]))
+            output.write("{}\n".format(grid.get((x,y), default_key)))
+        output.write("{}\n\"}}\n".format(grid.get((x,maxy), default_key)))
 
 def search_key(dictionary, data):
     for key, value in dictionary.items():

@@ -24,7 +24,7 @@ var/list/gamemode_cache = list()
 	var/allow_admin_ooccolor = 0		// Allows admins with relevant permissions to have their own ooc colour
 	var/allow_vote_restart = 0 			// allow votes to restart
 	var/ert_admin_call_only = 0
-	var/allow_vote_mode = 0				// allow votes to change mode
+	var/allow_vote_mode = 1				// allow votes to change mode
 	var/allow_admin_jump = 1			// allows admin jumping
 	var/allow_admin_spawning = 1		// allows admin item spawning
 	var/allow_admin_rev = 1				// allows admin revives
@@ -204,7 +204,7 @@ var/list/gamemode_cache = list()
 	var/ghosts_can_possess_animals = 0
 	var/delist_when_no_admins = FALSE
 
-	var/allow_map_switching = 0 // Whether map switching is allowed
+	var/allow_map_switching = 1 // Whether map switching is allowed
 	var/auto_map_vote = 0 // Automatically call a map vote at end of round and switch to the selected map
 	var/wait_for_sigusr1_reboot = 0 // Don't allow reboot unless it was caused by SIGUSR1
 

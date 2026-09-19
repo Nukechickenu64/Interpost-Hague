@@ -1,22 +1,225 @@
-"a" = (/turf/space,/area/space)
-"u" = (/turf/simulated/floor/tiled/steel_ridged,/area/space)
-"w" = (/turf/simulated/wall,/area/space)
-"t" = (/obj/structure/table/standard,/turf/simulated/floor/tiled/steel_ridged,/area/space)
-"l" = (/obj/machinery/light/small,/turf/simulated/floor/tiled/steel_ridged,/area/space)
-"c" = (/obj/structure/closet/crate,/turf/simulated/floor/tiled/steel_ridged,/area/space)
-"r" = (/obj/random/maintenance,/turf/simulated/floor/tiled/steel_ridged,/area/space)
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE 
+"a" = (
+/turf/space,
+/area/space)
+"u" = (
+/turf/simulated/floor/tiled/steel_ridged,
+/area/space)
+"w" = (
+/turf/simulated/wall,
+/area/space)
+"t" = (
+/obj/structure/table/standard,
+/turf/simulated/floor/tiled/steel_ridged,
+/area/space)
+"l" = (
+/obj/machinery/light/small,
+/turf/simulated/floor/tiled/steel_ridged,
+/area/space)
+"c" = (
+/obj/structure/closet/crate,
+/turf/simulated/floor/tiled/steel_ridged,
+/area/space)
+"r" = (
+/obj/random/maintenance,
+/turf/simulated/floor/tiled/steel_ridged,
+/area/space)
 
 (1,1,1) = {"
- aaaaaaaaaaaaaa
- aaaaawwwwaaaa
- aaaawuuuuwaaa
- aaawutcluwaaa
- aaawulr.uw.aa
- aaaawuuuuwaaa
- aaaaawwwwaaaa
- aaaaaaaaaaaaaa
- aaaaaaaaaaaaaa
- aaaaaaaaaaaaaa
- aaaaaaaaaaaaaa
- aaaaaaaaaaaaaa
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 "}
+(2,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(3,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(4,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(5,1,1) = {"
+a
+a
+a
+w
+w
+a
+a
+a
+a
+a
+a
+a
+"}
+(6,1,1) = {"
+a
+a
+w
+u
+u
+w
+a
+a
+a
+a
+a
+a
+"}
+(7,1,1) = {"
+a
+w
+u
+t
+l
+u
+w
+a
+a
+a
+a
+a
+"}
+(8,1,1) = {"
+a
+w
+u
+c
+r
+u
+w
+a
+a
+a
+a
+a
+"}
+(9,1,1) = {"
+a
+w
+u
+l
+.
+u
+w
+a
+a
+a
+a
+a
+"}
+(10,1,1) = {"
+a
+w
+u
+u
+u
+u
+w
+a
+a
+a
+a
+a
+"}
+(11,1,1) = {"
+a
+a
+w
+w
+w
+w
+a
+a
+a
+a
+a
+a
+"}
+(12,1,1) = {"
+a
+a
+a
+a
+.
+a
+a
+a
+a
+a
+a
+a
+"}
+(13,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(14,1,1) = {"
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+"}
+(15,1,1) = {"
+a

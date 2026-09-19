@@ -13,6 +13,12 @@
 	idle_power_usage = 60
 	active_power_usage = 10000	//10 kW. It's a big all-body scanner.
 
+/obj/machinery/bodyscanner/Destroy()
+	if(occupant && occupant.loc == src)
+		occupant.dropInto(loc)
+	occupant = null
+	return ..()
+
 /obj/machinery/bodyscanner/relaymove(mob/user as mob)
 	if (user.stat)
 		return
@@ -37,6 +43,10 @@
 
 	if (usr.stat != 0)
 		return
+	if (src.occupant && QDELETED(src.occupant))
+		src.occupant = null
+		update_use_power(1)
+		src.icon_state = "body_scanner_0"
 	if (src.occupant)
 		to_chat(usr, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -51,14 +61,16 @@
 	playsound(src, 'sound/machines/scanner_entry.ogg', 50)
 	update_use_power(2)
 	src.icon_state = "body_scanner_1"
-	for(var/obj/O in src)
-		//O = null
-		qdel(O)
-		//Foreach goto(124)
+	for(var/obj/O in src.contents.Copy())
+		O.dropInto(loc)
 	src.add_fingerprint(usr)
 	return
 
 /obj/machinery/bodyscanner/proc/go_out()
+	if (src.occupant && QDELETED(src.occupant))
+		src.occupant = null
+		update_use_power(1)
+		src.icon_state = "body_scanner_0"
 	if ((!( src.occupant ) || src.locked))
 		return
 	for(var/obj/O in src)
@@ -79,6 +91,10 @@
 		return ..()
 	if (!ismob(G.affecting))
 		return
+	if (src.occupant && QDELETED(src.occupant))
+		src.occupant = null
+		update_use_power(1)
+		src.icon_state = "body_scanner_0"
 	if (src.occupant)
 		to_chat(user, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -90,7 +106,7 @@
 	src.occupant = M
 	update_use_power(2)
 	src.icon_state = "body_scanner_1"
-	for(var/obj/O in src)
+	for(var/obj/O in src.contents.Copy())
 		O.forceMove(loc)
 	src.add_fingerprint(user)
 	qdel(G)
@@ -101,6 +117,10 @@
 		return
 	if (!CanMouseDrop(target, user))
 		return
+	if (src.occupant && QDELETED(src.occupant))
+		src.occupant = null
+		update_use_power(1)
+		src.icon_state = "body_scanner_0"
 	if (src.occupant)
 		to_chat(user, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -118,34 +138,34 @@
 	src.occupant = M
 	update_use_power(2)
 	src.icon_state = "body_scanner_1"
-	for(var/obj/O in src)
+	for(var/obj/O in src.contents.Copy())
 		O.forceMove(loc)
 	src.add_fingerprint(user)
 
 /obj/machinery/bodyscanner/ex_act(severity)
 	switch(severity)
 		if(1.0)
-			for(var/atom/movable/A as mob|obj in src)
+			for(var/atom/movable/A as mob|obj in src.contents.Copy())
 				A.dropInto(loc)
-				ex_act(severity)
+				A.ex_act(severity)
 				//Foreach goto(35)
 			//SN src = null
 			qdel(src)
 			return
 		if(2.0)
 			if (prob(50))
-				for(var/atom/movable/A as mob|obj in src)
+				for(var/atom/movable/A as mob|obj in src.contents.Copy())
 					A.dropInto(loc)
-					ex_act(severity)
+					A.ex_act(severity)
 					//Foreach goto(108)
 				//SN src = null
 				qdel(src)
 				return
 		if(3.0)
 			if (prob(25))
-				for(var/atom/movable/A as mob|obj in src)
+				for(var/atom/movable/A as mob|obj in src.contents.Copy())
 					A.dropInto(loc)
-					ex_act(severity)
+					A.ex_act(severity)
 					//Foreach goto(181)
 				//SN src = null
 				qdel(src)

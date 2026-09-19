@@ -3,75 +3,95 @@
 // Opens a small, borderless browser window listing all atoms on the turf, allowing the user
 // to select which atom to target for right-click interactions. It attempts to appear near the mouse.
 /mob/proc/open_tile_context_menu(var/turf/T, var/atom/clicked, var/params)
-	if(!client || !T)
+	if(!client || !clicked)
 		return
 
-	// Extract click params to position the menu near the mouse
+	// BYOND click params on HUD elements and on-map clicks are typically in icon-x/icon-y and
+	// screen-loc, not mouse-x/mouse-y. Use the actual click position from the params to keep the
+	// menu anchored to the cursor without requiring a turf.
 	var/list/P = istext(params) ? params2list(params) : null
 	var/has_pos = FALSE
 	var/pos_x = 0
 	var/pos_y = 0
-	if(P && P["screen-loc"]) // Preferred: derive pixel position from screen-loc
+
+	if(P && P["screen-loc"])
 		var/list/screen_loc_params = splittext(P["screen-loc"], ",")
 		if(screen_loc_params && screen_loc_params.len >= 2)
-			// X base and pixel
 			var/list/x_parts = splittext(screen_loc_params[1], ":")
 			var/base_x = (x_parts.len >= 1) ? x_parts[1] : "CENTER"
 			var/pix_x = text2num((x_parts.len >= 2) ? x_parts[2] : "0")
-			// Y base and pixel
+			if(isnull(pix_x))
+				pix_x = 0
 			var/list/y_parts = splittext(screen_loc_params[2], ":")
 			var/base_y = (y_parts.len >= 1) ? y_parts[1] : "CENTER"
 			var/pix_y = text2num((y_parts.len >= 2) ? y_parts[2] : "0")
+			if(isnull(pix_y))
+				pix_y = 0
 
-			var/view = client.view
-			var/tile_x = _decode_screen_axis(base_x, view, 1) // EAST/WEST/CENTER
-			var/tile_y = _decode_screen_axis(base_y, view, 0) // NORTH/SOUTH/CENTER
-			var/pixel_x = (max(1, tile_x) - 1) * world.icon_size + pix_x
-			var/pixel_y = (max(1, tile_y) - 1) * world.icon_size + pix_y
-
-			// Get absolute position of the map control and mainwindow, then place popup
-			var/map_pos_text = winget(src, "map", "pos")
 			var/win_pos_text = winget(src, "mainwindow", "pos")
-			if(map_pos_text && win_pos_text)
+			var/map_pos_text = winget(src, "mapwindow.map", "pos")
+			if(T && map_pos_text && win_pos_text)
 				var/list/mp = splittext(map_pos_text, ",")
 				var/list/wp = splittext(win_pos_text, ",")
 				if(mp.len >= 2 && wp.len >= 2)
+					var/view = client.view
+					var/tile_x = _decode_screen_axis(base_x, view, 1)
+					var/tile_y = _decode_screen_axis(base_y, view, 0)
+					var/pixel_x = (max(1, tile_x) - 1) * world.icon_size + pix_x
+					var/pixel_y = (max(1, tile_y) - 1) * world.icon_size + pix_y
 					var/map_x = text2num(mp[1])
 					var/map_y = text2num(mp[2])
 					var/win_x = text2num(wp[1])
 					var/win_y = text2num(wp[2])
-					pos_x = win_x + map_x + pixel_x + 12 // slight offset from cursor
-					pos_y = win_y + map_y + pixel_y + 12
+					pos_x = win_x + map_x + pixel_x
+					pos_y = win_y + map_y + pixel_y
+					has_pos = TRUE
+			else if(win_pos_text)
+				var/list/wp = splittext(win_pos_text, ",")
+				if(wp.len >= 2)
+					pos_x = text2num(wp[1]) + pix_x
+					pos_y = text2num(wp[2]) + pix_y
 					has_pos = TRUE
 
-	// Fallback: try icon-x/y if screen-loc wasn’t present
-	if(!has_pos && P)
+	if(!has_pos && T && P)
 		var/ix = text2num(P["icon-x"]) - 1
 		var/iy = text2num(P["icon-y"]) - 1
 		if(ix >= 0 && iy >= 0)
 			var/win_pos_text2 = winget(src, "mainwindow", "pos")
-			var/map_pos_text2 = winget(src, "map", "pos")
+			var/map_pos_text2 = winget(src, "mapwindow.map", "pos")
 			if(win_pos_text2 && map_pos_text2)
 				var/list/wp2 = splittext(win_pos_text2, ",")
 				var/list/mp2 = splittext(map_pos_text2, ",")
 				if(wp2.len >= 2 && mp2.len >= 2)
-					pos_x = text2num(wp2[1]) + text2num(mp2[1]) + ix + 12
-					pos_y = text2num(wp2[2]) + text2num(mp2[2]) + iy + 12
+					pos_x = text2num(wp2[1]) + text2num(mp2[1]) + ix
+					pos_y = text2num(wp2[2]) + text2num(mp2[2]) + iy
 					has_pos = TRUE
 
-	// Build a stable list of visible atoms on the tile: include the turf and its contents
+	if(!has_pos && !P && !isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
+		pos_x = tilectx_last_pos_x
+		pos_y = tilectx_last_pos_y
+		has_pos = TRUE
+
+	// Build a stable list of visible atoms for the menu. For HUD elements we include the clicked screen
+	// control itself and its underlying object so the menu still opens when there is no turf.
 	var/list/atoms_on_tile = list()
-	// Include the turf itself at the bottom of the list
-	atoms_on_tile += T
-	// Include all atoms in turf contents (objects, mobs, items)
-	for(var/atom/A in T)
-		// Skip admin-only/screen/UI objects that shouldn't be in-world selectable
-		if(istype(A, /obj/screen))
-			continue
-		// Basic visibility filter
-		if(A.invisibility && A.invisibility > see_invisible)
-			continue
-		atoms_on_tile += A
+	if(T)
+		atoms_on_tile += T
+		for(var/atom/A in T)
+			if(istype(A, /obj/screen))
+				continue
+			if(A.invisibility && A.invisibility > see_invisible)
+				continue
+			atoms_on_tile += A
+	else if(clicked)
+		atoms_on_tile += clicked
+		if(clicked:master && clicked:master != clicked)
+			atoms_on_tile += clicked:master
+		if(istype(clicked, /obj/screen/inventory) && clicked:master)
+			atoms_on_tile += clicked:master
+
+	if(!atoms_on_tile.len && clicked)
+		atoms_on_tile += clicked
 
 	// Optional: cap the number to avoid huge menus
 	var/max_items = 100
@@ -133,6 +153,8 @@
 		browse_args += ";pos=[pos_x],[pos_y]"
 	src << browse(html, browse_args)
 	if(has_pos)
+		tilectx_last_pos_x = pos_x
+		tilectx_last_pos_y = pos_y
 		// Ensure position sticks if the engine ignores the initial pos argument sometimes
 		winset(src, "tilectx", "pos=[pos_x],[pos_y]")
 
@@ -246,9 +268,104 @@
 	html += "</div></body></html>"
 
 	var/browse_args = "window=tilectx;border=0;titlebar=0;can_resize=0;can_minimize=0;can_close=1;size=300x[dyn_h]"
+	if(!isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
+		browse_args += ";pos=[tilectx_last_pos_x],[tilectx_last_pos_y]"
 	src.tilectx_last_clicked = target
 	src << browse(html, browse_args)
+	if(!isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
+		winset(src, "tilectx", "pos=[tilectx_last_pos_x],[tilectx_last_pos_y]")
 	src.tilectx_open = TRUE
+
+/mob/proc/close_tile_context_menu()
+	src << browse(null, "window=tilectx")
+	tilectx_open = FALSE
+
+/mob/proc/handle_tilectx_topic(var/list/href_list)
+	if(!href_list)
+		return FALSE
+
+	if(href_list["tilectx_fit"]) {
+		var/w = text2num(href_list["w"])
+		var/h = text2num(href_list["h"])
+		if(w && h)
+			var/fit_args = "size=[w]x[h]"
+			if(!isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
+				fit_args += ";pos=[tilectx_last_pos_x],[tilectx_last_pos_y]"
+			winset(src, "tilectx", fit_args)
+		return TRUE
+	}
+
+	if(href_list["mach_close"] == "tilectx") {
+		close_tile_context_menu()
+		return TRUE
+	}
+
+	if(href_list["tilectx_back"]) {
+		if(tilectx_last_turf)
+			open_tile_context_menu(tilectx_last_turf, tilectx_last_clicked, null)
+		return TRUE
+	}
+
+	if(href_list["tilectx_obj"]) {
+		var/atom/target_obj = locate(href_list["tilectx_obj"])
+		if(target_obj) {
+			tilectx_last_clicked = target_obj
+			open_object_context_menu(target_obj)
+		}
+		return TRUE
+	}
+
+	if(href_list["tilectx_invoke"]) {
+		var/atom/target = locate(href_list["tilectx_invoke"])
+		var/procname = href_list["proc"]
+		if(target && procname) {
+			if(procname == "pickup") {
+				if(isatom(target) && !target.Adjacent(src)) {
+					to_chat(src, "<span class='warning'>You're too far away to pick that up.</span>")
+					return TRUE
+				}
+				if(isobj(target)) {
+					var/obj/O = target
+					if(istype(O, /obj/item)) {
+						var/obj/item/I = O
+						I.attack_hand(src)
+					} else {
+						O.attack_hand(src)
+					}
+				} else {
+					target.attack_hand(src)
+				}
+				close_tile_context_menu()
+				return TRUE
+			} else if(procname == "examine") {
+				target.examine(src)
+			} else if(procname == "use") {
+				target.attack_hand(src)
+			} else if(procname == "use_right") {
+				target.attack_hand_right(src)
+			} else if(procname == "pull") {
+				if(ismovable(target)) {
+					var/atom/movable/M = target
+					start_pulling(M)
+				}
+			} else {
+				var/allowed = FALSE
+				if(target:verbs)
+					for(var/V in target:verbs)
+						var/list/parts = splittext("[V]", "/")
+						if(parts && parts.len && parts[parts.len] == procname)
+							allowed = TRUE
+							break
+				if(allowed)
+					call(target, procname)()
+			}
+			close_tile_context_menu()
+			return TRUE
+		}
+		return FALSE
+	}
+
+	return FALSE
 
 // Handle selection in mob/Topic (implemented there) to dispatch right-click action.
 
