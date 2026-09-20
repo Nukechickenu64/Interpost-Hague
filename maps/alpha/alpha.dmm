@@ -1361,15 +1361,6 @@
 	},
 /turf/simulated/floor/plating,
 /area/quartermaster/miningdock)
-"acZ" = (
-/obj/structure/cable{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8"
-	},
-/obj/structure/vent_gas,
-/turf/simulated/floor/lino,
-/area/quartermaster/miningdock)
 "ada" = (
 /obj/machinery/conveyor{
 	dir = 4;
@@ -4145,7 +4136,6 @@
 	icon_state = "1-2";
 	pixel_y = 0
 	},
-/obj/structure/vent_gas,
 /turf/simulated/floor/tiled/dark,
 /area/security/brig)
 "aiy" = (
@@ -4360,16 +4350,6 @@
 	req_access = list(63)
 	},
 /turf/simulated/floor/tiled,
-/area/security/brig)
-"aiX" = (
-/obj/effect/floor_decal/newcorner/plazaf,
-/obj/effect/floor_decal/newcorner/plazaf{
-	tag = "icon-plazaf (NORTH)";
-	icon_state = "plazaf";
-	dir = 1
-	},
-/obj/structure/vent_gas,
-/turf/simulated/floor/tiled/dark,
 /area/security/brig)
 "aiY" = (
 /obj/effect/floor_decal/turf/shaft{
@@ -8275,7 +8255,6 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 5
 	},
-/obj/structure/vent_gas,
 /turf/simulated/floor/tiled/bunker/polar_white,
 /area/crew_quarters/sleep/cryo)
 "aqz" = (
@@ -15275,23 +15254,19 @@
 	},
 /turf/simulated/floor/tiled/bunker/polar_white,
 /area/medical/medbay3)
-"aDS" = (
-/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
-/obj/machinery/atmospherics/pipe/simple/hidden/supply,
-/obj/structure/vent_gas,
-/turf/simulated/floor/tiled/bunker/polar_white,
-/area/crew_quarters/sleep/cryo)
 "aDT" = (
-/obj/structure/cable{
+/obj/structure/cable/yellow{
 	d1 = 1;
 	d2 = 2;
 	icon_state = "1-2"
 	},
-/obj/machinery/atmospherics/pipe/simple/hidden/supply,
-/obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
-/obj/structure/vent_gas,
-/turf/simulated/floor/tiled,
-/area/crew_quarters/sleep)
+/obj/structure/cable{
+	d2 = 2;
+	icon_state = "0-2";
+	pixel_y = 0
+	},
+/turf/simulated/floor/tiled/bunker/polar_circuit,
+/area/tcommsat/computer)
 "aDU" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 5
@@ -68176,7 +68151,7 @@ abB
 abG
 abP
 abX
-acZ
+acd
 aci
 aco
 ade
@@ -100898,7 +100873,7 @@ aCr
 aCr
 aCr
 aCr
-aDS
+aCq
 aCt
 aho
 adz
@@ -102325,7 +102300,7 @@ aqC
 auq
 asE
 aty
-aDT
+aqC
 auX
 avO
 apw
@@ -103105,7 +103080,7 @@ aJM
 ajB
 afB
 ahd
-aiX
+aps
 anx
 ahh
 afG
@@ -106744,7 +106719,7 @@ aeU
 aft
 aGb
 agg
-agW
+aDT
 agW
 agW
 agW

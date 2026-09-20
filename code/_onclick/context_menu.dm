@@ -1,73 +1,107 @@
 // Shift+Right-Click tile context menu implementation
 
 // Opens a small, borderless browser window listing all atoms on the turf, allowing the user
-// to select which atom to target for right-click interactions. It attempts to appear near the mouse.
+// to select which atom to target for right-click interactions. It appears at the mouse cursor.
 /mob/proc/open_tile_context_menu(var/turf/T, var/atom/clicked, var/params)
 	if(!client || !clicked)
 		return
 
-	// BYOND click params on HUD elements and on-map clicks are typically in icon-x/icon-y and
-	// screen-loc, not mouse-x/mouse-y. Use the actual click position from the params to keep the
-	// menu anchored to the cursor without requiring a turf.
+	// Position the menu at the mouse cursor, like a native right-click dropdown.
+	// BYOND's screen-loc uses a bottom-left origin with 1-based indices; window pos uses
+	// a top-left origin in screen pixels. We must convert between the two.
 	var/list/P = istext(params) ? params2list(params) : null
 	var/has_pos = FALSE
 	var/pos_x = 0
 	var/pos_y = 0
 
 	if(P && P["screen-loc"])
-		var/list/screen_loc_params = splittext(P["screen-loc"], ",")
-		if(screen_loc_params && screen_loc_params.len >= 2)
-			var/list/x_parts = splittext(screen_loc_params[1], ":")
-			var/base_x = (x_parts.len >= 1) ? x_parts[1] : "CENTER"
-			var/pix_x = text2num((x_parts.len >= 2) ? x_parts[2] : "0")
-			if(isnull(pix_x))
-				pix_x = 0
-			var/list/y_parts = splittext(screen_loc_params[2], ":")
-			var/base_y = (y_parts.len >= 1) ? y_parts[1] : "CENTER"
-			var/pix_y = text2num((y_parts.len >= 2) ? y_parts[2] : "0")
-			if(isnull(pix_y))
-				pix_y = 0
+		var/list/sl = splittext(P["screen-loc"], ",")
+		if(sl.len >= 2)
+			var/list/xp = splittext(sl[1], ":")
+			var/list/yp = splittext(sl[2], ":")
+			if(xp.len >= 2 && yp.len >= 2)
+				// Determine view dimensions (client.view may be a number or "WxH" string)
+				var/view_x = 7
+				var/view_y = 7
+				if(istext(client.view))
+					var/list/vp = splittext("[client.view]", "x")
+					view_x = text2num(vp[1]) || 7
+					if(vp.len >= 2)
+						view_y = text2num(vp[2]) || view_x
+					else
+						view_y = view_x
+				else
+					view_x = client.view
+					view_y = client.view
 
-			var/win_pos_text = winget(src, "mainwindow", "pos")
-			var/map_pos_text = winget(src, "mapwindow.map", "pos")
-			if(T && map_pos_text && win_pos_text)
-				var/list/mp = splittext(map_pos_text, ",")
-				var/list/wp = splittext(win_pos_text, ",")
-				if(mp.len >= 2 && wp.len >= 2)
-					var/view = client.view
-					var/tile_x = _decode_screen_axis(base_x, view, 1)
-					var/tile_y = _decode_screen_axis(base_y, view, 0)
-					var/pixel_x = (max(1, tile_x) - 1) * world.icon_size + pix_x
-					var/pixel_y = (max(1, tile_y) - 1) * world.icon_size + pix_y
-					var/map_x = text2num(mp[1])
-					var/map_y = text2num(mp[2])
-					var/win_x = text2num(wp[1])
-					var/win_y = text2num(wp[2])
-					pos_x = win_x + map_x + pixel_x
-					pos_y = win_y + map_y + pixel_y
-					has_pos = TRUE
-			else if(win_pos_text)
-				var/list/wp = splittext(win_pos_text, ",")
-				if(wp.len >= 2)
-					pos_x = text2num(wp[1]) + pix_x
-					pos_y = text2num(wp[2]) + pix_y
-					has_pos = TRUE
+				var/col = _screen_loc_to_index(xp[1], view_x, TRUE)
+				var/row = _screen_loc_to_index(yp[1], view_y, FALSE)
+				var/pix_x = text2num(xp[2]) || 0
+				var/pix_y = text2num(yp[2]) || 0
 
-	if(!has_pos && T && P)
-		var/ix = text2num(P["icon-x"]) - 1
-		var/iy = text2num(P["icon-y"]) - 1
-		if(ix >= 0 && iy >= 0)
-			var/win_pos_text2 = winget(src, "mainwindow", "pos")
-			var/map_pos_text2 = winget(src, "mapwindow.map", "pos")
-			if(win_pos_text2 && map_pos_text2)
-				var/list/wp2 = splittext(win_pos_text2, ",")
-				var/list/mp2 = splittext(map_pos_text2, ",")
-				if(wp2.len >= 2 && mp2.len >= 2)
-					pos_x = text2num(wp2[1]) + text2num(mp2[1]) + ix
-					pos_y = text2num(wp2[2]) + text2num(mp2[2]) + iy
-					has_pos = TRUE
+				// The map control's "pos" from winget returns an absolute screen position
+				// when the window is docked as a pane. We do NOT add mainwindow's position
+				// on top of it — that would double-count and skew the menu right/down.
+				var/map_pos = winget(src, "mapwindow.map", "pos")
+				var/map_size = winget(src, "mapwindow.map", "size")
+				var/map_icon_size = winget(src, "mapwindow.map", "icon-size")
 
-	if(!has_pos && !P && !isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
+				if(map_pos)
+					var/list/mp = splittext(map_pos, ",")
+					if(mp.len >= 2)
+						var/map_x = text2num(mp[1])
+						var/map_y = text2num(mp[2])
+
+						var/map_w_px = 0
+						var/map_h_px = 0
+						if(map_size)
+							var/list/ms = splittext(map_size, "x")
+							if(ms.len >= 2)
+								map_w_px = text2num(ms[1]) || 0
+								map_h_px = text2num(ms[2]) || 0
+
+						// Number of tiles visible in each dimension
+						var/tiles_x = view_x * 2 + 1
+						var/tiles_y = view_y * 2 + 1
+
+						// Determine the actual on-screen tile size.
+						// icon-size=0 means "stretch to fit" — tiles are scaled to fill the control.
+						// icon-size=N means fixed N-pixel tiles, possibly centered in the control.
+						var/tile_px = world.icon_size
+						var/is_stretch = TRUE
+						if(map_icon_size)
+							var/icon_sz = text2num(map_icon_size)
+							if(icon_sz && icon_sz > 0)
+								tile_px = icon_sz
+								is_stretch = FALSE
+
+						var/grid_off_x = 0
+						var/grid_off_y = 0
+						var/eff_tile_w = tile_px
+						var/eff_tile_h = tile_px
+
+						if(is_stretch && map_w_px > 0 && map_h_px > 0)
+							// Stretch mode: tiles fill the entire control
+							eff_tile_w = map_w_px / tiles_x
+							eff_tile_h = map_h_px / tiles_y
+						else
+							// Fixed tile mode: grid may be centered in the control
+							var/grid_w = tiles_x * tile_px
+							var/grid_h = tiles_y * tile_px
+							grid_off_x = max(0, round((map_w_px - grid_w) / 2))
+							grid_off_y = max(0, round((map_h_px - grid_h) / 2))
+
+						// Convert screen-loc (bottom-left origin, 1-based) to screen pixels
+						// (top-left origin). In stretch mode, pixel offsets scale proportionally.
+						var/scale_x = eff_tile_w / world.icon_size
+						var/scale_y = eff_tile_h / world.icon_size
+
+						pos_x = map_x + grid_off_x + (col - 1) * eff_tile_w + (pix_x - 1) * scale_x
+						pos_y = map_y + map_h_px - grid_off_y - (row - 1) * eff_tile_h - pix_y * scale_y
+						has_pos = TRUE
+
+	// Fallback to last known position if we couldn't determine the cursor position
+	if(!has_pos && !isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
 		pos_x = tilectx_last_pos_x
 		pos_y = tilectx_last_pos_y
 		has_pos = TRUE
@@ -85,10 +119,10 @@
 			atoms_on_tile += A
 	else if(clicked)
 		atoms_on_tile += clicked
-		if(clicked:master && clicked:master != clicked)
-			atoms_on_tile += clicked:master
-		if(istype(clicked, /obj/screen/inventory) && clicked:master)
-			atoms_on_tile += clicked:master
+		if(istype(clicked, /obj/screen))
+			var/obj/screen/S = clicked
+			if(S.master && S.master != clicked)
+				atoms_on_tile += S.master
 
 	if(!atoms_on_tile.len && clicked)
 		atoms_on_tile += clicked
@@ -147,7 +181,7 @@
 	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
-	// Open the menu window: borderless, non-resizable, placed near mouse if possible
+	// Open the menu window: borderless, non-resizable, placed at mouse cursor if possible
 	var/browse_args = "window=tilectx;border=0;titlebar=0;can_resize=0;can_minimize=0;can_close=1;size=260x[dyn_h]"
 	if(has_pos)
 		browse_args += ";pos=[pos_x],[pos_y]"
@@ -192,8 +226,9 @@
 
 	// Build verbs list from the object's verbs
 	var/list/verbs_list = list()
-	if(target:verbs)
-		for(var/V in target:verbs)
+	var/list/target_verbs = target.verbs
+	if(target_verbs)
+		for(var/V in target_verbs)
 			var/pathtext = "[V]" // e.g., /obj/item/verb/toggle
 			var/list/parts = splittext(pathtext, "/")
 			if(!parts || !parts.len) continue
@@ -288,6 +323,9 @@
 		var/w = text2num(href_list["w"])
 		var/h = text2num(href_list["h"])
 		if(w && h)
+			// Clamp to sane bounds to prevent absurd window sizes from malformed JS values
+			w = clamp(round(w), 100, 800)
+			h = clamp(round(h), 100, 900)
 			var/fit_args = "size=[w]x[h]"
 			if(!isnull(tilectx_last_pos_x) && !isnull(tilectx_last_pos_y))
 				fit_args += ";pos=[tilectx_last_pos_x],[tilectx_last_pos_y]"
@@ -320,21 +358,11 @@
 		var/procname = href_list["proc"]
 		if(target && procname) {
 			if(procname == "pickup") {
-				if(isatom(target) && !target.Adjacent(src)) {
+				if(!target.Adjacent(src)) {
 					to_chat(src, "<span class='warning'>You're too far away to pick that up.</span>")
 					return TRUE
 				}
-				if(isobj(target)) {
-					var/obj/O = target
-					if(istype(O, /obj/item)) {
-						var/obj/item/I = O
-						I.attack_hand(src)
-					} else {
-						O.attack_hand(src)
-					}
-				} else {
-					target.attack_hand(src)
-				}
+				target.attack_hand(src)
 				close_tile_context_menu()
 				return TRUE
 			} else if(procname == "examine") {
@@ -349,9 +377,11 @@
 					start_pulling(M)
 				}
 			} else {
+				// Validate that the requested proc is an actual verb on the target before calling it
 				var/allowed = FALSE
-				if(target:verbs)
-					for(var/V in target:verbs)
+				var/list/target_verbs = target.verbs
+				if(target_verbs)
+					for(var/V in target_verbs)
 						var/list/parts = splittext("[V]", "/")
 						if(parts && parts.len && parts[parts.len] == procname)
 							allowed = TRUE
@@ -367,20 +397,25 @@
 
 	return FALSE
 
-// Handle selection in mob/Topic (implemented there) to dispatch right-click action.
-
-// Helper: decode EAST/WEST/CENTER or NORTH/SOUTH/CENTER to a tile index on the screen grid
-/mob/proc/_decode_screen_axis(var/base, var/view, var/is_x)
+// Helper: convert a screen-loc tile reference to a 1-based numeric index.
+// Handles "CENTER", "WEST+n"/"EAST-n" (X axis), "SOUTH+n"/"NORTH-n" (Y axis), and plain numbers.
+/mob/proc/_screen_loc_to_index(var/base, var/view, var/is_x)
 	if(!istext(base))
-		return view+1
-	if(findtext(base, is_x ? "EAST-" : "NORTH-"))
-		var/num = text2num(copytext(base, 6))
-		if(!num) num = 0
-		return view*2 + 1 - num
-	else if(findtext(base, is_x ? "WEST+" : "SOUTH+"))
-		var/num2 = text2num(copytext(base, 6))
-		if(!num2) num2 = 0
-		return num2 + 1
-	else if(findtext(base, "CENTER"))
 		return view + 1
+	// Try parsing as a plain number first (BYOND may return numeric indices directly)
+	var/num = text2num(base)
+	if(!isnull(num))
+		return num
+	if(findtext(base, "CENTER"))
+		return view + 1
+	if(is_x)
+		if(findtext(base, "EAST-"))
+			return view * 2 + 1 - (text2num(copytext(base, 6)) || 0)
+		if(findtext(base, "WEST+"))
+			return (text2num(copytext(base, 6)) || 0) + 1
+	else
+		if(findtext(base, "NORTH-"))
+			return view * 2 + 1 - (text2num(copytext(base, 7)) || 0)
+		if(findtext(base, "SOUTH+"))
+			return (text2num(copytext(base, 7)) || 0) + 1
 	return view + 1
