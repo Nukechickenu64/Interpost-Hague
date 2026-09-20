@@ -783,6 +783,23 @@ var/global/floorIsLava = 0
 	log_and_message_admins("toggled deadchat.")
 	SSstatistics.add_field_details("admin_verb","TDSAY") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc
 
+/datum/admins/proc/toggle_smsafemode()
+	set category = "Server"
+	set desc = "Toggles inter-round persistent supermatter safemode (resets SM to 100% and deactivates it instead of exploding)"
+	set name = "Toggle SM Safemode"
+
+	if(!check_rights(R_ADMIN))
+		return
+
+	GLOB.smsafemode = !GLOB.smsafemode
+	world.save_smsafemode(GLOB.smsafemode)
+	if(GLOB.smsafemode)
+		to_world("<B>Supermatter safemode has been globally enabled! The supermatter will no longer explode.</B>")
+	else
+		to_world("<B>Supermatter safemode has been globally disabled! The supermatter can explode again.</B>")
+	log_and_message_admins("toggled supermatter safemode ([GLOB.smsafemode ? "on" : "off"]).")
+	SSstatistics.add_field_details("admin_verb","TSMSAFE") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc
+
 /datum/admins/proc/toggleoocdead()
 	set category = "Server"
 	set desc="Toggle Dead OOC."

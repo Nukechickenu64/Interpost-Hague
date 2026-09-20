@@ -30,7 +30,6 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(restrict_job && (rank in restrict_job))
 			return get_spawnpoint_instance(type)
 	return null
-	return null
 
 /datum/spawnpoint
 	var/msg		  //Message to display on the arrivals computer.

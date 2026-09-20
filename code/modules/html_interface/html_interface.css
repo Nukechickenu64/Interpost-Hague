@@ -5,7 +5,27 @@ html
 
 body
 {
-	font-family: Arial;
+	font-family: Verdana, Arial, sans-serif;
 	overflow-y: scroll;
 	overflow-x: auto;
+	background: #090a0b;
+	color: #c8c1b3;
+}
+
+a
+{
+	color: #d7b46a;
+}
+
+a:hover
+{
+	color: #f0cf84;
+	background: #231816;
+}
+
+button, input, select, textarea
+{
+	background: #11100e;
+	color: #c8c1b3;
+	border: 1px solid #4a4035;
 }

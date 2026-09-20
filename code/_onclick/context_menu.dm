@@ -141,24 +141,39 @@
 	var/dyn_h = clamp(base_h + (items_count * row_h), min_h, max_h)
 
 	// Compose HTML menu with a diegetic style
-	var/html = "<html><head><title>Local Context</title>"
+	// DOCTYPE is required: without it the embedded browser renders in quirks mode, where
+	// document.body.scrollHeight reports the viewport height instead of the actual content
+	// height, so the auto-fit below silently fails and the background never shrinks to the border.
+	var/html = "<!DOCTYPE html><html><head><title>Local Context</title>"
 	html += "<style>"
-	html += "html,body{background:rgba(14,19,27,0.94);color:#d7f6ff;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:9pt;margin:0;padding:0;}"
-	html += ".wrap{padding:8px 10px;min-width:220px;max-width:360px;border:1px solid #3ad;border-radius:6px;box-shadow:0 0 14px rgba(58,173,255,0.25) inset, 0 0 12px rgba(8,18,28,0.6);}"
-	html += ".hdr{font-size:10pt;color:#8fe3ff;letter-spacing:0.06em;margin-bottom:6px;text-transform:uppercase;}"
-	html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
-	html += ".note{color:#9fd;opacity:0.85;font-size:8pt;} .loc{color:#8fe3ff;} .item{margin:2px 0;}"
-	html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
+	html += "html,body{background:#050b09;color:#6fe8c0;font-family:'Consolas','Courier New',monospace;font-size:9pt;margin:0;padding:0;}"
+	html += ".wrap{display:inline-block;position:relative;padding:10px 12px;min-width:220px;max-width:360px;border:1px solid #4fe0ab;background:rgba(10,30,24,0.92);box-shadow:0 0 10px rgba(79,224,171,0.2) inset;}"
+	html += ".corner{position:absolute;width:7px;height:7px;border-color:#8ffcd2;}"
+	html += ".corner.tl{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid;}"
+	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
+	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
+	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
+	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);}"
+	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
+	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;} .loc{color:#8ffcd2;}"
+	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
+	html += ".item:hover{background:rgba(111,232,192,0.15);border-color:#8ffcd2;}"
+	html += ".item.plain{padding:3px 6px;text-align:center;color:#4fa88a;}"
+	html += ".item.two{display:table;width:100%;table-layout:fixed;}"
+	html += ".item a{color:#8ffcd2;text-decoration:none;display:block;padding:3px 6px;text-align:center;}"
+	html += ".item a:hover{color:#c8fff0;}"
+	html += ".item.two a.main{display:table-cell;vertical-align:middle;width:100%;}"
+	html += ".item.two a.expand{display:table-cell;vertical-align:middle;width:26px;border-left:1px solid rgba(111,232,192,0.35);}"
 	html += "</style>"
-	// Auto-fit the browser window to the content once it finishes laying out
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
-	html += "</head><body><div class='wrap'>"
+	// Auto-fit the browser window to the bordered .wrap element itself, not the viewport
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "</head><body><div id='wrap' class='wrap'>"
+	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	html += "<div class='hdr'>Local Context</div>"
-	html += "<div class='accent'></div>"
-	html += "<div class='note'>Select an object to interact.</div>"
+	html += "<div class='note' style='text-align:center;margin-bottom:6px;'>Select an object to interact.</div>"
 
 	if(!atoms_on_tile.len)
-		html += "<div class='item note'>(Nothing here)</div>"
+		html += "<div class='item plain'>(Nothing here)</div>"
 	else
 		// Show top-most last added first (simple: reverse iterate so contents appear above turf)
 		for(var/i = atoms_on_tile.len, i >= 1, i--)
@@ -170,15 +185,14 @@
 			// Build links using inline BYOND ref tokens so the engine encodes them properly at compile-time.
 			if(isturf(A))
 				// Don't make the turf itself clickable for pickup
-				html += "<div class='item'>&#8226; [label]"
+				html += "<div class='item plain'>[label]</div>"
 			else
-				html += "<div class='item'>&#8226; <a href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label]</a> <span class='note'>(<a href=\"?src=\ref[src];tilectx_obj=\ref[A]\">...</a>)</span>"
-			if(A == clicked)
-				html += " <span class='note'>(clicked)</span>"
-			html += "</div>"
+				// Split into two cells (label + expand) so each is independently clickable across its full area
+				var/clicked_suffix = (A == clicked) ? " (CLICKED)" : ""
+				html += "<div class='item two'><a class='main' href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label][clicked_suffix]</a><a class='expand' href=\"?src=\ref[src];tilectx_obj=\ref[A]\">...</a></div>"
 
 	// Close row and HTML wrapper (always include)
-	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "<div class='accent'></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	// Open the menu window: borderless, non-resizable, placed at mouse cursor if possible
@@ -251,19 +265,31 @@
 	var/max_h = 800
 	var/dyn_h = clamp(base_h + (items_count * row_h), min_h, max_h)
 
-	var/html = "<html><head><title>Object Actions</title>"
+	// DOCTYPE is required: without it the embedded browser renders in quirks mode, where
+	// document.body.scrollHeight reports the viewport height instead of the actual content
+	// height, so the auto-fit below silently fails and the background never shrinks to the border.
+	var/html = "<!DOCTYPE html><html><head><title>Object Actions</title>"
 	html += "<style>"
-	html += "html,body{background:rgba(14,19,27,0.94);color:#d7f6ff;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:9pt;margin:0;padding:0;}"
-	html += ".wrap{padding:8px 10px;min-width:240px;max-width:400px;border:1px solid #3ad;border-radius:6px;box-shadow:0 0 14px rgba(58,173,255,0.25) inset, 0 0 12px rgba(8,18,28,0.6);}"
-	html += ".hdr{font-size:10pt;color:#8fe3ff;letter-spacing:0.06em;margin-bottom:4px;text-transform:uppercase;}"
-	html += ".accent{height:2px;background:linear-gradient(90deg,#3ad,transparent);margin:6px 0 8px 0;}"
-	html += ".note{color:#9fd;opacity:0.85;font-size:8pt;} .loc{color:#8fe3ff;} .item{margin:2px 0;}"
-	html += "a{color:#b9ecff;text-decoration:none;} a:hover{text-decoration:underline;}"
-	html += ".iconwrap{display:flex;align-items:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border-radius:4px;border:1px solid #3ad;background:#091018;}"
+	html += "html,body{background:#050b09;color:#6fe8c0;font-family:'Consolas','Courier New',monospace;font-size:9pt;margin:0;padding:0;}"
+	html += ".wrap{display:inline-block;position:relative;padding:10px 12px;min-width:240px;max-width:400px;border:1px solid #4fe0ab;background:rgba(10,30,24,0.92);box-shadow:0 0 10px rgba(79,224,171,0.2) inset;}"
+	html += ".corner{position:absolute;width:7px;height:7px;border-color:#8ffcd2;}"
+	html += ".corner.tl{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid;}"
+	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
+	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
+	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
+	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);}"
+	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
+	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;text-align:center;} .loc{color:#8ffcd2;}"
+	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
+	html += ".item:hover{background:rgba(111,232,192,0.15);border-color:#8ffcd2;}"
+	html += ".item a{color:#8ffcd2;text-decoration:none;display:block;padding:3px 6px;text-align:center;}"
+	html += ".item a:hover{color:#c8fff0;}"
+	html += ".iconwrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border:1px solid #4fe0ab;background:#091018;}"
 	html += "</style>"
-	// Auto-fit this object actions window to its content after render (icons may change height)
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var w=Math.ceil(document.body.scrollWidth);var h=Math.ceil(document.body.scrollHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
-	html += "</head><body><div class='wrap'>"
+	// Auto-fit this object actions window to the bordered .wrap element itself, not the viewport
+	html += "<script type='text/javascript'>function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	html += "</head><body><div id='wrap' class='wrap'>"
+	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	var/title = sanitizeSafe(target.name, 64, 1, 1, 1)
 	html += "<div class='hdr'>[title]</div>"
 	if(I)
@@ -272,10 +298,10 @@
 
 	// Standard actions
 	// Links below use inline BYOND ref tokens for the target
-	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=examine'>Examine</a></div>"
-	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use'>Use</a></div>"
-	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Right-use</a></div>"
-	html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=pull'>Pull</a></div>"
+	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=examine'>Examine</a></div>"
+	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use'>Use</a></div>"
+	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Right-use</a></div>"
+	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=pull'>Pull</a></div>"
 
 	// Custom verbs
 	if(verbs_list.len)
@@ -283,23 +309,23 @@
 		for(var/entry in verbs_list)
 			var/label = entry["label"]
 			var/procname = entry["proc"]
-			html += "<div class='item'>&#8226; <a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=[url_encode(procname)]'>[label]</a></div>"
+			html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=[url_encode(procname)]'>[label]</a></div>"
 
 	// Admin-only actions
 	if(is_admin)
 		html += "<div class='accent'></div><div class='note'>Admin</div>"
 		// View Variables (VV)
-		html += "<div class='item'>&#8226; <a href='?_src_=vars;Vars=\ref[target]'>VV</a> <span class='note'>(View Variables)</span></div>"
+		html += "<div class='item'><a href='?_src_=vars;Vars=\ref[target]'>VV (View Variables)</a></div>"
 		// Player Panel (PP) and Follow, only meaningful for mobs
 		if(ismob(target))
-			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayeropts=\ref[target]'>PP</a> <span class='note'>(Player Panel)</span></div>"
-			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayerobservefollow=\ref[target]'>Follow</a></div>"
+			html += "<div class='item'><a href='?_src_=holder;adminplayeropts=\ref[target]'>PP (Player Panel)</a></div>"
+			html += "<div class='item'><a href='?_src_=holder;adminplayerobservefollow=\ref[target]'>Follow</a></div>"
 		// Coordinate Jump (JMP) to the target's turf, if available
 		if(admin_jump_turf)
-			html += "<div class='item'>&#8226; <a href='?_src_=holder;adminplayerobservecoodjump=1;X=[admin_jump_turf.x];Y=[admin_jump_turf.y];Z=[admin_jump_turf.z]'>Jump</a></div>"
+			html += "<div class='item'><a href='?_src_=holder;adminplayerobservecoodjump=1;X=[admin_jump_turf.x];Y=[admin_jump_turf.y];Z=[admin_jump_turf.z]'>Jump</a></div>"
 
 	// Controls
-	html += "<div class='accent'></div><div class='note'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a> | <a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "<div class='accent'></div><div class='item'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	var/browse_args = "window=tilectx;border=0;titlebar=0;can_resize=0;can_minimize=0;can_close=1;size=300x[dyn_h]"

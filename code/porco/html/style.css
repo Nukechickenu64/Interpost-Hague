@@ -1,12 +1,13 @@
 body {
     background-image:url('chatbg.png');
+    background-color:#090a0b;
     background-attachment:scroll;
     background-repeat: repeat;
     background-size: auto;
     overflow: hidden;
     word-break: break-word;
     font-family: "Droser","Verdana",sans-serif;
-    color:#9d9c96;
+    color:#b8b0a0;
     font-size:14px;
     margin: 0px;
     text-shadow: 0px 0px 4px rgba(0,0,0, 0.9);
@@ -22,18 +23,18 @@ border-collapse: collapse;
 }
 .trstats
 {
-background: rgba(255, 255, 0, 0.1);
+background: rgba(199, 154, 75, 0.12);
 }
 .trstats:nth-child(2n) 
-{ background: rgba(255, 0, 0, 0.1);}
+{ background: rgba(139, 47, 34, 0.16);}
 
 .ST
 {
     font-weight: bold;
     font-size:150%;
     font-family: "Cond",sans-serif;
-    color: #d8f074;
-    text-shadow: 0px 0px 12px #003200;
+    color: #c79a4b;
+    text-shadow: 0px 0px 10px #000;
 }
 .ST.SMALLER
 {
@@ -41,26 +42,26 @@ background: rgba(255, 255, 0, 0.1);
 }
 .ST.MINOR
 {
-    color: #c8d240;
+    color: #9ea36d;
     
 }
 .ST.DES
 {
-    color: #d8d874;
-    text-shadow: 0px 0px 5px #ffff00;
+    color: #d7b46a;
+    text-shadow: 0px 0px 5px #5d241b;
 }
 .smallstat
 {
     font-size:80%;
-    color: #a8f004;
-    text-shadow: 0px 0px 3px #a8f004;
+    color: #9ea36d;
+    text-shadow: 0px 0px 3px #000;
 }
 .verb {float: top; font-family: "Cond";text-shadow: 0px 0px 3px #bdda57;
-color:#acd249; text-decoration:none;outline: none;border: none;font-size:90%;}
+color:#d7b46a; text-decoration:none;outline: none;border: none;font-size:90%;}
 .verb.dim { color:#707070; text-shadow: 0px 0px 3px #707070;}
 .verb.smaller { font-size:80%;}
-.verb.dim:hover{color: #702963; word-break: keep-all; }
-.verb:hover {color:#999;background:rgba(0,255,0,0.2);outline: none;border: none;font-weight:bold; word-break: keep-all;}
+.verb.dim:hover{color: #8b2f22; word-break: keep-all; }
+.verb:hover {color:#f0cf84;background:rgba(139,47,34,0.25);outline: none;border: none;font-weight:bold; word-break: keep-all;}
 .verb:focus{outline:none;}
 
 #buttonpanel
@@ -105,15 +106,15 @@ background-image:url('button_options.png');
 }
 #reloadpig
 {
-color: #ccc;
+color: #c8c1b3;
 font-size: 22px;
 line-height: 42px;
 text-align: center;
-background-color: rgba(0,0,0,0.35);
+background-color: rgba(5,5,5,0.55);
 }
 #reloadpig:hover
 {
-color: #fff;
+color: #d7b46a;
 }
 
 #statpanel {
@@ -224,7 +225,7 @@ width:90%;
 
 
 .button.dynamic{
-background-color: #600;
+background-color: #5d241b;
 height: 32px;
 width: 32px;
 float: left;

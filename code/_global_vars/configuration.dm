@@ -14,6 +14,9 @@ var/Debug2 = 0
 
 var/gravity_is_on = 1
 
+// Inter-round persistent admin toggle: resets the supermatter to 100% integrity and deactivates it instead of letting it explode.
+GLOBAL_VAR_INIT(smsafemode, FALSE)
+
 // Database connections. A connection is established on world creation.
 // Ideally, the connection dies when the server restarts (After feedback logging.).
 var/DBConnection/dbcon     = new() // Feedback    database (New database)

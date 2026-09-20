@@ -353,7 +353,7 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	)
 
 /datum/asset/simple/jquery
-	verify = FALSE
+	verify = TRUE // Must be confirmed as received before browserOutput.html (which depends on jQuery) is shown, otherwise the chat window can render blank/broken.
 	assets = list(
 		"jquery.min.js"            = 'code/modules/goonchat/browserassets/js/jquery.min.js',
 		"jquery.jscrollpane.min.js"= 'code/modules/goonchat/browserassets/js/scrollbar/jquery.jscrollpane.min.js',

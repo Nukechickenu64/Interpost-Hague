@@ -4351,6 +4351,19 @@
 	},
 /turf/simulated/floor/tiled,
 /area/security/brig)
+"aiX" = (
+/obj/structure/cable/yellow{
+	d1 = 1;
+	d2 = 2;
+	icon_state = "1-2"
+	},
+/obj/structure/cable{
+	d2 = 2;
+	icon_state = "0-2";
+	pixel_y = 0
+	},
+/turf/simulated/floor/tiled/bunker/polar_circuit,
+/area/tcommsat/computer)
 "aiY" = (
 /obj/effect/floor_decal/turf/shaft{
 	tag = "icon-shaft (EAST)";
@@ -12820,7 +12833,11 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/visible/cyan,
+/obj/machinery/atmospherics/pipe/manifold/hidden/cyan{
+	tag = "icon-map (WEST)";
+	icon_state = "map";
+	dir = 8
+	},
 /turf/simulated/floor/tiled/dark,
 /area/engineering/engine_room)
 "azf" = (
@@ -12836,7 +12853,11 @@
 /turf/simulated/floor/tiled/bunker/polar_chess,
 /area/engineering/engine_monitoring)
 "azg" = (
-/obj/machinery/atmospherics/pipe/simple/visible/cyan,
+/obj/machinery/atmospherics/pipe/manifold/hidden/cyan{
+	tag = "icon-map (WEST)";
+	icon_state = "map";
+	dir = 8
+	},
 /turf/simulated/floor/tiled/dark,
 /area/engineering/engine_room)
 "azh" = (
@@ -13093,6 +13114,11 @@
 	},
 /obj/structure/disposalpipe/segment{
 	dir = 4
+	},
+/obj/machinery/atmospherics/unary/freezer{
+	tag = "icon-freezer (NORTH)";
+	icon_state = "freezer";
+	dir = 8
 	},
 /turf/simulated/floor/reinforced,
 /area/engineering/engine_room)
@@ -13494,6 +13520,11 @@
 "aAy" = (
 /obj/effect/floor_decal/industrial/warning{
 	icon_state = "warning";
+	dir = 8
+	},
+/obj/machinery/atmospherics/unary/freezer{
+	tag = "icon-freezer (NORTH)";
+	icon_state = "freezer";
 	dir = 8
 	},
 /turf/simulated/floor/reinforced,
@@ -15254,19 +15285,6 @@
 	},
 /turf/simulated/floor/tiled/bunker/polar_white,
 /area/medical/medbay3)
-"aDT" = (
-/obj/structure/cable/yellow{
-	d1 = 1;
-	d2 = 2;
-	icon_state = "1-2"
-	},
-/obj/structure/cable{
-	d2 = 2;
-	icon_state = "0-2";
-	pixel_y = 0
-	},
-/turf/simulated/floor/tiled/bunker/polar_circuit,
-/area/tcommsat/computer)
 "aDU" = (
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers{
 	dir = 5
@@ -15302,7 +15320,6 @@
 /obj/machinery/atmospherics/pipe/simple/hidden/supply,
 /obj/machinery/atmospherics/pipe/simple/hidden/scrubbers,
 /obj/structure/disposalpipe/segment,
-/obj/structure/vent_gas,
 /turf/simulated/floor/tiled/white,
 /area/medical/medbay3)
 "aEa" = (
@@ -21842,7 +21859,9 @@
 	pixel_y = -32
 	},
 /obj/effect/floor_decal/corner/purple,
-/obj/machinery/computer/bluegate,
+/obj/machinery/computer/bluegate{
+	desc = "Use me to convert things into bluespace"
+	},
 /turf/simulated/floor/tiled/purpleos,
 /area/assembly/chargebay)
 "aRy" = (
@@ -28397,7 +28416,9 @@
 /turf/simulated/floor/asteroid,
 /area/mine/explored)
 "bde" = (
-/obj/machinery/computer/rdconsole/core,
+/obj/machinery/computer/rdconsole/core{
+	name = "fabricator console"
+	},
 /turf/simulated/floor/tiled/darkpurpleos,
 /area/rnd/research)
 "bdf" = (
@@ -28878,7 +28899,6 @@
 	inputting = 1;
 	output_attempt = 1;
 	output_level = 250000;
-	outputting = 1;
 	RCon_tag = "Engineering 1"
 	},
 /obj/effect/floor_decal/industrial/warning{
@@ -28896,7 +28916,6 @@
 	inputting = 1;
 	output_attempt = 1;
 	output_level = 250000;
-	outputting = 1;
 	RCon_tag = "Engineering 2"
 	},
 /obj/effect/floor_decal/industrial/warning{
@@ -28914,7 +28933,6 @@
 	inputting = 1;
 	output_attempt = 1;
 	output_level = 250000;
-	outputting = 1;
 	RCon_tag = "Engineering 3"
 	},
 /obj/effect/floor_decal/industrial/warning{
@@ -106719,7 +106737,7 @@ aeU
 aft
 aGb
 agg
-aDT
+aiX
 agW
 agW
 agW

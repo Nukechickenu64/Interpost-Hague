@@ -60,20 +60,26 @@ var/list/integrated_circuit_blacklist = list(/obj/item/integrated_circuit, /obj/
 
 /obj/machinery/integrated_circuit_printer/attack_hand(var/mob/user)
 	user.set_machine(src)
-	var/dat = "<center><b>Integrated Circuit Printer<br>\
+	var/dat = "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'><a href='?src=\ref[src];ui_close=1'>Close</a></div>"
+	dat += "<center><b>Integrated Circuit Printer<br>\
 				Metal: [metal]/[maxMetal]</b><br>\
 				<a href='?src=\ref[src];mode=Circuits'>Circuits</a>	<a href='?src=\ref[src];mode=Assemblies'>Assemblies</a></center><br><br>"
 	for(var/type in recipe_list[mode])
 		var/obj/O = type
 		dat += "<A href='?src=\ref[src];build=[type]'>[initial(O.name)]</A>: [initial(O.desc)]<br>"
 
-	show_browser(user,dat,"window=integrated")
+	ui_browse_styled(user, "Integrated Circuit Printer", dat, "window=integrated;size=600x500;can_close=0;can_resize=0;border=0;titlebar=0")
 
 /obj/machinery/integrated_circuit_printer/Topic(href, href_list)
 	if(..())
 		return 1
 
 	add_fingerprint(usr)
+
+	if(href_list["ui_close"])
+		usr << browse(null, "window=integrated")
+		usr.unset_machine()
+		return 1
 
 	if(href_list["mode"])
 		mode = href_list["mode"]

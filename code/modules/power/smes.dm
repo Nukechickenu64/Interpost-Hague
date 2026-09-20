@@ -146,6 +146,10 @@
 	if(failure_timer)	// Disabled by gridcheck.
 		failure_timer--
 		return
+	if(GLOB.infinite_smes_power)
+		charge = capacity
+		output_attempt = TRUE
+		output_level = output_level_max
 
 	// only update icon if state changed
 	if(last_disp != chargedisplay() || last_chrg != inputting || last_onln != outputting)

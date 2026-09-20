@@ -1,12 +1,15 @@
-body{font-family:Tahoma,sans-serif;}
+body{font-family:Tahoma,sans-serif;background:#090a0b;color:#c8c1b3;}
 .top{font-size:12px;}
+a{color:#d7b46a;text-decoration:none;}
+a:hover{color:#f0cf84;background:#231816;}
 a img {border:none;}
 .bgimages16 li {
 	padding:2px 10px 2px 30px;
 	background-position:6px center;
 	background-repeat:no-repeat;
-	border:1px solid #ddd;
-	border-left:4px solid #999;
+	border:1px solid #4a4035;
+	border-left:4px solid #8b2f22;
+	background-color:#11100e;
 	margin-bottom:2px;
 }
 .bugfix {background-image:url(bug-minus.png)}
@@ -35,8 +38,8 @@ a img {border:none;}
 }
 .date {
 	margin:10px 0;
-	color:blue;
-	border-bottom:2px solid #00f;
+	color:#c79a4b;
+	border-bottom:2px solid #8b2f22;
 	width:60%;
 	padding:2px 0;
 	font-size:1em;
@@ -50,7 +53,9 @@ a img {border:none;}
 	}
 .drop {
 	cursor:pointer;
-	border:1px solid #999;
+	border:1px solid #4a4035;
+	background:#171512;
+	color:#d7b46a;
 	display:inline;
 	font-size:0.9em;
 	padding:1px 20px 1px 5px;
@@ -60,8 +65,8 @@ a img {border:none;}
 .indrop {
 	margin:2px 0 0 0;
 	clear:both;
-	background:#fff;
-	border:1px solid #ddd;
+	background:#11100e;
+	border:1px solid #4a4035;
 	padding:5px 10px;
 	}
 .indrop p {

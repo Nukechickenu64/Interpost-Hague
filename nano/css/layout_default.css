@@ -1,5 +1,5 @@
 body {
-    background: #121212 url(uiBackground.png) 50% 0 repeat;
+    background: #090a0b url(uiBackground.png) 50% 0 repeat;
     box-shadow: 0px 0px 5px 5px #000;
 }
 
@@ -21,7 +21,7 @@ body {
     left: 44px;
     width: 66%;
     overflow: hidden;
-    color: #E9C183;
+    color: #c79a4b;
     font-size: 16px;
 }
 
@@ -63,7 +63,7 @@ body {
     width: 100%;
     height: 600px;
     overflow: hidden;
-    border: 1px solid #40628a;
+    border: 1px solid #4a4035;
     background: url(nanomapBackground.png);
 }
 
@@ -108,8 +108,8 @@ body {
     position: absolute;
     right: 10px;
     top: 10px;
-    border: 1px solid #40628a;
-    background-color: #272727;
+    border: 1px solid #4a4035;
+    background-color: #11100e;
     padding: 8px;
     display: none;
     z-index: 9999;
@@ -118,7 +118,7 @@ body {
 #uiLoadingNotice {
     position: relative;
     background: url(uiNoticeBackground.jpg) 50% 50%;
-    color: #000000;
+    color: #11100e;
     font-size: 14px;
     font-style: italic;
     font-weight: bold;

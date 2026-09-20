@@ -2,10 +2,10 @@ body {
     padding: 0;
     margin: 0;
     font-size: 12px;
-    color: #00ff00;
+    color: #c8c1b3;
     line-height: 170%;
     font-family: fixedsys;
-    background: #272727;
+    background: #090a0b;
 }
 
 #uiNoScript {
@@ -15,9 +15,9 @@ body {
     margin: -60px 0 0 -150px;
     width: 280px;
     height: 120px;
-    background: #ffffff;
-    border: 2px solid #ff0000;
-    color: #000000;
+    background: #11100e;
+    border: 2px solid #8b2f22;
+    color: #c8c1b3;
     font-size: 10px;
     font-weight: bold;
     z-index: 9999;
@@ -26,7 +26,7 @@ body {
 }
 
 hr {
-    background-color: #40628a;
+    background-color: #4a4035;
     height: 1px;
 }
 
@@ -35,10 +35,11 @@ hr {
     min-width: 15px;
     height: 16px;
     text-align: center;
-    color: #ffffff;
+    color: #d7b46a;
     text-decoration: none;
-    background: #003300;
-    border: 1px solid #00ff00;
+    background: #171512;
+    border: 1px solid #4a4035;
+    border-left: 2px solid #8b2f22;
     padding: 0px 4px 4px 4px;
     margin: 0 2px 2px 0;
     cursor: default;
@@ -54,27 +55,27 @@ hr {
 }
 
 a:hover, .zoomLink:hover, .linkActive:hover {
-    background: #003300;
+    background: #231816;
 }
 
 .linkPending, .linkPending:hover {
-    color: #ffffff;
-    background: #003300;
+    color: #c8c1b3;
+    background: #171512;
 }
 
 a.white, a.white:link, a.white:visited, a.white:active {
-    color: #40628a;
+    color: #d7b46a;
     text-decoration: none;
-    background: #ffffff;
-    border: 1px solid #161616;
+    background: #11100e;
+    border: 1px solid #4a4035;
     padding: 1px 4px 1px 4px;
     margin: 0 2px 0 0;
     cursor: default;
 }
 
 a.white:hover {
-    color: #ffffff;
-    background: #40628a;
+    color: #f0cf84;
+    background: #231816;
 }
 
 .hidden {
@@ -82,14 +83,14 @@ a.white:hover {
 }
 
 .linkOn, a.linkOn:link, a.linkOn:visited, a.linkOn:active, a.linkOn:hover, .selected, a.selected:link, a.selected:visited, a.selected:active, a.selected:hover {
-    color: #ffffff;
-    background: #2f943c;
+    color: #f0cf84;
+    background: #5d241b;
 }
 
 .linkOff, a.linkOff:link, a.linkOff:visited, a.linkOff:active, a.linkOff:hover, .disabled, a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover {
-    color: #ffffff;
-    background: #999999;
-    border-color: #666666;
+    color: #8f8b82;
+    background: #181818;
+    border-color: #383229;
 }
 
 a.icon, .linkOn.icon, .linkOff.icon, .selected.icon, .disabled.icon {
@@ -106,13 +107,13 @@ a.icon img, .linkOn.icon img, .linkOff.icon img, .selected.icon img, .disabled.i
 }
 
 .linkDanger, a.linkDanger:link, a.linkDanger:visited, a.linkDanger:active {
-    color: #ffffff;
-    background-color: #ff0000;
-    border-color: #aa0000;
+    color: #f0cf84;
+    background-color: #8b2f22;
+    border-color: #d05b46;
 }
 
 .linkDanger:hover {
-    background-color: #ff6666;
+    background-color: #b34a38;
 }
 
 ul {
@@ -132,7 +133,7 @@ img, a img {
 h1, h2, h3, h4, h5, h6 {
     margin: 0;
     padding: 12px 0 6px 0;
-    color: #FFFFFF;
+    color: #c79a4b;
     clear: both;
 }
 
@@ -167,34 +168,34 @@ abbr {
 }
 
 .average {
-    color: #00ff00;
+    color: #c88745;
     font-weight: bold;
 }
 
 .bad {
-    color: #ee0000;
+    color: #d05b46;
     font-weight: bold;
 }
 
 .idle {
-    color: #272727;
+    color: #8f8b82;
     font-weight: bold;
 }
 
 .redButton {
-    background: #ea0000;
+    background: #8b2f22;
 }
 
 .yellowButton {
-    background: #cacc00;
+    background: #c88745;
 }
 
 .highlight {
-    color: #8BA5C4;
+    color: #d7b46a;
 }
 
 .dark {
-    color: #272727;
+    color: #090a0b;
 }
 
 .caption {
@@ -218,7 +219,7 @@ abbr {
 .notice {
     position: relative;
     background: url(uiNoticeBackground.jpg) 50% 50%;
-    color: #000000;
+    color: #11100e;
     font-size: 12px;
     font-weight: bold;
     padding: 3px 4px 3px 4px;
@@ -273,7 +274,7 @@ div.notice {
 
 .itemLabelNarrow, .itemLabel, .itemLabelWide, .itemLabelWider, .itemLabelWidest {
     float: left;
-    color: #00ff00;
+    color: #c79a4b;
 }
 
 .itemLabelNarrow {
@@ -312,18 +313,18 @@ div.notice {
 }
 
 .statusDisplay {
-    background: #000000;
-    color: #ffffff;
-    border: 1px solid #40628a;
+    background: #050505;
+    color: #c8c1b3;
+    border: 1px solid #4a4035;
     padding: 4px;
     margin: 3px 0;
 	overflow: hidden;
 }
 
 .statusDisplayRecords {
-    background: #000000;
-    color: #ffffff;
-    border: 1px solid #40628a;
+    background: #050505;
+    color: #c8c1b3;
+    border: 1px solid #4a4035;
     padding: 4px;
     margin: 3px 0;
     overflow-x: hidden;
@@ -333,12 +334,12 @@ div.notice {
 .statusDisplayComm {
 	width: 100%;
     background: rgba(0, 0, 0, 0.5);
-    color: #ffffff;
+    color: #c8c1b3;
 	padding-bottom: 4px;
 	border-top: 0 none;
 	border-left: 0 none;
 	border-right: 0 none;
-	border-bottom: 2px inset #40628a;
+    border-bottom: 2px inset #8b2f22;
     margin: 3px 0;
 	overflow: hidden;
 }
@@ -347,7 +348,7 @@ div.notice {
     width: 138px;
     float: left;
     overflow: hidden;
-    color: #98B0C3;
+    color: #c79a4b;
 }
 
 .statusValue {
@@ -357,8 +358,9 @@ div.notice {
 .block {
     padding: 8px;
     margin: 10px 4px 4px 4px;
-    border: 1px solid #40628a;
-    background-color: #202020;
+    border: 1px solid #4a4035;
+    border-left: 3px solid #8b2f22;
+    background-color: #11100e;
 }
 
 .block h3 {
@@ -373,7 +375,7 @@ div.notice {
     float: left;
     margin: 0 5px 0 0;
     overflow: hidden;
-    background: #000000;
+    background: #050505;
 }
 
 .displayBarText, .displayBarVerticalText, .displayBarBeakerText{
@@ -389,7 +391,7 @@ div.notice {
 .displayBarFill {
     width: 0%;
     height: 100%;
-    background: #40628a;
+    background: #8b2f22;
     overflow: hidden;
     float: left;
 }

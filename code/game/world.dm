@@ -496,6 +496,24 @@ var/world_topic_spam_protect_time = world.timeofday
 	fdel(F)
 	F << the_mode
 
+/hook/startup/proc/loadSMSafeMode()
+	world.load_smsafemode()
+	return 1
+
+/world/proc/load_smsafemode()
+	if(!fexists("data/smsafemode.txt"))
+		return
+
+	var/list/Lines = file2list("data/smsafemode.txt")
+	if(Lines.len && Lines[1])
+		GLOB.smsafemode = text2num(Lines[1])
+		log_misc("Saved SM safemode is '[GLOB.smsafemode]'")
+
+/world/proc/save_smsafemode(var/the_value)
+	var/F = file("data/smsafemode.txt")
+	fdel(F)
+	F << "[the_value]"
+
 /hook/startup/proc/loadMOTD()
 	world.load_motd()
 	return 1

@@ -149,6 +149,20 @@
 		return 0
 	return round((air.total_moles / air.group_multiplier) / 23.1, 0.01)
 
+// Exposed so external controllers (e.g. supermatter core control computer) can react to real chamber
+// temperature without needing CRITICAL_TEMPERATURE, which is #undef'd at the bottom of this file.
+/obj/machinery/power/supermatter/proc/get_ambient_temperature()
+	var/turf/T = get_turf(src)
+	if(!istype(T))
+		return 0
+	var/datum/gas_mixture/air = T.return_air()
+	if(!air)
+		return 0
+	return air.temperature
+
+/obj/machinery/power/supermatter/proc/get_critical_temperature()
+	return CRITICAL_TEMPERATURE
+
 /obj/machinery/power/supermatter/proc/get_status()
 	var/turf/T = get_turf(src)
 	if(!T)
@@ -310,6 +324,17 @@
 
 	if(!istype(L)) 	//We are in a crate or somewhere that isn't turf, if we return to turf resume processing but for now.
 		return  //Yeah just stop.
+
+	// Admin safemode: instead of letting the crystal delaminate, stabilize it back to full integrity and shut it down.
+	if(GLOB.smsafemode && !exploded && get_integrity() <= 5)
+		damage = 0
+		damage_archived = 0
+		power = 0
+		safe_warned = 0
+		public_alert = 0
+		log_and_message_admins("Supermatter safemode triggered: crystal reset to 100% integrity and deactivated at [x],[y],[z].")
+		GLOB.global_announcer.autosay("EMERGENCY STABILIZATION FIELD ENGAGED: Crystalline hyperstructure integrity restored to 100%. Reactor has been deactivated.", "Supermatter Monitor", "Engineering")
+		return
 
 	if(damage > explosion_point)
 		if(!exploded)

@@ -16,16 +16,17 @@ html, body {
     height: 100%;
 	position: relative;
 	width: 100%;
-	color: #cccce2;
+    color: #c8c1b3;
     word-wrap: break-word;
 }
 body {
 	background-image: url("chatbg.png");
+    background-color: #090a0b;
 	background-size: 100%;
 	background-attachment: scroll;
 	font-family: Bahnschrift, sans-serif;
 	font-size: 19px;
-	font-color: #8b97a6;
+    color: #b8b0a0;
     white-space: normal;
     height: 102%;
 	position: relative;
@@ -57,9 +58,9 @@ img.icon {
 	vertical-align: bottom;
 }
 
-a {color: #85cf17;}
-a.visited {color: #85cf17;}
-a:visited {color: #85cf17;}
+a {color: #d7b46a;}
+a.visited {color: #d7b46a;}
+a:visited {color: #d7b46a;}
 a.popt {text-decoration: none;}
 
 /*****************************************
@@ -90,21 +91,21 @@ a.popt {text-decoration: none;}
 	bottom: 0;
 	right: 0;
 	padding: 8px;
-	background: #202020;
+    background: #11100e;
 	text-decoration: none;
 	font-variant: small-caps;
 	font-size: 1.1em;
 	font-weight: bold;
-	color: #a4bad6;
+    color: #d7b46a;
 }
-#newMessages:hover {background: #171717;}
+#newMessages:hover {background: #231816;}
 #newMessages i {vertical-align: middle; padding-left: 3px;}
 #ping {
 	position: fixed;
 	top: 0;
 	right: 135px;
 	width: 45px;
-	background: #202020;
+    background: #11100e;
 	height: 30px;
 	padding: 8px 0 2px 0;
 }
@@ -131,16 +132,16 @@ a.popt {text-decoration: none;}
 }
 
 #userBar .subCell {
-	background: #202020;
+    background: #11100e;
 	height: 30px;
 	padding: 5px 0;
 	display: block;
-	color: #a4bad6;
+    color: #d7b46a;
 	text-decoration: none;
 	line-height: 28px;
-	border-top: 1px solid #171717;
+    border-top: 1px solid #4a4035;
 }
-#userBar .subCell:hover {background: #202020;}
+#userBar .subCell:hover {background: #231816;}
 #userBar .toggle {
 	width: 45px;
 	background: #202020;
@@ -179,40 +180,41 @@ a.popt {text-decoration: none;}
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	background: #ddd;
+    background: #11100e;
+    border: 1px solid #4a4035;
 }
 .popup .close {
 	position: absolute;
-	background: #aaa;
+    background: #5d241b;
 	top: 0;
 	right: 0;
-	color: #333;
+    color: #f0cf84;
 	text-decoration: none;
 	z-index: 2;
 	padding: 0 10px;
 	height: 30px;
 	line-height: 30px;
 }
-.popup .close:hover {background: #999;}
+.popup .close:hover {background: #8b2f22;}
 .popup .head {
-	background: #999;
-	color: #ddd;
+    background: #181512;
+    color: #c79a4b;
 	padding: 0 10px;
 	height: 30px;
 	line-height: 30px;
 	text-transform: uppercase;
 	font-size: 0.9em;
 	font-weight: bold;
-	border-bottom: 2px solid green;
+    border-bottom: 2px solid #8b2f22;
 }
-.popup input {border: 1px solid #999; background: #fff; margin: 0; padding: 5px; outline: none; color: #333;}
-.popup input[type=text]:hover, .popup input[type=text]:active, .popup input[type=text]:focus {border-color: green;}
-.popup input[type=submit] {padding: 5px 10px; background: #999; color: #ddd; text-transform: uppercase; font-size: 0.9em; font-weight: bold;}
-.popup input[type=submit]:hover, .popup input[type=submit]:focus, .popup input[type=submit]:active {background: #aaa; cursor: pointer;}
+.popup input {border: 1px solid #4a4035; background: #090a0b; margin: 0; padding: 5px; outline: none; color: #c8c1b3;}
+.popup input[type=text]:hover, .popup input[type=text]:active, .popup input[type=text]:focus {border-color: #8b2f22;}
+.popup input[type=submit] {padding: 5px 10px; background: #5d241b; color: #f0cf84; text-transform: uppercase; font-size: 0.9em; font-weight: bold;}
+.popup input[type=submit]:hover, .popup input[type=submit]:focus, .popup input[type=submit]:active {background: #8b2f22; cursor: pointer;}
 
 .changeFont {padding: 10px;}
-.changeFont a {display: block; text-decoration: none; padding: 3px; color: #333;}
-.changeFont a:hover {background: #ccc;}
+.changeFont a {display: block; text-decoration: none; padding: 3px; color: #d7b46a;}
+.changeFont a:hover {background: #231816;}
 
 .highlightPopup {padding: 10px; text-align: center;}
 .highlightPopup input[type=text] {display: block; width: 215px; text-align: left; margin-top: 5px;}
@@ -221,7 +223,8 @@ a.popt {text-decoration: none;}
 
 /* ADMIN CONTEXT MENU */
 .contextMenu {
-	background-color: #ddd;
+    background-color: #11100e;
+    border: 1px solid #4a4035;
 	position: fixed;
 	margin: 2px;
 	width: 150px;
@@ -230,18 +233,18 @@ a.popt {text-decoration: none;}
 	display: block;
 	padding: 2px 5px;
 	text-decoration: none;
-	color: #333;
+    color: #d7b46a;
 }
 
 .contextMenu a:hover {
-	background-color: #ccc;
+    background-color: #231816;
 }
 
 /* ADMIN FILTER MESSAGES MENU */
 .filterMessages {padding: 5px;}
 .filterMessages div {padding: 2px 0;}
-.filterMessages input {}
-.filterMessages label {}
+.filterMessages input {display: block;}
+.filterMessages label {display: block;}
 
 .icon-stack {height: 1em; line-height: 1em; width: 1em; vertical-align: middle; margin-top: -2px;}
 
@@ -253,23 +256,23 @@ a.popt {text-decoration: none;}
 ******************************************/
 
 /* MOTD */
-.motd {color: #a4bad6;	font-family: Roboto Condensed;}
-.motd h1, .motd h2, .motd h3, .motd h4, .motd h5, .motd h6 {color: #a4bad6;	text-decoration: underline;}
-.motd a, .motd a:link, .motd a:visited, .motd a:active, .motd a:hover {color: #a4bad6;}
+.motd {color: #c8c1b3;	font-family: Roboto Condensed;}
+.motd h1, .motd h2, .motd h3, .motd h4, .motd h5, .motd h6 {color: #c79a4b;	text-decoration: underline;}
+.motd a, .motd a:link, .motd a:visited, .motd a:active, .motd a:hover {color: #d7b46a;}
 
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 150; font-size: 105%; color: #395ecc; text-shadow: 0 0 4px #395ecc}
+.name {font-weight: 150; font-size: 105%; color: #a99b8d; text-shadow: 0 0 4px #000}
 .nameradio {font-weight: 100; font-size: 102%}
 
 /* ADD HERE FOR ITALIC */
 .italic, .italics, .emote {font-style: italic;}
 
 /* OUTPUT COLORS */
-.highlight {background: yellow;}
+.highlight {background: #5d241b; color: #f0cf84;}
 
-h1, h2, h3, h4, h5, h6	{color: #a4bad6;font-family: Roboto Condensed;}
+h1, h2, h3, h4, h5, h6	{color: #c79a4b;font-family: Roboto Condensed;}
 
 em						{font-style: normal;	font-weight: bold;}
 
@@ -474,16 +477,14 @@ a:visited {
     font-size: 15px;
     vertical-align: middle;
     background: rgba(40, 40, 40, 0.5);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .firstdiv {
     padding: 10px;
     text-align: center;
     vertical-align: middle;
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 @keyframes hypnocolor {
@@ -535,8 +536,7 @@ a:visited {
     padding: 10px;
     text-align: center;
     vertical-align: middle;
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .boxexamine {
@@ -550,16 +550,14 @@ a:visited {
     vertical-align: middle;
     background-color: rgba(50, 50, 50, 0.3);
     border: 1px solid rgba(50, 50, 50, 0.3);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .firstdivskill {
     padding: 10px;
     text-align: center;
     vertical-align: middle;
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .skilldiv {
@@ -572,8 +570,7 @@ a:visited {
     vertical-align: middle;
     background-color: rgba(50, 50, 50, 0.3);
     border: 1px solid rgba(50, 50, 50, 0.3);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .linediv {
@@ -600,8 +597,7 @@ a:visited {
     padding: 10px;
     text-align: center;
     vertical-align: middle;
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .boxexamineplyr {
@@ -615,16 +611,14 @@ a:visited {
     vertical-align: middle;
     background-color: rgba(50, 50, 50, 0.3);
     border: 1px solid rgba(50, 50, 50, 0.3);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .firstdivmood {
     padding: 10px;
     text-align: center;
     vertical-align: middle;
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .moodbox {
@@ -637,8 +631,7 @@ a:visited {
     vertical-align: middle;
     background-color: rgba(50, 50, 50, 0.3);
     border: 1px solid rgba(50, 50, 50, 0.3);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }
 
 .compbox {
@@ -651,6 +644,5 @@ a:visited {
     vertical-align: middle;
     background-color: rgb(0, 0, 0);
     border: 1px solid rgba(65, 65, 65, 0.3);
-    *zoom: 1;
-    *display: inline;
+    zoom: 1;
 }

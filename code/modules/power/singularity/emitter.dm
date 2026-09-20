@@ -101,6 +101,19 @@
 /obj/machinery/power/emitter/emp_act(var/severity)
 	return 1
 
+// Silent remote toggle used by automated controllers (e.g. supermatter core control) - no mob feedback/logging spam.
+/obj/machinery/power/emitter/proc/remote_set_active(var/should_fire)
+	should_fire = !!should_fire
+	if(locked || emagged || active == should_fire)
+		return
+	if(should_fire && (state != 2 || !anchored || !powernet))
+		return
+	active = should_fire
+	if(active)
+		shot_number = 0
+		fire_delay = get_initial_fire_delay()
+	update_icon()
+
 /obj/machinery/power/emitter/Process()
 	if(stat & (BROKEN))
 		return
