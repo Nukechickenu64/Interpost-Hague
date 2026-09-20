@@ -1,8 +1,7 @@
 /client
 	var/country = null
 
-/client/New()
-	. = ..()
+/client/proc/init_country()
 	spawn if(src)
 		src.country = ip2country(address)
 

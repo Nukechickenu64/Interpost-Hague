@@ -328,10 +328,18 @@
 /client/proc/setDefaultButtons()
 	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("Poo", "Poo")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("ShowGoals", "Show Goals")))]</span>"})
 
-/client/New()
-	..()
+/client/proc/init_pig()
 	loadDataPig()
-	lobbyPig()
+	// Give assets time to arrive before opening the browser.
+	// On public servers, clients may be slower to receive browse_rsc assets.
+	spawn(30)
+		if(!src)
+			return
+		lobbyPig()
+		// Retry once after a longer delay in case assets weren't ready yet.
+		spawn(50)
+			if(src && !pigReady)
+				lobbyPig()
 
 	if(!holder)
 		return

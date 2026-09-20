@@ -11,9 +11,8 @@
 /datum/achievements
 	var/list/achievements = list()
 
-/client/New()
+/client/proc/init_achievements()
 	achievement_holder = new
-	..()
 
 //The actual achievements
 /datum/achievement

@@ -1,6 +1,5 @@
 
-/client/New()
-	..()
+/client/proc/init_movement()
 	dir = NORTH
 
 /*

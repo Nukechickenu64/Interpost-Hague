@@ -118,6 +118,7 @@
 	TopicData = null
 							//Prevent calls to client.Topic from connect
 	chatOutput = new /datum/chatOutput(src) // Right off the bat.
+	init_achievements()
 
 	if(!(connection in list("seeker", "web")))					//Invalid connection type.
 		return null
@@ -163,9 +164,15 @@
 	apply_fps(prefs.clientfps)
 
 	. = ..()	//calls mob.Login()
+	init_movement()
+	init_country()
 	chatOutput.start()
 	prefs.sanitize_preferences()
-	fit_viewport()
+	// Defer viewport fitting so the skin's is-maximized=true takes effect first.
+	spawn(5)
+		if(src)
+			fit_viewport()
+			winset(src, "mainwindow", "is-maximized=true")
 
 	// Capture right-clicks in Click() instead of showing BYOND's default popup.
 	// Shift+Right can be repurposed for a custom context menu.
@@ -219,6 +226,7 @@
 	log_client_to_db()
 
 	send_resources()
+	init_pig()
 
 	if(!winexists(src, "asset_cache_browser")) // The client is using a custom skin, tell them.
 		to_chat(src, "<span class='warning'>Unable to access asset cache browser, if you are using a custom skin file, please allow DS to download the updated version, if you are not, then make a bug report. This is not a critical issue but can cause issues with resource downloading, as it is impossible to know when extra resources arrived to you.</span>")

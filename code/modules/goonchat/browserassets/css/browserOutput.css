@@ -22,7 +22,8 @@ html, body {
 body {
 	background-image: url("chatbg.png");
     background-color: #090a0b;
-	background-size: 100%;
+	background-size: auto;
+	background-repeat: repeat;
 	background-attachment: scroll;
 	font-family: Bahnschrift, sans-serif;
 	font-size: 19px;

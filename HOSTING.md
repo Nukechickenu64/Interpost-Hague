@@ -62,6 +62,7 @@ Warn players before updates; compile locally first when changing code.
 | Undefined type path on compile | Ensure new .dm file added to `.dme`. |
 | SQL auth errors | Confirm DB migration and credentials in `config/dbconfig.txt`. |
 | High tick lag | Reduce event frequency, disable unused random events. |
+| No CSS/HTML renders for players (blank chat/UI), but works when you test locally | DreamDaemon's embedded browser is IE/Trident-based and needs the `FEATURE_BROWSER_EMULATION` registry key set for `DreamDaemon.exe` (value `11001`, DWORD) in the **HKCU hive of the Windows account that actually runs DreamDaemon**. If you host via a service/scheduled task/different user than the one you use for local testing, that account's registry won't have the key even though yours does. `scripts/run-server.ps1` now sets this automatically before launch — use it instead of starting `DreamDaemon.exe` directly, or set the key manually for that user account and restart the process. |
 
 ## 10. Next Hardening Ideas
 - Add Prometheus exporter for basic metrics.
