@@ -24,7 +24,7 @@
 	antag_templates = list()
 
 /datum/game_mode/dynamic/announce()
-	to_world("<B>The AI Director is active. Your actions will shape the round.</B>")
+	to_world("<B>The Director is active. Your actions will shape the round.</B>")
 	to_world("<i>Instead of a pre-determined gamemode, the server is continuously evaluating station telemetry and scaling threats based on crew behavior. Tension will rise and fall based on what happens during the shift. Every crewmember has a Corporate Profile - check your notes for details.</i>")
 
 /datum/game_mode/dynamic/pre_setup()

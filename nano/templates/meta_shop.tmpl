@@ -1,0 +1,52 @@
+<!--
+Title: Leverage Shop, the persistent meta-currency shop.
+Used In File(s): \code\modules\economy\meta_shop.dm
+-->
+<H2><span class="white">Leverage Exchange</span></H2>
+<div class="item">
+	<div class="itemLabelNarrow">
+		<b>Balance</b>:
+	</div>
+	<div class="itemContent">
+		{{:data.leverage}} Leverage
+	</div>
+</div>
+<br>
+<div class="item">
+	<div class="itemLabelNarrow">
+		<b>Categories</b>:
+	</div>
+	<div class="itemContent">
+		{{if data.category == 'items'}}
+			{{:helper.link('Items', 'gear', {'meta_shop_category' : 'items'}, 'disabled')}}
+		{{else}}
+			{{:helper.link('Items', 'gear', {'meta_shop_category' : 'items'})}}
+		{{/if}}
+		{{if data.category == 'modifiers'}}
+			{{:helper.link('Shift Modifiers', 'gear', {'meta_shop_category' : 'modifiers'}, 'disabled')}}
+		{{else}}
+			{{:helper.link('Shift Modifiers', 'gear', {'meta_shop_category' : 'modifiers'})}}
+		{{/if}}
+		{{if data.category == 'antag'}}
+			{{:helper.link('Antagonist Role', 'gear', {'meta_shop_category' : 'antag'}, 'disabled')}}
+		{{else}}
+			{{:helper.link('Antagonist Role', 'gear', {'meta_shop_category' : 'antag'})}}
+		{{/if}}
+	</div>
+</div>
+<br>
+
+<H2>For Sale:</H2>
+{{for data.items}}
+	<div class="item">
+		{{:helper.link(value.name, 'gear', {'meta_shop_buy' : value.ref}, value.can_buy ? null : 'disabled')}} - {{:value.cost}} Leverage
+	</div>
+	<div class="item">
+		{{:value.desc}}
+	</div>
+{{/for}}
+{{if data.items.length == 0}}
+	<div class="item">
+		Nothing available in this category.
+	</div>
+{{/if}}

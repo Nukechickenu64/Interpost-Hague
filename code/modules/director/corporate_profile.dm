@@ -22,6 +22,7 @@
 	var/debt_contraband_delivered = 0
 	var/debt_threshold = 0        // When debt_paid >= debt_amount, debt is cleared
 	var/debt_failed = FALSE       // If round ends without paying, consequences
+	var/debt_leverage_granted = FALSE // Guards against granting Leverage more than once
 
 	// Tension contribution
 	var/tension_contribution = 0  // How much this profile adds to the tension meter
@@ -183,6 +184,7 @@
 		owner.initial_account.do_transaction(T)
 	if(owner && owner.current)
 		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> Your corporate bonus of T[agenda_reward] has been deposited.</span>")
+	grant_leverage(round(agenda_reward / 25))
 
 /// Mark debt as partially paid
 /datum/corporate_profile/proc/pay_debt(var/amount)
@@ -192,6 +194,9 @@
 	if(debt_paid >= debt_threshold)
 		to_chat(owner.current, "<span class='notice'><b>Debt Cleared:</b> You have paid off your debt to [debt_creditor]. You are free.</span>")
 		tension_contribution = max(0, tension_contribution - 10)
+		if(!debt_leverage_granted)
+			debt_leverage_granted = TRUE
+			grant_leverage(round(debt_amount / 25))
 
 /// Mark contraband delivered for debt
 /datum/corporate_profile/proc/deliver_contraband()
@@ -210,6 +215,17 @@
 		to_chat(owner.current, "<span class='danger'><b>Debt Unpaid:</b> You failed to repay [debt_creditor]. They will remember this...</span>")
 	else if(type_name == PROFILE_AGENDA && agenda_completed)
 		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> Your corporate bonus of T[agenda_reward] has been deposited.</span>")
+
+/// Grant persistent Leverage currency to the owner's account, spendable in the Leverage shop.
+/datum/corporate_profile/proc/grant_leverage(var/amount)
+	if(amount <= 0 || !owner || !owner.current || !owner.current.client)
+		return
+	var/datum/preferences/prefs = owner.current.client.prefs
+	if(!prefs)
+		return
+	prefs.meta_currency += amount
+	prefs.save_preferences()
+	to_chat(owner.current, "<span class='notice'><b>Leverage Earned:</b> +[amount] Leverage (total: [prefs.meta_currency]). Spend it in the Leverage shop on your next join.</span>")
 
 /// Get a summary for round-end display
 /datum/corporate_profile/proc/get_summary()

@@ -34,7 +34,28 @@
 		return
 	if(!client.pigReady)
 		return
-	client << output(list2params(list("#timestart", "[SSticker?.pregame_timeleft]")), "outputwindow.browser:change")
+	var/lobby_text = ""
+	if(GAME_STATE <= RUNLEVEL_LOBBY)
+		var/time_seconds = round((SSticker?.pregame_timeleft || 0) / 10)
+		lobby_text = "Time to Start: [time_seconds]s"
+		if(SSticker && !SSticker.round_progressing)
+			lobby_text = "PAUSED - Waiting for ready players..."
+		lobby_text += "<br>"
+		var/ready_count = 0
+		var/total_count = 0
+		for(var/mob/new_player/P in GLOB.player_list)
+			if(!P.client)
+				continue
+			total_count++
+			if(P.ready)
+				ready_count++
+		lobby_text += "Players: [total_count] | Ready: [ready_count]<br>"
+		for(var/mob/new_player/P in GLOB.player_list)
+			if(!P.client)
+				continue
+			var/readycheck = P.ready ? "<span style='color:#0e3b0e'>READY</span>" : "<span style='color:#8b2f22'>NOT READY</span>"
+			lobby_text += "<b>[P.client.ckey]</b> [readycheck]<br>"
+	client << output(list2params(list("#timestart", lobby_text)), "outputwindow.browser:change")
 
 /mob/new_player/Login()
 	..()

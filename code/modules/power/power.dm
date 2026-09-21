@@ -239,14 +239,20 @@
 		net2 = temp
 
 	//merge net2 into net1
-	for(var/obj/structure/cable/Cable in net2.cables) //merge cables
-		net1.add_cable(Cable)
+	for(var/obj/structure/cable/Cable in net2.cables.Copy())
+		net2.cables -= Cable
+		Cable.powernet = net1
+		net1.cables += Cable
 
-	if(!net2) return net1
-
-	for(var/obj/machinery/power/Node in net2.nodes) //merge power machines
+	var/list/old_nodes = net2.nodes.Copy()
+	net2.nodes.Cut()
+	for(var/obj/machinery/power/Node in old_nodes)
+		Node.powernet = null
 		if(!Node.connect_to_network())
-			Node.disconnect_from_network() //if somehow we can't connect the machine to the new powernet, disconnect it from the old nonetheless
+			Node.disconnect_from_network()
+
+	net2.cables.Cut()
+	qdel(net2)
 
 	return net1
 

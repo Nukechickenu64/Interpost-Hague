@@ -488,13 +488,13 @@ var/world_topic_spam_protect_time = world.timeofday
 	var/list/Lines = file2list("data/mode.txt")
 	if(Lines.len)
 		if(Lines[1])
-			SSticker.master_mode = Lines[1]
-			log_misc("Saved mode is '[SSticker.master_mode]'")
+			SSticker.master_mode = "dynamic"
+			log_misc("Ignoring saved mode '[Lines[1]]'; forcing Dynamic.")
 
 /world/proc/save_mode(var/the_mode)
 	var/F = file("data/mode.txt")
 	fdel(F)
-	F << the_mode
+	F << "dynamic"
 
 /hook/startup/proc/loadSMSafeMode()
 	world.load_smsafemode()

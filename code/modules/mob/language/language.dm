@@ -211,6 +211,8 @@
 	src << browse(dat, "window=checklanguage")
 
 /mob/living/Topic(href, href_list)
+	if(meta_shop_topic(href, href_list))
+		return 1
 	if(href_list["default_lang"])
 		if(href_list["default_lang"] == "reset")
 

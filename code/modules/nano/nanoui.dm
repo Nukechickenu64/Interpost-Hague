@@ -48,7 +48,7 @@ nanoui is used to open and update nano browser uis
 	// initial data, containing the full data structure, must be sent to the ui (the data structure cannot be extended later on)
 	var/list/initial_data[0]
 	// set to 1 to update the ui automatically every master_controller tick
-	var/is_auto_updating = 0
+	var/is_auto_updating = 1
 	// the current status/visibility of the ui
 	var/status = STATUS_INTERACTIVE
 

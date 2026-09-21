@@ -15,6 +15,9 @@
 
 	S["version"] >> savefile_version
 	player_setup.load_preferences(S)
+	S["meta_currency"] >> meta_currency
+	if(!meta_currency)
+		meta_currency = 0
 	loaded_preferences = S
 	return 1
 
@@ -26,6 +29,7 @@
 
 	S["version"] << SAVEFILE_VERSION_MAX
 	player_setup.save_preferences(S)
+	S["meta_currency"] << meta_currency
 	loaded_preferences = S
 	return 1
 

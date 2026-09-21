@@ -26,7 +26,6 @@
 						//datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -63,7 +62,6 @@
 						//datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -99,7 +97,6 @@
 						//datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -136,7 +133,6 @@
 						///datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -174,7 +170,6 @@
 						//datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep
@@ -213,7 +208,6 @@
 						//datum/job/jester
 						///datum/job/assistant,
 						/datum/job/greyhound,
-						/datum/job/revolutionary,
 						///datum/job/cadet
 						///datum/job/ouvrier
 						///datum/job/jr_upkeep

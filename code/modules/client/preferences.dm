@@ -34,6 +34,9 @@
 	var/selected_sin
 	var/selected_virtue
 
+	// Persistent meta currency ("Leverage"), earned via Corporate Profile agendas/debts, spent in the Leverage shop.
+	var/meta_currency = 0
+
 /datum/preferences/New(client/C)
 	if(istype(C))
 		client = C

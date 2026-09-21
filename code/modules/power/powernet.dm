@@ -25,12 +25,13 @@
 	..()
 
 /datum/powernet/Destroy()
-	for(var/obj/structure/cable/C in cables)
-		cables -= C
+	for(var/obj/structure/cable/C in cables.Copy())
 		C.powernet = null
-	for(var/obj/machinery/power/M in nodes)
-		nodes -= M
+	for(var/obj/machinery/power/M in nodes.Copy())
 		M.powernet = null
+	cables.Cut()
+	nodes.Cut()
+	inputting.Cut()
 	STOP_PROCESSING_POWERNET(src)
 	return ..()
 

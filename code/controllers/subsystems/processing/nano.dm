@@ -1,7 +1,7 @@
 PROCESSING_SUBSYSTEM_DEF(nano)
 	name = "NanoUI"
 	priority = SS_PRIORITY_NANO
-	wait = 2 SECONDS
+	wait = 1 SECONDS
 
 	// a list of current open /nanoui UIs, grouped by src_object and ui_key
 	var/list/open_uis = list()

@@ -61,13 +61,15 @@
 		return 0
 
 	var/datum/gas_mixture/G = src.air_contents.remove(num)
+	if(!G)
+		return 0
 
-	var/allgases = G.gas["carbon_dioxide"] + G.gas["nitrogen"] + G.gas["oxygen"] + G.gas["phoron"]
-	if(allgases >= 0.005)
+	if(G.total_moles >= 0.005)
+		qdel(G)
 		return 1
 
 	qdel(G)
-	return
+	return 0
 
 /obj/item/weapon/tank/jetpack/ui_action_click()
 	toggle()
@@ -118,7 +120,11 @@
 		return 0
 
 	var/datum/gas_mixture/G = pressure_vessel.air_contents.remove(num)
+	if(!G)
+		return 0
 
 	if(G.total_moles >= 0.005)
+		qdel(G)
 		return 1
 	qdel(G)
+	return 0

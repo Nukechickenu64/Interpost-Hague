@@ -272,15 +272,15 @@
 	dir = 4
 	},
 /obj/machinery/conveyor{
-	tag = "icon-conveyor0 (NORTHEAST)";
-	icon_state = "conveyor0";
-	dir = 5;
+	dir = 1;
 	id = "mining_internal"
 	},
 /turf/simulated/floor,
 /area/quartermaster/miningdock)
 "aaO" = (
-/obj/machinery/mineral/unloading_machine,
+/obj/machinery/mineral/unloading_machine{
+	icon_state = "unloader-corner"
+	},
 /turf/simulated/floor/tiled,
 /area/quartermaster/miningdock)
 "aaP" = (
@@ -1298,15 +1298,10 @@
 /turf/simulated/floor/tiled,
 /area/quartermaster/miningdock)
 "acV" = (
-/obj/machinery/embedded_controller/radio/airlock/docking_port{
-	frequency = 1331;
-	id_tag = "merc_shuttle";
-	pixel_x = -8;
-	pixel_y = 25;
-	req_access = list(150)
+/turf/simulated/shuttle/wall{
+	icon_state = "wall3"
 	},
-/turf/simulated/mineral,
-/area/mine/unexplored)
+/area/supply/dock)
 "acW" = (
 /obj/machinery/door/airlock/glass_external{
 	frequency = 1379;
@@ -21402,18 +21397,10 @@
 /turf/simulated/floor/airless,
 /area/engineering/engine_monitoring)
 "aQA" = (
-/obj/structure/cable{
-	d1 = 4;
-	d2 = 8;
-	icon_state = "4-8";
-	pixel_x = 0
-	},
-/obj/structure/cable{
-	d2 = 8;
-	icon_state = "0-8"
-	},
-/turf/simulated/floor/tiled/bunker/polar_green,
-/area/bridge)
+/obj/effect/floor_decal/industrial/warning,
+/obj/effect/decal/cleanable/dirt,
+/turf/simulated/floor/plating,
+/area/supply/dock)
 "aQB" = (
 /obj/structure/catwalk,
 /obj/structure/railing{
@@ -40745,19 +40732,10 @@
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAj" = (
-/obj/machinery/conveyor{
-	dir = 8;
-	id = "QMLoad"
-	},
 /obj/effect/floor_decal/industrial/warning,
-/obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAk" = (
-/obj/machinery/conveyor{
-	dir = 8;
-	id = "QMLoad"
-	},
 /obj/effect/floor_decal/industrial/warning/corner{
 	icon_state = "warningcorner";
 	dir = 8
@@ -40805,31 +40783,13 @@
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAo" = (
-/obj/effect/decal/cleanable/dirt,
-/turf/simulated/shuttle/wall{
-	icon_state = "wall3"
-	},
+/turf/simulated/floor/plating,
 /area/supply/dock)
 "bAp" = (
-/obj/structure/window/reinforced,
-/obj/structure/window/reinforced{
-	dir = 4
-	},
-/obj/structure/grille,
-/obj/structure/window/reinforced{
-	dir = 8
-	},
-/obj/structure/window/reinforced{
-	dir = 1
-	},
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAq" = (
-/obj/machinery/conveyor{
-	dir = 1;
-	id = "QMLoad2"
-	},
 /obj/effect/floor_decal/industrial/warning{
 	dir = 8
 	},
@@ -40906,10 +40866,6 @@
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAx" = (
-/obj/machinery/conveyor{
-	dir = 4;
-	id = "QMLoad2"
-	},
 /obj/effect/floor_decal/industrial/warning{
 	icon_state = "warning";
 	dir = 1
@@ -40918,10 +40874,6 @@
 /turf/simulated/floor/plating,
 /area/supply/dock)
 "bAy" = (
-/obj/machinery/conveyor{
-	dir = 1;
-	id = "QMLoad2"
-	},
 /obj/effect/floor_decal/industrial/warning/corner{
 	dir = 1
 	},
@@ -43430,6 +43382,23 @@
 /obj/effect/floor_decal/newcorner/blue,
 /turf/simulated/floor/tiled/dark,
 /area/shuttle/escape/centcom)
+"qXx" = (
+/obj/effect/floor_decal/industrial/warning,
+/obj/effect/decal/cleanable/dirt,
+/obj/machinery/light/small{
+	dir = 1
+	},
+/turf/simulated/floor/plating,
+/area/supply/dock)
+"tol" = (
+/obj/effect/floor_decal/industrial/warning{
+	icon_state = "warning";
+	dir = 1
+	},
+/obj/effect/decal/cleanable/dirt,
+/obj/machinery/light/small,
+/turf/simulated/floor/plating,
+/area/supply/dock)
 
 (1,1,1) = {"
 aaa
@@ -68760,7 +68729,7 @@ aab
 aab
 aab
 aab
-acV
+aab
 aaf
 aal
 ade
@@ -146939,7 +146908,7 @@ bxw
 bxh
 aMe
 aSE
-aQA
+aQy
 aRI
 aWL
 aSq
@@ -184147,7 +184116,7 @@ bxL
 aaa
 bzV
 bAb
-bAj
+aQA
 bAp
 bAx
 bAb
@@ -184349,8 +184318,8 @@ bxL
 aaa
 bzV
 bAc
-bAj
-bzZ
+aQA
+acV
 bAx
 bAc
 bzV
@@ -184551,9 +184520,9 @@ bxL
 aaa
 bzV
 bzZ
-bAi
+qXx
 bAp
-bAw
+tol
 bzZ
 bzV
 aaa

@@ -307,16 +307,16 @@ datum/controller/vote
 				if("restart")
 					choices.Add("Restart Round","Continue Playing")
 				if("gamemode")
+					return 0
 					if(ticker.current_state >= GAME_STATE_SETTING_UP)
 						return 0
-					choices.Add(config.votable_modes)
+					choices.Add("dynamic")
 					for (var/F in choices)
 						var/datum/game_mode/M = gamemode_cache[F]
 						if(!M)
 							continue
 						gamemode_names[M.config_tag] = capitalize(M.name) //It's ugly to put this here but it works
 						additional_text.Add("<td align = 'center'>[M.required_players]</td>")
-					gamemode_names["secret"] = "Secret"
 				if("crew_transfer")
 					if(check_rights(R_ADMIN|R_MOD, 0))
 						question = "End the shift?"
@@ -460,18 +460,12 @@ datum/controller/vote
 				. += "\t(<a href='?src=\ref[src];vote=toggle_restart'>[config.allow_vote_restart?"Allowed":"Disallowed"]</a>)"
 			. += "</li><li>"
 			//gamemode
-			if(trialmin || config.allow_vote_mode)
-				. += "<a href='?src=\ref[src];vote=gamemode'>GameMode</a>"
-			else
-				. += "<font color='grey'>GameMode (Disallowed)</font>"
+			. += "<font color='grey'>GameMode (Disallowed)</font>"
 			if(trialmin)
 				. += "\t(<a href='?src=\ref[src];vote=toggle_gamemode'>[config.allow_vote_mode?"Allowed":"Disallowed"]</a>)"
 			. += "</li><li>"
 			//map!
-			if(trialmin && config.allow_map_switching)
-				. += "<a href='?src=\ref[src];vote=map'>Map</a>"
-			else
-				. += "<font color='grey'>Map (Disallowed)</font>"
+			. += "<font color='grey'>Map (Disallowed)</font>"
 			. += "</li><li>"
 			//extra antagonists
 			if(config.allow_extra_antags && is_addantag_allowed(0))
@@ -508,8 +502,7 @@ datum/controller/vote
 					if(config.allow_vote_restart || usr.client.holder)
 						initiate_vote("restart",usr.key)
 				if("gamemode")
-					if(config.allow_vote_mode || usr.client.holder)
-						initiate_vote("gamemode",usr.key)
+					return
 				if("crew_transfer")
 					if(config.allow_vote_restart || usr.client.holder)
 						initiate_vote("crew_transfer",usr.key)
@@ -517,8 +510,7 @@ datum/controller/vote
 					if(config.allow_extra_antags)
 						initiate_vote("add_antagonist",usr.key)
 				if("map")
-					if(config.allow_map_switching && usr.client.holder)
-						initiate_vote("map", usr.key)
+					return
 				if("custom")
 					if(usr.client.holder)
 						initiate_vote("custom",usr.key)

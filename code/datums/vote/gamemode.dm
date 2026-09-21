@@ -5,6 +5,7 @@
 	win_y = 1100
 
 /datum/vote/gamemode/can_run(mob/creator, automatic)
+	return FALSE
 	if(!automatic && (!config.allow_vote_mode || !is_admin(creator)))
 		return FALSE // Admins and autovotes bypass the config setting.
 	if(GAME_STATE >= RUNLEVEL_GAME)
@@ -19,14 +20,13 @@
 
 /datum/vote/gamemode/setup_vote(mob/creator, automatic)
 	..()
-	choices += config.votable_modes
+	choices += "dynamic"
 	for (var/F in choices)
 		var/datum/game_mode/M = gamemode_cache[F]
 		if(!M)
 			continue
 		display_choices[F] = capitalize(M.name)
 		additional_text[F] ="<td align = 'center'>[M.required_players]</td>"
-	display_choices["secret"] = "Secret"
 
 /datum/vote/gamemode/handle_default_votes()
 	var/non_voters = ..()

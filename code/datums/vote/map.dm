@@ -2,6 +2,7 @@
 	name = "map"
 
 /datum/vote/map/can_run(mob/creator, automatic)
+	return FALSE
 	if(!config.allow_map_switching)
 		return FALSE
 	if(GAME_STATE >= RUNLEVEL_GAME)

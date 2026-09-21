@@ -14,9 +14,9 @@
 
 /datum/pipe_network/Destroy()
     STOP_PROCESSING_PIPENET(src)
-    for(var/datum/pipeline/line_member in line_members)
+    for(var/datum/pipeline/line_member in line_members.Copy())
         line_member.network = null
-    for (var/obj/machinery/atmospherics/thing in normal_members)
+    for (var/obj/machinery/atmospherics/thing in normal_members.Copy())
         thing.reassign_network(src, null)
     gases.Cut()  // Do not qdel the gases, we don't own them
     leaks.Cut()
@@ -63,6 +63,11 @@
 
     for(var/datum/pipeline/line_member in giver.line_members)
         line_member.network = src
+
+    giver.normal_members.Cut()
+    giver.line_members.Cut()
+    giver.leaks.Cut()
+    qdel(giver)
 
     update_network_gases()
     return 1

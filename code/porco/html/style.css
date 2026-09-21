@@ -9,23 +9,23 @@ body {
     font-family: "Droser","Verdana",sans-serif;
     color:#b8b0a0;
     font-size:14px;
-    margin: 0px;
+    margin: 0;
     text-shadow: 0px 0px 4px rgba(0,0,0, 0.9);
-    
-    border: 0px;
-    padding: 0px;
+
+    border: 0;
+    padding: 0;
 }
 .statstable
 {
-width:80%;
-border-collapse: collapse;
+    width:80%;
+    border-collapse: collapse;
      margin-top:8px;
 }
 .trstats
 {
 background: rgba(199, 154, 75, 0.12);
 }
-.trstats:nth-child(2n) 
+.trstats:nth-child(2n)
 { background: rgba(139, 47, 34, 0.16);}
 
 .ST
@@ -43,7 +43,7 @@ background: rgba(199, 154, 75, 0.12);
 .ST.MINOR
 {
     color: #9ea36d;
-    
+
 }
 .ST.DES
 {
@@ -56,7 +56,7 @@ background: rgba(199, 154, 75, 0.12);
     color: #9ea36d;
     text-shadow: 0px 0px 3px #000;
 }
-.verb {float: top; font-family: "Cond";text-shadow: 0px 0px 3px #bdda57;
+.verb {font-family: "Cond";text-shadow: 0px 0px 3px #bdda57;
 color:#d7b46a; text-decoration:none;outline: none;border: none;font-size:90%;}
 .verb.dim { color:#707070; text-shadow: 0px 0px 3px #707070;}
 .verb.smaller { font-size:80%;}
@@ -71,9 +71,9 @@ color:#d7b46a; text-decoration:none;outline: none;border: none;font-size:90%;}
     height: 136px;
     width: 44px;
     position: absolute;
-    
+
 }
-.button 
+.button
 {
     margin:2px;
     width: 44px;
@@ -84,7 +84,7 @@ color:#d7b46a; text-decoration:none;outline: none;border: none;font-size:90%;}
 }
 .button:active {
     transition: 0.1s;
-  transform: translateY(4px);
+        transform: translateY(4px);
 }
 #loading
 {
@@ -120,11 +120,11 @@ color: #d7b46a;
 #statpanel {
     position:absolute;
     background-image:url('stats.png');
-    
+
     overflow: hidden;
     background-repeat:no-repeat;
-    top:0px;
-    left:0px;
+    top:0;
+    left:0;
     width: 541px;
     height: 315px;
 }
@@ -171,9 +171,9 @@ color: #d7b46a;
     background-image:url('chatscroller-t.png');
     background-repeat:no-repeat;
     cursor:move;
-    border:0px;
-    padding:0px;
-    margin:0px;
+    border:0;
+    padding:0;
+    margin:0;
 }
 
 .scrollbarb {
@@ -185,9 +185,9 @@ color: #d7b46a;
     background-repeat:no-repeat;
     background-position:left bottom;
     cursor:move;
-    border:0px;
-    padding:0px;
-    margin:0px;
+    border:0;
+    padding:0;
+    margin:0;
 }
 
 #scrollbtnup {
@@ -232,7 +232,7 @@ float: left;
 }
 
 #overpanel
-{   
+{
     background-image:url('panel.png');
     top: 275px;
     width: 541px;
@@ -242,7 +242,7 @@ float: left;
     pointer-events:none;
 }
 #dynamicpanel
-{   
+{
     background-image: url("data:image/gif;base64,R0lGODlhAQABAPcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAABAAEAAAgEAP8FBAA7");
     background-size: cover;
     top: 210px;
@@ -253,7 +253,7 @@ float: left;
     z-index:1;
 }
 #dynamicpanel2
-{   
+{
     background-image: url("data:image/gif;base64,R0lGODlhAQABAPcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAABAAEAAAgEAP8FBAA7");
     background-size: cover;
     top: 256px;
@@ -281,4 +281,22 @@ float: left;
     margin-right: 44%;
     left: 50%;
     z-index: 0;
+}
+
+#lobbyinfo {
+    position: absolute;
+    top: 42px;
+    left: 70px;
+    width: 240px;
+    height: 160px;
+    overflow: hidden;
+    font-size: 12px;
+    color: #b8b0a0;
+    padding: 4px;
+    z-index: 0;
+}
+#lobbyinfo #timestart {
+    font-weight: bold;
+    color: #d7b46a;
+    font-size: 14px;
 }

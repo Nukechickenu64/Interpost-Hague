@@ -1,8 +1,8 @@
 SUBSYSTEM_DEF(tgui)
 	name = "TGUI"
 	priority = SS_PRIORITY_TGUI
-	wait = 1 SECOND
-	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
+	wait = 0.5 SECONDS
+	flags = SS_POST_FIRE_TIMING
 
 	var/basehtml                     // The HTML base used for all UIs.
 	var/list/tg_open_uis = list()    // A list of open UIs, grouped by src_object and ui_key.

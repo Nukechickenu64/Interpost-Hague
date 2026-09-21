@@ -10,7 +10,7 @@ SUBSYSTEM_DEF(ticker)
 	var/list/gamemode_vote_results  //Will be a list, in order of preference, of form list(config_tag = number of votes).
 	var/bypass_gamemode_vote = 0    //Intended for use with admin tools. Will avoid voting and ignore any results.
 
-	var/master_mode = "extended"    //The underlying game mode (so "secret" or the voted mode). Saved to default back to previous round's mode in case the vote failed. This is a config_tag.
+	var/master_mode = "dynamic"     //The underlying game mode (so "secret" or the voted mode). Saved to default back to previous round's mode in case the vote failed. This is a config_tag.
 	var/datum/game_mode/mode        //The actual gamemode, if selected.
 	var/round_progressing = 1       //Whether the lobby clock is ticking down.
 
@@ -113,9 +113,15 @@ SUBSYSTEM_DEF(ticker)
 /datum/controller/subsystem/ticker/proc/pregame_tick()
 	if(round_progressing && last_fire)
 		pregame_timeleft -= world.time - last_fire
-	if(!gamemode_vote_results && !SSvote.active_vote && config.allow_vote_mode && pregame_timeleft <= config.vote_autogamemode_timeleft SECONDS)
-		SSvote.initiate_vote(/datum/vote/gamemode, automatic = 1)
 	if(pregame_timeleft <= 0)
+		var/ready_players = count_ready_players()
+		if(ready_players < 1)
+			if(!round_progressing)
+				return
+			round_progressing = 0
+			to_world("<B>Waiting for at least one player to be ready before starting the round...</B>")
+			return
+		round_progressing = 1
 		Master.SetRunLevel(RUNLEVEL_SETUP)
 		return
 
@@ -281,17 +287,8 @@ Helpers
 /datum/controller/subsystem/ticker/proc/choose_gamemode()
 	. = (revotes_allowed && !bypass_gamemode_vote) ? CHOOSE_GAMEMODE_REVOTE : CHOOSE_GAMEMODE_RETRY
 
-	var/mode_to_try = master_mode //This is the config tag
+	var/mode_to_try = "dynamic" //This is the config tag
 	var/datum/game_mode/mode_datum
-
-	//Decide on the mode to try.
-	if(!bypass_gamemode_vote && gamemode_vote_results)
-		gamemode_vote_results -= bad_modes
-		if(length(gamemode_vote_results))
-			mode_to_try = gamemode_vote_results[1]
-			. = CHOOSE_GAMEMODE_RETRY //Worth it to try again at least once.
-		else
-			mode_to_try = "extended"
 
 	if(!mode_to_try)
 		return
@@ -570,8 +567,19 @@ Helpers
 	for(var/i in total_antagonists)
 		log_game("[i]s[total_antagonists[i]].")
 
+/datum/controller/subsystem/ticker/proc/count_ready_players()
+	var/ready_count = 0
+	for(var/mob/new_player/player in GLOB.player_list)
+		if(player.client && player.ready)
+			ready_count++
+	return ready_count
+
 /datum/controller/subsystem/ticker/proc/start_now(mob/user)
 	if(!(GAME_STATE == RUNLEVEL_LOBBY))
+		return
+	if(count_ready_players() < 1)
+		if(user)
+			to_chat(user, "<span class='warning'>Cannot start the round: at least one player must be ready.</span>")
 		return
 	if(istype(SSvote.active_vote, /datum/vote/gamemode))
 		SSvote.cancel_vote(user)
