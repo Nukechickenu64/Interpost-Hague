@@ -31,15 +31,16 @@
 /datum/catalyst_event/proc/trigger(var/datum/telemetry/T)
 	if(!can_trigger(T, SSdirector.tension))
 		return FALSE
+	log_debug("Catalyst event '[name]' triggered at tension [SSdirector.tension].")
+	if(!execute(T))
+		return FALSE
 	last_triggered = world.time
 	uses_this_round++
-	log_debug("Catalyst event '[name]' triggered at tension [SSdirector.tension].")
-	execute(T)
 	return TRUE
 
 /// Actually perform the catalyst action - override in subclasses
 /datum/catalyst_event/proc/execute(var/datum/telemetry/T)
-	return
+	return TRUE
 
 /// Reset for a new round
 /datum/catalyst_event/proc/reset()
@@ -96,13 +97,14 @@
 		var/mob/observer/ghost/chosen = pick(candidates)
 		candidates -= chosen
 
-		// Create a new human for the operative
-		var/mob/living/carbon/human/operative = new(chosen)
-		operative.real_name = "Syndicate Operative [rand(100,999)]"
-		operative.mind = new(chosen.key)
-		operative.mind.current = operative
+		// Create a new human for the operative and register it through the antag datum.
+		var/mob/living/carbon/human/operative = director_spawn_ghost_body(chosen, "Syndicate Operative [rand(100,999)]")
+		var/datum/antagonist/traitor/traitor_antag = GLOB.all_antag_types_["traitor"]
+		if(!operative || !operative.mind || !traitor_antag || !traitor_antag.add_antagonist(operative.mind, 0, 0, 1))
+			if(operative)
+				qdel(operative)
+			continue
 		operative.mind.assigned_role = "Syndicate Operative"
-		operative.mind.special_role = "Syndicate Operative"
 		SSdirector.loyalty.set_faction(operative.mind, LOYALTY_SYNDICATE)
 		team_minds += operative.mind
 
@@ -125,6 +127,7 @@
 
 	// Add tension
 	SSdirector.add_tension(20, "Tactical Strike deployed")
+	return TRUE
 
 // === The Anomaly ===
 // If Science pushes experimental research too far, trigger a Cult or Eldritch invasion
@@ -166,10 +169,11 @@
 		center = director_pick_station_turf()
 
 	// Spawn eldritch effects - portals and cult structures
-	for(var/i = 1 to 3)
-		var/turf/target = get_step(center, pick(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST))
-		if(target)
-			new /obj/effect/portal(target)
+	if(center)
+		for(var/i = 1 to 3)
+			var/turf/target = get_step(center, pick(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST))
+			if(target)
+				new /obj/effect/portal(target)
 
 	// Flag nearby crew as cultists
 	var/list/nearby_crew = list()
@@ -190,8 +194,7 @@
 		var/datum/mind/M = pick(nearby_crew)
 		nearby_crew -= M
 		var/datum/antagonist/cultist = GLOB.all_antag_types_["cultist"]
-		if(cultist)
-			cultist.add_antagonist(M, 0, 0, 1)
+		if(cultist && cultist.add_antagonist(M, 0, 0, 1))
 			SSdirector.loyalty.set_faction(M, LOYALTY_CULT)
 
 	command_announcement.Announce( \
@@ -200,6 +203,7 @@
 		)
 
 	SSdirector.add_tension(25, "Dimensional Anomaly manifested")
+	return TRUE
 
 // === The Mutiny ===
 // If Security begins mass-arresting crew and loyalty telemetry drops into the red,
@@ -256,8 +260,8 @@
 			break
 		var/datum/mind/M = pick(candidates)
 		candidates -= M
-		if(rev_antag)
-			rev_antag.add_antagonist(M, 0, 0, 1)
+		if(!rev_antag || !rev_antag.add_antagonist(M, 0, 0, 1))
+			continue
 		SSdirector.loyalty.set_faction(M, LOYALTY_REVOLUTIONARY)
 		if(M.current)
 			to_chat(M.current, "<span class='danger'>The crackdown has gone too far. You receive an encrypted message on a hidden frequency: 'The revolution begins now. You are not alone. Use :t to communicate on the revolutionary channel.'</span>")
@@ -268,6 +272,7 @@
 		)
 
 	SSdirector.add_tension(15, "Mutiny fomented")
+	return TRUE
 
 // === The Infiltration ===
 // A lighter catalyst: spawns a single syndicate infiltrator when tension is moderate
@@ -298,19 +303,32 @@
 		return
 
 	var/mob/observer/ghost/chosen = pick(candidates)
-	var/mob/living/carbon/human/infiltrator = new(chosen)
-	infiltrator.real_name = "Agent [rand(100,999)]"
-	infiltrator.mind = new(chosen.key)
-	infiltrator.mind.current = infiltrator
-	infiltrator.mind.assigned_role = "Syndicate Agent"
-	infiltrator.mind.special_role = "Syndicate Agent"
-	SSdirector.loyalty.set_faction(infiltrator.mind, LOYALTY_SYNDICATE)
+	var/mob/living/carbon/human/infiltrator = director_spawn_ghost_body(chosen, "Agent [rand(100,999)]")
+	if(!infiltrator || !infiltrator.mind)
+		return FALSE
 
 	// Give basic traitor gear
 	var/datum/antagonist/traitor_antag = GLOB.all_antag_types_["traitor"]
-	if(traitor_antag)
-		traitor_antag.add_antagonist(infiltrator.mind, 0, 0, 1)
+	if(!traitor_antag || !traitor_antag.add_antagonist(infiltrator.mind, 0, 0, 1))
+		qdel(infiltrator)
+		return FALSE
+	infiltrator.mind.assigned_role = "Syndicate Agent"
+	SSdirector.loyalty.set_faction(infiltrator.mind, LOYALTY_SYNDICATE)
 
 	to_chat(infiltrator, "<span class='danger'>You are a Syndicate infiltrator. You have been inserted onto the station. Complete your objectives with subtlety.</span>")
 
 	SSdirector.add_tension(10, "Infiltrator deployed")
+	return TRUE
+
+/proc/director_spawn_ghost_body(var/mob/observer/ghost/ghost, var/name)
+	if(!ghost || !ghost.client || !ghost.key)
+		return null
+	var/mob/living/carbon/human/body = new(get_turf(ghost))
+	body.key = ghost.key
+	if(!body.mind)
+		body.mind = new /datum/mind(ghost.key)
+		body.mind.current = body
+		body.mind.original = body
+	body.real_name = name
+	body.SetName(name)
+	return body

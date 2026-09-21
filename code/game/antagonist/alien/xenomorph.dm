@@ -47,4 +47,6 @@ GLOBAL_DATUM_INIT(xenomorphs, /datum/antagonist/xenos, new)
 	player.objectives += new /datum/objective/escape()
 
 /datum/antagonist/xenos/place_mob(var/mob/living/player)
-	player.forceMove(get_turf(pick(get_vents())))
+	var/list/vents = get_vents()
+	if(vents.len)
+		player.forceMove(get_turf(pick(vents)))

@@ -19,6 +19,7 @@
 	if(!gag_announcement)
 		announce_antagonist_spawn()
 	target.current.unlock_achievement(new/datum/achievement/traitor())
+	return 1
 
 /datum/antagonist/proc/create_default(var/mob/source)
 	var/mob/living/M

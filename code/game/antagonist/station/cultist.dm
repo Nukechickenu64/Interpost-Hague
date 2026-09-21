@@ -101,22 +101,6 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 		H.religion = NARSIE_RELIGION
 		to_chat(H, "<span class='cult'>Your faith binds to [NARSIE_RELIGION].</span>")
 
-/datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
-	if(!..())
-		return 0
-	to_chat(player.current, "<span class='danger'>An unfamiliar white light flashes through your mind, cleansing the taint of the dark-one and the memories of your time as his servant with it.</span>")
-	player.memory = ""
-	if(show_message)
-		player.current.visible_message("<span class='notice'>[player.current] looks like they just reverted to their old faith!</span>")
-	// Revert to legal religion if they were aligned to Nar-Sie
-	if(player.current && ishuman(player.current))
-		var/mob/living/carbon/human/H = player.current
-		if(H.religion == NARSIE_RELIGION)
-			H.religion = LEGAL_RELIGION
-			to_chat(H, "<span class='notice'>Your faith returns to mundane order.</span>")
-	remove_cult_magic(player.current)
-	remove_cultiness(CULTINESS_PER_CULTIST)
-
 /datum/antagonist/cultist/add_antagonist(var/datum/mind/player, var/ignore_role, var/do_not_equip, var/move_to_spawn, var/do_not_announce, var/preserve_appearance)
 	. = ..()
 	if(.)
@@ -131,8 +115,23 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 
 /datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	. = ..()
-	if(. && player.current && !istype(player.current, /mob/living/simple_animal/construct))
-		player.current.remove_language(LANGUAGE_CULT)
+	if(!.)
+		return 0
+	if(player.current)
+		if(!istype(player.current, /mob/living/simple_animal/construct))
+			player.current.remove_language(LANGUAGE_CULT)
+		to_chat(player.current, "<span class='danger'>An unfamiliar white light flashes through your mind, cleansing the taint of the dark-one and the memories of your time as his servant.</span>")
+	player.memory = ""
+	if(show_message && player.current)
+		player.current.visible_message("<span class='notice'>[player.current] looks like they just reverted to their old faith!</span>")
+	if(player.current && ishuman(player.current))
+		var/mob/living/carbon/human/H = player.current
+		if(H.religion == NARSIE_RELIGION)
+			H.religion = LEGAL_RELIGION
+			to_chat(H, "<span class='notice'>Your faith returns to mundane order.</span>")
+	remove_cult_magic(player.current)
+	remove_cultiness(CULTINESS_PER_CULTIST)
+	return 1
 
 /datum/antagonist/cultist/update_antag_mob(var/datum/mind/player)
 	. = ..()

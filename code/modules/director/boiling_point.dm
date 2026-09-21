@@ -202,6 +202,10 @@
 		return
 
 	active = FALSE
+	for(var/obj/effect/radiation_hazard/R in active_hazards)
+		if(R)
+			qdel(R)
+	active_hazards.Cut()
 
 	switch(scenario)
 		if(BOILING_REACTOR_MELTDOWN)
@@ -279,4 +283,7 @@
 	scenario = ""
 	time_remaining = 0
 	started_at = 0
+	for(var/obj/effect/radiation_hazard/R in active_hazards)
+		if(R)
+			qdel(R)
 	active_hazards.Cut()

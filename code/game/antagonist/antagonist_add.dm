@@ -9,13 +9,26 @@
 		player.assigned_role = role_text
 	player.special_role = role_text
 
+	var/created_default = FALSE
 	if(isghostmind(player))
-		create_default(player.current)
+		var/mob/living/default_mob = create_default(player.current)
+		if(!default_mob || !default_mob.mind || !(default_mob.mind in current_antagonists))
+			remove_antagonist(player)
+			return 0
+		current_antagonists -= player
+		player.special_role = null
+		player = default_mob.mind
+		created_default = TRUE
 	else
-		create_antagonist(player, move_to_spawn, do_not_announce, preserve_appearance)
-		if(!do_not_equip)
-			equip(player.current)
+		if(!create_antagonist(player, move_to_spawn, do_not_announce, preserve_appearance))
+			remove_antagonist(player)
+			return 0
+	if(!created_default && !do_not_equip)
+		equip(player.current)
 
+	if(!player.current)
+		remove_antagonist(player)
+		return 0
 	player.current.faction = faction
 	return 1
 
@@ -57,7 +70,8 @@
 			to_chat(player.current, "<span class='danger'><font size = 3>You are no longer a [role_text]!</font></span>")
 		current_antagonists -= player
 		faction_members -= player
-		player.special_role = null
+		if(player.special_role == role_text || (faction_role_text && player.special_role == faction_role_text))
+			player.special_role = null
 		update_icons_removed(player)
 		if(player.current)
 			BITSET(player.current.hud_updateflag, SPECIALROLE_HUD)

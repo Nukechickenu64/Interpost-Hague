@@ -164,7 +164,7 @@ SUBSYSTEM_DEF(director)
 	update_state()
 
 	// Check catalyst events
-	if(director_state >= DIRECTOR_STATE_SIMMERING)
+	if(director_state >= DIRECTOR_STATE_SIMMERING && director_state < DIRECTOR_STATE_BOILING)
 		check_catalysts()
 
 	// Check corporate profile completion
@@ -182,20 +182,22 @@ SUBSYSTEM_DEF(director)
 	var	atmos = telemetry.get_value(TELEMETRY_ATMOS_INTEGRITY)
 	var	structural = telemetry.get_value(TELEMETRY_STRUCTURAL)
 	var	comms = telemetry.get_value(TELEMETRY_COMMS_STATUS)
+	var/security_arrests = telemetry.get_value(TELEMETRY_SECURITY_ARRESTS)
 	var	loyalty_val = telemetry.get_value(TELEMETRY_LOYALTY)
 	var	vitality = telemetry.get_value(TELEMETRY_CREW_VITALITY)
 	var	death_rate = telemetry.get_value(TELEMETRY_DEATH_RATE)
 	var	research = telemetry.get_value(TELEMETRY_RESEARCH_THRESHOLD)
 
 	// Weighted contributions (each contributes to tension)
-	new_tension += (100 - power) * 0.10       // Power grid: 10%
-	new_tension += (100 - atmos) * 0.10       // Atmos: 10%
-	new_tension += (100 - structural) * 0.15  // Structural: 15%
-	new_tension += (100 - comms) * 0.05       // Comms: 5%
-	new_tension += (100 - loyalty_val) * 0.15 // Loyalty: 15%
-	new_tension += (100 - vitality) * 0.10    // Crew vitality: 10%
-	new_tension += (100 - death_rate) * 0.10  // Death rate: 10%
-	new_tension += (100 - research) * 0.05    // Research threshold: 5%
+	new_tension += (100 - power) * 0.10           // Power grid: 10%
+	new_tension += (100 - atmos) * 0.10           // Atmos: 10%
+	new_tension += (100 - structural) * 0.15      // Structural: 15%
+	new_tension += (100 - comms) * 0.05           // Comms: 5%
+	new_tension += (100 - security_arrests) * 0.10 // Security arrests: 10%
+	new_tension += (100 - loyalty_val) * 0.15     // Loyalty: 15%
+	new_tension += (100 - vitality) * 0.10        // Crew vitality: 10%
+	new_tension += (100 - death_rate) * 0.10      // Death rate: 10%
+	new_tension += (100 - research) * 0.05        // Research threshold: 5%
 
 	// Add tension from corporate profiles
 	var/profile_tension = 0
