@@ -24,7 +24,9 @@ mob/living/carbon/proc/dream()
 
 	spawn(0)
 		for(var/i = rand(1,4),i > 0, i--)
-			to_chat(src, "<span class='notice'><i>... [pick(dreams)] ...</i></span>")
+			// Occasionally let the AI Director's omens bleed into a dream instead of a normal one
+			var/omen = (SSdirector && prob(20)) ? SSdirector.get_foreshadowing() : null
+			to_chat(src, "<span class='notice'><i>... [omen || pick(dreams)] ...</i></span>")
 			sleep(rand(40,70))
 			if(paralysis <= 0)
 				dreaming = 0

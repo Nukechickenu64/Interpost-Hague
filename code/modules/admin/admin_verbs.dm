@@ -97,6 +97,11 @@ var/list/admin_verbs_admin = list(
 	/client/proc/fixatmos,
 	/datum/admins/proc/sendFax
     ,/client/proc/test_job_latejoin
+	,/client/proc/director_status_panel
+	,/client/proc/director_set_tension
+	,/client/proc/director_force_catalyst
+	,/client/proc/director_force_boiling_point
+	,/client/proc/director_toggle
 )
 var/list/admin_verbs_ban = list(
 	/client/proc/unban_panel,
@@ -296,7 +301,12 @@ var/list/admin_verbs_hideable = list(
 	/client/proc/enable_debug_verbs,
 	/client/proc/roll_dices,
 	/proc/possess,
-	/proc/release
+	/proc/release,
+	/client/proc/director_status_panel,
+	/client/proc/director_set_tension,
+	/client/proc/director_force_catalyst,
+	/client/proc/director_force_boiling_point,
+	/client/proc/director_toggle
 	)
 var/list/admin_verbs_mod = list(
 	/client/proc/cmd_admin_pm_context,	// right-click adminPM interface,

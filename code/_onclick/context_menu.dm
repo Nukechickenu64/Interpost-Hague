@@ -238,18 +238,27 @@
 	if(I)
 		src << browse_rsc(I, rsc_name)
 
-	// Build verbs list from the object's verbs
+	// Build verbs list from the object's verbs. Only "Object" category verbs are meant to be
+	// used this way (interacting with a nearby atom) - everything else (emotes, IC/OOC say
+	// commands, abilities, hotkeys, admin verbs, etc.) is reachable through its own dedicated
+	// UI, so pulling in the whole raw verbs list would flood this menu with unrelated entries.
 	var/list/verbs_list = list()
 	var/list/target_verbs = target.verbs
 	if(target_verbs)
 		for(var/V in target_verbs)
+			if(V:hidden)
+				continue
+			if(V:category != "Object")
+				continue
 			var/pathtext = "[V]" // e.g., /obj/item/verb/toggle
 			var/list/parts = splittext(pathtext, "/")
 			if(!parts || !parts.len) continue
 			var/procname = parts[parts.len]
 			if(!procname || findtext(procname, "..")) continue
-			// Labelize: underscores to spaces, capitalize first letter
-			var/label = capitalize(replacetext(procname, "_", " "))
+			// Prefer the verb's own display name over a derived one, if it set one
+			var/label = V:name
+			if(!label || !length(label))
+				label = capitalize(replacetext(procname, "_", " "))
 			verbs_list += list(list("proc"=procname, "label"=label))
 
 	// Precompute dynamic height
