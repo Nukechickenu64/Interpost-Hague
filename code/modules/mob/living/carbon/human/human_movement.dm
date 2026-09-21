@@ -113,7 +113,7 @@
 				break
 
 	if(thrust)
-		if(((!check_drift) || (check_drift && thrust.stabilization_on)) && (!lying) && (thrust.allow_thrust(0.01, src)))
+		if(((!check_drift) || (check_drift && thrust.stabilization_on)) && (thrust.allow_thrust(0.01, src)))
 			inertia_dir = 0
 			return 1
 

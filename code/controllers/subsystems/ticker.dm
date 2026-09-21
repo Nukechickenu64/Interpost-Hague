@@ -114,14 +114,6 @@ SUBSYSTEM_DEF(ticker)
 	if(round_progressing && last_fire)
 		pregame_timeleft -= world.time - last_fire
 	if(pregame_timeleft <= 0)
-		var/ready_players = count_ready_players()
-		if(ready_players < 1)
-			if(!round_progressing)
-				return
-			round_progressing = 0
-			to_world("<B>Waiting for at least one player to be ready before starting the round...</B>")
-			return
-		round_progressing = 1
 		Master.SetRunLevel(RUNLEVEL_SETUP)
 		return
 
@@ -567,19 +559,8 @@ Helpers
 	for(var/i in total_antagonists)
 		log_game("[i]s[total_antagonists[i]].")
 
-/datum/controller/subsystem/ticker/proc/count_ready_players()
-	var/ready_count = 0
-	for(var/mob/new_player/player in GLOB.player_list)
-		if(player.client && player.ready)
-			ready_count++
-	return ready_count
-
 /datum/controller/subsystem/ticker/proc/start_now(mob/user)
 	if(!(GAME_STATE == RUNLEVEL_LOBBY))
-		return
-	if(count_ready_players() < 1)
-		if(user)
-			to_chat(user, "<span class='warning'>Cannot start the round: at least one player must be ready.</span>")
 		return
 	if(istype(SSvote.active_vote, /datum/vote/gamemode))
 		SSvote.cancel_vote(user)
