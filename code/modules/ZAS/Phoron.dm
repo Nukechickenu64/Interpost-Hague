@@ -1,7 +1,7 @@
 var/image/contamination_overlay = image('icons/effects/contamination.dmi')
 
 /pl_control
-	var/PHORON_DMG = 3
+	var/PHORON_DMG = 8
 	var/PHORON_DMG_NAME = "Phoron Damage Amount"
 	var/PHORON_DMG_DESC = "Self Descriptive"
 
@@ -9,15 +9,15 @@ var/image/contamination_overlay = image('icons/effects/contamination.dmi')
 	var/CLOTH_CONTAMINATION_NAME = "Cloth Contamination"
 	var/CLOTH_CONTAMINATION_DESC = "If this is on, phoron does damage by getting into cloth."
 
-	var/PHORONGUARD_ONLY = 0
+	var/PHORONGUARD_ONLY = 1
 	var/PHORONGUARD_ONLY_NAME = "\"PhoronGuard Only\""
 	var/PHORONGUARD_ONLY_DESC = "If this is on, only biosuits and spacesuits protect against contamination and ill effects."
 
-	var/GENETIC_CORRUPTION = 0
+	var/GENETIC_CORRUPTION = 35
 	var/GENETIC_CORRUPTION_NAME = "Genetic Corruption Chance"
 	var/GENETIC_CORRUPTION_DESC = "Chance of genetic corruption as well as toxic damage, X in 10,000."
 
-	var/SKIN_BURNS = 0
+	var/SKIN_BURNS = 1
 	var/SKIN_BURNS_DESC = "Phoron has an effect similar to mustard gas on the un-suited."
 	var/SKIN_BURNS_NAME = "Skin Burns"
 
@@ -25,11 +25,11 @@ var/image/contamination_overlay = image('icons/effects/contamination.dmi')
 	var/EYE_BURNS_NAME = "Eye Burns"
 	var/EYE_BURNS_DESC = "Phoron burns the eyes of anyone not wearing eye protection."
 
-	var/CONTAMINATION_LOSS = 0.02
+	var/CONTAMINATION_LOSS = 0.08
 	var/CONTAMINATION_LOSS_NAME = "Contamination Loss"
 	var/CONTAMINATION_LOSS_DESC = "How much toxin damage is dealt from contaminated clothing" //Per tick?  ASK ARYN
 
-	var/PHORON_HALLUCINATION = 0
+	var/PHORON_HALLUCINATION = 1
 	var/PHORON_HALLUCINATION_NAME = "Phoron Hallucination"
 	var/PHORON_HALLUCINATION_DESC = "Does being in phoron cause you to hallucinate?"
 
@@ -84,6 +84,21 @@ obj/var/contaminated = 0
 	if(stat >= 2)
 		return
 
+	if(vsc.plc.PHORON_DMG)
+		adjustToxLoss(vsc.plc.PHORON_DMG * 0.2)
+		if(prob(25))
+			confused = min(confused + rand(2, 6), 100)
+			stuttering = max(stuttering, rand(2, 8))
+			if(prob(25))
+				Weaken(1)
+				to_chat(src, "<span class='danger'>The phoron writhes inside your lungs and your muscles seize up.</span>")
+
+	if(vsc.plc.PHORON_HALLUCINATION)
+		if(prob(20))
+			hallucination(rand(20, 60), rand(25, 50))
+			if(prob(15))
+				to_chat(src, "<span class='danger'>Something in the gas is moving under your skin.</span>")
+
 	//Burn skin if exposed.
 	if(vsc.plc.SKIN_BURNS)
 		if(!pl_head_protected() || !pl_suit_protected())
@@ -111,7 +126,7 @@ obj/var/contaminated = 0
 	if(vsc.plc.GENETIC_CORRUPTION)
 		if(rand(1,10000) < vsc.plc.GENETIC_CORRUPTION)
 			randmutb(src)
-			to_chat(src, "<span class='danger'>High levels of toxins cause you to spontaneously mutate!</span>")
+			to_chat(src, "<span class='danger'>The phoron mutates your body into something wrong.</span>")
 			domutcheck(src,null)
 
 
