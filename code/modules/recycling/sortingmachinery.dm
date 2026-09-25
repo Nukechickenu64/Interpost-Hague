@@ -402,6 +402,8 @@
 	return
 
 /obj/machinery/disposal/deliveryChute/Bumped(var/atom/movable/AM) //Go straight into the chute
+	if(flushing)
+		return
 	if(istype(AM, /obj/item/projectile) || istype(AM, /obj/effect))	return
 	switch(dir)
 		if(NORTH)
@@ -422,28 +424,36 @@
 	src.flush()
 
 /obj/machinery/disposal/deliveryChute/flush()
+	if(flushing)
+		return
 	flushing = 1
 	flick("intake-closing", src)
 	var/obj/structure/disposalholder/H = new()	// virtual holder object which actually
 												// travels through the pipes.
-	air_contents = new()		// new empty gas resv.
 
 	sleep(10)
+	if(QDELETED(src))
+		qdel(H)
+		return
 	playsound(src, 'sound/machines/disposalflush.ogg', 50, 0, 0)
 	sleep(5) // wait for animation to finish
+	if(QDELETED(src))
+		qdel(H)
+		return
 
 	if(prob(35))
 		for(var/mob/living/carbon/human/L in src)
 			var/list/obj/item/organ/external/crush = L.get_damageable_organs()
-			if(!crush.len)
-				return
+			if(crush.len)
+				var/obj/item/organ/external/E = pick(crush)
 
-			var/obj/item/organ/external/E = pick(crush)
+				E.take_external_damage(45, used_weapon = "Blunt Trauma")
+				to_chat(L, "\The [src]'s mechanisms crush your [E.name]!")
 
-			E.take_external_damage(45, used_weapon = "Blunt Trauma")
-			to_chat(L, "\The [src]'s mechanisms crush your [E.name]!")
-
-	H.init(src)	// copy the contents of disposer to holder
+	if(!air_contents)
+		air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
+	H.init(src, air_contents)	// copy the contents of disposer to holder
+	air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
 
 	H.start(src) // start the holder processing movement
 	flushing = 0

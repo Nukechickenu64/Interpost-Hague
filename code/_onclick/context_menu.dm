@@ -212,6 +212,40 @@
 	src.tilectx_last_turf = T
 	src.tilectx_last_clicked = clicked
 
+/mob/proc/tilectx_can_give_to(var/atom/target)
+	if(src == target)
+		return FALSE
+
+	var/mob/living/carbon/human/giver = src
+	var/mob/living/carbon/human/recipient = target
+	if(!istype(giver) || !istype(recipient))
+		return FALSE
+	if(!giver.species || !giver.species.hud || !giver.species.hud.has_hands)
+		return FALSE
+	if(!recipient.species || !recipient.species.hud || !recipient.species.hud.has_hands)
+		return FALSE
+	return TRUE
+
+/mob/proc/tilectx_can_bite(var/atom/target)
+	var/mob/living/carbon/human/attacker = src
+	var/mob/living/carbon/human/victim = target
+	if(!istype(attacker) || !istype(victim) || attacker == victim || !attacker.Adjacent(victim))
+		return FALSE
+	if(!attacker.check_has_mouth() || attacker.check_mouth_coverage())
+		return FALSE
+	var/obj/item/organ/external/head/head = attacker.get_organ(BP_HEAD)
+	if(!head || !head.get_teeth() || !victim.get_organ(attacker.zone_sel.selecting))
+		return FALSE
+	return TRUE
+
+/mob/proc/tilectx_bite_label()
+	var/style = "standard"
+	if(c_intent == I_QUICK)
+		style = "quick"
+	else if(c_intent == I_STRONG)
+		style = "strong"
+	return "Bite ([style])"
+
 // Open a verb/action menu for a specific object, with an image preview and a list of available verbs.
 /mob/proc/open_object_context_menu(var/atom/target)
 	if(!client || !target)
@@ -261,8 +295,15 @@
 				label = capitalize(replacetext(procname, "_", " "))
 			verbs_list += list(list("proc"=procname, "label"=label))
 
+	var/can_give = tilectx_can_give_to(target)
+	var/can_bite = tilectx_can_bite(target)
+
 	// Precompute dynamic height
 	var/items_count = verbs_list.len + 4 // include standard actions
+	if(can_give)
+		items_count++
+	if(can_bite)
+		items_count++
 	if(is_admin)
 		// Admin section: VV + Jump are always present; PP + Follow only for mobs
 		items_count += 2
@@ -311,6 +352,10 @@
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use'>Use</a></div>"
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Right-use</a></div>"
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=pull'>Pull</a></div>"
+	if(can_give)
+		html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=context_give'>Give</a></div>"
+	if(can_bite)
+		html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=context_bite'>[tilectx_bite_label()]</a></div>"
 
 	// Custom verbs
 	if(verbs_list.len)
@@ -411,7 +456,27 @@
 					var/atom/movable/M = target
 					start_pulling(M)
 				}
-			} else {
+			} else if(procname == "context_give") {
+				if(!tilectx_can_give_to(target))
+					return TRUE
+				if(!target.Adjacent(src)) {
+					to_chat(src, "<span class='warning'>You need to be next to \the [target] to give them something.</span>")
+					return TRUE
+				}
+				var/mob/living/carbon/human/giver = src
+				var/mob/living/recipient = target
+				giver.give(recipient)
+			} else if(procname == "context_bite") {
+				if(!tilectx_can_bite(target))
+					return TRUE
+				var/mob/living/carbon/human/attacker = src
+				var/mob/living/carbon/human/victim = target
+				var/obj/item/grab/mouth/bite_grab = new(attacker, victim)
+				if(bite_grab.can_grab())
+					bite_grab.init()
+				else
+					qdel(bite_grab)
+			} else if(procname != "context_bite") {
 				// Validate that the requested proc is an actual verb on the target before calling it
 				var/allowed = FALSE
 				var/list/target_verbs = target.verbs

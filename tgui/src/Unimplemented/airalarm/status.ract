@@ -14,7 +14,7 @@
     </ui-section>
     <ui-section label='Area Status'>
       <span class='{{data.atmos_alarm || data.fire_alarm ? "bad bold" : "good"}}'>
-    	  {{data.atmos_alarm ? "Atmosphere Alarm" : fire_alarm ? "Fire Alarm" : "Nominal"}}
+    	  {{data.atmos_alarm ? "Atmosphere Alarm" : data.fire_alarm ? "Fire Alarm" : "Nominal"}}
     	</span>
     </ui-section>
   {{else}}

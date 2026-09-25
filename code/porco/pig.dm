@@ -1,6 +1,3 @@
-/client/
-	var/scrollbarready = 0
-
 /client/proc/loadDataPig()
 	var/datum/asset/stuff = get_asset_datum(/datum/asset/pig)
 	stuff.register()
@@ -13,6 +10,7 @@
 	pigReady = 1
 	if(mob)
 		mob.updatePig()
+		mob.startPig()
 
 /client/verb/unready()
 	set hidden = 1
@@ -28,112 +26,6 @@
 	pigReady = 0
 	loadDataPig()
 	lobbyPig()
-
-/mob/new_player/proc/updateTimeToStart()
-	if(!client)
-		return
-	if(!client.pigReady)
-		return
-	var/lobby_text = ""
-	if(GAME_STATE <= RUNLEVEL_LOBBY)
-		var/time_seconds = round((SSticker?.pregame_timeleft || 0) / 10)
-		lobby_text = "Time to Start: [time_seconds]s"
-		if(SSticker && !SSticker.round_progressing)
-			lobby_text = "PAUSED - Waiting for ready players..."
-		lobby_text += "<br>"
-		var/ready_count = 0
-		var/total_count = 0
-		for(var/mob/new_player/P in GLOB.player_list)
-			if(!P.client)
-				continue
-			total_count++
-			if(P.ready)
-				ready_count++
-		lobby_text += "Players: [total_count] | Ready: [ready_count]<br>"
-		for(var/mob/new_player/P in GLOB.player_list)
-			if(!P.client)
-				continue
-			var/readycheck = P.ready ? "<span style='color:#0e3b0e'>READY</span>" : "<span style='color:#8b2f22'>NOT READY</span>"
-			lobby_text += "<b>[P.client.ckey]</b> [readycheck]<br>"
-	client << output(list2params(list("#timestart", lobby_text)), "outputwindow.browser:change")
-
-/mob/new_player/Login()
-	..()
-	spawn while(client)
-		sleep(10)
-		updateTimeToStart()
-		updatePig()
-
-/mob/new_player/Life()
-	..()
-	updateTimeToStart()
-	updatePig()
-
-/mob/living/carbon/human/proc/updateSpider()
-	if(!client)
-		return
-
-	var/list/text = list()
-	var/fulltext = ""
-
-/*
-	if(src?.mind?.succubus)
-		text += "<a href='#' id='teleportSlaves'>Teleport Slaves<br></a><a href='#' id='punishSlave'>Punish Slave<br></a> <a href='#' id='killSlave'>Kill Slave<br></a>"
-*/
-
-/*
-	if(src.verbs.Find(/mob/living/carbon/human/proc/plantEgg))
-		text += "<a href='#' id='plantEgg'>Lay Egg<br></a>"
-	if(src.verbs.Find(/mob/living/carbon/human/proc/plantWeeds))
-		text += "<a href='#' id='plantWeeds'>Plant Weeds<br></a>"
-*/
-	switch(job)
-		if("Bishop")
-			text += "<a href='#' id='Excommunicate'>Excommunicate<br></a><a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia'>Epitemia<br></a><a href='#' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#' id='Coronation'><br>Coronation</a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage'>Marriage!<br></a><a href='#' id='ClearName'>Clear Name<br></a>"
-		if("Priest")
-			text += "<a href='#' id='Excommunicate'>Excommunicate<br></a><a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Epitemia'>Epitemia<br></a><a href='#' id='RewardtheInquisitor'>Reward the Inquisitor</a><a href='#' id='Coronation'><br>Coronation</a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='CallforChurchMeeting'>Call for Chuch Meeting<br></a><a href='#' id='Marriage'>Marriage!<br></a><a href='#' id='ClearName'>Clear Name<br></a>"
-		if("Monk")
-			text += "<a href='#' id='BannishtheUndead'>Banish Undead</a><a href='#' id='RobofSins'><br>Rob of Sins<br></a><a href='#' id='Eucharisty'><br>Eucharisty<br></a><a href='#' id='BannishSpirits'>Banish Spirits<br></a><a href='#' id='Marriage'>Marriage<br></a>"
-		if("Expedition Leader")
-			text += "<a href='#' id='SetMigSpawn'>Set Migrant Arrival<br></a><a href='#' id='announceEx'>Announce (14 TILES)<br></a>"
-		if("Bum")
-			text += "<a href='#' id='tellTheTruth'>Tell the Truth<br></a>"
-		if("Urchin")
-			text += "<a href='#' id='tellTheTruth'>Tell the Truth<br></a>"
-/*
-		if("Migrant")
-			if(!migclass)
-				if(ckey in outlaw)
-					text += "<a href='#' id='ChoosemigrantClass'>Choose Migrant Class!<br></a><a href='#' id='ToggleOutlaw'>Toggle Outlaw!<br></a>"
-				else
-					text += "<a href='#' id='ChoosemigrantClass'>Choose Migrant Class!<br></a>"
-*/
-
-		if("Count")
-			text += "<a href='#' id='Reinforcement'>Change Reinforcement Type<br></a><a href='#' id='Command'>Command<br></a><a href='#' id='SpecialReinforcement'>Call for Special Reinforcement!<br></a><a href='#' id='Recruit'>Recruit<br></a><a href='#' id='CaptureThrone'>Capture Throne<br></a>"
-		if("Count Hand")
-			text += "<a href='#' id='Command'>Command<br></a><a href='#' id='SpecialReinforcement'>Call for Special Reinforcement!<br></a><a href='#' id='Recruit'>Recruit<br></a>"
-		if("Count Heir")
-			text += "<a href='#' id='SpecialReinforcement'>Call for Special Reinforcement!<br></a>"
-
-/*
-	if(src.consyte)
-		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='respark'>Respark<br></a>"
-*/
-	if(src.job == "Jester")
-		text += "<a href='#' id='Choir'>Choir<br></a><a href='#' id='nickname'>Give a nickname!<br></a>"
-		text += "<a href='#' id='juggle'>Juggle!<br></a>"
-		text += "<a href='#' id='rememberjoke'>Remember Joke!<br></a>"
-		text += "<a href='#' id='joke'>Joke!<br></a>"
-
-	for(var/T in text)
-		fulltext += "[T]"
-
-
-/mob/living/carbon/human/proc/updateSmalltext()
-	if(!client)
-		return ""
-	return ""
 
 /proc/generateVerbHtml(var/verbname = "", var/displayname = "", var/number = 1)
 	if(number % 2)
@@ -158,6 +50,9 @@
 /client/proc/addbutton(var/newcontent = "", var/selector = "")
 	src << output(list2params(list("[newcontent]", "[selector]")), "outputwindow.browser:addel")
 
+/mob
+	var/pig_refresh_active = FALSE
+
 /mob/proc/updatePig()
 	set waitfor = 0
 	if(!client)
@@ -166,7 +61,6 @@
 		return
 
 	var/buttonHTML = ""
-	defaultButton()
 
 	// Main heart/menu button
 	buttonHTML += {"<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-right:1px;\"><div style=\"background-image: url('Heart.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Verb\" class=\"button\"></div></a>"}
@@ -199,25 +93,12 @@
 			if(H.mind.special_role == "Head Revolutionary")
 				buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Epsilon.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Integralist\" class=\"button\"></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
-			// Fix: this button should use the Thanati id, not Craft
 			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Thanati.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-42px;\" id=\"Thanati\" class=\"button\"></div></a>"
-		if(istype(H.head, /obj/item/clothing/head/caphat))
-			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Crown.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-50px;\" id=\"Crown\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
 			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-88px;\" id=\"Dead\" class=\"button\"></div></a>"
 
 	client.addbutton(buttonHTML, "#dynamicpanel")
 	updateButtons()
-
-/mob/proc/noteUpdate()
-	var/newHTML = ""
-
-	if(ishuman(src))
-		var/mob/living/carbon/human/H = src
-		newHTML += "<span style='white-space: nowrap' class='segment1 ST'>ST: <span id='st'>[H.stats[STAT_ST]]</span>$HT: <span id='ht'>[H.stats[STAT_HT]]</span>$IN: <span id='int'>[H.stats[STAT_IQ]]</span>$DX: <span id='dx'>[H.stats[STAT_DX]]</span></span>"
-		newHTML += "<span class='smallstat'>[H.updateSmalltext()]</span>"
-
-	return newHTML
 
 /mob/proc/updateButtons()
 	set waitfor = 0
@@ -226,141 +107,54 @@
 	if(!client.pigReady)
 		return
 
-	client.changebuttoncontent("#note", noteUpdate())
+	var/noteHTML = ""
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		noteHTML += "<span style='white-space: nowrap' class='segment1 ST'>ST: <span id='st'>[H.stats[STAT_ST]]</span>$HT: <span id='ht'>[H.stats[STAT_HT]]</span>$IN: <span id='int'>[H.stats[STAT_IQ]]</span>$DX: <span id='dx'>[H.stats[STAT_DX]]</span></span>"
+	client.changebuttoncontent("#note", noteHTML)
 	client.changebuttoncontent("#Verb", verbUpdate())
+	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))) + "</span>")
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
 	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("MoveUp", "Move Upwards"), list("MoveDown", "Move Down"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
 	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Succumb", "Succumb")))]</span>"})
-
-	client.changebuttoncontent("#Vampire", {"<span class='segment1'>[generateVerbList(list(list("ExposeFangs", "Expose Fangs"), list("BloodStrength", "Blood Strength (50cl)"), list("Fortitude", "Fortitude (50cl)"), list("Heal", "Heal (150cl)"), list("Celerety", "Celerety (250cl)"), list("DeadEyes", "Dead Eyes")))]</span>"})
-	client.changebuttoncontent("#Advisor", {"<span class='segment1'>[generateVerbList(list(list("gradeHygiene", "Grade the Hygiene"), list("gradePeople", "Grade the People"), list("gradeFortress", "Grade the Fortress")))]</span>"})
-	client.changebuttoncontent("#Bodyguard", {"<span class='segment1'>[generateVerbList(list(list("localizeAdvisor", "Localize Advisor")))]</span>"})
 	client.changebuttoncontent("#They", {"<span class='segment1'>[generateVerbList(list(list("EvolutionMenu", "Evolve"), list("RangedSting", "Ranged Attack"), list("AbsorbDNA", "Absorb Victim"), list("Transform", "Transform"), list("LesserForm", "Lesser Form"), list("TransformLesser", "Lesser Transform"), list("ReviveLing", "Revive"), list("EpinephrineSacs", "Epinephrine Sacs"), list("ToggleDigitalCamoflague", "Hide from AI"), list("RapidRegeneration", "Rapid Regeneration"), list("HiveChannel", "Hive Channel"), list("HiveAbsorb", "Hive Absorb"), list("MimicVoice", "Mimic Voice"), list("HallucinationSting", "Hallucination Sting"), list("SilenceSting", "Silence Sting"), list("BlindSting", "Blind Sting"), list("ParalysisSting", "Paralysis Sting"), list("DeafSting", "Deaf Sting"), list("TransformationSting", "Transformation Sting"), list("DeathSting", "Death Sting"), list("ExtractDNASting", "Extract DNA Sting"), list("BuffStats", "Enhance ourselves"), list("RegenerativeStasis", "Regenerative Stasis")))]</span>"})
-	client.changebuttoncontent("#Crown", {"<span class='segment1'>[generateVerbList(list(list("DecretodoBarao", "Baron Decree"), list("Abrirtrapdoors", "Open Traps"), list("ColocarTaxas", "Impose Fees"), list("Declararalerta", "Declare Emergency"), list("VendadeDrogas", "Drug Sell"), list("VendadeArmas", "Gun Sell"), list("Expandirpoderesdaigreja", "Expand Church Power"), list("SetHands", "Set Hand")))]</span>"})
 	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("ConvertBourgeoise", "Convert to our Cause")))]</span>"})
 	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("CreateShrine", "Create a Shrine"), list("getBrothers", "Remember the Associates")))]</span>"})
 
 
 /mob/proc/verbUpdate()
 	var/newHTML = ""
-	var/mob/new_player/player = usr
 	if(istype(src, /mob/new_player))
 		var/lobby = ""
 		if(GAME_STATE <= RUNLEVEL_LOBBY)
-			lobby += "Time to Start: <span style='color:#0e3b0e'>[SSticker.pregame_timeleft]</span>$"
-			for(var/client/C)
-				var/gendercheck = "MALE"
-				var/readycheck = "NOT READY"
-
-				if(C.prefs.gender != MALE)
-					gendercheck = "FEMALE"
-				if(player.ready)
-					readycheck = "READY"
-
-				lobby += "<b>[C.ckey]</b> ([C.prefs.age] [gendercheck]) <b>[readycheck]</b>$"
+			lobby += "Time to Start: <span style='color:#0e3b0e' id='timetostart'>[SSticker ? round(SSticker.pregame_timeleft/10) : 0]</span>$"
+			for(var/mob/new_player/P in GLOB.player_list)
+				if(!P.client || !P.client.prefs)
+					continue
+				var/gendercheck = (P.client.prefs.gender != MALE) ? "FEMALE" : "MALE"
+				var/readycheck = P.ready ? "READY" : "NOT READY"
+				lobby += "<b>[P.client.ckey]</b> ([P.client.prefs.age] [gendercheck]) <b>[readycheck]</b>$"
 			newHTML += {"<span style='color:#0e3b0e; font-weight:bold;'>[lobby]</span>"}
 	if(ishuman(src))
 		newHTML += {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("LookUp", "Look Up"), list("MoveUp", "Move Upwards"), list("ShowGoals", "Show Goals")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("AddNote", "Add Memories"), list("Pray", "Pray"), list("Poo", "Poo"), list("LookDown", "Look Down"), list("MoveDown", "Move Down")), 2)]</span>"}
-		// Append spells segment if any learned spells
 	return newHTML
 
-/mob/proc/spiderUpdate()
-	var/newOption = ""
-	var/list/verbs = list()
-	if(ishuman(src))
-		var/mob/living/carbon/human/H = src
-		verbs += list(list("RememberTheTerrain", "Remember the Terrain"))
-
-/*
-		if(is_dreamer(H))
-			verbs += list(list("Wonders", "Wonders"))
-		if(H.reflectneed >= 750)
-			verbs += list(list("ReflectExperience", "Reflect your Experience!"))
-		if(H?.mind?.succubus)
-			verbs += list(list("teleportSlaves", "Teleport Slaves"), list("killSlave", "Kill Slave"))
-		if(istype(H?.species, /datum/species/human/alien))
-			verbs += list(list("plantWeeds", "Plant Weeds"), list("plantEgg", "Lay Egg"))
-*/
-
-/*
-		if(H.job == "Bishop" || H.old_job == "Bishop")
-			verbs += list(list("Excommunicate", "Excommunicate"), list("BannishtheUndead", "Banish Undead"), list("RobofSins", "Rob of Sins"), list("Epitemia", "Epitemia"), list("RewardtheInquisitor", "Reward the Inquisitor"), list("Coronation", "Coronation"), list("Eucharisty", "Eucharisty"), list("BannishSpirits", "Banish Spirits"), list("CallforChurchMeeting", "Call for Church Meeting"), list("Marriage", "Marriage!"), list("ClearName", "Clear Name"))
-		if(H.job == "Priest" || H.old_job == "Priest")
-			verbs += list(list("Excommunicate", "Excommunicate"), list("BannishtheUndead", "Banish Undead"), list("RobofSins", "Rob of Sins"), list("Epitemia", "Epitemia"), list("RewardtheInquisitor", "Reward the Inquisitor"), list("Coronation", "Coronation"), list("Eucharisty", "Eucharisty"), list("BannishSpirits", "Banish Spirits"), list("CallforChurchMeeting", "Call for Church Meeting"), list("Marriage", "Marriage!"), list("ClearName", "Clear Name"))
-		if(H.job == "Monk" || H.old_job == "Monk")
-			verbs += list(list("BannishtheUndead", "Banish Undead"), list("RobofSins", "Rob of Sins"), list("Eucharisty", "Eucharisty"), list("BannishSpirits", "Banish Spirits"), list("Marriage", "Marriage"))
-		if(H.job == "Expedition Leader" || H.old_job == "Expedition Leader")
-			verbs += list(list("SetMigSpawn", "Set Migrant Arrival"), list("announceEx", "Announce (14 TILES)"))
-
-		if(H.job == "Bum" || H.old_job == "Bum")
-			verbs += list(list("tellTheTruth", "Tell the Truth"))
-
-		if(H.job == "Urchin" || H.old_job == "Urchin")
-			verbs += list(list("tellTheTruth", "Tell the Truth"))
-
-		if(H.job == "Migrant" || H.old_job == "Migrant")
-			if(!H.migclass)
-				verbs += list(list("ChoosemigrantClass", "Choose Migrant Class!"))
-				if(ckey in outlaw)
-					verbs += list(list("ToggleOutlaw", "Toggle Outlaw!"))
-
-		if(H.job == "Count" || H.old_job == "Count")
-			verbs += list(list("Reinforcement" , "Change Reinforcement Type"), list("Command", "Command"), list("SpecialReinforcement", "Call for Special Reinforcement!"), list("Recruit", "Recruit"), list("CaptureThrone", "Capture Throne"))
-
-		if(H.job == "Count Hand" || H.old_job == "Count Hand")
-			verbs += list(list("Command", "Command"), list("SpecialReinforcement", "Call for Special Reinforcement!"), list("Recruit", "Recruit"))
-
-		if(H.job == "Count Heir" || H.old_job == "Count Heir")
-			verbs += list(list("SpecialReinforcement", "Call for Special Reinforcement!"))
-
-		if(H.job == "Sieger" || H.old_job == "Sieger")
-			if(!H.migclass)
-				verbs += list(list("ChoosesiegerClass", "Choose Sieger Class!"))
-
-		if(H.job == "Mercenary" || H.old_job == "Mercenary")
-			if(!H.migclass)
-				verbs += list(list("PegaclasseMerc", "Choose Mercenary Class!"))
-
-
-		if(H.consyte)
-			verbs += list(list("Choir", "Choir"), list("Respark", "Respark"))
-		if(H.job == "Jester")
-			verbs += list(list("joke", "Joke"), list("rememberjoke", "Remember Joke"),list("apelidar", "Give a Nickname!"), list("malabares", "Juggling!"))
-		if(H.check_perk(/datum/perk/pathfinder))
-			verbs += list(list("TrackSomeonePathFinder", "Track Someone"), list("TrackselfPathfinder", "Track Yourself"))
-		if(H.check_perk(/datum/perk/singer))
-			verbs += list(list("RememberSong", "Remember Song"), list("Sing", "Sing"))
-*/
-
-		if(H.verbs.Find(/mob/living/proc/interrogate))
-			verbs += list(list("Interrogate", "Interrogate"))
-
-	newOption = generateVerbList(verbs)
-	return {"<span class='segment1'>[newOption]</span>"}
-
 /client/proc/lobbyPig()
-	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=411x330;")
-
-/mob/proc/defaultButton()
-	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))) + "</span>")
-
-/client/proc/setDefaultButtons()
-	changebuttoncontent("#Verb", {"<span class='segment1'>[generateVerbList(list(list("DisguiseVoice", "Disguise Voice"), list("Dance", "Dance"), list("Pee", "Pee"), list("Poo", "Poo")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Notes", "Memories"), list("Pray", "Pray"), list("AddNote", "Add Memories"), list("ShowGoals", "Show Goals")))]</span>"})
+	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=541x315;")
 
 /client/proc/init_pig()
 	loadDataPig()
-	// Give assets time to arrive before opening the browser.
-	// On public servers, clients may be slower to receive browse_rsc assets.
+	// Give assets time to arrive before opening the browser, with bounded retries.
 	spawn(30)
-		if(!src)
-			return
-		lobbyPig()
-		// Retry once after a longer delay in case assets weren't ready yet.
-		spawn(50)
-			if(src && !pigReady)
-				lobbyPig()
+		var/attempt = 0
+		while(src && !pigReady && attempt < 3)
+			lobbyPig()
+			attempt++
+			if(pigReady)
+				break
+			sleep(50)
 
 	if(!holder)
 		return
@@ -415,10 +209,11 @@
 
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		client << output(list2params(list("#st", "[H.stats[STAT_ST]]")), "outputwindow.browser:change")
-		client << output(list2params(list("#ht", "[H.stats[STAT_HT]]")), "outputwindow.browser:change")
-		client << output(list2params(list("#int", "[H.stats[STAT_IQ]]")), "outputwindow.browser:change")
-		client << output(list2params(list("#dx", "[H.stats[STAT_DX]]")), "outputwindow.browser:change")
+		// change() uses getElementById(), which needs the bare id, not a CSS selector
+		client << output(list2params(list("st", "[H.stats[STAT_ST]]")), "outputwindow.browser:change")
+		client << output(list2params(list("ht", "[H.stats[STAT_HT]]")), "outputwindow.browser:change")
+		client << output(list2params(list("int", "[H.stats[STAT_IQ]]")), "outputwindow.browser:change")
+		client << output(list2params(list("dx", "[H.stats[STAT_DX]]")), "outputwindow.browser:change")
 
 /*
 	if(ishuman(src))
@@ -431,20 +226,36 @@
 
 /mob/proc/pigHandler()
 	updatePig()
+	updateLobbyTimer()
 	if(!ishuman(src))
 		return
 
 	var/mob/living/carbon/human/H = src
 	H.updateStatPig()
 
-/mob/living/carbon/human/New()
-	..()
+// changel() only re-arms the popup's onclick with fresh HTML, it won't refresh an already-open popup, so push the countdown span directly
+/mob/proc/updateLobbyTimer()
+	if(!client)
+		return
+	if(!client.pigReady)
+		return
+	if(GAME_STATE > RUNLEVEL_LOBBY)
+		return
+
+	client << output(list2params(list("timetostart", "[SSticker ? round(SSticker.pregame_timeleft/10) : 0]")), "outputwindow.browser:change")
 
 /mob/proc/startPig()
-	spawn while(client)
-		sleep(85)
-		pigHandler()
-		updateStatPig()
+	if(pig_refresh_active)
+		return
+
+	pig_refresh_active = TRUE
+	spawn
+		while(src && client && !QDELETED(src))
+			sleep(85)
+			if(!client || !client.pigReady || QDELETED(src))
+				break
+			pigHandler()
+		pig_refresh_active = FALSE
 
 /mob/living/carbon/human/Login()
 	..()

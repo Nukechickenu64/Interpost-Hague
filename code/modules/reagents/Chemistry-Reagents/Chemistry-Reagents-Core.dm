@@ -78,6 +78,16 @@
 
 /datum/reagent/blood/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 
+	if(ishuman(M))
+		var/mob/living/carbon/human/H = M
+		if(H.mind?.is_leech())
+			var/restoration = removed
+			if(holder?.temperature < T0C)
+				restoration *= 0.5
+				if(prob(20))
+					H.vomit()
+			H.vessel.add_reagent(/datum/reagent/blood, restoration, data)
+
 	if(M.chem_doses[type] > 5)
 		M.adjustToxLoss(removed)
 	if(M.chem_doses[type] > 15)

@@ -38,7 +38,10 @@
 // find the attached trunk (if present) and init gas resvr.
 /obj/machinery/disposal/New()
 	..()
+	air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
 	spawn(5)
+		if(QDELETED(src))
+			return
 		trunk = locate() in src.loc
 		if(!trunk)
 			mode = 0
@@ -46,13 +49,13 @@
 		else
 			trunk.linked = src	// link the pipe trunk to self
 
-		air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
 		update_icon()
 
 /obj/machinery/disposal/Destroy()
 	eject()
 	if(trunk)
 		trunk.linked = null
+	QDEL_NULL(air_contents)
 	return ..()
 
 // attack by item places it in to disposal
@@ -119,7 +122,7 @@
 			var/mob/GM = G.affecting
 			for (var/mob/V in viewers(usr))
 				V.show_message("[usr] starts putting [GM.name] into the disposal.", 3)
-			if(do_after(usr, 20, src))
+			if(do_after(usr, 20, src) && GM && !QDELETED(GM) && G.affecting == GM)
 				if (GM.client)
 					GM.client.perspective = EYE_PERSPECTIVE
 					GM.client.eye = src
@@ -333,7 +336,8 @@
 
 // eject the contents of the disposal unit
 /obj/machinery/disposal/proc/eject()
-	for(var/atom/movable/AM in src)
+	var/list/contents_copy = src.contents.Copy()
+	for(var/atom/movable/AM in contents_copy)
 		AM.forceMove(src.loc)
 		AM.pipe_eject(0)
 	update_icon()
@@ -394,7 +398,7 @@
 		src.pressurize() //otherwise charge
 
 /obj/machinery/disposal/proc/pressurize()
-	if(stat & NOPOWER)			// won't charge if no power
+	if((stat & NOPOWER) || !air_contents)			// won't charge if no power
 		update_use_power(POWER_USE_OFF)
 		return
 
@@ -411,6 +415,8 @@
 
 // perform a flush
 /obj/machinery/disposal/proc/flush()
+	if(flushing || !air_contents)
+		return
 
 	flushing = 1
 	flick("[icon_state]-flush", src)
@@ -435,6 +441,9 @@
 		last_sound = world.time
 	sleep(5) // wait for animation to finish
 
+	if(QDELETED(src))
+		qdel(H)
+		return
 
 	H.init(src, air_contents)	// copy the contents of disposer to holder
 	air_contents = new(PRESSURE_TANK_VOLUME)	// new empty gas resv.
@@ -463,7 +472,8 @@
 	var/turf/target
 	playsound(src, 'sound/machines/hiss.ogg', 50, 0, 0)
 	if(H) // Somehow, someone managed to flush a window which broke mid-transit and caused the disposal to go in an infinite loop trying to expel null, hopefully this fixes it
-		for(var/atom/movable/AM in H)
+		var/list/contents_copy = H.contents.Copy()
+		for(var/atom/movable/AM in contents_copy)
 			target = get_offset_target_turf(src.loc, rand(5)-rand(5), rand(5)-rand(5))
 
 			AM.forceMove(src.loc)
@@ -527,7 +537,8 @@
 					hasmob = 1
 	// now everything inside the disposal gets put into the holder
 	// note AM since can contain mobs or objs
-	for(var/atom/movable/AM in D)
+	var/list/disposal_contents = D.contents.Copy()
+	for(var/atom/movable/AM in disposal_contents)
 		AM.forceMove(src)
 		if(istype(AM, /obj/structure/bigDelivery) && !hasmob)
 			var/obj/structure/bigDelivery/T = AM
@@ -554,8 +565,17 @@
 	// movement process, persists while holder is moving through pipes
 /obj/structure/disposalholder/Process()
 	for (var/i in 1 to speed)
+		var/obj/structure/disposalpipe/curr = loc
 		if(!(count--))
 			active = 0
+			if(curr)
+				curr.expel(src, curr.loc, 0)
+			else
+				var/list/holder_contents = src.contents.Copy()
+				for(var/atom/movable/AM in holder_contents)
+					AM.forceMove(get_turf(src))
+					AM.pipe_eject(0)
+				qdel(src)
 		if(!active)
 			return PROCESS_KILL
 
@@ -567,14 +587,17 @@
 					H.take_overall_damage(20, 0, "Blunt Trauma")//horribly maim any living creature jumping down disposals.  c'est la vie
 					H.unlock_achievement(new/datum/achievement/clang())
 
-		var/obj/structure/disposalpipe/curr = loc
+		if(!curr)
+			active = 0
+			vent_gas(loc)
+			return PROCESS_KILL
 		last = curr
 		curr = curr.transfer(src)
 
 		if(QDELETED(src))
 			return PROCESS_KILL
 
-		if(!curr)
+		if(!curr && last)
 			last.expel(src, loc, dir)
 
 	// find the turf which should contain the next pipe
@@ -681,7 +704,8 @@
 				// deleting pipe is inside a dense turf (wall)
 				// this is unlikely, but just dump out everything into the turf in case
 
-				for(var/atom/movable/AM in H)
+				var/list/contents_copy = H.contents.Copy()
+				for(var/atom/movable/AM in contents_copy)
 					AM.forceMove(T)
 					AM.pipe_eject(0)
 				qdel(H)
@@ -753,8 +777,9 @@
 		// Empty the holder if it is expelled into a dense turf.
 		// Leaving it intact and sitting in a wall is stupid.
 		if(T.density)
-			for(var/atom/movable/AM in H)
-				AM.loc = T
+			var/list/contents_copy = H.contents.Copy()
+			for(var/atom/movable/AM in contents_copy)
+				AM.forceMove(T)
 				AM.pipe_eject(0)
 			qdel(H)
 			return
@@ -773,7 +798,8 @@
 
 			playsound(src, 'sound/machines/hiss.ogg', 50, 0, 0)
 			if(H)
-				for(var/atom/movable/AM in H)
+				var/list/contents_copy = H.contents.Copy()
+				for(var/atom/movable/AM in contents_copy)
 					AM.forceMove(T)
 					AM.pipe_eject(direction)
 					spawn(1)
@@ -786,7 +812,8 @@
 
 			playsound(src, 'sound/machines/hiss.ogg', 50, 0, 0)
 			if(H)
-				for(var/atom/movable/AM in H)
+				var/list/contents_copy = H.contents.Copy()
+				for(var/atom/movable/AM in contents_copy)
 					target = get_offset_target_turf(T, rand(5)-rand(5), rand(5)-rand(5))
 
 					AM.forceMove(T)
@@ -821,7 +848,8 @@
 				// broken pipe is inside a dense turf (wall)
 				// this is unlikely, but just dump out everything into the turf in case
 
-				for(var/atom/movable/AM in H)
+				var/list/contents_copy = H.contents.Copy()
+				for(var/atom/movable/AM in contents_copy)
 					AM.forceMove(T)
 					AM.pipe_eject(0)
 				qdel(H)
@@ -942,7 +970,8 @@
 			// deleting pipe is inside a dense turf (wall)
 			// this is unlikely, but just dump out everything into the turf in case
 
-			for(var/atom/movable/AM in H)
+			var/list/contents_copy = H.contents.Copy()
+			for(var/atom/movable/AM in contents_copy)
 				AM.forceMove(T)
 				AM.pipe_eject(0)
 			qdel(H)
@@ -1613,10 +1642,16 @@
 		flick("outlet-open", src)
 		playsound(src, 'sound/machines/warning-buzzer.ogg', 50, 0, 0)
 		sleep(20)	//wait until correct animation frame
+		if(QDELETED(src))
+			qdel(H)
+			return
 		playsound(src, 'sound/machines/hiss.ogg', 50, 0, 0)
 
 		if(H)
-			for(var/atom/movable/AM in H)
+			var/list/contents_copy = H.contents.Copy()
+			if(!target)
+				target = get_ranged_target_turf(src, dir, 10)
+			for(var/atom/movable/AM in contents_copy)
 				AM.forceMove(src.loc)
 				AM.pipe_eject(dir)
 				if(!istype(AM,/mob/living/silicon/robot/drone)) //Drones keep smashing windows from being fired out of chutes. Bad for the station. ~Z

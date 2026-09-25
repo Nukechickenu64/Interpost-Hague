@@ -5,7 +5,7 @@
 #define HUB_ENABLED 1
 	hub = "Exadv1.spacestation13"
 	name = "interpost Marrow"
-	status = "I'm tired, I want it back, y'now, the golden days"
+	status = "classic SS13 storytelling. Discord: https://discord.gg/muaCHWtDDU"
 #ifdef HUB_ENABLED
 	hub_password = "kMZy3U5jJHSiBQjr"
 #else

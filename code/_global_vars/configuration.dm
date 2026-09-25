@@ -14,6 +14,9 @@ var/Debug2 = 0
 
 var/gravity_is_on = 1
 
+// Admin toggle: gives all station-level powernets effectively unlimited power.
+GLOBAL_VAR_INIT(infinite_station_power, FALSE)
+
 // Inter-round persistent admin toggle: resets the supermatter to 100% integrity and deactivates it instead of letting it explode.
 GLOBAL_VAR_INIT(smsafemode, FALSE)
 

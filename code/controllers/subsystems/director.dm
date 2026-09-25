@@ -48,6 +48,8 @@ SUBSYSTEM_DEF(director)
 		new /datum/catalyst_event/anomaly(),
 		new /datum/catalyst_event/mutiny(),
 		new /datum/catalyst_event/infiltration(),
+		new /datum/catalyst_event/leech(),
+		new /datum/catalyst_event/epicurean(),
 	)
 
 	log_debug("AI Director: Initialized with [catalysts.len] catalyst events.")
@@ -159,6 +161,13 @@ SUBSYSTEM_DEF(director)
 
 	// Calculate tension from telemetry
 	calculate_tension()
+	apply_time_pressure()
+
+	// Start the ten-minute finale with one evaluation interval to spare so a
+	// Dynamic round concludes before the two-hour hard limit.
+	if(round_start_time && world.time - round_start_time >= DIRECTOR_MAX_ROUND_DURATION - boiling_point.total_duration - DIRECTOR_EVAL_INTERVAL)
+		tension = TENSION_CRITICAL
+		tension_last_change_reason = "Maximum shift duration reached"
 
 	// Update state machine
 	update_state()
@@ -217,6 +226,21 @@ SUBSYSTEM_DEF(director)
 		// Slow decay
 		tension = clamp(tension + difference * 0.3, 0, TENSION_MAX)
 		tension_last_change_reason = "Telemetry-driven decay"
+
+/// Apply a growing minimum tension as the Director loses patience with a long shift.
+/datum/controller/subsystem/director/proc/apply_time_pressure()
+	if(!round_start_time)
+		return
+
+	var/elapsed = world.time - round_start_time
+	if(elapsed <= DIRECTOR_IMPATIENCE_START)
+		return
+
+	var/impatience_window = DIRECTOR_MAX_ROUND_DURATION - boiling_point.total_duration - DIRECTOR_IMPATIENCE_START
+	var/time_pressure = min(DIRECTOR_MAX_TIME_PRESSURE, ((elapsed - DIRECTOR_IMPATIENCE_START) / impatience_window) * DIRECTOR_MAX_TIME_PRESSURE)
+	if(tension < time_pressure)
+		tension = time_pressure
+		tension_last_change_reason = "Director impatience"
 
 /// Update the state machine based on tension
 /datum/controller/subsystem/director/proc/update_state()

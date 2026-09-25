@@ -86,9 +86,9 @@
 	target_ladder.audible_message("<span class='notice'>I hear something coming [direction] \the [src]</span>")
 
 	if(do_after(M, climb_time, src))
-		climbLadder(M, target_ladder)
-		for (var/obj/item/grab/G in M)
-			G.adjust_position(force = 1)
+		if(climbLadder(M, target_ladder))
+			for (var/obj/item/grab/G in M)
+				G.adjust_position(force = 1)
 
 /obj/structure/ladder/attack_ghost(var/mob/M)
 	instant_climb(M)
@@ -204,6 +204,8 @@
 					var/mob/living/L = A
 					if(L.pulling)
 						L.pulling.forceMove(source)
+					for(var/obj/item/grab/G in L)
+						G.adjust_position(force = 1)
 		if(ishuman(A))
 			var/mob/living/carbon/human/H = A
 			if(H.has_footsteps())
@@ -285,5 +287,7 @@
 			var/mob/living/L = A
 			if(L.pulling)
 				L.pulling.forceMove(target)
+			for(var/obj/item/grab/G in L)
+				G.adjust_position(force = 1)
 	else
 		to_chat(A, "<span class='warning'>Something blocks the path.</span>")

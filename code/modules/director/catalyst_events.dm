@@ -320,6 +320,68 @@
 	SSdirector.add_tension(10, "Infiltrator deployed")
 	return TRUE
 
+// === Hidden Appetites ===
+// Covert station antagonists selected from living crew who opted into the role.
+
+/datum/catalyst_event/proc/convert_station_antagonist(var/antag_id)
+	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
+	if(!antag)
+		return FALSE
+	var/list/candidates = list()
+	for(var/mob/living/carbon/human/H in GLOB.player_list)
+		if(!H.client || !H.mind || H.stat == DEAD || !is_station_turf(get_turf(H)))
+			continue
+		if(player_is_antag(H.mind))
+			continue
+		if(!H.client.prefs || !H.client.prefs.be_special_role || !(antag_id in H.client.prefs.be_special_role))
+			continue
+		candidates += H.mind
+	while(candidates.len)
+		var/datum/mind/candidate = pick(candidates)
+		candidates -= candidate
+		if(antag.add_antagonist(candidate, 0, 0, 0, 1, 1))
+			SSdirector.loyalty.set_faction(candidate, LOYALTY_NEUTRAL)
+			return TRUE
+	return FALSE
+
+/datum/catalyst_event/leech
+	name = "Hematopoietic Failure"
+	catalyst_type = CATALYST_LEECH
+	description = "A crewmember's failing marrow has developed an appetite for fresh blood."
+	tension_threshold = TENSION_ELEVATED
+	max_uses_per_round = 1
+	cooldown = 10 MINUTES
+	omen_text = "a hollow pulse and a thirst no drink can touch"
+
+/datum/catalyst_event/leech/check_conditions(var/datum/telemetry/T)
+	return T.get_value(TELEMETRY_CREW_VITALITY) < 75
+
+/datum/catalyst_event/leech/execute(var/datum/telemetry/T)
+	if(!convert_station_antagonist("leech"))
+		log_debug("Hematopoietic Failure: No eligible Leech candidate, aborting.")
+		return FALSE
+	SSdirector.add_tension(8, "A Leech emerged among the crew")
+	return TRUE
+
+/datum/catalyst_event/epicurean
+	name = "Forbidden Appetite"
+	catalyst_type = CATALYST_EPICUREAN
+	description = "Mounting pressure has pushed a crewmember toward a carefully concealed appetite."
+	tension_threshold = TENSION_HIGH
+	max_uses_per_round = 1
+	cooldown = 10 MINUTES
+	omen_text = "a spotless knife laid beside an empty plate"
+
+/datum/catalyst_event/epicurean/check_conditions(var/datum/telemetry/T)
+	return T.get_value(TELEMETRY_CREW_VITALITY) >= 60
+
+/datum/catalyst_event/epicurean/execute(var/datum/telemetry/T)
+	if(!convert_station_antagonist("epicurean"))
+		log_debug("Forbidden Appetite: No eligible Epicurean candidate, aborting.")
+		return FALSE
+	SSdirector.add_tension(8, "An Epicurean emerged among the crew")
+	return TRUE
+
 /proc/director_spawn_ghost_body(var/mob/observer/ghost/ghost, var/name)
 	if(!ghost || !ghost.client || !ghost.key)
 		return null

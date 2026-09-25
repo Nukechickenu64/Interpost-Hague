@@ -69,6 +69,11 @@
 	)
 
 /datum/reagent/dylovene/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(ishuman(M))
+		var/mob/living/carbon/human/H = M
+		if(H.mind?.is_leech())
+			H.adjustFireLoss(2 * removed)
+			H.regenerate_blood(removed)
 	M.drowsyness = max(0, M.drowsyness - 6 * removed)
 	M.adjust_hallucination(-9 * removed)
 	M.add_up_to_chemical_effect(CE_ANTITOX, 1)

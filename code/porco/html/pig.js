@@ -1,12 +1,18 @@
-var scrollbar = new Control.ScrollBar('scrollbar_content', 'scrollbar_track', 'scrollbtnup', 'scrollbtndown');
+var scrollbar;
+try {
+	scrollbar = new Control.ScrollBar('scrollbar_content', 'scrollbar_track', 'scrollbtnup', 'scrollbtndown');
+} catch(error) {
+	scrollbar = {
+		scrollBy: function() {},
+		scrollTo: function() {},
+		recalculateLayout: function() {},
+		lastscrollTop: 0
+	};
+}
 var cureval = 0;
 var elem = document.getElementById('scrollbar_content');
 var elem_scrollbar = document.getElementById('scrollbar_track');
 var E = document.getElementById('scrollbar_container');
-
-function byondCommand(command) {
-	window.location = 'byond://winset?command=' + encodeURIComponent(command);
-}
 
 function stopScrollRepeat() {
 	if(cureval !== 0) {
@@ -31,7 +37,7 @@ function startScrollRepeat(event, amount, callback) {
 }
 
 $('scrollbtndown').observe('mousedown', function(event) {
-	startScrollRepeat(event, 24, scrolldown);
+		startScrollRepeat(event, 24, scrolldown);
 });
 
 $('scrollbtndown').observe('mouseup', function(event) {
@@ -50,6 +56,18 @@ $('scrollbtnup').observe('mouseup', function(event) {
 
 function redirect() {
 	byondCommand('doneRsc');
+}
+
+function byondCommand(command) {
+	window.location = 'byond://winset?command=' + encodeURIComponent(command);
+}
+
+function cancelLink(event) {
+	if(event) {
+		event.returnValue = false;
+		event.cancelBubble = true;
+	}
+	return false;
 }
 
 function FI(tmpImg) {
@@ -94,11 +112,17 @@ function changel(content, selector) {
 		return;
 	}
 
-	selected.onclick = function() {
-		byondCommand('button');
+	selected.onclick = function(event) {
 		InputMsg(content);
+		if(event) {
+			event.returnValue = false;
+			event.cancelBubble = true;
+		}
 		return false;
 	};
+	if(selected.parentNode && selected.parentNode.tagName && selected.parentNode.tagName.toLowerCase() === 'a') {
+		selected.parentNode.onclick = selected.onclick;
+	}
 	scrollbar.recalculateLayout();
 }
 
@@ -119,25 +143,26 @@ function change(id, content) {
 	}
 
 	selected.innerHTML = content;
+	scrollbar.recalculateLayout();
 }
 
 elem.onscroll = fixScrollbar;
 elem.onload = fixScrollbar;
-window.onload = redirect;
-
-var p = document.getElementById('pig');
-var n = document.getElementById('note');
-
-if(p) {
-	p.onclick = function() {
-		byondCommand('Who');
-		return false;
-	};
-}
-
-if(n) {
-	n.onclick = function() {
-		byondCommand('heartpig');
-		return false;
-	};
-}
+window.onload = function() {
+	redirect();
+	imagesReload();
+	var chromeLink = document.getElementById('chrome-link');
+	var optionsLink = document.getElementById('options-link');
+	if(chromeLink) {
+		chromeLink.onclick = function(event) {
+			InputMsg('Stats are shown in the main panel.');
+			return cancelLink(event);
+		};
+	}
+	if(optionsLink) {
+		optionsLink.onclick = function(event) {
+			InputMsg('');
+			return cancelLink(event);
+		};
+	}
+};

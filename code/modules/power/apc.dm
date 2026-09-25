@@ -963,7 +963,10 @@
 
 /obj/machinery/power/apc/surplus()
 	if(terminal)
-		return terminal.surplus()
+		var/s = terminal.surplus()
+		if(terminal.powernet && terminal.powernet.perapc)	// respect the powernet's fair-share allotment between APCs
+			return min(s, terminal.powernet.perapc)
+		return s
 	else
 		return 0
 
@@ -1210,7 +1213,7 @@ obj/machinery/power/apc/proc/autoset(var/cur_state, var/on)
 	return
 
 /obj/machinery/power/apc/disconnect_terminal(var/obj/machinery/power/terminal/term)
-	if(terminal)
+	if(term == terminal)
 		terminal.master = null
 		terminal = null
 

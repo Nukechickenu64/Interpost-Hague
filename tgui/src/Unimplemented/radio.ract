@@ -2,7 +2,7 @@
   component.exports = {
     computed: {
       readableFrequency () {
-        return Math.round(this.get('adata.frequency')) / 10
+        return Math.round(this.get('data.frequency')) / 10
       }
     }
   }

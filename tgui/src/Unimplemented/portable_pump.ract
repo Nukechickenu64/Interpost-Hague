@@ -12,7 +12,7 @@
 <ui-display title='Pump'>
   <ui-section label='Power'>
     <ui-button icon='{{data.on ? "power-off" : "close"}}'
-      style='{{data.on ? "selected" : "null"}}'
+      style='{{data.on ? "selected" : ""}}'
       action='power'>{{data.on ? "On" : "Off"}}</ui-button>
   </ui-section>
   <ui-section label='Direction'>

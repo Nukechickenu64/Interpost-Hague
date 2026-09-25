@@ -942,6 +942,8 @@ var/list/rank_prefix = list(\
 		germ_level += n
 
 /mob/living/carbon/human/revive()
+	if(mind && mind.is_leech() && !mind.leech_conversion_pending)
+		return FALSE
 
 	if(should_have_organ(BP_HEART))
 		vessel.add_reagent(/datum/reagent/blood,species.blood_volume-vessel.total_volume)

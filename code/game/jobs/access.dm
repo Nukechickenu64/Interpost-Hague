@@ -221,6 +221,8 @@
 		var/obj/item/I = item_slot
 		if(I)
 			. |= I.GetAccess()
+	if(mind?.has_epicurean_trophy("command_brain"))
+		. |= access_security
 #undef HUMAN_ID_CARDS
 
 /mob/living/silicon/GetIdCard()

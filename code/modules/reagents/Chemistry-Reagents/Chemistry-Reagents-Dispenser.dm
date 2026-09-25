@@ -194,6 +194,10 @@
 
 /datum/reagent/iron/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	M.add_chemical_effect(CE_BLOODRESTORE, 8 * removed)
+	if(ishuman(M))
+		var/mob/living/carbon/human/H = M
+		if(H.mind?.is_leech())
+			H.regenerate_blood(removed * 2)
 
 /datum/reagent/lithium
 	name = "Lithium"

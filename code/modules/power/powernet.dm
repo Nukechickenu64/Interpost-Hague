@@ -96,8 +96,23 @@
 
 //handles the power changes in the powernet
 //called every ticks by the powernet controller
+// Amount of power granted to a station powernet when the infinite power admin secret is enabled.
+#define INFINITE_STATION_POWER_AMOUNT 999999999
+
+/datum/powernet/proc/is_on_station_level()
+	for(var/obj/structure/cable/C in cables)
+		if(C.z in GLOB.using_map.station_levels)
+			return TRUE
+	for(var/obj/machinery/power/M in nodes)
+		if(M.z in GLOB.using_map.station_levels)
+			return TRUE
+	return FALSE
+
 /datum/powernet/proc/reset()
 	var/numapc = 0
+
+	if(GLOB.infinite_station_power && is_on_station_level())
+		newavail = max(newavail, INFINITE_STATION_POWER_AMOUNT)
 
 	if(problem > 0)
 		problem = max(problem - 1, 0)

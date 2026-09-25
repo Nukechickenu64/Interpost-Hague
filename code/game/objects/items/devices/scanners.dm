@@ -134,6 +134,9 @@ proc/medical_scan_results(var/mob/living/carbon/human/H, var/verbose)
 	// Blood pressure. Based on the idea of a normal blood pressure being 120 over 80.
 	if(H.get_blood_volume() <= 70)
 		. += "\n<span class='danger'>Severe blood loss detected.</span>"
+	if(H.mind?.is_leech())
+		. += "\n<span class='danger'>Severe Hematopoietic Failure: anomalous metabolic rate detected.</span>"
+		H.mind.leech_diagnosed = TRUE
 	. += "\n<b>Blood pressure:</b> [H.get_blood_pressure()] ([H.get_blood_oxygenation()]% blood oxygenation)"
 
 	// Body temperature.

@@ -298,7 +298,8 @@
 
 		if(damage)
 			damage *= isSynthetic() ? 0.5 : species.radiation_mod
-			adjustToxLoss(damage * RADIATION_SPEED_COEFFICIENT)
+			if(!mind?.has_epicurean_trophy("resilience_liver"))
+				adjustToxLoss(damage * RADIATION_SPEED_COEFFICIENT)
 			updatehealth()
 			if(!isSynthetic() && organs.len)
 				var/obj/item/organ/external/O = pick(organs)
@@ -711,6 +712,10 @@
 
 		CheckStamina()
 		handle_fatigue()
+		handle_leech_decay()
+		if(mind?.has_epicurean_trophy("security_heart") && health < maxHealth * 0.3)
+			adjustStaminaLoss(-5)
+			make_adrenaline(1)
 	return 1
 
 // Fatigue: accumulates from running and actions, recovers while idle/resting.

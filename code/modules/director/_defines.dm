@@ -34,6 +34,8 @@
 #define CATALYST_MUTINY            "mutiny"
 #define CATALYST_INFILTRATION      "infiltration"
 #define CATALYST_BIOHAZARD         "biohazard"
+#define CATALYST_LEECH             "leech"
+#define CATALYST_EPICUREAN         "epicurean"
 
 // Squad doctrine roles
 #define SQUAD_ROLE_LEADER          "leader"
@@ -63,3 +65,9 @@
 #define DIRECTOR_EVAL_INTERVAL     30 SECONDS
 #define CATALYST_COOLDOWN          5 MINUTES
 #define TELEMETRY_SAMPLE_INTERVAL  10 SECONDS
+
+// The Director becomes steadily less patient as a shift runs long. Reserve
+// enough time for the Boiling Point finale to conclude before this limit.
+#define DIRECTOR_MAX_ROUND_DURATION 2 HOURS
+#define DIRECTOR_IMPATIENCE_START   20 MINUTES
+#define DIRECTOR_MAX_TIME_PRESSURE  40

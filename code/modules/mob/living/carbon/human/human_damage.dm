@@ -182,6 +182,8 @@
 
 	if((species.species_flags & SPECIES_FLAG_NO_POISON) || isSynthetic())
 		return
+	if(amount > 0 && mind?.has_epicurean_trophy("resilience_liver"))
+		return
 
 	var/heal = amount < 0
 	amount = abs(amount)

@@ -49,7 +49,7 @@
 			if(ishuman(user))
 				user.put_in_hands(I)
 			else
-				I.loc = get_turf(src)
+				I.forceMove(get_turf(src))
 			to_chat(user, "<span class='notice'>You find \an [I] in the cistern.</span>")
 			w_items -= I.w_class
 			return
@@ -85,13 +85,13 @@
 			var/mob/living/GM = G.affecting
 
 			if(G.type_name == GRAB_NORMAL)
-				if(!GM.loc == get_turf(src))
+				if(GM.loc != get_turf(src))
 					to_chat(user, "<span class='notice'>[GM.name] needs to be on the toilet.</span>")
 					return
 				if(open && !swirlie)
 					user.visible_message("<span class='danger'>[user] starts to give [GM.name] a swirlie!</span>", "<span class='notice'>You start to give [GM.name] a swirlie!</span>")
 					swirlie = GM
-					if(do_after(user, 30, src))
+					if(do_after(user, 30, src) && GM && !QDELETED(GM) && GM.loc == get_turf(src))
 						user.visible_message("<span class='danger'>[user] gives [GM.name] a swirlie!</span>", "<span class='notice'>You give [GM.name] a swirlie!</span>", "You hear a toilet flushing.")
 						GM.adjustOxyLoss(1)
 					swirlie = null
@@ -112,7 +112,7 @@
 			to_chat(user, "<span class='notice'>The cistern is full.</span>")
 			return
 		user.drop_item()
-		I.loc = src
+		I.forceMove(src)
 		w_items += I.w_class
 		to_chat(user, "You carefully place \the [I] into the cistern.")
 		return
@@ -150,6 +150,14 @@
 
 /obj/machinery/disposal/toilet/interact(mob/user)
 	return
+
+/obj/machinery/disposal/toilet/flush()
+	. = ..()
+	w_items = 0
+
+/obj/machinery/disposal/toilet/eject()
+	w_items = 0
+	. = ..()
 
 /obj/machinery/disposal/toilet/Topic(href, href_list)
 	return
