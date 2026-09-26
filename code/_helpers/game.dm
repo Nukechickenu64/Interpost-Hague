@@ -236,13 +236,15 @@
 	return hear
 
 
-/proc/get_mobs_in_radio_ranges(var/list/obj/item/device/radio/radios)
+/proc/get_mobs_in_radio_ranges(var/list/obj/item/device/radio/radios, var/list/radio_sources)
 
 	set background = 1
 
 	. = list()
 	// Returns a list of mobs who can hear any of the radios given in @radios
+	// If @radio_sources is given it is filled with mob -> radio they most likely heard it from
 	var/list/speaker_coverage = list()
+	var/list/held_radios = list()
 	for(var/obj/item/device/radio/R in radios)
 		if(R)
 			//Cyborg checks. Receiving message uses a bit of cyborg's charge.
@@ -257,8 +259,10 @@
 
 			var/turf/speaker = get_turf(R)
 			if(speaker)
+				if(radio_sources)
+					held_radios[get_atom_on_turf(R)] = R
 				for(var/turf/T in hear(R.canhear_range,speaker))
-					speaker_coverage[T] = T
+					speaker_coverage[T] = R
 
 
 	// Try to find all the players who can hear the message
@@ -270,6 +274,8 @@
 				// Ghostship is magic: Ghosts can hear radio chatter from anywhere
 				if(speaker_coverage[ear] || (isghost(M) && M.get_preference_value(/datum/client_preference/ghost_radio) == GLOB.PREF_ALL_CHATTER))
 					. |= M		// Since we're already looping through mobs, why bother using |= ? This only slows things down.
+					if(radio_sources)
+						radio_sources[M] = held_radios[M] || speaker_coverage[ear]
 	return .
 
 /proc/get_mobs_and_objs_in_view_fast(var/turf/T, var/range, var/list/mobs, var/list/objs, var/checkghosts = null)

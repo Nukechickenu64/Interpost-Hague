@@ -1,5 +1,5 @@
 // Bitflags for mutations.
-#define STRUCDNASIZE 27
+#define STRUCDNASIZE 36
 #define   UNIDNASIZE 13
 
 // Generic mutations:
@@ -30,6 +30,16 @@
 #define mShock         109 // Insulated hands.
 #define mSmallsize     110 // Table climbing.
 
+// Additional character mutation effects.
+#define mHeatTolerance 111 // Improved resistance to heat damage.
+#define mQuietHands    112 // Reduced electrical conduction.
+#define mCompactFrame  113 // Smaller body frame.
+#define mCleanPrints   114 // No usable fingerprints.
+#define mResilientLungs 115 // Reduced need for oxygen.
+#define mRapidHealing  116 // Accelerated recovery.
+#define mNightVision   117 // Improved vision in darkness.
+#define mSteadyHands   118 // Resistance to clumsiness.
+
 // disabilities
 #define NEARSIGHTED 0x1
 #define EPILEPSY    0x2
@@ -57,6 +67,14 @@ GLOBAL_VAR_INIT(GLASSESBLOCK,0)
 GLOBAL_VAR_INIT(EPILEPSYBLOCK,0)
 GLOBAL_VAR_INIT(TWITCHBLOCK,0)
 GLOBAL_VAR_INIT(NERVOUSBLOCK,0)
+GLOBAL_VAR_INIT(HEATTOLERANCEBLOCK,0)
+GLOBAL_VAR_INIT(QUIETHANDSBLOCK,0)
+GLOBAL_VAR_INIT(COMPACTFRAMEBLOCK,0)
+GLOBAL_VAR_INIT(CLEANPRINTSBLOCK,0)
+GLOBAL_VAR_INIT(RESILIENTLUNGSBLOCK,0)
+GLOBAL_VAR_INIT(RAPIDHEALINGBLOCK,0)
+GLOBAL_VAR_INIT(NIGHTVISIONBLOCK,0)
+GLOBAL_VAR_INIT(STEADYHANDSBLOCK,0)
 GLOBAL_VAR_INIT(MONKEYBLOCK, STRUCDNASIZE)
 
 GLOBAL_VAR_INIT(BLOCKADD,0)

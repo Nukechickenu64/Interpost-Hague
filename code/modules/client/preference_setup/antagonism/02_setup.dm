@@ -2,18 +2,20 @@
 	var/list/uplink_sources
 	var/exploit_record = ""
 
-/datum/category_item/player_setup_item/antagonism/basic
-	name = "Setup"
-	sort_order = 2
+/datum/category_item/player_setup_item/general/antag_setup
+	name = "Antag Setup"
+	sort_order = 10
 
 	var/static/list/uplink_sources_by_name
 
-/datum/category_item/player_setup_item/antagonism/basic/New()
+/datum/category_item/player_setup_item/general/antag_setup/New()
 	..()
 	SETUP_SUBTYPE_DECLS_BY_NAME(/decl/uplink_source, uplink_sources_by_name)
 
-/datum/category_item/player_setup_item/antagonism/basic/load_character(var/savefile/S)
+/datum/category_item/player_setup_item/general/antag_setup/load_character(var/savefile/S)
 	var/list/uplink_order
+	from_file(S["be_special"], pref.be_special_role)
+	from_file(S["never_be_special"], pref.never_be_special_role)
 	from_file(S["uplink_sources"], uplink_order)
 	from_file(S["exploit_record"], pref.exploit_record)
 
@@ -24,8 +26,10 @@
 			if(uplink_source)
 				pref.uplink_sources += uplink_source
 
-/datum/category_item/player_setup_item/antagonism/basic/save_character(var/savefile/S)
+/datum/category_item/player_setup_item/general/antag_setup/save_character(var/savefile/S)
 	var/uplink_order = list()
+	to_file(S["be_special"], pref.be_special_role)
+	to_file(S["never_be_special"], pref.never_be_special_role)
 	for(var/entry in pref.uplink_sources)
 		var/decl/uplink_source/UL = entry
 		uplink_order += UL.name
@@ -33,14 +37,14 @@
 	to_file(S["uplink_sources"], uplink_order)
 	to_file(S["exploit_record"], pref.exploit_record)
 
-/datum/category_item/player_setup_item/antagonism/basic/sanitize_character()
+/datum/category_item/player_setup_item/general/antag_setup/sanitize_character()
 	if(!istype(pref.uplink_sources))
 		pref.uplink_sources = list()
 		for(var/entry in GLOB.default_uplink_source_priority)
 			pref.uplink_sources += decls_repository.get_decl(entry)
 
-/datum/category_item/player_setup_item/antagonism/basic/content(var/mob/user)
-	. +="<b>Antag Setup:</b><br>"
+/datum/category_item/player_setup_item/general/antag_setup/content(var/mob/user)
+	. +="<b>Uplink Setup:</b><br>"
 	. +="Uplink Source Priority: <a href='?src=\ref[src];add_source=1'>Add</a><br>"
 	for(var/entry in pref.uplink_sources)
 		var/decl/uplink_source/US = entry
@@ -58,7 +62,7 @@
 		. +="<a href='?src=\ref[src];exploitable_record=1'>[TextPreview(pref.exploit_record,40)]</a><br>"
 */
 
-/datum/category_item/player_setup_item/antagonism/basic/OnTopic(var/href,var/list/href_list, var/mob/user)
+/datum/category_item/player_setup_item/general/antag_setup/OnTopic(var/href,var/list/href_list, var/mob/user)
 	if(href_list["add_source"])
 		var/source_selection = input(user, "Select Uplink Source to Add", CHARACTER_PREFERENCE_INPUT_TITLE) as null|anything in (list_values(uplink_sources_by_name) - pref.uplink_sources)
 		if(source_selection && CanUseTopic(user))

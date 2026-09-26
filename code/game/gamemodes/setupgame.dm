@@ -56,6 +56,14 @@
 	GLOB.EPILEPSYBLOCK      = getAssignedBlock("EPILEPSY",      numsToAssign)
 	GLOB.TWITCHBLOCK        = getAssignedBlock("TWITCH",        numsToAssign)
 	GLOB.NERVOUSBLOCK       = getAssignedBlock("NERVOUS",       numsToAssign)
+	GLOB.HEATTOLERANCEBLOCK = getAssignedBlock("HEATTOLERANCE", numsToAssign, DNA_HARD_BOUNDS)
+	GLOB.QUIETHANDSBLOCK    = getAssignedBlock("QUIETHANDS",    numsToAssign)
+	GLOB.COMPACTFRAMEBLOCK  = getAssignedBlock("COMPACTFRAME",  numsToAssign, DNA_HARD_BOUNDS)
+	GLOB.CLEANPRINTSBLOCK   = getAssignedBlock("CLEANPRINTS",   numsToAssign, DNA_HARD_BOUNDS)
+	GLOB.RESILIENTLUNGSBLOCK = getAssignedBlock("RESILIENTLUNGS", numsToAssign, DNA_HARD_BOUNDS)
+	GLOB.RAPIDHEALINGBLOCK  = getAssignedBlock("RAPIDHEALING",  numsToAssign, DNA_HARDER_BOUNDS)
+	GLOB.NIGHTVISIONBLOCK   = getAssignedBlock("NIGHTVISION",   numsToAssign, DNA_HARDER_BOUNDS)
+	GLOB.STEADYHANDSBLOCK   = getAssignedBlock("STEADYHANDS",   numsToAssign)
 
 	// UNUSED!
 

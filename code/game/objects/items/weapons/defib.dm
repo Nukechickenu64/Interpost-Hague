@@ -265,8 +265,19 @@
 		return "buzzes, \"Patient's chest is obstructed. Operation aborted.\""
 
 /obj/item/weapon/shockpaddles/proc/can_revive(mob/living/carbon/human/H) //This is checked right before attempting to revive
-	if(H.stat == DEAD)
+	if(H.stat != DEAD)
+		return "buzzes, \"Resuscitation aborted - Patient is not dead.\""
+
+	var/deadtime = world.time - H.timeofdeath
+	if(deadtime > DEFIB_TIME_LIMIT)
 		return "buzzes, \"Resuscitation failed - Severe neurological decay makes recovery of patient impossible. Further attempts futile.\""
+
+	if(H.get_blood_volume() < BLOOD_VOLUME_SURVIVE)
+		return "buzzes, \"Resuscitation failed - Patient has insufficient circulating blood volume.\""
+
+	var/obj/item/organ/internal/brain/brain = H.internal_organs_by_name[BP_BRAIN]
+	if(!brain || (brain.status & ORGAN_DEAD) || brain.damage >= brain.max_damage)
+		return "buzzes, \"Resuscitation failed - Patient's brain is not viable.\""
 
 /obj/item/weapon/shockpaddles/proc/check_contact(mob/living/carbon/human/H)
 	if(!combat)
@@ -367,6 +378,7 @@
 	//set oxyloss so that the patient is just barely in crit, if possible
 	make_announcement("pings, \"Resuscitation successful.\"", "notice")
 	playsound(get_turf(src), 'sound/machines/defib_success.ogg', 50, 0)
+	make_alive(H)
 	H.resuscitate()
 	user.unlock_achievement(new/datum/achievement/revive())
 	var/obj/item/organ/internal/cell/potato = H.internal_organs_by_name[BP_CELL]

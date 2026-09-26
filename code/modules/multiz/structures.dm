@@ -91,6 +91,8 @@
 				G.adjust_position(force = 1)
 
 /obj/structure/ladder/attack_ghost(var/mob/M)
+	if(get_dist(M, src) > 1)
+		return
 	instant_climb(M)
 
 /obj/structure/ladder/proc/getTargetLadder(var/mob/M)

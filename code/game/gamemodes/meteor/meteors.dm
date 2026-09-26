@@ -197,6 +197,7 @@
 	//then, ram the turf if it still exists
 	if(T && !T.CanPass(src, src.loc, 0.5, 0))
 		T.ex_act(hitpwr)
+		floor_jolt(T, heavy ? 5 : 3, heavy ? 6 : 3)
 
 //process getting 'hit' by colliding with a dense object
 //or randomly when ramming turfs

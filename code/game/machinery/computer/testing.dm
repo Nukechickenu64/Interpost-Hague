@@ -14,18 +14,31 @@
 	// Next world.time (in deciseconds) when a beacon scan may be initiated again
 	var/next_beacon_scan_time = 0
 
+/obj/machinery/computer/bridge/proc/topic_requires_command_access(var/list/href_list)
+	if(!href_list || !href_list["action"])
+		return FALSE
+	var/action = href_list["action"]
+	return (action in list("wake_station", "printstatus", "checkstationintegrity", "announce", "scan_for_beacons"))
+
 /obj/machinery/computer/bridge/Topic(href, href_list, hsrc)
-	..()
+	if(..())
+		return
+	if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE)
+		return
 	if(get_dist(src, usr) > 1)
 		return
 	switch(href_list["action"])
 		if("wake_station")
-			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
 			wake_station()
 		if("printstatus")
+			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
 			if(!dispensed)
 				if(get_dist(src, usr) > 1)
 					return
@@ -58,16 +71,24 @@
 			else
 				to_chat(usr, "<span class='warning'>The printer chirps and jams; no paper detected.</span>")
 		if("checkstationintegrity")
+			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
 			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 			to_chat(usr, "<span class='warning'></b> &@&# ERR### ARRAY OFFLINE, PL333E CONTACT LOCAL ENGINEERING DEPARTMENT HEAD #$$@%) </span></b>")
 		if("announce")
+			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
 			if(usr)
 				var/obj/item/weapon/card/id/id_card = usr.GetIdCard()
 				crew_announcement.announcer = GetNameAndAssignmentFromId(id_card)
 			else
 				crew_announcement.announcer = "Unknown"
 			if(announcment_cooldown)
-				to_chat(usr, "Please allow at least one minute to pass between announcements.")
+				to_chat(usr, "Please allow at least ten minutes to pass between announcements.")
 				return TRUE
 			var/input = input(usr, "Please write a message to announce to the [station_name()].", "Priority Announcement") as null|message
 			if(!input || get_dist(src, usr) > 1)
@@ -84,10 +105,10 @@
 			else if(df.code == RED_CODE)
 				crew_announcement.Announce(input, new_sound = 'sound/machines/announce_alarm_red.ogg')
 				announcment_cooldown = 1
-			spawn(6000)//One hour cooldown
+			spawn(6000)//Ten-minute cooldown
 				announcment_cooldown = 0
 		if("scan_for_beacons")
-			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return

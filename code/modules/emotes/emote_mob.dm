@@ -157,6 +157,7 @@
 		visible_message(message, checkghosts = check_ghosts)
 	else
 		audible_message(message, checkghosts = check_ghosts)
+	runechat_to_hearers(runechat_emote_text(src, message), RUNECHAT_EMOTE, m_type == VISIBLE_MESSAGE)
 
 // Specific mob type exceptions below.
 /mob/living/silicon/ai/emote(var/act, var/type, var/message)

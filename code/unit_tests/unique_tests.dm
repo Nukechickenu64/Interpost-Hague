@@ -23,6 +23,31 @@
 
 	return 1
 
+/datum/unit_test/mining_shuttle_uses_open_space_as_initial_waypoint
+	name = "MINING: Shuttle Uses Open Space Before Space Ruins"
+
+/datum/unit_test/mining_shuttle_uses_open_space_as_initial_waypoint/start_test()
+	var/datum/shuttle/autodock/multi/mining/mining_shuttle = SSshuttle.shuttles["Mining"]
+	if(!istype(mining_shuttle))
+		skip("The active map has no multi-destination Mining shuttle.")
+		return 1
+	if(mining_shuttle.move_time != 120)
+		fail("The Mining shuttle transit time is [mining_shuttle.move_time] seconds, expected 120.")
+		return 1
+
+	var/obj/effect/shuttle_landmark/open_space = SSshuttle.get_landmark("mining_space")
+	var/obj/effect/shuttle_landmark/space_ruins = SSshuttle.get_landmark("nav_mining_space_ruins")
+	if(!istype(open_space) || !istype(space_ruins))
+		skip("The active map does not register both Mining space waypoints.")
+		return 1
+
+	var/valid = mining_shuttle.get_station_space_waypoint() == open_space
+	if(valid)
+		pass("The initial Space destination resolves to open Space, not Space Ruins.")
+	else
+		fail("The initial Space destination bypasses the open-Space waypoint.")
+	return 1
+
 /datum/unit_test/research_processor_only_offers_buildable_designs
 	name = "RESEARCH: Ideation Condenser Only Offers Buildable Designs"
 
@@ -79,6 +104,43 @@
 		pass("Sensitive href actions are classified independently of the visible menu.")
 	else
 		fail("R&D console href action authorization classification is incorrect.")
+	return 1
+
+/datum/unit_test/requests_console_announcement_requires_authorization
+	name = "REQUESTS: Announcement Sending Requires Auth"
+
+/datum/unit_test/requests_console_announcement_requires_authorization/start_test()
+	var/obj/machinery/requests_console/console = new
+	console.announcementConsole = 1
+	console.announceAuth = 0
+	var/valid = !console.can_send_announcement()
+	console.announceAuth = 1
+	valid = valid && console.can_send_announcement()
+	qdel(console)
+	if(valid)
+		pass("Requests-console announcements are blocked unless the user has authenticated.")
+	else
+		fail("Requests-console announcement authorization is not enforced server-side.")
+	return 1
+
+/datum/unit_test/bridge_command_actions_require_command_access
+	name = "BRIDGE: Command Actions Require Access"
+
+/datum/unit_test/bridge_command_actions_require_command_access/start_test()
+	var/obj/machinery/computer/bridge/console = new
+	var/list/command_actions = list("announce", "wake_station", "scan_for_beacons", "printstatus", "checkstationintegrity")
+	var/valid = TRUE
+	for(var/action in command_actions)
+		if(!console.topic_requires_command_access(list("action" = action)))
+			valid = FALSE
+			break
+	if(valid && console.topic_requires_command_access(list("action" = "unknown")))
+		valid = FALSE
+	qdel(console)
+	if(valid)
+		pass("Bridge command actions are gated by command access and the public action set is preserved.")
+	else
+		fail("Bridge command-action authorization classification is incorrect.")
 	return 1
 
 /datum/unit_test/mining_sell_order_accepts_ten_sheet_stack

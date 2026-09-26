@@ -416,6 +416,12 @@
 /obj/machinery/door/proc/next_close_time()
 	return normalspeed ? 150 : 5
 
+/obj/machinery/door/proc/can_close_on_occupants()
+	for(var/turf/turf in locs)
+		if(locate(/mob/living) in turf)
+			return FALSE
+	return TRUE
+
 /obj/machinery/door/proc/close(var/forced = 0)
 	if(!can_close(forced))
 		if(autoclose)
@@ -425,6 +431,12 @@
 
 	do_animate("closing")
 	sleep(3)
+	if(!can_close_on_occupants())
+		operating = 0
+		update_icon()
+		if(autoclose)
+			addtimer(CALLBACK(src, .proc/close), next_close_time(), TIMER_UNIQUE|TIMER_OVERRIDE)
+		return FALSE
 	src.set_density(1)
 	src.layer = closed_layer
 	update_nearby_tiles()
@@ -440,7 +452,7 @@
 	var/obj/fire/fire = locate() in loc
 	if(fire)
 		qdel(fire)
-	return
+	return TRUE
 
 /obj/machinery/door/proc/requiresID()
 	return 1

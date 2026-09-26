@@ -113,6 +113,11 @@
 			W.update_icon()
 		if(can_join_with(W))
 			dirs += get_dir(src, W)
+	for(var/obj/structure/window/W in orange(src, 1))
+		if(W.anchored && W.density && W.is_fulltile())
+			dirs += get_dir(src, W)
+			if(propagate)
+				W.update_icon()
 
 	wall_connections = dirs_to_corner_states(dirs)
 

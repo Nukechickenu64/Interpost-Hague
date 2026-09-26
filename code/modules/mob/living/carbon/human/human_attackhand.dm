@@ -1,5 +1,7 @@
 /mob/living/carbon/human/proc/get_unarmed_attack(var/mob/living/carbon/human/target, var/hit_zone)
 	for(var/datum/unarmed_attack/u_attack in species.unarmed_attacks)
+		if(is_leech() && istype(u_attack, /datum/unarmed_attack/bite) && !can_use_leech_fangs())
+			continue
 		if(u_attack.is_usable(src, target, hit_zone))
 			if(pulling_punches)
 				var/datum/unarmed_attack/soft_variant = u_attack.get_sparring_variant()
@@ -369,8 +371,8 @@
 	spawn(0)
 		organ.applied_pressure = user
 
-		//apply pressure as long as they stay still and keep grabbing
-		do_mob(user, src, INFINITY, target_zone, progress = 0)
+		// Movement does not interrupt self-treatment; hand and target-zone changes still end the hold.
+		do_mob(user, src, INFINITY, target_zone, progress = 0, movement_interrupt = (user != src))
 
 		organ.applied_pressure = null
 

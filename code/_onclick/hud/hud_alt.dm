@@ -286,15 +286,18 @@
 		client.screen += B
 
 	if(!client) return
+	for(var/obj/screen/S in client.screen)
+		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/lighting_backdrop))
+			client.screen -= S
 	var/obj/screen/plane_master/shadowcasting/p3 = new
-//	var/obj/screen/plane_master/lighting/p4 = new
+	var/obj/screen/plane_master/lighting/p4 = new
 
 	p3.plane = SHADOWCASTING_PLANE
-	p3.add_filter("turf_blocker", 5, list("type" = "alpha", render_source="all4", flags=MASK_INVERSE))
 	p3.render_target = "all3"
 
-	//p4.plane = LIGHTING_PLANE
-	//p4.render_target = "light"
-
 	client.screen.Add(p3)
+	client.screen.Add(new /obj/screen/plane_master/los_occluders)
+	client.screen.Add(p4)
+	client.screen.Add(new /obj/screen/lighting_backdrop)
+	client.screen.Add(new /obj/screen/plane_master/emissive)
 	//client.screen.Add(p4)

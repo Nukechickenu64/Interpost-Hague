@@ -9,6 +9,9 @@
 #define AALARM_MODE_FILL		5 //emergency fill
 #define AALARM_MODE_OFF			6 //Shuts it all down.
 
+#define AALARM_SCOPE_AREA		1
+#define AALARM_SCOPE_CURRENT	2
+
 #define AALARM_SCREEN_MAIN		1
 #define AALARM_SCREEN_VENT		2
 #define AALARM_SCREEN_SCRUB		3
@@ -80,6 +83,7 @@
 	var/datum/wires/alarm/wires
 
 	var/mode = AALARM_MODE_SCRUBBING
+	var/mode_scope = AALARM_SCOPE_AREA
 	var/screen = AALARM_SCREEN_MAIN
 	var/area_uid
 	var/area/alarm_area
@@ -430,41 +434,44 @@
 
 	return 1
 
-/obj/machinery/alarm/proc/apply_mode()
-	//propagate mode to other air alarms in the area
-	//TODO: make it so that players can choose between applying the new mode to the room they are in (related area) vs the entire alarm area
-	for (var/obj/machinery/alarm/AA in alarm_area)
-		AA.mode = mode
+/obj/machinery/alarm/proc/apply_mode(var/area/target_area, var/new_mode)
+	if(!target_area)
+		target_area = alarm_area
+	if(isnull(new_mode))
+		new_mode = mode
 
-	switch(mode)
+	for (var/obj/machinery/alarm/AA in target_area)
+		AA.mode = new_mode
+
+	switch(new_mode)
 		if(AALARM_MODE_SCRUBBING)
-			for(var/device_id in alarm_area.air_scrub_names)
+			for(var/device_id in target_area.air_scrub_names)
 				send_signal(device_id, list("power"= 1, "co2_scrub"= 1, "scrubbing"= 1, "panic_siphon"= 0) )
-			for(var/device_id in alarm_area.air_vent_names)
+			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_PANIC, AALARM_MODE_CYCLE)
-			for(var/device_id in alarm_area.air_scrub_names)
+			for(var/device_id in target_area.air_scrub_names)
 				send_signal(device_id, list("power"= 1, "panic_siphon"= 1) )
-			for(var/device_id in alarm_area.air_vent_names)
+			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 0) )
 
 		if(AALARM_MODE_REPLACEMENT)
-			for(var/device_id in alarm_area.air_scrub_names)
+			for(var/device_id in target_area.air_scrub_names)
 				send_signal(device_id, list("power"= 1, "panic_siphon"= 1) )
-			for(var/device_id in alarm_area.air_vent_names)
+			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_FILL)
-			for(var/device_id in alarm_area.air_scrub_names)
+			for(var/device_id in target_area.air_scrub_names)
 				send_signal(device_id, list("power"= 0) )
-			for(var/device_id in alarm_area.air_vent_names)
+			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_OFF)
-			for(var/device_id in alarm_area.air_scrub_names)
+			for(var/device_id in target_area.air_scrub_names)
 				send_signal(device_id, list("power"= 0) )
-			for(var/device_id in alarm_area.air_vent_names)
+			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 0) )
 
 /obj/machinery/alarm/proc/apply_danger_level(var/new_danger_level)
@@ -589,6 +596,7 @@
 				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Nitrous Oxide",	"command" = "n2o_scrub","val" = info["filter_n2o"]))
 			data["scrubbers"] = scrubbers
 		if(AALARM_SCREEN_MODE)
+			data["mode_scope"] = mode_scope
 			var/modes[0]
 			modes[++modes.len] = list("name" = "Filtering - Scrubs out contaminants", 			"mode" = AALARM_MODE_SCRUBBING,		"selected" = mode == AALARM_MODE_SCRUBBING, 	"danger" = 0)
 			modes[++modes.len] = list("name" = "Replace Air - Siphons out air while replacing", "mode" = AALARM_MODE_REPLACEMENT,	"selected" = mode == AALARM_MODE_REPLACEMENT,	"danger" = 0)
@@ -776,8 +784,17 @@
 			return TOPIC_REFRESH
 
 		if(href_list["mode"])
-			mode = text2num(href_list["mode"])
-			apply_mode()
+			var/new_mode = text2num(href_list["mode"])
+			var/area/target_area = alarm_area
+			if(mode_scope == AALARM_SCOPE_CURRENT)
+				target_area = get_area(user)
+			apply_mode(target_area, new_mode)
+			return TOPIC_REFRESH
+
+		if(href_list["mode_scope"])
+			var/selected_scope = text2num(href_list["mode_scope"])
+			if(selected_scope == AALARM_SCOPE_AREA || selected_scope == AALARM_SCOPE_CURRENT)
+				mode_scope = selected_scope
 			return TOPIC_REFRESH
 
 /obj/machinery/alarm/attackby(obj/item/W as obj, mob/user as mob)

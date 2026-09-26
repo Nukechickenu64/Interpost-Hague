@@ -53,6 +53,7 @@
 #define SS_PRIORITY_TGUI          20    // Updates to tgui uis.
 #define SS_PRIORITY_GARBAGE       20   // Garbage collection.
 #define SS_PRIORITY_WIRELESS      10	// Wireless connection setup.
+#define SS_PRIORITY_DYNAMIC_SHADOWS 10 // Light-direction object shadows near clients.
 
 
 // Subsystem fire priority, from lowest to highest priority

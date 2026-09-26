@@ -56,6 +56,9 @@
 		for(var/turf/T in range(range, origin))
 			var/use_alpha = 255 - (step_alpha * get_dist(origin, T))
 			for(var/atom/A in T.contents)
+				if(ishuman(A))
+					var/mob/living/carbon/human/H = A
+					H.handle_leech_light_exposure()
 				if(A.fluorescent == 1)
 					A.fluorescent = 2 //To prevent light crosstalk.
 					if(A.invisibility)

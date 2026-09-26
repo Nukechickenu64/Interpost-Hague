@@ -255,3 +255,222 @@
 /datum/round_event/guns_n_roses/apply_event()
 	for(var/obj/item/weapon/material/sword/B in world)
 		qdel(B)
+
+/datum/round_event/no_pdas
+	id = "no_pdas"
+	event_message = "The station's personal data assistants were recalled for a firmware audit. Paperwork is back in fashion."
+
+/datum/round_event/no_pdas/apply_event()
+	for(var/obj/item/device/pda/P in world)
+		qdel(P)
+		CHECK_TICK
+
+/datum/round_event/no_id_cards
+	id = "no_id_cards"
+	event_message = "The identification office lost the entire badge shipment. Everyone will have to explain themselves the old-fashioned way."
+
+/datum/round_event/no_id_cards/apply_event()
+	for(var/obj/item/weapon/card/id/I in world)
+		qdel(I)
+		CHECK_TICK
+
+/datum/round_event/no_flashlights
+	id = "no_flashlights"
+	event_message = "The emergency-lighting contractor delivered an empty crate. Personal flashlights are nowhere to be found."
+
+/datum/round_event/no_flashlights/apply_event()
+	for(var/obj/item/device/flashlight/F in world)
+		qdel(F)
+		CHECK_TICK
+
+/datum/round_event/empty_vending
+	id = "empty_vending"
+	event_message = "The vending consortium is observing a labor action. Machines hum, but their shelves are empty."
+
+/datum/round_event/empty_vending/apply_event()
+	for(var/obj/machinery/vending/V in world)
+		V.slogan_list = list()
+		V.products = list()
+		V.premium = list()
+		V.contraband = list()
+		CHECK_TICK
+
+/datum/round_event/maintenance_shift
+	id = "maintenance_shift"
+	event_message = "A scheduling error assigned the entire station to maintenance duty. Departmental boundaries are mostly advisory today."
+
+/datum/round_event/maintenance_shift/apply_event()
+	for(var/obj/machinery/door/airlock/A in world)
+		A.req_access = list()
+		A.req_one_access = list()
+		CHECK_TICK
+
+/datum/round_event/department_blackout
+	id = "department_blackout"
+	event_message = "The station's departmental power routing failed. Only the public corridors remembered to stay lit."
+
+/datum/round_event/department_blackout/apply_event()
+	for(var/obj/machinery/light/L in world)
+		if(istype(get_area(L), /area/security) || istype(get_area(L), /area/medical) || istype(get_area(L), /area/rnd))
+			L.on = 0
+			L.update_icon()
+		CHECK_TICK
+
+/datum/round_event/security_shortage
+	id = "security_shortage"
+	event_message = "Security's equipment order was cut to the bone. The department will have to improvise."
+
+/datum/round_event/security_shortage/apply_event()
+	for(var/obj/item/weapon/melee/classic_baton/B in world)
+		qdel(B)
+		CHECK_TICK
+	for(var/obj/item/weapon/handcuffs/C in world)
+		qdel(C)
+		CHECK_TICK
+
+/datum/round_event/medical_shortage
+	id = "medical_shortage"
+	event_message = "Medical supplies arrived in miniature quantities. Every treatment will need to count."
+
+/datum/round_event/medical_shortage/apply_event()
+	for(var/obj/item/weapon/storage/firstaid/F in world)
+		qdel(F)
+		CHECK_TICK
+	for(var/obj/item/weapon/defibrillator/D in world)
+		qdel(D)
+		CHECK_TICK
+
+/datum/round_event/research_shortage
+	id = "research_shortage"
+	event_message = "Research received a shipment of empty containers. Science will have to work with what it has."
+
+/datum/round_event/research_shortage/apply_event()
+	for(var/obj/item/stack/material/phoron/P in world)
+		qdel(P)
+		CHECK_TICK
+	for(var/obj/item/stack/material/uranium/U in world)
+		qdel(U)
+		CHECK_TICK
+
+/datum/round_event/communications_blackout
+	id = "communications_blackout"
+	event_message = "Long-range communications are down. The station is on its own until someone restores the antenna network."
+
+/datum/round_event/communications_blackout/apply_event()
+	for(var/obj/item/device/radio/headset/R in world)
+		qdel(R)
+		CHECK_TICK
+	for(var/obj/item/device/radio/intercom/I in world)
+		qdel(I)
+		CHECK_TICK
+
+/datum/round_event/airlock_census
+	id = "airlock_census"
+	event_message = "Every airlock received the same access audit result: insufficient data. Doors will not recognize department credentials."
+
+/datum/round_event/airlock_census/apply_event()
+	for(var/obj/machinery/door/airlock/A in world)
+		A.req_access = list()
+		A.req_one_access = list()
+		CHECK_TICK
+	for(var/obj/machinery/door/window/W in world)
+		W.req_access = list()
+		W.req_one_access = list()
+		CHECK_TICK
+
+/datum/round_event/party_lights
+	id = "party_lights"
+	event_message = "The station lighting controller entered celebration mode before anyone could find the off switch."
+
+/datum/round_event/party_lights/apply_event()
+	for(var/obj/machinery/light/L in world)
+		L.lightbulb.brightness_color = pick(COLOR_PINK, COLOR_RED, COLOR_LIME, COLOR_VIOLET, COLOR_BLUE, COLOR_LIGHT_CYAN)
+		L.on = L.powered()
+		L.update_icon()
+		CHECK_TICK
+
+/datum/round_event/window_inspection
+	id = "window_inspection"
+	event_message = "The station's windows failed inspection and were removed pending a replacement order. Try not to lean on the walls."
+
+/datum/round_event/window_inspection/apply_event()
+	for(var/obj/structure/window/W in world)
+		qdel(W)
+		CHECK_TICK
+	for(var/obj/machinery/door/window/D in world)
+		qdel(D)
+		CHECK_TICK
+
+/datum/round_event/empty_toolboxes
+	id = "empty_toolboxes"
+	event_message = "The tool supplier sent beautifully organized boxes containing absolutely nothing useful."
+
+/datum/round_event/empty_toolboxes/apply_event()
+	for(var/obj/item/weapon/storage/toolbox/T in world)
+		for(var/obj/item/I in T.contents)
+			qdel(I)
+		CHECK_TICK
+
+/datum/round_event/no_cameras
+	id = "no_cameras"
+	event_message = "The station's surveillance office suffered a catastrophic filing error. There is no camera footage of anything."
+
+/datum/round_event/no_cameras/apply_event()
+	for(var/obj/machinery/camera/C in world)
+		qdel(C)
+		CHECK_TICK
+
+/datum/round_event/random_names
+	id = "randomnames"
+	event_message = "The personnel database suffered a bizarre sorting error. Nobody's name matches the roster anymore."
+
+/datum/round_event/random_names/apply_event()
+	for(var/mob/living/carbon/human/H in GLOB.human_mob_list)
+		if(!H.mind)
+			continue
+		H.real_name = random_name(H.gender)
+		H.f_style = random_facial_hair_style(H.gender)
+		H.h_style = random_hair_style(H.gender)
+		H.name = H.real_name
+		CHECK_TICK
+
+/datum/round_event/clumsy_shift
+	id = "clumpsydumbasses"
+	event_message = "A statistical anomaly has made the crew unusually talented at dropping important things. Mind your feet."
+
+/datum/round_event/clumsy_shift/apply_event()
+	for(var/mob/living/carbon/human/H in GLOB.human_mob_list)
+		if(prob(69))
+			H.mutations.Add(CLUMSY)
+		CHECK_TICK
+
+/datum/round_event/assjesters
+	id = "assjesters"
+	event_message = "The station's role labels were shuffled overnight. Some members of the crew may discover a new calling at their first paycheck."
+
+/datum/round_event/director_pressure
+	id = "director_pressure"
+	event_message = "The station's risk office began the shift with a red marker and a very long list of concerns."
+
+/datum/round_event/director_pressure/apply_event()
+	if(SSdirector && SSdirector.enabled)
+		SSdirector.tension = max(SSdirector.tension, 35)
+		SSdirector.tension_last_change_reason = "Round aspect: director pressure"
+
+/datum/round_event/corporate_austerity
+	id = "corporate_austerity"
+	event_message = "Corporate has tightened the purse strings. Personal agendas are plentiful, but assistance will be scarce."
+
+/datum/round_event/corporate_austerity/apply_event()
+	if(SSdirector && SSdirector.enabled)
+		SSdirector.debt_probability = max(SSdirector.debt_probability, 55)
+		SSdirector.agenda_probability = min(SSdirector.agenda_probability, 25)
+
+/datum/round_event/calm_before_the_storm
+	id = "calm_before_the_storm"
+	event_message = "The station's first reports are unusually calm. Everyone has a little too much time to notice the silence."
+
+/datum/round_event/calm_before_the_storm/apply_event()
+	if(SSdirector && SSdirector.enabled)
+		SSdirector.tension = min(SSdirector.tension, 5)
+		SSdirector.tension_last_change_reason = "Round aspect: calm before the storm"

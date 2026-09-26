@@ -26,6 +26,11 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	var/anonsay = 0
 	var/ghostvision = 1 //is the ghost able to see things humans can't?
 	var/seedarkness = 1
+	var/list/pain_possession_candidates
+	var/turf/pain_possession_turf
+	var/obj/pain_possession_object
+	var/old_possession_invisibility
+	var/next_pain_speech
 
 	var/obj/item/device/multitool/ghost_multitool
 	incorporeal_move = 1
@@ -75,6 +80,15 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	..()
 
 /mob/observer/ghost/Destroy()
+	if(pain_possession_object)
+		GLOB.moved_event.unregister(pain_possession_object, src)
+		GLOB.destroyed_event.unregister(pain_possession_object, src)
+		if(pain_possession_object.pain_possessor == src)
+			pain_possession_object.pain_possessor = null
+		if(client && client.eye == pain_possession_object)
+			client.eye = src
+		control_object = null
+		pain_possession_object = null
 	GLOB.ghost_mob_list -= src
 	stop_following()
 	qdel(ghost_multitool)
@@ -85,9 +99,81 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		hud_images = null
 	return ..()
 
+/mob/observer/ghost/proc/valid_pain_possession_target(obj/target)
+	return target && !QDELETED(target) && target.loc == pain_possession_turf && !target.anchored && !istype(target, /obj/effect) && !target.pain_possessor
+
+/mob/observer/ghost/proc/can_walk_into(turf/target)
+	return target && !target.density
+
+/mob/observer/ghost/proc/offer_pain_possession()
+	if(!client || !pain_possession_candidates || !pain_possession_turf)
+		return
+	var/list/options = list()
+	for(var/obj/target in pain_possession_candidates)
+		if(valid_pain_possession_target(target))
+			options += target
+	if(!options.len)
+		pain_possession_candidates = null
+		return
+	var/obj/chosen = input(src, "Your final agony binds you to something nearby.", "Possess an object") as null|anything in options
+	if(!src || !client || !pain_possession_candidates || pain_possession_object)
+		return
+	if(!valid_pain_possession_target(chosen) || !(chosen in pain_possession_candidates))
+		options.Cut()
+		for(var/obj/target in pain_possession_candidates)
+			if(valid_pain_possession_target(target))
+				options += target
+		chosen = options.len ? pick(options) : null
+	pain_possession_candidates = null
+	if(chosen)
+		possess_pain_object(chosen)
+
+/mob/observer/ghost/proc/possess_pain_object(obj/target)
+	if(!client || control_object || pain_possession_object || !valid_pain_possession_target(target))
+		return FALSE
+	stop_following()
+	can_reenter_corpse = FALSE
+	pain_possession_object = target
+	control_object = target
+	target.pain_possessor = src
+	old_possession_invisibility = invisibility
+	set_invisibility(101)
+	GLOB.moved_event.register(target, src, /mob/observer/ghost/proc/update_pain_possession_position)
+	GLOB.destroyed_event.register(target, src, /mob/observer/ghost/proc/end_pain_possession)
+	forceMove(get_turf(target))
+	client.eye = target
+	to_chat(src, "<span class='notice'>Your spirit is trapped inside \the [target].</span>")
+	return TRUE
+
+/mob/observer/ghost/proc/update_pain_possession_position(atom/movable/source, old_loc, new_loc)
+	if(source == pain_possession_object)
+		var/turf/target = get_turf(new_loc)
+		if(target)
+			forceMove(target)
+
+/mob/observer/ghost/proc/end_pain_possession()
+	if(!pain_possession_object)
+		return
+	var/obj/target = pain_possession_object
+	var/turf/last_turf = get_turf(target)
+	GLOB.moved_event.unregister(target, src)
+	GLOB.destroyed_event.unregister(target, src)
+	pain_possession_object = null
+	control_object = null
+	if(target.pain_possessor == src)
+		target.pain_possessor = null
+	set_invisibility(old_possession_invisibility)
+	if(last_turf)
+		forceMove(last_turf)
+	if(client)
+		client.eye = src
+	to_chat(src, "<span class='notice'>Your vessel is gone. You are a ghost again.</span>")
+
 /mob/observer/ghost/Topic(href, href_list)
 	// Preserve existing ghost-specific handlers
 	if (href_list["track"])
+		if(!client || !client.holder)
+			return
 		var/mob/target = locate(href_list["track"]) in SSmobs.mob_list
 		if(target)
 			ManualFollow(target)
@@ -149,6 +235,16 @@ Works together with spawning an observer, noted above.
 		ghost.can_reenter_corpse = can_reenter_corpse
 		ghost.timeofdeath = src.stat == DEAD ? src.timeofdeath : world.time
 		ghost.key = key
+		if(ishuman(src))
+			var/mob/living/carbon/human/body = src
+			if(body.stat == DEAD && body.pain_possession_candidates)
+				ghost.pain_possession_turf = body.pain_possession_turf
+				ghost.pain_possession_candidates = body.pain_possession_candidates
+				body.pain_possession_candidates = null
+				body.pain_possession_turf = null
+				spawn(0)
+					if(ghost && ghost.client)
+						ghost.offer_pain_possession()
 		if(ghost.client && !ghost.client.holder && !config.antag_hud_allowed)		// For new ghosts we remove the verb from even showing up if it's not allowed.
 			ghost.verbs -= /mob/observer/ghost/verb/toggle_antagHUD	// Poor guys, don't know what they are missing!
 		return ghost
@@ -202,6 +298,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/reenter_corpse()
 	set category = "Ghost"
 	set name = "ReenterCorpse"
+	if(pain_possession_object)
+		return
 	if(!client)	return
 	if(!(mind && mind.current && can_reenter_corpse))
 		to_chat(src, "<span class='warning'>You have no body.</span>")
@@ -259,6 +357,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/dead_tele(A in area_repository.get_areas_by_z_level(GLOB.is_ghost_teleportable_area))
 	set category = "Ghost"
 	set name = "TeleportGhost"
+	if(!client || !client.holder || pain_possession_object)
+		return
 
 	var/area/thearea = area_repository.get_areas_by_z_level(GLOB.is_ghost_teleportable_area)[A]
 	if(!thearea)
@@ -276,6 +376,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Teleport to Coordinate"
 	set desc= "Teleport to a coordinate"
+	if(!client || !client.holder || pain_possession_object)
+		return
 
 	var/clamped_x = clamp(tx, 1, world.maxx)
 	var/clamped_y = clamp(ty, 1, world.maxy)
@@ -288,6 +390,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/follow(var/datum/follow_holder/fh in get_follow_targets())
 	set category = "Ghost"
 	set name = "FollowGhost"
+	if(!client || !client.holder || pain_possession_object)
+		return
 
 	if(!fh.show_entry()) return
 	ManualFollow(fh.followed_instance)
@@ -301,6 +405,10 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 
 // This is the ghost's follow verb with an argument
 /mob/observer/ghost/proc/ManualFollow(var/atom/movable/target)
+	if(pain_possession_object)
+		return
+	if(client && !client.holder)
+		return
 	if(!target || target == following || target == src)
 		return
 

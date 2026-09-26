@@ -305,12 +305,17 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	var/list/linked_emitters = list()
 	var/obj/machinery/atmospherics/unary/outlet_injector/linked_injector
 	var/obj/machinery/atmospherics/unary/vent_pump/linked_outpump
+	var/list/linked_feed_pumps = list()
+	var/list/linked_feed_filters = list()
 	var/obj/machinery/power/generator/linked_generator
 	var/link_refresh_at = 0
 
 	var/target_generation = 250000
-	var/max_excitation = 400
+	var/target_temperature = 3000
+	var/target_epr = 1
+	var/max_excitation = 600
 	var/generation_demand = TRUE
+	var/temperature_demand = TRUE
 	var/emitters_enabled = FALSE
 	var/safety_shutdown = FALSE
 	var/safe_streak = 0
@@ -318,25 +323,32 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 /obj/machinery/computer/general_air_control/supermatter_core/return_text()
 	var/list/core_data = get_core_sensor_data()
-	var/temperature = core_data["temperature"]
+	var/temperature = istype(linked_supermatter) ? linked_supermatter.get_ambient_temperature() : core_data["temperature"]
 	var/pressure = core_data["pressure"]
+	var/pressure_label = "Sensor Pressure"
+	if(istype(linked_supermatter))
+		var/turf/chamber = get_turf(linked_supermatter)
+		var/datum/gas_mixture/chamber_air = chamber?.return_air()
+		if(chamber_air)
+			pressure = chamber_air.return_pressure()
+			pressure_label = "Core Pressure"
 	var/automation_status = automatic_management ? "<span class='sm-good'>AUTOMATIC</span>" : "<span class='sm-muted'>MANUAL</span>"
 	var/automation_button = automatic_management ? "Disable Automatic Management" : "Enable Automatic Management"
 	var/output = {"
 <style>
-.sm-title{color:#8fe3ff;font-size:15px;font-weight:bold;letter-spacing:1px}.sm-subtitle{color:#9fd;font-size:10px}.sm-grid{width:100%;border-collapse:separate;border-spacing:5px}.sm-panel{background:#111d29;border:1px solid #246;padding:7px;vertical-align:top}.sm-panel h3{color:#b9ecff;font-size:10px;margin:0 0 5px}.sm-stat{color:#d7f6ff;font-size:16px;font-weight:bold}.sm-label{color:#9eb6c8;font-size:9px;text-transform:uppercase}.sm-good{color:#9fff9f;font-weight:bold}.sm-warn{color:#ffd866;font-weight:bold}.sm-bad{color:#ff7a7a;font-weight:bold}.sm-muted{color:#b7c2d0;font-weight:bold}.sm-action{display:inline-block;background:#17364b;border:1px solid #3ad;color:#d7f6ff;padding:3px 6px;margin:2px 2px 0 0;text-decoration:none}.sm-action:hover{background:#24536e;text-decoration:none}.sm-control{margin-top:5px;padding-top:5px;border-top:1px solid #246}.sm-value{color:#d7f6ff}
+.sm-subtitle{color:#9fd;font-size:10px}.sm-grid{width:100%;border-collapse:separate;border-spacing:5px}.sm-panel{background:#111d29;border:1px solid #246;padding:7px;vertical-align:top}.sm-panel h3{color:#b9ecff;font-size:10px;margin:0 0 5px}.sm-stat{color:#d7f6ff;font-size:16px;font-weight:bold}.sm-label{color:#9eb6c8;font-size:9px;text-transform:uppercase}.sm-good{color:#9fff9f;font-weight:bold}.sm-warn{color:#ffd866;font-weight:bold}.sm-bad{color:#ff7a7a;font-weight:bold}.sm-muted{color:#b7c2d0;font-weight:bold}.sm-action{display:inline-block;background:#17364b;border:1px solid #3ad;color:#d7f6ff;padding:3px 6px;margin:2px 2px 0 0;text-decoration:none}.sm-action:hover{background:#24536e;text-decoration:none}.sm-control{margin-top:5px;padding-top:5px;border-top:1px solid #246}.sm-value{color:#d7f6ff}
 </style>
-<div class='sm-title'>SUPERMATTER CORE CONTROL</div>
 <div class='sm-subtitle'>COOLANT AND CHAMBER PRESSURE MANAGEMENT</div>
 <table class='sm-grid'><tr>
 <td class='sm-panel'><h3>CHAMBER TELEMETRY</h3>
 <div class='sm-label'>Temperature</div><div class='sm-stat [temperature >= 4250 ? "sm-bad" : temperature >= 3500 ? "sm-warn" : "sm-good"]'>[temperature ? "[round(temperature)] K" : "NO SIGNAL"]</div>
-<div class='sm-label'>Pressure</div><div class='sm-stat [pressure >= 500 ? "sm-warn" : "sm-good"]'>[pressure ? "[round(pressure, 0.1)] kPa" : "NO SIGNAL"]</div>
+<div class='sm-label'>[pressure_label]</div><div class='sm-stat [pressure >= 500 ? "sm-warn" : "sm-good"]'>[pressure ? "[round(pressure, 0.1)] kPa" : "NO SIGNAL"]</div>
 </td>
 <td class='sm-panel'><h3>POWER MANAGEMENT</h3>
 <div class='sm-label'>Control Mode</div><div class='sm-stat'>[automation_status]</div>
 <div class='sm-subtitle'>[automatic_management ? "Adaptive coolant flow and pressure retention are active." : "Manual setpoints are active."]</div>
 <a class='sm-action' href='?src=\ref[src];toggle_automatic_management=1'>[automation_button]</a>
+<div class='sm-control'><span class='sm-label'>Automatic Core Target</span> <span class='sm-value'>[target_temperature] K</span><br>[automatic_management ? "<a class='sm-action' href='?src=\ref[src];set_target_temperature=1'>Set Target</a>" : ""]</div>
 </td>
 </tr><tr><td class='sm-panel'>"}
 
@@ -347,6 +359,9 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 	else
 		output += "<h3>COOLANT INJECTOR</h3><span class='sm-bad'>NO DEVICE STATUS</span>"
+	if(istype(linked_injector))
+		output += "<br><span class='sm-label'>Feed Reservoir</span> <span class='sm-value'>[round(linked_injector.air_contents.total_moles, 0.1)] mol / [round(linked_injector.air_contents.return_pressure(), 0.1)] kPa</span> <span class='sm-label'>Actual Flow</span> <span class='sm-value'>[round(linked_injector.last_flow_rate, 0.1)] L/cycle</span>"
+		output += "<br><span class='sm-label'>Feed Pumps / Filters</span> <span class='sm-value'>[linked_feed_pumps.len] / [linked_feed_filters.len]</span>"
 
 	output += "<div class='sm-control'><span class='sm-label'>Manual Flow Setpoint</span> <span class='sm-value'>[round(input_flow_setting, 0.1)] L/s</span><br><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=-100'>-100</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=-10'>-10</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=10'>+10</a><a class='sm-action' href='?src=\ref[src];adj_input_flow_rate=100'>+100</a><a class='sm-action' href='?src=\ref[src];in_set_flowrate=1'>Apply</a><a class='sm-action' href='?src=\ref[src];in_toggle_injector=1'>Toggle</a><a class='sm-action' href='?src=\ref[src];in_refresh_status=1'>Refresh</a></div></td><td class='sm-panel'>"
 
@@ -357,6 +372,8 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 	else
 		output += "<h3>CORE OUTPUMP</h3><span class='sm-bad'>NO DEVICE STATUS</span>"
+	if(istype(linked_outpump))
+		output += "<br><span class='sm-label'>Actual Flow</span> <span class='sm-value'>[round(linked_outpump.last_flow_rate, 0.1)] L/cycle</span>"
 
 	output += "<div class='sm-control'><span class='sm-label'>Manual Pressure Setpoint</span> <span class='sm-value'>[pressure_setting] kPa</span><br><a class='sm-action' href='?src=\ref[src];adj_pressure=-100'>-100</a><a class='sm-action' href='?src=\ref[src];adj_pressure=-10'>-10</a><a class='sm-action' href='?src=\ref[src];adj_pressure=10'>+10</a><a class='sm-action' href='?src=\ref[src];adj_pressure=100'>+100</a><a class='sm-action' href='?src=\ref[src];out_set_pressure=1'>Apply</a><a class='sm-action' href='?src=\ref[src];out_toggle_power=1'>Toggle</a><a class='sm-action' href='?src=\ref[src];out_refresh_status=1'>Refresh</a></div></td></tr>"
 
@@ -366,7 +383,7 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		var/integrity = linked_supermatter.get_integrity()
 		var/status_class = (status >= SUPERMATTER_DANGER) ? "sm-bad" : (status >= SUPERMATTER_WARNING) ? "sm-warn" : "sm-good"
 		output += "<span class='sm-label'>Crystal Integrity</span> <span class='sm-stat [status_class]'>[integrity]%</span> "
-		output += "<span class='sm-label'>Status</span> <span class='sm-stat [status_class]'>[status_name(status)]</span><br>"
+		output += "<span class='sm-label'>Status</span> <span class='sm-stat [status_class]'>[status_name(status)]</span> <span class='sm-label'>EPR</span> <span class='sm-value'>[linked_supermatter.get_epr()]</span><br>"
 	else
 		output += "<span class='sm-bad'>NO CRYSTAL LINKED</span><br>"
 
@@ -374,10 +391,14 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	output += "<span class='sm-label'>Emitters On</span> <span class='[emitters_enabled ? "sm-good" : "sm-muted"]'>[emitters_enabled ? "YES" : "NO"]</span> "
 	if(istype(linked_generator))
 		output += "<span class='sm-label'>Generator</span> <span class='sm-value'>[round(linked_generator.effective_gen / 1000, 0.1)] / [round(target_generation / 1000)] kW</span> "
+		if(linked_generator.circ1 && linked_generator.circ2)
+			output += "<br><span class='sm-label'>Circulators 1 / 2</span> <span class='sm-value'>[round(linked_generator.circ1.recent_moles_transferred, 0.1)] / [round(linked_generator.circ2.recent_moles_transferred, 0.1)] mol/cycle</span> "
 	else
 		output += "<span class='sm-bad'>NO GENERATOR LINKED</span> "
-	if(automatic_management && !cooling_available())
-		output += "<span class='sm-bad'>COOLANT FEED UNAVAILABLE</span> "
+	if(automatic_management)
+		var/cooling_fault = get_cooling_fault()
+		if(cooling_fault)
+			output += "<span class='sm-bad'>[cooling_fault]</span> "
 	if(safety_shutdown)
 		output += "<span class='sm-bad'>SAFETY INTERLOCK ENGAGED</span>"
 	output += "<div class='sm-control'><a class='sm-action' href='?src=\ref[src];refresh_links=1'>Rescan Engine Room</a></div>"
@@ -434,6 +455,8 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	linked_emitters = list()
 	linked_injector = null
 	linked_outpump = null
+	linked_feed_pumps = list()
+	linked_feed_filters = list()
 	linked_generator = null
 
 	var/turf/T = get_turf(src)
@@ -465,6 +488,21 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 			if(V.z == linked_supermatter.z && V.frequency == frequency && V.id_tag == output_tag)
 				linked_outpump = V
 				break
+		if(linked_injector?.network)
+			var/list/feed_networks = list(linked_injector.network)
+			for(var/obj/machinery/atmospherics/omni/filter/F in SSmachines.machinery)
+				if(F.z != linked_injector.z || get_dist(F, linked_injector) > 30 || F.error_check() || !F.input?.network)
+					continue
+				var/feeds_injector = (F.output?.network == linked_injector.network)
+				for(var/datum/omni_port/port in F.gas_filters)
+					if(port.network == linked_injector.network)
+						feeds_injector = TRUE
+				if(feeds_injector)
+					linked_feed_filters += F
+					feed_networks |= F.input.network
+			for(var/obj/machinery/atmospherics/binary/pump/P in SSmachines.machinery)
+				if(P.z == linked_injector.z && get_dist(P, linked_injector) <= 30 && P.node1 && P.node2 && P.network1 && (P.network2 in feed_networks))
+					linked_feed_pumps += P
 
 	for(var/obj/machinery/power/emitter/E in SSmachines.machinery)
 		if(!istype(linked_supermatter) || E.z != linked_supermatter.z || E.id != "EngineEmitter" || get_dist(E, linked_supermatter) > 30)
@@ -482,41 +520,98 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		if(E.active)
 			emitters_enabled = TRUE
 
-/obj/machinery/computer/general_air_control/supermatter_core/proc/cooling_available()
+/obj/machinery/computer/general_air_control/supermatter_core/proc/get_cooling_fault()
 	if(!istype(linked_injector) || !istype(linked_outpump))
-		return FALSE
-	if(linked_injector.stat & (NOPOWER|BROKEN) || !linked_injector.use_power || !linked_injector.node || !linked_injector.network)
-		return FALSE
-	if(linked_outpump.stat & (NOPOWER|BROKEN) || !linked_outpump.can_pump() || !linked_outpump.node || !linked_outpump.network || linked_outpump.pump_direction)
-		return FALSE
+		return "COOLANT DEVICE NOT LINKED"
+	if(linked_injector.stat & (NOPOWER|BROKEN) || !linked_injector.use_power)
+		return "INJECTOR UNPOWERED"
+	if(!linked_injector.node || !linked_injector.network)
+		return "INJECTOR FEED DISCONNECTED"
+	if(linked_outpump.stat & (NOPOWER|BROKEN) || !linked_outpump.can_pump())
+		return "OUTPUMP UNAVAILABLE"
+	if(!linked_outpump.node || !linked_outpump.network || linked_outpump.pump_direction)
+		return "OUTPUMP DISCONNECTED OR REVERSED"
 	if(linked_injector.air_contents.total_moles > 0.5)
-		return TRUE
+		return null
 	for(var/datum/gas_mixture/air in linked_injector.network.gases)
 		if(air.total_moles > 0.5)
-			return TRUE
-	return FALSE
+			return null
+	return "COOLANT FEED EMPTY"
 
-/obj/machinery/computer/general_air_control/supermatter_core/proc/needs_excitation(var/generation, var/crystal_power)
-	if(generation >= target_generation + 25000)
-		generation_demand = FALSE
-	else if(generation < target_generation)
+/obj/machinery/computer/general_air_control/supermatter_core/proc/cooling_available()
+	return !get_cooling_fault()
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/start_feed_pumps()
+	for(var/obj/machinery/atmospherics/omni/filter/F in linked_feed_filters)
+		if(!QDELETED(F) && !(F.stat & (NOPOWER|BROKEN)) && !F.error_check() && !F.use_power)
+			F.update_use_power(POWER_USE_IDLE)
+			F.update_icon()
+	for(var/obj/machinery/atmospherics/binary/pump/P in linked_feed_pumps)
+		if(QDELETED(P) || (P.stat & (NOPOWER|BROKEN)) || !P.node1 || !P.node2 || !P.network1 || !P.network2)
+			continue
+		var/feeds_injector = (P.network2 == linked_injector?.network)
+		for(var/obj/machinery/atmospherics/omni/filter/F in linked_feed_filters)
+			if(!QDELETED(F) && !F.error_check() && F.input?.network == P.network2 && (F.output?.network == linked_injector?.network))
+				feeds_injector = TRUE
+			if(!QDELETED(F) && !F.error_check() && F.input?.network == P.network2)
+				for(var/datum/omni_port/port in F.gas_filters)
+					if(port.network == linked_injector?.network)
+						feeds_injector = TRUE
+		if(!feeds_injector)
+			continue
+		P.target_pressure = max(P.target_pressure, min(1000, P.max_pressure_setting))
+		if(!P.use_power)
+			P.update_use_power(POWER_USE_IDLE)
+			P.update_icon()
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/needs_excitation(var/generation, var/crystal_power, var/temperature, var/epr = 1)
+	if(epr < target_epr || generation < target_generation)
 		generation_demand = TRUE
-	return generation_demand && crystal_power < max_excitation
+	else if(generation >= target_generation + 25000)
+		generation_demand = FALSE
+	else
+		generation_demand = FALSE
+	if(temperature >= target_temperature)
+		temperature_demand = FALSE
+	else if(temperature <= target_temperature - 100)
+		temperature_demand = TRUE
+	return generation_demand && temperature_demand && crystal_power < max_excitation
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/set_target_temperature(var/value)
+	if(!isnum_safe(value) || value < 300 || value > 3500)
+		return FALSE
+	target_temperature = value
+	return TRUE
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/automatic_danger(var/status, var/integrity, var/temperature, var/critical_temp, var/epr, var/cooling_ready, var/generator_ready)
+	return !cooling_ready || !generator_ready || epr < 1 || status > SUPERMATTER_NORMAL || integrity < 100 || (critical_temp && temperature >= critical_temp * 0.76)
 
 /obj/machinery/computer/general_air_control/supermatter_core/proc/update_automatic_setpoints(var/temperature, var/critical_temp, var/status, var/epr, var/cooling_ready, var/chamber_pressure)
 	automatic_flow_setting = 700
-	automatic_pressure_setting = 100
+	automatic_pressure_setting = 300
+	if(temperature >= target_temperature + 200)
+		automatic_flow_setting = 1200
+		automatic_pressure_setting = 25
+	else if(temperature >= target_temperature)
+		automatic_flow_setting = 1100
+		automatic_pressure_setting = 150
+	else if(temperature >= target_temperature - 200)
+		automatic_flow_setting = 900
+		automatic_pressure_setting = 250
 	if(critical_temp)
 		if(temperature >= critical_temp * 0.9 || status >= SUPERMATTER_DANGER)
-			automatic_flow_setting = 1200
-			automatic_pressure_setting = 25
+			automatic_flow_setting = max(automatic_flow_setting, 1200)
+			automatic_pressure_setting = min(automatic_pressure_setting, 25)
 		else if(temperature >= critical_temp * 0.7 || status >= SUPERMATTER_WARNING)
-			automatic_flow_setting = 1100
-			automatic_pressure_setting = 50
-		else if(temperature >= critical_temp * 0.5 || status >= SUPERMATTER_NOTIFY)
-			automatic_flow_setting = 900
-			automatic_pressure_setting = 75
-	if(!cooling_ready || epr < 1)
+			automatic_flow_setting = max(automatic_flow_setting, 1100)
+			automatic_pressure_setting = min(automatic_pressure_setting, 50)
+	if(critical_temp && temperature >= critical_temp * 0.7)
+		automatic_flow_setting = 1200
+		if(epr >= 1)
+			automatic_pressure_setting = max(25, min(chamber_pressure - 25, chamber_pressure / epr))
+		else
+			automatic_pressure_setting = 25
+	else if(!cooling_ready || epr < 1)
 		automatic_pressure_setting = max(100, chamber_pressure + 1)
 
 /obj/machinery/computer/general_air_control/supermatter_core/proc/run_automatic_management()
@@ -533,6 +628,7 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	var/temperature = linked_supermatter.get_ambient_temperature()
 	var/critical_temp = linked_supermatter.get_critical_temperature()
 	var/epr = linked_supermatter.get_epr()
+	start_feed_pumps()
 	var/cooling_ready = cooling_available()
 	var/turf/chamber = get_turf(linked_supermatter)
 	var/datum/gas_mixture/chamber_air = chamber?.return_air()
@@ -545,7 +641,7 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 	// Safety interlock: back off well before actual danger. Waiting for a WARNING/damage reading is already too
 	// late, since the reaction is self-sustaining and keeps heating the chamber long after emitters stop firing.
-	var/danger = !cooling_ready || !istype(linked_generator) || epr < 1 || (status > SUPERMATTER_NORMAL) || (integrity < 100) || (critical_temp && temperature >= critical_temp * 0.5)
+	var/danger = automatic_danger(status, integrity, temperature, critical_temp, epr, cooling_ready, istype(linked_generator))
 	if(danger)
 		safety_shutdown = TRUE
 		safe_streak = 0
@@ -561,7 +657,7 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		set_emitters(FALSE)
 		return
 
-	set_emitters(needs_excitation(linked_generator.effective_gen, linked_supermatter.power))
+	set_emitters(needs_excitation(linked_generator.effective_gen, linked_supermatter.power, temperature, epr))
 
 /obj/machinery/computer/general_air_control/supermatter_core/Initialize()
 	. = ..()
@@ -591,6 +687,14 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 
 /obj/machinery/computer/general_air_control/supermatter_core/Topic(href, href_list)
 	if(..())
+		return 1
+	if(href_list["set_target_temperature"])
+		if(!automatic_management)
+			return 1
+		var/new_target = input(usr, "Core temperature target in Kelvin (300-3500 K)", "Automatic Core Target", target_temperature) as num|null
+		if(automatic_management && usr && usr.machine == src && CanUseTopic(usr, GLOB.default_state) == STATUS_INTERACTIVE)
+			set_target_temperature(new_target)
+			src.updateUsrDialog()
 		return 1
 	if(href_list["toggle_automatic_management"])
 		automatic_management = !automatic_management

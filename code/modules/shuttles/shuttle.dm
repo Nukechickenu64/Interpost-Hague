@@ -160,6 +160,7 @@
 				else
 					qdel(AM) //it just gets atomized I guess? TODO throw it into space somewhere, prevents people from using shuttles as an atom-smasher
 	var/list/powernets = list()
+	var/list/jolted_mobs = list()
 	for(var/area/A in shuttle_area)
 		// if there was a zlevel above our origin, erase our ceiling now we're leaving
 		if(HasAbove(current_location.z))
@@ -177,15 +178,24 @@
 						else
 							to_chat(M, "<span class='warning'>The floor lurches beneath you!</span>")
 							shake_camera(M, 10, 1)
-				if(istype(M, /mob/living/carbon))
-					if(!M.buckled)
-						M.Weaken(3)
+				if(istype(M, /mob/living/carbon) && !M.buckled)
+					jolted_mobs += M
 
 		for(var/obj/structure/cable/C in A)
 			powernets |= C.powernet
 
+	var/turf/old_turf = get_turf(current_location)
+	var/turf/new_turf = get_turf(destination)
+	var/jolt_dir = 0
+	if(old_turf && new_turf && old_turf.z == new_turf.z)
+		jolt_dir = get_dir(new_turf, old_turf) //inertia throws people backwards
+
 	translate_turfs(turf_translation, current_location.base_area, current_location.base_turf)
 	current_location = destination
+
+	for(var/mob/living/L in jolted_mobs)
+		if(!L.floor_jolt_act(jolt_dir, rand(3, 6)) && !L.buckled && !L.Check_Shoegrip())
+			L.Weaken(3)
 
 	// if there's a zlevel above our destination, paint in a ceiling on it so we retain our air
 	if(HasAbove(current_location.z))

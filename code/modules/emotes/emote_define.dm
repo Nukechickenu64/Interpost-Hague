@@ -84,6 +84,9 @@
 	else
 		user.visible_message(message = use_3p, self_message = use_1p, blind_message = emote_message_impaired, checkghosts = /datum/client_preference/ghost_sight)
 
+	if(use_3p)
+		user.runechat_to_hearers(runechat_emote_text(user, use_3p), RUNECHAT_EMOTE, message_type != AUDIBLE_MESSAGE)
+
 	do_extra(user, target)
 
 /decl/emote/proc/do_extra(var/atom/user, var/atom/target)

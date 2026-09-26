@@ -189,6 +189,13 @@ Used In File(s): \code\game\machinery\alarm.dm
 		{{/for}}
     {{else data.screen == 4}}
 		<H3>Environmental Modes</H3>
+		<div class="item">
+			<div class="itemLabel">Apply changes to:</div>
+			<div class="itemContent">
+				{{:helper.link('Current area', null, { 'mode_scope' : 2 }, null, data.mode_scope == 2 ? 'selected' : null)}}
+				{{:helper.link('Alarm area', null, { 'mode_scope' : 1 }, null, data.mode_scope == 1 ? 'selected' : null)}}
+			</div>
+		</div>
 		{{for data.modes}}
 			<div class="item">
 				{{:helper.link(value.name, null, { 'mode' : value.mode }, null, value.selected ? (value.danger ? 'redButton' : 'selected') : null)}}

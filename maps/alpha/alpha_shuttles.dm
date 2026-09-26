@@ -166,6 +166,7 @@
 /datum/shuttle/autodock/multi/mining
 	name = "Mining"
 	warmup_time = 10
+	move_time = 120
 	shuttle_area = /area/shuttle/mining/station
 	dock_target = "mining_shuttle"
 	current_location = "nav_mining_start"
@@ -177,11 +178,8 @@
 /datum/shuttle/autodock/multi/mining/build_destinations_cache()
 	last_cache_rebuild_time = world.time
 	destinations_cache.Cut()
-	var/space_waypoint_tag = null
-	if(SSshuttle && SSshuttle.get_landmark("nav_mining_space_ruins"))
-		space_waypoint_tag = "nav_mining_space_ruins"
-	else if(SSshuttle && SSshuttle.get_landmark("mining_space"))
-		space_waypoint_tag = "mining_space"
+	var/obj/effect/shuttle_landmark/space_waypoint = get_station_space_waypoint()
+	var/space_waypoint_tag = space_waypoint ? space_waypoint.landmark_tag : null
 
 	// Require travelling to the Space waypoint before other nav_mining_* destinations become available
 	// Debug trace: log current location and count of registered nav_mining* waypoints
@@ -212,13 +210,18 @@
 			log_debug("Mining.build_destinations_cache: at-space include=[included] skip=[skipped]")
 	else
 		// Not at space: only allow going to the available Mining space waypoint.
-		var/obj/effect/shuttle_landmark/Lspace = null
-		if(space_waypoint_tag)
-			Lspace = SSshuttle.get_landmark(space_waypoint_tag)
-		if(istype(Lspace))
-			destinations_cache["Space"] = Lspace
+		if(istype(space_waypoint))
+			destinations_cache["Space"] = space_waypoint
 		if(config && config.log_debug)
-			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(Lspace)] tag=[space_waypoint_tag]")
+			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(space_waypoint)] tag=[space_waypoint_tag]")
+
+/datum/shuttle/autodock/multi/mining/proc/get_station_space_waypoint()
+	if(!SSshuttle)
+		return null
+	var/obj/effect/shuttle_landmark/open_space = SSshuttle.get_landmark("mining_space")
+	if(istype(open_space))
+		return open_space
+	return SSshuttle.get_landmark("nav_mining_space_ruins")
 
 /datum/shuttle/autodock/multi/mining/get_destinations()
 	build_destinations_cache()

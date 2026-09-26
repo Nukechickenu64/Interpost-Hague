@@ -40,8 +40,9 @@
 	if (src.m_intent == "run")
 		nut_removed *= 2
 		hyd_removed *= 2
-	adjust_nutrition(-nut_removed)
-	adjust_thirst(-hyd_removed)
+	if(!mind?.is_leech())
+		adjust_nutrition(-nut_removed)
+		adjust_thirst(-hyd_removed)
 
 	// Moving around increases germ_level faster
 	if(germ_level < GERM_LEVEL_MOVE_CAP && prob(8))
@@ -334,9 +335,7 @@
 	src.visible_message("<span class='warning'>[src] has thrown [item].</span>", range = min(itemsize*2,world.view))
 	playsound(src, 'sound/effects/throw.ogg', 50, 1)
 
-	if(!src.lastarea)
-		src.lastarea = get_area(src.loc)
-	if((istype(src.loc, /turf/space)) || (src.lastarea.has_gravity == 0))
+	if((istype(src.loc, /turf/space)) || !src.mob_has_gravity())
 		src.inertia_dir = get_dir(target, src)
 		step(src, inertia_dir)
 

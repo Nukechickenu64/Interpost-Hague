@@ -12,6 +12,11 @@
 	var/max_uses_per_round = 1
 	var/uses_this_round = 0
 	var/omen_text = "something waiting for its moment" // Cryptic hint shown by fluff systems (e.g. dreaming) when close to triggering
+	var/warning_duration = 0
+	var/warning_text = null
+	var/warning_clear_text = null
+	var/warning_active = FALSE
+	var/warning_started = 0
 
 /// Check if this catalyst can trigger based on telemetry and cooldowns
 /datum/catalyst_event/proc/can_trigger(var/datum/telemetry/T, var/tension)
@@ -20,8 +25,29 @@
 	if(world.time - last_triggered < cooldown)
 		return FALSE
 	if(tension < tension_threshold)
+		clear_warning()
 		return FALSE
-	return check_conditions(T)
+	if(!check_conditions(T))
+		clear_warning()
+		return FALSE
+	if(!warning_duration)
+		return TRUE
+	if(!warning_active)
+		warning_active = TRUE
+		warning_started = world.time
+		if(warning_text)
+			command_announcement.Announce(warning_text, "Director Advisory")
+		return FALSE
+	return world.time - warning_started >= warning_duration
+
+/// Clear an active warning when the crew resolves the conditions that prompted it.
+/datum/catalyst_event/proc/clear_warning()
+	if(!warning_active)
+		return
+	warning_active = FALSE
+	warning_started = 0
+	if(warning_clear_text)
+		command_announcement.Announce(warning_clear_text, "Director Advisory")
 
 /// Override in subclasses for specific telemetry conditions
 /datum/catalyst_event/proc/check_conditions(var/datum/telemetry/T)
@@ -46,6 +72,8 @@
 /datum/catalyst_event/proc/reset()
 	last_triggered = 0
 	uses_this_round = 0
+	warning_active = FALSE
+	warning_started = 0
 
 // === The Tactical Strike ===
 // If external communications go down and structural integrity drops,
@@ -58,6 +86,9 @@
 	tension_threshold = TENSION_ELEVATED
 	max_uses_per_round = 1
 	omen_text = "boots on the hull, faceless and silent"
+	warning_duration = 2 MINUTES
+	warning_text = "Long-range sensors detect a possible hostile insertion window. Restoring external communications and repairing hull damage may avert escalation, but severe station-wide instability can still authorize a strike."
+	warning_clear_text = "The hostile insertion warning has been withdrawn. Station vulnerabilities have stabilized."
 
 /datum/catalyst_event/tactical_strike/check_conditions(var/datum/telemetry/T)
 	// Comms down + structural damage = opportunity
@@ -76,7 +107,7 @@
 	for(var/mob/observer/ghost/G in GLOB.player_list)
 		if(!G.client)
 			continue
-		if(G.client.prefs && (G.client.prefs.be_special_role && "traitor" in G.client.prefs.be_special_role))
+		if(G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
 			candidates += G
 
 	if(candidates.len < 1)
@@ -295,7 +326,7 @@
 	// Find a ghost candidate
 	var/list/candidates = list()
 	for(var/mob/observer/ghost/G in GLOB.player_list)
-		if(G.client && G.client.prefs && (G.client.prefs.be_special_role && "traitor" in G.client.prefs.be_special_role))
+		if(G.client && G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
 			candidates += G
 
 	if(!candidates.len)

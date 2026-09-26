@@ -494,7 +494,7 @@
 					bite_grab.init()
 				else
 					qdel(bite_grab)
-			} else if(procname != "context_bite") {
+			} else {
 				// Validate that the requested proc is an actual verb on the target before calling it
 				var/allowed = FALSE
 				var/list/target_verbs = target.verbs

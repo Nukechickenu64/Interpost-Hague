@@ -7,6 +7,12 @@
 	anchored = 1
 	can_buckle = 1
 
+/obj/structure/handrai/attack_hand(mob/living/user)
+	if(buckled_mob)
+		user_unbuckle_mob(user)
+	else if(isliving(user))
+		user_buckle_mob(user, user)
+
 /obj/structure/handrai/buckle_mob(mob/living/M)
 	. = ..()
 	if(.)

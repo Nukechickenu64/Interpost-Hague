@@ -72,9 +72,10 @@
 
 	if(opacity)
 		updateVisibility(src)
-		var/turf/T = loc
-		if(istype(T))
-			T.RecalculateOpacity()
+		if(ismovable(src))
+			var/atom/movable/AM = src
+			for(var/turf/T in AM.locs)
+				T.RecalculateOpacity()
 
 	return INITIALIZE_HINT_NORMAL
 

@@ -10,11 +10,8 @@
 	var/opaque_counter
 
 /turf/set_opacity(new_opacity)
-	. = ..()
-	if(opacity == new_opacity)
+	if(!..())
 		return FALSE
-
-	opacity = new_opacity
 	return RecalculateOpacity()
 
 /turf/proc/RecalculateOpacity()
@@ -29,6 +26,7 @@
 	if(opaque_counter != old_opaque_counter && (!opaque_counter || !old_opaque_counter))
 		GLOB.opacity_set_event.raise_event(src, !opaque_counter, !!opaque_counter)
 		reconsider_lights()
+		shadowcast_queue_invalidate(src)
 		return TRUE
 	return FALSE
 

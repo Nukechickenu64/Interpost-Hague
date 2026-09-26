@@ -80,7 +80,7 @@
 /obj/machinery/door/blast/proc/force_open()
 	src.operating = 1
 	playsound(src.loc, open_sound, 100, 1)
-	flick(icon_state_opening, src)
+	depth_layer_flick(icon_state_opening)
 	src.set_density(0)
 	update_nearby_tiles()
 	src.update_icon()
@@ -93,16 +93,19 @@
 // Parameters: None
 // Description: Closes the door. No checks are done inside this proc.
 /obj/machinery/door/blast/proc/force_close()
+	if(!can_close_on_occupants())
+		return FALSE
 	src.operating = 1
 	playsound(src.loc, close_sound, 100, 1)
 	src.layer = closed_layer
-	flick(icon_state_closing, src)
+	depth_layer_flick(icon_state_closing)
 	src.set_density(1)
 	update_nearby_tiles()
 	src.update_icon()
 	src.set_opacity(1)
 	sleep(15)
 	src.operating = 0
+	return TRUE
 
 // Proc: force_toggle()
 // Parameters: None
@@ -163,7 +166,8 @@
 /obj/machinery/door/blast/close()
 	if (src.operating || (stat & BROKEN || stat & NOPOWER))
 		return
-	force_close()
+	if(!force_close() && autoclose)
+		addtimer(CALLBACK(src, .proc/close), next_close_time(), TIMER_UNIQUE|TIMER_OVERRIDE)
 
 
 // Proc: repair()
@@ -219,6 +223,14 @@
 	open_sound = 'sound/ported/GARRISON_UNLOCK.ogg'
 	close_sound = 'sound/ported/GARRISON_SEAL.ogg'
 	block_air_zones = 1
+
+/obj/machinery/door/blast/iddoor/Initialize()
+	. = ..()
+	enable_depth_layering(16)
+
+/obj/machinery/door/blast/iddoor/update_icon()
+	. = ..()
+	refresh_depth_layer()
 
 /obj/machinery/door/blast/iddoor/open
 	begins_closed = FALSE

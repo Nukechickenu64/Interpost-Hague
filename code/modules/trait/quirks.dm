@@ -50,6 +50,106 @@
 	description = "I love killing people!"
 	normal = 0
 
+/datum/quirk/night_owl
+	name = "night owl"
+	description = "I feel most comfortable working during the station's quiet hours."
+
+/datum/quirk/morning_person
+	name = "morning person"
+	description = "I am annoyingly cheerful at the start of a shift."
+
+/datum/quirk/neat_freak
+	name = "neat freak"
+	description = "I cannot stand clutter when there is time to clean it."
+
+/datum/quirk/pack_rat
+	name = "pack rat"
+	description = "I keep things that might become useful later."
+
+/datum/quirk/forgetful
+	name = "forgetful"
+	description = "I lose track of small details unless I write them down."
+
+/datum/quirk/superstitious
+	name = "superstitious"
+	description = "I take omens, lucky numbers, and unexplained coincidences seriously."
+
+/datum/quirk/claustrophobic
+	name = "claustrophobic"
+	description = "Tight spaces make me deeply uncomfortable."
+
+/datum/quirk/agoraphobic
+	name = "agoraphobic"
+	description = "Open spaces make me want to find a wall."
+
+/datum/quirk/acrophobic
+	name = "acrophobic"
+	description = "I dislike being far above the ground."
+
+/datum/quirk/arachnophobic
+	name = "arachnophobic"
+	description = "Spiders are not small or harmless as far as I am concerned."
+
+/datum/quirk/photophobic
+	name = "photophobic"
+	description = "Bright lights give me headaches."
+
+/datum/quirk/light_sleeper
+	name = "light sleeper"
+	description = "Every unusual noise wakes me up."
+
+/datum/quirk/deep_sleeper
+	name = "deep sleeper"
+	description = "Once I am asleep, alarms have to work for it."
+
+/datum/quirk/slow_reader
+	name = "slow reader"
+	description = "I need a little extra time to understand dense writing."
+
+/datum/quirk/dyslexic
+	name = "dyslexic"
+	description = "Written instructions sometimes rearrange themselves in my head."
+
+/datum/quirk/left_handed
+	name = "left-handed"
+	description = "I naturally reach for tools with my left hand."
+
+/datum/quirk/colorblind
+	name = "colorblind"
+	description = "Some colors look frustratingly similar to me."
+
+/datum/quirk/tinnitus
+	name = "tinnitus"
+	description = "There is a faint ringing in my ears that never quite leaves."
+
+/datum/quirk/fidgety
+	name = "fidgety"
+	description = "Standing perfectly still takes conscious effort."
+
+/datum/quirk/soft_spoken
+	name = "soft-spoken"
+	description = "People often ask me to repeat myself."
+
+/datum/quirk/loud
+	name = "loud"
+	description = "I do not notice how much of the room my voice fills."
+
+/datum/quirk/formal
+	name = "formal"
+	description = "I address coworkers as though every conversation were an official hearing."
+
+/datum/quirk/contrarian
+	name = "contrarian"
+	description = "I instinctively question the obvious solution."
+
+/datum/quirk/foodie
+	name = "foodie"
+	description = "A meal is an event, not just fuel."
+
+/datum/quirk/tea_drinker
+	name = "tea drinker"
+	description = "A proper cup of tea can fix more problems than people expect."
+
 /mob/living/proc/has_quirk(var/datum/quirk/this_quirk)
 	return istype(quirk, this_quirk)
 

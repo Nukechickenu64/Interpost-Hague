@@ -380,7 +380,7 @@ SUBSYSTEM_DEF(director)
 
 	var/list/ghost_candidates = list()
 	for(var/mob/observer/ghost/G in GLOB.player_list)
-		if(G.client && G.client.prefs && (G.client.prefs.be_special_role && "traitor" in G.client.prefs.be_special_role))
+		if(G.client && G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
 			ghost_candidates += G
 
 	if(ghost_candidates.len)
@@ -408,7 +408,10 @@ SUBSYSTEM_DEF(director)
 	last_major_fallback = world.time
 	if(!SSevent)
 		return
-	for(var/datum/event_container/EC in SSevent.event_containers[EVENT_LEVEL_MAJOR])
+	var/list/datum/event_container/major_containers = SSevent.event_containers[EVENT_LEVEL_MAJOR]
+	if(!islist(major_containers))
+		return
+	for(var/datum/event_container/EC in major_containers)
 		EC.start_event()
 	add_tension(15, "Director escalated with a major event - no viable antagonist")
 	log_and_message_admins("AI Director forced a major event due to lack of active antagonists.")

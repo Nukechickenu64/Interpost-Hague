@@ -299,6 +299,7 @@
 	update_nearby_tiles(need_rebuild=1) //Compel updates before
 	set_dir(turn(dir, 90))
 	updateSilicate()
+	update_nearby_icons()
 	update_nearby_tiles(need_rebuild=1)
 	return
 
@@ -318,6 +319,7 @@
 	update_nearby_tiles(need_rebuild=1) //Compel updates before
 	set_dir(turn(dir, 270))
 	updateSilicate()
+	update_nearby_icons()
 	update_nearby_tiles(need_rebuild=1)
 	return
 
@@ -347,15 +349,17 @@
 	update_nearby_tiles()
 	var/turf/location = loc
 	. = ..()
-	for(var/obj/structure/window/W in orange(location, 1))
-		W.update_icon()
+	update_nearby_icons(location)
 
 
 /obj/structure/window/Move()
 	var/ini_dir = dir
+	var/turf/old_location = get_turf(src)
+	update_nearby_icons(old_location)
 	update_nearby_tiles(need_rebuild=1)
 	..()
 	set_dir(ini_dir)
+	update_nearby_icons()
 	update_nearby_tiles(need_rebuild=1)
 
 //checks if this window is full-tile one
@@ -372,9 +376,15 @@
 	update_nearby_icons()
 
 //This proc is used to update the icons of nearby windows. It should not be confused with update_nearby_tiles(), which is an atmos proc!
-/obj/structure/window/proc/update_nearby_icons()
-	update_icon()
-	for(var/obj/structure/window/W in orange(src, 1))
+/obj/structure/window/proc/update_nearby_icons(var/turf/location)
+	if(!location)
+		location = get_turf(src)
+	if(get_turf(src) == location)
+		update_icon()
+	for(var/obj/structure/window/W in orange(location, 1))
+		W.update_icon()
+	for(var/turf/simulated/wall/W in orange(location, 1))
+		W.update_connections()
 		W.update_icon()
 
 //Updates the availabiliy of the rotation verbs
@@ -400,6 +410,9 @@
 	if(anchored)
 		for(var/obj/structure/window/W in orange(src,1))
 			if(W.anchored && W.density && W.type == src.type && W.is_fulltile()) //Only counts anchored, not-destroyed fill-tile windows.
+				dirs += get_dir(src, W)
+		for(var/turf/simulated/wall/W in orange(src, 1))
+			if(W.density && W.material)
 				dirs += get_dir(src, W)
 
 	var/list/connections = dirs_to_corner_states(dirs)

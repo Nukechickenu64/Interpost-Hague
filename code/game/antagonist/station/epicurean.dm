@@ -81,10 +81,10 @@ GLOBAL_DATUM_INIT(epicureans, /datum/antagonist/epicurean, new)
 		return
 	var/trophy_type
 	var/organ_name
-	if(target.mind && target.mind.assigned_role in list("Captain", "Head of Personnel", "Head of Security", "Chief Engineer", "Research Director", "Chief Medical Officer"))
+	if(target.mind && (target.mind.assigned_role in list("Captain", "Head of Personnel", "Head of Security", "Chief Engineer", "Research Director", "Chief Medical Officer")))
 		trophy_type = "command_brain"
 		organ_name = "Command Brain"
-	else if(target.mind && target.mind.assigned_role in list("Head of Security", "Warden", "Detective", "Security Officer"))
+	else if(target.mind && (target.mind.assigned_role in list("Head of Security", "Warden", "Detective", "Security Officer")))
 		trophy_type = "security_heart"
 		organ_name = "Security Heart"
 	else if((target.mind && target.mind.assigned_role == "Geneticist") || target.species?.name == "Plasmaman")

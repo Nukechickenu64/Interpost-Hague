@@ -162,27 +162,30 @@ What is the naming convention for planes or layers?
   #define LIGHTBULB_LAYER          1
   #define LIGHTING_LAYER           2
 
-#define EMISSIVE_PLANE           4 // For over-lighting overlays (ex. cigarette glows)
-  #define EMISSIVE_LAYER           1
-
-#define ABOVE_LIGHTING_PLANE     5 // laser beams, etc. that shouldn't be affected by darkness
+#define ABOVE_LIGHTING_PLANE     4 // laser beams, etc. that shouldn't be affected by darkness
   #define ABOVE_LIGHTING_LAYER     1
   #define BEAM_PROJECTILE_LAYER    2
   #define SUPERMATTER_WALL_LAYER   3
   #define OBFUSCATION_LAYER        4
 
-#define SHADOWCASTING_REFLECTOR_PLANE 6
+#define SHADOWCASTING_REFLECTOR_PLANE 5
 
-#define SHADOWCASTING_PLANE 7
+#define SHADOWCASTING_PLANE 6
 
-#define FULLSCREEN_PLANE         8 // for fullscreen overlays that do not cover the hud.
+#define EMISSIVE_PLANE           7 // Glows/bloom; above LOS shadows so light sources still glow out of occluded areas
+  #define EMISSIVE_LAYER           1
+
+#define RUNECHAT_PLANE           8 // floating chat text above speakers
+  #define RUNECHAT_LAYER           1
+
+#define FULLSCREEN_PLANE         9 // for fullscreen overlays that do not cover the hud.
   #define FULLSCREEN_LAYER         0
   #define DAMAGE_LAYER             1
   #define IMPAIRED_LAYER           2
   #define BLIND_LAYER              3
   #define CRIT_LAYER               4
 
-#define HUD_PLANE                9
+#define HUD_PLANE                10
   #define UNDER_HUD_LAYER          0
   #define HUD_BASE_LAYER           2
   #define HUD_ITEM_LAYER           3
@@ -219,14 +222,58 @@ What is the naming convention for planes or layers?
 /obj/screen/plane_master/blurs
 	filters = filter(type = "blur", size = 2)
 
+#define LIGHTING_BLOOM_THRESHOLD "#a0a0a0"
+#define LIGHTING_BLOOM_SIZE      2
+#define LIGHTING_BLOOM_OFFSET    1
+#define LIGHTING_BLOOM_ALPHA     110
+#define EMISSIVE_BLOOM_THRESHOLD "#404040"
+#define EMISSIVE_BLOOM_SIZE      4
+#define EMISSIVE_BLOOM_OFFSET    2
+#define EMISSIVE_BLOOM_ALPHA     200
+
+// Lighting overlays are BLEND_MULTIPLY; they need the white backdrop inside the plane to multiply against.
 /obj/screen/plane_master/lighting
 	name = "lighting plane master"
 	plane = LIGHTING_PLANE
+	blend_mode = BLEND_MULTIPLY
+	mouse_opacity = 0
 	render_target = "light"
 
 /obj/screen/plane_master/lighting/New()
 	. = ..()
-	add_filter("bloom", 4, list("type" = "bloom", size = 2, offset = 4, alpha = 150))
+	add_filter("bloom", 4, list("type" = "bloom", threshold = LIGHTING_BLOOM_THRESHOLD, size = LIGHTING_BLOOM_SIZE, offset = LIGHTING_BLOOM_OFFSET, alpha = LIGHTING_BLOOM_ALPHA))
+
+/obj/screen/plane_master/emissive
+	name = "emissive plane master"
+	plane = EMISSIVE_PLANE
+
+/obj/screen/plane_master/emissive/New()
+	. = ..()
+	add_filter("emissive_bloom", 1, list("type" = "bloom", threshold = EMISSIVE_BLOOM_THRESHOLD, size = EMISSIVE_BLOOM_SIZE, offset = EMISSIVE_BLOOM_OFFSET, alpha = EMISSIVE_BLOOM_ALPHA))
+
+/obj/screen/lighting_backdrop
+	name = ""
+	plane = LIGHTING_PLANE
+	// Screen objects draw above map objects in the same plane unless pushed into the background
+	layer = BACKGROUND_LAYER + 1
+	blend_mode = BLEND_OVERLAY
+	mouse_opacity = 0
+	screen_loc = "CENTER"
+
+/obj/screen/lighting_backdrop/New()
+	. = ..()
+	icon = get_solid_white_icon()
+	transform = matrix(64, 0, 0, 0, 64, 0)
+
+var/global/icon/solid_white_icon
+
+/proc/get_solid_white_icon()
+	if(!solid_white_icon)
+		var/icon/I = icon('icons/effects/triangle.dmi', "triangle")
+		I.Scale(world.icon_size, world.icon_size)
+		I.DrawBox(rgb(255, 255, 255), 1, 1, world.icon_size, world.icon_size)
+		solid_white_icon = I
+	return solid_white_icon
 
 /obj/screen/plane_master/drugabuse
 	plane = DEFAULT_PLANE
@@ -289,7 +336,13 @@ What is the naming convention for planes or layers?
 
 /obj/screen/plane_master/shadowcasting/New()
 	. = ..()
-	add_filter("blur", 4, list("type" = "blur", size=2))
+	add_filter("blur", 4, list("type" = "blur", size=1))
+	add_filter("wall_mask", 5, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
+
+/obj/screen/plane_master/los_occluders
+	name = "los wall mask"
+	plane = SHADOWCASTING_REFLECTOR_PLANE
+	render_target = "*los_occluders"
 
 /obj/screen/plane_master/ghost_dummy
 	// this avoids a bug which means plane masters which have nothing to control get angry and mess with the other plane masters out of spite

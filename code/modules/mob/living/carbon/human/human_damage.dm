@@ -6,6 +6,7 @@
 		set_stat(CONSCIOUS)
 		return
 
+	// Pain is handled by shock and incapacitation, not as direct tissue damage.
 	health = maxHealth - getBrainLoss() - (getBruteLoss() + getFireLoss() + getToxLoss() + getOxyLoss())
 
 	//TODO: fix husking

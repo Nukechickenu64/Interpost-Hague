@@ -192,3 +192,75 @@
 		block=GLOB.TELEBLOCK
 	OnDrawUnderlays(var/mob/M,var/g,var/fat)
 		return "telekinesishead[fat]_s"
+
+/datum/dna/gene/basic/heat_tolerance
+	name="Heat Tolerance"
+	activation_messages=list("Your skin feels comfortably warm.")
+	mutation=mHeatTolerance
+
+	New()
+		block=GLOB.HEATTOLERANCEBLOCK
+
+	OnMobLife(var/mob/living/carbon/human/M)
+		if(M.getFireLoss())
+			M.heal_organ_damage(0, 1)
+
+/datum/dna/gene/basic/quiet_hands
+	name="Quiet Hands"
+	activation_messages=list("A static charge passes harmlessly through your fingers.")
+	mutation=mQuietHands
+
+	New()
+		block=GLOB.QUIETHANDSBLOCK
+
+/datum/dna/gene/basic/compact_frame
+	name="Compact Frame"
+	activation_messages=list("Your clothes suddenly feel a little too large.")
+	mutation=mCompactFrame
+
+	New()
+		block=GLOB.COMPACTFRAMEBLOCK
+
+/datum/dna/gene/basic/clean_prints
+	name="Clean Prints"
+	activation_messages=list("Your fingertips feel strangely smooth.")
+	mutation=mCleanPrints
+
+	New()
+		block=GLOB.CLEANPRINTSBLOCK
+
+/datum/dna/gene/basic/resilient_lungs
+	name="Resilient Lungs"
+	activation_messages=list("Your lungs feel calm and efficient.")
+	mutation=mResilientLungs
+
+	New()
+		block=GLOB.RESILIENTLUNGSBLOCK
+
+/datum/dna/gene/basic/rapid_healing
+	name="Rapid Healing"
+	activation_messages=list("Small aches fade almost immediately.")
+	mutation=mRapidHealing
+
+	New()
+		block=GLOB.RAPIDHEALINGBLOCK
+
+	OnMobLife(var/mob/living/carbon/human/M)
+		if(M.health < M.maxHealth)
+			M.heal_organ_damage(1, 1)
+
+/datum/dna/gene/basic/night_vision
+	name="Night Vision"
+	activation_messages=list("The dark suddenly seems much less dark.")
+	mutation=mNightVision
+
+	New()
+		block=GLOB.NIGHTVISIONBLOCK
+
+/datum/dna/gene/basic/steady_hands
+	name="Steady Hands"
+	activation_messages=list("Your hands stop trembling.")
+	mutation=mSteadyHands
+
+	New()
+		block=GLOB.STEADYHANDSBLOCK

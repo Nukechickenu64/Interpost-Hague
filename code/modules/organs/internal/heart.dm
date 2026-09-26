@@ -23,6 +23,11 @@
 
 /obj/item/organ/internal/heart/Process()
 	if(owner)
+		if(owner.mind?.is_leech())
+			pulse = PULSE_NONE
+			heartbeat = 0
+			handle_blood()
+			return ..()
 		handle_pulse()
 		if(pulse)
 			handle_heartbeat()

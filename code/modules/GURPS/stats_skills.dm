@@ -333,6 +333,16 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 	msg += "</div></div>"
 	to_chat(src, msg)
 
+/mob/proc/check_all_skills()
+	var/msg = "\n<div class='firstdiv'><div class='box'>"
+	msg += "<span class='info'><EM>I try to remember what I could learn.</EM></span>\n"
+	msg += "<hr class='linexd'>"
+	msg += "<span class='wakeup'>All skills:</span>\n<BR>"
+	for(var/skill in skills)
+		msg += "I am <b>[skillnumtodesc(skills[skill])]</b> at [skill].\n"
+	msg += "</div></div>"
+	to_chat(src, msg)
+
 /mob/living/carbon/verb/reset_stats_skills()
 	set hidden = 1
 	for(var/stats in stats)

@@ -95,11 +95,14 @@
 #undef BLOOD_SPRAY_DISTANCE
 
 /mob/living/carbon/human/proc/remove_blood(var/amt)
-	if(!should_have_organ(BP_HEART)) //TODO: Make drips come from the reagents instead.
+	if(!vessel || !species || !species.blood_volume || !should_have_organ(BP_HEART)) //TODO: Make drips come from the reagents instead.
 		return 0
 	if(!amt)
 		return 0
-	return vessel.remove_reagent(/datum/reagent/blood, amt * (src.mob_size/MOB_MEDIUM))
+	var/removed = vessel.remove_reagent(/datum/reagent/blood, amt * (src.mob_size/MOB_MEDIUM))
+	if(removed && stat != DEAD)
+		shock_stage = min(160, shock_stage + round((removed / species.blood_volume) * 100))
+	return removed
 
 /****************************************************
 				BLOOD TRANSFERS
@@ -270,10 +273,14 @@ proc/blood_splatter(var/target,var/datum/reagent/blood/source,var/large,var/spra
 
 //Percentage of maximum blood volume.
 /mob/living/carbon/human/proc/get_blood_volume()
-	return round((vessel.get_reagent_amount(/datum/reagent/blood)/species.blood_volume)*100)
+	if(!vessel || !species || !species.blood_volume)
+		return 0
+	return clamp(round((vessel.get_reagent_amount(/datum/reagent/blood)/species.blood_volume)*100), 0, 100)
 
 //Percentage of maximum blood volume, affected by the condition of circulation organs
 /mob/living/carbon/human/proc/get_blood_circulation()
+	if(is_leech())
+		return get_blood_volume()
 	var/obj/item/organ/internal/heart/heart = internal_organs_by_name[BP_HEART]
 	var/blood_volume = get_blood_volume()
 	if(!heart || (heart.pulse == PULSE_NONE && !(status_flags & FAKEDEATH) && heart.robotic < ORGAN_ROBOT))

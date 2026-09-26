@@ -128,6 +128,9 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 		ui.set_initial_data(data)
 		ui.open()
 
+/obj/machinery/requests_console/proc/can_send_announcement()
+	return announcementConsole && announceAuth && message
+
 /obj/machinery/requests_console/Topic(href, href_list)
 	if(..())	return
 	usr.set_machine(src)
@@ -154,7 +157,8 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 			reset_message(1)
 
 	if(href_list["sendAnnouncement"])
-		if(!announcementConsole)	return
+		if(!can_send_announcement())
+			return
 		announcement.Announce(utf8_to_cp1251(message), msg_sanitized = 1)
 		reset_message(1)
 

@@ -108,6 +108,10 @@ var/list/_client_preferences_by_type
 		if(new_value == GLOB.PREF_NO)
 			H.hovertext.maptext = ""
 
+/datum/client_preference/runechat
+	description ="Show floating chat above speakers"
+	key = "CHAT_RUNECHAT"
+
 /datum/client_preference/ghost_ears
 	description ="Ghost ears"
 	key = "CHAT_GHOSTEARS"

@@ -189,6 +189,18 @@
 
 /client/proc/Move_object(direct)
 	if(mob && mob.control_object)
+		var/mob/observer/ghost/ghost = mob
+		if(istype(ghost) && ghost.pain_possession_object)
+			if(world.time < move_delay)
+				return
+			move_delay = world.time + (mob.m_intent == "walk" ? 7 + config.walk_speed : 1 + config.run_speed)
+			if(ghost.pain_possession_object.anchored || !prob(5))
+				return
+			var/turf/next_turf = get_step(ghost.pain_possession_object, direct)
+			if(!next_turf || next_turf.density)
+				return
+			step(ghost.pain_possession_object, direct)
+			return
 		if(mob.control_object.density)
 			step(mob.control_object,direct)
 			if(!mob.control_object)	return
@@ -202,9 +214,14 @@
 	if(!mob)
 		return // Moved here to avoid nullrefs below
 
-	if(mob.control_object)	Move_object(direct)
+	if(mob.control_object)
+		Move_object(direct)
+		return
 
 	if(mob.incorporeal_move && isobserver(mob))
+		if(world.time < move_delay)
+			return
+		move_delay = world.time + (mob.m_intent == "walk" ? 7 + config.walk_speed : 1 + config.run_speed)
 		Process_Incorpmove(direct)
 		return
 
@@ -261,10 +278,8 @@
 	if(!mob.canmove)
 		return
 
-	if(!mob.lastarea)
-		mob.lastarea = get_area(mob.loc)
-
-	if((istype(mob.loc, /turf/space)) || (mob.lastarea.has_gravity == 0))
+	// Check current location, not lastarea, so movement into zero-g rooms isn't gated on a stale area reference
+	if((istype(mob.loc, /turf/space)) || !mob.mob_has_gravity())
 		if(!mob.Process_Spacemove(0))	return 0
 
 	if(isobj(mob.loc) || ismob(mob.loc))//Inside an object, tell it we moved
@@ -407,14 +422,20 @@
 /client/proc/Process_Incorpmove(direct)
 	var/turf/mobloc = get_turf(mob)
 
-	switch(mob.incorporeal_move)
+	switch(istype(mob, /mob/observer/ghost) ? 1 : mob.incorporeal_move)
 		if(1)
 			var/turf/T = get_step(mob, direct)
+			if(istype(mob, /mob/observer/ghost))
+				var/mob/observer/ghost/observer = mob
+				if(!observer.can_walk_into(T))
+					return
+			else if(!T)
+				return
 			if(mob.check_is_holy_turf(T))
 				to_chat(mob, "<span class='warning'>You cannot enter holy grounds while you are in this plane of existence!</span>")
 				return
 			else
-				mob.forceMove(get_step(mob, direct))
+				mob.forceMove(T)
 				mob.dir = direct
 		if(2)
 			if(prob(25))

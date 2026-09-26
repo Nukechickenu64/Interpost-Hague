@@ -234,6 +234,7 @@ Class Procs:
 /obj/machinery/proc/state(var/msg)
 	for(var/mob/O in hearers(src, null))
 		O.show_message("[icon2html(src, world, realsize=FALSE)] <span class = 'notice'>[msg]</span>", 2)
+	runechat_to_hearers(runechat_emote_text(src, msg), RUNECHAT_EMOTE)
 
 /obj/machinery/proc/ping(text=null)
 	if (!text)

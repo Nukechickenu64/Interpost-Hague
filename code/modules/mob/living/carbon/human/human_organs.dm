@@ -198,6 +198,8 @@
 	return FALSE
 
 /mob/living/carbon/human/is_asystole()
+	if(is_leech())
+		return FALSE
 	if(isSynthetic())
 		var/obj/item/organ/internal/cell/C = internal_organs_by_name[BP_CELL]
 		if(istype(C))

@@ -61,6 +61,7 @@
 		return
 
 	var/buttonHTML = ""
+	var/roleButtonHTML = ""
 
 	// Main heart/menu button
 	buttonHTML += {"<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-right:1px;\"><div style=\"background-image: url('Heart.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Verb\" class=\"button\"></div></a>"}
@@ -89,15 +90,16 @@
 */
 		if(H?.mind)
 			if(H?.mind?.changeling)
-				buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Villain.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"They\" class=\"button\"></div></a>"
+				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Villain.png');\" id=\"They\" class=\"button\"></div></a>"
 			if(H.mind.special_role == "Head Revolutionary")
-				buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Epsilon.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-132px;\" id=\"Integralist\" class=\"button\"></div></a>"
+				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Chrome.png');\" id=\"Integralist\" class=\"button\"></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
-			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:45px;\"><div style=\"background-image: url('Thanati.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-42px;\" id=\"Thanati\" class=\"button\"></div></a>"
+			roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Thanati.png');\" id=\"Thanati\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
 			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-88px;\" id=\"Dead\" class=\"button\"></div></a>"
 
 	client.addbutton(buttonHTML, "#dynamicpanel")
+	client.addbutton(roleButtonHTML, "#dynamicpanel2")
 	updateButtons()
 
 /mob/proc/updateButtons()

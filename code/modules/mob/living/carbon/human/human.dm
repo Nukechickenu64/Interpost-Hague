@@ -1501,6 +1501,8 @@ var/list/rank_prefix = list(\
 
 //generates realistic-ish pulse output based on preset levels
 /mob/living/carbon/human/proc/get_pulse(var/method)	//method 0 is for hands, 1 is for machines, more accurate
+	if(is_leech())
+		return "0"
 	var/obj/item/organ/internal/heart/H = internal_organs_by_name[BP_HEART]
 	if(!H)
 		return
@@ -1525,6 +1527,8 @@ var/list/rank_prefix = list(\
 //			output for machines^	^^^^^^^output for people^^^^^^^^^
 
 /mob/living/carbon/human/proc/pulse()
+	if(is_leech())
+		return PULSE_NONE
 	var/obj/item/organ/internal/heart/H = internal_organs_by_name[BP_HEART]
 	if(!H)
 		return PULSE_NONE
@@ -1573,7 +1577,7 @@ var/list/rank_prefix = list(\
 	return (species && species.has_organ[organ_check])
 
 /mob/living/carbon/human/can_feel_pain(var/obj/item/organ/check_organ)
-	if(isSynthetic())
+	if(isSynthetic() || is_leech())
 		return 0
 	if(check_organ)
 		if(!istype(check_organ))
@@ -1582,6 +1586,8 @@ var/list/rank_prefix = list(\
 	return !(species.species_flags & SPECIES_FLAG_NO_PAIN)
 
 /mob/living/carbon/human/need_breathe()
+	if(is_leech())
+		return 0
 	if(species.breathing_organ && should_have_organ(species.breathing_organ))
 		return 1
 	else

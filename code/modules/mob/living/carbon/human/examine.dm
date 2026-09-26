@@ -168,6 +168,8 @@
 
 	//Disfigured face
 	if(!skipface) //Disfigurement only matters for the head currently.
+		if(is_leech() && leech_fangs_extended)
+			msg += "<span class='warning'>Their upper canines are extended into narrow fangs.</span>\n"
 		var/obj/item/organ/external/head/E = get_organ(BP_HEAD)
 		if(E && E.disfigured) //Check to see if we even have a head and if the head's disfigured.
 			if(E.species) //Check to make sure we have a species

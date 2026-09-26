@@ -109,7 +109,14 @@
 /turf/simulated/wall/ChangeTurf(var/newtype)
 	clear_plants()
 	clear_bulletholes()
-	return ..(newtype)
+	. = ..(newtype)
+	if(.)
+		for(var/turf/simulated/wall/W in orange(src, 1))
+			W.update_connections()
+			W.update_icon()
+		for(var/obj/structure/window/W in orange(src, 1))
+			W.update_icon()
+	return .
 
 //Appearance
 /turf/simulated/wall/examine(mob/user)
@@ -240,7 +247,7 @@
 	O.icon_state = "2"
 	O.anchored = 1
 	O.set_density(1)
-	O.plane = LIGHTING_PLANE
+	O.plane = ABOVE_LIGHTING_PLANE
 	O.layer = FIRE_LAYER
 
 	src.ChangeTurf(/turf/simulated/floor/plating)

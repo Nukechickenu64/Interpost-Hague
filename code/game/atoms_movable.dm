@@ -26,6 +26,7 @@
 	var/pull_sound = null
 
 /atom/movable/Destroy()
+	disable_depth_layering()
 	. = ..()
 	for(var/atom/movable/AM in src)
 		qdel(AM)

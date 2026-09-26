@@ -73,7 +73,19 @@
 
 /datum/preferences/proc/sanitize_preferences()
 	player_setup.sanitize_setup()
+	normalize_antagonist_role_preferences()
 	return 1
+
+/datum/preferences/proc/normalize_antagonist_role_preferences()
+	if(!islist(be_special_role))
+		be_special_role = list()
+	if(!islist(never_be_special_role))
+		never_be_special_role = list()
+
+	for(var/antag_type in GLOB.all_antag_types_)
+		var/datum/antagonist/antag = GLOB.all_antag_types_[antag_type]
+		be_special_role |= antag.id
+		never_be_special_role -= antag.id
 
 /datum/preferences/proc/update_setup(var/savefile/preferences, var/savefile/character)
 	if(!preferences || !character)

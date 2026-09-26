@@ -137,6 +137,9 @@
 	functioning_set = FALSE
 
 /obj/item/organ/internal/stomach/proc/handle_hunger()
+	if(owner.mind?.is_leech())
+		owner.clear_event("hunger")
+		return
 	owner.adjust_nutrition(-HUNGER_FACTOR)
 	switch(owner.nutrition)
 		if(NUTRITION_LEVEL_WELL_FED to NUTRITION_LEVEL_FULL)

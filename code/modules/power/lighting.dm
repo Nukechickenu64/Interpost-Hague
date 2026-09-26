@@ -164,6 +164,7 @@
 	var/obj/item/weapon/light/lightbulb
 
 	var/current_mode = null
+	var/image/emissive_overlay
 
 	var/sound_on = 'sound/machines/lightson.ogg'
 	var/sound_off = 'sound/machines/lightsoff.ogg'
@@ -271,6 +272,14 @@
 			playsound(get_turf(src),sound_off, 30, 0)
 		set_light(0)
 	change_power_consumption((light_range * light_power) * LIGHTING_POWER_FACTOR, POWER_USE_ACTIVE)
+
+	if(emissive_overlay)
+		overlays -= emissive_overlay
+		emissive_overlay = null
+	// After set_light() so the glow matches the colour actually emitted (modes, bulb colour, switch_check burnouts)
+	if(on && light_range)
+		emissive_overlay = overlay_image(icon, icon_state, light_color, RESET_COLOR, EMISSIVE_PLANE, EMISSIVE_LAYER)
+		overlays += emissive_overlay
 
 /obj/machinery/light/proc/get_status()
 	if(!lightbulb)

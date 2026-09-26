@@ -72,6 +72,7 @@
 			on_hear_say("<span class='game say'><span class='name'>[speaker_name]</span>[alt_name] [track][language.format_message(message, verb)]</span>")
 		else
 			on_hear_say("<span class='game say'><span class='name'>[speaker_name]</span>[alt_name] [track][verb], <span class='message'><span class='body'>\"[message]\"</span></span></span>")
+		runechat_to(src, speaker, message, italics ? (RUNECHAT_ITALIC|RUNECHAT_SMALL) : 0)
 		if (speech_sound && (get_dist(speaker, src) <= world.view && src.z == speaker.z))
 			var/turf/source = speaker? get_turf(speaker) : get_turf(src)
 			src.playsound_local(source, speech_sound, sound_vol, 1)
@@ -83,7 +84,7 @@
 	var/time = say_timestamp()
 	to_chat(src, "[time] [message]")
 
-/mob/proc/hear_radio(var/message, var/verb="says", var/datum/language/language=null, var/part_a, var/part_b, var/part_c, var/mob/speaker = null, var/hard_to_hear = 0, var/vname ="")
+/mob/proc/hear_radio(var/message, var/verb="says", var/datum/language/language=null, var/part_a, var/part_b, var/part_c, var/mob/speaker = null, var/hard_to_hear = 0, var/vname ="", var/atom/radio_source = null)
 
 	var/radio_sound = list('sound/effects/radio1.ogg', 'sound/effects/radio2.ogg', 'sound/effects/radio3.ogg', 'sound/effects/radio4.ogg')
 
@@ -216,6 +217,10 @@
 			to_chat(src, "<span class='warning'>You feel your headset vibrate but can hear nothing from it!</span>")
 	else
 		on_hear_radio(part_a, speaker_name, track, part_b, part_c, formatted)
+		// Speakers within 1 tile already produced a local runechat when talking into the radio
+		if(radio_source && !isghost(src) && (!speaker || speaker.z != z || get_dist(speaker, src) > 1))
+			var/rc_name = hard_to_hear ? "Unknown" : (vname || (speaker ? speaker.name : "Unknown"))
+			runechat_to(src, radio_source, "[rc_name]: [message]", RUNECHAT_RADIO, speaker ? runechat_color(speaker) : null)
 
 /proc/say_timestamp()
 	return "<span class='say_quote'>\[[stationtime2text()]\]</span>"

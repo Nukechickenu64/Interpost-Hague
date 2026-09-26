@@ -130,7 +130,7 @@
 	return 1
 
 /obj/machinery/door/window/close()
-	if (src.operating)
+	if (src.operating || !can_close_on_occupants())
 		return 0
 	operating = 1
 	flick(text("[]closing", src.base_state), src)

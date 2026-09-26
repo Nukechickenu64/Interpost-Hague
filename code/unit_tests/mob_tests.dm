@@ -93,6 +93,129 @@ datum/unit_test/human_missing_breathing_organ/start_test()
 	fail("No breathing species was available to test a missing breathing organ.")
 	return 1
 
+datum/unit_test/human_pain_does_not_reduce_health
+	name = "MOB: Pain Does Not Reduce Tissue Health"
+
+datum/unit_test/human_pain_does_not_reduce_health/start_test()
+	var/mob/living/carbon/human/H = new(null, SPECIES_HUMAN)
+	var/starting_health = H.maxHealth
+	var/obj/item/organ/external/limb = H.get_organ(BP_CHEST)
+
+	if(!limb)
+		qdel(H)
+		fail("Human test subject had no chest organ.")
+		return 1
+
+	limb.adjust_pain(limb.max_damage)
+	H.updatehealth()
+	var/ending_health = H.health
+	qdel(H)
+
+	if(ending_health != starting_health)
+		fail("Pain changed health from [starting_health] to [ending_health] without tissue damage.")
+	else
+		pass("Pain remains an incapacitating shock input instead of direct tissue damage.")
+	return 1
+
+datum/unit_test/human_blood_loss_causes_shock
+	name = "MOB: Acute Blood Loss Causes Proportional Shock"
+
+datum/unit_test/human_blood_loss_causes_shock/start_test()
+	var/mob/living/carbon/human/H = new(null, SPECIES_HUMAN)
+	var/starting_volume = H.get_blood_volume()
+	var/starting_shock = H.shock_stage
+	var/removed = H.remove_blood(100)
+	var/ending_volume = H.get_blood_volume()
+	var/ending_shock = H.shock_stage
+	qdel(H)
+
+	if(!removed || ending_volume >= starting_volume || ending_shock <= starting_shock)
+		fail("Removing blood did not reduce circulating volume and increase shock as expected.")
+	else
+		pass("Acute blood loss reduces volume and produces proportional shock.")
+	return 1
+
+datum/unit_test/leech_fangs_require_extension
+	name = "MOB: Leech Fangs Must Be Extended"
+
+datum/unit_test/leech_fangs_require_extension/start_test()
+	var/mob/living/carbon/human/H = new(null, SPECIES_HUMAN)
+	H.mind_initialize()
+	H.mind.special_role = "Leech"
+
+	var/can_bite_retracted = H.can_use_leech_fangs()
+	H.leech_fangs_extended = TRUE
+	var/can_bite_extended = H.can_use_leech_fangs()
+
+	qdel(H)
+	if(can_bite_retracted || !can_bite_extended)
+		fail("Leech fang eligibility did not follow its retracted/extended state.")
+	else
+		pass("A Leech can use fangs only while they are extended.")
+	return 1
+
+datum/unit_test/self_pressure_survives_movement
+	name = "MOB: Self-applied pressure survives movement and can be stopped"
+	async = 1
+	var/mob/living/carbon/human/patient
+	var/obj/item/organ/external/pressured_organ
+	var/turf/start_turf
+	var/turf/moved_turf
+	var/phase = 0
+
+datum/unit_test/self_pressure_survives_movement/start_test()
+	start_turf = get_safe_turf()
+	if(!start_turf)
+		fail("Could not find a safe turf for the movement test.")
+		return 1
+	moved_turf = get_step(start_turf, NORTH)
+	if(!moved_turf || moved_turf == start_turf)
+		fail("Could not find two turfs for the movement test.")
+		return 1
+
+	patient = new(start_turf, SPECIES_HUMAN)
+	pressured_organ = patient.get_organ(BP_CHEST)
+	if(!pressured_organ)
+		qdel(patient)
+		fail("Could not find a chest organ for the pressure test.")
+		return 1
+
+	pressured_organ.status |= ORGAN_BLEEDING
+	patient.zone_sel.selecting = BP_CHEST
+	patient.apply_pressure(patient, BP_CHEST)
+	return 1
+
+datum/unit_test/self_pressure_survives_movement/check_result()
+	if(!patient || QDELETED(patient) || !pressured_organ)
+		fail("The patient or pressured organ was deleted before the test completed.")
+		return 1
+
+	if(phase == 0)
+		if(pressured_organ.applied_pressure != patient)
+			return 0
+		patient.forceMove(moved_turf)
+		if(patient.loc == start_turf)
+			patient.zone_sel.selecting = BP_HEAD
+			fail("The patient could not be moved to the test turf.")
+			return 0
+		phase = 1
+		return 0
+
+	if(phase == 1)
+		if(pressured_organ.applied_pressure != patient)
+			fail("Moving interrupted self-applied pressure.")
+			return 1
+		patient.zone_sel.selecting = BP_HEAD
+		phase = 2
+		return 0
+
+	if(pressured_organ.applied_pressure)
+		return 0
+
+	pass("Self-applied pressure survives movement and ends after changing target zone.")
+	qdel(patient)
+	return 1
+
 // ============================================================================
 
 /var/default_mobloc = null

@@ -1,6 +1,9 @@
 #define SAVE_RESET -1
 
 /datum/preferences
+	var/list/never_be_special_role
+	var/list/be_special_role
+
 	//doohickeys for savefiles
 	var/path
 	var/default_slot = 1				//Holder so it doesn't default to slot 1, rather the last one used

@@ -138,6 +138,7 @@
 	icon_state = "capchair_preview"
 	base_icon = "capchair"
 	buckle_movable = 1
+	atom_flags = 0
 
 /obj/structure/bed/chair/comfy/captain/New(var/newloc,var/newmaterial)
 	..(newloc,"steel","black")

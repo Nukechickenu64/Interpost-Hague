@@ -22,9 +22,19 @@
 	else
 		..()
 
+/mob/living/carbon/human/var/list/pain_possession_candidates
+/mob/living/carbon/human/var/turf/pain_possession_turf
+
 /mob/living/carbon/human/death(gibbed,deathmessage="seizes up and falls limp...", show_dead_message = "You have died.")
 
 	if(stat == DEAD) return
+	var/turf/death_turf = get_turf(src)
+	if(!gibbed && getHalLoss() >= 300 && death_turf)
+		for(var/obj/target in death_turf)
+			if(!target.anchored && !istype(target, /obj/effect))
+				LAZYADD(pain_possession_candidates, target)
+		if(pain_possession_candidates)
+			pain_possession_turf = death_turf
 
 	BITSET(hud_updateflag, HEALTH_HUD)
 	BITSET(hud_updateflag, STATUS_HUD)
@@ -88,6 +98,10 @@
 
 	var/death_sound2 = 'sound/effects/death.ogg'
 	sound_to(src, sound(death_sound2,0,0,0,50))
+	if(pain_possession_candidates && client && !QDELETED(src))
+		spawn(0)
+			if(src && client && stat == DEAD)
+				ghostize()
 
 /mob/living/carbon/human/proc/ChangeToHusk()
 	if(HUSK in mutations)	return

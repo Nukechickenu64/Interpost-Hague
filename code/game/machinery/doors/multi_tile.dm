@@ -59,7 +59,10 @@
 			if(T) filler_turfs += T
 	return filler_turfs
 
-/obj/machinery/door/airlock/multi_tile/metal/open()
+/obj/machinery/door/airlock/multi_tile/metal/open(var/forced = 0)
+	if(can_open(forced))
+		for(var/turf/T in get_filler_turfs())
+			T.set_opacity(0)
 	. = ..()
 	update_filler_turfs()
 

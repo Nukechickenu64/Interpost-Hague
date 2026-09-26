@@ -24,7 +24,8 @@
 	assailant.equip_to_slot(src, slot_wear_mask)
 	affecting.grabbed_by += src
 	assailant.do_attack_animation(affecting)
-	visible_message("<span class='combat'>[assailant] clamps their teeth around [affecting]'s [get_targeted_organ().name]!</span>")
+	var/obj/item/organ/external/target_organ = get_targeted_organ()
+	visible_message("<span class='combat'>[assailant] clamps their teeth around [affecting]'s [target_organ.name]!</span>")
 
 /obj/item/grab/mouth/Process()
 	if(!assailant || !affecting || !assailant.Adjacent(affecting) || !assailant.check_has_mouth() || assailant.check_mouth_coverage())

@@ -104,11 +104,13 @@
 /datum/loyalty_tracker/proc/get_faction_summary()
 	var/list/summary = list()
 	for(var/faction in faction_members)
-		summary[faction] = faction_members[faction].len
+		var/list/members = faction_members[faction]
+		summary[faction] = members.len
 	return summary
 
 /// Reset all loyalties (round end)
 /datum/loyalty_tracker/proc/reset()
 	for(var/faction in faction_members)
-		faction_members[faction].Cut()
+		var/list/members = faction_members[faction]
+		members.Cut()
 	mind_factions.Cut()

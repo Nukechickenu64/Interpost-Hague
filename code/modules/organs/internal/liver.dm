@@ -63,13 +63,16 @@
 
 	// Blood loss or liver damage make you lose nutriments
 	var/blood_volume = owner.get_blood_volume()
-	if(blood_volume < BLOOD_VOLUME_SAFE || is_bruised())
+	if(!owner.mind?.is_leech() && (blood_volume < BLOOD_VOLUME_SAFE || is_bruised()))
 		if(owner.nutrition >= 300)
 			owner.adjust_nutrition(-30)
 		else if(owner.nutrition >= 200)
 			owner.adjust_nutrition(-20)
 
 /obj/item/organ/internal/liver/proc/handle_thirst()
+	if(owner.mind?.is_leech())
+		owner.clear_event("thirst")
+		return
 	owner.adjust_thirst(-THIRST_FACTOR)
 	switch(owner.thirst)
 		if(THIRST_LEVEL_FILLED to THIRST_LEVEL_MAX)

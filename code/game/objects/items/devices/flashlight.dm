@@ -58,6 +58,8 @@
 
 		var/mob/living/carbon/human/H = M	//mob has protective eyewear
 		if(istype(H))
+			if(H.is_leech() && flashlight_power >= 3)
+				H.handle_leech_light_exposure(2)
 			for(var/obj/item/clothing/C in list(H.head,H.wear_mask,H.glasses))
 				if(istype(C) && (C.body_parts_covered & EYES))
 					to_chat(user, "<span class='warning'>You're going to need to remove [C] first.</span>")

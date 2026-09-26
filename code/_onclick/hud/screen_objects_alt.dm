@@ -244,6 +244,11 @@
 /obj/screen/skills_family/Click(var/location, var/control, var/params)
 	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/P = params2list(params)
+	if(P["right"])
+		if(ishuman(usr))
+			var/mob/living/carbon/human/H = usr
+			H.check_all_skills()
+		return
 	var/icon_y = text2num(P["icon-y"])
 	playsound(usr, pick(clicksound), 30, 0)
 	if(icon_y <= world.icon_size/2)

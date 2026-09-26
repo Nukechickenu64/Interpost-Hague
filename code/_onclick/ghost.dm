@@ -11,10 +11,14 @@
 		to_chat(src, "<span class='notice'>You will no longer examine things you click on.</span>")
 
 /mob/observer/ghost/DblClickOn(var/atom/A, var/params)
+	if(pain_possession_object)
+		return
 	if(can_reenter_corpse && mind && mind.current)
 		if(A == mind.current || (mind.current in A)) // double click your corpse or whatever holds it
 			reenter_corpse()						// (cloning scanner, body bag, closet, mech, etc)
 			return
+	if(!client || !client.holder)
+		return
 
 	// Things you might plausibly want to follow
 	if(istype(A,/atom/movable))
@@ -27,6 +31,9 @@
 /mob/observer/ghost/ClickOn(var/atom/A, var/params)
 	if(!canClick()) return
 	setClickCooldown(DEFAULT_QUICK_COOLDOWN)
+	if(pain_possession_object)
+		examinate(A)
+		return
 
 	// You are responsible for checking config.ghost_interaction when you override this function
 	// Not all of them require checking, see below
@@ -51,22 +58,30 @@
 // Now you can click through portals, wormholes, gateways, and teleporters while observing. -Sayu
 
 /obj/machinery/teleport/hub/attack_ghost(mob/user as mob)
+	if(get_dist(user, src) > 1)
+		return
 	var/atom/l = loc
 	var/obj/machinery/computer/teleporter/com = locate(/obj/machinery/computer/teleporter, locate(l.x - 2, l.y, l.z))
-	if(com.locked)
+	if(com && com.locked)
 		user.forceMove(get_turf(com.locked))
 
 /obj/effect/portal/attack_ghost(mob/user as mob)
+	if(get_dist(user, src) > 1)
+		return
 	if(target)
 		user.forceMove(get_turf(target))
 
 /obj/machinery/gateway/centerstation/attack_ghost(mob/user as mob)
+	if(get_dist(user, src) > 1)
+		return
 	if(awaygate)
 		user.forceMove(awaygate.loc)
 	else
 		to_chat(user, "[src] has no destination.")
 
 /obj/machinery/gateway/centeraway/attack_ghost(mob/user as mob)
+	if(get_dist(user, src) > 1)
+		return
 	if(stationgate)
 		user.forceMove(stationgate.loc)
 	else

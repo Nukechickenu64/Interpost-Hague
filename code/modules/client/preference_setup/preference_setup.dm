@@ -13,11 +13,6 @@ var/const/CHARACTER_PREFERENCE_INPUT_TITLE = "Character Preference"
 	sort_order = 2
 	category_item_type = /datum/category_item/player_setup_item/occupation
 
-/datum/category_group/player_setup_category/appearance_preferences
-	name = "Roles"
-	sort_order = 3
-	category_item_type = /datum/category_item/player_setup_item/antagonism
-
 /datum/category_group/player_setup_category/morality_preferences
 	name = "Morality"
 	sort_order = 4

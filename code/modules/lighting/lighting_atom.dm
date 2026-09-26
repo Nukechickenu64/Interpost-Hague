@@ -49,11 +49,11 @@
 		light = null
 	return ..()
 
-/atom/set_opacity()
+// Multi-tile movables count toward every turf they cover, not just loc.
+/atom/movable/set_opacity()
 	. = ..()
 	if(.)
-		var/turf/T = loc
-		if(istype(T))
+		for(var/turf/T in locs)
 			T.RecalculateOpacity()
 
 #define LIGHT_MOVE_UPDATE \

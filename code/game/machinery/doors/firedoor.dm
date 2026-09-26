@@ -18,7 +18,7 @@
 	density = 0
 	layer = BELOW_DOOR_LAYER
 	open_layer = BELOW_DOOR_LAYER
-	closed_layer = ABOVE_DOOR_LAYER
+	closed_layer = BELOW_DOOR_LAYER
 
 	//These are frequenly used with windows, so make sure zones can pass.
 	//Generally if a firedoor is at a place where there should be a zone boundery then there will be a regular door underneath it.
@@ -332,7 +332,12 @@
 /obj/machinery/door/firedoor/close()
 	latetoggle()
 	playsound(src, 'sound/machines/firedoorclose.ogg', 35, 0)
-	return ..()
+	. = ..()
+	if(!. && !density && !blocked)
+		for(var/area/A in areas_added)
+			if(A.fire || A.air_doors_activated)
+				addtimer(CALLBACK(src, .proc/close), next_close_time(), TIMER_UNIQUE|TIMER_OVERRIDE)
+				break
 
 /obj/machinery/door/firedoor/open(var/forced = 0)
 	if(hatch_open)
@@ -389,23 +394,23 @@
 	if(density)
 		icon_state = "door_closed"
 		if(hatch_open)
-			overlays += "hatch"
+			overlays += image(icon, "hatch")
 		if(blocked)
-			overlays += "welded"
+			overlays += image(icon, "welded")
 		if(pdiff_alert)
-			overlays += "palert"
+			overlays += image(icon, "palert")
 			do_set_light = TRUE
 		if(dir_alerts)
 			for(var/d=1;d<=4;d++)
 				var/cdir = GLOB.cardinal[d]
 				for(var/i=1;i<=ALERT_STATES.len;i++)
 					if(dir_alerts[d] & (1<<(i-1)))
-						overlays += new/icon(icon,"alert_[ALERT_STATES[i]]", dir=cdir)
+						overlays += image(icon, "alert_[ALERT_STATES[i]]", dir = cdir)
 						do_set_light = TRUE
 	else
 		icon_state = "door_open"
 		if(blocked)
-			overlays += "welded_open"
+			overlays += image(icon, "welded_open")
 
 	if(do_set_light)
 		set_light(1.5, 0.5, COLOR_SUN)
