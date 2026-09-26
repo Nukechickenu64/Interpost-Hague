@@ -7,7 +7,7 @@
 <ui-display title='Range: {{data.range}} meter(s)'>
     <ui-section>
         <ui-button style='{{data.range <= 0 ? "selected" : null}}' action='decrease_range'>Decrease</ui-button>
-        <ui-button style='{{data.active >= data.max_range ? "selected" : "null"}}' action='increase_range'>Increase</ui-button>
+        <ui-button style='{{data.range >= data.max_range ? "selected" : null}}' action='increase_range'>Increase</ui-button>
     </ui-section>
 </ui-display>
 <ui-display title='Mode:'>
@@ -17,6 +17,6 @@
 </ui-display>
 <ui-section>
 	<ui-display title='Charge: {{data.current_charge}}/{{data.max_charge}}'>
-	<ui-bar min='0' max='1' value='{{data.current_charge/data.max_charge}}' state='{{data.current_charge/data.max_charge}}'>{{Math.fixed(data.current_charge*100/data.max_charge)}}%</ui-bar>
+    <ui-bar min='0' max='1' value='{{data.max_charge ? data.current_charge/data.max_charge : 0}}' state='{{data.max_charge ? "good" : "disabled"}}'>{{data.max_charge ? Math.fixed(data.current_charge*100/data.max_charge) + "%" : "No Cell"}}</ui-bar>
 </ui-section>
 <ui-display title='Energy Consumption: ~{{data.total_cost}}W'>

@@ -60,6 +60,39 @@ datum/unit_test/human_breath/check_result()
 
 	return 1	// return 1 to show we're done and don't want to recheck the result.
 
+datum/unit_test/human_missing_breathing_organ
+	name = "MOB: Missing Breathing Organ Causes Full Oxygen Loss"
+
+datum/unit_test/human_missing_breathing_organ/start_test()
+	for(var/species_name in all_species)
+		var/datum/species/S = all_species[species_name]
+		if(!S.breathing_organ)
+			continue
+
+		var/mob/living/carbon/human/H = new(null, S.name)
+		if(!H.need_breathe())
+			qdel(H)
+			continue
+
+		var/obj/item/organ/internal/breathing_organ = H.internal_organs_by_name[H.species.breathing_organ]
+		if(!breathing_organ)
+			qdel(H)
+			continue
+
+		breathing_organ.removed()
+		var/oxygen_loss = H.getOxyLoss()
+		qdel(H)
+		qdel(breathing_organ)
+
+		if(oxygen_loss != 100)
+			fail("[S.name] with no [S.breathing_organ] reported [oxygen_loss] oxygen loss instead of 100.")
+		else
+			pass("A missing required breathing organ reports full oxygen loss.")
+		return 1
+
+	fail("No breathing species was available to test a missing breathing organ.")
+	return 1
+
 // ============================================================================
 
 /var/default_mobloc = null

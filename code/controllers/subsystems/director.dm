@@ -37,6 +37,11 @@ SUBSYSTEM_DEF(director)
 	var/debt_probability = 25  // % chance a crewmember starts with a debt
 	var/agenda_probability = 60  // % chance a crewmember starts with an agenda
 
+	// Minimum antagonist presence maintenance
+	var/list/antag_last_activity = list()  // mind -> world.time of last recorded hostile action
+	var/last_antag_maintenance = 0
+	var/last_major_fallback = 0
+
 /datum/controller/subsystem/director/Initialize()
 	telemetry = new()
 	loyalty = new()
@@ -179,6 +184,9 @@ SUBSYSTEM_DEF(director)
 	// Check corporate profile completion
 	check_profiles()
 
+	// Ensure the round always has at least one live antagonist to react to
+	maintain_antagonist_presence()
+
 	// Log status
 	log_debug("AI Director: State=[state_name()], Tension=[round(tension)], Reason=[tension_last_change_reason]")
 
@@ -297,6 +305,113 @@ SUBSYSTEM_DEF(director)
 /// Called when a crewmember is arrested (hook from security systems)
 /datum/controller/subsystem/director/proc/register_arrest()
 	telemetry.register_arrest()
+
+/// Records that an antagonist mind took a hostile/evil action (hooked from admin_attack_log and antagonist creation)
+/datum/controller/subsystem/director/proc/record_antagonist_activity(var/datum/mind/M)
+	if(!M)
+		return
+	antag_last_activity[M] = world.time
+
+/// Total antagonists (any type) currently in the round
+/datum/controller/subsystem/director/proc/get_total_antag_count()
+	var/count = 0
+	for(var/id in GLOB.all_antag_types_)
+		var/datum/antagonist/AT = GLOB.all_antag_types_[id]
+		count += AT.get_antag_count()
+	return count
+
+/// Total antagonists (any type) that are alive and connected
+/datum/controller/subsystem/director/proc/get_total_active_antag_count()
+	var/count = 0
+	for(var/id in GLOB.all_antag_types_)
+		var/datum/antagonist/AT = GLOB.all_antag_types_[id]
+		count += AT.get_active_antag_count()
+	return count
+
+/// Number of living, connected crew on the station - used as the antagonist population cap basis
+/datum/controller/subsystem/director/proc/count_living_crew()
+	var/count = 0
+	for(var/mob/living/carbon/human/H in GLOB.player_list)
+		if(!H.client || H.stat == DEAD)
+			continue
+		if(!is_station_turf(get_turf(H)))
+			continue
+		count++
+	return count
+
+/// TRUE if there are no active antagonists, or every active antagonist has gone quiet for too long
+/datum/controller/subsystem/director/proc/all_active_antagonists_stale()
+	for(var/id in GLOB.all_antag_types_)
+		var/datum/antagonist/AT = GLOB.all_antag_types_[id]
+		for(var/datum/mind/M in AT.current_antagonists)
+			var/mob/living/L = M.current
+			if(!L || L.stat == DEAD)
+				continue //dead
+			if(!L.client && !L.teleop)
+				continue //SSD
+			var/last_activity = antag_last_activity[M]
+			if(last_activity && world.time - last_activity < ANTAG_STALE_THRESHOLD)
+				return FALSE
+	return TRUE //either nobody active, or everybody active has gone quiet
+
+/// Keeps the round populated with at least one engaged antagonist, capped at half the living crew
+/datum/controller/subsystem/director/proc/maintain_antagonist_presence()
+	if(director_state == DIRECTOR_STATE_DORMANT || director_state == DIRECTOR_STATE_CONCLUDED)
+		return
+	if(world.time - last_antag_maintenance < ANTAG_MAINTENANCE_COOLDOWN)
+		return
+	if(!all_active_antagonists_stale())
+		return
+	last_antag_maintenance = world.time
+
+	var/max_allowed = max(1, round(count_living_crew() / 2))
+	if(get_total_antag_count() >= max_allowed)
+		trigger_major_fallback_event()
+		return
+
+	if(!try_spawn_replacement_antagonist())
+		trigger_major_fallback_event()
+
+/// Attempts to stand up a fresh traitor from a ghost candidate, or a living opted-in crewmember
+/datum/controller/subsystem/director/proc/try_spawn_replacement_antagonist()
+	var/datum/antagonist/traitor_antag = GLOB.all_antag_types_["traitor"]
+	if(!traitor_antag)
+		return FALSE
+
+	var/list/ghost_candidates = list()
+	for(var/mob/observer/ghost/G in GLOB.player_list)
+		if(G.client && G.client.prefs && (G.client.prefs.be_special_role && "traitor" in G.client.prefs.be_special_role))
+			ghost_candidates += G
+
+	if(ghost_candidates.len)
+		var/mob/observer/ghost/chosen = pick(ghost_candidates)
+		var/mob/living/carbon/human/replacement = director_spawn_ghost_body(chosen, "Agent [rand(100,999)]")
+		if(replacement && replacement.mind && traitor_antag.add_antagonist(replacement.mind, 0, 0, 1))
+			replacement.mind.assigned_role = "Syndicate Agent"
+			loyalty.set_faction(replacement.mind, LOYALTY_SYNDICATE)
+			to_chat(replacement, "<span class='danger'>You are a Syndicate agent, quietly inserted to keep the station on its toes. Complete your objectives with subtlety.</span>")
+			add_tension(10, "Director restored a lapsed antagonist")
+			return TRUE
+		if(replacement)
+			qdel(replacement)
+
+	if(convert_station_antagonist("traitor"))
+		add_tension(10, "Director restored a lapsed antagonist")
+		return TRUE
+
+	return FALSE
+
+/// Forces a Major severity random event, used when the Director can't safely add another antagonist
+/datum/controller/subsystem/director/proc/trigger_major_fallback_event()
+	if(world.time - last_major_fallback < MAJOR_FALLBACK_COOLDOWN)
+		return
+	last_major_fallback = world.time
+	if(!SSevent)
+		return
+	for(var/datum/event_container/EC in SSevent.event_containers[EVENT_LEVEL_MAJOR])
+		EC.start_event()
+	add_tension(15, "Director escalated with a major event - no viable antagonist")
+	log_and_message_admins("AI Director forced a major event due to lack of active antagonists.")
 
 /// Returns a cryptic hint about an impending catalyst or the Boiling Point, for fluff systems like dreaming. Null if nothing looms.
 /datum/controller/subsystem/director/proc/get_foreshadowing()

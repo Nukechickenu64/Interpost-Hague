@@ -144,12 +144,31 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		return 1
 
 /obj/machinery/computer/rdconsole/CanUseTopic(var/mob/user, var/datum/topic_state/state, var/href_list)
+	if(topic_requires_research_access(href_list) && !allowed(user) && !emagged)
+		to_chat(user, "Unauthorized Access.")
+		return STATUS_CLOSE
 	if(href_list["menu"])
 		var/temp_screen = text2num(href_list["menu"])
-		if(!(temp_screen <= 1.1 || (3 <= temp_screen && 4.9 >= temp_screen) || allowed(usr) || emagged))
-			to_chat(usr, "Unauthorized Access.")
+		if(!(topic_menu_is_public(temp_screen) || allowed(user) || emagged))
+			to_chat(user, "Unauthorized Access.")
 			return STATUS_CLOSE
 	return ..()
+
+/obj/machinery/computer/rdconsole/proc/topic_menu_is_public(var/menu)
+	return menu <= 1.1 || (3 <= menu && menu <= 5.0)
+
+
+/obj/machinery/computer/rdconsole/proc/topic_requires_research_access(var/list/href_list)
+	var/list/restricted_actions = list(
+		"updt_tech", "clear_tech", "eject_tech", "copy_tech",
+		"updt_design", "clear_design", "eject_design", "copy_design",
+		"eject_item", "deconstruct", "lock", "sync", "togglesync",
+		"find_device", "disconnect", "reset"
+	)
+	for(var/action in restricted_actions)
+		if(href_list[action])
+			return TRUE
+	return FALSE
 
 /obj/machinery/computer/rdconsole/OnTopic(user, href_list)
 	if(href_list["ui_close"]) {

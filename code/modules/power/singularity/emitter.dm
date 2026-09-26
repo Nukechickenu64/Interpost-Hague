@@ -104,7 +104,7 @@
 // Silent remote toggle used by automated controllers (e.g. supermatter core control) - no mob feedback/logging spam.
 /obj/machinery/power/emitter/proc/remote_set_active(var/should_fire)
 	should_fire = !!should_fire
-	if(locked || emagged || active == should_fire)
+	if(active == should_fire || (should_fire && (locked || emagged)))
 		return
 	if(should_fire && (state != 2 || !anchored || !powernet))
 		return

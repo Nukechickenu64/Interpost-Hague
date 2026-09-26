@@ -12144,7 +12144,6 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/obj/structure/window/phoronreinforced,
 /turf/simulated/floor/reinforced{
 	name = "engine floor"
 	},
@@ -12223,11 +12222,6 @@
 	icon_state = "warning";
 	dir = 8
 	},
-/obj/structure/window/phoronreinforced{
-	tag = "icon-phoronrwindow (EAST)";
-	icon_state = "phoronrwindow";
-	dir = 4
-	},
 /turf/simulated/floor/reinforced{
 	name = "engine floor"
 	},
@@ -12249,11 +12243,6 @@
 /obj/effect/floor_decal/industrial/warning{
 	icon_state = "warning";
 	dir = 4
-	},
-/obj/structure/window/phoronreinforced{
-	tag = "icon-phoronrwindow (WEST)";
-	icon_state = "phoronrwindow";
-	dir = 8
 	},
 /turf/simulated/floor/reinforced{
 	name = "engine floor"
@@ -12804,11 +12793,6 @@
 /area/hallway/secondary/exit)
 "azc" = (
 /obj/effect/floor_decal/industrial/warning,
-/obj/structure/window/phoronreinforced{
-	tag = "icon-phoronrwindow (NORTH)";
-	icon_state = "phoronrwindow";
-	dir = 1
-	},
 /turf/simulated/floor/reinforced{
 	name = "engine floor"
 	},

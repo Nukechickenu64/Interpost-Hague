@@ -23,6 +23,99 @@
 
 	return 1
 
+/datum/unit_test/research_processor_only_offers_buildable_designs
+	name = "RESEARCH: Ideation Condenser Only Offers Buildable Designs"
+
+/datum/unit_test/research_processor_only_offers_buildable_designs/start_test()
+	var/obj/machinery/research_processor/processor = new
+	var/list/choices = processor.get_design_choices("grief")
+	var/valid = choices && choices.len
+	for(var/design_type in choices)
+		var/datum/design/design = design_type
+		if(!initial(design.build_path) || !(initial(design.build_type) & (PROTOLATHE|IMPRINTER)))
+			valid = FALSE
+	var/selected_type = processor.pick_weighted_design("grief")
+	if(selected_type && !(selected_type in choices))
+		valid = FALSE
+	qdel(processor)
+	if(valid)
+		pass("The condenser selects only designs that a fabricator can build.")
+	else
+		fail("The condenser candidate pool includes invalid designs or is empty.")
+	return 1
+
+/datum/unit_test/bluegate_activation_is_occupant_only
+	name = "BLUEGATE: Only Occupant Can Activate Transformation"
+
+/datum/unit_test/bluegate_activation_is_occupant_only/start_test()
+	var/obj/machinery/bluegate/gate = new
+	var/mob/living/carbon/human/occupant = new(null)
+	var/mob/living/carbon/human/bystander = new(null)
+	gate.occupant = occupant
+	var/valid = gate.can_activate(occupant) && !gate.can_activate(bystander)
+	qdel(gate)
+	qdel(occupant)
+	qdel(bystander)
+	if(valid)
+		pass("Only the current Bluegate occupant can activate transformation.")
+	else
+		fail("Bluegate activation authorization does not match the occupant.")
+	return 1
+
+/datum/unit_test/research_console_restricts_sensitive_topic_actions
+	name = "RESEARCH: Sensitive Console Actions Require Access"
+
+/datum/unit_test/research_console_restricts_sensitive_topic_actions/start_test()
+	var/obj/machinery/computer/rdconsole/console = new
+	var/list/disk_action = list("copy_tech" = "1")
+	var/list/mixed_action = list("menu" = "1.1", "reset" = "1")
+	var/list/public_action = list("build" = "design_id")
+	var/valid = console.topic_requires_research_access(disk_action)
+	valid = valid && console.topic_requires_research_access(mixed_action)
+	valid = valid && !console.topic_requires_research_access(public_action)
+	valid = valid && console.topic_menu_is_public(5.0) && !console.topic_menu_is_public(1.6)
+	qdel(console)
+	if(valid)
+		pass("Sensitive href actions are classified independently of the visible menu.")
+	else
+		fail("R&D console href action authorization classification is incorrect.")
+	return 1
+
+/datum/unit_test/mining_sell_order_accepts_ten_sheet_stack
+	name = "MINING: Sell Orders Accept Ten-Sheet Material Stacks"
+
+/datum/unit_test/mining_sell_order_accepts_ten_sheet_stack/start_test()
+	var/datum/sell_order/mining/osmium/v10/order = new
+	var/obj/item/stack/material/osmium/ten/stack = new
+	var/accepted = order.add_item(stack)
+	var/valid = accepted && order.progress == order.max_progress
+	qdel(stack)
+	qdel(order)
+	if(valid)
+		pass("Mining sell orders accept matching material stack subtypes.")
+	else
+		fail("An Osmium ten-sheet stack did not satisfy its mining sell order.")
+	return 1
+
+/datum/unit_test/sell_order_clamps_reagent_oversupply
+	name = "CARGO: Sell Orders Clamp Reagent Oversupply"
+
+/datum/unit_test/sell_order_clamps_reagent_oversupply/start_test()
+	var/datum/sell_order/order = new
+	order.wanted = list(/datum/reagent/water = 10)
+	order.max_progress = 10
+	var/obj/item/weapon/reagent_containers/glass/beaker/beaker = new
+	beaker.reagents.add_reagent(/datum/reagent/water, 20)
+	var/accepted = order.add_item(beaker)
+	var/valid = accepted && order.wanted[/datum/reagent/water] == 0 && order.progress == order.max_progress
+	qdel(beaker)
+	qdel(order)
+	if(valid)
+		pass("Reagent oversupply is clamped to the order's remaining amount.")
+	else
+		fail("Reagent oversupply left invalid sell-order progress.")
+	return 1
+
 /datum/unit_test/player_preferences_shall_have_unique_key
 	name = "UNIQUENESS: Player Preferences Shall Be Unique"
 

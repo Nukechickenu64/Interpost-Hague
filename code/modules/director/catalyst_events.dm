@@ -323,7 +323,7 @@
 // === Hidden Appetites ===
 // Covert station antagonists selected from living crew who opted into the role.
 
-/datum/catalyst_event/proc/convert_station_antagonist(var/antag_id)
+/proc/convert_station_antagonist(var/antag_id)
 	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
 	if(!antag)
 		return FALSE

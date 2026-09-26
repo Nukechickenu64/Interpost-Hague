@@ -24,6 +24,9 @@
 /obj/machinery/bluegate/update_icon()
 	icon_state = "sleeper_[occupant ? "1" : "0"]"
 
+/obj/machinery/bluegate/proc/can_activate(var/mob/user)
+	return occupant && user == occupant
+
 /obj/machinery/bluegate/attack_hand(var/mob/user)
 	if(stat & (NOPOWER|BROKEN))
 		return
@@ -55,6 +58,9 @@
 		if("activate")
 			if(!occupant)
 				to_chat(usr, "<span class='warning'>There is no occupant in the sleeper.</span>")
+				return TOPIC_REFRESH
+			if(!can_activate(usr))
+				to_chat(usr, "<span class='warning'>Only the occupant can activate the transformation.</span>")
 				return TOPIC_REFRESH
 
 			if(stat & (NOPOWER|BROKEN))
@@ -312,12 +318,20 @@
 				to_chat(usr, "<span class='warning'>The loaded design disk is not empty.</span>")
 				return TOPIC_REFRESH
 			// Consume power and produce a weighted random disk based on concept kind
-			use_power_oneoff(active_power_usage)
 			var/kind = (loaded_paper.concept_kind || "")
 			// Require and write to the inserted empty design disk
 			var/t_design = pick_weighted_design(kind)
-			loaded_disk.blueprint = new t_design()
+			if(!t_design)
+				to_chat(usr, "<span class='warning'>No buildable design could be generated.</span>")
+				return TOPIC_REFRESH
+			var/datum/design/selected_design = new t_design()
+			if(!selected_design.build_path || !(selected_design.build_type & (PROTOLATHE|IMPRINTER)))
+				qdel(selected_design)
+				to_chat(usr, "<span class='warning'>The selected design cannot be fabricated.</span>")
+				return TOPIC_REFRESH
+			loaded_disk.blueprint = selected_design
 			visible_message("\The [src] condenses the ideas into a component design and writes it to [loaded_disk].")
+			use_power_oneoff(active_power_usage)
 			qdel(loaded_paper)
 			loaded_paper = null
 	attack_hand(usr)
@@ -393,9 +407,15 @@
 	return choice
 
 /obj/machinery/research_processor/proc/pick_weighted_design(var/kind)
+	return weighted_pick(get_design_choices(kind))
+
+/obj/machinery/research_processor/proc/get_design_choices(var/kind)
 	var/list/design_types = typesof(/datum/design) - /datum/design
 	var/list/choices = list()
 	for(var/Dt in design_types)
+		var/datum/design/design = Dt
+		if(!initial(design.build_path) || !(initial(design.build_type) & (PROTOLATHE|IMPRINTER)))
+			continue
 		var/w = 1
 		if(kind == "fulfillment")
 			if(ispath(Dt, /datum/design/item/medical))
@@ -412,10 +432,7 @@
 			else if(ispath(Dt, /datum/design/item/robot_upgrade))
 				w = 2
 		choices[Dt] = w
-	var/choice = weighted_pick(choices)
-	if(!choice)
-		return pick(design_types)
-	return choice
+	return choices
 
 
 /obj/machinery/phaser/attackby(obj/item/O, mob/user)

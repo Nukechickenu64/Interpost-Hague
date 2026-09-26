@@ -66,6 +66,11 @@
 #define CATALYST_COOLDOWN          5 MINUTES
 #define TELEMETRY_SAMPLE_INTERVAL  10 SECONDS
 
+// Minimum antagonist presence maintenance
+#define ANTAG_STALE_THRESHOLD      15 MINUTES // How long an antagonist can go without a hostile action before being replaced
+#define ANTAG_MAINTENANCE_COOLDOWN 5 MINUTES  // How often the Director re-checks/re-attempts antagonist maintenance
+#define MAJOR_FALLBACK_COOLDOWN    10 MINUTES // Minimum time between Director-forced major events
+
 // The Director becomes steadily less patient as a shift runs long. Reserve
 // enough time for the Boiling Point finale to conclude before this limit.
 #define DIRECTOR_MAX_ROUND_DURATION 2 HOURS

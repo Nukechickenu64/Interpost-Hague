@@ -4,7 +4,8 @@ component.exports = {
     this.observe('value', (newkey, oldkey, keypath) => {
       const { min, max } = this.get()
       const value = Math.clamp(min, max, newkey)
-      this.set('percentage', Math.round((value - min) / (max - min) * 100))
+      const percentage = max > min ? (value - min) / (max - min) * 100 : 0
+      this.set('percentage', Math.clamp(0, 100, Math.round(percentage)))
     })
   }
 }

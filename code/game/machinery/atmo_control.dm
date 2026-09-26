@@ -303,10 +303,14 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	// Direct link to the actual crystal and any emitters feeding it, used by automatic management.
 	var/obj/machinery/power/supermatter/linked_supermatter
 	var/list/linked_emitters = list()
+	var/obj/machinery/atmospherics/unary/outlet_injector/linked_injector
+	var/obj/machinery/atmospherics/unary/vent_pump/linked_outpump
+	var/obj/machinery/power/generator/linked_generator
 	var/link_refresh_at = 0
 
-	// Automatic management will only fire emitters below this power level, and will latch off entirely once the crystal takes any damage.
-	var/target_power = 250
+	var/target_generation = 250000
+	var/max_excitation = 400
+	var/generation_demand = TRUE
 	var/emitters_enabled = FALSE
 	var/safety_shutdown = FALSE
 	var/safe_streak = 0
@@ -367,7 +371,13 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		output += "<span class='sm-bad'>NO CRYSTAL LINKED</span><br>"
 
 	output += "<span class='sm-label'>Linked Emitters</span> <span class='sm-value'>[linked_emitters.len]</span> "
-	output += "<span class='sm-label'>Firing</span> <span class='[emitters_enabled ? "sm-good" : "sm-muted"]'>[emitters_enabled ? "YES" : "NO"]</span> "
+	output += "<span class='sm-label'>Emitters On</span> <span class='[emitters_enabled ? "sm-good" : "sm-muted"]'>[emitters_enabled ? "YES" : "NO"]</span> "
+	if(istype(linked_generator))
+		output += "<span class='sm-label'>Generator</span> <span class='sm-value'>[round(linked_generator.effective_gen / 1000, 0.1)] / [round(target_generation / 1000)] kW</span> "
+	else
+		output += "<span class='sm-bad'>NO GENERATOR LINKED</span> "
+	if(automatic_management && !cooling_available())
+		output += "<span class='sm-bad'>COOLANT FEED UNAVAILABLE</span> "
 	if(safety_shutdown)
 		output += "<span class='sm-bad'>SAFETY INTERLOCK ENGAGED</span>"
 	output += "<div class='sm-control'><a class='sm-action' href='?src=\ref[src];refresh_links=1'>Rescan Engine Room</a></div>"
@@ -422,6 +432,9 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	link_refresh_at = world.time + 100
 	linked_supermatter = null
 	linked_emitters = list()
+	linked_injector = null
+	linked_outpump = null
+	linked_generator = null
 
 	var/turf/T = get_turf(src)
 	if(!T)
@@ -435,22 +448,79 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		linked_supermatter = S
 		break
 
+	if(istype(linked_supermatter))
+		var/nearest_generator_distance = 60
+		for(var/obj/machinery/power/generator/G in SSmachines.machinery)
+			if(G.z != linked_supermatter.z)
+				continue
+			var/distance = get_dist(G, linked_supermatter)
+			if(distance < nearest_generator_distance)
+				nearest_generator_distance = distance
+				linked_generator = G
+		for(var/obj/machinery/atmospherics/unary/outlet_injector/I in SSmachines.machinery)
+			if(I.z == linked_supermatter.z && I.frequency == frequency && I.id == input_tag)
+				linked_injector = I
+				break
+		for(var/obj/machinery/atmospherics/unary/vent_pump/V in SSmachines.machinery)
+			if(V.z == linked_supermatter.z && V.frequency == frequency && V.id_tag == output_tag)
+				linked_outpump = V
+				break
+
 	for(var/obj/machinery/power/emitter/E in SSmachines.machinery)
-		if(!(E.z in valid_z))
+		if(!istype(linked_supermatter) || E.z != linked_supermatter.z || E.id != "EngineEmitter" || get_dist(E, linked_supermatter) > 30)
 			continue
 		linked_emitters += E
 
 // Silently turns all linked emitters on or off. Used instead of touching them directly so we never fire an
 // emitter that isn't actually wired up and ready.
 /obj/machinery/computer/general_air_control/supermatter_core/proc/set_emitters(var/should_fire)
-	emitters_enabled = should_fire
+	emitters_enabled = FALSE
 	for(var/obj/machinery/power/emitter/E in linked_emitters)
 		if(QDELETED(E))
 			continue
 		E.remote_set_active(should_fire)
+		if(E.active)
+			emitters_enabled = TRUE
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/cooling_available()
+	if(!istype(linked_injector) || !istype(linked_outpump))
+		return FALSE
+	if(linked_injector.stat & (NOPOWER|BROKEN) || !linked_injector.use_power || !linked_injector.node || !linked_injector.network)
+		return FALSE
+	if(linked_outpump.stat & (NOPOWER|BROKEN) || !linked_outpump.can_pump() || !linked_outpump.node || !linked_outpump.network || linked_outpump.pump_direction)
+		return FALSE
+	if(linked_injector.air_contents.total_moles > 0.5)
+		return TRUE
+	for(var/datum/gas_mixture/air in linked_injector.network.gases)
+		if(air.total_moles > 0.5)
+			return TRUE
+	return FALSE
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/needs_excitation(var/generation, var/crystal_power)
+	if(generation >= target_generation + 25000)
+		generation_demand = FALSE
+	else if(generation < target_generation)
+		generation_demand = TRUE
+	return generation_demand && crystal_power < max_excitation
+
+/obj/machinery/computer/general_air_control/supermatter_core/proc/update_automatic_setpoints(var/temperature, var/critical_temp, var/status, var/epr, var/cooling_ready, var/chamber_pressure)
+	automatic_flow_setting = 700
+	automatic_pressure_setting = 100
+	if(critical_temp)
+		if(temperature >= critical_temp * 0.9 || status >= SUPERMATTER_DANGER)
+			automatic_flow_setting = 1200
+			automatic_pressure_setting = 25
+		else if(temperature >= critical_temp * 0.7 || status >= SUPERMATTER_WARNING)
+			automatic_flow_setting = 1100
+			automatic_pressure_setting = 50
+		else if(temperature >= critical_temp * 0.5 || status >= SUPERMATTER_NOTIFY)
+			automatic_flow_setting = 900
+			automatic_pressure_setting = 75
+	if(!cooling_ready || epr < 1)
+		automatic_pressure_setting = max(100, chamber_pressure + 1)
 
 /obj/machinery/computer/general_air_control/supermatter_core/proc/run_automatic_management()
-	if(world.time >= link_refresh_at || !istype(linked_supermatter))
+	if(world.time >= link_refresh_at || !istype(linked_supermatter) || !istype(linked_injector) || !istype(linked_outpump) || !istype(linked_generator))
 		refresh_links()
 
 	if(!istype(linked_supermatter))
@@ -462,28 +532,20 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 	var/integrity = linked_supermatter.get_integrity()
 	var/temperature = linked_supermatter.get_ambient_temperature()
 	var/critical_temp = linked_supermatter.get_critical_temperature()
+	var/epr = linked_supermatter.get_epr()
+	var/cooling_ready = cooling_available()
+	var/turf/chamber = get_turf(linked_supermatter)
+	var/datum/gas_mixture/chamber_air = chamber?.return_air()
+	var/chamber_pressure = chamber_air?.return_pressure()
 
-	// Coolant/pressure response now ramps up well ahead of actual danger, off the crystal's real temperature
-	// and status, rather than waiting for a single sensor reading or for damage to already be happening.
-	automatic_flow_setting = 700
-	automatic_pressure_setting = 100
-	if(critical_temp)
-		if(temperature >= critical_temp * 0.9 || status >= SUPERMATTER_DANGER)
-			automatic_flow_setting = 1200
-			automatic_pressure_setting = 500
-		else if(temperature >= critical_temp * 0.7 || status >= SUPERMATTER_WARNING)
-			automatic_flow_setting = 1100
-			automatic_pressure_setting = 300
-		else if(temperature >= critical_temp * 0.5 || status >= SUPERMATTER_NOTIFY)
-			automatic_flow_setting = 900
-			automatic_pressure_setting = 200
+	update_automatic_setpoints(temperature, critical_temp, status, epr, cooling_ready, chamber_pressure)
 
 	send_core_command(input_tag, list("power" = 1, "set_volume_rate" = "[automatic_flow_setting]"))
 	send_core_command(output_tag, list("power" = 1, "set_external_pressure" = automatic_pressure_setting, "checks" = 1))
 
 	// Safety interlock: back off well before actual danger. Waiting for a WARNING/damage reading is already too
 	// late, since the reaction is self-sustaining and keeps heating the chamber long after emitters stop firing.
-	var/danger = (status > SUPERMATTER_NORMAL) || (integrity < 100) || (critical_temp && temperature >= critical_temp * 0.5)
+	var/danger = !cooling_ready || !istype(linked_generator) || epr < 1 || (status > SUPERMATTER_NORMAL) || (integrity < 100) || (critical_temp && temperature >= critical_temp * 0.5)
 	if(danger)
 		safety_shutdown = TRUE
 		safe_streak = 0
@@ -499,8 +561,7 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		set_emitters(FALSE)
 		return
 
-	// Safe to keep the crystal fed - only fire while comfortably cool and below the power target.
-	set_emitters(linked_supermatter.power < target_power)
+	set_emitters(needs_excitation(linked_generator.effective_gen, linked_supermatter.power))
 
 /obj/machinery/computer/general_air_control/supermatter_core/Initialize()
 	. = ..()
@@ -513,7 +574,8 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		// Manual mode - don't leave emitters latched on/off from a previous automatic run.
 		safety_shutdown = FALSE
 		set_emitters(FALSE)
-	return ..()
+	..()
+	return 1
 
 /obj/machinery/computer/general_air_control/supermatter_core/receive_signal(datum/signal/signal)
 	if(!signal || signal.encryption) return
@@ -532,7 +594,9 @@ Max Output Pressure: [output_pressure] kPa<BR>"}
 		return 1
 	if(href_list["toggle_automatic_management"])
 		automatic_management = !automatic_management
-		if(!automatic_management)
+		if(automatic_management)
+			refresh_links()
+		else
 			safety_shutdown = FALSE
 			safe_streak = 0
 			set_emitters(FALSE)

@@ -54,6 +54,8 @@
 			attacker.attack_logs_ += text("\[[time_stamp()]\] <font color='red'>[attacker_message] [intent]</font>")
 		attacker.last_attacked_ = mob_repository.get_lite_mob(victim)
 		attack_location = get_turf(attacker)
+		if(SSdirector && attacker.mind && victim && attacker != victim)
+			SSdirector.record_antagonist_activity(attacker.mind) //antagonist hostile-action signal for Director maintenance
 	if(victim)
 		if(attacker)
 			victim.attack_logs_ += text("\[[time_stamp()]\] <font color='orange'>[key_name(attacker)] - [victim_message] [intent]</font>")

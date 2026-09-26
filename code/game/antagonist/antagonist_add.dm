@@ -42,6 +42,8 @@
 	if(!can_become_antag(player, ignore_role))
 		return 0
 	current_antagonists |= player
+	if(SSdirector)
+		SSdirector.record_antagonist_activity(player) //baseline so a freshly made antagonist isn't immediately considered stale
 
 	if(faction_verb)
 		player.current.verbs |= faction_verb

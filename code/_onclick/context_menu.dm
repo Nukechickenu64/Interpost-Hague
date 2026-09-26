@@ -148,6 +148,7 @@
 	html += "<style>"
 	html += "html,body{background:#050b09;color:#6fe8c0;font-family:'Consolas','Courier New',monospace;font-size:9pt;margin:0;padding:0;}"
 	html += ".wrap{display:inline-block;position:relative;padding:10px 12px;min-width:220px;max-width:360px;border:1px solid #4fe0ab;background:rgba(10,30,24,0.92);box-shadow:0 0 10px rgba(79,224,171,0.2) inset;}"
+	html += ".list{max-height:520px;overflow-y:auto;overflow-x:hidden;padding-right:3px;}"
 	html += ".corner{position:absolute;width:7px;height:7px;border-color:#8ffcd2;}"
 	html += ".corner.tl{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid;}"
 	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
@@ -171,6 +172,7 @@
 	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	html += "<div class='hdr'>Local Context</div>"
 	html += "<div class='note' style='text-align:center;margin-bottom:6px;'>Select an object to interact.</div>"
+	html += "<div class='list'>"
 
 	if(!atoms_on_tile.len)
 		html += "<div class='item plain'>(Nothing here)</div>"
@@ -192,7 +194,7 @@
 				html += "<div class='item two'><a class='main' href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label][clicked_suffix]</a><a class='expand' href=\"?src=\ref[src];tilectx_obj=\ref[A]\">...</a></div>"
 
 	// Close row and HTML wrapper (always include)
-	html += "<div class='accent'></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "</div><div class='accent'></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	// Open the menu window: borderless, non-resizable, placed at mouse cursor if possible
@@ -277,6 +279,7 @@
 	// commands, abilities, hotkeys, admin verbs, etc.) is reachable through its own dedicated
 	// UI, so pulling in the whole raw verbs list would flood this menu with unrelated entries.
 	var/list/verbs_list = list()
+	var/list/seen_proc_names = list()
 	var/list/target_verbs = target.verbs
 	if(target_verbs)
 		for(var/V in target_verbs)
@@ -289,10 +292,16 @@
 			if(!parts || !parts.len) continue
 			var/procname = parts[parts.len]
 			if(!procname || findtext(procname, "..")) continue
+			if(procname == "examine" || procname == "use" || procname == "use_right" || procname == "pull" || procname == "context_give" || procname == "context_bite")
+				continue
+			if(seen_proc_names[procname])
+				continue
+			seen_proc_names[procname] = TRUE
 			// Prefer the verb's own display name over a derived one, if it set one
 			var/label = V:name
 			if(!label || !length(label))
 				label = capitalize(replacetext(procname, "_", " "))
+			label = sanitizeSafe(label, 64, 1, 1, 1)
 			verbs_list += list(list("proc"=procname, "label"=label))
 
 	var/can_give = tilectx_can_give_to(target)
@@ -331,6 +340,7 @@
 	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
 	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;text-align:center;} .loc{color:#8ffcd2;}"
 	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
+	html += ".section{margin:8px 0 3px;color:#4fa88a;font-size:8pt;text-align:left;letter-spacing:0.08em;text-transform:uppercase;}"
 	html += ".item:hover{background:rgba(111,232,192,0.15);border-color:#8ffcd2;}"
 	html += ".item a{color:#8ffcd2;text-decoration:none;display:block;padding:3px 6px;text-align:center;}"
 	html += ".item a:hover{color:#c8fff0;}"
@@ -345,12 +355,14 @@
 	if(I)
 		html += "<div class='iconwrap'><img src='[rsc_name]' width='[icon_w]' height='[icon_h]'></div>"
 	html += "<div class='accent'></div>"
+	html += "<div class='list'>"
 
 	// Standard actions
 	// Links below use inline BYOND ref tokens for the target
+	html += "<div class='section'>Actions</div>"
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=examine'>Examine</a></div>"
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use'>Use</a></div>"
-	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Right-use</a></div>"
+	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=use_right'>Alternate use</a></div>"
 	html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=pull'>Pull</a></div>"
 	if(can_give)
 		html += "<div class='item'><a href='?src=\ref[src];tilectx_invoke=\ref[target];proc=context_give'>Give</a></div>"
@@ -359,7 +371,7 @@
 
 	// Custom verbs
 	if(verbs_list.len)
-		html += "<div class='accent'></div><div class='note'>Verbs</div>"
+		html += "<div class='accent'></div><div class='section'>Object actions</div>"
 		for(var/entry in verbs_list)
 			var/label = entry["label"]
 			var/procname = entry["proc"]
@@ -367,7 +379,7 @@
 
 	// Admin-only actions
 	if(is_admin)
-		html += "<div class='accent'></div><div class='note'>Admin</div>"
+		html += "<div class='accent'></div><div class='section'>Admin</div>"
 		// View Variables (VV)
 		html += "<div class='item'><a href='?_src_=vars;Vars=\ref[target]'>VV (View Variables)</a></div>"
 		// Player Panel (PP) and Follow, only meaningful for mobs
@@ -377,6 +389,7 @@
 		// Coordinate Jump (JMP) to the target's turf, if available
 		if(admin_jump_turf)
 			html += "<div class='item'><a href='?_src_=holder;adminplayerobservecoodjump=1;X=[admin_jump_turf.x];Y=[admin_jump_turf.y];Z=[admin_jump_turf.z]'>Jump</a></div>"
+	html += "</div>"
 
 	// Controls
 	html += "<div class='accent'></div><div class='item'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
@@ -436,6 +449,11 @@
 	if(href_list["tilectx_invoke"]) {
 		var/atom/target = locate(href_list["tilectx_invoke"])
 		var/procname = href_list["proc"]
+		if(!target || QDELETED(target) || !procname) {
+			to_chat(src, "<span class='warning'>That context-menu target is no longer available.</span>")
+			close_tile_context_menu()
+			return TRUE
+		}
 		if(target && procname) {
 			if(procname == "pickup") {
 				if(!target.Adjacent(src)) {
@@ -482,6 +500,8 @@
 				var/list/target_verbs = target.verbs
 				if(target_verbs)
 					for(var/V in target_verbs)
+						if(V:hidden || V:category != "Object")
+							continue
 						var/list/parts = splittext("[V]", "/")
 						if(parts && parts.len && parts[parts.len] == procname)
 							allowed = TRUE

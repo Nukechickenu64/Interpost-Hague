@@ -14,10 +14,18 @@
 /datum/sell_order/proc/add_item(var/atom/A)
 	if(istype(A, /obj/item/stack))  //if item is stack
 		var/obj/item/stack/S = A
-		if(wanted[A.type]) //and if we want this stack
-			wanted[A.type] -= S.amount //decrease wanted, but it mustn`t be lesser than zero
-			if(wanted[A.type] < 0)
-				wanted[A.type] = 0
+		var/wanted_stack_type = null
+		if(!isnull(wanted[A.type]))
+			wanted_stack_type = A.type
+		else
+			for(var/possible_stack_type in wanted)
+				if(ispath(possible_stack_type, /obj/item/stack) && wanted[possible_stack_type] && ispath(A.type, possible_stack_type))
+					wanted_stack_type = possible_stack_type
+					break
+		if(wanted_stack_type) //and if we want this stack
+			wanted[wanted_stack_type] -= S.amount //decrease wanted, but it mustn`t be lesser than zero
+			if(wanted[wanted_stack_type] < 0)
+				wanted[wanted_stack_type] = 0
 			check_progress() //check progress after adding item
 			return 1 //selling successful
 
@@ -27,8 +35,8 @@
 		for(var/datum/reagent/R in RS.reagent_list) //for every reagent in datum
 			if(wanted[R.type]) //if we want this reagent
 				wanted[R.type] -= R.volume //decrease wanted
-				if(wanted[R] < 0)
-					wanted[R] = 0
+				if(wanted[R.type] < 0)
+					wanted[R.type] = 0
 				check_progress() //check progress after adding reagent
 				return 1 //selling successful
 
