@@ -24,7 +24,7 @@ Connect using BYOND: `byond://<your-ip>:8000`
 3. Open Dream Daemon, load `Marrow.dmb`, set port (e.g., 8000), enable Trusted / Invisible, start.
 
 ## 3b. Linux One-Shot Start
-`start-server.sh` updates the repo, brings up the MariaDB container, compiles, and runs DreamDaemon in the foreground on port 6345.
+`start-server.sh` updates the repo, brings up the MariaDB container, compiles, and runs DreamDaemon in the foreground on port 26370.
 
 ```bash
 ./start-server.sh          # prompts before the hard reset
@@ -35,7 +35,7 @@ Requires Docker and a BYOND install on `PATH` (see `install-byond.sh`; set `BYON
 
 **The update step runs `git reset --hard`, discarding local changes.**
 
-Flags / env overrides: `--port N`, `--branch NAME`, `--skip-update`, `--skip-compile`, `--stop-db-on-exit`, plus `PORT`, `REMOTE`, `BRANCH`, `BYOND_HOME`.
+Flags / env overrides: `--port N`, `--branch NAME`, `--skip-update`, `--skip-compile`, `--stop-db-on-exit`, plus `PORT`, `REMOTE`, `BRANCH`, `PUBLIC_HOST`, `BYOND_HOME`.
 
 Only the `db` compose service is started — the game runs natively on the host and reaches the database via `127.0.0.1:3307` as configured in `config/dbconfig.txt`. Ctrl+C stops the server; the database keeps running unless `--stop-db-on-exit` is passed.
 
@@ -74,7 +74,7 @@ Warn players before updates; compile locally first when changing code.
 ## 9. Troubleshooting
 | Symptom | Fix |
 |---------|-----|
-| Clients hang on connection | Check port forward / firewall; ensure DreamDaemon running. |
+| Clients on another network cannot connect | While DreamDaemon is running, verify `sudo ss -ltnp | grep ':26370'`. Allow it with `sudo ufw allow 26370/tcp`, add an inbound TCP 26370 rule in any cloud firewall, or forward TCP 26370 on the router to this host. From the other network, test with PowerShell: `Test-NetConnection <public-ip> -Port 26370`. If the router's WAN address differs from `curl -4 https://api4.ipify.org` or is private/CGNAT space, ordinary port forwarding cannot work; request a public IPv4 address or host on a public VPS. |
 | Undefined type path on compile | Ensure new .dm file added to `.dme`. |
 | SQL auth errors | Confirm DB migration and credentials in `config/dbconfig.txt`. |
 | High tick lag | Reduce event frequency, disable unused random events. |

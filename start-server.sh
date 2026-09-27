@@ -139,21 +139,11 @@ fi
 
 # --- Run ---------------------------------------------------------------------
 
-if [[ -z "$PUBLIC_HOST" ]] && command -v curl >/dev/null 2>&1; then
-	PUBLIC_HOST="$(curl --fail --silent --max-time 5 https://api4.ipify.org 2>/dev/null || true)"
-fi
-
-if [[ -n "$PUBLIC_HOST" ]]; then
-	log "Public BYOND address: byond://$PUBLIC_HOST:$PORT"
-else
-	log "Public BYOND address unavailable (set PUBLIC_HOST to override)."
-fi
-
 if [[ "$STOP_DB_ON_EXIT" == "1" ]]; then
 	trap 'log "Stopping the database container..."; docker compose stop db' EXIT
 	log "Starting the server on port $PORT (Ctrl+C to stop)..."
-	bash scripts/run-server.sh "$PORT"
+	PUBLIC_HOST="$PUBLIC_HOST" bash scripts/run-server.sh "$PORT"
 else
 	log "Starting the server on port $PORT (Ctrl+C to stop; the database keeps running)..."
-	exec bash scripts/run-server.sh "$PORT"
+	PUBLIC_HOST="$PUBLIC_HOST" exec bash scripts/run-server.sh "$PORT"
 fi
