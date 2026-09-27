@@ -21,7 +21,7 @@ usage() {
 Usage: ./start-server.sh [--yes] [--port N] [--branch NAME] [--skip-update] [--skip-compile] [--stop-db-on-exit]
 
 Updates the repository (git fetch + hard reset), starts the MariaDB docker
-container, compiles Marrow.dme, then runs DreamDaemon in the foreground.
+container, compiles Interpost-Hague.dme, then runs DreamDaemon in the foreground.
 
 Environment overrides: PORT, REMOTE, BRANCH, SKIP_UPDATE, SKIP_COMPILE,
 STOP_DB_ON_EXIT, FORCE_RESET, BYOND_HOME.
@@ -120,8 +120,8 @@ mkdir -p data/logs data/player_saves
 if [[ "$SKIP_COMPILE" == "1" ]]; then
 	log "Skipping compile."
 else
-	log "Compiling Marrow.dme..."
-	if ! DreamMaker Marrow.dme 2>&1 | tee data/logs/compile.log; then
+	log "Compiling Interpost-Hague.dme..."
+	if ! DreamMaker Interpost-Hague.dme 2>&1 | tee data/logs/compile.log; then
 		die "Compilation failed. See data/logs/compile.log."
 	fi
 	grep -qE '\b0 errors\b' data/logs/compile.log || die "Compilation reported errors. See data/logs/compile.log."

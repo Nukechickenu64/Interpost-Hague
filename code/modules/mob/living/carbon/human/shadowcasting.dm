@@ -91,6 +91,27 @@ var/global/list/shadowcast_dirty_centers = list()
 
 var/global/shadowcast_generation = 0
 
+/proc/los_wall_occluder_cutouts(turf/viewer, turf/wall)
+	var/list/cutouts = list()
+	for(var/direction in GLOB.cardinal)
+		var/turf/object_turf = get_step(wall, direction)
+		if(!object_turf)
+			continue
+		var/dx = wall.x - object_turf.x
+		var/dy = wall.y - object_turf.y
+		if(!(wall in getline(viewer, object_turf)))
+			continue
+		for(var/obj/O in object_turf)
+			if(dx && O.pixel_x * dx > 0)
+				var/overlap = min(abs(O.pixel_x), world.icon_size)
+				var/left = dx > 0 ? 1 : world.icon_size - overlap + 1
+				cutouts += list(list(left, 1, left + overlap - 1, world.icon_size))
+			else if(dy && O.pixel_y * dy > 0)
+				var/overlap = min(abs(O.pixel_y), world.icon_size)
+				var/bottom = dy > 0 ? 1 : world.icon_size - overlap + 1
+				cutouts += list(list(1, bottom, world.icon_size, bottom + overlap - 1))
+	return cutouts
+
 /proc/create_shadowcast_overlays(turf/locturf)
 	var/vrange = SHADOWCAST_RANGE
 	var/moveid = ++shadowcast_generation
@@ -99,7 +120,17 @@ var/global/shadowcast_generation = 0
 	FOR_DVIEW(var/turf/T, vrange, locturf, INVISIBILITY_MAXIMUM)
 		T.shadowcast_inview = moveid
 		if(T.opaque_counter)
-			new_occluders += make_los_occluder(T.x - locturf.x, T.y - locturf.y)
+			var/occluded = FALSE
+			var/list/line = getline(locturf, T)
+			if(line.len > 2)
+				for(var/i in 2 to line.len - 1)
+					var/turf/intervening_turf = line[i]
+					if(intervening_turf?.opaque_counter)
+						occluded = TRUE
+						break
+			if(!occluded)
+				var/list/cutouts = los_wall_occluder_cutouts(locturf, T)
+				new_occluders += make_los_occluder(T.x - locturf.x, T.y - locturf.y, cutouts)
 	END_FOR_DVIEW
 
 	var/list/vturfsordered = list()
@@ -209,8 +240,7 @@ var/global/shadowcast_generation = 0
 	plane = SHADOWCASTING_PLANE
 	mouse_opacity = 0
 	opacity = 0
-	appearance_flags = PIXEL_SCALE
-	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,255, 0,0,0,0)
+	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,32, 0,0,0,0)
 
 /atom/movable/triangle/New(x1, y1, x2, y2, x3, y3)
 	transform = los_triangle_matrix(x1, y1, x2, y2, x3, y3)
@@ -228,16 +258,24 @@ var/global/shadowcast_generation = 0
 	mouse_opacity = 0
 	opacity = 0
 
-/atom/movable/los_occluder/New(dx, dy)
-	icon = get_solid_white_icon()
+/atom/movable/los_occluder/New(dx, dy, list/cutouts, new_tag)
+	var/icon/mask_icon = icon(get_solid_white_icon())
+	for(var/list/cutout in cutouts)
+		mask_icon.DrawBox(null, cutout[1], cutout[2], cutout[3], cutout[4])
+	icon = mask_icon
 	pixel_x = dx * world.icon_size
 	pixel_y = dy * world.icon_size
-	tag = "los-occluder-[dx]-[dy]"
+	tag = new_tag
 
-/proc/make_los_occluder(dx, dy)
-	var/atom/movable/los_occluder/O = locate("los-occluder-[dx]-[dy]")
+/proc/make_los_occluder(dx, dy, list/cutouts)
+	var/signature = ""
+	if(cutouts?.len)
+		for(var/list/cutout in cutouts)
+			signature += "-[cutout[1]]-[cutout[2]]-[cutout[3]]-[cutout[4]]"
+	var/tag = "los-occluder-[dx]-[dy][signature]"
+	var/atom/movable/los_occluder/O = locate(tag)
 	if(!O)
-		O = new(dx, dy)
+		O = new(dx, dy, cutouts, tag)
 	return O
 
 /client
