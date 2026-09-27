@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 # Linux one-shot launcher: update the repo, start the MariaDB container, compile, run DreamDaemon.
+
+if [ -z "${BASH_VERSION:-}" ]; then
+	command -v bash >/dev/null 2>&1 || {
+		printf 'ERROR: This launcher requires Bash.\n' >&2
+		exit 1
+	}
+	exec bash "$0" "$@"
+fi
+
 set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
