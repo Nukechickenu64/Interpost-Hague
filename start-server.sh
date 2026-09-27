@@ -20,6 +20,7 @@ SKIP_UPDATE="${SKIP_UPDATE:-0}"
 SKIP_COMPILE="${SKIP_COMPILE:-0}"
 STOP_DB_ON_EXIT="${STOP_DB_ON_EXIT:-0}"
 FORCE_RESET="${FORCE_RESET:-0}"
+PUBLIC_HOST="${PUBLIC_HOST:-}"
 
 DB_USER="gamelord"
 DB_PASS="gamelord"
@@ -33,7 +34,7 @@ Updates the repository (git fetch + hard reset), starts the MariaDB docker
 container, compiles Interpost-Hague.dme, then runs DreamDaemon in the foreground.
 
 Environment overrides: PORT, REMOTE, BRANCH, SKIP_UPDATE, SKIP_COMPILE,
-STOP_DB_ON_EXIT, FORCE_RESET, BYOND_HOME.
+STOP_DB_ON_EXIT, FORCE_RESET, PUBLIC_HOST, BYOND_HOME.
 EOF
 }
 
@@ -137,6 +138,16 @@ else
 fi
 
 # --- Run ---------------------------------------------------------------------
+
+if [[ -z "$PUBLIC_HOST" ]] && command -v curl >/dev/null 2>&1; then
+	PUBLIC_HOST="$(curl --fail --silent --max-time 5 https://api4.ipify.org 2>/dev/null || true)"
+fi
+
+if [[ -n "$PUBLIC_HOST" ]]; then
+	log "Public BYOND address: byond://$PUBLIC_HOST:$PORT"
+else
+	log "Public BYOND address unavailable (set PUBLIC_HOST to override)."
+fi
 
 if [[ "$STOP_DB_ON_EXIT" == "1" ]]; then
 	trap 'log "Stopping the database container..."; docker compose stop db' EXIT
