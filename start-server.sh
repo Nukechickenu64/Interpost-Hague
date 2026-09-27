@@ -141,8 +141,8 @@ fi
 if [[ "$STOP_DB_ON_EXIT" == "1" ]]; then
 	trap 'log "Stopping the database container..."; docker compose stop db' EXIT
 	log "Starting the server on port $PORT (Ctrl+C to stop)..."
-	scripts/run-server.sh "$PORT"
+	bash scripts/run-server.sh "$PORT"
 else
 	log "Starting the server on port $PORT (Ctrl+C to stop; the database keeps running)..."
-	exec scripts/run-server.sh "$PORT"
+	exec bash scripts/run-server.sh "$PORT"
 fi

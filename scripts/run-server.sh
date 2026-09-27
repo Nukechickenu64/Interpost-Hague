@@ -3,10 +3,10 @@ set -euo pipefail
 
 PORT="${1:-8000}"
 DMB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DMB="$DMB_DIR/Marrow.dmb"
+DMB="$DMB_DIR/Interpost-Hague.dmb"
 
 if [[ ! -f "$DMB" ]]; then
-  echo "Marrow.dmb not found at $DMB. Compile Marrow.dme first." >&2
+  echo "Interpost-Hague.dmb not found at $DMB. Compile Interpost-Hague.dme first." >&2
   exit 1
 fi
 
