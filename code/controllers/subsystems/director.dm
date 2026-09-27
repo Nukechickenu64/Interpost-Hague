@@ -409,12 +409,28 @@ SUBSYSTEM_DEF(director)
 	if(!SSevent)
 		return
 	var/list/datum/event_container/major_containers = SSevent.event_containers[EVENT_LEVEL_MAJOR]
-	if(!islist(major_containers))
+	var/event_started = FALSE
+	if(islist(major_containers))
+		for(var/datum/event_container/EC in major_containers)
+			if(EC.start_event())
+				event_started = TRUE
+
+	if(event_started)
+		add_tension(15, "Director escalated with a major event - no viable antagonist")
+		log_and_message_admins("AI Director forced a major event due to lack of active antagonists.")
 		return
-	for(var/datum/event_container/EC in major_containers)
-		EC.start_event()
-	add_tension(15, "Director escalated with a major event - no viable antagonist")
-	log_and_message_admins("AI Director forced a major event due to lack of active antagonists.")
+
+	var/list/datum/event_container/moderate_containers = SSevent.event_containers[EVENT_LEVEL_MODERATE]
+	if(islist(moderate_containers))
+		for(var/datum/event_container/EC in moderate_containers)
+			if(EC.start_event())
+				event_started = TRUE
+
+	if(event_started)
+		add_tension(10, "Director escalated with a moderate event - no viable major event")
+		log_and_message_admins("AI Director could not start a major event and forced a moderate event instead.")
+	else
+		log_and_message_admins("AI Director could not start a major or moderate fallback event.")
 
 /// Returns a cryptic hint about an impending catalyst or the Boiling Point, for fluff systems like dreaming. Null if nothing looms.
 /datum/controller/subsystem/director/proc/get_foreshadowing()

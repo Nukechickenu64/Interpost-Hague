@@ -654,21 +654,14 @@ BLIND		// can't see anything
 	var/displays_id = 1
 	var/rolled_down = -1 //0 = unrolled, 1 = rolled, -1 = cannot be toggled
 	var/rolled_sleeves = -1 //0 = unrolled, 1 = rolled, -1 = cannot be toggled
+	var/obj/item/weapon/storage/internal/pockets/left_pocket
+	var/obj/item/weapon/storage/internal/pockets/right_pocket
 
 	//convenience var for defining the icon state for the overlay used when the clothing is worn.
 	//Also used by rolling/unrolling.
 	var/worn_state = null
 	valid_accessory_slots = list(ACCESSORY_SLOT_UTILITY,ACCESSORY_SLOT_HOLSTER,ACCESSORY_SLOT_ARMBAND,ACCESSORY_SLOT_RANK,ACCESSORY_SLOT_DEPT,ACCESSORY_SLOT_DECOR,ACCESSORY_SLOT_MEDAL,ACCESSORY_SLOT_INSIGNIA)
 	restricted_accessory_slots = list(ACCESSORY_SLOT_UTILITY,ACCESSORY_SLOT_HOLSTER,ACCESSORY_SLOT_ARMBAND,ACCESSORY_SLOT_RANK,ACCESSORY_SLOT_DEPT)
-
-/obj/item/clothing/under/New()
-	..()
-	update_rolldown_status()
-	update_rollsleeves_status()
-	if(rolled_down == -1)
-		verbs -= /obj/item/clothing/under/verb/rollsuit
-	if(rolled_sleeves == -1)
-		verbs -= /obj/item/clothing/under/verb/rollsleeves
 
 /obj/item/clothing/under/get_icon_state(mob/user_mob, slot)
 	var/ret
@@ -687,6 +680,14 @@ BLIND		// can't see anything
 
 /obj/item/clothing/under/New()
 	..()
+	update_rolldown_status()
+	update_rollsleeves_status()
+	if(rolled_down == -1)
+		verbs -= /obj/item/clothing/under/verb/rollsuit
+	if(rolled_sleeves == -1)
+		verbs -= /obj/item/clothing/under/verb/rollsleeves
+	left_pocket = new/obj/item/weapon/storage/internal/pockets(src, slots = 2, slot_size = 2)
+	right_pocket = new/obj/item/weapon/storage/internal/pockets(src, slots = 2, slot_size = 2)
 	if(worn_state)
 		if(!item_state_slots)
 			item_state_slots = list()
@@ -698,6 +699,11 @@ BLIND		// can't see anything
 	if(rolled_down < 0)
 		if((worn_state + "_d_s") in icon_states(default_onmob_icons[slot_w_uniform_str]))
 			rolled_down = 0
+
+/obj/item/clothing/under/Destroy()
+	QDEL_NULL(left_pocket)
+	QDEL_NULL(right_pocket)
+	. = ..()
 
 /obj/item/clothing/under/proc/update_rolldown_status()
 	var/mob/living/carbon/human/H

@@ -274,7 +274,15 @@
 	var/obj/item/clothing/under/suit = w_uniform
 	// Other incidentals.
 	if(istype(suit))
-		dat += "<BR><b>Pockets:</b> <A href='?src=\ref[src];item=pockets'>Empty or Place Item</A>"
+		var/list/left_pocket_items = get_pocket_items(slot_l_store)
+		var/list/right_pocket_items = get_pocket_items(slot_r_store)
+		var/left_pocket_text = left_pocket_items.len ? english_list(left_pocket_items) : "nothing"
+		var/right_pocket_text = right_pocket_items.len ? english_list(right_pocket_items) : "nothing"
+		dat += "<BR><b>Left pocket:</b> [left_pocket_text]"
+		dat += " <A href='?src=\ref[src];item=pocket_left'>Open</A>"
+		dat += "<BR><b>Right pocket:</b> [right_pocket_text]"
+		dat += " <A href='?src=\ref[src];item=pocket_right'>Open</A>"
+		dat += "<BR><A href='?src=\ref[src];item=pockets'>Empty or Place Item</A>"
 		if(suit.has_sensor == 1)
 			dat += "<BR><A href='?src=\ref[src];item=sensors'>Set sensors</A>"
 	if(handcuffed)

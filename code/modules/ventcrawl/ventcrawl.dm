@@ -54,7 +54,7 @@ var/list/ventcrawl_machinery = list(
 		return TRUE
 	if(carried_item in organs)
 		return 1
-	if(carried_item in list(w_uniform, gloves, glasses, wear_mask, l_ear, r_ear, belt, l_store, r_store))
+	if(carried_item in list(w_uniform, gloves, glasses, wear_mask, l_ear, r_ear, belt) || get_inventory_slot(carried_item) in list(slot_l_store, slot_r_store))
 		return 1
 	if(carried_item in list(l_hand,r_hand))
 		return carried_item.w_class <= ITEM_SIZE_NORMAL

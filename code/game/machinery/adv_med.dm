@@ -25,10 +25,17 @@
 	src.go_out()
 	return
 
+/obj/machinery/bodyscanner/attack_hand(mob/user as mob)
+	if(user.incapacitated())
+		return
+	go_out()
+	add_fingerprint(user)
+	return
+
 /obj/machinery/bodyscanner/verb/eject()
 	set src in oview(1)
 	set category = "Object"
-	set name = "Eject Body Scanner"
+	set name = "Eject Occupant"
 
 	if (usr.stat != 0)
 		return

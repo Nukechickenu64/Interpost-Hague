@@ -23,6 +23,8 @@
 
 /turf/MouseDrop_T(mob/living/M, mob/living/user)
 	if(density > 0)
+		if(user.leaning)
+			return
 		// user leaning effect: nudge the user's sprite a few pixels toward the wall, then restore
 		if(istype(user, /mob/living))
 			user._lean_prev_pixel_x = user.pixel_x

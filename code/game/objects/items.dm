@@ -555,7 +555,7 @@ var/list/global/slot_flags_enumeration = list(
 
 	if(!force)
 		//Next check that the slot is free
-		if(H.get_equipped_item(slot))
+		if(H.get_equipped_item(slot) && !(slot in list(slot_l_store, slot_r_store)))
 			return 0
 
 		//Next check if the slot is accessible.
@@ -587,6 +587,9 @@ var/list/global/slot_flags_enumeration = list(
 				return 0
 			if(get_storage_cost() == ITEM_SIZE_NO_CONTAINER)
 				return 0 //pockets act like storage and should respect ITEM_SIZE_NO_CONTAINER. Suit storage might be fine as is
+			var/obj/item/weapon/storage/internal/pockets/pocket_storage = H.get_pocket_storage(slot)
+			if(!pocket_storage || !pocket_storage.can_be_inserted(src, H, -1, -1, 1))
+				return 0
 		if(slot_s_store)
 			if(!H.wear_suit && (slot_wear_suit in mob_equip))
 				if(!disable_warning)

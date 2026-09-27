@@ -64,18 +64,6 @@
 //returns 1 if the master item's parent's attack_hand() should be called, 0 otherwise.
 //It's strange, but no other way of doing it without the ability to call another proc's parent, really.
 /obj/item/weapon/storage/internal/proc/handle_attack_hand(mob/user as mob)
-
-	if(ishuman(user))
-		var/mob/living/carbon/human/H = user
-		if(H.l_store == master_item && !H.get_active_hand())	//Prevents opening if it's in a pocket.
-			H.put_in_hands(master_item)
-			H.l_store = null
-			return 0
-		if(H.r_store == master_item && !H.get_active_hand())
-			H.put_in_hands(master_item)
-			H.r_store = null
-			return 0
-
 	src.add_fingerprint(user)
 	if (master_item.loc == user)
 		src.open(user)

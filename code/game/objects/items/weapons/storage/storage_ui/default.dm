@@ -382,6 +382,9 @@
 	user.client.screen -= storage.contents
 	if(user.s_active == storage)
 		user.s_active = null
+	if(ishuman(user) && istype(storage, /obj/item/weapon/storage/internal/pockets))
+		var/mob/living/carbon/human/H = user
+		H.update_inv_pockets()
 
 //Creates the storage UI
 /datum/storage_ui/default/prepare_ui()

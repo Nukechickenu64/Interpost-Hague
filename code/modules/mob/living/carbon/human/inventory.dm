@@ -71,6 +71,22 @@ This saves us from having to call add_fingerprint() any time something is put in
 	var/obj/item/organ/external/O = organs_by_name[name]
 	return (O && !O.is_stump())
 
+/mob/living/carbon/human/proc/get_pocket_storage(var/slot)
+	if(!istype(w_uniform, /obj/item/clothing/under))
+		return null
+	var/obj/item/clothing/under/uniform = w_uniform
+	if(slot == slot_l_store)
+		return uniform.left_pocket
+	if(slot == slot_r_store)
+		return uniform.right_pocket
+	return null
+
+/mob/living/carbon/human/proc/get_pocket_items(var/slot)
+	var/obj/item/weapon/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
+	if(pocket_storage)
+		return pocket_storage.contents.Copy()
+	return list()
+
 /mob/living/carbon/human/proc/has_organ_for_slot(slot)
 	switch(slot)
 		if(slot_back)
@@ -128,10 +144,19 @@ This saves us from having to call add_fingerprint() any time something is put in
 		wear_suit = null
 		update_inv_wear_suit()
 	else if (W == w_uniform)
-		if (r_store)
-			drop_from_inventory(r_store)
-		if (l_store)
-			drop_from_inventory(l_store)
+		var/obj/item/clothing/under/uniform = W
+		if(uniform.left_pocket)
+			uniform.left_pocket.close_all()
+			for(var/obj/item/I in uniform.left_pocket)
+				if(client)
+					client.screen -= I
+				I.screen_loc = null
+		if(uniform.right_pocket)
+			uniform.right_pocket.close_all()
+			for(var/obj/item/I in uniform.right_pocket)
+				if(client)
+					client.screen -= I
+				I.screen_loc = null
 		if (belt)
 			drop_from_inventory(belt)
 		w_uniform = null
@@ -186,12 +211,6 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else if (W == wear_amulet)
 		wear_amulet = null
 		update_inv_wear_amulet()
-	else if (W == r_store)
-		r_store = null
-		update_inv_pockets()
-	else if (W == l_store)
-		l_store = null
-		update_inv_pockets()
 	else if (W == s_store)
 		s_store = null
 		update_inv_s_store()
@@ -216,7 +235,16 @@ This saves us from having to call add_fingerprint() any time something is put in
 			update_inv_l_hand()
 		update_inv_l_hand()
 	else
-		return 0
+		var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
+		var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
+		if(left_pocket_storage && W.loc == left_pocket_storage)
+			left_pocket_storage.remove_from_storage(W, src)
+			update_inv_pockets()
+		else if(right_pocket_storage && W.loc == right_pocket_storage)
+			right_pocket_storage.remove_from_storage(W, src)
+			update_inv_pockets()
+		else
+			return 0
 
 	update_action_buttons()
 	return 1
@@ -234,6 +262,14 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(!istype(W)) return
 	if(!has_organ_for_slot(slot)) return
 	if(!species || !species.hud || !(slot in species.hud.equip_slots)) return
+	if(slot == slot_l_store || slot == slot_r_store)
+		var/obj/item/weapon/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
+		if(!pocket_storage || !pocket_storage.can_be_inserted(W, src, -1, -1, 1))
+			return
+		pocket_storage.handle_item_insertion(W, prevent_warning = 1, NoUpdate = !redraw_mob)
+		W.equipped(src, slot)
+		update_inv_pockets(redraw_mob)
+		return 1
 	W.forceMove(src)
 	var/obj/item/old_item = get_equipped_item(slot)
 
@@ -327,13 +363,6 @@ This saves us from having to call add_fingerprint() any time something is put in
 				update_inv_shoes(0)
 			W.equipped(src, slot)
 			update_inv_w_uniform(redraw_mob)
-		if(slot_l_store)
-			src.l_store = W
-			W.equipped(src, slot)
-			update_inv_pockets(redraw_mob)
-		if(slot_r_store)
-			src.r_store = W
-			W.equipped(src, slot)
 			update_inv_pockets(redraw_mob)
 		if(slot_s_store)
 			src.s_store = W
@@ -371,6 +400,15 @@ This saves us from having to call add_fingerprint() any time something is put in
 
 	return 1
 
+/mob/living/carbon/human/get_inventory_slot(obj/item/I)
+	var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
+	if(left_pocket_storage && I.loc == left_pocket_storage)
+		return slot_l_store
+	var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
+	if(right_pocket_storage && I.loc == right_pocket_storage)
+		return slot_r_store
+	return ..()
+
 //Checks if a given slot can be accessed at this time, either to equip or unequip I
 /mob/living/carbon/human/slot_is_accessible(var/slot, var/obj/item/I, mob/user=null)
 	var/obj/item/covering = null
@@ -395,8 +433,9 @@ This saves us from having to call add_fingerprint() any time something is put in
 	switch(slot)
 		if(slot_back)        return back
 		if(slot_handcuffed)  return handcuffed
-		if(slot_l_store)     return l_store
-		if(slot_r_store)     return r_store
+		if(slot_l_store, slot_r_store)
+			var/list/pocket_contents = get_pocket_items(slot)
+			return pocket_contents.len ? pocket_contents[pocket_contents.len] : null
 		if(slot_wear_mask)   return wear_mask
 		if(slot_l_hand)      return l_hand
 		if(slot_r_hand)      return r_hand
@@ -429,8 +468,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(w_uniform)   . += w_uniform
 
 	if(include_carried)
-		if(l_store)    . += l_store
-		if(r_store)    . += r_store
+		. += get_pocket_items(slot_l_store)
+		. += get_pocket_items(slot_r_store)
 		if(handcuffed) . += handcuffed
 		if(s_store)    . += s_store
 

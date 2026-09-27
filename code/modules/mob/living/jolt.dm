@@ -23,7 +23,7 @@
 		L.floor_jolt_act(dir_override ? dir_override : get_dir(epicenter, L), local_strength)
 
 /mob/living/proc/floor_jolt_act(direction, strength)
-	if(stat == DEAD || buckled || anchored || issilicon(src) || throwing)
+	if(stat == DEAD || buckled || anchored || issilicon(src))
 		return FALSE
 	if(world.time < last_jolt + JOLT_COOLDOWN)
 		return FALSE

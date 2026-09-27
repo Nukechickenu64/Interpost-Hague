@@ -48,9 +48,11 @@ var/global/list/severity_to_string = list("Mundane", "Moderate", "Major")
 
 		log_debug("Starting event '[next_event.name]' of severity [severity_to_string[severity]].")
 		next_event = null						// When set to null, a random event will be selected next time
+		return TRUE
 	else
 		// If not, wait for one minute, instead of one tick, before checking again.
 		next_event_time += (60 * 10)
+		return FALSE
 
 
 /datum/event_container/proc/acquire_event()

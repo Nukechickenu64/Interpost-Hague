@@ -13,6 +13,8 @@
 	var/menu = 1 //Which menu screen to display
 	var/list/records = list()
 	var/datum/dna2/record/active_record = null
+	var/datum/dna2/record/identity_record = null
+	var/datum/dna2/record/donor_record = null
 	var/obj/item/weapon/disk/data/diskette = null //Mostly so the geneticist can steal everything.
 	var/loading = 0 // Nice loading text
 
@@ -198,11 +200,20 @@
 				else
 					dat += "<br>" //Keeping a line empty for appearances I guess.
 
+				dat += "<b>Identity DNA:</b> [identity_record ? identity_record.dna.real_name : "Not selected"] "
+				dat += "<a href='byond://?src=\ref[src];select_dna=identity;select_dna_record=\ref[src.active_record]'>Select this</a><br>"
+				dat += "<b>Second DNA:</b> [donor_record ? donor_record.dna.real_name : "Not selected"] "
+				dat += "<a href='byond://?src=\ref[src];select_dna=donor;select_dna_record=\ref[src.active_record]'>Select this</a><br>"
+				if(identity_record && donor_record && identity_record == donor_record)
+					dat += "<font color=red><b>Warning:</b> Using one DNA profile twice will create a severely mutated clone.</font><br>"
+				else
+					dat += "Two DNA profiles will be combined to create the clone.<br>"
+
 				dat += {"<b>UI:</b> [src.active_record.dna.uni_identity]<br>
 				<b>SE:</b> [src.active_record.dna.struc_enzymes]<br><br>"}
 
-				if(pods.len)
-					dat += {"<a href='byond://?src=\ref[src];clone=\ref[src.active_record]'>Clone</a><br>"}
+				if(pods.len && identity_record && donor_record)
+					dat += {"<a href='byond://?src=\ref[src];clone=1'>Grow clone</a><br>"}
 
 		if(4)
 			if (!src.active_record)
@@ -269,6 +280,19 @@
 			src.active_record = null
 			src.temp = "Record missing."
 
+	else if(href_list["select_dna"])
+		var/datum/dna2/record/selected = locate(href_list["select_dna_record"])
+		if(!selected && src.active_record in src.records)
+			selected = src.active_record
+		if(!(selected in src.records))
+			temp = "Error: DNA record is no longer available."
+		else if(href_list["select_dna"] == "identity")
+			identity_record = selected
+			temp = "Identity DNA selected."
+		else if(href_list["select_dna"] == "donor")
+			donor_record = selected
+			temp = "Second DNA selected."
+
 	else if (href_list["del_rec"])
 		if ((!src.active_record) || (src.menu < 3))
 			return
@@ -280,6 +304,10 @@
 			var/obj/item/weapon/card/id/C = usr.get_active_hand()
 			if (istype(C)||istype(C, /obj/item/device/pda))
 				if(src.check_access(C))
+					if(identity_record == src.active_record)
+						identity_record = null
+					if(donor_record == src.active_record)
+						donor_record = null
 					src.records.Remove(src.active_record)
 					qdel(src.active_record)
 					src.temp = "Record deleted."
@@ -331,9 +359,10 @@
 		src.updateUsrDialog()
 
 	else if (href_list["clone"])
-		var/datum/dna2/record/C = locate(href_list["clone"])
+		var/datum/dna2/record/C = identity_record
+		var/datum/dna2/record/D = donor_record
 		//Look for that player! They better be dead!
-		if(istype(C))
+		if(istype(C) && istype(D) && C in records && D in records)
 			//Can't clone without someone to clone.  Or a pod.  Or if the pod is busy. Or full of gibs.
 			if(!pods.len)
 				temp = "Error: No clone pods detected."
@@ -350,36 +379,15 @@
 				else if(!config.revival_cloning)
 					temp = "Error: Unable to initiate cloning cycle."
 
-				else if(pod.growclone(C))
+				else if(pod.growclone(C, D))
 					temp = "Initiating cloning cycle..."
-					if(!config.use_cortical_stacks)
-						records.Remove(C)
-					qdel(C)
 					menu = 1
 				else
-					var/cloning
-					if(config.use_cortical_stacks)
-						cloning = 1
-						pod.growclone(C)
-					else
-						var/mob/selected = find_dead_player("[C.ckey]")
-						sound_to(selected, 'sound/machines/chime.ogg')//probably not the best sound but I think it's reasonable
-
-						var/answer = alert(selected,"Do you want to return to life?","Cloning","Yes","No")
-						if(answer == "Yes" && pod.growclone(C))
-							cloning = 1
-					if(cloning)
-						temp = "Initiating cloning cycle..."
-						if(!config.use_cortical_stacks)
-							records.Remove(C)
-						qdel(C)
-						menu = 1
-					else
-						temp = "Initiating cloning cycle...<br>Error: Post-initialisation failed. Cloning cycle aborted."
+					temp = "Error: Clone initialization failed."
 
 
 		else
-			temp = "Error: Data corruption."
+			temp = "Error: Select two valid DNA records first."
 
 	else if (href_list["menu"])
 		src.menu = text2num(href_list["menu"])

@@ -119,9 +119,6 @@ Please contact me on #coderbus IRC. ~Carn x
 //Human Overlays Indexes/////////
 #define MUTATIONS_LAYER			1
 #define SKIN_LAYER				2
-#ifdef DAMAGE_LAYER
-#undef DAMAGE_LAYER
-#endif
 #define DAMAGE_LAYER			3
 #define BODYHAIR_LAYER			4
 #define SURGERY_LEVEL			5		//bs12 specific.
@@ -149,15 +146,11 @@ Please contact me on #coderbus IRC. ~Carn x
 #define L_HAND_LAYER			27
 #define R_HAND_LAYER			28
 #define BLEEDING_LAYER			29
-#ifdef FIRE_LAYER
-#undef FIRE_LAYER
-#endif
 #define FIRE_LAYER				30		//If you're on fire
 #define TARGETED_LAYER			31		//BS12: Layer for the target overlay from weapon targeting system
 #define FLIES_LAYER				32
 #define COLDBREATH_LAYER		33
 #define TOTAL_LAYERS			33
-//////////////////////////////////
 
 /mob/living/carbon/human
 	var/list/overlays_standing[TOTAL_LAYERS]
@@ -704,6 +697,8 @@ var/global/list/damage_icon_parts = list()
 	if(update_icons)   update_icons()
 
 /mob/living/carbon/human/update_inv_pockets(var/update_icons=1)
+	if(hud_used && client)
+		hud_used.persistant_inventory_update()
 	if(update_icons)	update_icons()
 
 
@@ -965,38 +960,4 @@ var/global/list/damage_icon_parts = list()
 	if(update_icons)   update_icons()
 
 
-//Human Overlays Indexes/////////
-#undef MUTATIONS_LAYER
-#undef SKIN_LAYER
-#undef DAMAGE_LAYER
-#undef BODYHAIR_LAYER
-#undef SURGERY_LEVEL
-#undef UNDERWEAR_LAYER
-#undef BANDAGES_LAYER
-#undef UNIFORM_LAYER
-#undef ID_LAYER
-#undef AMULET_LAYER
-#undef SHOES_LAYER
-#undef GLOVES_LAYER
-#undef BELT_LAYER
-#undef SUIT_LAYER
-#undef TAIL_LAYER
-#undef GLASSES_LAYER
-#undef BELT_LAYER_ALT
-#undef SUIT_STORE_LAYER
-#undef BACK_LAYER
-#undef HAIR_LAYER
-#undef GOGGLES_LAYER
-#undef EARS_LAYER
-#undef FACEMASK_LAYER
-#undef HEAD_LAYER
-#undef COLLAR_LAYER
-#undef HANDCUFF_LAYER
-#undef L_HAND_LAYER
-#undef R_HAND_LAYER
-#undef BLEEDING_LAYER
-#undef FIRE_LAYER
-#undef TARGETED_LAYER
-#undef FLIES_LAYER
-#undef COLDBREATH_LAYER
-#undef TOTAL_LAYERS
+//////////////////////////////////

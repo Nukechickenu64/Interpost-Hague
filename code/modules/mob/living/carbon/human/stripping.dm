@@ -14,6 +14,16 @@
 
 	switch(slot_to_strip_text)
 		// Handle things that are part of this interface but not removing/replacing a given item.
+		if("pocket_left")
+			var/obj/item/clothing/under/uniform = w_uniform
+			if(uniform && uniform.left_pocket)
+				uniform.left_pocket.open(user)
+			return
+		if("pocket_right")
+			var/obj/item/clothing/under/uniform = w_uniform
+			if(uniform && uniform.right_pocket)
+				uniform.right_pocket.open(user)
+			return
 		if("pockets")
 			if(stripping)
 				visible_message("<span class='bname'>\The [user] is trying to empty [src]'s pockets!</span>")
@@ -97,24 +107,24 @@
 
 // Empty out everything in the target's pockets.
 /mob/living/carbon/human/proc/empty_pockets(var/mob/living/user)
-	if(!r_store && !l_store)
+	var/list/left_items = get_pocket_items(slot_l_store)
+	var/list/right_items = get_pocket_items(slot_r_store)
+	if(!left_items.len && !right_items.len)
 		to_chat(user, "<span class='warning'>It seems like \the [src] has nothing in their pockets.</span>")
 		return
-	if(r_store)
-		unEquip(r_store)
-	if(l_store)
-		unEquip(l_store)
+	for(var/obj/item/I in right_items)
+		unEquip(I)
+	for(var/obj/item/I in left_items)
+		unEquip(I)
 	visible_message("<span class='danger'>\The [user] empties [src]'s pockets!</span>")
 
 /mob/living/carbon/human/proc/place_in_pockets(obj/item/I, var/mob/living/user)
 	if(!user.unEquip(I))
 		return
-	if(!r_store)
-		if(equip_to_slot_if_possible(I, slot_r_store, del_on_fail=0, disable_warning=1, redraw_mob=1))
-			return
-	if(!l_store)
-		if(equip_to_slot_if_possible(I, slot_l_store, del_on_fail=0, disable_warning=1, redraw_mob=1))
-			return
+	if(equip_to_slot_if_possible(I, slot_r_store, del_on_fail=0, disable_warning=1, redraw_mob=1))
+		return
+	if(equip_to_slot_if_possible(I, slot_l_store, del_on_fail=0, disable_warning=1, redraw_mob=1))
+		return
 	to_chat(user, "<span class='warning'>I can't place \the [I] in [src]'s pockets.</span>")
 	user.put_in_active_hand(I)
 

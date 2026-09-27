@@ -13,6 +13,19 @@
 /mob/observer/ghost/DblClickOn(var/atom/A, var/params)
 	if(pain_possession_object)
 		return
+	if(istype(A, /mob/living/carbon/human))
+		var/mob/living/carbon/human/clone = A
+		if(clone.clone_claimable)
+			if(!MayRespawn(1))
+				return
+			if(clone.stat == DEAD || clone.key || clone.mind)
+				to_chat(src, "<span class='warning'>That clone is already inhabited or unavailable.</span>")
+				return
+			clone.clone_claimable = FALSE
+			announce_ghost_joinleave(src, 0, "They have inhabited a freshly grown clone.")
+			clone.ckey = ckey
+			to_chat(clone, "<span class='notice'>You awaken in a newly grown body. Your genetic origins are unfamiliar.</span>")
+			return
 	if(can_reenter_corpse && mind && mind.current)
 		if(A == mind.current || (mind.current in A)) // double click your corpse or whatever holds it
 			reenter_corpse()						// (cloning scanner, body bag, closet, mech, etc)

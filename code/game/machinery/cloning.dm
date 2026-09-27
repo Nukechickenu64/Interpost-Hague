@@ -33,6 +33,9 @@
 		h_style = "Bald"
 	regenerate_icons()
 
+/mob/living/carbon/human
+	var/clone_claimable = FALSE
+
 /obj/machinery/clonepod/New()
 	set_extension(src, /datum/extension/interactive/multitool, /datum/extension/interactive/multitool/store)
 	..()
@@ -76,22 +79,11 @@
 //Clonepod
 
 //Start growing a human clone in the pod!
-/obj/machinery/clonepod/proc/growclone(var/datum/dna2/record/R)
+/obj/machinery/clonepod/proc/growclone(var/datum/dna2/record/R, var/datum/dna2/record/D)
 	if(mess || attempting)
 		return 0
-	var/datum/mind/clonemind
-
-	if(!config.use_cortical_stacks)
-		clonemind = locate(R.mind)
-		if(!istype(clonemind, /datum/mind))	//not a mind
-			return 0
-	else
-		for(var/mob/observer/ghost/G in GLOB.player_list)
-			if(G.ckey == R.ckey)
-				if(G.can_reenter_corpse)
-					break
-				else
-					return 0
+	if(!istype(R, /datum/dna2/record) || !istype(D, /datum/dna2/record) || !R.dna || !D.dna)
+		return 0
 
 	attempting = 1 //One at a time!!
 	locked = 1
@@ -115,24 +107,41 @@
 	//Here let's calculate their health so the pod doesn't immediately eject them!!!
 	H.updatehealth()
 
-	if(clonemind)
-		clonemind.transfer_to(H)
-		if(R.ckey)
-			H.ckey = R.ckey
-			to_chat(H, "<span class='notice'><b>Consciousness slowly creeps over you as your body regenerates.</b><br><i>So this is what cloning feels like?</i></span>")
-
 	// -- Mode/mind specific stuff goes here
 	callHook("clone", list(H))
 	update_antag_icons(H.mind)
 	// -- End mode specific stuff
 
-	if(!R.dna)
-		H.dna = new /datum/dna()
-		H.dna.real_name = H.real_name
-	else
-		H.dna = R.dna
+	H.dna = R.dna.Clone()
+	H.clone_claimable = TRUE
+	var/datum/dna/donor_dna = D.dna.Clone()
+	H.dna.real_name = H.real_name
+	H.dna.species = R.dna.species
+	H.dna.unique_enzymes = R.dna.unique_enzymes
+	H.dna.body_markings = list()
+	for(var/marking_tag in R.dna.body_markings)
+		H.dna.body_markings[marking_tag] = R.dna.body_markings[marking_tag].Copy()
+	for(var/marking_tag in D.dna.body_markings)
+		if(!(marking_tag in H.dna.body_markings) && prob(50))
+			H.dna.body_markings[marking_tag] = D.dna.body_markings[marking_tag].Copy()
+	for(var/block = 1; block <= DNA_UI_LENGTH; block++)
+		if(prob(50))
+			H.dna.SetUIValue(block, donor_dna.GetUIValue(block), 1)
+	for(var/block = 1; block <= DNA_SE_LENGTH; block++)
+		var/datum/dna/source_dna = prob(50) ? donor_dna : H.dna
+		H.dna.SetSEState(block, source_dna.GetSEState(block), 1)
+	H.dna.UpdateUI()
+	H.dna.UpdateSE()
+	qdel(donor_dna)
 	H.UpdateAppearance()
 	H.sync_organ_dna()
+	if(R == D)
+		for(var/block = 1; block <= DNA_SE_LENGTH; block++)
+			H.dna.SetSEValue(block, rand(1, 4095), 1)
+		H.dna.UpdateSE()
+		scramble(1, H, 100)
+		for(var/mutation_roll = 1; mutation_roll <= 4; mutation_roll++)
+			randmutb(H)
 	if(heal_level < 60)
 		randmutb(H) //Sometimes the clones come out wrong.
 		H.dna.UpdateSE()

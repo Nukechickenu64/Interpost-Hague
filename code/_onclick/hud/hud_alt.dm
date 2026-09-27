@@ -111,9 +111,21 @@
 					if(slot_back)
 						if(H.back)    H.back.screen_loc =    hud_data["loc"]
 					if(slot_l_store)
-						if(H.l_store) H.l_store.screen_loc = hud_data["loc"]
+						var/list/left_pocket_items = H.get_pocket_items(slot_l_store)
+						var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
+						if(left_pocket_items.len && H.s_active != left_pocket_storage)
+							var/obj/item/left_pocket_item = left_pocket_items[1]
+							left_pocket_item.screen_loc = hud_data["loc"]
+							left_pocket_item.hud_layerise()
+							H.client.screen |= left_pocket_item
 					if(slot_r_store)
-						if(H.r_store) H.r_store.screen_loc = hud_data["loc"]
+						var/list/right_pocket_items = H.get_pocket_items(slot_r_store)
+						var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
+						if(right_pocket_items.len && H.s_active != right_pocket_storage)
+							var/obj/item/right_pocket_item = right_pocket_items[1]
+							right_pocket_item.screen_loc = hud_data["loc"]
+							right_pocket_item.hud_layerise()
+							H.client.screen |= right_pocket_item
 					if(slot_head)
 						if(H.head)    H.head.screen_loc =      hud_data["loc"]
 					if(slot_w_uniform)
@@ -135,9 +147,17 @@
 					if(slot_back)
 						if(H.back)    H.back.screen_loc =    null
 					if(slot_l_store)
-						if(H.l_store) H.l_store.screen_loc = null
+						var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
+						if(H.s_active != left_pocket_storage)
+							for(var/obj/item/I in H.get_pocket_items(slot_l_store))
+								H.client.screen -= I
+								I.screen_loc = null
 					if(slot_r_store)
-						if(H.r_store) H.r_store.screen_loc = null
+						var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
+						if(H.s_active != right_pocket_storage)
+							for(var/obj/item/I in H.get_pocket_items(slot_r_store))
+								H.client.screen -= I
+								I.screen_loc = null
 					if(slot_head)
 						if(H.head)    H.head.screen_loc =      null
 					if(slot_w_uniform)
