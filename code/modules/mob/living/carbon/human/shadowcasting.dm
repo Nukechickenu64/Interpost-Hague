@@ -20,7 +20,7 @@ var/global/list/los_dither_icons = list()
 	los_dither_icons[key] = pattern
 	return pattern
 
-var/global/enhanced_los_enabled = TRUE
+var/global/enhanced_los_enabled = FALSE
 
 /turf
 	var/shadowcast_inview
@@ -209,7 +209,8 @@ var/global/shadowcast_generation = 0
 	plane = SHADOWCASTING_PLANE
 	mouse_opacity = 0
 	opacity = 0
-	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,32, 0,0,0,0)
+	appearance_flags = PIXEL_SCALE
+	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,255, 0,0,0,0)
 
 /atom/movable/triangle/New(x1, y1, x2, y2, x3, y3)
 	transform = los_triangle_matrix(x1, y1, x2, y2, x3, y3)

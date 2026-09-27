@@ -168,12 +168,12 @@ What is the naming convention for planes or layers?
   #define SUPERMATTER_WALL_LAYER   3
   #define OBFUSCATION_LAYER        4
 
-#define SHADOWCASTING_REFLECTOR_PLANE 5
-
-#define SHADOWCASTING_PLANE 6
-
-#define EMISSIVE_PLANE           7 // Glows/bloom; above LOS shadows so light sources still glow out of occluded areas
+#define EMISSIVE_PLANE           5 // Glows/bloom; below LOS shadows so unseen lights don't glow through
   #define EMISSIVE_LAYER           1
+
+#define SHADOWCASTING_REFLECTOR_PLANE 6
+
+#define SHADOWCASTING_PLANE 7
 
 #define RUNECHAT_PLANE           8 // floating chat text above speakers
   #define RUNECHAT_LAYER           1
@@ -336,13 +336,14 @@ var/global/icon/solid_white_icon
 
 /obj/screen/plane_master/shadowcasting/New()
 	. = ..()
-	add_filter("blur", 4, list("type" = "blur", size=1))
+	// Keep in-view walls and wall-mounted objects crisp and unshadowed.
 	add_filter("wall_mask", 5, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
 
 /obj/screen/plane_master/los_occluders
-	name = "los wall mask"
+	name = "los occluder plane master"
 	plane = SHADOWCASTING_REFLECTOR_PLANE
 	render_target = "*los_occluders"
+	mouse_opacity = 0
 
 /obj/screen/plane_master/ghost_dummy
 	// this avoids a bug which means plane masters which have nothing to control get angry and mess with the other plane masters out of spite

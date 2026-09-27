@@ -855,3 +855,12 @@
 	else if (user.a_intent == I_HURT)
 		user.visible_message("<span class='warning'>[user] rings \the [src] repeatedly, signalling a disqualification!</span>")
 		playsound(user.loc, 'sound/items/manydings.ogg', 60)
+
+/obj/item/toy/glaggle
+	name = "glaggle"
+	desc = "A strange toy that makes a glaggle sound when interacted with."
+	icon = 'icons/obj/toy.dmi'
+	icon_state= "glaggle"
+
+/obj/item/weapon/glaggle/attack_self(mob/living/user as mob)
+	user.visible_message("<span class='notice'>hey it's me, it's verity!</span>")

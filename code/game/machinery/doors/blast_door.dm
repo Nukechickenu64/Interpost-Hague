@@ -80,7 +80,7 @@
 /obj/machinery/door/blast/proc/force_open()
 	src.operating = 1
 	playsound(src.loc, open_sound, 100, 1)
-	depth_layer_flick(icon_state_opening)
+	flick(icon_state_opening, src)
 	src.set_density(0)
 	update_nearby_tiles()
 	src.update_icon()
@@ -98,7 +98,7 @@
 	src.operating = 1
 	playsound(src.loc, close_sound, 100, 1)
 	src.layer = closed_layer
-	depth_layer_flick(icon_state_closing)
+	flick(icon_state_closing, src)
 	src.set_density(1)
 	update_nearby_tiles()
 	src.update_icon()
@@ -226,11 +226,9 @@
 
 /obj/machinery/door/blast/iddoor/Initialize()
 	. = ..()
-	enable_depth_layering(16)
 
 /obj/machinery/door/blast/iddoor/update_icon()
 	. = ..()
-	refresh_depth_layer()
 
 /obj/machinery/door/blast/iddoor/open
 	begins_closed = FALSE

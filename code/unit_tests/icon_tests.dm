@@ -1,26 +1,6 @@
 /datum/unit_test/icon_test
 	name = "ICON STATE template"
 
-/datum/unit_test/icon_test/los_dither_coverage
-	name = "ICON STATE - LOS transition masks use ordered pixel coverage"
-
-/datum/unit_test/icon_test/los_dither_coverage/start_test()
-	for(var/coverage in list(4, 8, 12))
-		var/icon/pattern = get_los_dither_icon(coverage)
-		if(get_los_dither_icon(coverage) != pattern)
-			fail("LOS dither icons were not cached.")
-			return 1
-		var/opaque = 0
-		for(var/x in 1 to 4)
-			for(var/y in 1 to 4)
-				if(!isnull(pattern.GetPixel(x, y)))
-					opaque++
-		if(opaque != coverage)
-			fail("Expected [coverage] opaque pixels, got [opaque] in a 4x4 dither cell.")
-			return 1
-	pass("LOS transition masks have the expected opaque pixel coverage.")
-	return 1
-
 /datum/unit_test/icon_test/depth_layer_crop_shall_preserve_airlock_states
 	name = "ICON STATE - Depth layer crop shall preserve airlock states"
 

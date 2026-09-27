@@ -787,7 +787,6 @@ About the new airlock wires panel:
 /obj/machinery/door/airlock/update_icon()
 	set_light(0)
 	if(overlays) overlays.Cut()
-	var/airlock_icon = depth_layer_source_icon || icon
 	if(density)
 		if(locked && lights && src.arePowerSystemsOn())
 			icon_state = "door_locked"
@@ -797,54 +796,51 @@ About the new airlock wires panel:
 		if(p_open || welded)
 			overlays = list()
 			if(p_open)
-				overlays += image(airlock_icon, "panel_open")
+				overlays += image(icon, "panel_open")
 			if (!(stat & NOPOWER))
 				if(stat & BROKEN)
-					overlays += image(airlock_icon, "sparks_broken")
+					overlays += image(icon, "sparks_broken")
 				else if (health < maxhealth * 3/4)
-					overlays += image(airlock_icon, "sparks_damaged")
+					overlays += image(icon, "sparks_damaged")
 			if(welded)
-				overlays += image(airlock_icon, "welded")
+				overlays += image(icon, "welded")
 		else if (health < maxhealth * 3/4 && !(stat & NOPOWER))
-			overlays += image(airlock_icon, "sparks_damaged")
+			overlays += image(icon, "sparks_damaged")
 	else
 		icon_state = "door_open"
 		if((stat & BROKEN) && !(stat & NOPOWER))
-			overlays += image(airlock_icon, "sparks_open")
+			overlays += image(icon, "sparks_open")
 
 	if(brace)
 		brace.update_icon()
 		overlays += image(brace.icon, brace.icon_state)
-	refresh_depth_layer()
 
 /obj/machinery/door/airlock/do_animate(animation)
 	switch(animation)
 		if("opening")
 			if(overlays) overlays.Cut()
-			clear_depth_layer_overlays()
 			if(p_open)
 				spawn(2) // The only work around that works. Downside is that the door will be gone for a millisecond.
-					depth_layer_flick("o_door_opening")  //can not use flick due to BYOND bug updating overlays right before flicking
+					flick("o_door_opening", src)  //can not use flick due to BYOND bug updating overlays right before flicking
 					update_icon()
 			else
-				depth_layer_flick("door_opening")//[stat ? "_stat":]
+				flick("door_opening", src)//[stat ? "_stat":]
 				update_icon()
 		if("closing")
 			if(overlays) overlays.Cut()
-			clear_depth_layer_overlays()
 			if(p_open)
 				spawn(2)
-					depth_layer_flick("o_door_closing")
+					flick("o_door_closing", src)
 					update_icon()
 			else
-				depth_layer_flick("door_closing")
+				flick("door_closing", src)
 				update_icon()
 		if("spark")
 			if(density)
-				depth_layer_flick("door_spark")
+				flick("door_spark", src)
 		if("deny")
 			if(density && src.arePowerSystemsOn())
-				depth_layer_flick("door_deny")
+				flick("door_deny", src)
 				//if(secured_wires)
 				playsound(src.loc, open_failure_access_denied, 50, 0)
 	return
@@ -1431,7 +1427,6 @@ About the new airlock wires panel:
 		wires = new/datum/wires/airlock/secure(src)
 	else
 		wires = new/datum/wires/airlock(src)
-	enable_depth_layering(16)
 
 /obj/machinery/door/airlock/Initialize()
 	if(src.closeOtherId != null)

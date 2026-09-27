@@ -23,6 +23,22 @@ Connect using BYOND: `byond://<your-ip>:8000`
 2. Open Dream Maker, compile `Marrow.dme`.
 3. Open Dream Daemon, load `Marrow.dmb`, set port (e.g., 8000), enable Trusted / Invisible, start.
 
+## 3b. Linux One-Shot Start
+`start-server.sh` updates the repo, brings up the MariaDB container, compiles, and runs DreamDaemon in the foreground on port 6345.
+
+```bash
+./start-server.sh          # prompts before the hard reset
+./start-server.sh --yes    # non-interactive
+```
+
+Requires Docker and a BYOND install on `PATH` (see `install-byond.sh`; set `BYOND_HOME` if it isn't).
+
+**The update step runs `git reset --hard`, discarding local changes.**
+
+Flags / env overrides: `--port N`, `--branch NAME`, `--skip-update`, `--skip-compile`, `--stop-db-on-exit`, plus `PORT`, `REMOTE`, `BRANCH`, `BYOND_HOME`.
+
+Only the `db` compose service is started — the game runs natively on the host and reaches the database via `127.0.0.1:3307` as configured in `config/dbconfig.txt`. Ctrl+C stops the server; the database keeps running unless `--stop-db-on-exit` is passed.
+
 ## 4. Configuration
 Edit `config/config.txt`:
 - `SERVERNAME` – displayed server label.
