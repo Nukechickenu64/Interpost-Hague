@@ -4,7 +4,7 @@ set -euo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-PORT="${PORT:-6345}"
+PORT="${PORT:-26370}"
 REMOTE="${REMOTE:-origin}"
 BRANCH="${BRANCH:-}"
 SKIP_UPDATE="${SKIP_UPDATE:-0}"
