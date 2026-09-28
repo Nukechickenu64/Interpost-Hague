@@ -115,6 +115,9 @@ var/global/list/sparring_attack_cache = list()
 	sharp = 0
 	edge = 0
 
+/datum/unarmed_attack/bite/proc/ensure_nonzero_damage(var/attack_damage)
+	return max(1, attack_damage)
+
 /datum/unarmed_attack/bite/is_usable(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone)
 
 	if(istype(user.wear_mask, /obj/item/clothing/mask/muzzle))

@@ -94,6 +94,7 @@ else
 	git fetch "$REMOTE"
 	git checkout "$BRANCH"
 	git reset --hard "$REMOTE/$BRANCH"
+	git submodule update --init secret 2>/dev/null || log "Secret submodule unavailable; building without it."
 fi
 
 # --- Database ----------------------------------------------------------------
@@ -130,8 +131,13 @@ mkdir -p data/logs data/player_saves
 if [[ "$SKIP_COMPILE" == "1" ]]; then
 	log "Skipping compile."
 else
+	DM_FLAGS=()
+	if [[ -f secret/__secret.dme ]]; then
+		DM_FLAGS+=(-DSECRETS_ENABLED)
+		log "Secret content found; compiling with SECRETS_ENABLED."
+	fi
 	log "Compiling Interpost-Hague.dme..."
-	if ! DreamMaker Interpost-Hague.dme 2>&1 | tee data/logs/compile.log; then
+	if ! DreamMaker "${DM_FLAGS[@]}" Interpost-Hague.dme 2>&1 | tee data/logs/compile.log; then
 		die "Compilation failed. See data/logs/compile.log."
 	fi
 	grep -qE '\b0 errors\b' data/logs/compile.log || die "Compilation reported errors. See data/logs/compile.log."

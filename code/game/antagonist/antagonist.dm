@@ -29,6 +29,8 @@
 	var/faction_role_text                   // Role for sub-antags. Mandatory for faction role.
 	var/faction_descriptor                  // Description of the cause. Mandatory for faction role.
 	var/faction_verb                        // Verb added when becoming a member of the faction, if any.
+	var/porco_tab = "They"                  // Porco tab used for this antagonist's actions.
+	var/list/porco_actions = list()          // Actions displayed in the Porco antagonist tab.
 	var/faction_welcome                     // Message shown to faction members.
 	var/faction = "neutral"					// Actual faction name. Used primarily in stuff like simple_animals seeing if you are a threat or not.
 
@@ -104,6 +106,37 @@
 		if(faction_role_text) GLOB.hud_icon_reference[faction_role_text] = antaghud_indicator
 	if(!role_type)
 		role_type = id
+
+/datum/antagonist/proc/get_porco_actions(var/mob/living/carbon/human/user)
+	if(!user || !user.mind || !user.mind.has_active_antagonist(src))
+		return list()
+	return porco_actions.Copy()
+
+/proc/get_porco_antagonist(var/mob/living/carbon/human/user)
+	var/list/antagonists = list()
+	if(!user?.mind)
+		return antagonists
+	var/list/active_antagonists = user.mind.active_antagonists
+	for(var/datum/antagonist/active_antag in active_antagonists)
+		var/list/active_actions = active_antag.get_porco_actions(user)
+		if(active_actions)
+			antagonists.Add(active_antag)
+	return antagonists
+
+/proc/get_porco_antagonist_actions(var/mob/living/carbon/human/user)
+	var/list/actions = list()
+	for(var/datum/antagonist/antag in get_porco_antagonist(user))
+		actions.Add(antag.get_porco_actions(user))
+	return actions
+
+/proc/get_porco_antagonist_actions_by_tab(var/mob/living/carbon/human/user)
+	var/list/actions_by_tab = list()
+	for(var/datum/antagonist/antag in get_porco_antagonist(user))
+		if(!actions_by_tab[antag.porco_tab])
+			actions_by_tab[antag.porco_tab] = list()
+		var/list/tab_actions = actions_by_tab[antag.porco_tab]
+		tab_actions.Add(antag.get_porco_actions(user))
+	return actions_by_tab
 
 /datum/antagonist/proc/tick()
 	return 1

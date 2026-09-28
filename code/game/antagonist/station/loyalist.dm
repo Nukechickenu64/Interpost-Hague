@@ -11,6 +11,8 @@ GLOBAL_DATUM_INIT(loyalists, /datum/antagonist/loyalists, new)
 	victory_feedback_tag = "win - rev heads killed"
 	loss_feedback_tag = "loss - heads killed"
 	antaghud_indicator = "hudloyalist"
+	porco_tab = "Integralist"
+	porco_actions = list(list("ConvertToLoyalist", "Convert to Company"))
 	flags = 0
 
 	hard_cap = 2

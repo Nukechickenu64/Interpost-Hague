@@ -10,7 +10,11 @@
 	hard_cap_round = 2
 	initial_spawn_req = 1
 	initial_spawn_target = 1
-	antaghud_indicator = "hudtraitor"
+	antaghud_indicator = "huddead"
+	porco_actions = list(
+		list("ToggleLeechFangs", "Extend / Retract Fangs"),
+		list("LeechMesmerize", "Mesmerizing Gaze")
+	)
 	welcome_text = "You died, but the blood in your veins drags you onward. Your heart is silent, your lungs still, and pain is a distant memory. Fresh human blood is the only thing that keeps your dead flesh moving."
 
 /datum/antagonist/afflicted/create_objectives(var/datum/mind/leech_mind)
@@ -54,10 +58,22 @@
 	var/leech_conversion_pending = FALSE
 
 /datum/mind/proc/is_leech()
-	return special_role == "Leech"
+	return special_role == GLOB.leech_antagonist.role_text
 
 /mob/living/carbon/human/proc/is_leech()
 	return mind?.is_leech()
+
+/mob/living/carbon/human/adjustStaminaLoss(var/amount)
+	if(is_leech())
+		staminaloss = 0
+		return
+	..()
+
+/mob/living/carbon/human/setStaminaLoss(var/amount)
+	if(is_leech())
+		staminaloss = 0
+		return
+	..()
 
 /mob/living/carbon/human
 	var/leech_fangs_extended = FALSE
@@ -74,6 +90,24 @@
 		return
 	leech_fangs_extended = !leech_fangs_extended
 	to_chat(src, "<span class='notice'>You [leech_fangs_extended ? "bare" : "retract"] your fangs.</span>")
+
+/client/verb/toggle_leech_fangs_ui()
+	set name = "ToggleLeechFangs"
+	set hidden = 1
+
+	if(ishuman(mob))
+		var/mob/living/carbon/human/leech = mob
+		leech.toggle_leech_fangs()
+
+/client/verb/leech_mesmerize_ui()
+	set name = "LeechMesmerize"
+	set hidden = 1
+
+	if(ishuman(mob))
+		var/mob/living/carbon/human/leech = mob
+		var/mob/living/carbon/human/target = input(leech, "Choose a target", "Mesmerizing Gaze") as null|mob in oview(3)
+		if(target)
+			leech.leech_mesmerize(target)
 
 /mob/living/carbon/human/proc/can_use_leech_fangs()
 	return is_leech() && leech_fangs_extended
@@ -147,33 +181,46 @@
 		return FALSE
 	if(!victim || victim.stat == DEAD || !victim.lying)
 		return FALSE
-	if(victim.run_armor_check(target_zone, "melee") > 0)
+	var/is_neck_bite = target_zone == BP_THROAT
+	var/bite_zone = is_neck_bite ? BP_CHEST : target_zone
+	if(victim.run_armor_check(bite_zone, "melee") > 0)
 		to_chat(src, "<span class='warning'>You cannot reach blood through [victim]'s armor.</span>")
 		return FALSE
-	var/obj/item/organ/external/target_organ = victim.get_organ(target_zone)
-	visible_message("<span class='warning'>[src] presses their mouth against [victim]'s [target_organ.name].</span>")
+	var/obj/item/organ/external/target_organ = victim.get_organ(bite_zone)
+	if(!target_organ)
+		return FALSE
+	visible_message("<span class='warning'>[src] presses their mouth against [victim]'s [is_neck_bite ? "neck" : target_organ.name].</span>")
 	if(!do_after(src, 10, victim, progress = 0))
 		return FALSE
 	if(!Adjacent(victim) || victim.stat == DEAD || !victim.lying)
 		return FALSE
-	var/amount = min(20, victim.vessel.get_reagent_amount(/datum/reagent/blood), species.blood_volume - vessel.total_volume)
+	var/amount = leech_siphon_blood(victim, 5)
 	if(amount <= 0)
 		to_chat(src, "<span class='warning'>There is no fresh blood left to draw.</span>")
 		return FALSE
-	victim.vessel.trans_to_holder(vessel, amount)
-	victim.apply_damage(3, BRUTE, target_zone, victim.run_armor_check(target_zone, "melee"), 0, "fangs")
-	if(target_zone == BP_HEAD)
-		if(target_organ)
-			target_organ.sever_artery()
+	victim.apply_damage(3, BRUTE, bite_zone, victim.run_armor_check(bite_zone, "melee"), 0, "fangs")
+	if(is_neck_bite || target_zone == BP_HEAD)
+		target_organ.sever_artery()
 	victim.receive_damage()
 	adjustHalLoss(-10)
 	visible_message("<span class='danger'>[src] buries their teeth in [victim] and begins to drink!</span>")
 	playsound(get_turf(src), 'sound/weapons/bite.ogg', 50, 1, -1)
 	admin_attack_log(src, victim, "Drained blood from their victim.", "Had their blood drained.", "drained blood from")
-	if(victim.vessel.get_reagent_amount(/datum/reagent/blood) <= 0)
+	return TRUE
+
+/mob/living/carbon/human/proc/leech_siphon_blood(mob/living/carbon/human/victim, amount)
+	if(!is_leech() || !victim?.vessel || !vessel)
+		return 0
+	var/blood_available = victim.vessel.get_reagent_amount(/datum/reagent/blood)
+	var/blood_capacity = species.blood_volume - vessel.total_volume
+	var/blood_to_transfer = min(amount, blood_available, blood_capacity)
+	if(blood_to_transfer <= 0)
+		return 0
+	victim.vessel.trans_to_holder(vessel, blood_to_transfer)
+	if(victim.vessel.get_reagent_amount(/datum/reagent/blood) <= 0 && victim.stat != DEAD)
 		victim.death()
 		leech_schedule_conversion(victim)
-	return TRUE
+	return blood_to_transfer
 
 /mob/living/carbon/human/proc/leech_schedule_conversion(mob/living/carbon/human/victim)
 	if(!victim?.mind || victim.mind.leech_conversion_pending)

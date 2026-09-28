@@ -2,6 +2,7 @@
 
 	if(!add_antagonist_mind(player, ignore_role))
 		return
+	player.add_active_antagonist(src)
 
 	//do this again, just in case
 	if(flags & ANTAG_OVERRIDE_JOB)
@@ -55,6 +56,7 @@
 	// Handle only adding a mind and not bothering with gear etc.
 	if(nonstandard_role_type)
 		faction_members |= player
+		player.add_active_antagonist(src)
 		to_chat(player.current, "<span class='danger'><font size=3>You are \a [nonstandard_role_type]!</font></span>")
 		player.special_role = nonstandard_role_type
 		if(nonstandard_role_msg)
@@ -72,6 +74,7 @@
 			to_chat(player.current, "<span class='danger'><font size = 3>You are no longer a [role_text]!</font></span>")
 		current_antagonists -= player
 		faction_members -= player
+		player.remove_active_antagonist(src)
 		if(player.special_role == role_text || (faction_role_text && player.special_role == faction_role_text))
 			player.special_role = null
 		update_icons_removed(player)

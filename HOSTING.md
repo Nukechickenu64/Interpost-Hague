@@ -61,7 +61,7 @@ The Revolutionary job appears under the Opposition section in late join and (aft
 ## 7. Persistence & Logs
 - Player saves: `data/player_saves/`
 - Logs: `data/logs/`
-Ensure these are volume-mounted or backed up if using Docker for continuity.
+The Docker `game` service mounts `./data` to persist these across container restarts/rebuilds.
 
 ## 8. Updating
 ```bash

@@ -21,6 +21,8 @@ GLOBAL_DATUM_INIT(godcult, /datum/antagonist/godcultist, new)
 	initial_spawn_req = 2
 	initial_spawn_target = 2
 	antaghud_indicator = "hudcultist"
+	porco_tab = "Thanati"
+	porco_actions = list(list("dpray", "Call to the Lord"))
 
 /datum/antagonist/godcultist/add_antagonist_mind(var/datum/mind/player, var/ignore_role, var/nonstandard_role_type, var/nonstandard_role_msg, var/mob/living/deity/specific_god)
 	if(!..())

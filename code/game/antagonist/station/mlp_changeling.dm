@@ -13,6 +13,8 @@ var/global/datum/antagonist/pony_changeling/mlp_hive = new
 	initial_spawn_req = 1
 	initial_spawn_target = 1
 	antaghud_indicator = "hudchangeling"
+	porco_tab = "They"
+	porco_actions = list(list("MLPFeedOnLove", "Feed on Love"))
 	faction = "changeling"
 	welcome_text = "You are a changeling from a hidden hive. Wear the faces you steal, feed on the crew's love, and keep your true nature hidden. Use the Changeling abilities to absorb DNA and transform. Love is your strength; without it, your disguise and body will fail."
 
@@ -46,6 +48,14 @@ var/global/datum/antagonist/pony_changeling/mlp_hive = new
 		changeling.handle_changeling_transform(starting_disguise)
 		changeling.verbs += /mob/living/carbon/human/proc/mlp_feed_on_love
 		to_chat(changeling, "<span class='notice'>Your love reserves begin at [target.mlp_changeling.love]. Feed carefully: hunger makes disguise difficult.</span>")
+
+/client/verb/mlp_feed_on_love_ui()
+	set name = "MLPFeedOnLove"
+	set hidden = 1
+
+	if(ishuman(mob))
+		var/mob/living/carbon/human/changeling = mob
+		changeling.mlp_feed_on_love()
 
 /datum/antagonist/pony_changeling/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	. = ..()

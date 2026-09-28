@@ -154,7 +154,7 @@
 	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
 	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
 	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
-	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);}"
+	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);cursor:move;user-select:none;}"
 	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
 	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;} .loc{color:#8ffcd2;}"
 	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
@@ -166,8 +166,9 @@
 	html += ".item.two a.main{display:table-cell;vertical-align:middle;width:100%;}"
 	html += ".item.two a.expand{display:table-cell;vertical-align:middle;width:26px;border-left:1px solid rgba(111,232,192,0.35);}"
 	html += "</style>"
-	// Auto-fit the browser window to the bordered .wrap element itself, not the viewport
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	// Auto-fit the browser window to the bordered .wrap element itself, not the viewport.
+	// The header moves the borderless window while dragging and reports the final position to BYOND.
+	html += "<script type='text/javascript'>var __tilectx_drag=false,__tilectx_dx=0,__tilectx_dy=0;function __tilectx_move(e){if(!__tilectx_drag)return;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;try{window.moveTo(x,y)}catch(err){}}function __tilectx_stop(e){if(!__tilectx_drag)return;__tilectx_drag=false;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;window.location='?src=\ref[src];tilectx_move=1;x='+x+';y='+y;document.removeEventListener('mousemove',__tilectx_move);document.removeEventListener('mouseup',__tilectx_stop);}function __tilectx_start(e){if(e.button!==0)return;__tilectx_drag=true;__tilectx_dx=e.screenX-window.screenX;__tilectx_dy=e.screenY-window.screenY;document.addEventListener('mousemove',__tilectx_move);document.addEventListener('mouseup',__tilectx_stop);e.preventDefault();}function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){document.querySelector('.hdr').addEventListener('mousedown',__tilectx_start);setTimeout(__tilectx_fit,10)};</script>"
 	html += "</head><body><div id='wrap' class='wrap'>"
 	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	html += "<div class='hdr'>Local Context</div>"
@@ -336,7 +337,7 @@
 	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
 	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
 	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
-	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);}"
+	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);cursor:move;user-select:none;}"
 	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
 	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;text-align:center;} .loc{color:#8ffcd2;}"
 	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
@@ -346,8 +347,9 @@
 	html += ".item a:hover{color:#c8fff0;}"
 	html += ".iconwrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border:1px solid #4fe0ab;background:#091018;}"
 	html += "</style>"
-	// Auto-fit this object actions window to the bordered .wrap element itself, not the viewport
-	html += "<script type='text/javascript'>function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){setTimeout(__tilectx_fit,10)};</script>"
+	// Auto-fit this object actions window to the bordered .wrap element itself, not the viewport.
+	// The header moves the borderless window while dragging and reports the final position to BYOND.
+	html += "<script type='text/javascript'>var __tilectx_drag=false,__tilectx_dx=0,__tilectx_dy=0;function __tilectx_move(e){if(!__tilectx_drag)return;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;try{window.moveTo(x,y)}catch(err){}}function __tilectx_stop(e){if(!__tilectx_drag)return;__tilectx_drag=false;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;window.location='?src=\ref[src];tilectx_move=1;x='+x+';y='+y;document.removeEventListener('mousemove',__tilectx_move);document.removeEventListener('mouseup',__tilectx_stop);}function __tilectx_start(e){if(e.button!==0)return;__tilectx_drag=true;__tilectx_dx=e.screenX-window.screenX;__tilectx_dy=e.screenY-window.screenY;document.addEventListener('mousemove',__tilectx_move);document.addEventListener('mouseup',__tilectx_stop);e.preventDefault();}function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){document.querySelector('.hdr').addEventListener('mousedown',__tilectx_start);setTimeout(__tilectx_fit,10)};</script>"
 	html += "</head><body><div id='wrap' class='wrap'>"
 	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	var/title = sanitizeSafe(target.name, 64, 1, 1, 1)
@@ -411,6 +413,19 @@
 /mob/proc/handle_tilectx_topic(var/list/href_list)
 	if(!href_list)
 		return FALSE
+
+	if(href_list["tilectx_move"]) {
+		var/move_x = text2num(href_list["x"])
+		var/move_y = text2num(href_list["y"])
+		if(!isnull(move_x) && !isnull(move_y)) {
+			move_x = max(0, round(move_x))
+			move_y = max(0, round(move_y))
+			tilectx_last_pos_x = move_x
+			tilectx_last_pos_y = move_y
+			winset(src, "tilectx", "pos=[move_x],[move_y]")
+		}
+		return TRUE
+	}
 
 	if(href_list["tilectx_fit"]) {
 		var/w = text2num(href_list["w"])

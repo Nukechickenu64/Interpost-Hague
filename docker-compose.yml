@@ -18,6 +18,8 @@ services:
       - internal
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/marrow/Marrow/data
 
 networks:
   internal:

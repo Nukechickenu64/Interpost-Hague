@@ -13,6 +13,8 @@ GLOBAL_DATUM_INIT(revs, /datum/antagonist/revolutionary, new)
 	loss_feedback_tag = "loss - rev heads killed"
 	flags = ANTAG_SUSPICIOUS | ANTAG_VOTABLE
 	antaghud_indicator = "hudrevolutionary"
+	porco_tab = "Integralist"
+	porco_actions = list(list("ConvertBourgeoise", "Convert to our Cause"))
 
 	hard_cap = 2
 	hard_cap_round = 4

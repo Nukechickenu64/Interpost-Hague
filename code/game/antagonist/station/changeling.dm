@@ -10,6 +10,31 @@ GLOBAL_DATUM_INIT(changelings, /datum/antagonist/changeling, new)
 	welcome_text = "Use say \"#g message\" to communicate with your fellow changelings. Remember: you get all of their absorbed DNA if you absorb them."
 	flags = ANTAG_SUSPICIOUS | ANTAG_RANDSPAWN | ANTAG_VOTABLE
 	antaghud_indicator = "hudchangeling"
+	porco_actions = list(
+		list("EvolutionMenu", "Evolve"),
+		list("RangedSting", "Ranged Attack"),
+		list("AbsorbDNA", "Absorb Victim"),
+		list("Transform", "Transform"),
+		list("LesserForm", "Lesser Form"),
+		list("TransformLesser", "Lesser Transform"),
+		list("ReviveLing", "Revive"),
+		list("EpinephrineSacs", "Epinephrine Sacs"),
+		list("ToggleDigitalCamoflague", "Hide from AI"),
+		list("RapidRegeneration", "Rapid Regeneration"),
+		list("HiveChannel", "Hive Channel"),
+		list("HiveAbsorb", "Hive Absorb"),
+		list("MimicVoice", "Mimic Voice"),
+		list("HallucinationSting", "Hallucination Sting"),
+		list("SilenceSting", "Silence Sting"),
+		list("BlindSting", "Blind Sting"),
+		list("ParalysisSting", "Paralysis Sting"),
+		list("DeafSting", "Deaf Sting"),
+		list("TransformationSting", "Transformation Sting"),
+		list("DeathSting", "Death Sting"),
+		list("ExtractDNASting", "Extract DNA Sting"),
+		list("BuffStats", "Enhance ourselves"),
+		list("RegenerativeStasis", "Regenerative Stasis")
+	)
 
 	faction = "changeling"
 

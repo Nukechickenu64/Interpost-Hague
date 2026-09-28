@@ -850,7 +850,11 @@
 			clear_fullscreen("brute")
 
 		if(healths)
-			if (chem_effects[CE_PAINKILLER] > 100)
+			if(is_leech())
+				healths.overlays = null
+				healths.icon_state = "health7"
+
+			else if (chem_effects[CE_PAINKILLER] > 100)
 				healths.overlays.Cut()
 				healths.icon_state = "health_numb"
 
@@ -1115,7 +1119,7 @@
 /mob/living/carbon/human/proc/handle_hud_list()
 	if (BITTEST(hud_updateflag, HEALTH_HUD) && hud_list[HEALTH_HUD])
 		var/image/holder = hud_list[HEALTH_HUD]
-		if(stat == DEAD)
+		if(stat == DEAD || is_leech())
 			holder.icon_state = "0" 	// X_X
 		else if(is_asystole())
 			holder.icon_state = "flatline"

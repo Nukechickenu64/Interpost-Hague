@@ -5,6 +5,8 @@
 	icon = 'icons/mob/screen1.dmi'
 	icon_state = "reinforce"
 	slot_flags = SLOT_MASK
+	var/leech_bite_in_progress = FALSE
+	var/leech_fangs_inserted = FALSE
 
 /obj/item/grab/mouth/pre_check()
 	if(!assailant || !affecting)
@@ -26,10 +28,18 @@
 	assailant.do_attack_animation(affecting)
 	var/obj/item/organ/external/target_organ = get_targeted_organ()
 	visible_message("<span class='combat'>[assailant] clamps their teeth around [affecting]'s [target_organ.name]!</span>")
+	START_PROCESSING(SSobj, src)
 
 /obj/item/grab/mouth/Process()
 	if(!assailant || !affecting || !assailant.Adjacent(affecting) || !assailant.check_has_mouth() || assailant.check_mouth_coverage())
 		qdel(src)
+		return
+	if(assailant.mind?.is_leech())
+		if(!assailant.leech_fangs_extended)
+			leech_fangs_inserted = FALSE
+		else if(leech_fangs_inserted && affecting.stat != DEAD && affecting.lying && world.time >= last_action + 10)
+			assailant.leech_siphon_blood(affecting, 5)
+			last_action = world.time
 
 /obj/item/grab/mouth/attack_hand(mob/user)
 	if(user == assailant)
@@ -39,6 +49,10 @@
 	if(user == assailant)
 		visible_message("<span class='notice'>[assailant] releases their bite on [affecting].</span>")
 		qdel(src)
+
+/obj/item/grab/mouth/Destroy()
+	STOP_PROCESSING(SSobj, src)
+	return ..()
 
 /obj/item/grab/mouth/proc/bite_down()
 	if(!assailant || !affecting || !assailant.Adjacent(affecting))
@@ -53,8 +67,13 @@
 		qdel(src)
 		return
 	if(assailant.mind?.is_leech())
+		if(leech_fangs_inserted)
+			return
+		leech_bite_in_progress = TRUE
 		if(assailant.leech_drain_bite(affecting, target_zone))
-			last_action = world.time
+			leech_fangs_inserted = TRUE
+		last_action = world.time
+		leech_bite_in_progress = FALSE
 		return
 	var/datum/unarmed_attack/bite/bite_attack
 	for(var/datum/unarmed_attack/attack in assailant.species.unarmed_attacks)
@@ -86,6 +105,7 @@
 		damage = max(1, damage - 1)
 	if(bite_result == CRIT_SUCCESS)
 		damage += 2
+	damage = bite_attack.ensure_nonzero_damage(damage)
 	var/armour = affecting.run_armor_check(target_zone, "melee")
 	bite_attack.show_attack(assailant, affecting, target_zone, damage)
 	bite_attack.apply_effects(assailant, affecting, armour, damage, target_zone)

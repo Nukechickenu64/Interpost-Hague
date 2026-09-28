@@ -506,6 +506,30 @@ var/list/rank_prefix = list(\
 	return traced_organs
 
 /mob/living/carbon/human/Topic(href, href_list)
+	if(href_list["porco_action"])
+		var/action_id = href_list["porco_action"]
+		var/action_allowed = FALSE
+		for(var/datum/antagonist/porco_antag in get_porco_antagonist(src))
+			for(var/list/action in porco_antag.get_porco_actions(src))
+				if(action[1] == action_id)
+					action_allowed = TRUE
+					break
+			if(action_allowed)
+				break
+		if(!action_allowed || usr != src)
+			return
+		switch(action_id)
+			if("ToggleLeechFangs")
+				toggle_leech_fangs()
+			if("LeechMesmerize")
+				var/mob/living/carbon/human/target = input(src, "Choose a target", "Mesmerizing Gaze") as null|mob in oview(3)
+				if(target)
+					leech_mesmerize(target)
+			if("MLPFeedOnLove")
+				mlp_feed_on_love()
+			else
+				call(src, action_id)()
+		return
 
 	if (href_list["refresh"])
 		if(Adjacent(src, usr))

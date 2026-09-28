@@ -154,6 +154,22 @@ datum/unit_test/leech_fangs_require_extension/start_test()
 		pass("A Leech can use fangs only while they are extended.")
 	return 1
 
+datum/unit_test/bite_damage_is_nonzero
+	name = "MOB: Successful Bites Deal Damage"
+
+datum/unit_test/bite_damage_is_nonzero/start_test()
+	var/datum/unarmed_attack/bite/bite_attack = new
+	var/negative_damage = bite_attack.ensure_nonzero_damage(-2)
+	var/zero_damage = bite_attack.ensure_nonzero_damage(0)
+	var/positive_damage = bite_attack.ensure_nonzero_damage(3)
+	qdel(bite_attack)
+
+	if(negative_damage != 1 || zero_damage != 1 || positive_damage != 3)
+		fail("Bite damage was not clamped to a positive value while preserving positive damage.")
+	else
+		pass("Successful bite damage is always at least one before armor mitigation.")
+	return 1
+
 datum/unit_test/self_pressure_survives_movement
 	name = "MOB: Self-applied pressure survives movement and can be stopped"
 	async = 1

@@ -243,6 +243,9 @@
 
 /datum/job/greyhound
 	title = "Greyhound"
+	create_record = 0
+	announced = FALSE
+	wakeup_flavor = FALSE
 	job_desc = "You miss your parents, who forgo cryosleep, they taught you well, you love God and the sleepers."
 	supervisors = "the sleepers, and GOD"
 	minimal_player_age = 14

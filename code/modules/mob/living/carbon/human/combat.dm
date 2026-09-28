@@ -48,14 +48,15 @@
 	var/dodge_modifier = c_intent == I_DEFEND ? 4 : 0 //If they are in defend mode, they dodge more
 	if (defense_intent != I_DODGE || buckled || resting || lying || zoomed)  // If they are not trying to dodge, lying down, not buckled, or zoomed in.
 		return 0
-	if(combat_mode || prob(25))//Todo, make use of the check_shield_arc proc to make sure you can't dodge from behind.
-		if(staminaloss < 50 && statcheck(stats[STAT_DX], 10 - dodge_modifier, "We couldn't dodge in time!", "dex"))//You gotta be the master of dexterity to dodge every time.
+	if(combat_mode)//Todo, make use of the check_shield_arc proc to make sure you can't dodge from behind.
+		var/dodge_difficulty = 10 + min(round(staminaloss / 10), 8) - dodge_modifier
+		if(staminaloss < 50 && statcheck(stats[STAT_DX], dodge_difficulty, "We couldn't dodge in time!", "dex"))//You gotta be the master of dexterity to dodge every time.
 			do_dodge()
 			return	1
-		else if(staminaloss >= 50 && statcheck(stats[STAT_DX], 14 - dodge_modifier, "I'm getting too exhausted to dodge!", "dex")) //It's harder to dodge when you're tired
+		else if(staminaloss >= 50 && statcheck(stats[STAT_DX], dodge_difficulty + 2, "I'm getting too exhausted to dodge!", "dex")) //It's harder to dodge when you're tired
 			do_dodge()
 			return	1
-	else
+	else if(prob(5))
 		if(statcheck(stats[STAT_DX], 12, "I can't dodge something I'm not ready for!", "dex"))  //If you're not in combat mode, you're probably getting messed up
 			do_dodge()
 			return	1

@@ -27,7 +27,7 @@ make here >/dev/null; \
 source bin/byondsetup; \
 cd ../Marrow; \
 ln -sf /usr/lib/i386-linux-gnu/libmariadb.so.3 libmariadb.so || true; \
-DreamMaker Marrow.dme; \
+if [ -f secret/__secret.dme ]; then DreamMaker -DSECRETS_ENABLED Marrow.dme; else DreamMaker Marrow.dme; fi; \
 '
 
 # Default port (override with -p in docker run / compose)

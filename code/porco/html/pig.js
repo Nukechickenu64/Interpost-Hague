@@ -113,6 +113,9 @@ function changel(content, selector) {
 	}
 
 	selected.onclick = function(event) {
+		if(event && event.target && event.target.tagName && event.target.tagName.toLowerCase() === 'a') {
+			return true;
+		}
 		InputMsg(content);
 		if(event) {
 			event.returnValue = false;

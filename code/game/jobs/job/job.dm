@@ -33,6 +33,7 @@
 	var/list/allowed_ranks                // Ditto
 
 	var/announced = TRUE                  //If their arrival is announced on radio
+	var/wakeup_flavor = TRUE              //Whether their cryosleep wakeup flavor text is shown
 	var/latejoin_at_spawnpoints           //If this job should use roundstart spawnpoints for latejoin (offstation jobs etc)
 
 	var/hud_icon						  //icon used for Sec HUD overlay

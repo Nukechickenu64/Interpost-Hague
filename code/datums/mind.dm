@@ -42,7 +42,7 @@
 
 	var/assigned_role
 	var/special_role
-
+	var/list/active_antagonists = list()
 	var/role_alt_title
 
 	var/datum/job/assigned_job
@@ -74,6 +74,17 @@
 	var/prayer
 	var/religion
 	var/list/initial_email_login = list("login" = "", "password" = "")
+
+/datum/mind/proc/add_active_antagonist(var/datum/antagonist/antag)
+	if(antag && !(antag in active_antagonists))
+		active_antagonists += antag
+
+/datum/mind/proc/remove_active_antagonist(var/datum/antagonist/antag)
+	if(antag)
+		active_antagonists -= antag
+
+/datum/mind/proc/has_active_antagonist(var/datum/antagonist/antag)
+	return antag && antag in active_antagonists
 
 /datum/mind/New(var/key)
 	src.key = key

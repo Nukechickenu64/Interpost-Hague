@@ -40,6 +40,8 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	initial_spawn_req = 4
 	initial_spawn_target = 6
 	antaghud_indicator = "hudcultist"
+	porco_tab = "Thanati"
+	porco_actions = list(list("CreateRune", "Create Rune"))
 
 	var/allow_narsie = 1
 	var/powerless = 0

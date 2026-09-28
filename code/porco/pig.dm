@@ -27,18 +27,19 @@
 	loadDataPig()
 	lobbyPig()
 
-/proc/generateVerbHtml(var/verbname = "", var/displayname = "", var/number = 1)
+/proc/generateVerbHtml(var/verbname = "", var/displayname = "", var/number = 1, var/mob/user)
+	var/command_href = user ? "?src=\ref[user];porco_action=[url_encode(verbname)]" : "byond://winset?command=[url_encode(verbname)]"
 	if(number % 2)
-		return {"<a href='byond://winset?command=[verbname]' class='verb dim'>[displayname]</a>"}
+		return {"<a href='[command_href]' class='verb dim'>[displayname]</a>"}
 	else
-		return {"<a href='byond://winset?command=[verbname]' class='verb'>[displayname]</a>"}
+		return {"<a href='[command_href]' class='verb'>[displayname]</a>"}
 
-/proc/generateVerbList(var/list/verbs = list(), var/count = 1)
+/proc/generateVerbList(var/list/verbs = list(), var/count = 1, var/mob/user)
 	var/html = ""
 	var/counter = count
 	for(var/list/L in verbs)
 		counter++
-		html += generateVerbHtml(L[1], L[2], counter) + "$"
+		html += generateVerbHtml(L[1], L[2], counter, user) + "$"
 	return html
 
 /client/proc/newtext(var/newcontent = "")
@@ -89,10 +90,13 @@
 			buttonHTML += "<a href=\"#\"><div style=\"background-image: url(\'Plot.png\'); margin-top: -50px; margin-left:[pixelDistancing * buttonTimes]px; \" id=\"Bodyguard\" class=\"button\" /></div></a>"
 */
 		if(H?.mind)
-			if(H?.mind?.changeling)
+			var/list/porco_actions_by_tab = get_porco_antagonist_actions_by_tab(H)
+			if(porco_actions_by_tab["They"])
 				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Villain.png');\" id=\"They\" class=\"button\"></div></a>"
-			if(H.mind.special_role == "Head Revolutionary")
+			if(porco_actions_by_tab["Integralist"])
 				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Chrome.png');\" id=\"Integralist\" class=\"button\"></div></a>"
+			if(porco_actions_by_tab["Thanati"])
+				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Thanati.png');\" id=\"Thanati\" class=\"button\"></div></a>"
 		if(H?.religion != LEGAL_RELIGION)
 			roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Thanati.png');\" id=\"Thanati\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
@@ -121,9 +125,10 @@
 
 	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("MoveUp", "Move Upwards"), list("MoveDown", "Move Down"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
 	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Succumb", "Succumb")))]</span>"})
-	client.changebuttoncontent("#They", {"<span class='segment1'>[generateVerbList(list(list("EvolutionMenu", "Evolve"), list("RangedSting", "Ranged Attack"), list("AbsorbDNA", "Absorb Victim"), list("Transform", "Transform"), list("LesserForm", "Lesser Form"), list("TransformLesser", "Lesser Transform"), list("ReviveLing", "Revive"), list("EpinephrineSacs", "Epinephrine Sacs"), list("ToggleDigitalCamoflague", "Hide from AI"), list("RapidRegeneration", "Rapid Regeneration"), list("HiveChannel", "Hive Channel"), list("HiveAbsorb", "Hive Absorb"), list("MimicVoice", "Mimic Voice"), list("HallucinationSting", "Hallucination Sting"), list("SilenceSting", "Silence Sting"), list("BlindSting", "Blind Sting"), list("ParalysisSting", "Paralysis Sting"), list("DeafSting", "Deaf Sting"), list("TransformationSting", "Transformation Sting"), list("DeathSting", "Death Sting"), list("ExtractDNASting", "Extract DNA Sting"), list("BuffStats", "Enhance ourselves"), list("RegenerativeStasis", "Regenerative Stasis")))]</span>"})
-	client.changebuttoncontent("#Integralist", {"<span class='segment1'>[generateVerbList(list(list("ConvertBourgeoise", "Convert to our Cause")))]</span>"})
-	client.changebuttoncontent("#Thanati", {"<span class='segment1'>[generateVerbList(list(list("PraiseyourGod", "Call to the Lord"), list("CreateShrine", "Create a Shrine"), list("getBrothers", "Remember the Associates")))]</span>"})
+	var/list/porco_actions_by_tab = get_porco_antagonist_actions_by_tab(src)
+	client.changebuttoncontent("#They", porco_actions_by_tab["They"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["They"], 1, src)]</span>" : "")
+	client.changebuttoncontent("#Integralist", porco_actions_by_tab["Integralist"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["Integralist"], 1, src)]</span>" : "")
+	client.changebuttoncontent("#Thanati", porco_actions_by_tab["Thanati"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["Thanati"], 1, src)]</span>" : "")
 
 
 /mob/proc/verbUpdate()

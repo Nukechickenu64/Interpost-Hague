@@ -290,6 +290,8 @@
 			// Nerf attacks done while lying by 1/3rd
 			if (H.lying)
 				real_damage = max(real_damage * 0.66, 1)
+			if(istype(attack, /datum/unarmed_attack/bite))
+				real_damage = attack:ensure_nonzero_damage(real_damage)
 
 			// Finally, apply damage to target
 			apply_damage(real_damage, (attack.deal_halloss ? PAIN : BRUTE), hit_zone, armour, damage_flags=attack.damage_flags())
