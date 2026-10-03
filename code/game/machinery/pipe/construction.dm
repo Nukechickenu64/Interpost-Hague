@@ -424,6 +424,9 @@ Buildable meters
 
 /obj/item/pipe/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
 	..()
+	if(isWrench(W))
+		to_chat(user, "<span class='warning'>Atmospheric pipe installation is no longer supported.</span>")
+		return 1
 	//*
 	if(!isWrench(W))
 		return ..()

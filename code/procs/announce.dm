@@ -42,7 +42,8 @@
 	var/msg = FormMessage(message, message_title)
 	for(var/mob/M in GLOB.player_list)
 		if((M.z in (GLOB.using_map.contact_levels | GLOB.using_map.admin_levels)) && !istype(M,/mob/new_player) && !isdeaf(M))
-			to_chat(M, msg)
+			if(!do_newscast || !newscast)
+				to_chat(M, msg)
 			if(message_sound)
 				sound_to(M, message_sound)
 
@@ -94,7 +95,7 @@ datum/announcement/proc/NewsCast(message as text, message_title as text)
 	news.can_be_redacted = 0
 	announce_newscaster_news(news)
 
-/proc/GetNameAndAssignmentFromId(var/obj/item/weapon/card/id/I)
+/proc/GetNameAndAssignmentFromId(var/obj/item/card/id/I)
 	// Format currently matches that of newscaster feeds: Registered Name (Assigned Rank)
 	return I.assignment ? "[I.registered_name] ([I.assignment])" : I.registered_name
 
@@ -116,7 +117,7 @@ datum/announcement/proc/NewsCast(message as text, message_title as text)
 	AnnounceArrivalSimple(character.real_name, rank, join_message, get_announcement_frequency(job))
 
 /proc/AnnounceArrivalSimple(var/name, var/rank = "visitor", var/join_message = "has arrived on the [station_name()]", var/frequency)
-	GLOB.global_announcer.autosay("[name], [rank], [join_message].", "TETRACORP LIFESIGNS MONITORING")
+	GLOB.global_announcer.autosay("[name], [rank], [join_message].", "NANOTRASEN LIFESIGNS MONITORING")
 
 /proc/get_announcement_frequency(var/datum/job/job)
 	//This is just returning common utill we want to re-enable this

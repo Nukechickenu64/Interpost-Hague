@@ -32,8 +32,8 @@
 							/obj/structure/closet/wizard/scrying = 				1,
 							/obj/item/weapon/monster_manual = 					2,
 							/obj/item/weapon/magic_rock = 						1,
-							/obj/item/weapon/contract/wizard/telepathy = 		1,
-							/obj/item/weapon/contract/apprentice = 				1
+							/obj/item/contract/wizard/telepathy = 		1,
+							/obj/item/contract/apprentice = 				1
 							)
 
 	sacrifice_objects = list(/obj/item/stack/material/gold,

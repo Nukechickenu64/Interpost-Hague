@@ -3,7 +3,7 @@
 	name = "Revolutionary Gear"
 	uniform = /obj/item/clothing/under/color/red
 	shoes = /obj/item/clothing/shoes/black
-	id_type = /obj/item/weapon/card/id/civilian
+	id_type = /obj/item/card/id/civilian
 	flags = OUTFIT_HAS_BACKPACK
-	back = /obj/item/weapon/storage/backpack
+	back = /obj/item/storage/backpack
 	pda_type = /obj/item/device/pda

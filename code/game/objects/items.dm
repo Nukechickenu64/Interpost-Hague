@@ -310,11 +310,11 @@
 	set src in view()
 
 	var/TheReach
-	if(istype(src, /obj/item/weapon))
-		var/obj/item/weapon/W = src
-		if(W.w_class >= 1)
+	if(istype(src, /obj/item))
+		var/obj/item/I = src
+		if(I.w_class >= 1)
 			TheReach = "Size: "
-			switch(W.w_class)
+			switch(I.w_class)
 				if(1)
 					TheReach += "•"
 				if(2)
@@ -329,7 +329,6 @@
 					TheReach += "••••••"
 
 	if(!isobserver(usr))
-		usr.visible_message("<span class='looksatbold'>[usr.name]</span> <span class='looksat'>looks at [src].</span>")
 		if(get_dist(usr,src) > 5)//Don't get descriptions of things far away.
 			to_chat(usr, "<span class='passivebold'>It's too far away to see clearly.</span>")
 			return
@@ -364,8 +363,8 @@
 
 	var/old_loc = src.loc
 
-	if (istype(src.loc, /obj/item/weapon/storage))
-		var/obj/item/weapon/storage/S = src.loc
+	if (istype(src.loc, /obj/item/storage))
+		var/obj/item/storage/S = src.loc
 		S.remove_from_storage(src)
 	src.pickup(user)
 	src.throwing = 0
@@ -389,7 +388,7 @@
 	return
 
 /obj/item/attack_ai(mob/user as mob)
-	if (istype(src.loc, /obj/item/weapon/robot_module))
+	if (istype(src.loc, /obj/item/robot_module))
 		//If the item is part of a cyborg module, equip it
 		if(!isrobot(user))
 			return
@@ -398,8 +397,8 @@
 		R.hud_used.update_robot_modules_display()
 
 /obj/item/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/storage))
-		var/obj/item/weapon/storage/S = W
+	if(istype(W, /obj/item/storage))
+		var/obj/item/storage/S = W
 		if(S.use_to_pickup)
 			if(S.collection_mode) //Mode is set to collect all items
 				if(isturf(src.loc))
@@ -440,6 +439,8 @@
 
 // apparently called whenever an item is removed from a slot, container, or anything else.
 /obj/item/proc/dropped(mob/user as mob)
+	if(!ismob(loc) && plane > SHADOWCASTING_PLANE)
+		reset_plane_and_layer()
 	if(randpixel)
 		pixel_z = randpixel //an idea borrowed from some of the older pixel_y randomizations. Intended to make items appear to drop at a character
 	if(zoom)
@@ -459,11 +460,11 @@
 	return
 
 // called when this item is removed from a storage item, which is passed on as S. The loc variable is already set to the new destination before this is called.
-/obj/item/proc/on_exit_storage(obj/item/weapon/storage/S as obj)
+/obj/item/proc/on_exit_storage(obj/item/storage/S as obj)
 	return
 
 // called when this item is added into a storage item, which is passed on as S. The loc variable is already set to the storage item.
-/obj/item/proc/on_enter_storage(obj/item/weapon/storage/S as obj)
+/obj/item/proc/on_enter_storage(obj/item/storage/S as obj)
 	return
 
 // called when "found" in pockets and storage items. Returns 1 if the search should end.
@@ -587,7 +588,7 @@ var/list/global/slot_flags_enumeration = list(
 				return 0
 			if(get_storage_cost() == ITEM_SIZE_NO_CONTAINER)
 				return 0 //pockets act like storage and should respect ITEM_SIZE_NO_CONTAINER. Suit storage might be fine as is
-			var/obj/item/weapon/storage/internal/pockets/pocket_storage = H.get_pocket_storage(slot)
+			var/obj/item/storage/internal/pockets/pocket_storage = H.get_pocket_storage(slot)
 			if(!pocket_storage || !pocket_storage.can_be_inserted(src, H, -1, -1, 1))
 				return 0
 		if(slot_s_store)
@@ -599,15 +600,15 @@ var/list/global/slot_flags_enumeration = list(
 				if(!disable_warning)
 					to_chat(usr, "<span class='warning'>You somehow have a suit with no defined allowed items for suit storage, stop that.</span>")
 				return 0
-			if( !(istype(src, /obj/item/device/pda) || istype(src, /obj/item/weapon/pen) || is_type_in_list(src, H.wear_suit.allowed)) )
+			if( !(istype(src, /obj/item/device/pda) || istype(src, /obj/item/pen) || is_type_in_list(src, H.wear_suit.allowed)) )
 				return 0
 		if(slot_handcuffed)
 			if(!istype(src, /obj/item/weapon/handcuffs))
 				return 0
 		if(slot_in_backpack) //used entirely for equipping spawned mobs or at round start
 			var/allow = 0
-			if(H.back && istype(H.back, /obj/item/weapon/storage/backpack))
-				var/obj/item/weapon/storage/backpack/B = H.back
+			if(H.back && istype(H.back, /obj/item/storage/backpack))
+				var/obj/item/storage/backpack/B = H.back
 				if(B.can_be_inserted(src,M,1))
 					allow = 1
 			if(!allow)
@@ -672,6 +673,9 @@ var/list/global/slot_flags_enumeration = list(
 //Checks before we get to here are: mob is alive, mob is not restrained, paralyzed, asleep, resting, laying, item is on the mob.
 /obj/item/proc/ui_action_click()
 	attack_self(usr)
+
+/obj/item/proc/worn_use(mob/user)
+	return attack_self(user)
 
 /obj/item/weapon/proc/get_block_chance(mob/user, var/damage, atom/damage_source = null, mob/attacker = null)
 	var/defense_mode_modifier = user.c_intent == I_DEFEND ? 15 : 0 //If they are blocking, make parrying fairly easy
@@ -1090,6 +1094,5 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 
 
 /obj/item/proc/drawsound(mob/user)
-	if(drawsound)
-		user.visible_message("<span class = 'warning'><b>[user] grabs a weapon!</b></span>")
+	if(drawsound && user)
 		playsound(user, drawsound, 50, 1)

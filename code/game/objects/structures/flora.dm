@@ -247,6 +247,16 @@
 	icon_state = "plant-01"
 	layer = ABOVE_HUMAN_LAYER
 
+/obj/structure/flora/verb/collect_purchase()
+	set name = "Collect Purchase"
+	set category = "Object"
+	set src in oview(1)
+
+	if(!isliving(usr))
+		return
+	var/mob/living/shop_user = usr
+	shop_user.collect_meta_shop(src)
+
 /obj/structure/flora/pottedplant/large
 	name = "large potted plant"
 	desc = "This is a large plant. Three branches support pairs of waxy leaves."

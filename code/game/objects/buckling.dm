@@ -3,6 +3,10 @@
 	var/buckle_movable = 0
 	var/buckle_dir = 0
 	var/buckle_lying = -1 //bed-like behavior, forces mob.lying = buckle_lying if != -1
+	var/buckle_action = null
+	var/buckle_action_third_person = null
+	var/unbuckle_action = null
+	var/unbuckle_action_third_person = null
 	var/buckle_pixel_shift = "x=0;y=0" //where the buckled mob should be pixel shifted to, or null for no pixel shift control
 	var/buckle_require_restraints = 0 //require people to be handcuffed before being able to buckle. eg: pipes
 	var/mob/living/buckled_mob = null
@@ -80,29 +84,43 @@
 
 	. = buckle_mob(M)
 	if(.)
+		var/third_person_action = buckle_action_third_person
+		var/action = buckle_action
+		if(!third_person_action || !action)
+			if(buckle_lying == 1)
+				third_person_action = "lies in"
+				action = "lie in"
+			else
+				third_person_action = "sits on"
+				action = "sit on"
 		if(M == user)
 			M.visible_message(\
-				"<span class='notice'>[M.name] buckles themselves to [src].</span>",\
-				"<span class='notice'>You buckle yourself to [src].</span>",\
+				"<span class='notice'>[M.name] [third_person_action] [src].</span>",\
+				"<span class='notice'>You [action] [src].</span>",\
 				"<span class='notice'>You hear metal clanking.</span>")
 		else
 			M.visible_message(\
-				"<span class='danger'>[M.name] is buckled to [src] by [user.name]!</span>",\
-				"<span class='danger'>You are buckled to [src] by [user.name]!</span>",\
+				"<span class='danger'>[user.name] forces [M.name] to [action] [src]!</span>",\
+				"<span class='danger'>You are forced to [action] [src] by [user.name]!</span>",\
 				"<span class='notice'>You hear metal clanking.</span>")
 
 /obj/proc/user_unbuckle_mob(mob/user)
 	var/mob/living/M = unbuckle_mob()
 	if(M)
+		var/third_person_action = unbuckle_action_third_person
+		var/action = unbuckle_action
+		if(!third_person_action || !action)
+			third_person_action = "rises from"
+			action = "rise from"
 		if(M != user)
 			M.visible_message(\
-				"<span class='notice'>[M.name] was unbuckled by [user.name]!</span>",\
-				"<span class='notice'>You were unbuckled from [src] by [user.name].</span>",\
+				"<span class='notice'>[M.name] [third_person_action] [src].</span>",\
+				"<span class='notice'>You [action] [src].</span>",\
 				"<span class='notice'>You hear metal clanking.</span>")
 		else
 			M.visible_message(\
-				"<span class='notice'>[M.name] unbuckled themselves!</span>",\
-				"<span class='notice'>You unbuckle yourself from [src].</span>",\
+				"<span class='notice'>[M.name] [third_person_action] [src].</span>",\
+				"<span class='notice'>You [action] [src].</span>",\
 				"<span class='notice'>You hear metal clanking.</span>")
 		add_fingerprint(user)
 	return M

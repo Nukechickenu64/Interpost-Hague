@@ -17,7 +17,7 @@ GLOBAL_DATUM_INIT(sound_player, /decl/sound_player, new)
 	var/list/taken_channels // taken_channels and source_id_uses can be merged into one but would then require a meta-object to store the different values I desire.
 	var/list/source_id_uses
 
-	var/static/list/reserved_channels = list(1,2,3,123) // The following channels have been found to be in use at various locations in the codebase
+	var/static/list/reserved_channels = list(1,2,3,7,123) // The following channels have been found to be in use at various locations in the codebase
 
 /decl/sound_player/New()
 	..()

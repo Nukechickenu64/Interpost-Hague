@@ -1,7 +1,7 @@
 /datum/crafting_recipe/furniture
 	category = "Furniture"
 	time = 80
-	tools = list(/obj/item/weapon/screwdriver = 1)
+	tools = list(/obj/item/screwdriver = 1)
 	parts = list(MATERIAL_STEEL_TYPE = 5)
 	result = null
 	int_required = 11
@@ -19,7 +19,7 @@
 /datum/crafting_recipe/furniture/bar_stool
 	name = "Bar Stool"
 	parts = list(MATERIAL_STEEL_TYPE = 1)
-	result = list(/obj/item/weapon/stool/bar  = 1)
+	result = list(/obj/item/stool/bar  = 1)
 	time = 20
 
 /datum/crafting_recipe/furniture/table_frame
@@ -70,7 +70,7 @@
 
 /datum/crafting_recipe/furniture/stool
 	name = "stool"
-	result = list(/obj/item/weapon/stool = 1)
+	result = list(/obj/item/stool = 1)
 	time = 30
 	parts = list(MATERIAL_STEEL_TYPE = 1)
 

@@ -15,7 +15,7 @@
 
 	overlays = new/list()
 
-	var/obj/item/weapon/reagent_containers/beaker = null
+	var/obj/item/reagent_containers/beaker = null
 	var/datum/thermal_manager/tmg = new /datum/thermal_manager/heater/hotplate()
 
 	//We use this to know when to rebuild the icon.
@@ -29,7 +29,7 @@
 
 /obj/machinery/hotplate/attackby(var/obj/item/O as obj, var/mob/user as mob)
 
-	if ( !istype(O,/obj/item/weapon/reagent_containers/glass) && !istype(O,/obj/item/weapon/reagent_containers/food/drinks))
+	if ( !istype(O,/obj/item/reagent_containers/glass) && !istype(O,/obj/item/reagent_containers/food/drinks))
 		return 1
 
 

@@ -13,18 +13,18 @@
 /obj/structure/closet/secure_closet/miner/WillContain()
 	return list(
 		new /datum/atom_creator/weighted(list(
-				/obj/item/weapon/storage/backpack/industrial,
-				/obj/item/weapon/storage/backpack/satchel_eng
+				/obj/item/storage/backpack/industrial,
+				/obj/item/storage/backpack/satchel_eng
 			)),
 		/obj/item/device/radio/headset/headset_cargo,
 		/obj/item/clothing/under/rank/miner,
 		/obj/item/clothing/gloves/thick,
 		/obj/item/clothing/shoes/black,
 		/obj/item/device/analyzer,
-		/obj/item/weapon/storage/ore,
+		/obj/item/storage/ore,
 		/obj/item/device/flashlight/lantern,
-		/obj/item/weapon/shovel,
-		/obj/item/weapon/pickaxe,
+		/obj/item/shovel,
+		/obj/item/pickaxe,
 		/obj/item/clothing/glasses/meson
 	)
 
@@ -35,10 +35,11 @@
 	icon_state = "lantern"
 	desc = "A mining lantern."
 	brightness_on = 6			// luminosity when on
+	cone_angle = 0
 
 /*****************************Pickaxe********************************/
 
-/obj/item/weapon/pickaxe
+/obj/item/pickaxe
 	name = "mining drill"
 	desc = "The most basic of mining drills, for short excavations and small mineral extractions."
 	icon = 'icons/obj/tools.dmi'
@@ -61,15 +62,15 @@
 	var/excavation_amount = 200
 
 //Used to add mining skill to digging speed
-/obj/item/weapon/pickaxe/proc/get_digspeed(var/mob/user)
+/obj/item/pickaxe/proc/get_digspeed(var/mob/user)
 	return digspeed - user.skills[SKILL_MINE] * 0.1 // -10 is the best you can do
 
-/obj/item/weapon/pickaxe/hammer
+/obj/item/pickaxe/hammer
 	name = "sledgehammer"
 	//icon_state = "sledgehammer" Waiting on sprite
 	desc = "A mining hammer made of reinforced metal. You feel like smashing your boss in the face with this."
 
-/obj/item/weapon/pickaxe/silver
+/obj/item/pickaxe/silver
 	name = "silver pickaxe"
 	icon_state = "spickaxe"
 	item_state = "spickaxe"
@@ -77,7 +78,7 @@
 	origin_tech = list(TECH_MATERIAL = 3)
 	desc = "This makes no metallurgic sense."
 
-/obj/item/weapon/pickaxe/drill
+/obj/item/pickaxe/drill
 	name = "advanced mining drill" // Can dig sand as well!
 	icon_state = "handdrill"
 	item_state = "jackhammer"
@@ -86,7 +87,7 @@
 	desc = "Yours is the drill that will pierce through the rock walls."
 	drill_verb = "drilling"
 
-/obj/item/weapon/pickaxe/jackhammer
+/obj/item/pickaxe/jackhammer
 	name = "sonic jackhammer"
 	icon_state = "jackhammer"
 	item_state = "jackhammer"
@@ -95,7 +96,7 @@
 	desc = "Cracks rocks with sonic blasts, perfect for killing cave lizards."
 	drill_verb = "hammering"
 
-/obj/item/weapon/pickaxe/gold
+/obj/item/pickaxe/gold
 	name = "golden pickaxe"
 	icon_state = "gpickaxe"
 	item_state = "gpickaxe"
@@ -104,7 +105,7 @@
 	desc = "This makes no metallurgic sense."
 	drill_verb = "picking"
 
-/obj/item/weapon/pickaxe/diamond
+/obj/item/pickaxe/diamond
 	name = "diamond pickaxe"
 	icon_state = "dpickaxe"
 	item_state = "dpickaxe"
@@ -113,7 +114,7 @@
 	desc = "A pickaxe with a diamond pick head."
 	drill_verb = "picking"
 
-/obj/item/weapon/pickaxe/diamonddrill //When people ask about the badass leader of the mining tools, they are talking about ME!
+/obj/item/pickaxe/diamonddrill //When people ask about the badass leader of the mining tools, they are talking about ME!
 	name = "diamond mining drill"
 	icon_state = "diamonddrill"
 	item_state = "jackhammer"
@@ -122,7 +123,7 @@
 	desc = "Yours is the drill that will pierce the heavens!"
 	drill_verb = "drilling"
 
-/obj/item/weapon/pickaxe/borgdrill
+/obj/item/pickaxe/borgdrill
 	name = "cyborg mining drill"
 	icon_state = "diamonddrill"
 	item_state = "jackhammer"
@@ -132,7 +133,7 @@
 
 /*****************************Shovel********************************/
 
-/obj/item/weapon/shovel
+/obj/item/shovel
 	name = "shovel"
 	desc = "A large tool for digging and moving dirt."
 	icon = 'icons/obj/tools.dmi'
@@ -149,7 +150,7 @@
 	sharp = 0
 	edge = 1
 
-/obj/item/weapon/shovel/spade
+/obj/item/shovel/spade
 	name = "spade"
 	desc = "A small tool for digging and moving dirt."
 	icon_state = "spade"
@@ -158,7 +159,7 @@
 	throwforce = 7.0
 	w_class = ITEM_SIZE_SMALL
 
-/obj/item/weapon/shovel/improvised
+/obj/item/shovel/improvised
 	name = "junk shovel"
 	desc = "A large but fragile tool for moving dirt and rock."
 	icon_state = "impro_shovel"
@@ -281,7 +282,8 @@
 /**************************Plasma Cutter*****************************/
 
 /obj/item/weapon/gun/energy/plasmacutter/mounted
-	name = "mounted plasma cutter"
+	name = "\improper Hephaestus Industries MPC-3M Mounted Plasma Cutter"
+	desc = "A suit-powered MPC-3 mining cutter configured for powered mounting."
 	self_recharge = 1
 	use_external_power = 1
 
@@ -295,8 +297,8 @@
 	gun = /obj/item/weapon/gun/energy/plasmacutter/mounted
 
 /obj/item/weapon/gun/energy/plasmacutter
-	name = "plasma cutter"
-	desc = "A mining tool capable of expelling concentrated plasma bursts. You could use it to cut limbs off of xenos! Or, you know, mine stuff."
+	name = "\improper Hephaestus Industries MPC-3 Mining Plasma Cutter"
+	desc = "A portable mining tool that expels concentrated plasma bursts to cut mineral deposits and other hard materials."
 	charge_meter = 0
 	icon = 'icons/obj/tools.dmi'
 	icon_state = "plasmacutter"

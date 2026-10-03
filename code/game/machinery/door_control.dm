@@ -74,18 +74,18 @@
 	. = ..()
 	update_icon()
 
-/obj/machinery/button/remote/id/proc/CanToggleButton(var/mob/user, var/obj/item/weapon/card/id/id_card)
+/obj/machinery/button/remote/id/proc/CanToggleButton(var/mob/user, var/obj/item/card/id/id_card)
 	return allowed(user) || (istype(id_card) && check_access_list(id_card.GetAccess()))
 
 /obj/machinery/button/remote/id/attack_hand(mob/user as mob)
 	to_chat(user, "<span class='info'>Maybe, if I use an ID this would work?</span>")
 	return
 
-/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user, var/obj/item/weapon/card/id/id_card)
+/obj/machinery/button/remote/id/attackby(var/obj/item/I, var/mob/user, var/obj/item/card/id/id_card)
 	if(stat & (NOPOWER|BROKEN))
 		return
 
-	if(CanToggleButton(user, id_card) && istype(I, /obj/item/weapon/card/id/))
+	if(CanToggleButton(user, id_card) && istype(I, /obj/item/card/id/))
 		use_power_oneoff(5)
 		icon_state = "[initial(icon_state)]1"
 		desiredstate = !desiredstate

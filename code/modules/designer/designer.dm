@@ -73,6 +73,8 @@ GLOBAL_DATUM_INIT(designer_system, /datum/designer_system, new)
 // Our dear design holder. Almost everything related to designer happens under this datum.
 /datum/designer_unit
 	var/id
+	var/design_finished = FALSE
+	var/design_started_at = 0
 
 	var/icon_width = 0
 	var/icon_height = 0
@@ -131,6 +133,8 @@ GLOBAL_DATUM_INIT(designer_system, /datum/designer_system, new)
 		if ("getIcon")
 			icon_custom = new()
 			creator_ckey = usr.ckey
+			design_started_at = world.time
+			design_finished = FALSE
 
 			var/icon_array = json_decode(href_list["json_string"])
 			for ( var/x = 1 to icon_width )
@@ -153,6 +157,8 @@ GLOBAL_DATUM_INIT(designer_system, /datum/designer_system, new)
 		if ("start")
 			icon_custom = icon('icons/effects/effects.dmi', "icon_state"="nothing")
 			creator_ckey = usr.ckey
+			design_started_at = world.time
+			design_finished = FALSE
 		if ("stop")
 			finishIcon()
 
@@ -170,6 +176,7 @@ GLOBAL_DATUM_INIT(designer_system, /datum/designer_system, new)
 	icon_custom.Shift(EAST, icon_offset_x)
 	icon_custom.Shift(SOUTH, icon_offset_y)
 	baked_image = new(icon_custom)
+	design_finished = TRUE
 	update_associated_atoms()
 
 /datum/designer_unit/proc/update_associated_atoms()

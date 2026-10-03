@@ -32,6 +32,60 @@
 // MOB HELPERS
 // ===========
 /mob/living/carbon/human/var/list/datum/medical_effect/side_effects = list()
+/mob/living/carbon/human
+	var/medical_pallor = 0
+	var/medical_cyanosis = 0
+	var/medical_flushing = 0
+	var/medical_jaundice = 0
+	var/medical_jaundice_burden = 0
+	var/medical_appearance_time = 0
+
+/mob/living/carbon/human/proc/medical_appearance_stage(value, current_stage, first_threshold, step_size, hysteresis, third_threshold = null)
+	var/new_stage = 0
+	for(var/stage in 1 to 3)
+		var/threshold = first_threshold + (stage - 1) * step_size
+		if(stage == 3 && !isnull(third_threshold))
+			threshold = third_threshold
+		if(current_stage >= stage)
+			threshold -= hysteresis
+		if(value >= threshold)
+			new_stage = stage
+	return new_stage
+
+/mob/living/carbon/human/proc/medical_appearance_key()
+	return "[medical_pallor]_[medical_cyanosis]_[medical_flushing]_[medical_jaundice]"
+
+/mob/living/carbon/human/proc/update_medical_skin_appearance()
+	var/old_key = medical_appearance_key()
+	var/elapsed = medical_appearance_time ? clamp(world.time - medical_appearance_time, 0, 5 SECONDS) : 0
+	medical_appearance_time = world.time
+	if(!species.medical_skin_appearance)
+		medical_pallor = 0
+		medical_cyanosis = 0
+		medical_flushing = 0
+		medical_jaundice = 0
+		medical_jaundice_burden = 0
+		if(old_key != medical_appearance_key())
+			pale = FALSE
+	else
+		var/blood_volume = get_blood_volume()
+		var/circulation = get_blood_circulation()
+		medical_pallor = medical_appearance_stage(100 - min(blood_volume, circulation), medical_pallor, 100 - BLOOD_VOLUME_SAFE, BLOOD_VOLUME_SAFE - BLOOD_VOLUME_OKAY, 3, 100 - BLOOD_VOLUME_BAD)
+		var/oxygen_deficit = 0
+		if(need_breathe() && blood_carries_oxygen() && blood_volume > BLOOD_VOLUME_BAD)
+			oxygen_deficit = clamp(getOxyLoss() / max(1, maxHealth / 2), 0, 1)
+			var/oxygen_support = chem_effects[CE_OXYGENATED] >= 2 ? 0.8 : (chem_effects[CE_OXYGENATED] == 1 ? 0.5 : 0)
+			oxygen_deficit *= (1 - oxygen_support) * blood_volume / 100
+		medical_cyanosis = medical_appearance_stage(oxygen_deficit, medical_cyanosis, 0.3, 0.2, 0.05)
+		medical_flushing = medical_appearance_stage(max(0, bodytemperature - species.body_temperature) * circulation / 100, medical_flushing, 2, 2, 0.5)
+		var/obj/item/organ/internal/liver/liver = internal_organs_by_name[BP_LIVER]
+		var/liver_failure = should_have_organ(BP_LIVER) && (!liver || liver.is_broken() || (liver.status & ORGAN_DEAD))
+		medical_jaundice_burden = clamp(medical_jaundice_burden + (liver_failure ? elapsed / (5 MINUTES) : -elapsed / (10 MINUTES)), 0, 1)
+		medical_jaundice = medical_appearance_stage(medical_jaundice_burden, medical_jaundice, 0.25, 0.25, 0.05)
+		pale = medical_pallor > 0
+	if(old_key != medical_appearance_key())
+		update_body()
+
 /mob/proc/add_side_effect(name, strength = 0)
 /mob/living/carbon/human/add_side_effect(name, strength = 0)
 	for(var/datum/medical_effect/M in src.side_effects)

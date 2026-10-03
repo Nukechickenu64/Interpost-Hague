@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/launcher
-	name = "launcher"
-	desc = "A device that launches things."
+	name = "Uncatalogued L-0 Utility Launcher"
+	desc = "An unidentified launcher configured to propel a compatible payload. No manufacturer or model markings are present."
 	w_class = ITEM_SIZE_HUGE
 	obj_flags =  OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BACK

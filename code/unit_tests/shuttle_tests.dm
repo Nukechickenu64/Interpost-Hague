@@ -126,3 +126,48 @@
 	log_bad("[shuttle]: [main_area.type] had a size of [main_size] but [checked_area.type] had a size of [checked_size].")
 	return TRUE
 */
+
+/datum/unit_test/director_evacuation_completion
+	name = "SHUTTLE - Director Waits For Completed Evacuation"
+
+/datum/unit_test/director_evacuation_completion/start_test()
+	var/datum/game_mode/dynamic/test_mode = new
+	var/datum/evacuation_controller/original_controller = SSevac.evacuation_controller
+	var/datum/evacuation_controller/test_controller = new
+	var/original_director_state = SSdirector.director_state
+	var/datum/boiling_point/original_boiling_point = SSdirector.boiling_point
+	var/datum/boiling_point/test_boiling_point = new
+	var/list/failures = list()
+
+	SSevac.evacuation_controller = test_controller
+	SSdirector.director_state = DIRECTOR_STATE_BOILING
+	SSdirector.boiling_point = test_boiling_point
+	test_controller.finish_evacuation()
+	var/completed_state = test_controller.state
+
+	for(var/catastrophe_active in list(FALSE, TRUE))
+		test_boiling_point.active = catastrophe_active
+		for(var/evacuation_state in initial(test_controller.state) to (completed_state - 1))
+			test_controller.state = evacuation_state
+			if(test_mode.check_finished())
+				failures += "Round ended in evacuation state [evacuation_state] with catastrophe active=[catastrophe_active]."
+		test_controller.finish_evacuation()
+		if(!test_mode.check_finished())
+			failures += "Completed evacuation did not end the round with catastrophe active=[catastrophe_active]."
+
+	SSevac.evacuation_controller = null
+	if(test_mode.check_finished())
+		failures += "Round ended without an evacuation controller."
+
+	SSevac.evacuation_controller = original_controller
+	SSdirector.director_state = original_director_state
+	SSdirector.boiling_point = original_boiling_point
+	qdel(test_mode)
+	qdel(test_controller)
+	qdel(test_boiling_point)
+
+	if(length(failures))
+		fail(jointext(failures, " "))
+	else
+		pass("Director round completion requires completed evacuation, not catastrophe expiry.")
+	return TRUE

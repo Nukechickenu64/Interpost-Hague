@@ -1,6 +1,6 @@
 /decl/hierarchy/outfit/job/engineering
 	hierarchy_type = /decl/hierarchy/outfit/job/engineering
-	belt = /obj/item/weapon/storage/belt/utility/full
+	belt = /obj/item/storage/belt/utility/full
 	l_ear = /obj/item/device/radio/headset/headset_eng
 	shoes = /obj/item/clothing/shoes/workboots
 
@@ -15,7 +15,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/engineering/head
+	id_type = /obj/item/card/id/engineering/head
 	pda_type = /obj/item/device/pda/heads/ce
 
 /decl/hierarchy/outfit/job/engineering/engineer
@@ -25,7 +25,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/engineering
+	id_type = /obj/item/card/id/engineering
 	pda_type = /obj/item/device/pda/engineering
 
 /decl/hierarchy/outfit/job/engineering/engineer/void
@@ -41,5 +41,5 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/engineering/atmos
+	id_type = /obj/item/card/id/engineering/atmos
 	pda_type = /obj/item/device/pda/atmos

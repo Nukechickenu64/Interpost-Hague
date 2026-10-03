@@ -10,7 +10,6 @@
 	#include "alpha_shuttles.dm"
 
 	#include "alpha.dmm"
-	#include "ruinsalpha.dmm"
 	#include "../../maps/away/mining/mining.dm"
 
 	//#include "job/jobs.dm"

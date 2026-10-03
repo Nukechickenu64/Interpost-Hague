@@ -58,7 +58,7 @@
 				sparks.start()
 
 /*
-/obj/item/weapon/hand_tele/handmade
+/obj/item/hand_tele/handmade
 	name = "Handmade hand-teleporter"
 	desc = "Handmade version of hand-tele. Woah, that's was they call an experimental science!"
 	icon_state = "hm_hand-tele"
@@ -67,7 +67,7 @@
 	cell_charge_per_attempt = 50
 	var/calibration_required = TRUE
 
-/obj/item/weapon/hand_tele/handmade/attackby(obj/item/C, mob/living/user)
+/obj/item/hand_tele/handmade/attackby(obj/item/C, mob/living/user)
 	..()
 	if(istype(C, /obj/item/weapon/tool/screwdriver))
 		if(user.a_intent == I_HURT)

@@ -83,7 +83,7 @@
 	origin_tech = list(TECH_COMBAT = 3)
 	attack_verb = list("robusted", "slammed")
 	var/reinforced = FALSE
-	var/obj/item/weapon/storage/toolbox/toolbox = null
+	var/obj/item/storage/toolbox/toolbox = null
 	//structure_damage_factor = STRUCTURE_DAMAGE_HEAVY
 	New()
 		..()
@@ -105,7 +105,7 @@
 
 /obj/item/weapon/melee/toolbox_maul/proc/break_apart(var/mob/living/user)
 	qdel(src)
-	var/obj/item/weapon/mop/mop = new(user.loc)
+	var/obj/item/mop/mop = new(user.loc)
 	if(!user.get_active_hand())
 		user.put_in_active_hand(mop)
 	else
@@ -115,7 +115,7 @@
 
 /obj/item/weapon/melee/toolbox_maul/attackby(obj/item/C, mob/living/user)
 	if(toolbox)
-		if(istype(C, /obj/item/weapon/wirecutters))
+		if(istype(C, /obj/item/wirecutters))
 			if(reinforced)
 				to_chat(user, SPAN_NOTICE("You cutted up the tapes from [src]."))
 				reinforced = FALSE
@@ -123,7 +123,7 @@
 				to_chat(user, SPAN_NOTICE("You carefully cut cables from [src]."))
 				break_apart(user)
 
-		if(istype(C, /obj/item/weapon/tape_roll))
+		if(istype(C, /obj/item/tape_roll))
 			to_chat(user, SPAN_NOTICE("You begins to tie [src] with [C]..."))
 			if(do_after(user, 50))
 				if(!reinforced)
@@ -132,7 +132,7 @@
 				else
 					to_chat(user, SPAN_WARNING("[src] is already reinforced."))
 	else
-		if(istype(C, /obj/item/weapon/storage/toolbox))
+		if(istype(C, /obj/item/storage/toolbox))
 			src.name = initial(src.name)
 			src.desc = initial(src.desc)
 			src.force = initial(src.force)
@@ -142,10 +142,10 @@
 			item_state = initial(item_state)
 			toolbox = C
 			user.drop_from_inventory(C, src)
-			if(istype(C, /obj/item/weapon/storage/toolbox/electrical))
+			if(istype(C, /obj/item/storage/toolbox/electrical))
 				icon_state = "hm_hammer_yellow"
 				item_state = "hm_hammer_yellow"
-			if(istype(C, /obj/item/weapon/storage/toolbox/mechanical))
+			if(istype(C, /obj/item/storage/toolbox/mechanical))
 				icon_state = "hm_hammer_blue"
 				item_state = "hm_hammer_blue"
 			to_chat(user, SPAN_NOTICE("You tied [C] to [src] and finally finish it!"))

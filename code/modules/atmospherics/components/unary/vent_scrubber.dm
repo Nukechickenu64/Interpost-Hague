@@ -1,6 +1,7 @@
 /obj/machinery/atmospherics/unary/vent_scrubber
 	icon = 'icons/atmos/vent_scrubber.dmi'
 	icon_state = "map_scrubber_off"
+	los_never_cull = TRUE
 
 	name = "Air Scrubber"
 	desc = "Has a valve and pump attached to it."
@@ -69,18 +70,7 @@
 	overlays += icon_manager.get_atmos_icon("device", , , scrubber_icon)
 
 /obj/machinery/atmospherics/unary/vent_scrubber/update_underlays()
-	if(..())
-		underlays.Cut()
-		var/turf/T = get_turf(src)
-		if(!istype(T))
-			return
-		if(!T.is_plating() && node && node.level == 1 && istype(node, /obj/machinery/atmospherics/pipe))
-			return
-		else
-			if(node)
-				add_underlay(T, node, dir, node.icon_connect_type)
-			else
-				add_underlay(T,, dir)
+	underlays.Cut()
 
 /obj/machinery/atmospherics/unary/vent_scrubber/proc/set_frequency(new_frequency)
 	radio_controller.remove_object(src, frequency)
@@ -138,56 +128,38 @@
 
 // Ensure vent scrubbers can connect to mains pipes by targeting the scrubbers line when adjacent to a mains pipe.
 /obj/machinery/atmospherics/unary/vent_scrubber/atmos_init()
-	..()
-	if(node)
-		return
-	for(var/obj/machinery/atmospherics/mains_pipe/M in get_step(src, dir))
-		if(M.initialize_mains_directions & get_dir(M, src))
-			node = M.scrubbers
-			break
-	if(node)
-		update_icon()
-		update_underlays()
+	update_icon()
+	update_underlays()
 
 /obj/machinery/atmospherics/unary/vent_scrubber/Process()
 	..()
-
-	if (hibernate > world.time)
+	if(hibernate > world.time)
 		return 1
-
-	if (!node)
-		update_use_power(POWER_USE_OFF)
-	//broadcast_status()
-	if(!use_power || (stat & (NOPOWER|BROKEN)))
+	if(!use_power || (stat & (NOPOWER|BROKEN)) || welded)
+		last_flow_rate = 0
 		return 0
-	if(welded)
-		return 0
-
 	var/datum/gas_mixture/environment = loc.return_air()
-
-	var/power_draw = -1
-	if(scrubbing)
-		//limit flow rate from turfs
-		var/transfer_moles = min(environment.total_moles, environment.total_moles*MAX_SCRUBBER_FLOWRATE/environment.volume)	//group_multiplier gets divided out here
-
-		power_draw = scrub_gas(src, scrubbing_gas, environment, air_contents, transfer_moles, power_rating)
-	else //Just siphon all air
-		//limit flow rate from turfs
-		var/transfer_moles = min(environment.total_moles, environment.total_moles*MAX_SIPHON_FLOWRATE/environment.volume)	//group_multiplier gets divided out here
-
-		power_draw = pump_gas(src, environment, air_contents, transfer_moles, power_rating)
-
-	if(scrubbing && power_draw <= 0)	//99% of all scrubbers
-		//Fucking hibernate because you ain't doing shit.
-		hibernate = world.time + (rand(100,200))
-
-	if (power_draw >= 0)
+	var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
+	var/efficiency = area_modcon ? area_modcon.scrub_efficiency() : 0
+	if(!scrubbing || !efficiency || !environment || !environment.volume || !scrubbing_gas)
+		last_flow_rate = 0
+		return 0
+	var/list/contaminants = scrubbing_gas.Copy()
+	contaminants -= GAS_OXYGEN
+	contaminants -= GAS_NITROGEN
+	var/transfer_moles = min(environment.total_moles, environment.total_moles * MAX_SCRUBBER_FLOWRATE / environment.volume) * efficiency
+	var/datum/gas_mixture/removed = new /datum/gas_mixture(environment.volume, environment.temperature)
+	var/previous_moles = environment.total_moles
+	var/power_draw = scrub_gas(src, contaminants, environment, removed, transfer_moles, power_rating)
+	last_flow_rate = max(0, previous_moles - environment.total_moles)
+	qdel(removed)
+	if(last_flow_rate)
+		area_modcon.wear_scrubber(last_flow_rate)
+	else
+		hibernate = world.time + rand(100, 200)
+	if(power_draw >= 0)
 		last_power_draw = power_draw
 		use_power_oneoff(power_draw)
-
-	if(network)
-		network.update = 1
-
 	return 1
 
 /obj/machinery/atmospherics/unary/vent_scrubber/hide(var/i) //to make the little pipe section invisible, the icon changes.
@@ -299,9 +271,9 @@
 			qdel(src)
 		return 1
 
-	if(istype(W, /obj/item/weapon/weldingtool))
+	if(istype(W, /obj/item/weldingtool))
 
-		var/obj/item/weapon/weldingtool/WT = W
+		var/obj/item/weldingtool/WT = W
 
 		if(!WT.isOn())
 			to_chat(user, "<span class='notice'>The welding tool needs to be on to start this task.</span>")
@@ -342,9 +314,35 @@
 	if(welded)
 		to_chat(user, "It seems welded shut.")
 
-/obj/machinery/atmospherics/unary/vent_scrubber/Destroy()
-	if(initial_loc)
-		initial_loc.air_scrub_info -= id_tag
-		initial_loc.air_scrub_names -= id_tag
+/obj/machinery/atmospherics/unary/vent_scrubber/Process()
 	..()
-	return
+	if(hibernate > world.time)
+		return 1
+	if(!use_power || (stat & (NOPOWER|BROKEN)) || welded)
+		last_flow_rate = 0
+		return 0
+
+	var/datum/gas_mixture/environment = loc.return_air()
+	var/obj/machinery/alarm/modcon = initial_loc ? initial_loc.master_air_alarm : null
+	var/efficiency = modcon ? modcon.scrub_efficiency() : 0
+	if(!scrubbing || !efficiency || !environment || !environment.volume || !scrubbing_gas)
+		last_flow_rate = 0
+		return 0
+
+	var/list/contaminants = scrubbing_gas.Copy()
+	contaminants -= GAS_OXYGEN
+	contaminants -= GAS_NITROGEN
+	var/transfer_moles = min(environment.total_moles, environment.total_moles * MAX_SCRUBBER_FLOWRATE / environment.volume) * efficiency
+	var/datum/gas_mixture/removed = new(environment.volume, environment.temperature)
+	var/previous_moles = environment.total_moles
+	var/power_draw = scrub_gas(src, contaminants, environment, removed, transfer_moles, power_rating)
+	last_flow_rate = max(0, previous_moles - environment.total_moles)
+	qdel(removed)
+	if(last_flow_rate)
+		modcon.wear_scrubber(last_flow_rate)
+	else
+		hibernate = world.time + rand(100, 200)
+	if(power_draw >= 0)
+		last_power_draw = power_draw
+		use_power_oneoff(power_draw)
+	return 1

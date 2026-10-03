@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/projectile/automatic //Hopefully someone will find a way to make these fire in bursts or something. --Superxpdude
-	name = "prototype SMG"
-	desc = "A protoype lightweight, fast firing gun. Uses 9mm rounds."
+	name = "\improper Lawson Arms L-9 Prototype Submachine Gun"
+	desc = "A lightweight development-stage submachine gun configured for rapid fire. Uses 9mm rounds."
 	icon_state = "saber"	//ugly
 	w_class = ITEM_SIZE_NORMAL
 	load_method = SPEEDLOADER //yup. until someone sprites a magazine for it.
@@ -23,8 +23,8 @@
 		)
 
 /obj/item/weapon/gun/projectile/automatic/c20r/oldsmg
-	name = "\improper 9MM Harbinger"
-	desc = "A 9MM SMG, popular among prison gaurds and soldiers alike."
+	name = "\improper Scarborough Arms Harbinger Submachine Gun"
+	desc = "An older Scarborough Arms submachine gun used by prison guards and military units. It accepts the C-20r platform's standard magazines."
 	icon_state = "smg"
 	item_state = "wt550"
 	wielded_item_state = "smg-wielded"
@@ -43,8 +43,8 @@
 
 
 /obj/item/weapon/gun/projectile/automatic/machine_pistol
-	name = ".45 machine pistol"
-	desc = "The Lumoco Arms MP6 Vesper, A fairly common machine pistol. Sometimes refered to as an 'uzi' by the backwater spacers it is often associated with. Uses .45 rounds."
+	name = "\improper Lumoco Arms MP6 Vesper Machine Pistol"
+	desc = "The Lumoco Arms MP6 Vesper is a common .45-caliber machine pistol, sometimes informally called an Uzi on frontier stations."
 	icon_state = "mac"
 	item_state = "mac"
 	wielded_item_state = "mac-wielded"
@@ -79,9 +79,13 @@
 	else
 		icon_state = "mpistolen-empty"
 
+/obj/item/weapon/gun/projectile/automatic/mini_uzi
+	name = "\improper Lumoco Arms MP9 Compact Submachine Gun"
+	desc = "An ultra-compact submachine gun designed for close protection and confined-space use."
+
 /obj/item/weapon/gun/projectile/automatic/c20r
-	name = "10mm submachine gun"
-	desc = "The C-20r is a lightweight and rapid firing SMG, for when you REALLY need someone dead. Uses 10mm rounds. Has a 'Scarborough Arms - Per falcis, per pravitas' buttstamp."
+	name = "\improper Scarborough Arms C-20r Submachine Gun"
+	desc = "A lightweight, select-fire 10mm submachine gun manufactured by Scarborough Arms. The receiver bears the company's 'Per falcis, per pravitas' motto."
 	icon_state = "c20r"
 	item_state = "c20r"
 	w_class = ITEM_SIZE_LARGE
@@ -114,8 +118,8 @@
 	return
 
 /obj/item/weapon/gun/projectile/automatic/sts35
-	name = "assault rifle"
-	desc = "The rugged STS-35 is a durable automatic weapon of a make popular on the frontier worlds. The serial number has been scratched off. Uses 5.56mm rounds."
+	name = "\improper Frontier Arms STS-35 Assault Rifle"
+	desc = "A rugged 5.56mm select-fire rifle common on frontier worlds. Its manufacturer and serial number have been removed."
 	icon_state = "arifle"
 	item_state = null
 	w_class = ITEM_SIZE_HUGE
@@ -145,8 +149,8 @@
 	..()
 
 /obj/item/weapon/gun/projectile/automatic/ak47
-	name = "AK-C45"
-	desc = "This old gun was pretty iconic in the old world. It seems to be fake wood on this rifle."
+	name = "\improper Mars Military Industries MA-47 Frontier Rifle"
+	desc = "An older 7.62x39mm rifle design with imitation-wood furniture, widely copied and refurbished across the frontier."
 	icon_state = "ak47"
 	item_state = null
 	w_class = ITEM_SIZE_HUGE
@@ -175,8 +179,8 @@
 	..()
 
 /obj/item/weapon/gun/projectile/automatic/lr
-	name = "LR-204 rifle"
-	desc = "The LR-204 is a civilian assault rifle and is common to most people. This rifle is very easy to modify and easy to maintain."
+	name = "\improper Aussec Armoury LR-204 Civilian Rifle"
+	desc = "A semi-automatic 5.56mm rifle sold for civilian use. Its simple construction is easy to maintain and modify."
 	icon_state = "lr204"
 	item_state = null
 	w_class = ITEM_SIZE_HUGE
@@ -204,8 +208,8 @@
 	..()
 
 /obj/item/weapon/gun/projectile/automatic/tacticalgun
-	name = "CTAC B-2 rifle"
-	desc = "The special CTAC B-2 is a durable automatic rifle used by special forces. It uses A.P.T to land accurate and precise hits on the target. Uses 5.56mm rounds."
+	name = "\improper Hephaestus Industries CTAC B-2 Tactical Rifle"
+	desc = "A durable select-fire rifle configured for accurate fire and issued to specialist units by the CTAC program."
 	icon_state = "tacticalgun"
 	item_state = null
 	w_class = ITEM_SIZE_HUGE
@@ -235,8 +239,8 @@
 	..()
 
 /obj/item/weapon/gun/projectile/automatic/tbr21
-	name = "TBR-21"
-	desc = "The rugged TBR-21 is an open bolt, gas operated, battle rifle, reliable, and expensive, as body armor becomes more popular so too will this rifle."
+	name = "\improper Scarborough Arms TBR-21 Battle Rifle"
+	desc = "An expensive 7.62x51mm, gas-operated battle rifle with an open-bolt action, intended for use against armored targets."
 	icon_state = "ctacassault"
 	item_state = "rifle1"
 	w_class = ITEM_SIZE_HUGE
@@ -260,8 +264,8 @@
 		)
 
 /obj/item/weapon/gun/projectile/automatic/colonyak
-	name = "colony AK-B"
-	desc = "A very reliable rifle, used on most frontier colonies in space. (Chambered in 762x39)."
+	name = "\improper Frontier Arms FA-47 Colony Rifle"
+	desc = "A rugged 7.62x39mm rifle produced for frontier colonies, where reliability and ease of maintenance are priorities."
 	icon_state = "colonyrifle"
 	item_state = "rifle1"
 	w_class = ITEM_SIZE_HUGE
@@ -293,8 +297,8 @@
 	return
 
 /obj/item/weapon/gun/projectile/automatic/tbr16
-	name = "TBR-16"
-	desc = "The compact TBR-16 is an open bolt, gas operated, battle SMG, reliable, and expensive."
+	name = "\improper Scarborough Arms TBR-16 Battle Submachine Gun"
+	desc = "A compact, gas-operated 7.62x51mm submachine gun with an open-bolt action, built for military close-quarters use."
 	icon_state = "ctacsmg"
 	item_state = "rifle1"
 	w_class = ITEM_SIZE_HUGE
@@ -323,9 +327,13 @@
 	wielded_item_state = (ammo_magazine)? "arifle-wielded" : "arifle-wielded-empty"
 	..()
 
+/obj/item/weapon/gun/projectile/automatic/tbr12
+	name = "\improper Scarborough Arms TBR-12 Experimental Rifle"
+	desc = "An experimental rifle from Scarborough Arms' TBR development program."
+
 /obj/item/weapon/gun/projectile/automatic/wt550
-	name = "9mm submachine gun"
-	desc = "The WT-550 Saber is a cheap self-defense weapon, mass-produced by Ward-Takahashi for paramilitary and private use. Uses 9mm rounds."
+	name = "\improper Ward-Takahashi WT-550 Saber Submachine Gun"
+	desc = "The WT-550 Saber is an affordable 9mm submachine gun manufactured by Ward-Takahashi for private security and paramilitary use."
 	icon_state = "wt550"
 	item_state = "wt550"
 	w_class = ITEM_SIZE_NORMAL
@@ -353,8 +361,8 @@
 	return
 
 /obj/item/weapon/gun/projectile/automatic/z8
-	name = "bullpup assault rifle"
-	desc = "The Z8 Bulldog is an older model bullpup carbine, made by the now defunct Zendai Foundries. Uses armor piercing 7.62mm rounds. Makes you feel like a space marine when you hold it. Does not support automatic firemodes."
+	name = "\improper Zendai Foundries Z8 Bulldog Bullpup Carbine"
+	desc = "A bullpup 7.62mm carbine from the now-defunct Zendai Foundries. It uses armor-piercing ammunition and has an underslung grenade launcher; this model does not support automatic fire."
 	icon_state = "carbine"
 	item_state = "z8carbine"
 	w_class = ITEM_SIZE_HUGE
@@ -427,8 +435,8 @@
 		to_chat(user, "\The [launcher] is empty.")
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw
-	name = "light machine gun"
-	desc = "A rather traditionally made L6 SAW with a pleasantly lacquered wooden pistol grip. Has 'Aussec Armoury- 2531' engraved on the reciever." //probably should refluff this
+	name = "\improper Aussec Armoury L6 Squad Automatic Weapon"
+	desc = "The Aussec Armoury L6 is a 5.56mm squad automatic weapon with a 50-round box magazine and a lacquered wooden pistol grip."
 	icon_state = "l6closed100"
 	item_state = "l6closedmag"
 	w_class = ITEM_SIZE_HUGE

@@ -8,7 +8,7 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	antag_text = "You are a <b>survivor.</b> Wander the wastes and try not to die."
 	leader_welcome_text = "Welcome."
 	landmark_id = "Hell Spawn"
-	id_type = /obj/item/weapon/card/id/centcom/ERT
+	id_type = /obj/item/card/id/centcom/ERT
 
 	flags = ANTAG_OVERRIDE_JOB | ANTAG_HAS_LEADER | ANTAG_CHOOSE_NAME | ANTAG_RANDOM_EXCEPTED
 	antaghud_indicator = "hudloyalist"

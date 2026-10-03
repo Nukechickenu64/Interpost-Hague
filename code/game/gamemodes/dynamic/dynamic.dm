@@ -5,8 +5,8 @@
 
 /datum/game_mode/dynamic
 	name = "Dynamic"
-	round_description = "The station's fate is determined by an AI Director that monitors telemetry and scales threats dynamically. No round-start dice roll."
-	extended_round_description = "Instead of pre-determined gamemodes, the server acts as an AI director monitoring live station telemetry - power grid stability, atmospheric integrity, security arrest rates, and spatial coordinates. As tension rises, the engine triggers Catalyst Events tailored to the environment. Every shift feels like an organic, escalating narrative rather than a repetitive deathmatch."
+	round_description = "An AI Director monitors telemetry and scales threats dynamically. One hidden traitor or leech is selected at round start and awakens after five minutes."
+	extended_round_description = "A hidden traitor or leech is selected from the crew at round start. After five minutes, a traitor receives their assignment, while a leech suffers a fatal heart attack and may rise again one minute later. The AI Director continues monitoring live station telemetry and triggering Catalyst Events tailored to the environment."
 	config_tag = "dynamic"
 	votable = 1
 	probability = 10
@@ -51,13 +51,8 @@
 	return
 
 /datum/game_mode/dynamic/check_finished()
-	// The round ends when the shuttle arrives/evacuation completes
-	// or when the Boiling Point catastrophe triggers a station destruction
+	// The round ends once the evacuation shuttle has returned offsite.
 	if(SSevac.evacuation_controller && SSevac.evacuation_controller.round_over())
-		return 1
-	if(SSdirector && SSdirector.boiling_point && SSdirector.director_state == DIRECTOR_STATE_BOILING \
-		&& !SSdirector.boiling_point.active)
-		// Boiling Point ends the round after its catastrophe deactivates.
 		return 1
 	return 0
 
@@ -72,6 +67,7 @@
 /datum/game_mode/dynamic/cleanup()
 	// Reset the Director for the next round
 	if(SSdirector)
+		SSdirector.reset_starter_antagonist()
 		SSdirector.director_state = DIRECTOR_STATE_DORMANT
 		SSdirector.tension = 0
 		if(SSdirector.boiling_point)

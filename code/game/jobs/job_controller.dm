@@ -398,7 +398,7 @@ var/global/datum/controller/occupations/job_master
 		return 1
 
 
-	proc/EquipRank(mob/living/carbon/human/H, rank, joined_late = 0)
+	proc/EquipRank(mob/living/carbon/human/H, rank, joined_late = 0, no_starting_equipment = FALSE)
 		if(!H || QDELETED(H))	return null
 
 		if(SSticker.eof && H.mind)
@@ -415,17 +415,25 @@ var/global/datum/controller/occupations/job_master
 
 		var/datum/job/job = GetJob(rank)
 		var/list/spawn_in_storage = list()
+		if(no_starting_equipment)
+			H.clear_preference_starting_gear()
 
 		if(job)
 
+			H.social_class = job.social_class
+			if(!H.job_character_initialized)
+				job.initialize_character(H)
+				H.job_character_initialized = TRUE
+
 			//Equip job items.
 			job.setup_account(H)
-			job.equip(H, H.mind ? H.mind.role_alt_title : "", H.char_branch, H.char_rank)
+			if(!no_starting_equipment)
+				job.equip(H, H.mind ? H.mind.role_alt_title : "", H.char_branch, H.char_rank)
 			job.apply_fingerprints(H)
 
 			// Equip custom gear loadout, replacing any job items
 			var/list/loadout_taken_slots = list()
-			if(H.client && H.client.prefs && H.client.prefs.Gear() && job.loadout_allowed)
+			if(!no_starting_equipment && H.client && H.client.prefs && H.client.prefs.Gear() && job.loadout_allowed)
 				for(var/thing in H.client.prefs.Gear())
 					var/datum/gear/G = gear_datums[thing]
 					if(G)
@@ -450,7 +458,7 @@ var/global/datum/controller/occupations/job_master
 							loadout_taken_slots.Add(G.slot)
 
 			// do accessories last so they don't attach to a suit that will be replaced
-			if(H.char_rank && H.char_rank.accessory)
+			if(!no_starting_equipment && H.char_rank && H.char_rank.accessory)
 				for(var/accessory_path in H.char_rank.accessory)
 					var/list/accessory_data = H.char_rank.accessory[accessory_path]
 					if(islist(accessory_data))
@@ -507,6 +515,8 @@ var/global/datum/controller/occupations/job_master
 		var/alt_title = null
 		if(H.mind)
 			H.mind.assigned_role = rank
+			for(var/obj/machinery/airlock_keypad/keypad in world)
+				keypad.grant_code_to_mind(H.mind)
 			alt_title = H.mind.role_alt_title
 
 			switch(rank)
@@ -537,7 +547,7 @@ var/global/datum/controller/occupations/job_master
 				spawn(50)
 					to_chat(H, "<B>.......<B> ")
 					spawn(50)
-						to_chat(H, "<B><span class = 'wakeup'>I should gather the officers for a meeting.</span> <span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'>'s bound to have sent us some new job to do...<B></span>")
+						to_chat(H, "<B><span class = 'wakeup'>I should gather the officers for a meeting.</span> <span class = 'nanotrasen'>Nanotrasen</span><span class = 'wakeup'>'s bound to have sent us some new job to do...<B></span>")
 		else if(job.wakeup_flavor)
 			spawn(20)
 				to_chat(H, "<B><span class = 'wakeup'>Wh-where am I?</B></span>")
@@ -553,9 +563,9 @@ var/global/datum/controller/occupations/job_master
 									to_chat(H, "<B>.......<B> ")
 									spawn(60)
 										if(H.mind.special_role == "Revolutionary" || H.mind.special_role == "Head Revolutionary")
-											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm a revolutionary working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'>, but my true cause is Christianity.</span>")
+											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm a revolutionary working for </span><span class = 'nanotrasen'>Nanotrasen</span><span class = 'wakeup'>, but my true cause is Christianity.</span>")
 										else
-											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'tetracorp'>TetraCorp</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
+											to_chat(H, "<B><span class = 'wakeup'>Right, right...I'm [job.total_positions == 1 ? "the" : "a"] [alt_title ? alt_title : rank] working for </span><span class = 'nanotrasen'>Nanotrasen</span><span class = 'wakeup'> on one of their ''state of the art'' research outposts.</span>")
 										spawn(20)
 											to_chat(H, "<B>.......<B>")
 											spawn(100)

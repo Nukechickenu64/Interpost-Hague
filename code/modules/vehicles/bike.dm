@@ -102,7 +102,7 @@
 		engine.emp_act(severity)
 	..()
 
-/obj/vehicle/bike/insert_cell(var/obj/item/weapon/cell/C, var/mob/living/carbon/human/H)
+/obj/vehicle/bike/insert_cell(var/obj/item/cell/C, var/mob/living/carbon/human/H)
 	return
 
 /obj/vehicle/bike/attackby(obj/item/W as obj, mob/user as mob)

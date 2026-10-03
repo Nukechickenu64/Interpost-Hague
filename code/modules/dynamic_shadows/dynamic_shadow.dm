@@ -29,9 +29,7 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	casts_dynamic_shadow = FALSE
 /obj/machinery/atmospherics
 	casts_dynamic_shadow = FALSE
-/obj/machinery/power/apc
-	casts_dynamic_shadow = FALSE
-/obj/machinery/power/terminal
+/obj/machinery/power/area_smes
 	casts_dynamic_shadow = FALSE
 /obj/machinery/alarm
 	casts_dynamic_shadow = FALSE
@@ -62,8 +60,6 @@ var/global/list/dynamic_shadow_icon_heights = list()
 /obj/structure/sign
 	casts_dynamic_shadow = FALSE
 /obj/structure/extinguisher_cabinet
-	casts_dynamic_shadow = FALSE
-/obj/structure/cable
 	casts_dynamic_shadow = FALSE
 /obj/structure/disposalpipe
 	casts_dynamic_shadow = FALSE

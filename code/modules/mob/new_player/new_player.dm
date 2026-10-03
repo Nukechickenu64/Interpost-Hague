@@ -293,13 +293,11 @@
 	if(!character)
 		return 0
 
-	character = job_master.EquipRank(character, job.title, 1)					//equips the human
+	character = job_master.EquipRank(character, job.title, 1, TRUE)					//equips the human
 	if(!character || QDELETED(character) || !character.mind)
 		qdel(character)
 		qdel(src)
 		return 0
-	equip_custom_items(character)
-
 	// AIs don't need a spawnpoint, they must spawn at an empty core
 	if(character.mind && character.mind.assigned_role == "AI")
 
@@ -326,6 +324,7 @@
 	if(job_master.ShouldCreateRecords(job.title))
 		if(character.mind.assigned_role != "Cyborg")
 			CreateModularRecord(character)
+			file_crew_id(character)
 			SSticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
 			AnnounceArrival(character, job, spawnpoint.msg)
 		else

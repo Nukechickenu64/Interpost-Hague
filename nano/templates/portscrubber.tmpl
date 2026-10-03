@@ -1,10 +1,11 @@
 <h3>Scrubber Status</h3>
 <div class="item">
 	<div class="itemLabel">
-		Tank Pressure:
+		Gas Remaining:
 	</div>
 	<div class="itemContent">
-		{{:data.tankPressure}} kPa
+		{{:helper.displayBar(data.tankPercent, 0, 100, (data.tankPercent > 50) ? 'good' : ((data.tankPercent > 20) ? 'average' : 'bad'))}}
+		<div class="statusValue">{{:data.tankPercent}}% ({{:data.tankPressure}} kPa)</div>
 	</div>
 </div>
 
@@ -44,14 +45,15 @@
 		<div class="itemContent">
 			<div style="float: left; width: 180px;">{{:data.holdingTank.name}}</div> {{:helper.link('Eject', 'eject', {'remove_tank' : 1})}}
 		</div>
-	</div>q
+	</div>
 
 	<div class="item">
 		<div class="itemLabel">
-			Tank Pressure:
+			Gas Remaining:
 		</div>
 		<div class="itemContent">
-			{{:data.holdingTank.tankPressure}} kPa
+			{{:helper.displayBar(data.holdingTank.tankPercent, 0, 100, (data.holdingTank.tankPercent > 50) ? 'good' : ((data.holdingTank.tankPercent > 20) ? 'average' : 'bad'))}}
+			<div class="statusValue">{{:data.holdingTank.tankPercent}}% ({{:data.holdingTank.tankPressure}} kPa)</div>
 		</div>
 	</div>
 {{else}}

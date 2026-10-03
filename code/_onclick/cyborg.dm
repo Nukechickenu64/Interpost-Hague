@@ -131,7 +131,7 @@
 /obj/machinery/door/airlock/BorgCtrlClick() // Bolts doors. Forwards to AI code.
 	AICtrlClick()
 
-/obj/machinery/power/apc/BorgCtrlClick() // turns off/on APCs. Forwards to AI code.
+/obj/machinery/power/area_smes/BorgCtrlClick() // turns off/on area SMES breakers. Forwards to AI code.
 	AICtrlClick()
 
 /obj/machinery/turretid/BorgCtrlClick() //turret control on/off. Forwards to AI code.

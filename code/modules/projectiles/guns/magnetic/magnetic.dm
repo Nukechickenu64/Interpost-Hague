@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/magnetic
-	name = "improvised coilgun"
-	desc = "A coilgun hastily thrown together out of a basic frame and advanced power storage components. Is it safe for it to be duct-taped together like that?"
+	name = "frontier-built CF-1 Improvised Coilgun"
+	desc = "A hand-built electromagnetic launcher assembled from a basic frame, a capacitor, and salvaged power components. Its improvised wiring and taped joints are unsafe."
 	icon_state = "coilgun"
 	item_state = "coilgun"
 	icon = 'icons/obj/railgun.dmi'
@@ -9,8 +9,8 @@
 	w_class = ITEM_SIZE_LARGE
 	combustion = 1
 
-	var/obj/item/weapon/cell/cell                              // Currently installed powercell.
-	var/obj/item/weapon/stock_parts/capacitor/capacitor        // Installed capacitor. Higher rating == faster charge between shots.
+	var/obj/item/cell/cell                              // Currently installed powercell.
+	var/obj/item/stock_parts/capacitor/capacitor        // Installed capacitor. Higher rating == faster charge between shots.
 	var/removable_components = TRUE                            // Whether or not the gun can be dismantled.
 	var/gun_unreliable = 15                                    // Percentage chance of detonating in your hands.
 
@@ -89,7 +89,7 @@
 /obj/item/weapon/gun/magnetic/attackby(var/obj/item/thing, var/mob/user)
 
 	if(removable_components)
-		if(istype(thing, /obj/item/weapon/cell))
+		if(istype(thing, /obj/item/cell))
 			if(cell)
 				to_chat(user, "<span class='warning'>\The [src] already has \a [cell] installed.</span>")
 				return
@@ -113,7 +113,7 @@
 			update_icon()
 			return
 
-		if(istype(thing, /obj/item/weapon/stock_parts/capacitor))
+		if(istype(thing, /obj/item/stock_parts/capacitor))
 			if(capacitor)
 				to_chat(user, "<span class='warning'>\The [src] already has \a [capacitor] installed.</span>")
 				return

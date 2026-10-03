@@ -4,12 +4,14 @@
 	var/datum/gas_mixture/air_contents = new
 
 	var/obj/machinery/atmospherics/portables_connector/connected_port
-	var/obj/item/weapon/tank/holding
+	var/obj/item/tank/holding
 
 	var/volume = 0
 	var/destroyed = 0
 
 	var/start_pressure = ONE_ATMOSPHERE
+	var/max_fill_pressure = 0
+	var/max_fill_moles = 0
 	var/maximum_pressure = 90 * ONE_ATMOSPHERE
 	atom_flags = ATOM_FLAG_CLIMBABLE
 
@@ -18,6 +20,9 @@
 
 	air_contents.volume = volume
 	air_contents.temperature = T20C
+	if(!max_fill_pressure)
+		max_fill_pressure = start_pressure
+	max_fill_moles = MolesForPressure(max_fill_pressure)
 
 	return 1
 
@@ -50,6 +55,11 @@
 
 /obj/machinery/portable_atmospherics/proc/MolesForPressure(var/target_pressure = start_pressure)
 	return (target_pressure * air_contents.volume) / (R_IDEAL_GAS_EQUATION * air_contents.temperature)
+
+/obj/machinery/portable_atmospherics/proc/gas_remaining_percent()
+	if(!air_contents || max_fill_moles <= 0 || air_contents.total_moles <= 0)
+		return 0
+	return min(100, max(1, round(air_contents.total_moles / max_fill_moles * 100)))
 
 /obj/machinery/portable_atmospherics/update_icon()
 	return null
@@ -102,10 +112,10 @@
 		network.update = 1
 
 /obj/machinery/portable_atmospherics/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
-	if ((istype(W, /obj/item/weapon/tank) && !( src.destroyed )))
+	if ((istype(W, /obj/item/tank) && !( src.destroyed )))
 		if (src.holding)
 			return
-		var/obj/item/weapon/tank/T = W
+		var/obj/item/tank/T = W
 		user.drop_item()
 		T.forceMove(src)
 		src.holding = T
@@ -144,7 +154,7 @@
 	var/power_rating
 	var/power_losses
 	var/last_power_draw = 0
-	var/obj/item/weapon/cell/cell
+	var/obj/item/cell/cell
 
 /obj/machinery/portable_atmospherics/powered/powered()
 	if(use_power) //using area power
@@ -154,12 +164,12 @@
 	return 0
 
 /obj/machinery/portable_atmospherics/powered/attackby(obj/item/I, mob/user)
-	if(istype(I, /obj/item/weapon/cell))
+	if(istype(I, /obj/item/cell))
 		if(cell)
 			to_chat(user, "There is already a power cell installed.")
 			return
 
-		var/obj/item/weapon/cell/C = I
+		var/obj/item/cell/C = I
 
 		user.drop_item()
 		C.add_fingerprint(user)

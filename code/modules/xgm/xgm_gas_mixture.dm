@@ -314,23 +314,28 @@
 		if(total_moles == 0 && sample.total_moles != 0 || sample.total_moles == 0 && total_moles != 0)
 			return 0
 
-	var/list/marked = list()
-	for(var/g in gas)
-		if((abs(gas[g] - sample.gas[g]) > MINIMUM_AIR_TO_SUSPEND) && \
-		((gas[g] < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g]) || \
-		(gas[g] > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g])))
+	var/list/our_gases = gas
+	var/list/sample_gases = sample.gas
+	for(var/g in our_gases)
+		var/our_moles = our_gases[g]
+		var/sample_moles = sample_gases[g]
+		if((abs(our_moles - sample_moles) > MINIMUM_AIR_TO_SUSPEND) && \
+		((our_moles < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample_moles) || \
+		(our_moles > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample_moles)))
 			return 0
-		marked[g] = 1
 
 	if(abs(return_pressure() - sample.return_pressure()) > MINIMUM_PRESSURE_DIFFERENCE_TO_SUSPEND)
 		return 0
 
-	for(var/g in sample.gas)
-		if(!marked[g])
-			if((abs(gas[g] - sample.gas[g]) > MINIMUM_AIR_TO_SUSPEND) && \
-			((gas[g] < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g]) || \
-			(gas[g] > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample.gas[g])))
-				return 0
+	for(var/g in sample_gases)
+		var/our_moles = our_gases[g]
+		if(!isnull(our_moles))
+			continue
+		var/sample_moles = sample_gases[g]
+		if((abs(our_moles - sample_moles) > MINIMUM_AIR_TO_SUSPEND) && \
+		((our_moles < (1 - MINIMUM_AIR_RATIO_TO_SUSPEND) * sample_moles) || \
+		(our_moles > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample_moles)))
+			return 0
 
 	if(total_moles > MINIMUM_AIR_TO_SUSPEND)
 		if((abs(temperature - sample.temperature) > MINIMUM_TEMPERATURE_DELTA_TO_SUSPEND) && \
@@ -416,38 +421,37 @@
 
 	var/size = max(1, group_multiplier)
 	if(isnull(share_size)) share_size = max(1, other.group_multiplier)
+	var/combined_size = size + share_size
 
 	var/full_heat_capacity = heat_capacity()
 	var/s_full_heat_capacity = other.heat_capacity()
-
-	var/list/avg_gas = list()
-
-	for(var/g in gas)
-		avg_gas[g] += gas[g] * size
-
-	for(var/g in other.gas)
-		avg_gas[g] += other.gas[g] * share_size
-
-	for(var/g in avg_gas)
-		avg_gas[g] /= (size + share_size)
+	var/combined_heat_capacity = full_heat_capacity + s_full_heat_capacity
 
 	var/temp_avg = 0
-	if(full_heat_capacity + s_full_heat_capacity)
-		temp_avg = (temperature * full_heat_capacity + other.temperature * s_full_heat_capacity) / (full_heat_capacity + s_full_heat_capacity)
+	if(combined_heat_capacity)
+		temp_avg = (temperature * full_heat_capacity + other.temperature * s_full_heat_capacity) / combined_heat_capacity
 
 	//WOOT WOOT TOUCH THIS AND YOU ARE A RETARD.
 	if(sharing_lookup_table.len >= connecting_tiles) //6 or more interconnecting tiles will max at 42% of air moved per tick.
 		ratio = sharing_lookup_table[connecting_tiles]
 	//WOOT WOOT TOUCH THIS AND YOU ARE A RETARD
 
-	for(var/g in avg_gas)
-		gas[g] = max(0, (gas[g] - avg_gas[g]) * (1 - ratio) + avg_gas[g])
+	var/remaining_ratio = 1 - ratio
+	var/list/our_gases = gas
+	var/list/other_gases = other.gas
+	var/list/gas_ids = our_gases | other_gases
+	for(var/gas_id in gas_ids)
+		var/our_moles = our_gases[gas_id]
+		var/average_moles = our_moles * size
+		average_moles += other_gases[gas_id] * share_size
+		average_moles /= combined_size
+		our_gases[gas_id] = max(0, (our_moles - average_moles) * remaining_ratio + average_moles)
 		if(!one_way)
-			other.gas[g] = max(0, (other.gas[g] - avg_gas[g]) * (1 - ratio) + avg_gas[g])
+			other_gases[gas_id] = max(0, (other_gases[gas_id] - average_moles) * remaining_ratio + average_moles)
 
-	temperature = max(0, (temperature - temp_avg) * (1-ratio) + temp_avg)
+	temperature = max(0, (temperature - temp_avg) * remaining_ratio + temp_avg)
 	if(!one_way)
-		other.temperature = max(0, (other.temperature - temp_avg) * (1-ratio) + temp_avg)
+		other.temperature = max(0, (other.temperature - temp_avg) * remaining_ratio + temp_avg)
 
 	update_values()
 	other.update_values()

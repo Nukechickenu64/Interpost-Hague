@@ -183,7 +183,7 @@
 		if(eyeobj.owner != src)
 			reset_view(null)
 	else if(z_eye) return
-	else if(!client.adminobs)
+	else if(!client.adminobs && !client.look_far_active())
 		reset_view(null)
 
 /mob/living/proc/update_sight()

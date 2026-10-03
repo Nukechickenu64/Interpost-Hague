@@ -416,11 +416,6 @@
 	id = "extinguisher"
 	build_path = /obj/item/mecha_parts/mecha_equipment/tool/extinguisher
 
-/datum/design/item/mecha/cable_layer
-	name = "Cable layer"
-	id = "mech_cable_layer"
-	build_path = /obj/item/mecha_parts/mecha_equipment/tool/cable_layer
-	
 /datum/design/item/mecha/flaregun
 	name = "Flare launcher"
 	id = "mecha_flare_gun"

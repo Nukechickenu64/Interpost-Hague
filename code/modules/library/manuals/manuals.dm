@@ -1,4 +1,4 @@
-/obj/item/weapon/book/manual/chef_recipes
+/obj/item/book/manual/chef_recipes
 	name = "Recipe Book"
 	icon_state = "cooked_book"
 	author = "TTC CB"
@@ -19,7 +19,7 @@
 				<body>
 
 				<h1>FOOD RECIPES</h1>
-				This is a guide mandated by the TetraCorp Chef Board for the enjoyment of the crew.
+				This is a guide mandated by the Nanotrasen Chef Board for the enjoyment of the crew.
 
 				<h3>Dough:</h3>
 				Knead an egg and some flour along with some water to make dough. Bake that to make a bun or flatten and cut it.
@@ -57,7 +57,7 @@
 			"}
 
 
-/obj/item/weapon/book/manual/barman_recipes
+/obj/item/book/manual/barman_recipes
 	name = "Barman Recipes"
 	icon_state = "barbook"
 	author = "Sir John Rose"
@@ -112,7 +112,7 @@
 			"}
 
 
-/obj/item/weapon/book/manual/detective
+/obj/item/book/manual/detective
 	name = "The Film Noir: Proper Procedures for Investigations"
 	icon_state ="bookDetective"
 	author = "The Company"
@@ -155,7 +155,7 @@
 				</body>
 			</html>"}
 
-/obj/item/weapon/book/manual/nuclear
+/obj/item/book/manual/nuclear
 	name = "Fission Mailed: Nuclear Sabotage 101"
 	icon_state ="bookNuclear"
 	author = "Syndicate"

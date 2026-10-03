@@ -25,8 +25,8 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/robotics/unscrew_hatch
 	allowed_tools = list(
-		/obj/item/weapon/screwdriver = 100,
-		/obj/item/weapon/coin = 50,
+		/obj/item/screwdriver = 100,
+		/obj/item/coin = 50,
 		/obj/item/weapon/material/kitchen/utensil/knife = 50
 	)
 
@@ -60,8 +60,8 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/robotics/screw_hatch
 	allowed_tools = list(
-		/obj/item/weapon/screwdriver = 100,
-		/obj/item/weapon/coin = 50,
+		/obj/item/screwdriver = 100,
+		/obj/item/coin = 50,
 		/obj/item/weapon/material/kitchen/utensil/knife = 50
 	)
 
@@ -96,7 +96,7 @@
 /datum/surgery_step/robotics/open_hatch
 	allowed_tools = list(
 		/obj/item/weapon/surgery_tool/retractor = 100,
-		/obj/item/weapon/crowbar = 100,
+		/obj/item/crowbar = 100,
 		/obj/item/weapon/material/kitchen/utensil = 50
 	)
 
@@ -131,7 +131,7 @@
 /datum/surgery_step/robotics/close_hatch
 	allowed_tools = list(
 		/obj/item/weapon/surgery_tool/retractor = 100,
-		/obj/item/weapon/crowbar = 100,
+		/obj/item/crowbar = 100,
 		/obj/item/weapon/material/kitchen/utensil = 50
 	)
 
@@ -166,7 +166,7 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/robotics/repair_brute
 	allowed_tools = list(
-		/obj/item/weapon/weldingtool = 100,
+		/obj/item/weldingtool = 100,
 		/obj/item/weapon/gun/energy/plasmacutter = 50
 	)
 
@@ -177,7 +177,7 @@
 	if(..())
 		var/obj/item/organ/external/affected = target.get_organ(target_zone)
 		if(isWelder(tool))
-			var/obj/item/weapon/weldingtool/welder = tool
+			var/obj/item/weldingtool/welder = tool
 			if(!welder.isOn() || !welder.remove_fuel(1,user))
 				return 0
 		return affected && affected.hatch_state == HATCH_OPENED && (affected.disfigured || affected.brute_dam > 0) && target_zone != BP_MOUTH
@@ -252,7 +252,7 @@
 	allowed_tools = list(
 	/obj/item/stack/nanopaste = 100,		\
 	/obj/item/weapon/surgery_tool/bonegel = 30, 		\
-	/obj/item/weapon/screwdriver = 70,	\
+	/obj/item/screwdriver = 70,	\
 	)
 
 	min_duration = 70
@@ -371,7 +371,7 @@
 //////////////////////////////////////////////////////////////////
 /datum/surgery_step/robotics/attach_organ_robotic
 	allowed_tools = list(
-		/obj/item/weapon/screwdriver = 100,
+		/obj/item/screwdriver = 100,
 	)
 
 	min_duration = 100

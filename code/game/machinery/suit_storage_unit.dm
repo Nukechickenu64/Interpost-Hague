@@ -19,7 +19,7 @@
 	var/obj/item/clothing/suit/space/suit = null
 	var/obj/item/clothing/head/helmet/space/helmet = null
 	var/obj/item/clothing/shoes/magboots/boots = null
-	var/obj/item/weapon/tank/tank = null
+	var/obj/item/tank/tank = null
 	var/obj/item/clothing/mask/mask = null
 
 	var/suit_type = null
@@ -42,7 +42,7 @@
 /obj/machinery/suit_storage_unit/standard_unit
 	suit_type = /obj/item/clothing/suit/space
 	helmet_type = /obj/item/clothing/head/helmet/space
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_eva)
 
@@ -51,7 +51,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/atmos
 	helmet_type = /obj/item/clothing/head/helmet/space/void/atmos
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_atmospherics)
 	islocked = 1
@@ -65,7 +65,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/engineering
 	helmet_type = /obj/item/clothing/head/helmet/space/void/engineering
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_engine)
 	islocked = 1
@@ -85,7 +85,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/medical
 	helmet_type = /obj/item/clothing/head/helmet/space/void/medical
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_medical)
 	islocked = 1
@@ -100,7 +100,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/mining
 	helmet_type = /obj/item/clothing/head/helmet/space/void/mining
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_mining)
 	islocked = 1
@@ -115,7 +115,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/excavation
 	helmet_type = /obj/item/clothing/head/helmet/space/void/excavation
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_xenoarch)
 	islocked = 1
@@ -125,7 +125,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/security
 	helmet_type = /obj/item/clothing/head/helmet/space/void/security
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_security)
 	islocked = 1
@@ -140,7 +140,7 @@
 	suit_type = /obj/item/clothing/suit/space/void/merc
 	helmet_type = /obj/item/clothing/head/helmet/space/void/merc
 	boots_type = /obj/item/clothing/shoes/magboots
-	tank_type = /obj/item/weapon/tank/oxygen
+	tank_type = /obj/item/tank/oxygen
 	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_syndicate)
 	islocked = 1
@@ -626,10 +626,10 @@
 		update_icon()
 		updateUsrDialog()
 		return
-	if( istype(I,/obj/item/weapon/tank) )
+	if( istype(I,/obj/item/tank) )
 		if(!isopen)
 			return
-		var/obj/item/weapon/tank/T = I
+		var/obj/item/tank/T = I
 		if(tank)
 			to_chat(user, "<span class='notice'>The unit already contains an air tank.</span>")
 			return

@@ -32,11 +32,11 @@
 		var/bad_msg = "--------------- [A.name]([A.type])"
 
 		var/exemptions = get_exemptions(A)
-		if(!A.apc && !(exemptions & GLOB.using_map.NO_APC))
-			log_bad("[bad_msg] lacks an APC.")
+		if(!A.area_smes && !(exemptions & GLOB.using_map.NO_APC))
+			log_bad("[bad_msg] lacks an area SMES marker.")
 			area_good = 0
-		else if(A.apc && (exemptions & GLOB.using_map.NO_APC))
-			log_bad("[bad_msg] is not supposed to have an APC.")
+		else if(A.area_smes && (exemptions & GLOB.using_map.NO_APC))
+			log_bad("[bad_msg] is not supposed to have an area power marker.")
 			area_good = 0
 
 		if(!A.air_scrub_info.len && !(exemptions & GLOB.using_map.NO_SCRUBBER))
@@ -69,65 +69,6 @@
 		var/exempt_type = GLOB.using_map.apc_test_exempt_areas[i]
 		if(istype(area, exempt_type))
 			return GLOB.using_map.apc_test_exempt_areas[exempt_type]
-
-//=======================================================================================
-
-/datum/unit_test/wire_test
-	name = "MAP: Cable Overlap Test"
-
-/datum/unit_test/wire_test/start_test()
-	var/wire_test_count = 0
-	var/bad_tests = 0
-	var/turf/T = null
-	var/obj/structure/cable/C = null
-	var/list/cable_turfs = list()
-	var/list/dirs_checked = list()
-
-	for(C in world)
-		T = get_turf(C)
-		cable_turfs |= get_turf(C)
-
-	for(T in cable_turfs)
-		var/bad_msg = "[ascii_red]--------------- [T.name] \[[T.x] / [T.y] / [T.z]\]"
-		dirs_checked.Cut()
-		for(C in T)
-			wire_test_count++
-			var/combined_dir = "[C.d1]-[C.d2]"
-			if(combined_dir in dirs_checked)
-				bad_tests++
-				log_unit_test("[bad_msg] Contains multiple wires with same direction on top of each other.")
-			dirs_checked.Add(combined_dir)
-
-	if(bad_tests)
-		fail("\[[bad_tests] / [wire_test_count]\] Some turfs had overlapping wires going the same direction.")
-	else
-		pass("All \[[wire_test_count]\] wires had no overlapping cables going the same direction.")
-
-	return 1
-
-//=======================================================================================
-
-/datum/unit_test/wire_dir_and_icon_stat
-	name = "MAP: Cable Dir And Icon State Test"
-
-/datum/unit_test/wire_dir_and_icon_stat/start_test()
-	var/list/bad_cables = list()
-
-	for(var/obj/structure/cable/C in world)
-		var/expected_icon_state = "[C.d1]-[C.d2]"
-		if(C.icon_state != expected_icon_state)
-			bad_cables |= C
-			log_bad("[log_info_line(C)] has an invalid icon state. Expected [expected_icon_state], was [C.icon_state]")
-		if(!(C.icon_state in icon_states(C.icon)))
-			bad_cables |= C
-			log_bad("[log_info_line(C)] has an non-existing icon state.")
-
-	if(bad_cables.len)
-		fail("Found [bad_cables.len] cable\s with an unexpected icon state.")
-	else
-		pass("All wires had their expected icon state.")
-
-	return 1
 
 //=======================================================================================
 
@@ -190,7 +131,7 @@
 /datum/unit_test/storage_map_test/start_test()
 	var/bad_tests = 0
 
-	for(var/obj/item/weapon/storage/S in world)
+	for(var/obj/item/storage/S in world)
 		if(isPlayerLevel(S.z))
 			var/bad_msg = "[ascii_red]--------------- [S.name] \[[S.type]\] \[[S.x] / [S.y] / [S.z]\]"
 			bad_tests += test_storage_capacity(S, bad_msg)
@@ -396,72 +337,55 @@ datum/unit_test/ladder_check/start_test()
 
 //=======================================================================================
 
-/datum/unit_test/disposal_segments_shall_connect_with_other_disposal_pipes
-	name = "MAP: Disposal segments shall connect with other disposal pipes"
+/datum/unit_test/legacy_atmospherics_shall_be_retired
+	name = "MAP: Legacy atmospherics and disposal piping shall be retired"
 
-/datum/unit_test/disposal_segments_shall_connect_with_other_disposal_pipes/start_test()
-	var/list/faulty_pipes = list()
-
-	// Desired directions for straight pipes, when encountering curved pipes in the main and reversed dir respectively
-	var/list/straight_desired_directions = list(
-		num2text(SOUTH) = list(list(NORTH, WEST), list(SOUTH, EAST)),
-		num2text(EAST) = list(list(SOUTH, WEST), list(NORTH, EAST)))
-
-	// Desired directions for curved pipes:
-	// list(desired_straight, list(desired_curved_one, desired_curved_two) in the main and curved direction
-	var/list/curved_desired_directions = list(
-		num2text(NORTH) = list(list(SOUTH, list(SOUTH, EAST)), list(EAST,  list(SOUTH, WEST))),
-		num2text(EAST)  = list(list(EAST,  list(SOUTH, WEST)), list(SOUTH, list(NORTH, WEST))),
-		num2text(SOUTH) = list(list(SOUTH, list(NORTH, WEST)), list(EAST,  list(NORTH, EAST))),
-		num2text(WEST)  = list(list(EAST,  list(NORTH, EAST)), list(SOUTH, list(SOUTH, EAST))))
-
-	for(var/obj/structure/disposalpipe/segment/D in world)
-		if(D.icon_state == "pipe-s")
-			if(!(D.dir == SOUTH || D.dir == EAST))
-				log_bad("Following disposal pipe has an invalid direction set: [log_info_line(D)]")
-				continue
-			var/turf/turf_one = get_step(D.loc, D.dir)
-			var/turf/turf_two = get_step(D.loc, turn(D.dir, 180))
-
-			var/list/desired_dirs = straight_desired_directions[num2text(D.dir)]
-			if(!turf_contains_matching_disposal_pipe(turf_one, D.dir, desired_dirs[1]) || !turf_contains_matching_disposal_pipe(turf_two, D.dir, desired_dirs[2]))
-				log_bad("Following disposal pipe does not connect correctly: [log_info_line(D)]")
-				faulty_pipes += D
-		else
-			var/turf/turf_one = get_step(D.loc, D.dir)
-			var/turf/turf_two = get_step(D.loc, turn(D.dir, -90))
-
-			var/list/desired_dirs = curved_desired_directions[num2text(D.dir)]
-			var/main_dirs = desired_dirs[1]
-			var/rev_dirs = desired_dirs[2]
-
-			if(!turf_contains_matching_disposal_pipe(turf_one, main_dirs[1], main_dirs[2]) || !turf_contains_matching_disposal_pipe(turf_two, rev_dirs[1], rev_dirs[2]))
-				log_bad("Following disposal pipe does not connect correctly: [log_info_line(D)]")
-				faulty_pipes += D
-
-	if(faulty_pipes.len)
-		fail("[faulty_pipes.len] disposal segment\s did not connect with other disposal pipes.")
+/datum/unit_test/disposal_loading_size/start_test()
+	var/obj/machinery/disposal/bin = new(null)
+	var/mob/living/carbon/human/human = new(null)
+	var/mob/living/simple_animal/mouse/mouse = new(null)
+	var/obj/structure/closet/container = new(null)
+	if(bin.can_load(human))
+		fail("Disposal accepts a human directly.")
+	else if(!bin.can_load(mouse))
+		fail("Disposal rejects a mouse.")
 	else
-		pass("All disposal segments connect with other disposal pipes.")
-
+		human.forceMove(container)
+		if(bin.can_load(container))
+			fail("Disposal accepts a container holding a human.")
+		else
+			pass("Disposal restricts direct and nested living passengers.")
+	qdel(bin)
+	qdel(container)
+	qdel(human)
+	qdel(mouse)
 	return 1
 
-/datum/unit_test/disposal_segments_shall_connect_with_other_disposal_pipes/proc/turf_contains_matching_disposal_pipe(var/turf/T, var/straight_dir, var/list/curved_dirs)
-	if(!T)
-		return FALSE
+/datum/unit_test/legacy_atmospherics_shall_be_retired/start_test()
+	var/failures = 0
+	for(var/obj/machinery/atmospherics/machine in world)
+		if(istype(machine, /obj/machinery/atmospherics/unary/vent_pump) || istype(machine, /obj/machinery/atmospherics/unary/vent_scrubber))
+			continue
+		log_bad("Legacy atmospheric machinery remains: [log_info_line(machine)]")
+		failures++
 
-	// We need to loop over all potential pipes in a turf as long as there isn't a dir match, as they may be overlapping (i.e. 2 straight pipes in a cross)
-	for(var/obj/structure/disposalpipe/D in T)
-		if(D.type == /obj/structure/disposalpipe/segment)
-			if(D.icon_state == "pipe-s")
-				if(D.dir == straight_dir)
-					return TRUE
-			else
-				if(D.dir in curved_dirs)
-					return TRUE
-		else
-			return TRUE
-	return FALSE
+	for(var/obj/structure/disposalpipe/pipe in world)
+		log_bad("Legacy disposal pipe remains: [log_info_line(pipe)]")
+		failures++
+	for(var/obj/structure/disposaloutlet/outlet in world)
+		log_bad("Legacy disposal outlet remains: [log_info_line(outlet)]")
+		failures++
+	for(var/obj/structure/disposalconstruct/construction in world)
+		if(construction.ptype == 6 || construction.ptype == 8)
+			continue
+		log_bad("Unfinished disposal construction remains: [log_info_line(construction)]")
+		failures++
+
+	if(failures)
+		fail("[failures] legacy atmospheric or disposal plumbing objects remain.")
+	else
+		pass("Legacy atmospheric and disposal piping is retired.")
+	return 1
 
 //=======================================================================================
 

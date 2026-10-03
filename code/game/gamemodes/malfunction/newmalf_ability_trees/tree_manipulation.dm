@@ -54,7 +54,7 @@
 	if(!ability_prechecks(user, price) || !ability_pay(user,price))
 		return
 	to_chat(user, "Sending feedback pulse...")
-	for(var/obj/machinery/power/apc/AP in SSmachines.machinery)
+	for(var/obj/machinery/power/area_smes/AP in SSmachines.machinery)
 		if(prob(5))
 			AP.overload_lighting()
 		if(prob(2.5) && (get_area(AP) != get_area(user))) // Very very small chance to actually destroy the APC, but not if the APC is powering the AI.
@@ -124,11 +124,11 @@
 
 	// Verify if we can overload the target, if yes, calculate explosion strength. Some things have higher explosion strength than others, depending on charge(APCs, SMESs)
 	if(N && istype(N)) // /obj/machinery/power first, these create bigger explosions due to direct powernet connection
-		if(!istype(N, /obj/machinery/power/apc) && !istype(N, /obj/machinery/power/smes/buildable) && (!N.powernet || !N.powernet.avail)) // Directly connected machine which is not an APC or SMES. Either it has no powernet connection or it's powernet does not have enough power to overload
+		if(!istype(N, /obj/machinery/power/area_smes) && !istype(N, /obj/machinery/power/smes/buildable) && (!N.powernet || !N.powernet.avail)) // Directly connected machine which is not an area SMES or SMES. Either it has no bus or the bus does not have enough power to overload
 			to_chat(user, "<span class='notice'>ERROR: Low network voltage. Unable to overload. Increase network power level and try again.</span>")
 			return
-		else if (istype(N, /obj/machinery/power/apc)) // APC. Explosion is increased by available cell power.
-			var/obj/machinery/power/apc/A = N
+		else if (istype(N, /obj/machinery/power/area_smes)) // Area SMES. Explosion is increased by available cell power.
+			var/obj/machinery/power/area_smes/A = N
 			if(A.cell && A.cell.charge)
 				explosion_intensity = 4 + round((A.cell.charge / CELLRATE) / 100000)
 			else
@@ -166,9 +166,9 @@
 	// Trigger a powernet alarm. Careful engineers will probably notice something is going on.
 	var/area/temp_area = get_area(M)
 	if(temp_area)
-		var/obj/machinery/power/apc/temp_apc = temp_area.get_apc()
-		if(temp_apc && temp_apc.terminal && temp_apc.terminal.powernet)
-			temp_apc.terminal.powernet.trigger_warning(50) // Long alarm
+		var/obj/machinery/power/area_smes/temp_apc = temp_area.get_area_smes()
+		if(temp_apc && temp_apc.powernet)
+			temp_apc.powernet.trigger_warning(50) // Long alarm
 			 // Such power surges are not good for APC electronics/cell in general.
 			if(prob(explosion_intensity))
 				temp_apc.emp_act(1)

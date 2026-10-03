@@ -2,8 +2,13 @@
 #define CHAT_MESSAGE_LIFESPAN		(5 SECONDS)
 #define CHAT_MESSAGE_EXTRA_PER_CHAR	0.5
 #define CHAT_MESSAGE_MAX_LIFESPAN	(12 SECONDS)
-#define CHAT_MESSAGE_EOL_FADE		(0.7 SECONDS)
+#define CHAT_MESSAGE_EOL_FADE		(1.5 SECONDS)
+#define CHAT_MESSAGE_SUPERSEDED_FADE	(0.7 SECONDS)
+#define CHAT_MESSAGE_DRIFT			8
+#define CHAT_MESSAGE_EOL_DRIFT		4
+#define CHAT_MESSAGE_EOL_BLUR		8
 #define CHAT_MESSAGE_WIDTH			96
+#define CHAT_MESSAGE_FONT_SIZE		6
 #define CHAT_MESSAGE_MAX_LENGTH		110
 #define CHAT_MESSAGE_APPROX_LHEIGHT	11
 #define CHAT_MESSAGE_MAX_STACK		5
@@ -18,6 +23,7 @@
 	var/client/owned_by
 	var/speaker_key
 	var/approx_height = CHAT_MESSAGE_APPROX_LHEIGHT
+	var/fading = FALSE
 
 /datum/chatmessage/New(text, atom/target, mob/owner, flags = 0, color_override)
 	..()
@@ -46,12 +52,11 @@
 		qdel(src)
 		return
 
-	var/font_size = (flags & RUNECHAT_SMALL) ? 6 : 7
 	var/text_color = color_override || runechat_color(target)
 	var/body = text
 	if(flags & (RUNECHAT_ITALIC|RUNECHAT_EMOTE|RUNECHAT_RADIO))
 		body = "<i>[body]</i>"
-	var/complete = "<span style=\"font-family:'Small Fonts';font-size:[font_size]px;-dm-text-outline:1px #000000;color:[text_color];text-align:center;\">[body]</span>"
+	var/complete = "<span style=\"font-family:'Press Start 2P';font-size:[CHAT_MESSAGE_FONT_SIZE]px;color:[text_color];text-align:center;\">[body]</span>"
 
 	// MeasureText sleeps until the client answers, so state may have changed afterwards
 	var/measured = C.MeasureText(complete, null, CHAT_MESSAGE_WIDTH)
@@ -71,8 +76,8 @@
 		bucket = list()
 		owned_by.seen_messages[speaker_key] = bucket
 	for(var/datum/chatmessage/old as anything in bucket)
-		if(old.message)
-			animate(old.message, pixel_y = old.message.pixel_y + approx_height, time = CHAT_MESSAGE_SPAWN_TIME)
+		// fade older bubbles out early; they keep their slow drift and never get shoved upward
+		old.end_of_life(TRUE)
 	bucket += src
 	while(bucket.len > CHAT_MESSAGE_MAX_STACK)
 		qdel(bucket[1])
@@ -91,19 +96,27 @@
 	message.maptext_height = approx_height
 	message.maptext_x = (world.icon_size - CHAT_MESSAGE_WIDTH) / 2
 	message.maptext = complete
+	message.filters = list(filter(type = "blur", size = 0), filter(type = "drop_shadow", x = 0, y = 0, size = 0, color = text_color))
 
 	owned_by.images |= message
-	animate(message, alpha = 255, time = CHAT_MESSAGE_SPAWN_TIME)
-
 	var/lifespan = min(CHAT_MESSAGE_MAX_LIFESPAN, CHAT_MESSAGE_LIFESPAN + length(text) * CHAT_MESSAGE_EXTRA_PER_CHAR)
+	animate(message, alpha = 255, time = CHAT_MESSAGE_SPAWN_TIME)
+	// slow upward drift for the rest of the message's life
+	animate(pixel_y = message.pixel_y + CHAT_MESSAGE_DRIFT, time = lifespan - CHAT_MESSAGE_SPAWN_TIME)
+
 	addtimer(CALLBACK(src, .proc/end_of_life), lifespan)
 
-/datum/chatmessage/proc/end_of_life()
-	if(QDELETED(src))
+/datum/chatmessage/proc/end_of_life(superseded = FALSE)
+	if(QDELETED(src) || fading)
 		return
+	fading = TRUE
+	var/fade_time = superseded ? CHAT_MESSAGE_SUPERSEDED_FADE : CHAT_MESSAGE_EOL_FADE
 	if(message)
-		animate(message, alpha = 0, time = CHAT_MESSAGE_EOL_FADE)
-	QDEL_IN(src, CHAT_MESSAGE_EOL_FADE)
+		// parallel+relative so an early fade never interrupts the ongoing drift animation
+		animate(message, alpha = -255, pixel_y = CHAT_MESSAGE_EOL_DRIFT, time = fade_time, easing = QUAD_EASING | EASE_OUT, flags = ANIMATION_PARALLEL | ANIMATION_RELATIVE)
+		animate(message.filters[1], size = CHAT_MESSAGE_EOL_BLUR, time = fade_time, easing = SINE_EASING | EASE_OUT)
+		animate(message.filters[2], color = "#00000000", time = fade_time)
+	QDEL_IN(src, fade_time)
 
 /proc/runechat_sanitize(text)
 	text = trim(html_decode(strip_html_properly(text)))
@@ -119,6 +132,8 @@
 
 /proc/runechat_to(mob/listener, atom/speaker, text, flags = 0, color_override)
 	if(!listener || !listener.client || !speaker || !text)
+		return
+	if(flags & (RUNECHAT_EMOTE|RUNECHAT_RADIO))
 		return
 	if(listener.get_preference_value(/datum/client_preference/runechat) != GLOB.PREF_YES)
 		return

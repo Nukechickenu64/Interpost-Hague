@@ -44,24 +44,31 @@
 
 /datum/virtue/chastity
 	name = "chastity"
+	description = "I keep telling myself I don't want what I can't have."
 
 /datum/virtue/temperance
 	name = "temperance"
+	description = "I keep saying 'enough' before I enjoy any of it."
 
 /datum/virtue/charity
 	name = "charity"
+	description = "I give what I can, even when I know it won't fix much."
 
 /datum/virtue/diligence
 	name = "diligence"
+	description = "I keep working, even when nobody's going to notice."
 
 /datum/virtue/patience
 	name = "patience"
+	description = "I can wait. No one else seems to care if I do."
 
 /datum/virtue/kindness
 	name = "kindness"
+	description = "I try to be kind, even when people make me regret it."
 
 /datum/virtue/humility
 	name = "humility"
+	description = "I tell myself I don't need the credit."
 
 /mob/living/proc/has_virtue(var/datum/virtue/this_virtue)
 	return istype(virtue, this_virtue)

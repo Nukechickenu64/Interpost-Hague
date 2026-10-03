@@ -202,14 +202,14 @@
 					/obj/item/clothing/suit/chaplain_hoodie,
 					/obj/item/clothing/head/chaplain_hood,
 					/obj/item/clothing/under/wedding/bride_white,
-					/obj/item/weapon/storage/backpack/cultpack,
-					/obj/item/weapon/storage/fancy/candle_box = 3)
+					/obj/item/storage/backpack/cultpack,
+					/obj/item/storage/fancy/candle_box = 3)
 	cost = 10
 	containername = "\improper Chaplain equipment crate"
 
 /decl/hierarchy/supply_pack/miscellaneous/mousetrap
 	num_contained = 3
-	contains = list(/obj/item/weapon/storage/box/mousetraps)
+	contains = list(/obj/item/storage/box/mousetraps)
 	name = "\improper Pest Control Crate"
 	cost = 10
 	containername = "\improper Pest Control Crate"

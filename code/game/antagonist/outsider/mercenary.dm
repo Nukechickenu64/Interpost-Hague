@@ -26,7 +26,7 @@ GLOBAL_DATUM_INIT(mercs, /datum/antagonist/mercenary, new)
 	global_objectives |= new /datum/objective/nuclear
 	return 1
 
-/datum/antagonist/mercenary/equip(var/mob/living/carbon/human/player, var/mob/living/carbon/human/H)
+/datum/antagonist/mercenary/equip(var/mob/living/carbon/human/player)
 	if(!..())
 		return 0
 
@@ -36,7 +36,7 @@ GLOBAL_DATUM_INIT(mercs, /datum/antagonist/mercenary, new)
 	var/obj/item/device/radio/uplink/U = new(get_turf(player), player.mind, DEFAULT_TELECRYSTAL_AMOUNT)
 	player.put_in_hands(U)
 
-	H.generate_stats(STAT_ST)
-	H.generate_skills(list("melee", "ranged"))
+	player.generate_stats(STAT_ST)
+	player.generate_skills(list("melee", "ranged"))
 
 	return 1

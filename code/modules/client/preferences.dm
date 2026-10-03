@@ -284,8 +284,12 @@
 	// Apply morality selections to the character
 	if(istype(character, /mob/living/carbon/human))
 		var/mob/living/carbon/human/H = character
-		H.moral_sin = selected_sin
-		H.moral_virtue = selected_virtue
+		var/sin_type = MORAL_SINS[selected_sin]
+		var/virtue_type = MORAL_VIRTUES[selected_virtue]
+		if(sin_type)
+			H.set_sin(new sin_type)
+		if(virtue_type)
+			H.set_virtue(new virtue_type)
 
 	if(!character.isSynthetic())
 		character.set_nutrition(rand(140,360))

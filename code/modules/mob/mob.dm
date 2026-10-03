@@ -113,6 +113,40 @@
 	if(bound_overlay)
 		bound_overlay.visible_message(message, self_message, blind_message)
 
+/mob
+	var/stealth_mode = FALSE
+	var/list/examine_memory
+
+// Like visible_message, but each onlooker must pass a perception roll to notice.
+/mob/proc/perceived_visible_message(var/message, var/self_message, var/range = world.view)
+	var/turf/T = get_turf(src)
+	var/list/mobs = list()
+	var/list/objs = list()
+	get_mobs_and_objs_in_view_fast(T, range, mobs, objs)
+
+	for(var/o in objs)
+		var/obj/O = o
+		O.show_message(message, VISIBLE_MESSAGE)
+
+	for(var/m in mobs)
+		var/mob/M = m
+		if(M == src)
+			if(self_message)
+				M.show_message(self_message, VISIBLE_MESSAGE)
+			continue
+		if(M.see_invisible < invisibility)
+			continue
+		if(stealth_mode ? !M.perception_opposed(src) : !M.perception_check())
+			continue
+		M.show_message(message, VISIBLE_MESSAGE)
+
+/mob/living/carbon/human/verb/toggle_stealth()
+	set name = "Toggle Stealth"
+	set category = "IC"
+
+	stealth_mode = !stealth_mode
+	to_chat(src, "<span class='notice'>You are [stealth_mode ? "now moving carefully, trying not to be noticed" : "no longer trying to be subtle"].</span>")
+
 // Returns an amount of power drawn from the object (-1 if it's not viable).
 // If drain_check is set it will not actually drain power, just return a value.
 // If surge is set, it will destroy/damage the recipient and not return any power.
@@ -225,6 +259,10 @@
 
 /mob/proc/reset_view(atom/A)
 	if (client)
+		var/was_looking_far = client.look_far_target
+		client.look_far_target = null
+		client.look_far_origin = null
+		client.look_far_owner = null
 		A = A ? A : eyeobj
 		if (istype(A, /atom/movable))
 			client.perspective = EYE_PERSPECTIVE
@@ -236,6 +274,11 @@
 			else
 				client.perspective = EYE_PERSPECTIVE
 				client.eye = loc
+		client.update_cull_mask()
+		if(was_looking_far)
+			client.update_opacity_image()
+			client.update_cull_mask(TRUE)
+			update_vision_cone()
 	return
 
 
@@ -252,7 +295,34 @@
 		return 1
 
 	face_atom(A)
-	A.examine(src)
+	if(is_perception_exempt())
+		A.examine(src)
+		return
+
+	perceived_visible_message("<span class='looksatbold'>[name]</span> <span class='looksat'>looks at [A].</span>")
+
+	if(ishuman(A))
+		A.examine(src)
+		return
+
+	if(!examine_memory)
+		examine_memory = list()
+	var/weakref/ref = weakref(A)
+	switch(examine_memory[ref])
+		if(2)
+			A.examine(src)
+			return
+		if(1)
+			if(perception_check())
+				examine_memory[ref] = 2
+				A.examine(src)
+				return
+			to_chat(src, "<span class='uppertext'>This is \a [A].</span>\n<span class='statustext'>You can't make out anything more.</span>")
+			return 1
+
+	examine_memory[ref] = 1
+	to_chat(src, "<span class='uppertext'>This is \a [A].</span>")
+	return 1
 
 /mob/verb/pointed(atom/A as mob|obj|turf in view())
 	set name = "Point To"
@@ -746,8 +816,8 @@
 	if(status_flags & CANWEAKEN)
 		facing_dir = null
 		weakened = max(max(weakened,amount),0)
-		update_canmove()	//updates lying, canmove and icons
 		resting = 1
+		update_canmove()	//updates lying, canmove and icons
 		if(l_hand) unEquip(l_hand)
 		if(r_hand) unEquip(r_hand)
 	return
@@ -835,8 +905,8 @@
 	implant.dropInto(loc)
 	implant.add_blood(src)
 	implant.update_icon()
-	if(istype(implant,/obj/item/weapon/implant))
-		var/obj/item/weapon/implant/imp = implant
+	if(istype(implant,/obj/item/implant))
+		var/obj/item/implant/imp = implant
 		imp.removed()
 	. = TRUE
 

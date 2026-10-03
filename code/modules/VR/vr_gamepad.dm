@@ -14,7 +14,7 @@
 	var/test = 0
 
 /obj/machinery/gamepod/attackby(obj/item/I, mob/user)
-	if(istype(I, /obj/item/weapon/card/emag))
+	if(istype(I, /obj/item/card/emag))
 		if(emagged)
 			to_chat(user, SPAN_NOTICE("It is already broken."))
 			return
@@ -81,7 +81,7 @@
 		return
 
 	if(ishuman(usr))
-		for(var/obj/item/weapon/implant/cyberdock/E in usr)
+		for(var/obj/item/implant/cyberdock/E in usr)
 			test = test + 1
 		if(test < 1)
 			to_chat(usr, "You lack the necessary implant to get into the Cyberspace dock.")

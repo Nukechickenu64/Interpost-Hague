@@ -1,14 +1,11 @@
 #ifndef TANK_MAX_RELEASE_PRESSURE
 #define TANK_MAX_RELEASE_PRESSURE (3*ONE_ATMOSPHERE)
 #endif
-#ifndef TANK_DEFAULT_RELEASE_PRESSURE
-#define TANK_DEFAULT_RELEASE_PRESSURE 24
-#endif
 #define TANK_IDEAL_PRESSURE 1015 //Arbitrary.
 
 var/list/global/tank_gauge_cache = list()
 
-/obj/item/weapon/tank
+/obj/item/tank
 	name = "tank"
 	icon = 'icons/obj/tank.dmi'
 
@@ -25,6 +22,7 @@ var/list/global/tank_gauge_cache = list()
 	throw_range = 4
 
 	var/datum/gas_mixture/air_contents = null
+	var/max_gas_moles = 0
 	var/distribute_pressure = ONE_ATMOSPHERE
 	var/integrity = 20
 	var/maxintegrity = 20
@@ -55,20 +53,24 @@ var/list/global/tank_gauge_cache = list()
 	Relatively easy to make, the single tank bomb requries no tank transfer valve, and is still a fairly formidable weapon that can be manufactured from any tank."
 
 
-/obj/item/weapon/tank/Initialize()
+/obj/item/tank/Initialize()
 	. = ..()
 	proxyassembly = new /obj/item/device/tankassemblyproxy(src)
 	proxyassembly.tank = src
 
 	air_contents = new /datum/gas_mixture(volume, T20C)
 	for(var/gas in starting_pressure)
-		air_contents.adjust_gas(gas, starting_pressure[gas]*volume/(R_IDEAL_GAS_EQUATION*T20C), 0)
+		var/gas_moles = starting_pressure[gas] * volume / (R_IDEAL_GAS_EQUATION * T20C)
+		max_gas_moles += gas_moles
+		air_contents.adjust_gas(gas, gas_moles, 0)
 	air_contents.update_values()
+	if(max_gas_moles <= 0)
+		max_gas_moles = 6 * ONE_ATMOSPHERE * volume / (R_IDEAL_GAS_EQUATION * T20C)
 
 	START_PROCESSING(SSobj, src)
 	update_icon()
 
-/obj/item/weapon/tank/Destroy()
+/obj/item/tank/Destroy()
 	QDEL_NULL(air_contents)
 
 	STOP_PROCESSING(SSobj, src)
@@ -81,7 +83,7 @@ var/list/global/tank_gauge_cache = list()
 
 	. = ..()
 
-/obj/item/weapon/tank/examine(mob/user)
+/obj/item/tank/examine(mob/user)
 	. = ..(user, 0)
 	if(.)
 		var/celsius_temperature = air_contents.temperature - T0C
@@ -103,13 +105,14 @@ var/list/global/tank_gauge_cache = list()
 				descriptive = "bitterly cold"
 		to_chat(user, "<span class='notice'>\The [src] feels [descriptive].</span>")
 
+	to_chat(user, "<span class='notice'>It has [remaining_gas_percent()]% of its gas remaining.</span>")
 	if(proxyassembly.assembly || wired)
 		to_chat(user, "<span class='warning'>It seems to have [wired? "some wires ": ""][wired && proxyassembly.assembly? "and ":""][proxyassembly.assembly ? "some sort of assembly ":""]attached to it.</span>")
 	if(valve_welded)
 		to_chat(user, "<span class='warning'>\The [src] emergency relief valve has been welded shut!</span>")
 
 
-/obj/item/weapon/tank/attackby(obj/item/weapon/W as obj, mob/user as mob)
+/obj/item/tank/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
 	if (istype(loc, /obj/item/assembly))
 		icon = loc
@@ -179,7 +182,7 @@ var/list/global/tank_gauge_cache = list()
 			to_chat(user, "<span class='notice'>You need to wire the device up first.</span>")
 
 	if(isWelder(W))
-		var/obj/item/weapon/weldingtool/WT = W
+		var/obj/item/weldingtool/WT = W
 		if(WT.remove_fuel(1,user))
 			if(!valve_welded)
 				to_chat(user, "<span class='notice'>You begin welding the \the [src] emergency pressure relief valve.</span>")
@@ -202,94 +205,17 @@ var/list/global/tank_gauge_cache = list()
 
 
 
-/obj/item/weapon/tank/attack_self(mob/user as mob)
+/obj/item/tank/attack_self(mob/user as mob)
 	add_fingerprint(user)
 	if (!air_contents)
 		return
-	ui_interact(user)
 
 // There's GOT to be a better way to do this
 	if (proxyassembly.assembly)
 		proxyassembly.assembly.attack_self(user)
 
 
-/obj/item/weapon/tank/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
-	var/mob/living/carbon/location = null
-
-	if(istype(loc, /obj/item/weapon/rig))		// check for tanks in rigs
-		if(istype(loc.loc, /mob/living/carbon))
-			location = loc.loc
-	else if(istype(loc, /mob/living/carbon))
-		location = loc
-
-	var/using_internal
-	if(istype(location))
-		if(location.internal==src)
-			using_internal = 1
-
-	// this is the data which will be sent to the ui
-	var/data[0]
-	data["tankPressure"] = round(air_contents.return_pressure() ? air_contents.return_pressure() : 0)
-	data["releasePressure"] = round(distribute_pressure ? distribute_pressure : 0)
-	data["defaultReleasePressure"] = round(TANK_DEFAULT_RELEASE_PRESSURE)
-	data["maxReleasePressure"] = round(TANK_MAX_RELEASE_PRESSURE)
-	data["valveOpen"] = using_internal ? 1 : 0
-	data["maskConnected"] = 0
-
-	if(istype(location))
-		var/mask_check = 0
-
-		if(location.internal == src)	// if tank is current internal
-			mask_check = 1
-		else if(src in location)		// or if tank is in the mobs possession
-			if(!location.internal)		// and they do not have any active internals
-				mask_check = 1
-		else if(istype(loc, /obj/item/weapon/rig))	// or the rig is in the mobs possession
-			if(loc in location)
-				if(!location.internal)		// and they do not have any active internals
-					mask_check = 1
-
-		if(mask_check)
-			if(location.wear_mask && (location.wear_mask.item_flags & ITEM_FLAG_AIRTIGHT))
-				data["maskConnected"] = 1
-			else if(istype(location, /mob/living/carbon/human))
-				var/mob/living/carbon/human/H = location
-				if(H.head && (H.head.item_flags & ITEM_FLAG_AIRTIGHT))
-					data["maskConnected"] = 1
-
-	// update the ui if it exists, returns null if no ui is passed/found
-	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
-	if (!ui)
-		// the ui does not exist, so we'll create a new() one
-		// for a list of parameters and their descriptions see the code docs in \code\modules\nano\nanoui.dm
-		ui = new(user, src, ui_key, "tanks.tmpl", "Tank", 500, 300)
-		// when the ui is first opened this is the data it will use
-		ui.set_initial_data(data)
-		// open the new ui window
-		ui.open()
-		// auto update every Master Controller tick
-		ui.set_auto_update(1)
-
-/obj/item/weapon/tank/Topic(user, href_list, state = GLOB.inventory_state)
-	..()
-
-/obj/item/weapon/tank/OnTopic(user, href_list)
-	if (href_list["dist_p"])
-		if (href_list["dist_p"] == "reset")
-			distribute_pressure = TANK_DEFAULT_RELEASE_PRESSURE
-		else if (href_list["dist_p"] == "max")
-			distribute_pressure = TANK_MAX_RELEASE_PRESSURE
-		else
-			var/cp = text2num(href_list["dist_p"])
-			distribute_pressure += cp
-		distribute_pressure = min(max(round(distribute_pressure), 0), TANK_MAX_RELEASE_PRESSURE)
-		return TOPIC_REFRESH
-
-	if (href_list["stat"])
-		toggle_valve(usr)
-		return TOPIC_REFRESH
-
-/obj/item/weapon/tank/proc/toggle_valve(var/mob/user)
+/obj/item/tank/proc/toggle_valve(var/mob/user)
 	if(istype(loc,/mob/living/carbon))
 		var/mob/living/carbon/location = loc
 		if(location.internal == src)
@@ -315,37 +241,41 @@ var/list/global/tank_gauge_cache = list()
 			else
 				to_chat(user, "<span class='warning'>You need something to connect to \the [src].</span>")
 
-/obj/item/weapon/tank/remove_air(amount)
+/obj/item/tank/remove_air(amount)
 	return air_contents.remove(amount)
 
-/obj/item/weapon/tank/return_air()
+/obj/item/tank/return_air()
 	return air_contents
 
-/obj/item/weapon/tank/assume_air(datum/gas_mixture/giver)
+/obj/item/tank/assume_air(datum/gas_mixture/giver)
 	air_contents.merge(giver)
 
 	check_status()
 	return 1
 
-/obj/item/weapon/tank/proc/remove_air_volume(volume_to_return)
-	if(!air_contents)
+/obj/item/tank/proc/remove_air_volume(volume_to_return)
+	if(!air_contents || air_contents.temperature <= 0 || air_contents.total_moles <= 0 || volume_to_return <= 0)
 		return null
-
-	var/tank_pressure = air_contents.return_pressure()
-	if(tank_pressure < distribute_pressure)
-		distribute_pressure = tank_pressure
 
 	var/moles_needed = distribute_pressure*volume_to_return/(R_IDEAL_GAS_EQUATION*air_contents.temperature)
 
-	return remove_air(moles_needed)
+	var/datum/gas_mixture/removed = air_contents.remove_ratio(moles_needed / air_contents.get_total_moles(), 1)
+	if(removed)
+		removed.volume = volume_to_return
+	return removed
 
-/obj/item/weapon/tank/Process()
+/obj/item/tank/proc/remaining_gas_percent()
+	if(!air_contents || max_gas_moles <= 0 || air_contents.total_moles <= 0)
+		return 0
+	return min(100, max(1, round(air_contents.total_moles / max_gas_moles * 100)))
+
+/obj/item/tank/Process()
 	//Allow for reactions
 	air_contents.react() //cooking up air tanks - add phoron and oxygen, then heat above PHORON_MINIMUM_BURN_TEMPERATURE
 	update_icon()
 	check_status()
 
-/obj/item/weapon/tank/update_icon()
+/obj/item/tank/update_icon()
 	if((atom_flags & ATOM_FLAG_INITIALIZED) && istype(loc, /obj/) && !istype(loc, /obj/item/clothing/suit/)) //So we don't eat up our tick. Every tick, when we're not actually in play.
 		return
 	overlays.Cut()
@@ -361,13 +291,9 @@ var/list/global/tank_gauge_cache = list()
 	if(!gauge_icon)
 		return
 
-	var/gauge_pressure = 0
-	if(air_contents)
-		gauge_pressure = air_contents.return_pressure()
-		if(gauge_pressure > TANK_IDEAL_PRESSURE)
-			gauge_pressure = -1
-		else
-			gauge_pressure = round((gauge_pressure/TANK_IDEAL_PRESSURE)*gauge_cap)
+	var/gauge_pressure = round(remaining_gas_percent() / 100 * gauge_cap)
+	if(air_contents && air_contents.return_pressure() > TANK_IDEAL_PRESSURE)
+		gauge_pressure = -1
 
 	var/indicator = "[gauge_icon][(gauge_pressure == -1) ? "overload" : gauge_pressure]"
 	if(!tank_gauge_cache[indicator])
@@ -375,7 +301,7 @@ var/list/global/tank_gauge_cache = list()
 	overlays += tank_gauge_cache[indicator]
 
 //Handle exploding, leaking, and rupturing of the tank
-/obj/item/weapon/tank/proc/check_status()
+/obj/item/tank/proc/check_status()
 	if(!air_contents)
 		return 0
 
@@ -487,16 +413,16 @@ var/list/global/tank_gauge_cache = list()
 ///Prewelded tanks
 /////////////////////////////////
 
-/obj/item/weapon/tank/phoron/welded
+/obj/item/tank/phoron/welded
 	valve_welded = 1
-/obj/item/weapon/tank/oxygen/welded
+/obj/item/tank/oxygen/welded
 	valve_welded = 1
 
 /////////////////////////////////
 ///Onetankbombs (added as actual items)
 /////////////////////////////////
 
-/obj/item/weapon/tank/proc/onetankbomb()
+/obj/item/tank/proc/onetankbomb()
 	var/phoron_amt = 4 + rand(4)
 	var/oxygen_amt = 6 + rand(8)
 
@@ -515,11 +441,11 @@ var/list/global/tank_gauge_cache = list()
 	H.update_icon()
 	update_icon()
 
-/obj/item/weapon/tank/phoron/onetankbomb/Initialize()
+/obj/item/tank/phoron/onetankbomb/Initialize()
 	. = ..()
 	onetankbomb()
 
-/obj/item/weapon/tank/oxygen/onetankbomb/Initialize()
+/obj/item/tank/oxygen/onetankbomb/Initialize()
 	. = ..()
 	onetankbomb()
 
@@ -530,13 +456,13 @@ var/list/global/tank_gauge_cache = list()
 /obj/item/device/tankassemblyproxy
 	name = "Tank assembly proxy"
 	desc = "Used as a stand in to trigger single tank assemblies... but you shouldn't see this."
-	var/obj/item/weapon/tank/tank = null
+	var/obj/item/tank/tank = null
 	var/obj/item/device/assembly_holder/assembly = null
 
 /obj/item/device/tankassemblyproxy/receive_signal()	//This is mainly called by the sensor through sense() to the holder, and from the holder to here.
 	tank.ignite()	//boom (or not boom if you made shijwtty mix)
 
-/obj/item/weapon/tank/proc/assemble_bomb(W,user)	//Bomb assembly proc. This turns assembly+tank into a bomb
+/obj/item/tank/proc/assemble_bomb(W,user)	//Bomb assembly proc. This turns assembly+tank into a bomb
 	var/obj/item/device/assembly_holder/S = W
 	var/mob/M = user
 	if(!S.secured)										//Check if the assembly is secured
@@ -554,7 +480,7 @@ var/list/global/tank_gauge_cache = list()
 
 	update_icon()
 
-/obj/item/weapon/tank/proc/ignite()	//This happens when a bomb is told to explode
+/obj/item/tank/proc/ignite()	//This happens when a bomb is told to explode
 	var/obj/item/device/assembly_holder/assy = proxyassembly.assembly
 	var/ign = assy.a_right
 	var/obj/item/other = assy.a_left

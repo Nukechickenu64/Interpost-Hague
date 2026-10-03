@@ -40,14 +40,15 @@ SUBSYSTEM_DEF(radiation)
 		if (MC_TICK_CHECK)
 			return
 
-	if(!sources.len)
-		listeners.Cut()
-
+	var/no_sources = !sources.len
 	while(listeners.len)
 		var/atom/A = listeners[listeners.len]
 		listeners.len--
 
 		if(!QDELETED(A))
+			// Without sources, only cosmic background in space can apply.
+			if(no_sources && !istype(get_turf(A), /turf/space))
+				continue
 			var/atom/location = A.loc
 			var/rads = 0
 			if(istype(location))

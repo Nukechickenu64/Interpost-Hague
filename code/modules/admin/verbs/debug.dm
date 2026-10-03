@@ -160,19 +160,19 @@
 	if (istype(M, /mob/living/carbon/human))
 		var/mob/living/carbon/human/H = M
 		if (H.wear_id)
-			var/obj/item/weapon/card/id/id = H.wear_id
+			var/obj/item/card/id/id = H.wear_id
 			if(istype(H.wear_id, /obj/item/device/pda))
 				var/obj/item/device/pda/pda = H.wear_id
 				id = pda.id
 			id.icon_state = "gold"
 			id.access = get_all_accesses()
 		else
-			var/obj/item/weapon/card/id/id = new/obj/item/weapon/card/id(M);
+			var/obj/item/card/id/id = new/obj/item/card/id(M);
 			id.icon_state = "gold"
 			id.access = get_all_accesses()
 			id.registered_name = H.real_name
 			id.assignment = "Captain"
-			id.SetName("[id.registered_name]'s ID Card ([id.assignment])")
+			id.update_name()
 			H.equip_to_slot_or_del(id, slot_wear_id)
 			H.update_inv_wear_id()
 	else
@@ -221,8 +221,8 @@
 		if(!(A.type in areas_all))
 			areas_all.Add(A.type)
 
-	for(var/obj/machinery/power/apc/APC in world)
-		var/area/A = get_area(APC)
+	for(var/obj/effect/area_power_marker/M in GLOB.area_power_markers)
+		var/area/A = get_area(M)
 		if(!(A.type in areas_with_APC))
 			areas_with_APC.Add(A.type)
 
@@ -359,7 +359,7 @@
 	for(var/obj/machinery/power/rad_collector/Rad in world)
 		if(Rad.anchored)
 			if(!Rad.P)
-				var/obj/item/weapon/tank/phoron/Phoron = new/obj/item/weapon/tank/phoron(Rad)
+				var/obj/item/tank/phoron/Phoron = new/obj/item/tank/phoron(Rad)
 				Phoron.air_contents.gas["phoron"] = 70
 				Rad.drainratio = 0
 				Rad.P = Phoron
@@ -469,13 +469,13 @@
 
 	for(var/datum/powernet/PN in SSmachines.powernets)
 		var/netcolor = rgb(rand(100,255),rand(100,255),rand(100,255))
-		for(var/obj/structure/cable/C in PN.cables)
-			var/image/I = image('icons/effects/lighting_overlay.dmi', get_turf(C), "transparent")
+		for(var/obj/O in PN.nodes | PN.input_nodes)
+			var/image/I = image('icons/effects/lighting_overlay.dmi', get_turf(O), "transparent")
 			I.plane = DEFAULT_PLANE
 			I.layer = EXPOSED_WIRE_LAYER
 			I.alpha = 127
 			I.color = netcolor
-			I.maptext = "\ref[PN]"
+			I.maptext = "<span style='font-size:6px'>[O.ccid]</span>"
 			powernet_markers += I
 	images += powernet_markers
 

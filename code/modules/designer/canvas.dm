@@ -17,6 +17,13 @@
 	show(user)
 	..()
 
+/obj/item/frame/canvas/verb/examine_artwork_deeply()
+	set name = "Examine Deeply"
+	set category = "IC"
+	set src in view(1)
+	show(usr)
+	appraise_artwork(usr)
+
 /obj/item/frame/canvas/proc/show(mob/user as mob)
 	if(designer_unit && designer_unit.icon_custom)
 		user << browse_rsc(designer_unit.icon_custom, "tmp_canvas_\ref[src].png")
@@ -72,6 +79,13 @@
 	show(user)
 	..()
 
+/obj/structure/canvas/verb/examine_artwork_deeply()
+	set name = "Examine Deeply"
+	set category = "IC"
+	set src in view(1)
+	show(usr)
+	appraise_artwork(usr)
+
 /obj/structure/canvas/proc/show(mob/user as mob)
 	if(designer_unit && designer_unit.icon_custom)
 		user << browse_rsc(designer_unit.icon_custom, "tmp_canvas_\ref[src].png")
@@ -122,3 +136,20 @@
 		if (WEST)
 			ico.Turn(90)
 	overlays += ico
+
+/atom/proc/appraise_artwork(mob/user)
+	if(!designer_unit || !designer_unit.design_finished)
+		to_chat(user, "<span class='warning'>There is no finished artwork to examine.</span>")
+		return FALSE
+	if(!user || !user.ckey || lowertext(user.ckey) == lowertext(designer_unit.creator_ckey))
+		to_chat(user, "<span class='warning'>You cannot appraise your own artwork.</span>")
+		return FALSE
+
+	to_chat(user, "<span class='notice'>You study the artwork closely.</span>")
+	for(var/mob/living/carbon/human/artist in GLOB.player_list)
+		if(!artist.ckey || lowertext(artist.ckey) != lowertext(designer_unit.creator_ckey))
+			continue
+		if(artist.sanity_crisis_active && artist.sanity_crisis_objective == SANITY_CRISIS_CREATE_ART && designer_unit.design_started_at >= artist.sanity_crisis_started_at)
+			artist.complete_sanity_crisis(SANITY_CRISIS_CREATE_ART)
+			break
+	return TRUE

@@ -5,7 +5,7 @@
 	icon = 'icons/obj/machines/shielding.dmi'
 	icon_state = "hdiffuser_off"
 	origin_tech = list(TECH_MAGNET = 5, TECH_POWER = 5, TECH_ILLEGAL = 2)
-	var/obj/item/weapon/cell/device/cell
+	var/obj/item/cell/device/cell
 	var/enabled = 0
 
 /obj/item/weapon/shield_diffuser/update_icon()

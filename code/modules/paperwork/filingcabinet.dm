@@ -19,13 +19,13 @@
 	atom_flags = ATOM_FLAG_CLIMBABLE
 	obj_flags = OBJ_FLAG_ANCHORABLE
 	var/list/can_hold = list(
-		/obj/item/weapon/paper,
-		/obj/item/weapon/folder,
-		/obj/item/weapon/photo,
-		/obj/item/weapon/paper_bundle,
-		/obj/item/weapon/sample,
-		/obj/item/weapon/card/id,
-		/obj/item/weapon/disk/nuclear)
+		/obj/item/paper,
+		/obj/item/folder,
+		/obj/item/photo,
+		/obj/item/paper_bundle,
+		/obj/item/sample,
+		/obj/item/card/id,
+		/obj/item/disk/nuclear)
 
 
 /obj/structure/filingcabinet/chestdrawer
@@ -44,9 +44,61 @@
 	icon_state = "tallcabinet"
 
 
+/obj/structure/filingcabinet/id_records
+	name = "identification records cabinet"
+	desc = "A tall cabinet where spare crew identification cards are filed away."
+	icon_state = "tallcabinet"
+	can_hold = list(/obj/item/card/id)
+
+/obj/structure/filingcabinet/id_records/Initialize()
+	. = ..()
+	GLOB.id_record_cabinets += src
+
+/obj/structure/filingcabinet/id_records/Destroy()
+	GLOB.id_record_cabinets -= src
+	return ..()
+
+// Files a spare job ID for H, usually in the HoP's office but occasionally somewhere else on the map.
+/proc/file_crew_id(mob/living/carbon/human/H)
+	if(!istype(H) || !H.mind || !length(GLOB.id_record_cabinets))
+		return
+	var/datum/job/job = job_master.GetJob(H.mind.assigned_role)
+	if(!job)
+		return
+	var/alt_title = H.mind.role_alt_title
+	var/decl/hierarchy/outfit/outfit = job.get_outfit(H, alt_title, H.char_branch, H.char_rank)
+	if(!outfit || !outfit.id_type)
+		return
+
+	var/list/hop_cabinets = list()
+	var/list/captain_cabinets = list()
+	for(var/obj/structure/filingcabinet/id_records/C in GLOB.id_record_cabinets)
+		var/area/A = get_area(C)
+		if(istype(A, /area/crew_quarters/heads/hop))
+			hop_cabinets += C
+		else if(istype(A, /area/crew_quarters/captain))
+			captain_cabinets += C
+	var/obj/structure/filingcabinet/id_records/cabinet
+	if(istype(job, /datum/job/captain) && captain_cabinets.len)
+		cabinet = pick(captain_cabinets)
+	else
+		cabinet = pick((hop_cabinets.len && prob(98)) ? hop_cabinets : GLOB.id_record_cabinets)
+
+	var/obj/item/card/id/W = new outfit.id_type(cabinet)
+	if(outfit.id_desc)
+		W.desc = outfit.id_desc
+	W.rank = job.title
+	W.assignment = alt_title || job.title
+	H.set_id_info(W)
+	// Unnamed so the owner has to prove it's theirs via photo, prints and DNA.
+	W.registered_name = null
+	W.update_name()
+	return W
+
+
 /obj/structure/filingcabinet/Initialize()
 	for(var/obj/item/I in loc)
-		if(istype(I, /obj/item/weapon/paper) || istype(I, /obj/item/weapon/folder) || istype(I, /obj/item/weapon/photo) || istype(I, /obj/item/weapon/paper_bundle))
+		if(istype(I, /obj/item/paper) || istype(I, /obj/item/folder) || istype(I, /obj/item/photo) || istype(I, /obj/item/paper_bundle))
 			I.loc = src
 	. = ..()
 

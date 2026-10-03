@@ -173,12 +173,15 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 		genetic_degradation = 0
 		status &= ~ORGAN_MUTATED
 		return
+	var/previous_medical_pallor = get_medical_skin_pallor()
 	var/last_gene_dam = genetic_degradation
 	genetic_degradation = min(100,max(0,genetic_degradation - amount))
 	if(genetic_degradation <= 30)
 		if(status & ORGAN_MUTATED)
 			unmutate()
-			to_chat(src, "<span class = 'notice'>Your [name] is shaped normally again.</span>")
+			to_chat(src, "<span class = 'notice'>Your [name] [species.medical_skin_appearance ? "looks healthier again" : "is shaped normally again"].</span>")
+	if(can_show_medical_skin() && previous_medical_pallor != get_medical_skin_pallor())
+		owner.update_body()
 	return -(genetic_degradation - last_gene_dam)
 
 /obj/item/organ/external/proc/add_genetic_damage(var/amount)
@@ -186,12 +189,15 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 		genetic_degradation = 0
 		status &= ~ORGAN_MUTATED
 		return
+	var/previous_medical_pallor = get_medical_skin_pallor()
 	var/last_gene_dam = genetic_degradation
 	genetic_degradation = min(100,max(0,genetic_degradation + amount))
 	if(genetic_degradation > 30)
 		if(!(status & ORGAN_MUTATED) && prob(genetic_degradation))
 			mutate()
 			to_chat(owner, "<span class = 'notice'>Something is not right with your [name]...</span>")
+	if(can_show_medical_skin() && previous_medical_pallor != get_medical_skin_pallor())
+		owner.update_body()
 	return (genetic_degradation - last_gene_dam)
 
 /obj/item/organ/external/proc/mutate()

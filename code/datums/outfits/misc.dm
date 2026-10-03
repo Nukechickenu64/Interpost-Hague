@@ -4,7 +4,7 @@
 	head = /obj/item/clothing/head/helmet/space
 	suit = /obj/item/clothing/suit/space
 	uniform = /obj/item/clothing/under/color/grey
-	back = /obj/item/weapon/tank/jetpack/oxygen
+	back = /obj/item/tank/jetpack/oxygen
 	mask = /obj/item/clothing/mask/breath
 	flags = OUTFIT_HAS_JETPACK|OUTFIT_RESET_EQUIPMENT
 
@@ -14,7 +14,7 @@
 	l_ear = /obj/item/device/radio/headset
 	uniform = /obj/item/clothing/under/color/grey
 	id_slot = slot_wear_id
-	id_type = /obj/item/weapon/card/id/merchant
+	id_type = /obj/item/card/id/merchant
 	pda_slot = slot_r_store
 	pda_type = /obj/item/device/pda/chef //cause I like the look
 	id_pda_assignment = "Merchant"
@@ -30,4 +30,4 @@
 
 /decl/hierarchy/outfit/clown/New()
 	..()
-	backpack_overrides[/decl/backpack_outfit/backpack] = /obj/item/weapon/storage/backpack/clown
+	backpack_overrides[/decl/backpack_outfit/backpack] = /obj/item/storage/backpack/clown

@@ -91,14 +91,26 @@
 */
 		if(H?.mind)
 			var/list/porco_actions_by_tab = get_porco_antagonist_actions_by_tab(H)
-			if(porco_actions_by_tab["They"])
-				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Villain.png');\" id=\"They\" class=\"button\"></div></a>"
-			if(porco_actions_by_tab["Integralist"])
-				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Chrome.png');\" id=\"Integralist\" class=\"button\"></div></a>"
-			if(porco_actions_by_tab["Thanati"])
-				roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Thanati.png');\" id=\"Thanati\" class=\"button\"></div></a>"
-		if(H?.religion != LEGAL_RELIGION)
-			roleButtonHTML += "<a href=\"#\" class=\"role-button\"><div style=\"background-image: url('Thanati.png');\" id=\"Thanati\" class=\"button\"></div></a>"
+			var/tab_index = 0
+			for(var/tab_name in porco_actions_by_tab)
+				var/list/tab_actions = porco_actions_by_tab[tab_name]
+				var/tab_id = tab_name
+				var/tab_icon = "Villain.png"
+				switch(tab_name)
+					if("Integralist")
+						tab_icon = "Chrome.png"
+					if("Thanati")
+						tab_icon = "Thanati.png"
+					if("They", "Xenophage")
+						tab_icon = "Villain.png"
+					else
+						tab_id = "PorcoTab[tab_index]"
+				tab_index++
+				if(!tab_actions.len)
+					continue
+				roleButtonHTML += "<a href=\"#\" class=\"role-button\" title=\"[tab_name]\"><div style=\"background-image: url('[tab_icon]');\" id=\"[tab_id]\" class=\"button\"></div></a>"
+		if(H.religion && H.religion != LEGAL_RELIGION)
+			roleButtonHTML += "<a href=\"#\" class=\"role-button\" title=\"Religion\"><div style=\"background-image: url('Thanati.png');\" id=\"Religion\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
 			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-88px;\" id=\"Dead\" class=\"button\"></div></a>"
 
@@ -119,16 +131,37 @@
 		noteHTML += "<span style='white-space: nowrap' class='segment1 ST'>ST: <span id='st'>[H.stats[STAT_ST]]</span>$HT: <span id='ht'>[H.stats[STAT_HT]]</span>$IN: <span id='int'>[H.stats[STAT_IQ]]</span>$DX: <span id='dx'>[H.stats[STAT_DX]]</span></span>"
 	client.changebuttoncontent("#note", noteHTML)
 	client.changebuttoncontent("#Verb", verbUpdate())
-	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))) + "</span>")
+	var/list/ooc_options = list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))
+	if(isliving(src))
+		var/mob/living/shop_user = src
+		if(shop_user.meta_shop_access())
+			ooc_options += list(list("Leverage-Exchange", "Leverage Exchange"))
+	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(ooc_options) + "</span>")
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
 
 	client.changebuttoncontent("#DeadGhost", {"<span class='segment1'>[generateVerbList(list(list("JoinHellDelverSquad", "Fight in Hell"), list("ToggleGhostVision", "Toggle Ghost Vision"), list("ToggleAnonymousChat", "Become Anonymous"), list("ToggleDarkness", "Add Light"), list("BecomeMouse", "Transform into a Mouse"), list("FollowGhost", "Follow"), list("TeleportGhost", "Teleport"), list("ToggleAntagHUD", "Toggle Antag HUD"), list("ToggleMedicHUD", "Toggle Medic HUD"), list("MoveUp", "Move Upwards"), list("MoveDown", "Move Down"), list("ReenterCorpse", "Re-enter Corpse")))]</span>"})
 	client.changebuttoncontent("#Dead", {"<span class='segment1'>[generateVerbList(list(list("Succumb", "Succumb")))]</span>"})
 	var/list/porco_actions_by_tab = get_porco_antagonist_actions_by_tab(src)
-	client.changebuttoncontent("#They", porco_actions_by_tab["They"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["They"], 1, src)]</span>" : "")
-	client.changebuttoncontent("#Integralist", porco_actions_by_tab["Integralist"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["Integralist"], 1, src)]</span>" : "")
-	client.changebuttoncontent("#Thanati", porco_actions_by_tab["Thanati"] ? "<span class='segment1'>[generateVerbList(porco_actions_by_tab["Thanati"], 1, src)]</span>" : "")
+	var/tab_index = 0
+	for(var/tab_name in porco_actions_by_tab)
+		var/list/tab_actions = porco_actions_by_tab[tab_name]
+		var/tab_id = tab_name
+		if(!(tab_name in list("They", "Integralist", "Thanati", "Xenophage")))
+			tab_id = "PorcoTab[tab_index]"
+		tab_index++
+		if(!tab_actions.len)
+			continue
+		client.changebuttoncontent("#[tab_id]", "<span class='segment1'>[generateVerbList(tab_actions, 1, src)]</span>")
+	var/list/religion_actions = list()
+	if(ishuman(src))
+		var/mob/living/carbon/human/religion_user = src
+		if(religion_user.religion && religion_user.religion != LEGAL_RELIGION)
+			if(/mob/living/proc/praise_god in religion_user.verbs)
+				religion_actions += list(list("PraiseyourGod", "Praise Your God"))
+			if(/mob/living/proc/make_shrine in religion_user.verbs)
+				religion_actions += list(list("CreateShrine", "Create Shrine"))
+	client.changebuttoncontent("#Religion", religion_actions.len ? "<span class='segment1'>[generateVerbList(religion_actions)]</span>" : "")
 
 
 /mob/proc/verbUpdate()

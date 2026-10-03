@@ -1,9 +1,6 @@
 #ifndef TANK_MAX_RELEASE_PRESSURE
 #define TANK_MAX_RELEASE_PRESSURE (3*ONE_ATMOSPHERE)
 #endif
-#ifndef TANK_DEFAULT_RELEASE_PRESSURE
-#define TANK_DEFAULT_RELEASE_PRESSURE ONE_ATMOSPHERE
-#endif
 
 /obj/machinery/oxygen_pump
 	name = "emergency oxygen pump"
@@ -13,11 +10,11 @@
 
 	anchored = TRUE
 
-	var/obj/item/weapon/tank/tank
+	var/obj/item/tank/tank
 	var/mob/living/carbon/breather
 	var/obj/item/clothing/mask/breath/contained
 
-	var/spawn_type = /obj/item/weapon/tank/emergency/oxygen/engi
+	var/spawn_type = /obj/item/tank/emergency/oxygen/engi
 	var/mask_type = /obj/item/clothing/mask/breath/emergency
 	var/icon_state_open = "emerg_open"
 	var/icon_state_closed = "emerg"
@@ -143,7 +140,7 @@
 		if(!stat)
 			icon_state = icon_state_closed
 		//TO-DO: Open icon
-	if(istype(W, /obj/item/weapon/tank) && (stat & MAINT))
+	if(istype(W, /obj/item/tank) && (stat & MAINT))
 		if(tank)
 			to_chat(user, "<span class='warning'>\The [src] already has a tank installed!</span>")
 		else
@@ -152,7 +149,7 @@
 			tank = W
 			user.visible_message("<span class='notice'>\The [user] installs \the [tank] into \the [src].</span>", "<span class='notice'>You install \the [tank] into \the [src].</span>")
 			src.add_fingerprint(user)
-	if(istype(W, /obj/item/weapon/tank) && !stat)
+	if(istype(W, /obj/item/tank) && !stat)
 		to_chat(user, "<span class='warning'>Please open the maintenance hatch first.</span>")
 
 /obj/machinery/oxygen_pump/examine(var/mob/user)
@@ -192,6 +189,7 @@
 	if(!tank)
 		to_chat(usr, "<span class='warning'>It is missing a tank!</span>")
 		data["tankPressure"] = 0
+		data["tankPercent"] = 0
 		data["releasePressure"] = 0
 		data["defaultReleasePressure"] = 0
 		data["maxReleasePressure"] = 0
@@ -200,8 +198,9 @@
 	// this is the data which will be sent to the ui
 	if(tank)
 		data["tankPressure"] = round(tank.air_contents.return_pressure() ? tank.air_contents.return_pressure() : 0)
+		data["tankPercent"] = tank.remaining_gas_percent()
 		data["releasePressure"] = round(tank.distribute_pressure ? tank.distribute_pressure : 0)
-		data["defaultReleasePressure"] = round(TANK_DEFAULT_RELEASE_PRESSURE)
+		data["defaultReleasePressure"] = round(initial(tank.distribute_pressure))
 		data["maxReleasePressure"] = round(TANK_MAX_RELEASE_PRESSURE)
 		data["maskConnected"] = 0
 		data["tankInstalled"] = 1
@@ -231,18 +230,20 @@
 
 	if (href_list["dist_p"])
 		if (href_list["dist_p"] == "reset")
-			tank.distribute_pressure = TANK_DEFAULT_RELEASE_PRESSURE
+			tank.distribute_pressure = initial(tank.distribute_pressure)
 		else if (href_list["dist_p"] == "max")
 			tank.distribute_pressure = TANK_MAX_RELEASE_PRESSURE
 		else
 			var/cp = text2num(href_list["dist_p"])
 			tank.distribute_pressure += cp
-		tank.distribute_pressure = min(max(round(tank.distribute_pressure), 0), TANK_MAX_RELEASE_PRESSURE)
+		if (href_list["dist_p"] != "reset")
+			tank.distribute_pressure = round(tank.distribute_pressure)
+		tank.distribute_pressure = min(max(tank.distribute_pressure, 0), TANK_MAX_RELEASE_PRESSURE)
 		return 1
 
 /obj/machinery/oxygen_pump/anesthetic
 	name = "anesthetic pump"
-	spawn_type = /obj/item/weapon/tank/anesthetic
+	spawn_type = /obj/item/tank/anesthetic
 	icon_state = "anesthetic_tank"
 	icon_state_closed = "anesthetic_tank"
 	icon_state_open = "anesthetic_tank_open"

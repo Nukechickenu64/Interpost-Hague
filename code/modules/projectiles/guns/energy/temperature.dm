@@ -1,9 +1,9 @@
 /obj/item/weapon/gun/energy/temperature
-	name = "temperature gun"
+	name = "\improper Hephaestus Industries THP-4 Thermal Projector"
 	icon_state = "freezegun"
 	item_state = "freezegun"
 	fire_sound = 'sound/weapons/pulse3.ogg'
-	desc = "A gun that changes temperatures. It has a small label on the side, 'More extreme temperatures will cost more charge!'"
+	desc = "A handheld thermal projector with selectable output temperatures. Extreme settings consume more cell charge."
 	var/temperature = T20C
 	var/current_temperature = T20C
 	charge_cost = 10
@@ -13,7 +13,7 @@
 	wielded_item_state = "gun_wielded"
 
 	projectile_type = /obj/item/projectile/temp
-	power_supply = /obj/item/weapon/cell/high
+	power_supply = /obj/item/cell/high
 	combustion = 0
 
 

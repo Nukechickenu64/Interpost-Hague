@@ -13,11 +13,11 @@
 	var/selectable_rewards = list()
 	var/selectable_punishments = list()
 	var/whisper_lines = list()
-	var/offering_items = list(/obj/item/weapon/paper)
+	var/offering_items = list(/obj/item/paper)
 // Cult-specific religion aligned with Nar-Sie
 /datum/religion/narsie
 	name = NARSIE_RELIGION
-	holy_item = /obj/item/weapon/book/tome
+	holy_item = /obj/item/book/tome
 	favor = 0
 	whisper_lines = list(
 		"The geometer must be completed.",
@@ -25,7 +25,7 @@
 		"Carve the angles. Open the way.",
 		"The veil thins with every stroke."
 	)
-	offering_items = list(/obj/item/weapon/book/tome, /obj/item/weapon/material/knife/ritual)
+	offering_items = list(/obj/item/book/tome, /obj/item/weapon/material/knife/ritual)
 
 /datum/religion/New()
 	selectable_requests =  subtypesof(/datum/request)
@@ -36,12 +36,12 @@
 	name = "Atheism"
 	holy_item = /obj/item/weapon/brander
 	whisper_lines = list("Remember: science protects.", "The researcher provides.", "Trust the Internal Affairs agent.")
-	offering_items = list(/obj/item/weapon/spacecash/bundle/c10)
+	offering_items = list(/obj/item/spacecash/bundle/c10)
 
 /*
 /datum/religion/narsie
 	name = "Narsie"
-	holy_item = /obj/item/weapon/book/tome
+	holy_item = /obj/item/book/tome
 	favor = 0
 */
 

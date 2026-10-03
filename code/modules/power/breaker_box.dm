@@ -15,7 +15,6 @@
 	anchored = 1
 	var/on = 0
 	var/busy = 0
-	var/directions = list(1,2,4,8,5,6,9,10)
 	var/RCon_tag = "NO_TAG"
 	var/update_locked = 0
 
@@ -89,37 +88,17 @@
 
 
 
+/obj/machinery/power/breakerbox/power_node_is_split()
+	return TRUE
+
+// When on, the input and output buses are joined into one.
 /obj/machinery/power/breakerbox/proc/set_state(var/state)
 	on = state
-	if(on)
-		icon_state = icon_state_on
-		var/list/connection_dirs = list()
-		for(var/direction in directions)
-			for(var/obj/structure/cable/C in get_step(src,direction))
-				if(C.d1 == turn(direction, 180) || C.d2 == turn(direction, 180))
-					connection_dirs += direction
-					break
-
-		for(var/direction in connection_dirs)
-			var/obj/structure/cable/C = new/obj/structure/cable(src.loc)
-			C.d1 = 0
-			C.d2 = direction
-			C.icon_state = "[C.d1]-[C.d2]"
-			C.breaker_box = src
-
-			var/datum/powernet/PN = new()
-			PN.add_cable(C)
-
-			C.mergeConnectedNetworks(C.d2)
-			C.mergeConnectedNetworksOnTurf()
-
-			if(C.d2 & (C.d2 - 1))// if the cable is layed diagonally, check the others 2 possible directions
-				C.mergeDiagonalsNetworks(C.d2)
-
-	else
-		icon_state = icon_state_off
-		for(var/obj/structure/cable/C in src.loc)
-			qdel(C)
+	icon_state = on ? icon_state_on : icon_state_off
+	var/datum/power_node/N = get_power_node()
+	if(N)
+		N.bridged = !!on
+		power_grid_dirty = TRUE
 
 // Used by RCON to toggle the breaker box.
 /obj/machinery/power/breakerbox/proc/auto_toggle()

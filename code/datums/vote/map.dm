@@ -2,12 +2,15 @@
 	name = "map"
 
 /datum/vote/map/can_run(mob/creator, automatic)
+	// Map voting is disabled; restore the checks below to re-enable.
 	return FALSE
+	/*
 	if(!config.allow_map_switching)
 		return FALSE
 	if(GAME_STATE >= RUNLEVEL_GAME)
 		return FALSE
 	return ..()
+	*/
 
 /datum/vote/map/setup_vote()
 	for(var/name in GLOB.all_maps)

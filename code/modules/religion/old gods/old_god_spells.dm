@@ -30,7 +30,7 @@
 	to_world("Something is fucked up, you should not be seeing this. It's from old gods spell code, go tell a coder.")
 
 	//Helper to make spells involving paper easier TODO: same thing for blood/limbs/organs
-/datum/old_god_spell/proc/get_player_from_paper(var/obj/item/weapon/paper/target_paper)
+/datum/old_god_spell/proc/get_player_from_paper(var/obj/item/paper/target_paper)
 	for(var/mob/player in GLOB.player_list)
 		if(findtext(target_paper.info, player.name))
 			return player
@@ -43,7 +43,7 @@
 /* // Demonstration of working order.
 /datum/old_god_spell/smoke_example
 	name = "Simple puff of smoke to demonstrate"
-	requirments = list("NORTH" = /obj/item/weapon/paper)
+	requirments = list("NORTH" = /obj/item/paper)
 	old_god = "None"
 
 	spell_effect(var/mob/living/user, var/list/spell_components)

@@ -54,7 +54,17 @@
 				src.open_tile_context_menu(T, A, params)
 			return 1
 		}
+		if(modifiers["ctrl"]) {
+			LookFarClickOn(A)
+			return 1
+		}
 		// Plain Right-Click -> call the new right-click interaction
+		if(istype(A, /obj/item))
+			var/obj/item/item = A
+			if(isEquipped(item))
+				if(canClick() && !stat && !restrained() && !stunned && !lying && !paralysis && !weakened && !sleeping)
+					item.worn_use(src)
+				return 1
 		if(A)
 			A.attack_hand_right(src)
 		return 1
@@ -121,6 +131,11 @@
 		throw_mode_off()
 
 	var/obj/item/W = get_active_hand()
+
+	var/obj/item/device/flashlight/aimed_light = W
+	if(istype(aimed_light) && aimed_light.can_aim(A, src))
+		aimed_light.aim_at(A, src, params)
+		return 1
 
 	if(W == A) // Handle attack_self
 

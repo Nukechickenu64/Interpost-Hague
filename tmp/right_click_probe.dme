@@ -1,0 +1,32 @@
+/obj/right_click_probe
+	var/observed_actor
+
+/obj/right_click_probe/verb/base_action()
+	set category = "Object"
+	observed_actor = usr
+
+/obj/right_click_probe/child/verb/specific_action()
+	set category = "Object"
+
+/obj/right_click_reparented
+	parent_type = /obj/right_click_probe/child
+
+/world/New()
+	var/obj/right_click_probe/target = new /obj/right_click_reparented
+	var/found_base = FALSE
+	var/found_specific = FALSE
+	for(var/verb_path in target.verbs)
+		world.log << "VERB [verb_path] category=[verb_path:category] invisibility=[verb_path:invisibility]"
+		if(verb_path == /obj/right_click_probe/verb/base_action)
+			found_base = TRUE
+		if(verb_path == /obj/right_click_probe/child/verb/specific_action)
+			found_specific = TRUE
+	if(!found_base || !found_specific || !ispath(target.type, /obj/right_click_probe/child))
+		CRASH("Verb inheritance contract failed")
+	var/mob/actor = new
+	usr = actor
+	call(target, /obj/right_click_probe/verb/base_action)()
+	if(target.observed_actor != actor)
+		CRASH("Verb invocation actor contract failed")
+	world.log << "PASS: verb metadata, real inheritance and actor context"
+	del(world)

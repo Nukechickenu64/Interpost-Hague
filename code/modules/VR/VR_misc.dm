@@ -42,11 +42,11 @@
 	ChangeTurf(/turf/simulated/floor/fixed/cyber)
 	playsound(src,'sound/misc/ipick.ogg', 100)
 
-/obj/item/weapon/disk/tech_disk/vr
+/obj/item/disk/tech_disk/vr
 	name = "Technical Design Disk"
 	desc = "A design disk crammed to the brim with whatever the cybertechnician could get his grubby little hands on before he got booted out."
 
-/obj/item/weapon/disk/tech_disk/vr/New()
+/obj/item/disk/tech_disk/vr/New()
 	switch(roll(1,9))
 		if(1)
 			name = "Engineering Design Disk"
@@ -103,15 +103,15 @@
 			stored = sneed
 			stored.level = 5
 
-/obj/item/weapon/implant/cyberdock
+/obj/item/implant/cyberdock
 	name = "Cyberspace plug"
 	desc = "A head-mounted Cyber-plug. Allows for direct brain-stem connection to any Cyberspace dock. Necessary for any exploration of Cyberspace."
 	icon_state = "cyberport"
 	var/points = 0
 
-/obj/item/weapon/implanter/cyberdock
+/obj/item/implanter/cyberdock
 	name = "implanter (Cyber)"
-	imp = /obj/item/weapon/implant/cyberdock
+	imp = /obj/item/implant/cyberdock
 
 /obj/item/clothing/head/cyberdeck
 	name = "Cyberspace Deck"

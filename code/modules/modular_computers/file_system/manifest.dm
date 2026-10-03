@@ -179,7 +179,7 @@
 			var/datum/mil_rank/rank_obj = mil_branches.get_rank(CR.get_branch(), CR.get_rank())
 
 			if(branch_obj && rank_obj)
-				mil_ranks[name] = "<span class='manifesttext'>[rank_obj.name], [branch_obj.name], [rank_obj.name_short]</span>"
+				mil_ranks[name] = "<span class='manifesttext'>[rank_obj.name], [branch_obj.name], [rank_obj.name_short]</span> "
 
 		if(OOC)
 			var/active = 0
@@ -217,7 +217,7 @@
 		var/list/names = department["names"]
 		if(names.len > 0)
 			for(var/name in names)
-				msg += "<span class='manifesttext'>[mil_ranks[name]][name], [names[name]]</span>"
+				msg += "<span class='manifesttext'>[mil_ranks[name]][name], [names[name]]</span><br>"
 
 	msg += "</div></div>"
 	to_chat(usr, msg)

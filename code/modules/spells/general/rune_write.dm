@@ -66,7 +66,7 @@
 	// All rune types except Summon Tome require carrying a cult tome
 	if(choice != "Summon Tome")
 		var/has_tome = 0
-		for(var/obj/item/weapon/book/tome/T in user.contents)
+		for(var/obj/item/book/tome/T in user.contents)
 			has_tome = 1; break
 		if(!has_tome)
 			to_chat(user, "<span class='warning'>You need your cult tome on you to recall the words for that rune.</span>")

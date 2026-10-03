@@ -1,5 +1,5 @@
 /obj/item/weapon/gun/energy/gun
-	name = "energy gun"
+	name = "\improper Lawson Arms LAEP90 Perun Energy Pistol"
 	desc = "Another bestseller of Lawson Arms and the FTU, the LAEP90 Perun is a versatile energy based sidearm, capable of switching between low, medium and high power projectile settings. In other words: stun, shock or kill."
 	icon_state = "energystun100"
 	item_state = null	//so the human update icon uses the icon_state instead.
@@ -17,8 +17,8 @@
 		)
 
 /obj/item/weapon/gun/energy/gun/small
-	name = "small energy gun"
-	desc = "A smaller model of the versatile LAEP90 Perun, packing considerable utility in a smaller package. Best used in situations where full-sized sidearms are inappropriate."
+	name = "\improper Lawson Arms LAEP90-S Perun Compact Energy Pistol"
+	desc = "A reduced-size LAEP90 Perun variant intended for discreet carry where a full-sized sidearm is unsuitable."
 	icon_state = "smallgunstun"
 	max_shots = 5
 	w_class = ITEM_SIZE_SMALL
@@ -32,8 +32,8 @@
 		)
 
 /obj/item/weapon/gun/energy/gun/gamma
-	name = "T-Gamma laser rifle"
-	desc = "A very bulky old laser rifle used by companies around the world. This heavy laser rifle seems to have a lot of scratches on it."
+	name = "\improper Mars Military Industries TG-20 Gamma Laser Rifle"
+	desc = "An older, heavy laser rifle once issued by several corporate security forces. Its casing is extensively scratched."
 	icon_state = "gamma"
 	max_shots = 20
 	w_class = ITEM_SIZE_NORMAL
@@ -46,13 +46,14 @@
 		)
 
 /obj/item/weapon/gun/energy/gun/mounted
-	name = "mounted energy gun"
+	name = "\improper Lawson Arms LAEP90-M Perun Mounted Energy System"
+	desc = "An LAEP90 Perun energy system configured for powered mounting and external cell supply."
 	self_recharge = 1
 	use_external_power = 1
 
 /obj/item/weapon/gun/energy/gun/nuclear
-	name = "advanced energy gun"
-	desc = "An energy gun with an experimental miniaturized reactor."
+	name = "\improper Lawson Arms LAEP90-R Perun Reactor-Powered Energy Pistol"
+	desc = "An experimental Perun variant with a miniaturized reactor for self-recharging operation. Reactor damage can produce hazardous emissions."
 	icon_state = "nucgun"
 	origin_tech = list(TECH_COMBAT = 3, TECH_MATERIAL = 5, TECH_POWER = 3)
 	slot_flags = SLOT_BELT

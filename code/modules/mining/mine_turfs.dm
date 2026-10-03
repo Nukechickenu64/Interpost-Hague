@@ -59,6 +59,21 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		mining_walls["[src.z]"] -= src
 	return ..()
 
+/turf/simulated/mineral/ChangeTurf(var/turf/N, var/tell_universe=1, var/force_lighting_update = 0)
+	clear_attached_overlays()
+	return ..()
+
+// Edge overlays are drawn onto neighbouring turfs, so they must be removed from there explicitly.
+/turf/simulated/mineral/proc/clear_attached_overlays()
+	if(!attachedoverlays.len)
+		return
+	for(var/turf/T in orange(1, src))
+		T.overlays -= attachedoverlays
+	attachedoverlays.Cut()
+
+/turf/simulated/mineral/proc/is_in_space_ruins()
+	return istype(loc, /area/space/ruins) || (z && z == get_space_ruins_z())
+
 /turf/simulated/mineral/can_build_cable()
 	return !density
 
@@ -75,6 +90,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 	overlays.Cut()
 
 	spawn(1)
+		clear_attached_overlays()
 		var/turf/T
 		var/image/theoverlay
 		if(mineral_overlay_elegibility(get_step(src, NORTH)))
@@ -175,14 +191,14 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 	. = ..()
 	if(istype(AM,/mob/living/carbon/human))
 		var/mob/living/carbon/human/H = AM
-		if((istype(H.l_hand,/obj/item/weapon/pickaxe)) && (!H.hand))
+		if((istype(H.l_hand,/obj/item/pickaxe)) && (!H.hand))
 			attackby(H.l_hand,H)
-		else if((istype(H.r_hand,/obj/item/weapon/pickaxe)) && H.hand)
+		else if((istype(H.r_hand,/obj/item/pickaxe)) && H.hand)
 			attackby(H.r_hand,H)
 
 	else if(istype(AM,/mob/living/silicon/robot))
 		var/mob/living/silicon/robot/R = AM
-		if(istype(R.module_active,/obj/item/weapon/pickaxe))
+		if(istype(R.module_active,/obj/item/pickaxe))
 			attackby(R.module_active,R)
 
 	else if(istype(AM,/obj/mecha))
@@ -232,11 +248,11 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 			to_chat(user, "<span class='notice'>\The [src] has been excavated to a depth of [excavation_level]cm.</span>")
 		return
 
-	if (istype(W, /obj/item/weapon/pickaxe))
+	if (istype(W, /obj/item/pickaxe))
 		if(!istype(user.loc, /turf))
 			return
 
-		var/obj/item/weapon/pickaxe/P = W
+		var/obj/item/pickaxe/P = W
 		if(last_act + P.get_digspeed(user) > world.time)//prevents message spam
 			return
 		last_act = world.time
@@ -330,7 +346,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 			next_rock += P.excavation_amount
 			while(next_rock > 50)
 				next_rock -= 50
-				var/obj/item/weapon/ore/O = new(src)
+				var/obj/item/ore/O = new(src)
 				geologic_data.UpdateNearbyArtifactInfo(src)
 				O.geologic_data = geologic_data
 
@@ -346,7 +362,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		return
 
 	clear_ore_effects()
-	var/obj/item/weapon/ore/O = new mineral.ore (src)
+	var/obj/item/ore/O = new mineral.ore (src)
 	if(geologic_data && istype(O))
 		geologic_data.UpdateNearbyArtifactInfo(src)
 		O.geologic_data = geologic_data
@@ -379,6 +395,12 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		SSradiation.flat_radiate(src, 25, 200)
 	//Add some rubble,  you did just clear out a big chunk of rock.
 
+	if(is_in_space_ruins())
+		var/turf/space/S = ChangeTurf(/turf/space)
+		for(var/turf/simulated/mineral/M in orange(1, S))
+			M.update_icon()
+		return
+
 	var/turf/simulated/floor/asteroid/N = ChangeTurf(mined_turf)
 
 	if(istype(N))
@@ -401,7 +423,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		var/find = get_archeological_find_by_findtype(F.find_type)
 		new find(src)
 	else
-		var/obj/item/weapon/ore/strangerock/rock = new(src, inside_item_type = F.find_type)
+		var/obj/item/ore/strangerock/rock = new(src, inside_item_type = F.find_type)
 		geologic_data.UpdateNearbyArtifactInfo(src)
 		rock.geologic_data = geologic_data
 
@@ -516,10 +538,10 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		return 0
 
 	var/list/usable_tools = list(
-		/obj/item/weapon/shovel,
-		/obj/item/weapon/pickaxe/diamonddrill,
-		/obj/item/weapon/pickaxe/drill,
-		/obj/item/weapon/pickaxe/borgdrill
+		/obj/item/shovel,
+		/obj/item/pickaxe/diamonddrill,
+		/obj/item/pickaxe/drill,
+		/obj/item/pickaxe/borgdrill
 		)
 
 	var/valid_tool
@@ -545,16 +567,16 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		to_chat(user, "<span class='notice'>You dug a hole.</span>")
 		gets_dug()
 
-	else if(istype(W,/obj/item/weapon/storage/ore))
-		var/obj/item/weapon/storage/ore/S = W
+	else if(istype(W,/obj/item/storage/ore))
+		var/obj/item/storage/ore/S = W
 		if(S.collection_mode)
-			for(var/obj/item/weapon/ore/O in contents)
+			for(var/obj/item/ore/O in contents)
 				O.attackby(W,user)
 				return
-	else if(istype(W,/obj/item/weapon/storage/bag/fossils))
-		var/obj/item/weapon/storage/bag/fossils/S = W
+	else if(istype(W,/obj/item/storage/bag/fossils))
+		var/obj/item/storage/bag/fossils/S = W
 		if(S.collection_mode)
-			for(var/obj/item/weapon/fossil/F in contents)
+			for(var/obj/item/fossil/F in contents)
 				F.attackby(W,user)
 				return
 
@@ -568,7 +590,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 		return
 
 	for(var/i=0;i<(rand(3)+2);i++)
-		new/obj/item/weapon/ore/glass(src)
+		new/obj/item/ore/glass(src)
 
 	dug = 1
 	icon_state = "asteroid_dug"
@@ -610,11 +632,11 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 	if(istype(M,/mob/living/silicon/robot))
 		var/mob/living/silicon/robot/R = M
 		if(R.module)
-			if(istype(R.module_state_1,/obj/item/weapon/storage/ore))
+			if(istype(R.module_state_1,/obj/item/storage/ore))
 				attackby(R.module_state_1,R)
-			else if(istype(R.module_state_2,/obj/item/weapon/storage/ore))
+			else if(istype(R.module_state_2,/obj/item/storage/ore))
 				attackby(R.module_state_2,R)
-			else if(istype(R.module_state_3,/obj/item/weapon/storage/ore))
+			else if(istype(R.module_state_3,/obj/item/storage/ore))
 				attackby(R.module_state_3,R)
 			else
 				return

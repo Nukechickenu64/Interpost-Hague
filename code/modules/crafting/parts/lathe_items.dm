@@ -25,7 +25,7 @@
 	mill()
 		return /obj/item/pipe
 	press()
-		return /obj/item/weapon/crowbar
+		return /obj/item/crowbar
 
 
 /obj/item/glass_bar
@@ -107,8 +107,8 @@
 					return /obj/item/cylinder/four_slot
 			if(4)
 				to_chat(usr, "<span class='notice'>You nick another hole, and the cylinder falls apart.</span>")
-				return /obj/item/weapon/ore/slag
-		return /obj/item/weapon/ore/slag
+				return /obj/item/ore/slag
+		return /obj/item/ore/slag
 
 	press()
 		return /obj/item/wrench_head

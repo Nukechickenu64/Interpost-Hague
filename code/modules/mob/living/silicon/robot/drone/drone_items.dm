@@ -10,20 +10,20 @@
 
 	//Has a list of items that it can hold.
 	var/list/can_hold = list(
-		/obj/item/weapon/cell,
-		/obj/item/weapon/firealarm_electronics,
-		/obj/item/weapon/airalarm_electronics,
-		/obj/item/weapon/airlock_electronics,
-		/obj/item/weapon/tracker_electronics,
+		/obj/item/cell,
+		/obj/item/firealarm_electronics,
+		/obj/item/airalarm_electronics,
+		/obj/item/airlock_electronics,
+		/obj/item/tracker_electronics,
 		/obj/item/weapon/module/power_control,
-		/obj/item/weapon/stock_parts,
+		/obj/item/stock_parts,
 		/obj/item/frame,
-		/obj/item/weapon/camera_assembly,
-		/obj/item/weapon/tank,
-		/obj/item/weapon/circuitboard,
-		/obj/item/weapon/smes_coil,
-		/obj/item/weapon/computer_hardware,
-		/obj/item/weapon/fuel_assembly
+		/obj/item/camera_assembly,
+		/obj/item/tank,
+		/obj/item/circuitboard,
+		/obj/item/smes_coil,
+		/obj/item/computer_hardware,
+		/obj/item/fuel_assembly
 		)
 
 	var/obj/item/wrapped = null // Item currently being held.
@@ -35,9 +35,9 @@
 	icon_state = "gripper-mining"
 
 	can_hold = list(
-	/obj/item/weapon/cell,
-	/obj/item/weapon/stock_parts,
-	/obj/item/weapon/circuitboard/miningdrill
+	/obj/item/cell,
+	/obj/item/stock_parts,
+	/obj/item/circuitboard/miningdrill
 	)
 
 /obj/item/weapon/gripper/paperwork
@@ -45,12 +45,12 @@
 	desc = "A simple grasping tool for clerical work."
 
 	can_hold = list(
-		/obj/item/weapon/clipboard,
-		/obj/item/weapon/paper,
-		/obj/item/weapon/paper_bundle,
-		/obj/item/weapon/card/id,
-		/obj/item/weapon/book,
-		/obj/item/weapon/newspaper
+		/obj/item/clipboard,
+		/obj/item/paper,
+		/obj/item/paper_bundle,
+		/obj/item/card/id,
+		/obj/item/book,
+		/obj/item/newspaper
 		)
 
 /obj/item/weapon/gripper/chemistry
@@ -58,10 +58,10 @@
 	desc = "A simple grasping tool for chemical work."
 
 	can_hold = list(
-		/obj/item/weapon/reagent_containers/glass,
-		/obj/item/weapon/reagent_containers/pill,
-		/obj/item/weapon/reagent_containers/ivbag,
-		/obj/item/weapon/storage/pill_bottle,
+		/obj/item/reagent_containers/glass,
+		/obj/item/reagent_containers/pill,
+		/obj/item/reagent_containers/ivbag,
+		/obj/item/storage/pill_bottle,
 		)
 
 /obj/item/weapon/gripper/research //A general usage gripper, used for toxins/robotics/xenobio/etc
@@ -70,8 +70,8 @@
 	desc = "A simple grasping tool suited to assist in a wide array of research applications."
 
 	can_hold = list(
-		/obj/item/weapon/cell,
-		/obj/item/weapon/stock_parts,
+		/obj/item/cell,
+		/obj/item/stock_parts,
 		/obj/item/device/mmi,
 		/obj/item/robot_parts,
 		/obj/item/borg/upgrade,
@@ -79,18 +79,18 @@
 		/obj/item/organ/internal/brain,
 		/obj/item/organ/internal/posibrain,
 		/obj/item/stack/cable_coil,
-		/obj/item/weapon/circuitboard,
+		/obj/item/circuitboard,
 		/obj/item/slime_extract,
-		/obj/item/weapon/reagent_containers/glass,
-		/obj/item/weapon/reagent_containers/food/snacks/monkeycube,
+		/obj/item/reagent_containers/glass,
+		/obj/item/reagent_containers/food/snacks/monkeycube,
 		/obj/item/mecha_parts,
-		/obj/item/weapon/computer_hardware,
+		/obj/item/computer_hardware,
 		/obj/item/device/transfer_valve,
 		/obj/item/device/assembly/signaler,
 		/obj/item/device/assembly/timer,
 		/obj/item/device/assembly/igniter,
 		/obj/item/device/assembly/infra,
-		/obj/item/weapon/tank
+		/obj/item/tank
 		)
 
 /obj/item/weapon/gripper/service //Used to handle food, drinks, and seeds.
@@ -99,8 +99,8 @@
 	desc = "A simple grasping tool used to perform tasks in the service sector, such as handling food, drinks, and seeds."
 
 	can_hold = list(
-		/obj/item/weapon/reagent_containers/glass,
-		/obj/item/weapon/reagent_containers/food,
+		/obj/item/reagent_containers/glass,
+		/obj/item/reagent_containers/food,
 		/obj/item/seeds,
 		/obj/item/weapon/grown,
 		/obj/item/weapon/glass_extra
@@ -220,8 +220,8 @@
 		else
 			to_chat(user, "<span class='danger'>Your gripper cannot hold \the [target].</span>")
 
-	else if(istype(target,/obj/machinery/power/apc))
-		var/obj/machinery/power/apc/A = target
+	else if(istype(target,/obj/machinery/power/area_smes))
+		var/obj/machinery/power/area_smes/A = target
 		if(A.opened)
 			if(A.cell)
 
@@ -333,8 +333,8 @@
 				wood.add_charge(2000)
 			if(plastic)
 				plastic.add_charge(2000)
-		else if(istype(W,/obj/item/weapon/light))
-			var/obj/item/weapon/light/L = W
+		else if(istype(W,/obj/item/light))
+			var/obj/item/light/L = W
 			if(L.status >= 2) //In before someone changes the inexplicably local defines. ~ Z
 				if(metal)
 					metal.add_charge(250)
@@ -368,7 +368,7 @@
 		else if(istype(W,/obj/item/weapon/material/shard))
 			if(glass)
 				glass.add_charge(1000)
-		else if(istype(W,/obj/item/weapon/reagent_containers/food/snacks/grown))
+		else if(istype(W,/obj/item/reagent_containers/food/snacks/grown))
 			if(wood)
 				wood.add_charge(4000)
 		else if(istype(W,/obj/item/pipe))
@@ -393,7 +393,7 @@
 		return
 
 	if(!module)
-		module = new /obj/item/weapon/robot_module/drone(src)
+		module = new /obj/item/robot_module/drone(src)
 
 	var/dat = "<HEAD><TITLE>Drone modules</TITLE></HEAD><BODY>\n"
 	dat += {"

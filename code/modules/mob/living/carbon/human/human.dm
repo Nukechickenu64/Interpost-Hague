@@ -8,7 +8,7 @@
 
 	var/list/hud_list[10]
 	var/embedded_flag	  //To check if we've need to roll for damage on movement while an item is imbedded in us.
-	var/obj/item/weapon/rig/wearing_rig // This is very not good, but it's much much better than calling get_rig() every update_canmove() call.
+	var/obj/item/rig/wearing_rig // This is very not good, but it's much much better than calling get_rig() every update_canmove() call.
 	var/combat_music = 'sound/music/bloodlust.ogg'
 
 /mob/living/carbon/human/New(var/new_loc, var/new_species = null)
@@ -101,6 +101,7 @@
 		stat(uppertext(STAT_DX), "[round(stats[STAT_DX])]")
 		stat(uppertext(STAT_IQ), "[round(stats[STAT_IQ])]")
 		stat(uppertext(STAT_HT), "[round(stats[STAT_HT])]")
+		stat(uppertext(STAT_PER), "[round(stats[STAT_PER])]")
 
 		if(SSevac.evacuation_controller)
 			var/eta_status = SSevac.evacuation_controller.get_status_panel_eta()
@@ -123,8 +124,8 @@
 		if(potato && potato.cell)
 			stat("Battery charge:", "[potato.get_charge()]/[potato.cell.maxcharge]")
 
-		if(back && istype(back,/obj/item/weapon/rig))
-			var/obj/item/weapon/rig/suit = back
+		if(back && istype(back,/obj/item/rig))
+			var/obj/item/rig/suit = back
 			var/cell_status = "ERROR"
 			if(suit.cell) cell_status = "[suit.cell.charge]/[suit.cell.maxcharge]"
 			stat(null, "Suit charge: [cell_status]")
@@ -202,7 +203,7 @@
 /mob/living/carbon/human/proc/implant_loyalty(mob/living/carbon/human/M, override = FALSE) // Won't override by default.
 	if(!config.use_loyalty_implants && !override) return // Nuh-uh.
 
-	var/obj/item/weapon/implant/loyalty/L = new/obj/item/weapon/implant/loyalty(M)
+	var/obj/item/implant/loyalty/L = new/obj/item/implant/loyalty(M)
 	L.imp_in = M
 	L.implanted = 1
 	var/obj/item/organ/external/affected = M.organs_by_name[BP_HEAD]
@@ -212,7 +213,7 @@
 
 /mob/living/carbon/human/proc/is_loyalty_implanted(mob/living/carbon/human/M)
 	for(var/L in M.contents)
-		if(istype(L, /obj/item/weapon/implant/loyalty))
+		if(istype(L, /obj/item/implant/loyalty))
 			for(var/obj/item/organ/external/O in M.organs)
 				if(L in O.implants)
 					return 1
@@ -268,7 +269,7 @@
 
 	// Do they get an option to set internals?
 	if(istype(wear_mask, /obj/item/clothing/mask) || istype(head, /obj/item/clothing/head/helmet/space))
-		if(istype(back, /obj/item/weapon/tank) || istype(belt, /obj/item/weapon/tank) || istype(s_store, /obj/item/weapon/tank))
+		if(istype(back, /obj/item/tank) || istype(belt, /obj/item/tank) || istype(s_store, /obj/item/tank))
 			dat += "<BR><A href='?src=\ref[src];item=internals'>Toggle internals.</A>"
 
 	var/obj/item/clothing/under/suit = w_uniform
@@ -320,7 +321,7 @@
 		else
 			return pda.ownrank
 	else
-		var/obj/item/weapon/card/id/id = get_idcard()
+		var/obj/item/card/id/id = get_idcard()
 		if(id)
 			return id.rank ? id.rank : if_no_job
 		else
@@ -336,7 +337,7 @@
 		else
 			return pda.ownjob
 	else
-		var/obj/item/weapon/card/id/id = get_idcard()
+		var/obj/item/card/id/id = get_idcard()
 		if(id)
 			return id.assignment ? id.assignment : if_no_job
 		else
@@ -352,7 +353,7 @@
 		else
 			return pda.owner
 	else
-		var/obj/item/weapon/card/id/id = get_idcard()
+		var/obj/item/card/id/id = get_idcard()
 		if(id)
 			return id.registered_name
 		else
@@ -384,7 +385,7 @@
 		var/obj/item/device/pda/P = wear_id
 		return P.owner
 	if(wear_id)
-		var/obj/item/weapon/card/id/I = wear_id.GetIdCard()
+		var/obj/item/card/id/I = wear_id.GetIdCard()
 		if(I)
 			return I.registered_name
 	return
@@ -422,7 +423,7 @@ var/list/rank_prefix = list(\
 
 /mob/living/carbon/human/proc/get_job_name()
 	if(wear_id)
-		var/obj/item/weapon/card/id/I = wear_id.GetIdCard()
+		var/obj/item/card/id/I = wear_id.GetIdCard()
 		if(I)
 			return I.assignment
 
@@ -506,6 +507,8 @@ var/list/rank_prefix = list(\
 	return traced_organs
 
 /mob/living/carbon/human/Topic(href, href_list)
+	if(href_list["meta_shop_category"] || href_list["meta_shop_buy"])
+		return ..()
 	if(href_list["porco_action"])
 		var/action_id = href_list["porco_action"]
 		var/action_allowed = FALSE
@@ -519,6 +522,12 @@ var/list/rank_prefix = list(\
 		if(!action_allowed || usr != src)
 			return
 		switch(action_id)
+			if("CreateRune")
+				var/spell/rune_write/rune_spell = locate(/spell/rune_write) in mind.learned_spells
+				if(!rune_spell)
+					to_chat(src, "<span class='warning'>You do not know how to scribe a rune.</span>")
+					return
+				rune_spell.perform(src)
 			if("ToggleLeechFangs")
 				toggle_leech_fangs()
 			if("LeechMesmerize")
@@ -527,6 +536,37 @@ var/list/rank_prefix = list(\
 					leech_mesmerize(target)
 			if("MLPFeedOnLove")
 				mlp_feed_on_love()
+			if("transfer_plasma")
+				var/list/plasma_targets = list()
+				for(var/mob/living/carbon/human/plasma_candidate in oview(1))
+					if(istype(plasma_candidate.internal_organs_by_name[BP_PLASMA], /obj/item/organ/internal/xenos/plasmavessel))
+						plasma_targets += plasma_candidate
+				var/mob/living/carbon/human/plasma_target = input(src, "Choose an alien", "Transfer Plasma") as null|anything in plasma_targets
+				if(plasma_target)
+					transfer_plasma(plasma_target)
+			if("corrosive_acid")
+				var/atom/acid_target = input(src, "Choose an object or turf", "Corrosive Acid") as null|obj|turf in oview(1)
+				if(acid_target)
+					corrosive_acid(acid_target)
+			if("neurotoxin")
+				var/mob/neurotoxin_target = input(src, "Choose a target", "Spit Neurotoxin") as null|mob in oview()
+				if(neurotoxin_target)
+					neurotoxin(neurotoxin_target)
+			if("psychic_whisper")
+				var/mob/whisper_target = input(src, "Choose a target", "Psychic Whisper") as null|mob in oview()
+				if(whisper_target)
+					psychic_whisper(whisper_target)
+			if("xeno_infest")
+				var/list/infest_targets = list()
+				for(var/mob/living/carbon/human/infest_candidate in oview())
+					infest_targets += infest_candidate
+				var/mob/living/carbon/human/infest_target = input(src, "Choose a target", "Infest") as null|anything in infest_targets
+				if(infest_target)
+					xeno_infest(infest_target)
+			if("pry_open")
+				var/obj/machinery/door/door_target = input(src, "Choose an airlock", "Pry Open Airlock") as null|anything in filter_list(oview(1), /obj/machinery/door)
+				if(door_target)
+					pry_open(door_target)
 			else
 				call(src, action_id)()
 		return
@@ -550,7 +590,7 @@ var/list/rank_prefix = list(\
 			var/modified = 0
 			var/perpname = "wot"
 			if(wear_id)
-				var/obj/item/weapon/card/id/I = wear_id.GetIdCard()
+				var/obj/item/card/id/I = wear_id.GetIdCard()
 				if(I)
 					perpname = I.registered_name
 				else
@@ -562,7 +602,10 @@ var/list/rank_prefix = list(\
 			if(R)
 				var/setcriminal = input(usr, "Specify a new criminal status for this person.", "Security HUD", R.get_criminalStatus()) as null|anything in GLOB.security_statuses
 				if(hasHUD(usr, "security") && setcriminal)
+					var/previous_criminal_status = R.get_criminalStatus()
 					R.set_criminalStatus(setcriminal)
+					if(setcriminal == GLOB.arrest_security_status && previous_criminal_status != GLOB.arrest_security_status && usr.mind && SSdirector)
+						SSdirector.register_arrest(usr.mind, R.uid)
 					modified = 1
 
 					spawn()
@@ -582,7 +625,7 @@ var/list/rank_prefix = list(\
 			var/read = 0
 
 			if(wear_id)
-				if(istype(wear_id,/obj/item/weapon/card/id))
+				if(istype(wear_id,/obj/item/card/id))
 					perpname = wear_id:registered_name
 				else if(istype(wear_id,/obj/item/device/pda))
 					var/obj/item/device/pda/tempPda = wear_id
@@ -605,7 +648,7 @@ var/list/rank_prefix = list(\
 			var/modified = 0
 
 			if(wear_id)
-				if(istype(wear_id,/obj/item/weapon/card/id))
+				if(istype(wear_id,/obj/item/card/id))
 					perpname = wear_id:registered_name
 				else if(istype(wear_id,/obj/item/device/pda))
 					var/obj/item/device/pda/tempPda = wear_id
@@ -636,7 +679,7 @@ var/list/rank_prefix = list(\
 			var/read = 0
 
 			if(wear_id)
-				if(istype(wear_id,/obj/item/weapon/card/id))
+				if(istype(wear_id,/obj/item/card/id))
 					perpname = wear_id:registered_name
 				else if(istype(wear_id,/obj/item/device/pda))
 					var/obj/item/device/pda/tempPda = wear_id
@@ -786,11 +829,12 @@ var/list/rank_prefix = list(\
 		lastpuke = 1
 		to_chat(src, "<span class='warning'>You feel nauseous...</span>")
 		if(level > 1)
+			if(level > 2)
+				Stun(3)
 			sleep(150 / timevomit)	//15 seconds until second warning
 			to_chat(src, "<span class='warning'>You feel like you are about to throw up!</span>")
 			if(level > 2)
 				sleep(100 / timevomit)	//and you have 10 more for mad dash to the bucket
-				Stun(3)
 				var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
 				if(should_have_organ(BP_STOMACH) && (!istype(stomach) || (stomach.ingested.total_volume <= 5 && stomach.contents.len == 0)))
 					for(var/a in stomach.contents)
@@ -1055,7 +1099,7 @@ var/list/rank_prefix = list(\
 	var/list/visible_implants = list()
 	for(var/obj/item/organ/external/organ in src.organs)
 		for(var/obj/item/weapon/O in organ.implants)
-			if(!istype(O,/obj/item/weapon/implant) && (O.w_class > class) && !istype(O,/obj/item/weapon/material/shard/shrapnel))
+			if(!istype(O,/obj/item/implant) && (O.w_class > class) && !istype(O,/obj/item/weapon/material/shard/shrapnel))
 				visible_implants += O
 
 	return(visible_implants)
@@ -1063,7 +1107,7 @@ var/list/rank_prefix = list(\
 /mob/living/carbon/human/embedded_needs_process()
 	for(var/obj/item/organ/external/organ in src.organs)
 		for(var/obj/item/O in organ.implants)
-			if(!istype(O, /obj/item/weapon/implant)) //implant type items do not cause embedding effects, see handle_embedded_objects()
+			if(!istype(O, /obj/item/implant)) //implant type items do not cause embedding effects, see handle_embedded_objects()
 				return 1
 	return 0
 
@@ -1072,7 +1116,7 @@ var/list/rank_prefix = list(\
 		if(organ.splinted)
 			continue
 		for(var/obj/item/O in organ.implants)
-			if(!istype(O,/obj/item/weapon/implant) && O.w_class > 1 && prob(5)) //Moving with things stuck in you could be bad.
+			if(!istype(O,/obj/item/implant) && O.w_class > 1 && prob(5)) //Moving with things stuck in you could be bad.
 				jossle_internal_object(organ, O)
 	var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
 	if(stomach && stomach.contents.len)

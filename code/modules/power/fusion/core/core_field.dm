@@ -27,7 +27,6 @@
 	var/list/ignore_types = list(
 		/obj/item/projectile,
 		/obj/effect,
-		/obj/structure/cable,
 		/obj/machinery/atmospherics
 		)
 

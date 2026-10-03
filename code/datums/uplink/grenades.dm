@@ -12,7 +12,7 @@
 /datum/uplink_item/item/grenades/anti_photons
 	name = "5xPhoton Disruption Grenades"
 	item_cost = 16
-	path = /obj/item/weapon/storage/box/anti_photons
+	path = /obj/item/storage/box/anti_photons
 
 /datum/uplink_item/item/grenades/smoke
 	name = "1xSmoke Grenade"
@@ -22,7 +22,7 @@
 /datum/uplink_item/item/grenades/smokes
 	name = "5xSmoke Grenades"
 	item_cost = 16
-	path = /obj/item/weapon/storage/box/smokes
+	path = /obj/item/storage/box/smokes
 
 /datum/uplink_item/item/grenades/emp
 	name = "1xEMP Grenade"
@@ -32,7 +32,7 @@
 /datum/uplink_item/item/grenades/emps
 	name = "5xEMP Grenades"
 	item_cost = 24
-	path = /obj/item/weapon/storage/box/emps
+	path = /obj/item/storage/box/emps
 
 /datum/uplink_item/item/grenades/frag_high_yield
 	name = "Fragmentation Bomb"
@@ -52,7 +52,7 @@
 	desc = "Weaker than standard fragmentation grenades, these devices can be fired from a grenade launcher."
 	item_cost = 40
 	antag_roles = list(MODE_MERCENARY)
-	path = /obj/item/weapon/storage/box/fragshells
+	path = /obj/item/storage/box/fragshells
 
 /datum/uplink_item/item/grenades/frag
 	name = "1xFragmentation Grenade"
@@ -64,7 +64,7 @@
 	name = "5xFragmentation Grenades"
 	item_cost = 40
 	antag_roles = list(MODE_MERCENARY)
-	path = /obj/item/weapon/storage/box/frags
+	path = /obj/item/storage/box/frags
 
 /datum/uplink_item/item/grenades/supermatter
 	name = "1xSupermatter Grenade"
@@ -78,4 +78,4 @@
 	desc = "These grenades contains a small supermatter shard which will delaminate upon activation and pull in nearby objects, irradiate lifeforms, and eventually explode."
 	item_cost = 60
 	antag_roles = list(MODE_MERCENARY)
-	path = /obj/item/weapon/storage/box/supermatters
+	path = /obj/item/storage/box/supermatters

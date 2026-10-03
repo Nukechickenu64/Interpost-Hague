@@ -17,7 +17,7 @@
 	see_in_dark = 6
 	maxHealth = 1
 	health = 1
-	meat_type = /obj/item/weapon/reagent_containers/food/snacks/meat
+	meat_type = /obj/item/reagent_containers/food/snacks/meat
 	response_help  = "pets"
 	response_disarm = "gently pushes aside"
 	response_harm   = "stamps on"
@@ -27,7 +27,7 @@
 	maxbodytemp = 323	//Above 50 Degrees Celcius
 	universal_speak = 0
 	universal_understand = 1
-	holder_type = /obj/item/weapon/holder/mouse
+	holder_type = /obj/item/holder/mouse
 	mob_size = MOB_MINISCULE
 	possession_candidate = 1
 	var/datum/disease2/disease/virus = null

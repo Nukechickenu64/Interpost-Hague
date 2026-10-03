@@ -7,7 +7,7 @@
 /*
  * Gifts
  */
-/obj/item/weapon/a_gift
+/obj/item/a_gift
 	name = "gift"
 	desc = "PRESENTS!!!! eek!"
 	icon = 'icons/obj/items.dmi'
@@ -16,7 +16,7 @@
 	obj_flags = OBJ_FLAG_NO_EMBED
 	randpixel = 10
 
-/obj/item/weapon/a_gift/New()
+/obj/item/a_gift/New()
 	..()
 	if(w_class > 0 && w_class < ITEM_SIZE_HUGE)
 		icon_state = "gift[w_class]"
@@ -24,7 +24,7 @@
 		icon_state = "gift[pick(1, 2, 3)]"
 	return
 
-/obj/item/weapon/a_gift/ex_act()
+/obj/item/a_gift/ex_act()
 	qdel(src)
 	return
 
@@ -50,22 +50,22 @@
 
 	qdel(src)
 
-/obj/item/weapon/a_gift/attack_self(mob/M as mob)
+/obj/item/a_gift/attack_self(mob/M as mob)
 	var/gift_type = pick(
-		/obj/item/weapon/storage/wallet,
-		/obj/item/weapon/storage/photo_album,
-		/obj/item/weapon/storage/box/snappops,
-		/obj/item/weapon/storage/fancy/crayons,
-		/obj/item/weapon/storage/backpack/holding,
-		/obj/item/weapon/soap/deluxe,
-		/obj/item/weapon/pickaxe/silver,
-		/obj/item/weapon/pen/invisible,
-		/obj/item/weapon/lipstick/random,
+		/obj/item/storage/wallet,
+		/obj/item/storage/photo_album,
+		/obj/item/storage/box/snappops,
+		/obj/item/storage/fancy/crayons,
+		/obj/item/storage/backpack/holding,
+		/obj/item/soap/deluxe,
+		/obj/item/pickaxe/silver,
+		/obj/item/pen/invisible,
+		/obj/item/lipstick/random,
 		/obj/item/weapon/grenade/smokebomb,
 		/obj/item/weapon/corncob,
-		/obj/item/weapon/contraband/poster,
-		/obj/item/weapon/book/manual/barman_recipes,
-		/obj/item/weapon/book/manual/chef_recipes,
+		/obj/item/contraband/poster,
+		/obj/item/book/manual/barman_recipes,
+		/obj/item/book/manual/chef_recipes,
 		/obj/item/weapon/bikehorn,
 		/obj/item/weapon/beach_ball,
 		/obj/item/weapon/beach_ball/holoball,
@@ -87,11 +87,11 @@
 		/obj/item/toy/prize/seraph,
 		/obj/item/toy/spinningtoy,
 		/obj/item/toy/sword,
-		/obj/item/weapon/reagent_containers/food/snacks/grown/ambrosiadeus,
-		/obj/item/weapon/reagent_containers/food/snacks/grown/ambrosiavulgaris,
+		/obj/item/reagent_containers/food/snacks/grown/ambrosiadeus,
+		/obj/item/reagent_containers/food/snacks/grown/ambrosiavulgaris,
 		/obj/item/device/paicard,
 		/obj/item/device/violin,
-		/obj/item/weapon/storage/belt/utility/full,
+		/obj/item/storage/belt/utility/full,
 		/obj/item/clothing/accessory/horrible)
 
 	if(!ispath(gift_type,/obj/item))	return

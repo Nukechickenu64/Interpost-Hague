@@ -2,9 +2,50 @@
 // The Director Engine triggers these events based on live station telemetry.
 // Each catalyst is tailored to the current environmental conditions.
 
+/datum/director_arc
+	var/theme = ""
+	var/title = ""
+	var/started_at = 0
+	var/last_advanced = 0
+	var/beat_count = 0
+	var/last_selection_reason = ""
+	var/list/beat_history = list()
+
+/datum/director_arc/New(var/new_theme, var/datum/catalyst_event/first_beat)
+	..()
+	theme = new_theme
+	started_at = world.time
+	last_advanced = world.time
+	beat_history = list()
+	if(first_beat)
+		switch(theme)
+			if("syndicate_incursion")
+				title = "Syndicate Incursion"
+			if("dimensional_breach")
+				title = "Dimensional Breach"
+			if("crew_unrest")
+				title = "Crew Unrest"
+			if("biological_predation")
+				title = "Biological Predation"
+			else
+				title = "Station Crisis"
+		record_beat(first_beat, "Opening beat selected from current station conditions")
+
+/datum/director_arc/proc/record_beat(var/datum/catalyst_event/beat, var/selection_reason)
+	if(!beat)
+		return
+	beat_count++
+	last_advanced = world.time
+	last_selection_reason = selection_reason
+	beat_history += "[world.time]: [beat.name] - [selection_reason]"
+	if(beat_history.len > DIRECTOR_ARC_HISTORY_LIMIT)
+		beat_history.Cut(1, 2)
+
 /datum/catalyst_event
 	var/name = "Catalyst"
 	var/catalyst_type = ""
+	var/arc_theme = "station_crisis"
+	var/director_priority = 50
 	var/description = ""
 	var/tension_threshold = TENSION_RISING
 	var/cooldown = CATALYST_COOLDOWN
@@ -20,14 +61,7 @@
 
 /// Check if this catalyst can trigger based on telemetry and cooldowns
 /datum/catalyst_event/proc/can_trigger(var/datum/telemetry/T, var/tension)
-	if(uses_this_round >= max_uses_per_round)
-		return FALSE
-	if(world.time - last_triggered < cooldown)
-		return FALSE
-	if(tension < tension_threshold)
-		clear_warning()
-		return FALSE
-	if(!check_conditions(T))
+	if(!is_eligible(T, tension))
 		clear_warning()
 		return FALSE
 	if(!warning_duration)
@@ -39,6 +73,17 @@
 			command_announcement.Announce(warning_text, "Director Advisory")
 		return FALSE
 	return world.time - warning_started >= warning_duration
+
+/datum/catalyst_event/proc/is_eligible(var/datum/telemetry/T, var/tension)
+	if(uses_this_round >= max_uses_per_round)
+		return FALSE
+	if(world.time - last_triggered < cooldown)
+		return FALSE
+	if(tension < tension_threshold)
+		return FALSE
+	if(!check_conditions(T))
+		return FALSE
+	return TRUE
 
 /// Clear an active warning when the crew resolves the conditions that prompted it.
 /datum/catalyst_event/proc/clear_warning()
@@ -82,6 +127,8 @@
 /datum/catalyst_event/tactical_strike
 	name = "Tactical Strike"
 	catalyst_type = CATALYST_TACTICAL_STRIKE
+	arc_theme = "syndicate_incursion"
+	director_priority = 70
 	description = "A Syndicate strike force has detected the station's vulnerability and is launching a stealth insertion."
 	tension_threshold = TENSION_ELEVATED
 	max_uses_per_round = 1
@@ -102,13 +149,23 @@
 	return FALSE
 
 /datum/catalyst_event/tactical_strike/execute(var/datum/telemetry/T)
-	// Gather ghost candidates for the strike team
+	if(!SSdirector.can_recruit_antagonist("traitor"))
+		return FALSE
+	if(!SSdirector.can_director_recruit_ghosts() && !SSdirector.can_director_convert_crew())
+		return FALSE
+	// Crew mode keeps selected players in their existing human bodies.
 	var/list/candidates = list()
-	for(var/mob/observer/ghost/G in GLOB.player_list)
-		if(!G.client)
-			continue
-		if(G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
-			candidates += G
+	if(SSdirector.can_director_convert_crew())
+		for(var/mob/living/carbon/human/H in GLOB.player_list)
+			if(!H.client || !H.mind || H.stat == DEAD || !is_station_turf(get_turf(H)) || player_is_antag(H.mind) || H.mind == SSdirector.starter_mind)
+				continue
+			candidates += H.mind
+	else
+		for(var/mob/observer/ghost/G in GLOB.player_list)
+			if(SSdirector.starter_mind && G.mind == SSdirector.starter_mind)
+				continue
+			if(G.client && G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
+				candidates += G
 
 	if(candidates.len < 1)
 		log_debug("Tactical Strike: Not enough ghost candidates, aborting.")
@@ -120,19 +177,34 @@
 		if(is_station_turf(get_turf(H)))
 			crew_count++
 	var/team_size = clamp(round(crew_count / 10), 2, 5)
+	var/datum/antagonist/traitor/traitor_antag = GLOB.all_antag_types_["traitor"]
+	if(!traitor_antag)
+		return FALSE
+	var/antag_slots = traitor_antag.hard_cap - traitor_antag.get_antag_count()
+	var/round_antag_slots = max(1, round(crew_count / 2)) - SSdirector.get_total_antag_count()
+	team_size = min(team_size, antag_slots, round_antag_slots)
+	if(team_size <= 0)
+		return FALSE
 
 	var/list/team_minds = list()
 	for(var/i = 1 to team_size)
-		if(!candidates.len)
+		if(!candidates.len || !SSdirector.can_recruit_antagonist("traitor"))
 			break
-		var/mob/observer/ghost/chosen = pick(candidates)
-		candidates -= chosen
+		var/mob/observer/ghost/chosen = null
+		var/mob/living/carbon/human/operative = null
+		var/move_to_spawn = FALSE
+		if(SSdirector.can_director_convert_crew())
+			var/datum/mind/chosen_mind = pick(candidates)
+			candidates -= chosen_mind
+			operative = chosen_mind.current
+		else
+			chosen = pick(candidates)
+			candidates -= chosen
+			operative = director_spawn_ghost_body(chosen, "Syndicate Operative [rand(100,999)]")
+			move_to_spawn = TRUE
 
-		// Create a new human for the operative and register it through the antag datum.
-		var/mob/living/carbon/human/operative = director_spawn_ghost_body(chosen, "Syndicate Operative [rand(100,999)]")
-		var/datum/antagonist/traitor/traitor_antag = GLOB.all_antag_types_["traitor"]
-		if(!operative || !operative.mind || !traitor_antag || !traitor_antag.add_antagonist(operative.mind, 0, 0, 1))
-			if(operative)
+		if(!operative || !operative.mind || !traitor_antag.add_antagonist(operative.mind, 0, 0, move_to_spawn))
+			if(operative && chosen)
 				qdel(operative)
 			continue
 		operative.mind.assigned_role = "Syndicate Operative"
@@ -167,6 +239,8 @@
 /datum/catalyst_event/anomaly
 	name = "Dimensional Anomaly"
 	catalyst_type = CATALYST_ANOMALY
+	arc_theme = "dimensional_breach"
+	director_priority = 65
 	description = "Science has breached dimensional thresholds. An eldritch invasion is manifesting in the research sector."
 	tension_threshold = TENSION_RISING
 	max_uses_per_round = 1
@@ -209,7 +283,9 @@
 	// Flag nearby crew as cultists
 	var/list/nearby_crew = list()
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
-		if(!H.mind || !H.client)
+		if(!H.mind || !H.client || H.stat == DEAD || player_is_antag(H.mind) || H.mind == SSdirector.starter_mind)
+			continue
+		if(!SSdirector.can_director_convert_crew())
 			continue
 		var/turf/H_turf = get_turf(H)
 		if(!H_turf || !isStationLevel(H_turf.z))
@@ -217,17 +293,18 @@
 		if(get_dist(H_turf, center) <= 15)
 			nearby_crew += H.mind
 
-	// Convert a few nearby crew to cultists
-	var/cultists_to_make = min(3, nearby_crew.len)
+	// Convert a few nearby crew to cultists without moving them from their current bodies.
+	var/datum/antagonist/cultist = GLOB.all_antag_types_["cultist"]
+	var/crew_slots = cultist ? cultist.hard_cap - cultist.get_antag_count() : 0
+	var/round_slots = max(1, round(SSdirector.count_living_crew() / 2)) - SSdirector.get_total_antag_count()
+	var/cultists_to_make = min(3, nearby_crew.len, crew_slots, round_slots)
 	for(var/i = 1 to cultists_to_make)
-		if(!nearby_crew.len)
+		if(!nearby_crew.len || !SSdirector.can_recruit_antagonist("cultist"))
 			break
 		var/datum/mind/M = pick(nearby_crew)
 		nearby_crew -= M
-		var/datum/antagonist/cultist = GLOB.all_antag_types_["cultist"]
-		if(cultist && cultist.add_antagonist(M, 0, 0, 1))
+		if(cultist.add_antagonist(M, 0, 0, 0))
 			SSdirector.loyalty.set_faction(M, LOYALTY_CULT)
-
 	command_announcement.Announce( \
 		"Dimensional breach detected in the research sector. Anomalous entities are manifesting. All personnel evacuate the area immediately.", \
 		"Anomaly Alert", \
@@ -243,6 +320,8 @@
 /datum/catalyst_event/mutiny
 	name = "Mutiny"
 	catalyst_type = CATALYST_MUTINY
+	arc_theme = "crew_unrest"
+	director_priority = 60
 	description = "Security crackdown has pushed crew loyalty into the red. Revolutionary sentiment is spreading."
 	tension_threshold = TENSION_ELEVATED
 	max_uses_per_round = 2
@@ -259,14 +338,16 @@
 	return FALSE
 
 /datum/catalyst_event/mutiny/execute(var/datum/telemetry/T)
+	if(!SSdirector.can_director_convert_crew())
+		return FALSE
 	// Find disgruntled crew (low NT loyalty, not already antags)
 	var/list/candidates = list()
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
 		if(!H.mind || !H.client)
 			continue
-		if(!is_station_turf(get_turf(H)))
+		if(H.stat == DEAD || !is_station_turf(get_turf(H)))
 			continue
-		if(player_is_antag(H.mind))
+		if(player_is_antag(H.mind) || H.mind == SSdirector.starter_mind)
 			continue
 		if(H.client.prefs)
 			var/loyalty = H.client.prefs.nanotrasen_relation
@@ -285,13 +366,19 @@
 	if(!rev_antag)
 		// Fallback: use renegade
 		rev_antag = GLOB.all_antag_types_["renegade"]
+	if(!rev_antag)
+		return FALSE
+	revs_to_make = min(revs_to_make, rev_antag.hard_cap - rev_antag.get_antag_count())
+	revs_to_make = min(revs_to_make, max(1, round(SSdirector.count_living_crew() / 2)) - SSdirector.get_total_antag_count())
+	if(revs_to_make <= 0)
+		return FALSE
 
 	for(var/i = 1 to revs_to_make)
-		if(!candidates.len)
+		if(!candidates.len || !SSdirector.can_recruit_antagonist(rev_antag.id))
 			break
 		var/datum/mind/M = pick(candidates)
 		candidates -= M
-		if(!rev_antag || !rev_antag.add_antagonist(M, 0, 0, 1))
+		if(!rev_antag.add_antagonist(M, 0, 0, 0))
 			continue
 		SSdirector.loyalty.set_faction(M, LOYALTY_REVOLUTIONARY)
 		if(M.current)
@@ -311,6 +398,8 @@
 /datum/catalyst_event/infiltration
 	name = "Syndicate Infiltration"
 	catalyst_type = CATALYST_INFILTRATION
+	arc_theme = "syndicate_incursion"
+	director_priority = 40
 	description = "A lone Syndicate infiltrator has boarded the station."
 	tension_threshold = TENSION_RISING
 	max_uses_per_round = 2
@@ -323,9 +412,24 @@
 	return FALSE
 
 /datum/catalyst_event/infiltration/execute(var/datum/telemetry/T)
+	if(!SSdirector.can_recruit_antagonist("traitor"))
+		return FALSE
+	if(SSdirector.can_director_convert_crew())
+		if(!convert_station_antagonist("traitor"))
+			log_debug("Infiltration: No eligible crewmember to recruit.")
+			return FALSE
+		SSdirector.add_tension(10, "Existing crewmember recruited as an infiltrator")
+		return TRUE
+	if(!SSdirector.can_director_recruit_ghosts())
+		return FALSE
+	var/datum/antagonist/traitor/traitor_antag = GLOB.all_antag_types_["traitor"]
+	if(!traitor_antag || traitor_antag.get_antag_count() >= traitor_antag.hard_cap)
+		return FALSE
 	// Find a ghost candidate
 	var/list/candidates = list()
 	for(var/mob/observer/ghost/G in GLOB.player_list)
+		if(SSdirector.starter_mind && G.mind == SSdirector.starter_mind)
+			continue
 		if(G.client && G.client.prefs && G.client.prefs.be_special_role && ("traitor" in G.client.prefs.be_special_role))
 			candidates += G
 
@@ -339,8 +443,7 @@
 		return FALSE
 
 	// Give basic traitor gear
-	var/datum/antagonist/traitor_antag = GLOB.all_antag_types_["traitor"]
-	if(!traitor_antag || !traitor_antag.add_antagonist(infiltrator.mind, 0, 0, 1))
+	if(!traitor_antag.add_antagonist(infiltrator.mind, 0, 0, 1))
 		qdel(infiltrator)
 		return FALSE
 	infiltrator.mind.assigned_role = "Syndicate Agent"
@@ -355,16 +458,22 @@
 // Covert station antagonists selected from living crew who opted into the role.
 
 /proc/convert_station_antagonist(var/antag_id)
+	if(!SSdirector || !SSdirector.can_director_convert_crew())
+		return FALSE
+	if(!SSdirector.can_recruit_antagonist(antag_id))
+		return FALSE
 	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
-	if(!antag)
+	if(!antag || antag.get_antag_count() >= antag.hard_cap)
+		return FALSE
+	if(SSdirector.get_total_antag_count() >= max(1, round(SSdirector.count_living_crew() / 2)))
 		return FALSE
 	var/list/candidates = list()
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
 		if(!H.client || !H.mind || H.stat == DEAD || !is_station_turf(get_turf(H)))
 			continue
-		if(player_is_antag(H.mind))
+		if(player_is_antag(H.mind) || H.mind == SSdirector.starter_mind)
 			continue
-		if(!H.client.prefs || !H.client.prefs.be_special_role || !(antag_id in H.client.prefs.be_special_role))
+		if(!SSdirector.can_director_convert_crew() && (!H.client.prefs || !H.client.prefs.be_special_role || !(antag_id in H.client.prefs.be_special_role)))
 			continue
 		candidates += H.mind
 	while(candidates.len)
@@ -378,6 +487,8 @@
 /datum/catalyst_event/leech
 	name = "Hematopoietic Failure"
 	catalyst_type = CATALYST_LEECH
+	arc_theme = "biological_predation"
+	director_priority = 50
 	description = "A crewmember's failing marrow has developed an appetite for fresh blood."
 	tension_threshold = TENSION_ELEVATED
 	max_uses_per_round = 1
@@ -397,6 +508,8 @@
 /datum/catalyst_event/epicurean
 	name = "Forbidden Appetite"
 	catalyst_type = CATALYST_EPICUREAN
+	arc_theme = "biological_predation"
+	director_priority = 55
 	description = "Mounting pressure has pushed a crewmember toward a carefully concealed appetite."
 	tension_threshold = TENSION_HIGH
 	max_uses_per_round = 1
@@ -412,6 +525,66 @@
 		return FALSE
 	SSdirector.add_tension(8, "An Epicurean emerged among the crew")
 	return TRUE
+
+// === Cargo Incursion ===
+// Armed boarders stow away on the supply shuttle while it is off-station, then hunt the crew once it docks.
+
+/datum/catalyst_event/cargo_incursion
+	name = "Cargo Incursion"
+	catalyst_type = CATALYST_CARGO_INCURSION
+	arc_theme = "syndicate_incursion"
+	director_priority = 60
+	description = "Armed boarders have stowed away aboard the inbound supply shuttle."
+	tension_threshold = TENSION_HIGH
+	max_uses_per_round = 1
+	omen_text = "crates that breathe in the dark"
+	warning_duration = 2 MINUTES
+	warning_text = "Supply manifests show unexplained mass discrepancies on the next cargo run. Cargo personnel should treat the inbound shuttle with caution."
+	warning_clear_text = "The supply manifest discrepancy has been reconciled."
+
+/datum/catalyst_event/cargo_incursion/check_conditions(var/datum/telemetry/T)
+	return !!SSsupply.shuttle
+
+/datum/catalyst_event/cargo_incursion/execute(var/datum/telemetry/T)
+	var/datum/shuttle/autodock/ferry/supply/S = SSsupply.shuttle
+	if(!S || S.at_station() || S.moving_status != SHUTTLE_IDLE)
+		log_debug("Cargo Incursion: Supply shuttle is not idle off-station, deferring.")
+		return FALSE
+
+	var/list/spawn_turfs = list()
+	for(var/area/A in S.shuttle_area)
+		for(var/turf/simulated/floor/F in A)
+			if(!F.contains_dense_objects())
+				spawn_turfs += F
+	if(!spawn_turfs.len)
+		return FALSE
+
+	var/crew_count = 0
+	for(var/mob/living/carbon/human/H in GLOB.player_list)
+		if(H.stat != DEAD && is_station_turf(get_turf(H)))
+			crew_count++
+	var/squad_size = clamp(round(crew_count / 6), 2, 6)
+	for(var/i in 1 to squad_size)
+		var/mob/living/carbon/human/invader/I = new(pick(spawn_turfs))
+		I.brain.wait_for_dock()
+
+	S.launch()
+	announce_on_dock(S)
+	SSdirector.add_tension(15, "Cargo Incursion launched")
+	return TRUE
+
+/datum/catalyst_event/cargo_incursion/proc/announce_on_dock(var/datum/shuttle/autodock/ferry/supply/S)
+	set waitfor = FALSE
+	var/give_up_at = world.time + 10 MINUTES
+	sleep(10 SECONDS)
+	while(S && !(S.at_station() && S.moving_status == SHUTTLE_IDLE))
+		if(world.time > give_up_at)
+			return
+		sleep(5 SECONDS)
+	command_announcement.Announce( \
+		"Unregistered life signs detected aboard the docked supply shuttle. Armed hostiles are disembarking into Cargo. All hands, prepare for hostile contact.", \
+		"Emergency Alert", \
+		)
 
 /proc/director_spawn_ghost_body(var/mob/observer/ghost/ghost, var/name)
 	if(!ghost || !ghost.client || !ghost.key)

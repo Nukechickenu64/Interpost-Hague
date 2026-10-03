@@ -1,4 +1,4 @@
-/obj/item/weapon/hand_labeler
+/obj/item/hand_labeler
 	name = "hand labeler"
 	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "labeler0"
@@ -8,12 +8,12 @@
 	var/mode = 0	//off or on.
 	matter = list(DEFAULT_WALL_MATERIAL = 100)
 
-/obj/item/weapon/hand_labeler/attack(atom/target, mob/living/user, target_zone, animate)
+/obj/item/hand_labeler/attack(atom/target, mob/living/user, target_zone, animate)
 	if (label)
 		target.AddLabel(label, user)
 		return TRUE
 
-/obj/item/weapon/hand_labeler/attack_self(mob/living/user)
+/obj/item/hand_labeler/attack_self(mob/living/user)
 	if (label)
 		to_chat(user, "<span class='info'>You turn off \the [src].</span>")
 		label = null

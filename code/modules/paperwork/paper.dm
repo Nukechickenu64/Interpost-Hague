@@ -3,7 +3,7 @@
  * also scraps of paper
  */
 
-/obj/item/weapon/paper
+/obj/item/paper
 	name = "sheet of paper"
 	gender = NEUTER
 	icon = 'icons/obj/bureaucracy.dmi'
@@ -39,11 +39,11 @@
 
 	drop_sound = 'sound/items/drop_paper.ogg'
 
-/obj/item/weapon/paper/New(loc, text,title)
+/obj/item/paper/New(loc, text,title)
 	..(loc)
 	set_content(text ? text : info, title)
 
-/obj/item/weapon/paper/proc/set_content(text,title)
+/obj/item/paper/proc/set_content(text,title)
 	if(title)
 		SetName(title)
 	info = rhtml_encode(text)
@@ -52,7 +52,7 @@
 	update_space(info)
 	updateinfolinks()
 
-/obj/item/weapon/paper/update_icon()
+/obj/item/paper/update_icon()
 	if(icon_state == "paper_talisman")
 		return
 	else if(info)
@@ -60,18 +60,18 @@
 	else
 		icon_state = "paper"
 
-/obj/item/weapon/paper/proc/update_space(var/new_text)
+/obj/item/paper/proc/update_space(var/new_text)
 	if(new_text)
 		free_space -= length(strip_html_properly(new_text))
 
-/obj/item/weapon/paper/examine(mob/user)
+/obj/item/paper/examine(mob/user)
 	. = ..()
 	if(in_range(user, src) || isghost(user))
 		show_content(usr)
 	else
 		to_chat(user, "<span class='notice'>You have to go closer if you want to read it.</span>")
 
-/obj/item/weapon/paper/proc/show_content(mob/user, forceshow)
+/obj/item/paper/proc/show_content(mob/user, forceshow)
 	var/can_read = (istype(user, /mob/living/carbon/human) || isghost(user) || istype(user, /mob/living/silicon)) || forceshow
 	if(!forceshow && istype(user,/mob/living/silicon/ai))
 		var/mob/living/silicon/ai/AI = user
@@ -81,7 +81,7 @@
 	user << browse(page, "window=[name]")
 	onclose(user, "[name]")
 
-/obj/item/weapon/paper/verb/rename()
+/obj/item/paper/verb/rename()
 	set name = "Rename paper"
 	set category = "Object"
 	set src in usr
@@ -91,12 +91,12 @@
 		return
 	var/n_name = sanitizeSafe(input(usr, "What would you like to label the paper?", "Paper Labelling", null)  as text, MAX_NAME_LEN)
 
-	// We check loc one level up, so we can rename in clipboards and such. See also: /obj/item/weapon/photo/rename()
+	// We check loc one level up, so we can rename in clipboards and such. See also: /obj/item/photo/rename()
 	if((loc == usr || loc.loc && loc.loc == usr) && usr.stat == 0 && n_name)
 		SetName(n_name)
 		add_fingerprint(usr)
 
-/obj/item/weapon/paper/attack_self(mob/living/user as mob)
+/obj/item/paper/attack_self(mob/living/user as mob)
 	if(user.a_intent == I_HURT)
 		if(icon_state == "scrap")
 			user.show_message("<span class='warning'>\The [src] is already crumpled.</span>")
@@ -114,10 +114,10 @@
 			spawn(20)
 				spam_flag = 0
 
-/obj/item/weapon/paper/attack_ai(var/mob/living/silicon/ai/user)
+/obj/item/paper/attack_ai(var/mob/living/silicon/ai/user)
 	show_content(user)
 
-/obj/item/weapon/paper/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/paper/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(user.zone_sel.selecting == BP_EYES)
 		user.visible_message("<span class='notice'>You show the paper to [M]. </span>", \
 			"<span class='notice'> [user] holds up a paper and shows it to [M]. </span>")
@@ -139,7 +139,7 @@
 					H.lip_style = null
 					H.update_body()
 
-/obj/item/weapon/paper/proc/addtofield(var/id, var/text, var/links = 0)
+/obj/item/paper/proc/addtofield(var/id, var/text, var/links = 0)
 	var/locid = 0
 	var/laststart = 1
 	var/textindex = 1
@@ -175,7 +175,7 @@
 		info = before + text + after
 		updateinfolinks()
 
-/obj/item/weapon/paper/proc/updateinfolinks()
+/obj/item/paper/proc/updateinfolinks()
 	info_links = info
 	var/i = 0
 	for(i=1,i<=fields,i++)
@@ -183,7 +183,7 @@
 	info_links = info_links + "<font face=\"[deffont]\"><A href='?src=\ref[src];write=end'>write</A></font>"
 
 
-/obj/item/weapon/paper/proc/clearpaper()
+/obj/item/paper/proc/clearpaper()
 	info = null
 	stamps = null
 	free_space = MAX_PAPER_MESSAGE_LEN
@@ -192,12 +192,12 @@
 	updateinfolinks()
 	update_icon()
 
-/obj/item/weapon/paper/proc/get_signature(var/obj/item/weapon/pen/P, mob/user as mob)
-	if(P && istype(P, /obj/item/weapon/pen))
+/obj/item/paper/proc/get_signature(var/obj/item/pen/P, mob/user as mob)
+	if(P && istype(P, /obj/item/pen))
 		return P.get_signature(user)
 	return (user && user.real_name) ? user.real_name : "Anonymous"
 
-/obj/item/weapon/paper/proc/parsepencode(t, obj/item/weapon/pen/P, mob/user, iscrayon)
+/obj/item/paper/proc/parsepencode(t, obj/item/pen/P, mob/user, iscrayon)
 	t = cp1251_to_utf8(t)
 	if(length(t) == 0)
 		return ""
@@ -237,7 +237,7 @@
 	return t
 
 
-/obj/item/weapon/paper/proc/burnpaper(obj/item/weapon/flame/P, mob/user)
+/obj/item/paper/proc/burnpaper(obj/item/weapon/flame/P, mob/user)
 	var/class = "warning"
 
 	if(P.lit && !user.restrained())
@@ -262,7 +262,7 @@
 				to_chat(user, "<span class='warning'>You must hold \the [P] steady to burn \the [src].</span>")
 
 
-/obj/item/weapon/paper/Topic(href, href_list)
+/obj/item/paper/Topic(href, href_list)
 	..()
 	if(!usr || (usr.stat || usr.restrained()))
 		return
@@ -282,9 +282,9 @@
 
 		var/obj/item/i = usr.get_active_hand() // Check to see if he still got that darn pen, also check if he's using a crayon or pen.
 		var/iscrayon = 0
-		if(!istype(i, /obj/item/weapon/pen))
-			if(usr.back && istype(usr.back,/obj/item/weapon/rig))
-				var/obj/item/weapon/rig/r = usr.back
+		if(!istype(i, /obj/item/pen))
+			if(usr.back && istype(usr.back,/obj/item/rig))
+				var/obj/item/rig/r = usr.back
 				var/obj/item/rig_module/device/pen/m = locate(/obj/item/rig_module/device/pen) in r.installed_modules
 				if(!r.offline && m)
 					i = m.device
@@ -293,12 +293,12 @@
 			else
 				return
 
-		if(istype(i, /obj/item/weapon/pen/crayon))
+		if(istype(i, /obj/item/pen/crayon))
 			iscrayon = 1
 
 
 		// if paper is not in usr, then it must be near them, or in a clipboard or folder, which must be in or near usr
-		if(src.loc != usr && !src.Adjacent(usr) && !((istype(src.loc, /obj/item/weapon/clipboard) || istype(src.loc, /obj/item/weapon/folder)) && (src.loc.loc == usr || src.loc.Adjacent(usr)) ) )
+		if(src.loc != usr && !src.Adjacent(usr) && !((istype(src.loc, /obj/item/clipboard) || istype(src.loc, /obj/item/folder)) && (src.loc.loc == usr || src.loc.Adjacent(usr)) ) )
 			return
 
 		var/last_fields_value = fields
@@ -329,25 +329,25 @@
 		update_icon()
 
 
-/obj/item/weapon/paper/attackby(obj/item/weapon/P as obj, mob/user as mob)
+/obj/item/paper/attackby(obj/item/weapon/P as obj, mob/user as mob)
 	..()
 	var/clown = 0
 	if(user.mind && (user.mind.assigned_role == "Clown"))
 		clown = 1
 
-	if(istype(P, /obj/item/weapon/tape_roll))
-		var/obj/item/weapon/tape_roll/tape = P
+	if(istype(P, /obj/item/tape_roll))
+		var/obj/item/tape_roll/tape = P
 		tape.stick(src, user)
 		return
 
-	if(istype(P, /obj/item/weapon/paper) || istype(P, /obj/item/weapon/photo))
-		if (istype(P, /obj/item/weapon/paper/carbon))
-			var/obj/item/weapon/paper/carbon/C = P
+	if(istype(P, /obj/item/paper) || istype(P, /obj/item/photo))
+		if (istype(P, /obj/item/paper/carbon))
+			var/obj/item/paper/carbon/C = P
 			if (!C.iscopy && !C.copied)
 				to_chat(user, "<span class='notice'>Take off the carbon copy first.</span>")
 				add_fingerprint(user)
 				return
-		var/obj/item/weapon/paper_bundle/B = new(src.loc)
+		var/obj/item/paper_bundle/B = new(src.loc)
 		if (name != "paper")
 			B.SetName(name)
 		else if (P.name != "paper" && P.name != "photo")
@@ -365,12 +365,12 @@
 		B.pages.Add(P)
 		B.update_icon()
 
-	else if(istype(P, /obj/item/weapon/pen))
+	else if(istype(P, /obj/item/pen))
 		if(icon_state == "scrap")
 			to_chat(usr, "<span class='warning'>\The [src] is too crumpled to write on.</span>")
 			return
 
-		var/obj/item/weapon/pen/robopen/RP = P
+		var/obj/item/pen/robopen/RP = P
 		if ( istype(RP) && RP.mode == 2 )
 			RP.RenamePaper(user,src)
 			playsound(pick(write_sounds), 50)
@@ -380,8 +380,8 @@
 			playsound(pick(write_sounds), 50)
 		return
 
-	else if(istype(P, /obj/item/weapon/stamp) || istype(P, /obj/item/clothing/ring/seal))
-		if((!in_range(src, usr) && loc != user && !( istype(loc, /obj/item/weapon/clipboard) ) && loc.loc != user && user.get_active_hand() != P))
+	else if(istype(P, /obj/item/stamp) || istype(P, /obj/item/clothing/ring/seal))
+		if((!in_range(src, usr) && loc != user && !( istype(loc, /obj/item/clipboard) ) && loc.loc != user && user.get_active_hand() != P))
 			return
 
 		stamps += (stamps=="" ? "<HR>" : "<BR>") + "<i>This paper has been stamped with the [P.name].</i>"
@@ -389,7 +389,7 @@
 		var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
 		var/x
 		var/y
-		if(istype(P, /obj/item/weapon/stamp/captain) || istype(P, /obj/item/weapon/stamp/centcomm))
+		if(istype(P, /obj/item/stamp/captain) || istype(P, /obj/item/stamp/centcomm))
 			x = rand(-2, 0)
 			y = rand(-1, 2)
 		else
@@ -400,7 +400,7 @@
 		stampoverlay.pixel_x = x
 		stampoverlay.pixel_y = y
 
-		if(istype(P, /obj/item/weapon/stamp/clown))
+		if(istype(P, /obj/item/stamp/clown))
 			if(!clown)
 				to_chat(user, "<span class='notice'>You are totally unable to use the stamp. HONK!</span>")
 				return
@@ -420,8 +420,8 @@
 	else if(istype(P, /obj/item/weapon/flame))
 		burnpaper(P, user)
 
-	else if(istype(P, /obj/item/weapon/paper_bundle))
-		var/obj/item/weapon/paper_bundle/attacking_bundle = P
+	else if(istype(P, /obj/item/paper_bundle))
+		var/obj/item/paper_bundle/attacking_bundle = P
 		attacking_bundle.insert_sheet_at(user, (attacking_bundle.pages.len)+1, src)
 		attacking_bundle.update_icon()
 
@@ -431,30 +431,30 @@
 /*
  * Premade paper
  */
-/obj/item/weapon/paper/Court
+/obj/item/paper/Court
 	name = "Judgement"
 	info = "For crimes as specified, the offender is sentenced to:<BR>\n<BR>\n"
 
-/obj/item/weapon/paper/crumpled
+/obj/item/paper/crumpled
 	name = "paper scrap"
 	icon_state = "scrap"
 
-/obj/item/weapon/paper/crumpled/update_icon()
+/obj/item/paper/crumpled/update_icon()
 	return
 
-/obj/item/weapon/paper/crumpled/bloody
+/obj/item/paper/crumpled/bloody
 	icon_state = "scrap_bloodied"
 
-/obj/item/weapon/paper/workvisa
+/obj/item/paper/workvisa
 	name = "Work Visa"
 	info = "<center><b><large>Work Visa of the Ishim Republic</large></b></center><br><center><br><br><i><small>Issued on behalf of the Ministry of Work Activities.</small></i></center><hr><BR>This paper hereby permits the carrier to travel unhindered through Ishim territories, colonies, and space for the purpose of work and labor."
 	desc = "A flimsy piece of laminated cardboard issued by the Sol Central Government."
 
-/obj/item/weapon/paper/workvisa/New()
+/obj/item/paper/workvisa/New()
 	..()
 	icon_state = "workvisa" //Has to be here or it'll assume default paper sprites.
 
 //For supply.
-/obj/item/weapon/paper/manifest
+/obj/item/paper/manifest
 	name = "supply manifest"
 	var/is_copy = 1

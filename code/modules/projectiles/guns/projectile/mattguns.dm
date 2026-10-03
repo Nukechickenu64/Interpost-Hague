@@ -1,7 +1,7 @@
 //Shitty variant of the normal bolt action rifle.
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/shitty
-	name = "\improper Mark I Stormrider"
-	desc = "The much, much older brother of the sleaker, better, Mark II. Kind of a piece of shit."
+	name = "\improper Frontier Arms FA-01 Stormrider Bolt-Action Rifle"
+	desc = "An early Stormrider-pattern rifle, older and less reliable than the FA-02. This example shows heavy wear."
 	icon_state = "mosin2"
 	item_state = "mosin2"
 	wielded_item_state = "mosin2-wielded"
@@ -12,8 +12,8 @@
 	ammo_type = /obj/item/ammo_casing/brifle
 
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/shitty/bayonet
-	name = "\improper Mark I Stormrider"
-	desc = "The much, much older brother of the sleaker, better, Mark II. This one has a bayonet."
+	name = "\improper Frontier Arms FA-01 Stormrider Rifle with Bayonet"
+	desc = "An early, worn Stormrider-pattern rifle fitted with a fixed bayonet."
 	icon_state = "mosin2-bayonet"
 	force = 15
 	sharp = 1
@@ -42,8 +42,8 @@
 	toggle_scope(usr, 2.0)
 */
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/madsen
-	name = "Masonion"
-	desc = "A finer model of a bolt action. Seems to be pretty clean."
+	name = "\improper Aussec Armoury M-4 Bolt-Action Rifle"
+	desc = "A well-maintained bolt-action rifle with a clean stock and refinished metalwork."
 	icon_state = "madsen"
 	item_state = "mosin2"
 	wielded_item_state = "mosin2-wielded"
@@ -54,8 +54,8 @@
 	ammo_type = /obj/item/ammo_casing/brifle
 
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/remedymk1
-	name = "Remedy mk1 rifle"
-	desc = "A old wooden model of a bolt action. Seems to be pretty clean."
+	name = "\improper Remedy Arms RM-1 Bolt-Action Rifle"
+	desc = "An older bolt-action rifle with a wooden stock, kept in unusually good condition."
 	icon_state = "remedymk1"
 	item_state = "remedymk1"
 	wielded_item_state = "mosin2-wielded"
@@ -82,13 +82,13 @@
 
 //Shitty shotgun
 /obj/item/weapon/gun/projectile/shotgun/pump/shitty
-	name = "\improper WTX Frontier Special"
-	desc = "A common shotgun used on the frontiers of space. It's not the best made and is prone to jamming."
+	name = "\improper Ward-Takahashi WTX Frontier Shotgun"
+	desc = "A low-cost 12-gauge pump shotgun sold for frontier use. Its loose tolerances make it prone to jamming."
 	jam_chance = 15
 
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/persuasion
-	name = "Persuasion MK2"
-	desc = "A very modern sniper rifle. Chambered in (7.62x54)."
+	name = "\improper Hephaestus HPR-2 Precision Rifle"
+	desc = "A modern bolt-action precision rifle chambered for 7.62x54mm ammunition, with a 20-round capacity."
 	icon_state = "Persuasion_mk2"
 	item_state = "madsen"
 	jam_chance = 1

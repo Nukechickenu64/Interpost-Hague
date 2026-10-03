@@ -74,11 +74,11 @@
 								/obj/item/weapon/gun/energy/xray                         = TRADER_THIS_TYPE,
 								/obj/item/weapon/gun/energy/laser                        = TRADER_THIS_TYPE,
 								/obj/item/weapon/gun/energy/gun                          = TRADER_THIS_TYPE,
-								/obj/item/weapon/cell                                    = TRADER_THIS_TYPE,
-								/obj/item/weapon/cell/crap                               = TRADER_THIS_TYPE,
-								/obj/item/weapon/cell/high                               = TRADER_THIS_TYPE,
-								/obj/item/weapon/cell/super                              = TRADER_THIS_TYPE,
-								/obj/item/weapon/cell/hyper                              = TRADER_THIS_TYPE,
+								/obj/item/cell                                    = TRADER_THIS_TYPE,
+								/obj/item/cell/crap                               = TRADER_THIS_TYPE,
+								/obj/item/cell/high                               = TRADER_THIS_TYPE,
+								/obj/item/cell/super                              = TRADER_THIS_TYPE,
+								/obj/item/cell/hyper                              = TRADER_THIS_TYPE,
 								/obj/item/clothing/accessory/holster                     = TRADER_ALL)
 
 /datum/trader/dogan

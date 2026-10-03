@@ -104,7 +104,7 @@
 //#####BOTTLES#####
 
 //PISS
-/obj/item/weapon/reagent_containers/glass/bottle/urine
+/obj/item/reagent_containers/glass/bottle/urine
 	name = "urine bottle"
 	desc = "A small bottle. Contains urine."
 	icon = 'icons/obj/chemical.dmi'
@@ -191,7 +191,7 @@
 
 		else if(w_uniform)
 			message = "<B>[src]</B> shits \his pants."
-			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
+			var/obj/item/reagent_containers/food/snacks/poo/V = new/obj/item/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
 			adjust_hygiene(-25)
@@ -205,7 +205,7 @@
 		//Poo on the floor.
 		else
 			message = "<B>[src]</B> [pick("shits", "craps", "poops")]."
-			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
+			var/obj/item/reagent_containers/food/snacks/poo/V = new/obj/item/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
 
@@ -229,7 +229,7 @@
 	var/obj/structure/hygiene/toilet/T = locate() in src.loc
 	//var/obj/structure/toilet/T2 = locate() in src.loc
 	var/obj/structure/hygiene/sink/S = locate() in src.loc
-	var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
+	var/obj/item/reagent_containers/RC = locate() in src.loc
 	if((U || S) && gender != FEMALE)//In the urinal or sink.
 		message = "<B>[src]</B> urinates into [U ? U : S]."
 		reagents.remove_any(rand(1,8))
@@ -238,7 +238,7 @@
 		message = "<B>[src]</B> urinates into [T]."
 		reagents.remove_any(rand(1,8))
 
-	else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
+	else if(RC && (istype(RC,/obj/item/reagent_containers/food/drinks || istype(RC,/obj/item/reagent_containers/glass))))
 		if(RC.is_open_container())
 			//Inside a beaker, glass, drink, etc.
 			message = "<B>[src]</B> urinates into [RC]."

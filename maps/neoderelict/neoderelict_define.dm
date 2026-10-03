@@ -17,13 +17,13 @@
 	station_name  = "Perimeter Station 34-53"
 	station_short = "Perimeter"
 	dock_name     = "Gnezdo"
-	boss_name     = "TETRACORP DIAGNOSTICS SUBROUTINE"
+	boss_name     = "NANOTRASEN DIAGNOSTICS SUBROUTINE"
 	boss_short    = "TTC-D-S"
-	company_name  = "TetraCorp"
+	company_name  = "Nanotrasen"
 	company_short = "TTC"
 	system_name = "WISE 0855−0714"
 
-	map_admin_faxes = list("TETRACORP MAIL SUBROUTINE")
+	map_admin_faxes = list("NANOTRASEN MAIL SUBROUTINE")
 
 	shuttle_docked_message = " has docked with the station. Command staff is prioritised."
 	shuttle_leaving_dock = "The Elipse has departed from home dock."

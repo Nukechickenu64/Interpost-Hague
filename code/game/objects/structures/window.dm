@@ -485,8 +485,9 @@
 	glasstype = /obj/item/stack/material/glass/reinforced
 
 /obj/structure/window/reinforced/full
+	icon = 'icons/obj/structures.dmi'
 	dir = 5
-	icon_state = "nwindow1"
+	icon_state = "wingrille"
 	basestate = "nwindow"
 
 /obj/structure/window/reinforced/full/Destroy()

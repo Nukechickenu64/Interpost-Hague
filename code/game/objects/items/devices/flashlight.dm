@@ -15,23 +15,173 @@
 	var/brightness_on = 4 //range of light when on
 	var/activation_sound = 'sound/effects/flashlight.ogg'
 	var/flashlight_power //luminosity of light when on, can be negative
+	var/cone_angle = 30 // half-width in degrees; 0 keeps an all-around glow and disables aiming
+	var/cone_range = 6
+	var/glow_range = 2
+	var/aim_angle
+	var/mob/cone_holder
 
 /obj/item/device/flashlight/Initialize()
 	. = ..()
 	update_icon()
 
+/obj/item/device/flashlight/Destroy()
+	set_cone_holder(null)
+	return ..()
+
 /obj/item/device/flashlight/update_icon()
 	if(on)
 		icon_state = "[initial(icon_state)]-on"
 		item_state = "[initial(icon_state)]-on"
+		var/range = cone_angle ? cone_range : brightness_on
+		update_cone()
 		if(flashlight_power)
-			set_light(l_range = brightness_on, l_power = flashlight_power)
+			set_light(l_range = range, l_power = flashlight_power)
 		else
-			set_light(brightness_on)
+			set_light(range)
 	else
 		icon_state = "[initial(icon_state)]"
 		item_state = "[initial(icon_state)]"
 		set_light(0)
+		update_cone()
+
+/obj/item/device/flashlight/proc/update_cone()
+	if(!on || !cone_angle)
+		set_light_cone(0, 0, 0)
+		return
+	set_light_cone(cone_angle, get_cone_dir(), glow_range)
+
+/obj/item/device/flashlight/proc/get_cone_dir()
+	var/mob/M = loc
+	if(istype(M))
+		if(!isnull(aim_angle) && M.get_active_hand() == src)
+			return aim_angle
+		. = dir2angle(M.dir)
+	else
+		. = dir2angle(dir)
+	if(isnull(.))
+		. = 180
+
+/obj/item/device/flashlight/proc/set_cone_holder(mob/M)
+	if(cone_holder == M)
+		return
+	if(cone_holder)
+		GLOB.dir_set_event.unregister(cone_holder, src, /obj/item/device/flashlight/proc/holder_dir_set)
+	cone_holder = M
+	if(cone_holder && cone_angle)
+		GLOB.dir_set_event.register(cone_holder, src, /obj/item/device/flashlight/proc/holder_dir_set)
+
+/obj/item/device/flashlight/proc/holder_dir_set(atom/holder, old_dir, new_dir)
+	if(loc != holder)
+		set_cone_holder(null)
+		return
+	update_cone()
+
+/obj/item/device/flashlight/proc/hands_swapped(mob/user)
+	if(user.get_active_hand() != src)
+		aim_angle = null
+	update_cone()
+
+/obj/item/device/flashlight/equipped(mob/user, slot)
+	. = ..()
+	set_cone_holder(user)
+	if(user.get_active_hand() != src)
+		aim_angle = null
+	update_cone()
+
+/obj/item/device/flashlight/dropped(mob/user)
+	. = ..()
+	if(loc != user)
+		set_cone_holder(null)
+		aim_angle = null
+		if(user)
+			set_dir(user.dir)
+	update_cone()
+
+/obj/item/device/flashlight/proc/can_aim(atom/A, mob/user)
+	if(!on || !cone_angle || !A || !user || user.get_active_hand() != src)
+		return FALSE
+	if(user.a_intent == I_HURT)
+		return FALSE
+	if(istype(A, /obj/screen/click_catcher))
+		return TRUE
+	if(!(isturf(A) || isturf(A.loc)))
+		return FALSE
+	if(ismob(A) && user.a_intent == I_HELP && user.zone_sel && user.zone_sel.selecting == BP_EYES && A.Adjacent(user))
+		return FALSE
+	return TRUE
+
+/obj/item/device/flashlight/proc/aim_at(atom/A, mob/user, params)
+	var/turf/U = get_turf(user)
+	if(!U || !A)
+		return
+	var/px
+	var/py
+	var/list/P = params2list(params)
+	if(istype(A, /obj/screen/click_catcher))
+		var/obj/screen/click_catcher/CC = A
+		px = (U.x + CC.x_offset - 1) * world.icon_size
+		py = (U.y + CC.y_offset - 1) * world.icon_size
+	else
+		var/turf/T = get_turf(A)
+		if(!T || T.z != U.z)
+			return
+		px = (T.x - 1) * world.icon_size + A.pixel_x
+		py = (T.y - 1) * world.icon_size + A.pixel_y
+	if(P["icon-x"] && P["icon-y"])
+		px += text2num(P["icon-x"])
+		py += text2num(P["icon-y"])
+	else
+		px += world.icon_size / 2
+		py += world.icon_size / 2
+
+	var/dx = px - ((U.x - 1) * world.icon_size + world.icon_size / 2)
+	var/dy = py - ((U.y - 1) * world.icon_size + world.icon_size / 2)
+	if(!dx && !dy)
+		return
+	if(!dy)
+		aim_angle = dx > 0 ? 90 : 270
+	else
+		aim_angle = arctan(dx / dy)
+		if(dy < 0)
+			aim_angle += 180
+		else if(dx < 0)
+			aim_angle += 360
+
+	var/face = abs(dx) > abs(dy) ? (dx > 0 ? EAST : WEST) : (dy > 0 ? NORTH : SOUTH)
+	if(user.dir != face && user.canface())
+		if(user.facing_dir)
+			user.facing_dir = face
+		user.set_dir(face)
+	update_cone()
+
+/client
+	var/atom/flashlight_aim_target
+	var/flashlight_aim_params
+	var/flashlight_aiming = FALSE
+
+/client/proc/flashlight_mouse_down(atom/object, params)
+	var/list/P = params2list(params)
+	if(!P["left"] || P["shift"] || P["ctrl"] || P["alt"] || !mob)
+		return FALSE
+	var/obj/item/device/flashlight/F = mob.get_active_hand()
+	if(!istype(F) || !F.can_aim(object, mob))
+		return FALSE
+	flashlight_aim_target = object
+	flashlight_aim_params = params
+	if(!flashlight_aiming)
+		flashlight_aim_loop(F)
+	return TRUE
+
+/client/proc/flashlight_aim_loop(obj/item/device/flashlight/F)
+	set waitfor = FALSE
+	flashlight_aiming = TRUE
+	while(flashlight_aim_target && mob && !QDELETED(F) && F.on && mob.get_active_hand() == F && !mob.incapacitated() && mob.a_intent != I_HURT)
+		if(!QDELETED(flashlight_aim_target))
+			F.aim_at(flashlight_aim_target, mob, flashlight_aim_params)
+		sleep(world.tick_lag)
+	flashlight_aim_target = null
+	flashlight_aiming = FALSE
 
 /obj/item/device/flashlight/attack_self(mob/user)
 	if(!isturf(user.loc))
@@ -125,6 +275,7 @@
 	item_state = "biglight"
 	brightness_on = 6
 	flashlight_power = 3
+	cone_range = 8
 
 /obj/item/device/flashlight/flashdark
 	name = "flashdark"
@@ -134,6 +285,8 @@
 	w_class = ITEM_SIZE_NORMAL
 	brightness_on = 8
 	flashlight_power = -6
+	cone_range = 8
+	cone_angle = 35
 
 /obj/item/device/flashlight/pen
 	name = "penlight"
@@ -144,6 +297,9 @@
 	slot_flags = SLOT_EARS
 	brightness_on = 2
 	w_class = ITEM_SIZE_TINY
+	cone_range = 3
+	cone_angle = 20
+	glow_range = 1
 
 /obj/item/device/flashlight/maglight
 	name = "maglight"
@@ -154,6 +310,8 @@
 	attack_verb = list ("smacked", "thwacked", "thunked")
 	matter = list(DEFAULT_WALL_MATERIAL = 200,"glass" = 50)
 	hitsound = "swing_hit"
+	cone_range = 7
+	cone_angle = 25
 
 /obj/item/device/flashlight/drone
 	name = "low-power flashlight"
@@ -163,6 +321,7 @@
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	brightness_on = 2
 	w_class = ITEM_SIZE_TINY
+	cone_angle = 0
 
 
 // the desk lamps are a bit special
@@ -174,6 +333,7 @@
 	brightness_on = 5
 	w_class = ITEM_SIZE_LARGE
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
+	cone_angle = 0
 
 	on = 1
 
@@ -206,6 +366,7 @@
 	icon_state = "flare"
 	item_state = "flare"
 	action_button_name = null //just pull it manually, neckbeard.
+	cone_angle = 0
 	var/fuel = 0
 	var/on_damage = 7
 	var/produce_heat = 1500
@@ -263,6 +424,7 @@
 	randpixel = 12
 	var/fuel = 0
 	activation_sound = null
+	cone_angle = 0
 
 /obj/item/device/flashlight/glowstick/Initialize()
 	fuel = rand(1600, 2000)
@@ -354,6 +516,7 @@
 	w_class = ITEM_SIZE_TINY
 	brightness_on = 6
 	on = 1 //Bio-luminesence has one setting, on.
+	cone_angle = 0
 
 /obj/item/device/flashlight/slime/New()
 	..()
@@ -377,6 +540,7 @@
 	icon_state = "torch0"
 	item_state = "torch"
 	action_button_name = null //just pull it manually, neckbeard.
+	cone_angle = 0
 	var/fuel = 0
 	var/on_damage = 7
 	var/produce_heat = 1500

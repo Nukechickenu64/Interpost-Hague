@@ -11,6 +11,7 @@
 	icon = 'icons/obj/power.dmi'
 	anchored = 1.0
 	var/datum/powernet/powernet = null
+	var/datum/powernet/input_powernet = null	// only for split nodes (SMES-like)
 	use_power = POWER_USE_OFF
 	idle_power_usage = 0
 	active_power_usage = 0
@@ -22,6 +23,13 @@
 /obj/machinery/power/Destroy()
 	disconnect_from_network()
 	. = ..()
+
+/obj/machinery/power/is_power_linkable()
+	return TRUE
+
+/obj/machinery/power/power_nets_changed(datum/power_node/N)
+	powernet = N.out_net
+	input_powernet = N.split ? N.in_net : null
 
 ///////////////////////////////
 // General procedures
@@ -65,200 +73,33 @@
 	else
 		return 0
 
-/obj/machinery/power/proc/disconnect_terminal(var/obj/machinery/power/terminal/term) // machines without a terminal will just return, no harm no fowl.
-	return
-
-// connect the machine to a powernet if a node cable is present on the turf
+// Enable this machine's node so it joins whatever buses it is linked into.
 /obj/machinery/power/proc/connect_to_network()
-	var/turf/T = src.loc
-	if(!T || !istype(T))
+	var/datum/power_node/N = get_power_node()
+	if(!N)
 		return 0
-
-	var/obj/structure/cable/C = T.get_cable_node() //check if we have a node cable on the machine turf, the first found is picked
-	if(!C || !C.powernet)
-		return 0
-
-	C.powernet.add_machine(src)
+	N.set_enabled(TRUE)
 	return 1
 
-// remove and disconnect the machine from its current powernet
+// Keep links but leave every bus until reconnected.
 /obj/machinery/power/proc/disconnect_from_network()
-	if(!powernet)
+	if(!power_node)
 		return 0
-	powernet.remove_machine(src)
+	power_node.set_enabled(FALSE)
+	if(powernet)
+		powernet.nodes -= src
+		powernet = null
+	if(input_powernet)
+		input_powernet.input_nodes -= src
+		input_powernet = null
 	return 1
 
-// attach a wire to a power machine - leads from the turf you are standing on
-//almost never called, overwritten by all power machines but terminal and generator
-/obj/machinery/power/attackby(obj/item/weapon/W, mob/user)
-
-	if(isCoil(W))
-
-		var/obj/item/stack/cable_coil/coil = W
-
-		var/turf/T = user.loc
-
-		if(!T.is_plating() || !istype(T, /turf/simulated/floor))
-			return
-
-		if(get_dist(src, user) > 1)
-			return
-
-		coil.turf_place(T, user)
-		return
-	else
-		..()
-	return
-
-///////////////////////////////////////////
-// Powernet handling helpers
-//////////////////////////////////////////
-
-//returns all the cables WITHOUT a powernet in neighbors turfs,
-//pointing towards the turf the machine is located at
-/obj/machinery/power/proc/get_connections()
-
-	. = list()
-
-	var/cdir
-	var/turf/T
-
-	for(var/card in GLOB.cardinal)
-		T = get_step(loc,card)
-		cdir = get_dir(T,loc)
-
-		for(var/obj/structure/cable/C in T)
-			if(C.powernet)	continue
-			if(C.d1 == cdir || C.d2 == cdir)
-				. += C
-	return .
-
-//returns all the cables in neighbors turfs,
-//pointing towards the turf the machine is located at
-/obj/machinery/power/proc/get_marked_connections()
-
-	. = list()
-
-	var/cdir
-	var/turf/T
-
-	for(var/card in GLOB.cardinal)
-		T = get_step(loc,card)
-		cdir = get_dir(T,loc)
-
-		for(var/obj/structure/cable/C in T)
-			if(C.d1 == cdir || C.d2 == cdir)
-				. += C
-	return .
-
-//returns all the NODES (O-X) cables WITHOUT a powernet in the turf the machine is located at
-/obj/machinery/power/proc/get_indirect_connections()
-	. = list()
-	for(var/obj/structure/cable/C in loc)
-		if(C.powernet)	continue
-		if(C.d1 == 0) // the cable is a node cable
-			. += C
-	return .
-
-///////////////////////////////////////////
-// GLOBAL PROCS for powernets handling
-//////////////////////////////////////////
-
-
-// returns a list of all power-related objects (nodes, cable, junctions) in turf,
-// excluding source, that match the direction d
-// if unmarked==1, only return those with no powernet
-/proc/power_list(var/turf/T, var/source, var/d, var/unmarked=0, var/cable_only = 0)
-	. = list()
-
-	var/reverse = d ? GLOB.reverse_dir[d] : 0
-	for(var/AM in T)
-		if(AM == source)	continue			//we don't want to return source
-
-		if(!cable_only && istype(AM,/obj/machinery/power))
-			var/obj/machinery/power/P = AM
-			if(P.powernet == 0)	continue		// exclude APCs which have powernet=0
-
-			if(!unmarked || !P.powernet)		//if unmarked=1 we only return things with no powernet
-				if(d == 0)
-					. += P
-
-		else if(istype(AM,/obj/structure/cable))
-			var/obj/structure/cable/C = AM
-
-			if(!unmarked || !C.powernet)
-				if(C.d1 == d || C.d2 == d || C.d1 == reverse || C.d2 == reverse )
-					. += C
-	return .
-
-//remove the old powernet and replace it with a new one throughout the network.
-/proc/propagate_network(var/obj/O, var/datum/powernet/PN)
-	//world.log << "propagating new network"
-	var/list/worklist = list()
-	var/list/found_machines = list()
-	var/index = 1
-	var/obj/P = null
-
-	worklist+=O //start propagating from the passed object
-
-	while(index<=worklist.len) //until we've exhausted all power objects
-		P = worklist[index] //get the next power object found
-		index++
-
-		if( istype(P,/obj/structure/cable))
-			var/obj/structure/cable/C = P
-			if(C.powernet != PN) //add it to the powernet, if it isn't already there
-				PN.add_cable(C)
-			worklist |= C.get_connections() //get adjacents power objects, with or without a powernet
-
-		else if(P.anchored && istype(P,/obj/machinery/power))
-			var/obj/machinery/power/M = P
-			found_machines |= M //we wait until the powernet is fully propagates to connect the machines
-
-		else
-			continue
-
-	//now that the powernet is set, connect found machines to it
-	for(var/obj/machinery/power/PM in found_machines)
-		if(!PM.connect_to_network()) //couldn't find a node on its turf...
-			PM.disconnect_from_network() //... so disconnect if already on a powernet
-
-
-//Merge two powernets, the bigger (in cable length term) absorbing the other
-/proc/merge_powernets(var/datum/powernet/net1, var/datum/powernet/net2)
-	if(!net1 || !net2) //if one of the powernet doesn't exist, return
-		return
-
-	if(net1 == net2) //don't merge same powernets
-		return
-
-	//We assume net1 is larger. If net2 is in fact larger we are just going to make them switch places to reduce on code.
-	if(net1.cables.len < net2.cables.len)	//net2 is larger than net1. Let's switch them around
-		var/temp = net1
-		net1 = net2
-		net2 = temp
-
-	//merge net2 into net1
-	for(var/obj/structure/cable/Cable in net2.cables.Copy())
-		net2.cables -= Cable
-		Cable.powernet = net1
-		net1.cables += Cable
-
-	var/list/old_nodes = net2.nodes.Copy()
-	net2.nodes.Cut()
-	for(var/obj/machinery/power/Node in old_nodes)
-		Node.powernet = null
-		if(!Node.connect_to_network())
-			Node.disconnect_from_network()
-
-	net2.cables.Cut()
-	qdel(net2)
-
-	return net1
+/proc/request_power_grid_rebuild()
+	power_grid_dirty = TRUE
 
 //Determines how strong could be shock, deals damage to mob, uses power.
 //M is a mob who touched wire/whatever
-//power_source is a source of electricity, can be powercell, area, apc, cable, powernet or null
+//power_source is a source of electricity, can be powercell, area, area SMES, powernet or null
 //source is an object caused electrocuting (airlock, grille, etc)
 //No animations will be performed by this proc.
 /proc/electrocute_mob(mob/living/carbon/M as mob, var/power_source, var/obj/source, var/siemens_coeff = 1.0)
@@ -266,23 +107,19 @@
 	var/area/source_area
 	if(istype(power_source,/area))
 		source_area = power_source
-		power_source = source_area.get_apc()
-	if(istype(power_source,/obj/structure/cable))
-		var/obj/structure/cable/Cable = power_source
-		power_source = Cable.powernet
+		power_source = source_area.get_area_smes()
 
 	var/datum/powernet/PN
-	var/obj/item/weapon/cell/cell
+	var/obj/item/cell/cell
 
 	if(istype(power_source,/datum/powernet))
 		PN = power_source
-	else if(istype(power_source,/obj/item/weapon/cell))
+	else if(istype(power_source,/obj/item/cell))
 		cell = power_source
-	else if(istype(power_source,/obj/machinery/power/apc))
-		var/obj/machinery/power/apc/apc = power_source
-		cell = apc.cell
-		if (apc.terminal)
-			PN = apc.terminal.powernet
+	else if(istype(power_source,/obj/machinery/power/area_smes))
+		var/obj/machinery/power/area_smes/smes = power_source
+		cell = smes.cell
+		PN = smes.powernet
 	else if (!power_source)
 		return 0
 	else
@@ -328,6 +165,6 @@
 	else if (istype(power_source,/datum/powernet))
 		var/drained_power = drained_energy/CELLRATE
 		drained_power = PN.draw_power(drained_power)
-	else if (istype(power_source, /obj/item/weapon/cell))
+	else if (istype(power_source, /obj/item/cell))
 		cell.use(drained_energy)
 	return drained_energy

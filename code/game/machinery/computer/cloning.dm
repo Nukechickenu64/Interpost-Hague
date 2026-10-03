@@ -4,7 +4,7 @@
 	icon_keyboard = "med_key"
 	icon_screen = "dna"
 	light_color = "#315ab4"
-	circuit = /obj/item/weapon/circuitboard/cloning
+	circuit = /obj/item/circuitboard/cloning
 	req_access = list(access_heads) //Only used for record deletion right now.
 	var/obj/machinery/dna_scannernew/scanner = null //Linked scanner. For scanning.
 	var/list/pods = list() //Linked cloning pods.
@@ -15,7 +15,7 @@
 	var/datum/dna2/record/active_record = null
 	var/datum/dna2/record/identity_record = null
 	var/datum/dna2/record/donor_record = null
-	var/obj/item/weapon/disk/data/diskette = null //Mostly so the geneticist can steal everything.
+	var/obj/item/disk/data/diskette = null //Mostly so the geneticist can steal everything.
 	var/loading = 0 // Nice loading text
 
 /obj/machinery/computer/cloning/Initialize()
@@ -92,7 +92,7 @@
 			P.name = "[initial(P.name)] #[num++]"
 
 /obj/machinery/computer/cloning/attackby(obj/item/W as obj, mob/user as mob)
-	if (istype(W, /obj/item/weapon/disk/data)) //INSERT SOME DISKETTES
+	if (istype(W, /obj/item/disk/data)) //INSERT SOME DISKETTES
 		if (!src.diskette)
 			user.drop_item()
 			W.forceMove(src)
@@ -181,7 +181,7 @@
 			else
 				dat += {"<br><font size=1><a href='byond://?src=\ref[src];del_rec=1'>Delete Record</a></font><br>
 					<b>Name:</b> [src.active_record.dna.real_name]<br>"}
-				var/obj/item/weapon/implant/health/H = null
+				var/obj/item/implant/health/H = null
 				if(src.active_record.implant)
 					H=locate(src.active_record.implant)
 
@@ -282,7 +282,7 @@
 
 	else if(href_list["select_dna"])
 		var/datum/dna2/record/selected = locate(href_list["select_dna_record"])
-		if(!selected && src.active_record in src.records)
+		if(!selected && (src.active_record in src.records))
 			selected = src.active_record
 		if(!(selected in src.records))
 			temp = "Error: DNA record is no longer available."
@@ -301,7 +301,7 @@
 			src.menu = 4
 
 		else if (src.menu == 4)
-			var/obj/item/weapon/card/id/C = usr.get_active_hand()
+			var/obj/item/card/id/C = usr.get_active_hand()
 			if (istype(C)||istype(C, /obj/item/device/pda))
 				if(src.check_access(C))
 					if(identity_record == src.active_record)
@@ -362,7 +362,7 @@
 		var/datum/dna2/record/C = identity_record
 		var/datum/dna2/record/D = donor_record
 		//Look for that player! They better be dead!
-		if(istype(C) && istype(D) && C in records && D in records)
+		if(istype(C) && istype(D) && (C in records) && (D in records))
 			//Can't clone without someone to clone.  Or a pod.  Or if the pod is busy. Or full of gibs.
 			if(!pods.len)
 				temp = "Error: No clone pods detected."
@@ -437,9 +437,9 @@
 	R.flavor=subject.flavor_texts.Copy()
 
 	//Add an implant if needed
-	var/obj/item/weapon/implant/health/imp = locate(/obj/item/weapon/implant/health, subject)
+	var/obj/item/implant/health/imp = locate(/obj/item/implant/health, subject)
 	if (isnull(imp))
-		imp = new /obj/item/weapon/implant/health(subject)
+		imp = new /obj/item/implant/health(subject)
 		imp.implanted = subject
 		R.implant = "\ref[imp]"
 	//Update it if needed

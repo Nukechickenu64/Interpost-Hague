@@ -21,6 +21,8 @@
 	var/eye_icon = "eyes_s"
 	var/eye_icon_location = 'icons/mob/human_face.dmi'
 	var/has_lips
+	var/icon/medical_lip_overlay
+	var/icon/medical_sclera_overlay
 	var/list/teeth_list = list()
 	var/max_teeth = 32
 	var/tongue = null
@@ -66,20 +68,63 @@
 /obj/item/organ/external/head/no_eyes
 	eye_icon = "blank_eyes"
 
+var/icon/medical_sclera_mask
+
+/obj/item/organ/external/head/proc/get_medical_sclera_mask()
+	if(!medical_sclera_mask)
+		medical_sclera_mask = new('icons/mob/human.dmi', "blank")
+		for(var/facing in list(SOUTH, NORTH, EAST, WEST))
+			var/icon/frame = new('icons/mob/human.dmi', "blank", dir = SOUTH)
+			switch(facing)
+				if(SOUTH)
+					frame.DrawBox("#ffffff", 14, 26, 14, 26)
+					frame.DrawBox("#ffffff", 18, 26, 18, 26)
+				if(EAST)
+					frame.DrawBox("#ffffff", 18, 26, 18, 26)
+				if(WEST)
+					frame.DrawBox("#ffffff", 15, 26, 15, 26)
+			medical_sclera_mask.Insert(frame, dir = facing)
+	return new/icon(medical_sclera_mask)
+
 /obj/item/organ/external/head/update_icon()
 
+	if(medical_lip_overlay)
+		overlays -= medical_lip_overlay
+		medical_lip_overlay = null
+	if(medical_sclera_overlay)
+		overlays -= medical_sclera_overlay
+		medical_sclera_overlay = null
 	..()
 
 	if(owner)
 		if(eye_icon)
 			var/icon/eyes_icon = new/icon(eye_icon_location, eye_icon)
 			var/obj/item/organ/internal/eyes/eyes = owner.internal_organs_by_name[owner.species.vision_organ ? owner.species.vision_organ : BP_EYES]
+			if(can_show_medical_skin() && owner.medical_jaundice && eyes && eyes.robotic < ORGAN_ROBOT && !(eyes.status & ORGAN_DEAD) && eye_icon == "eyes_s" && eye_icon_location == 'icons/mob/human_face.dmi')
+				var/icon/sclera = get_medical_sclera_mask()
+				sclera.Blend(rgb(235, 225 - 12 * owner.medical_jaundice, 195 - 35 * owner.medical_jaundice, 130 + 30 * owner.medical_jaundice), ICON_MULTIPLY)
+				mob_icon.Blend(sclera, ICON_OVERLAY)
+				overlays |= sclera
+				medical_sclera_overlay = sclera
 			if(eyes)
 				eyes_icon.Blend(rgb(eyes.eye_colour[1], eyes.eye_colour[2], eyes.eye_colour[3]), ICON_ADD)
 			else
 				eyes_icon.Blend(rgb(128,0,0), ICON_ADD)
 			mob_icon.Blend(eyes_icon, ICON_OVERLAY)
 			overlays |= eyes_icon
+
+		if(can_show_medical_skin() && !owner.lip_style && (species.appearance_flags & HAS_LIPS) && (get_medical_skin_pallor() || owner.medical_cyanosis))
+			var/icon/medical_lips = new('icons/mob/human_face.dmi', "lips_red_s")
+			medical_lips.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0)
+			var/brightness = 0.25 + 0.75 * medical_skin_brightness
+			var/pallor = get_medical_skin_pallor()
+			var/lip_red = (145 - 8 * pallor - 15 * owner.medical_cyanosis) * brightness
+			var/lip_green = (90 + 3 * pallor + 4 * owner.medical_cyanosis) * brightness
+			var/lip_blue = (90 + 5 * pallor + 15 * owner.medical_cyanosis) * brightness
+			medical_lips.Blend(rgb(lip_red, lip_green, lip_blue), ICON_MULTIPLY)
+			mob_icon.Blend(medical_lips, ICON_OVERLAY)
+			overlays |= medical_lips
+			medical_lip_overlay = medical_lips
 
 		if(owner.lip_style && robotic < ORGAN_ROBOT && (species && (species.appearance_flags & HAS_LIPS)))
 			var/icon/lip_icon = new/icon('icons/mob/human_face.dmi', "lips_[owner.lip_style]_s")

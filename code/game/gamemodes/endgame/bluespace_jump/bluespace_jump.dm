@@ -126,6 +126,8 @@
 	H.UpdateAppearance()
 	var/datum/job/job = job_master.GetJob(daddy.job)
 	if(job)
+		job.initialize_character(H)
+		H.job_character_initialized = TRUE
 		job.equip(H)
 	daddy.dust()
 	qdel(src)

@@ -54,6 +54,11 @@
 			if(location && location.docking_codes)
 				docking_controller.docking_codes = location.docking_codes
 
+	// Untagged landmarks (mapping placeholders) would all collide on a null key; give them unique tags instead.
+	if(!landmark_tag)
+		landmark_tag = "landmark_[x]_[y]_[z]_[random_id("landmarks",1,9999)]"
+		log_debug("Shuttle landmark '[name]' at ([x],[y],[z]) has no landmark_tag; auto-assigned '[landmark_tag]'.")
+
 	SSshuttle.register_landmark(landmark_tag, src)
 
 /obj/effect/shuttle_landmark/forceMove()

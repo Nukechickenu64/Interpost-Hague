@@ -7,7 +7,7 @@ var/global/list/minor_air_alarms = list()
 /obj/machinery/computer/atmos_alert
 	name = "atmospheric alert computer"
 	desc = "Used to access the atmospheric sensors."
-	circuit = /obj/item/weapon/circuitboard/atmos_alert
+	circuit = /obj/item/circuitboard/atmos_alert
 	icon_keyboard = "atmos_key"
 	icon_screen = "alert:0"
 	light_color = "#e6ffff"
@@ -79,7 +79,7 @@ var/datum/topic_state/air_alarm_topic/air_alarm_topic = new()
 /obj/machinery/computer/totalpower // so true queen
 	name = "total power computer"
 	desc = "Used to know information about the power grid."
-	//circuit = /obj/item/weapon/circuitboard/totalpower //later
+	//circuit = /obj/item/circuitboard/totalpower //later
 	icon_screen = "power_screen"
 	light_color = "#e6ffff"
 	var/datum/powernet/powernet = null
@@ -116,10 +116,8 @@ var/datum/topic_state/air_alarm_topic/air_alarm_topic = new()
 		return
 
 	var/list/L = list()
-	for(var/obj/machinery/power/terminal/term in powernet.nodes)
-		if(istype(term.master, /obj/machinery/power/apc))
-			var/obj/machinery/power/apc/A = term.master
-			L += A
+	for(var/obj/machinery/power/area_smes/A in powernet.nodes)
+		L += A
 
 	return L
 
@@ -133,7 +131,7 @@ var/datum/topic_state/air_alarm_topic/air_alarm_topic = new()
 	var/total_apc_load = 0
 
 	// Split to multiple lines to make it more readable
-	for(var/obj/machinery/power/apc/A in world)
+	for(var/obj/machinery/power/area_smes/A in world)
 		var/load = A.lastused_total // Load.
 		total_apc_load += load
 		load = reading_to_text(load)

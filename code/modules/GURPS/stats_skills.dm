@@ -30,10 +30,8 @@
 #endif
 #define CRIT_FAILURE 3
 
-
-
 /mob
-	var/list/stats = list(st = 10, dx = 10, iq = 10, ht = 10)
+	var/list/stats = list(st = 10, dx = 10, iq = 10, ht = 10, per = 10)
 	var/list/skills = list("melee" = 0, "ranged" = 0, "medical" = 0, "surgery" = 0, "engineering" = 0, "crafting" = 0, "cooking" = 0, "science" = 0, "cleaning" = 0, "gardening" = 0, "mining" = 0)
 
 /mob/proc/sin_stat_modifier(var/stat)
@@ -96,6 +94,22 @@
 		if(message)
 			to_chat(src, "<span class = 'warning'>[message]</span>")
 		return 0
+
+/mob/proc/is_perception_exempt()
+	return isobserver(src) || issilicon(src)
+
+/mob/proc/perception_check()
+	if(is_perception_exempt())
+		return TRUE
+	var/chance = (stats[STAT_PER] - PERCEPTION_STAT_FLOOR) * PERCEPTION_CHANCE_PER_POINT
+	chance += (mood_stat() + fatigue_stat()) * PERCEPTION_CHANCE_PER_MOD
+	return prob(Clamp(chance, PERCEPTION_CHANCE_MIN, PERCEPTION_CHANCE_MAX))
+
+/mob/proc/perception_opposed(mob/actor)
+	if(is_perception_exempt())
+		return TRUE
+	var/chance = PERCEPTION_OPPOSED_BASE + (stats[STAT_PER] - actor.stats[STAT_DX]) * PERCEPTION_OPPOSED_PER_POINT
+	return prob(Clamp(chance, PERCEPTION_CHANCE_MIN, PERCEPTION_CHANCE_MAX))
 
 /mob/proc/learn_stats(var/stat_type)
 	var/initial_stat = round(stats[stat_type])
@@ -210,7 +224,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 		stats[stat] = pick(rand_stats)
 		rand_stats.Remove(stats[stat])
 
-/mob/living/carbon/proc/newgeneratestats(var/stre1, var/stre2, var/dext1, var/dext2, var/int1, var/int2, var/helt1, var/helt2)
+/mob/living/carbon/proc/newgeneratestats(var/stre1, var/stre2, var/dext1, var/dext2, var/int1, var/int2, var/helt1, var/helt2, var/per1 = 7, var/per2 = 13)
 	stats[STAT_ST] = rand(stre1, stre2)
 	if(has_quirk(/datum/quirk/weak))
 		stats[STAT_ST] -= 2
@@ -225,6 +239,7 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 		stats[STAT_DX] += (rand(1,2))
 	stats[STAT_IQ] = rand(int1, int2)
 	stats[STAT_HT] = rand(helt1, helt2)
+	stats[STAT_PER] = rand(per1, per2)
 	for(var/stat in stats)
 		stats[stat] += src.sin_stat_modifier(stat) + src.virtue_stat_modifier(stat)
 	if(gender == FEMALE)

@@ -17,13 +17,13 @@
 	station_name  = "KS Gorodok-3"
 	station_short = "Gorodok"
 	dock_name     = "Gnezdo"
-	boss_name     = "TETRACORP DIAGNOSTICS SUBROUTINE"
+	boss_name     = "NANOTRASEN DIAGNOSTICS SUBROUTINE"
 	boss_short    = "TTC-D-S"
-	company_name  = "TetraCorp"
+	company_name  = "Nanotrasen"
 	company_short = "TTC"
 	system_name = "Algol, Beta Persei"
 
-	map_admin_faxes = list("TETRACORP MAIL SUBROUTINE")
+	map_admin_faxes = list("NANOTRASEN MAIL SUBROUTINE")
 
 	shuttle_docked_message = " has docked with the station. Command staff is prioritised."
 	shuttle_leaving_dock = "The Spiteful has departed from home dock."

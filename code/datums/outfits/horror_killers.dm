@@ -11,7 +11,7 @@
 	r_hand = /obj/item/weapon/material/twohanded/fireaxe
 
 	id_slot = slot_wear_id
-	id_type = /obj/item/weapon/card/id/centcom/station
+	id_type = /obj/item/card/id/centcom/station
 	id_pda_assignment = "Tunnel Clown!"
 
 /decl/hierarchy/outfit/masked_killer
@@ -43,17 +43,17 @@
 	l_pocket = /obj/item/weapon/melee/energy/sword
 
 	id_slot = slot_wear_id
-	id_type = /obj/item/weapon/card/id/syndicate/station_access
+	id_type = /obj/item/card/id/syndicate/station_access
 	pda_slot = slot_belt
 	pda_type = /obj/item/device/pda/heads
 
 /decl/hierarchy/outfit/reaper/post_equip(var/mob/living/carbon/human/H)
 	..()
-	var/obj/item/weapon/storage/secure/briefcase/sec_briefcase = new(H)
+	var/obj/item/storage/secure/briefcase/sec_briefcase = new(H)
 	for(var/obj/item/briefcase_item in sec_briefcase)
 		qdel(briefcase_item)
 	for(var/i=3, i>0, i--)
-		sec_briefcase.contents += new /obj/item/weapon/spacecash/bundle/c1000
+		sec_briefcase.contents += new /obj/item/spacecash/bundle/c1000
 	sec_briefcase.contents += new /obj/item/weapon/gun/energy/crossbow
 	sec_briefcase.contents += new /obj/item/weapon/gun/projectile/revolver/mateba
 	sec_briefcase.contents += new /obj/item/ammo_magazine/c50

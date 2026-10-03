@@ -189,7 +189,7 @@
 			if (!( machine.check_eye(src) ))
 				reset_view(null)
 		else
-			if(client && !client.adminobs)
+			if(client && !client.adminobs && !client.look_far_active())
 				reset_view(null)
 
 	return 1

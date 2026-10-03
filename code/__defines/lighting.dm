@@ -12,6 +12,9 @@
 
 #define LIGHTING_MULT_FACTOR 0.43
 
+#define STARLIGHT_POWER 0.35
+#define STARLIGHT_COLOR "#b8c8ff"
+
 // If I were you I'd leave this alone.
 #define LIGHTING_BASE_MATRIX \
 	list                     \

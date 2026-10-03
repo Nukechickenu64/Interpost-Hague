@@ -36,7 +36,8 @@
 		"Tactical Strike" = CATALYST_TACTICAL_STRIKE,
 		"Dimensional Anomaly" = CATALYST_ANOMALY,
 		"Mutiny" = CATALYST_MUTINY,
-		"Infiltration" = CATALYST_INFILTRATION
+		"Infiltration" = CATALYST_INFILTRATION,
+		"Cargo Incursion" = CATALYST_CARGO_INCURSION
 	)
 	var/choice = input("Select a catalyst event to force.", "Force Catalyst") as null|anything in catalyst_options
 	if(!choice)

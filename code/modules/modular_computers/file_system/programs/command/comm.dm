@@ -132,7 +132,7 @@
 			. = 1
 			if(is_autenthicated(user) && !issilicon(usr) && ntn_comm)
 				if(user)
-					var/obj/item/weapon/card/id/id_card = user.GetIdCard()
+					var/obj/item/card/id/id_card = user.GetIdCard()
 					crew_announcement.announcer = GetNameAndAssignmentFromId(id_card)
 				else
 					crew_announcement.announcer = "Unknown"
@@ -144,7 +144,7 @@
 					return 1
 				if(GLOB.in_character_filter.len)
 					if(findtext(input, config.ic_filter_regex))
-						to_chat(usr, "<span class='warning'>You rethink your decision and decide that Tetracorp will fire you if you announce that.</span>")
+						to_chat(usr, "<span class='warning'>You rethink your decision and decide that Nanotrasen will fire you if you announce that.</span>")
 						return 1
 				var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 				var/decl/security_level/default/df = security_state.current_security_level

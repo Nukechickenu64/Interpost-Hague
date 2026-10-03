@@ -83,29 +83,29 @@
 	icon_state = initial(d.icon_state)
 
 /datum/detective_gun_skin/colt
-	name = "\improper Colt M1911"
+	name = "\improper Lumoco Arms LA-1911 Duty Model"
 	icon_state = "colt"
 
 /datum/detective_gun_skin/luger
-	name = "\improper P08 Luger"
+	name = "\improper Zendai Foundries ZP-8 Heritage Model"
 	icon_state = "p08"
 
 /datum/detective_gun_skin/luger_brown
-	name = "\improper P08 Luger, brown"
+	name = "\improper Zendai Foundries ZP-8 Heritage Model, Brown Finish"
 	icon_state = "p08b"
 
 /datum/detective_gun_skin/mk_standard
-	name = "\improper NT Mk. 58"
+	name = "\improper NanoTrasen Mk58 Standard Model"
 	icon_state = "secguncomp"
 
 /datum/detective_gun_skin/mk_custom
-	name = "\improper NT Mk. 58 Custom"
+	name = "\improper NanoTrasen Mk58 Custom Model"
 	icon_state = "secgundark"
 
 /datum/detective_gun_skin/usp
-	name = "\improper USP"
+	name = "\improper Lumoco Arms L-9 Compact Model"
 	icon_state = "usp"
 
 /datum/detective_gun_skin/vp
-	name = "\improper H&K VP"
+	name = "\improper Ward-Takahashi VP-78 Service Model"
 	icon_state = "VP78"

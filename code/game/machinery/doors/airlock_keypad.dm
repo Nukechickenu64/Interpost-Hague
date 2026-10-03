@@ -75,3 +75,140 @@
 	else
 		..(user)
 	return
+
+// Separate from the keypad airlock above: this is a wall control for an existing airlock.
+/obj/machinery/airlock_keypad
+	name = "airlock keypad"
+	desc = "A wall-mounted keypad linked to an airlock."
+	icon = 'icons/obj/stationobjs.dmi'
+	icon_state = "doorctrlid"
+	anchored = 1.0
+	power_channel = ENVIRON
+	idle_power_usage = 2
+	active_power_usage = 5
+
+	var/airlock_id = null
+	var/code = null
+	var/list/owner_roles = list()
+	var/area/paper_destination = null
+	var/list/active_attempts = list()
+	var/list/granted_minds = list()
+
+/obj/machinery/airlock_keypad/Initialize()
+	. = ..()
+	if(!code)
+		code = add_zero(num2text(rand(0, 99999)), 5)
+
+	if(owner_roles && owner_roles.len)
+		for(var/datum/mind/mind in SSticker.minds)
+			grant_code_to_mind(mind)
+	else
+		var/list/destination_turfs = paper_destination ? get_area_turfs(paper_destination) : null
+		var/turf/destination = destination_turfs && destination_turfs.len ? pick(destination_turfs) : get_turf(src)
+		new /obj/item/paper(destination, "Airlock ID: [airlock_id]<br>Combination: [code]", "Keypad [airlock_id] Combination")
+
+/obj/machinery/airlock_keypad/Destroy()
+	for(var/mob/user in active_attempts.Copy())
+		clear_attempt(user)
+	. = ..()
+
+/obj/machinery/airlock_keypad/proc/grant_code_to_mind(datum/mind/mind)
+	if(!mind || !owner_roles || !(mind.assigned_role in owner_roles) || (mind in granted_minds))
+		return
+	granted_minds += mind
+	mind.store_memory("Airlock keypad [airlock_id] combination: [code]")
+
+/obj/machinery/airlock_keypad/proc/start_attempt(mob/user)
+	clear_attempt(user)
+	active_attempts[user] = list("start_turf" = get_turf(user), "digits" = "")
+	GLOB.moved_event.register(user, src, .proc/on_user_moved)
+	user.set_machine(src)
+	show_entry(user)
+
+/obj/machinery/airlock_keypad/proc/clear_attempt(mob/user)
+	if(!user || isnull(active_attempts[user]))
+		return
+	active_attempts -= user
+	GLOB.moved_event.unregister(user, src, .proc/on_user_moved)
+	if(user.client)
+		show_browser(user, null, "window=airlock_keypad")
+	if(user.machine == src)
+		user.unset_machine()
+
+/obj/machinery/airlock_keypad/proc/on_user_moved(var/atom/movable/mover, var/atom/old_loc, var/atom/new_loc)
+	var/mob/user = mover
+	if(active_attempts[user])
+		clear_attempt(user)
+		to_chat(user, "<span class='warning'>Your keypad attempt was canceled when you moved.</span>")
+
+/obj/machinery/airlock_keypad/proc/valid_attempt(mob/user)
+	var/list/attempt = active_attempts[user]
+	return attempt && user && !user.stat && !user.restrained() && !(stat & (NOPOWER|BROKEN)) && get_dist(user, src) <= 1 && get_turf(user) == attempt["start_turf"]
+
+/obj/machinery/airlock_keypad/examine(mob/user)
+	. = ..()
+	if(user && !user.stat && !user.restrained() && get_dist(user, src) <= 1 && !(stat & (NOPOWER|BROKEN)))
+		start_attempt(user)
+
+/obj/machinery/airlock_keypad/attack_hand(mob/user)
+	if(!valid_attempt(user))
+		to_chat(user, "<span class='notice'>Examine the keypad to begin an entry attempt.</span>")
+		return
+	show_entry(user)
+
+/obj/machinery/airlock_keypad/proc/show_entry(mob/user)
+	var/list/attempt = active_attempts[user]
+	if(!attempt)
+		return
+	var/entered_digits = attempt["digits"]
+	var/dat = "<TT><B>[src]</B><BR>Enter the five-digit combination:<BR>Code: [entered_digits]<BR><BR>"
+	dat += "<A href='?src=\ref[src];digit=1'>1</A> - <A href='?src=\ref[src];digit=2'>2</A> - <A href='?src=\ref[src];digit=3'>3</A><BR>"
+	dat += "<A href='?src=\ref[src];digit=4'>4</A> - <A href='?src=\ref[src];digit=5'>5</A> - <A href='?src=\ref[src];digit=6'>6</A><BR>"
+	dat += "<A href='?src=\ref[src];digit=7'>7</A> - <A href='?src=\ref[src];digit=8'>8</A> - <A href='?src=\ref[src];digit=9'>9</A><BR>"
+	dat += "<A href='?src=\ref[src];cancel=1'>Cancel</A> - <A href='?src=\ref[src];digit=0'>0</A></TT>"
+	show_browser(user, dat, "window=airlock_keypad;size=260x220")
+
+/obj/machinery/airlock_keypad/Topic(href, href_list)
+	if(..())
+		return 1
+	var/mob/user = usr
+	if(!valid_attempt(user))
+		clear_attempt(user)
+		return
+
+	if(href_list["cancel"])
+		clear_attempt(user)
+		return
+
+	if(isnull(href_list["digit"]) || !isnum_safe(href_list["digit"]))
+		return
+	var/digit = text2num(href_list["digit"])
+	if(digit < 0 || digit > 9)
+		return
+
+	var/list/attempt = active_attempts[user]
+	attempt["digits"] += "[digit]"
+	if(length(attempt["digits"]) < 5)
+		show_entry(user)
+		return
+
+	if(attempt["digits"] != code)
+		to_chat(user, "<span class='warning'>Incorrect combination. Examine the keypad to try again.</span>")
+		clear_attempt(user)
+		return
+
+	var/obj/machinery/door/airlock/target = null
+	var/target_count = 0
+	if(length(airlock_id))
+		for(var/obj/machinery/door/airlock/door in world)
+			if(door.id_tag == airlock_id)
+				target = door
+				target_count++
+
+	if(target_count != 1)
+		to_chat(user, "<span class='warning'>The keypad cannot identify a unique airlock.</span>")
+	else if(target.unlock())
+		to_chat(user, "<span class='notice'>The airlock bolts rise.</span>")
+	else
+		to_chat(user, "<span class='warning'>The airlock bolts do not respond.</span>")
+	clear_attempt(user)

@@ -164,9 +164,17 @@
 					floor_turfs += checking
 
 		// Do this area stuff before placing machinery or anything else. Otherwise it will potentially change areas without properly updating listeners.
+		if(az > areas_to_use.len)
+			log_debug("Insufficient defined areas in turbolift datum, aborting.")
+			qdel(src)
+			return
 		var/area_path = areas_to_use[az]
 		for(var/thing in floor_turfs)
 			new area_path(thing)
+		if(!floor_turfs.len)
+			log_debug("[name] generated no floor turfs on floor [cz]. Aborting.")
+			qdel(src)
+			return
 		var/area/A = get_area(floor_turfs[1])
 		cfloor.set_area_ref("\ref[A]")
 
@@ -212,10 +220,6 @@
 			light2.set_dir(NORTH)
 
 		// Update area.
-		if(az > areas_to_use.len)
-			log_debug("Insufficient defined areas in turbolift datum, aborting.")
-			qdel(src)
-			return
 		az++
 
 	// Place lift panel.

@@ -4,8 +4,8 @@
 	parry_sounds = list('sound/weapons/blunt_parry1.ogg', 'sound/weapons/blunt_parry2.ogg', 'sound/weapons/blunt_parry3.ogg')
 
 /obj/item/weapon/gun/projectile/shotgun/pump
-	name = "shotgun"
-	desc = "The mass-produced W-T Remmington 29x shotgun is a favourite of police and security forces on many worlds. Useful for sweeping alleys."
+	name = "\improper Ward-Takahashi WT-29 Pump Shotgun"
+	desc = "A mass-produced 12-gauge pump-action shotgun widely used by police and security services."
 	icon_state = "shotgun"
 	item_state = "shotgun"
 	max_shells = 4
@@ -60,8 +60,8 @@
 	update_icon()
 
 /obj/item/weapon/gun/projectile/shotgun/pump/combat
-	name = "combat shotgun"
-	desc = "Built for close quarters combat, the Hephaestus Industries KS-40 is widely regarded as a weapon of choice for repelling boarders."
+	name = "\improper Hephaestus Industries KS-40 Boarding Shotgun"
+	desc = "Built for close-quarters combat, the Hephaestus Industries KS-40 is a 12-gauge shotgun used to repel boarders."
 	icon_state = "cshotgun"
 	item_state = "cshotgun"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2)
@@ -71,8 +71,8 @@
 	wielded_item_state = "shotgun-wielded"
 
 /obj/item/weapon/gun/projectile/shotgun/pump/raider
-	name = "coneax shotgun"
-	desc = "A old shotgun with rusted steel and a rugged look to it, this sure will bring a victory to the battle."
+	name = "\improper Rimward Works RW-12 Frontier Shotgun"
+	desc = "A heavily worn 12-gauge pump shotgun with corroded fittings and extensive field modifications."
 	icon_state = "raider_gun2"
 	item_state = "sshotgun"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2)
@@ -86,8 +86,8 @@
 	hitsound = "stab_sound"
 
 /obj/item/weapon/gun/projectile/shotgun/doublebarrel
-	name = "double-barreled shotgun"
-	desc = "A true classic."
+	name = "\improper Lumoco Arms LS-2 Double-Barrel Shotgun"
+	desc = "A break-action 12-gauge shotgun with two barrels and a two-round capacity."
 	icon_state = "dshotgun"
 	item_state = "dshotgun"
 	//SPEEDLOADER because rapid unloading.
@@ -148,8 +148,8 @@
 	ammo_type = /obj/item/ammo_casing/shotgun/pellet
 
 /obj/item/weapon/gun/projectile/shotgun/doublebarrel/flare
-	name = "signal shotgun"
-	desc = "A double-barreled shotgun meant to fire signal flash shells."
+	name = "\improper Lumoco Arms LS-2 Signal Shotgun"
+	desc = "An LS-2 converted to fire signal and flash shells."
 	ammo_type = /obj/item/ammo_casing/shotgun/flash
 
 /obj/item/weapon/gun/projectile/shotgun/doublebarrel/unload_ammo(user, allow_dump)
@@ -173,15 +173,15 @@
 			one_hand_penalty = 0
 			slot_flags &= ~SLOT_BACK	//you can't sling it on your back
 			slot_flags |= (SLOT_BELT|SLOT_HOLSTER) //but you can wear it on your belt (poorly concealed under a trenchcoat, ideally) - or in a holster, why not.
-			SetName("sawn-off shotgun")
-			desc = "Omar's coming!"
+			SetName("Lumoco Arms LS-2 Short-Barrel Shotgun")
+			desc = "The barrel has been shortened, making the LS-2 easier to handle at close range."
 			to_chat(user, "<span class='warning'>You shorten the barrel of \the [src]!</span>")
 	else
 		..()
 
 /obj/item/weapon/gun/projectile/shotgun/doublebarrel/sawn
-	name = "sawn-off shotgun"
-	desc = "Omar's coming!"
+	name = "\improper Lumoco Arms LS-2 Short-Barrel Shotgun"
+	desc = "A shortened LS-2 double-barrel shotgun configured for close-range use."
 	icon_state = "sawnshotgun"
 	item_state = "sawnshotgun"
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
@@ -193,8 +193,8 @@
 
 
 /obj/item/weapon/gun/projectile/shotgun/pump/boltaction
-	name = "\improper Mark II Stormrider" //I used a random rifle generator to come up with that.
-	desc = "This piece of junk looks like something that could have been used 700 years ago"
+	name = "\improper Frontier Arms FA-02 Stormrider Bolt-Action Rifle"
+	desc = "An obsolete bolt-action rifle retained on the frontier; its worn construction suggests centuries of service."
 	icon_state = "mosin"
 	item_state = "mosin"
 	caliber = "a762"

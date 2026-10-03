@@ -153,9 +153,9 @@ SUBSYSTEM_DEF(zcopy)
 
 		var/t_target = OPENTURF_MAX_PLANE - depth	// this is where the openturf gets put
 
-		// Handle space parallax.
-		if (T.below.z_eventually_space)
-			T.z_eventually_space = TRUE
+		// Handle space parallax, including the first open turf directly above proper space.
+		T.z_eventually_space = istype(T.below, /turf/space) || T.below.z_eventually_space
+		if (T.z_eventually_space)
 			t_target = SPACE_PLANE
 
 		if (T.below.z_flags & ZM_FIX_BIGTURF)
@@ -195,6 +195,8 @@ SUBSYSTEM_DEF(zcopy)
 			if (QDELETED(object) || (object.z_flags & ZMM_IGNORE) || object.loc != T.below || object.invisibility == INVISIBILITY_ABSTRACT)
 				// Don't queue deleted stuff, stuff that's not visible, blacklisted stuff, or stuff that's centered on another tile but intersects ours.
 				continue
+			if (T.z_eventually_space && object.type == /atom/movable/openspace/multiplier)
+				continue
 
 			// Special case: these are merged into the shadower to reduce memory usage.
 			if (object.type == /atom/movable/lighting_overlay)
@@ -222,7 +224,10 @@ SUBSYSTEM_DEF(zcopy)
 						// If we're a turf overlay (the mimic for a non-OVERWRITE turf), we need to make sure copies of us respect space parallax too
 						if (T.z_eventually_space)
 							// Yes, this is an awful hack; I don't want to add yet another override_* var.
-							override_depth = OPENTURF_MAX_PLANE - SPACE_PLANE
+							override_depth = OPENTURF_SPACE_PARALLAX_OFFSET
+
+				if (T.z_eventually_space && object.type != /atom/movable/openspace/turf_overlay)
+					override_depth = OPENTURF_SPACE_PARALLAX_OFFSET + min(T.z - object.z, OPENTURF_MAX_DEPTH)
 
 				var/atom/movable/openspace/overlay/OO = object.bound_overlay
 

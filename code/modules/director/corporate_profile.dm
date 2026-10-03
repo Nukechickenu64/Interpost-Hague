@@ -14,13 +14,14 @@
 	var/agenda_target_type = null // Optional: type path of target item/area
 	var/agenda_target_amount = 0  // Optional: amount to hoard/collect
 	var/agenda_progress = 0       // Progress toward agenda_target_amount, credited externally
+	var/list/credited_arrest_records = list()
 
 	// Debt vars
 	var/debt_amount = 0           // How much is owed
 	var/debt_creditor = ""        // Who is owed (syndicate name)
 	var/debt_paid = 0             // How much has been paid so far
 	var/debt_contraband_delivered = 0
-	var/debt_threshold = 0        // When debt_paid >= debt_amount, debt is cleared
+	var/debt_threshold = 0        // When debt_paid >= debt_threshold, debt is cleared
 	var/debt_failed = FALSE       // If round ends without paying, consequences
 	var/debt_leverage_granted = FALSE // Guards against granting Leverage more than once
 
@@ -150,7 +151,7 @@
 			complete_agenda()
 			return TRUE
 	else if(agenda_progress >= agenda_target_amount)
-		// Quota-style agenda: progress credited externally (e.g. arrest processing)
+		// Quota-style progress is credited by gameplay systems.
 		complete_agenda()
 		return TRUE
 	return FALSE
@@ -166,12 +167,19 @@
 				total += S.get_amount()
 	return total
 
-/// Credit progress toward a quota-style agenda (called by external systems, e.g. security processing)
+/// Credit progress toward a quota-style agenda
 /datum/corporate_profile/proc/credit_agenda_progress(var/amount = 1)
 	if(type_name != PROFILE_AGENDA || agenda_completed)
 		return
 	agenda_progress += amount
 	check_completion()
+
+/datum/corporate_profile/proc/credit_arrest(var/record_uid)
+	if(!record_uid || record_uid in credited_arrest_records)
+		return FALSE
+	credited_arrest_records |= record_uid
+	credit_agenda_progress()
+	return TRUE
 
 /// Mark the agenda complete and pay out the reward
 /datum/corporate_profile/proc/complete_agenda()
@@ -225,7 +233,7 @@
 		return
 	prefs.meta_currency += amount
 	prefs.save_preferences()
-	to_chat(owner.current, "<span class='notice'><b>Leverage Earned:</b> +[amount] Leverage (total: [prefs.meta_currency]). Spend it in the Leverage shop on your next join.</span>")
+	to_chat(owner.current, "<span class='notice'><b>Leverage Earned:</b> +[amount] Leverage (total: [prefs.meta_currency]). Spend it in the Leverage Exchange in your OOC menu.</span>")
 
 /// Get a summary for round-end display
 /datum/corporate_profile/proc/get_summary()

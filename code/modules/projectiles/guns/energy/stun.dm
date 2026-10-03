@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/energy/taser
-	name = "taser gun"
-	desc = "The NT Mk30 NL is a small, low capacity gun used for non-lethal takedowns. Produced by NT, it's actually a licensed version of a W-T design. It can switch between high and low intensity stun shots."
+	name = "\improper NanoTrasen Mk30 NL Conducted-Energy Pistol"
+	desc = "A low-capacity conducted-energy sidearm based on a Ward-Takahashi design and licensed for NanoTrasen production. It has low- and high-intensity settings."
 	icon_state = "taser"
 	item_state = null	//so the human update icon uses the icon_state instead.
 	max_shots = 1
@@ -13,8 +13,8 @@
 		)
 
 /obj/item/weapon/gun/energy/taser/carbine
-	name = "taser carbine"
-	desc = "The NT Mk44 NL is a high capacity gun used for non-lethal takedowns. It can switch between high and low intensity stun shots."
+	name = "\improper NanoTrasen Mk44 NL Conducted-Energy Carbine"
+	desc = "A high-capacity conducted-energy carbine with low- and high-intensity settings for non-lethal takedowns."
 	icon_state = "tasercarbine"
 	w_class = ITEM_SIZE_LARGE
 	slot_flags = SLOT_BELT|SLOT_BACK
@@ -32,19 +32,21 @@
 		)
 
 /obj/item/weapon/gun/energy/taser/mounted
-	name = "mounted taser gun"
+	name = "\improper NanoTrasen Mk30-M Mounted Conducted-Energy System"
+	desc = "A Mk30 conducted-energy system configured for powered mounting and external cell supply."
 	self_recharge = 1
 	use_external_power = 1
 
 /obj/item/weapon/gun/energy/taser/mounted/cyborg
-	name = "taser gun"
+	name = "\improper NanoTrasen Mk30-C Cyborg Conducted-Energy System"
+	desc = "A compact Mk30 conducted-energy system integrated into a cyborg chassis."
 	max_shots = 6
 	recharge_time = 10 //Time it takes for shots to recharge (in ticks)
 
 
 /obj/item/weapon/gun/energy/stunrevolver
-	name = "stun revolver"
-	desc = "A LAEP20 Zeus. Designed by Lawson Arms and produced under the wing of the FTU, several TSCs have been trying to get a hold of the blueprints for half a decade."
+	name = "\improper Lawson Arms LAEP20 Zeus Electroshock Revolver"
+	desc = "The Lawson Arms LAEP20 Zeus is an electroshock revolver produced under the FTU. Several TSCs have sought its blueprints for years."
 	icon_state = "stunrevolver"
 	item_state = "stunrevolver"
 	origin_tech = list(TECH_COMBAT = 3, TECH_MATERIAL = 3, TECH_POWER = 2)
@@ -53,7 +55,7 @@
 	combustion = 0
 
 /obj/item/weapon/gun/energy/stunrevolver/rifle
-	name = "stun rifle"
+	name = "\improper Lawson Arms LAEP38 Thor Electroshock Rifle"
 	desc = "A LAEP38 Thor, a vastly oversized variant of the LAEP20 Zeus. Fires overcharged electrodes to take down hostile armored targets without harming them too much."
 	icon_state = "stunrifle"
 	item_state = "stunrifle"
@@ -68,8 +70,8 @@
 	wielded_item_state = "stunrifle-wielded"
 
 /obj/item/weapon/gun/energy/crossbow
-	name = "mini energy-crossbow"
-	desc = "A weapon favored by many mercenary stealth specialists."
+	name = "\improper Xenonomix XE-4 Compact Energy Crossbow"
+	desc = "A compact, silenced energy-bolt launcher designed for covert operations."
 	icon_state = "crossbow"
 	w_class = ITEM_SIZE_NORMAL
 	item_state = "crossbow"
@@ -85,13 +87,14 @@
 	combustion = 0
 
 /obj/item/weapon/gun/energy/crossbow/ninja
-	name = "energy dart thrower"
+	name = "\improper Xenonomix XD-5 Energy Dart Projector"
+	desc = "A compact energy projector configured to fire low-profile darts."
 	projectile_type = /obj/item/projectile/energy/dart
 	max_shots = 5
 
 /obj/item/weapon/gun/energy/crossbow/largecrossbow
-	name = "energy crossbow"
-	desc = "A weapon favored by mercenary infiltration teams."
+	name = "\improper Xenonomix XE-7 Heavy Energy Crossbow"
+	desc = "A full-size energy-bolt launcher used by infiltration teams requiring increased projectile output."
 	w_class = ITEM_SIZE_LARGE
 	force = 10
 	one_hand_penalty = 1
@@ -99,8 +102,8 @@
 	projectile_type = /obj/item/projectile/energy/bolt/large
 
 /obj/item/weapon/gun/energy/plasmastun
-	name = "plasma pulse projector"
-	desc = "The Mars Military Industries MA21 Selkie is a weapon that uses a laser pulse to ionise the local atmosphere, creating a disorienting pulse of plasma and deafening shockwave as the wave expands."
+	name = "\improper Mars Military Industries MA21 Selkie Plasma Pulse Projector"
+	desc = "The Mars Military Industries MA21 Selkie ionizes the surrounding atmosphere with a laser pulse, producing an expanding plasma burst and disorienting shockwave."
 	icon_state = "plasma_stun"
 	item_state = "plasma_stun"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2, TECH_POWER = 3)

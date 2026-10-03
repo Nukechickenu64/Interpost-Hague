@@ -265,6 +265,7 @@ a.popt {text-decoration: none;}
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
 .name {font-weight: 150; font-size: 105%; color: #a99b8d; text-shadow: 0 0 4px #000}
+.emote_speaker {color: #82c7d0;}
 .nameradio {font-weight: 100; font-size: 102%}
 
 /* ADD HERE FOR ITALIC */
@@ -441,7 +442,7 @@ a:visited {
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
 .wakeup					{color: #8ebf92; text-shadow: 0 0 2px #8ebf92;}
-.tetracorp				{color: #6a0080; text-shadow: 0 0 4px #6a0080;}
+.nanotrasen, .accentblue	{color: #2585d8; text-shadow: 0 0 4px #2585d8;}
 .manifest				{color: #505050; text-shadow: 0 0 4px #505050;}
 .manifesttext			{color: #008a37; text-shadow: 0 0 4px #008a37;}
 .hygiene				{color: #8f9779; text-shadow: 0 0 1px #8f9779;}

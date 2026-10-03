@@ -50,6 +50,8 @@ What is the naming convention for planes or layers?
 
 #define OPENTURF_MAX_PLANE -70
 #define OPENTURF_MAX_DEPTH 10		// The maxiumum number of planes deep we'll go before we just dump everything on the same plane.
+#define OPENTURF_SPACE_PARALLAX_OFFSET (OPENTURF_MAX_PLANE - SPACE_PLANE)
+#define OPENTURF_SPACE_PARALLAX_DARKENING_FACTOR 0.85
 
 #define CLICKCATCHER_PLANE -100
 
@@ -171,21 +173,25 @@ What is the naming convention for planes or layers?
 #define EMISSIVE_PLANE           5 // Glows/bloom; below LOS shadows so unseen lights don't glow through
   #define EMISSIVE_LAYER           1
 
-#define SHADOWCASTING_REFLECTOR_PLANE 6
+#define MAP_HUD_PLANE            6 // map-anchored UI images (progress bars, t-ray); under LOS shadows
+  #define TRAY_SCAN_LAYER          1
+  #define PROGRESSBAR_LAYER        2
 
-#define SHADOWCASTING_PLANE 7
+#define SHADOWCASTING_REFLECTOR_PLANE 7
 
-#define RUNECHAT_PLANE           8 // floating chat text above speakers
+#define SHADOWCASTING_PLANE 8
+
+#define RUNECHAT_PLANE           9 // floating chat text above speakers
   #define RUNECHAT_LAYER           1
 
-#define FULLSCREEN_PLANE         9 // for fullscreen overlays that do not cover the hud.
+#define FULLSCREEN_PLANE         10 // for fullscreen overlays that do not cover the hud.
   #define FULLSCREEN_LAYER         0
   #define DAMAGE_LAYER             1
   #define IMPAIRED_LAYER           2
   #define BLIND_LAYER              3
   #define CRIT_LAYER               4
 
-#define HUD_PLANE                10
+#define HUD_PLANE                11
   #define UNDER_HUD_LAYER          0
   #define HUD_BASE_LAYER           2
   #define HUD_ITEM_LAYER           3
@@ -222,14 +228,14 @@ What is the naming convention for planes or layers?
 /obj/screen/plane_master/blurs
 	filters = filter(type = "blur", size = 2)
 
-#define LIGHTING_BLOOM_THRESHOLD "#a0a0a0"
-#define LIGHTING_BLOOM_SIZE      2
-#define LIGHTING_BLOOM_OFFSET    1
-#define LIGHTING_BLOOM_ALPHA     110
 #define EMISSIVE_BLOOM_THRESHOLD "#404040"
 #define EMISSIVE_BLOOM_SIZE      4
 #define EMISSIVE_BLOOM_OFFSET    2
 #define EMISSIVE_BLOOM_ALPHA     200
+#define LIGHTING_BLOOM_THRESHOLD "#e0e0e0"
+#define LIGHTING_BLOOM_SIZE      1
+#define LIGHTING_BLOOM_OFFSET    0
+#define LIGHTING_BLOOM_ALPHA     110
 
 // Lighting overlays are BLEND_MULTIPLY; they need the white backdrop inside the plane to multiply against.
 /obj/screen/plane_master/lighting
@@ -313,6 +319,13 @@ var/global/icon/solid_white_icon
 	plane = OVER_OPENSPACE_PLANE
 	filters = filter(type = "blur", size = 1)
 
+/obj/screen/plane_master/openspace_parallax
+	color = list(
+		OPENTURF_SPACE_PARALLAX_DARKENING_FACTOR, 0, 0,
+		0, OPENTURF_SPACE_PARALLAX_DARKENING_FACTOR, 0,
+		0, 0, OPENTURF_SPACE_PARALLAX_DARKENING_FACTOR
+	)
+
 /obj/screen/plane_master/cryo
 	plane = DEFAULT_PLANE
 	filters = list(filter(type = "blur", size = 1), filter(type = "ripple", size = 1), filter(type = "bloom", size = 1))
@@ -337,7 +350,9 @@ var/global/icon/solid_white_icon
 /obj/screen/plane_master/shadowcasting/New()
 	. = ..()
 	// Keep in-view walls and wall-mounted objects crisp and unshadowed.
-	add_filter("wall_mask", 5, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
+	// Only under enhanced LOS: with it off, plane 7 is empty and an empty render_source can blank this whole plane.
+	if(enhanced_los_enabled)
+		add_filter("wall_mask", 5, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
 
 /obj/screen/plane_master/los_occluders
 	name = "los occluder plane master"

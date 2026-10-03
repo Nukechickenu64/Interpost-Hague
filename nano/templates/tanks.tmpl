@@ -6,16 +6,15 @@
 
 <div class="item">
 	<div class="itemLabel">
-		Tank Pressure:
+		Gas Remaining:
 	</div>
 	<div class="itemContent">
-		{{:helper.displayBar(data.tankPressure, 0, 1013, (data.tankPressure > 200) ? 'good' : ((data.tankPressure > 100) ? 'average' : 'bad'))}}
+		{{:helper.displayBar(data.tankPercent, 0, 100, (data.tankPercent > 50) ? 'good' : ((data.tankPercent > 20) ? 'average' : 'bad'))}}
 		<div class="statusValue">
-			{{:data.tankPressure}} kPa
+			{{:data.tankPercent}}% ({{:data.tankPressure}} kPa)
 		</div>
 	</div>
 </div>
-
 <div class="item">&nbsp;</div>
 
 <div class="item">

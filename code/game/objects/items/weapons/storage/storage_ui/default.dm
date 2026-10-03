@@ -11,10 +11,10 @@
 	var/list/item_underlays = new/list()
 	var/obj/screen/close/close_button = new()
 	var/client/client = null
-	var/obj/item/weapon/storage/storage
+	var/obj/item/storage/storage
 	var/datum/client_storage_ui_persist/csup
 
-/datum/client_storage_ui/New(var/client/C,var/datum/client_storage_ui_persist/ncsup,var/obj/item/weapon/storage/store)
+/datum/client_storage_ui/New(var/client/C,var/datum/client_storage_ui_persist/ncsup,var/obj/item/storage/store)
 	client = C
 	storage = store
 	close_button.master = store
@@ -26,7 +26,7 @@
 	var/datum/vec2/old_pos = new(0,0)
 	var/tx = 2
 	var/ty = 4
-	var/obj/item/weapon/storage/storage
+	var/obj/item/storage/storage
 
 /obj/screen/storage/proc/update_screen()
 	return
@@ -43,7 +43,7 @@
 	var/store_y = -1
 	var/obj/screen/border_overlay
 
-/obj/screen/storage/gridbox/New(var/datum/client_storage_ui/set_csu, var/obj/item/weapon/storage/storage, var/x, var/y)
+/obj/screen/storage/gridbox/New(var/datum/client_storage_ui/set_csu, var/obj/item/storage/storage, var/x, var/y)
 	..()
 	csu = set_csu
 	loc = null
@@ -60,7 +60,7 @@
 	..()
 	if(GAME_STATE < RUNLEVEL_GAME)
 		return
-	var/obj/item/weapon/storage/storage = master
+	var/obj/item/storage/storage = master
 	if(istype(storage))
 		var/obj/item/I = usr.get_active_hand()
 		if(I)
@@ -115,7 +115,7 @@
 		return 1
 	if (istype(usr.loc,/obj/mecha)) // stops inventory actions in a mech
 		return 1
-	var/obj/item/weapon/storage/storage = master
+	var/obj/item/storage/storage = master
 	if(istype(storage))
 		var/obj/item/I = usr.get_active_hand()
 		if(I)
@@ -151,7 +151,7 @@
 
 /client/MouseDrag(src_object,over_object,src_location,over_location,src_control,over_control,params)
 	if(mob)
-		for(var/obj/item/weapon/storage/stor in mob.s_active)
+		for(var/obj/item/storage/stor in mob.s_active)
 			var/datum/storage_ui/default/def = stor.storage_ui
 			var/datum/client_storage_ui_persist/csup = def.csu_persist[src]
 			if(csup)
@@ -160,7 +160,7 @@
 
 /client/MouseUp(object,location,control,params)
 	if(mob)
-		for(var/obj/item/weapon/storage/stor in mob.s_active)
+		for(var/obj/item/storage/stor in mob.s_active)
 			var/datum/storage_ui/default/def = stor.storage_ui
 			var/datum/client_storage_ui_persist/csup = def.csu_persist[src]
 			if(csup && csup.dragging)
@@ -252,6 +252,9 @@
 	for(var/mob/M in range(1))
 		if (M.s_active == storage)
 			storage.close(M)
+
+/datum/storage_ui/default/is_visible_to(var/mob/user)
+	return user.s_active == storage && (user in is_seeing)
 
 // I was doing this manually far too much.
 // I'd make this a macro if they supported multiline.
@@ -382,7 +385,7 @@
 	user.client.screen -= storage.contents
 	if(user.s_active == storage)
 		user.s_active = null
-	if(ishuman(user) && istype(storage, /obj/item/weapon/storage/internal/pockets))
+	if(ishuman(user) && istype(storage, /obj/item/storage/internal/pockets))
 		var/mob/living/carbon/human/H = user
 		H.update_inv_pockets()
 

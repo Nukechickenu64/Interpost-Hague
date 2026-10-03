@@ -50,6 +50,7 @@ SUBSYSTEM_DEF(machines)
 	var/list/machinery     = list() // These are all machines.
 	var/list/powernets     = list()
 	var/list/power_objects = list()
+	var/list/bus_consumers = list() // ordinary machinery drawing from a linked bus instead of its area
 
 	var/list/processing  = list() // These are the machines which are processing.
 	var/list/current_run = list()
@@ -82,24 +83,15 @@ if(current_step == this_step || (check_resumed && !resumed)) {\
 
 #undef INTERNAL_PROCESS_STEP
 
-// rebuild all power networks from scratch - only called at world creation or by the admin verb
-// The above is a lie. Turbolifts also call this proc.
+// rebuild all power buses from the CCID link graph
 /datum/controller/subsystem/machines/proc/makepowernets()
-	for(var/datum/powernet/PN in powernets)
-		qdel(PN)
-	powernets.Cut()
-	setup_powernets_for_cables(cable_list)
-
-/datum/controller/subsystem/machines/proc/setup_powernets_for_cables(list/cables)
-	for(var/obj/structure/cable/PC in cables)
-		if(!PC.powernet)
-			var/datum/powernet/NewPN = new()
-			NewPN.add_cable(PC)
-			propagate_network(PC,PC.powernet)
+	rebuild_power_grid()
 
 datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 	set background=1
 
+	retire_legacy_piping(machines)
+	ensure_station_gas_tank(machines)
 	if(!Master.current_runlevel)//So it only does it at roundstart
 		report_progress("Initializing atmos machinery")
 	for(var/obj/machinery/atmospherics/A in machines)
@@ -185,6 +177,9 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 
 /datum/controller/subsystem/machines/proc/process_powernets(resumed = 0)
 	if (!resumed)
+		if(power_grid_dirty)
+			rebuild_power_grid()
+		process_bus_consumers()
 		src.current_run = powernets.Copy()
 
 	var/list/current_run = src.current_run
@@ -198,6 +193,22 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 			PN.is_processing = null
 		if(MC_TICK_CHECK)
 			return
+
+/datum/controller/subsystem/machines/proc/process_bus_consumers()
+	for(var/obj/machinery/M in bus_consumers)
+		var/datum/power_node/N = M.power_node
+		if(QDELETED(M) || !N || !N.on_bus)
+			bus_consumers -= M
+			continue
+		var/datum/powernet/PN = N.in_net
+		var/need = M.get_power_usage() + N.bus_oneoff
+		N.bus_oneoff = 0
+		var/new_state = FALSE
+		if(PN && PN.avail > 0)
+			new_state = (PN.draw_power(need) >= need)
+		if(new_state != N.bus_powered)
+			N.bus_powered = new_state
+			M.power_change()
 
 /datum/controller/subsystem/machines/proc/process_power_objects(resumed = 0)
 	if (!resumed)
@@ -224,6 +235,8 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 		powernets = SSmachines.powernets
 	if (istype(SSmachines.power_objects))
 		power_objects = SSmachines.power_objects
+	if (istype(SSmachines.bus_consumers))
+		bus_consumers = SSmachines.bus_consumers
 
 #undef SSMACHINES_PIPENETS
 #undef SSMACHINES_MACHINERY

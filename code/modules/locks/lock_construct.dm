@@ -13,8 +13,8 @@
 	lock_data = generateRandomString(round(material.integrity/50))
 
 /obj/item/weapon/material/lock_construct/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I,/obj/item/weapon/key))
-		var/obj/item/weapon/key/K = I
+	if(istype(I,/obj/item/key))
+		var/obj/item/key/K = I
 		if(!K.key_data)
 			to_chat(user, "<span class='notice'>You fashion \the [I] to unlock \the [src]</span>")
 			K.key_data = lock_data

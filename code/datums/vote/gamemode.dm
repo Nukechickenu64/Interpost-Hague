@@ -5,12 +5,15 @@
 	win_y = 1100
 
 /datum/vote/gamemode/can_run(mob/creator, automatic)
+	// Gamemode voting is disabled; restore the checks below to re-enable.
 	return FALSE
+	/*
 	if(!automatic && (!config.allow_vote_mode || !is_admin(creator)))
 		return FALSE // Admins and autovotes bypass the config setting.
 	if(GAME_STATE >= RUNLEVEL_GAME)
 		return FALSE
 	return ..()
+	*/
 
 /datum/vote/gamemode/Process()
 	if(GAME_STATE >= RUNLEVEL_GAME)

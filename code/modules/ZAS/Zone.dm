@@ -49,6 +49,7 @@ Class Procs:
 /zone/var/needs_update = 0
 
 /zone/var/list/edges = list()
+/zone/var/list/zone_edges
 
 /zone/var/datum/gas_mixture/air = new
 
@@ -122,6 +123,11 @@ Class Procs:
 
 /zone/proc/c_invalidate()
 	invalid = 1
+	if(zone_edges)
+		for(var/zone/neighbour in zone_edges)
+			if(neighbour.zone_edges && neighbour.zone_edges[src] == zone_edges[neighbour])
+				neighbour.zone_edges -= src
+		zone_edges = null
 	SSair.remove_zone(src)
 	#ifdef ZASDBG
 	for(var/turf/simulated/T in contents)
@@ -138,12 +144,56 @@ Class Procs:
 		SSair.mark_for_update(T)
 
 /zone/proc/add_tile_air(datum/gas_mixture/tile_air)
-	//air.volume += CELL_VOLUME
+	var/old_size = contents.len
+	var/new_size = old_size + 1
+	if(!tile_air || tile_air == air || tile_air.gas == air.gas)
+		air.group_multiplier = 1
+		air.multiply(old_size)
+		air.merge(tile_air)
+		air.divide(new_size)
+		air.group_multiplier = new_size
+		return
+
 	air.group_multiplier = 1
-	air.multiply(contents.len)
-	air.merge(tile_air)
-	air.divide(contents.len+1)
-	air.group_multiplier = contents.len+1
+	var/list/zone_gases = air.gas
+	var/list/tile_gases = tile_air.gas
+	var/mix_temperature = abs(air.temperature - tile_air.temperature) > MINIMUM_TEMPERATURE_DELTA_TO_CONSIDER
+	var/self_heat_capacity = 0
+	for(var/gas_id in zone_gases)
+		var/scaled_moles = zone_gases[gas_id] * old_size
+		if(scaled_moles <= 0)
+			zone_gases -= gas_id
+		else
+			zone_gases[gas_id] = scaled_moles
+			if(mix_temperature)
+				self_heat_capacity += gas_data.specific_heat[gas_id] * scaled_moles
+
+	if(mix_temperature)
+		var/tile_heat_capacity = tile_air.heat_capacity()
+		var/combined_heat_capacity = tile_heat_capacity + self_heat_capacity
+		if(combined_heat_capacity != 0)
+			air.temperature = (tile_air.temperature * tile_heat_capacity + air.temperature * self_heat_capacity) / combined_heat_capacity
+
+	var/tile_size = tile_air.group_multiplier
+	if(tile_size != 1)
+		for(var/gas_id in tile_gases)
+			zone_gases[gas_id] += tile_gases[gas_id] * tile_size
+	else
+		for(var/gas_id in tile_gases)
+			zone_gases[gas_id] += tile_gases[gas_id]
+
+	var/total_moles = 0
+	for(var/gas_id in zone_gases)
+		var/moles = zone_gases[gas_id]
+		if(moles > 0)
+			moles /= new_size
+		if(moles <= 0)
+			zone_gases -= gas_id
+		else
+			zone_gases[gas_id] = moles
+			total_moles += moles
+	air.total_moles = total_moles
+	air.group_multiplier = new_size
 
 /zone/proc/tick()
 	if(air.temperature >= PHORON_FLASHPOINT && !(src in SSair.active_fire_zones) && air.check_combustability() && contents.len)

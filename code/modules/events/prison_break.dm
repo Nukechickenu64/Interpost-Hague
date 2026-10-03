@@ -61,9 +61,9 @@
 /datum/event/prison_break/tick()
 	if(activeFor == releaseWhen)
 		if(areas && areas.len > 0)
-			var/obj/machinery/power/apc/theAPC = null
+			var/obj/machinery/power/area_smes/theAPC = null
 			for(var/area/A in areas)
-				theAPC = A.get_apc()
+				theAPC = A.get_area_smes()
 				if(theAPC && theAPC.operating)	//If the apc's off, it's a little hard to overload the lights.
 					for(var/obj/machinery/light/L in A)
 						L.flicker(10)

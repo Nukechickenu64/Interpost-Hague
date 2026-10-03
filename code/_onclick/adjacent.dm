@@ -35,10 +35,16 @@
 	if(get_dist(src, T0) > 1 || z != T0.z) //too far
 		return FALSE
 
+	// The seat a mob is buckled to must not block its own reach
+	var/atom/seat
+	if(ismob(neighbor))
+		var/mob/M = neighbor
+		seat = M.buckled
+
 	// Non diagonal case
 	if(T0.x == x || T0.y == y)
 		// Check for border blockages
-		return T0.ClickCross(get_dir(T0,src), border_only = 1, target_atom = target) && src.ClickCross(get_dir(src,T0), border_only = 1, target_atom = target)
+		return T0.ClickCross(get_dir(T0,src), border_only = 1, target_atom = target, ignore_atom = seat) && src.ClickCross(get_dir(src,T0), border_only = 1, target_atom = target)
 
 	// Diagonal case
 	var/in_dir = get_dir(T0,src) // eg. northwest (1+8) = 9 (00001001)
@@ -46,7 +52,7 @@
 	var/d2 = in_dir&12			 // eg. west	  (1+8)&12 (0000 1100) = 8 (0000 1000)
 
 	for(var/d in list(d1,d2))
-		if(!T0.ClickCross(d, border_only = 1, target_atom = target))
+		if(!T0.ClickCross(d, border_only = 1, target_atom = target, ignore_atom = seat))
 			continue // could not leave T0 in that direction
 
 		var/turf/T1 = get_step(T0,d)
@@ -105,9 +111,9 @@ Quick adjacency (to turf):
 	This is defined as any dense ATOM_FLAG_CHECKS_BORDER object, or any dense object without throwpass.
 	The border_only flag allows you to not objects (for source and destination squares)
 */
-/turf/proc/ClickCross(var/target_dir, var/border_only, var/target_atom = null)
+/turf/proc/ClickCross(var/target_dir, var/border_only, var/target_atom = null, var/ignore_atom = null)
 	for(var/obj/O in src)
-		if( !O.density || O == target_atom || O.throwpass) continue // throwpass is used for anything you can click through
+		if( !O.density || O == target_atom || O == ignore_atom || O.throwpass) continue // throwpass is used for anything you can click through
 
 		if(O.atom_flags & ATOM_FLAG_CHECKS_BORDER) // windows have throwpass but are on border, check them first
 			if( O.dir & target_dir || O.dir&(O.dir-1) ) // full tile windows are just diagonals mechanically

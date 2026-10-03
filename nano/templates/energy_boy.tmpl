@@ -1,0 +1,76 @@
+<div class="item">
+	<div class="itemLabel">Device:</div>
+	<div class="itemContent">{{:data.targetName}}</div>
+</div>
+<div class="item">
+	<div class="itemLabel">CCID:</div>
+	<div class="itemContent">
+		<span class="good">{{:data.ccid}}</span>
+		{{:helper.link('Store in buffer', 'disk', {'buffer' : 1})}}
+		{{if !data.enabled}}<span class="bad">(disconnected)</span>{{/if}}
+	</div>
+</div>
+{{if data.split}}
+<div class="item">
+	<div class="itemLabel">Input bus:</div>
+	<div class="itemContent">{{:data.inBus}}</div>
+</div>
+<div class="item">
+	<div class="itemLabel">Output bus:</div>
+	<div class="itemContent">{{:data.outBus}}</div>
+</div>
+{{else}}
+<div class="item">
+	<div class="itemLabel">Bus:</div>
+	<div class="itemContent">{{:data.outBus}}</div>
+</div>
+{{/if}}
+<div class="item">
+	<div class="itemLabel">Buffer:</div>
+	<div class="itemContent">
+		{{if data.buffer}}
+			{{:data.buffer}} ({{:data.bufferName}})
+			{{:helper.link('Draw from buffer', 'arrowthick-1-e', {'link_buffer_in' : 1}, data.canEdit ? null : 'disabled')}}
+			{{:helper.link('Feed buffer', 'arrowthick-1-w', {'link_buffer_out' : 1}, data.canEdit ? null : 'disabled')}}
+		{{else}}
+			<i>Empty</i>
+		{{/if}}
+	</div>
+</div>
+{{if !data.canEdit}}
+<div class="notice">Access required to change links on this device.</div>
+{{/if}}
+
+<h3>Inputs (draws power from)</h3>
+{{for data.implicitInputs}}
+<div class="item"><div class="itemContent"><i>{{:value}}</i></div></div>
+{{/for}}
+{{for data.inputs}}
+<div class="item">
+	<div class="itemLabel">{{:value.ccid}}</div>
+	<div class="itemContent">
+		{{:value.name}} <span class="average">{{:value.where}}</span>
+		{{:helper.link('Remove', 'close', {'remove_in' : value.ccid}, data.canEdit ? null : 'disabled')}}
+	</div>
+</div>
+{{empty}}
+<div class="item"><div class="itemContent"><i>No linked inputs.</i></div></div>
+{{/for}}
+{{:helper.link('Add input', 'plus', {'add_in' : 1}, data.canEdit ? null : 'disabled')}}
+
+<h3>Outputs (feeds power to)</h3>
+{{for data.implicitOutputs}}
+<div class="item"><div class="itemContent"><i>{{:value}}</i></div></div>
+{{/for}}
+{{for data.outputs}}
+<div class="item">
+	<div class="itemLabel">{{:value.ccid}}</div>
+	<div class="itemContent">
+		{{:value.name}} <span class="average">{{:value.where}}</span>
+		{{:helper.link('Remove', 'close', {'remove_out' : value.ccid}, data.canEdit ? null : 'disabled')}}
+	</div>
+</div>
+{{empty}}
+<div class="item"><div class="itemContent"><i>No linked outputs.</i></div></div>
+{{/for}}
+{{:helper.link('Add output', 'plus', {'add_out' : 1}, data.canEdit ? null : 'disabled')}}

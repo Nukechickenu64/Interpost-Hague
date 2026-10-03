@@ -31,6 +31,7 @@
 		remove_antagonist(player)
 		return 0
 	player.current.faction = faction
+	player.current.updatePig()
 	return 1
 
 /datum/antagonist/proc/add_antagonist_mind(var/datum/mind/player, var/ignore_role, var/nonstandard_role_type, var/nonstandard_role_msg)
@@ -62,6 +63,7 @@
 		if(nonstandard_role_msg)
 			to_chat(player.current, "<span class='notice'>[nonstandard_role_msg]</span>")
 		update_icons_added(player)
+		player.current.updatePig()
 	return 1
 
 /datum/antagonist/proc/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)

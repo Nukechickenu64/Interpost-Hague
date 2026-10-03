@@ -112,7 +112,7 @@
 						if(H.back)    H.back.screen_loc =    hud_data["loc"]
 					if(slot_l_store)
 						var/list/left_pocket_items = H.get_pocket_items(slot_l_store)
-						var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
+						var/obj/item/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
 						if(left_pocket_items.len && H.s_active != left_pocket_storage)
 							var/obj/item/left_pocket_item = left_pocket_items[1]
 							left_pocket_item.screen_loc = hud_data["loc"]
@@ -120,7 +120,7 @@
 							H.client.screen |= left_pocket_item
 					if(slot_r_store)
 						var/list/right_pocket_items = H.get_pocket_items(slot_r_store)
-						var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
+						var/obj/item/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
 						if(right_pocket_items.len && H.s_active != right_pocket_storage)
 							var/obj/item/right_pocket_item = right_pocket_items[1]
 							right_pocket_item.screen_loc = hud_data["loc"]
@@ -147,13 +147,13 @@
 					if(slot_back)
 						if(H.back)    H.back.screen_loc =    null
 					if(slot_l_store)
-						var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
+						var/obj/item/storage/internal/pockets/left_pocket_storage = H.get_pocket_storage(slot_l_store)
 						if(H.s_active != left_pocket_storage)
 							for(var/obj/item/I in H.get_pocket_items(slot_l_store))
 								H.client.screen -= I
 								I.screen_loc = null
 					if(slot_r_store)
-						var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
+						var/obj/item/storage/internal/pockets/right_pocket_storage = H.get_pocket_storage(slot_r_store)
 						if(H.s_active != right_pocket_storage)
 							for(var/obj/item/I in H.get_pocket_items(slot_r_store))
 								H.client.screen -= I
@@ -316,7 +316,9 @@
 	p3.render_target = "all3"
 
 	client.screen.Add(p3)
-	client.screen.Add(new /obj/screen/plane_master/los_occluders)
+	// A contentless plane master can corrupt other planes (see ghost_dummy), so only add it when enhanced LOS populates it.
+	if(enhanced_los_enabled)
+		client.screen.Add(new /obj/screen/plane_master/los_occluders)
 	client.screen.Add(p4)
 	client.screen.Add(new /obj/screen/lighting_backdrop)
 	client.screen.Add(new /obj/screen/plane_master/emissive)

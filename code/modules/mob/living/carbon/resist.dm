@@ -104,19 +104,20 @@
 
 	setClickCooldown(100)
 	if(!buckled) return
+	var/unbuckle_action = buckled.unbuckle_action
+	if(!unbuckle_action)
+		unbuckle_action = "rise from"
 
 	if(!restrained())
 		..()
 	else
 		visible_message(
-			"<span class='danger'>[usr] attempts to unbuckle themself!</span>",
-			"<span class='warning'>You attempt to unbuckle yourself. (This will take around 2 minutes and you need to stand still)</span>"
+			"<span class='danger'>[src] tries to [unbuckle_action] [buckled]!</span>",
+			"<span class='warning'>You try to [unbuckle_action] [buckled]. (This will take around 2 minutes and you need to stand still)</span>"
 			)
 
 
 		if(do_after(usr, 2 MINUTES, incapacitation_flags = INCAPACITATION_DEFAULT & ~(INCAPACITATION_RESTRAINED | INCAPACITATION_BUCKLED_FULLY)))
 			if(!buckled)
 				return
-			visible_message("<span class='danger'>\The [usr] manages to unbuckle themself!</span>",
-							"<span class='notice'>You successfully unbuckle yourself.</span>")
 			buckled.user_unbuckle_mob(src)

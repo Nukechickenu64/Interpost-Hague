@@ -36,6 +36,7 @@
 #define CATALYST_BIOHAZARD         "biohazard"
 #define CATALYST_LEECH             "leech"
 #define CATALYST_EPICUREAN         "epicurean"
+#define CATALYST_CARGO_INCURSION   "cargo_incursion"
 
 // Squad doctrine roles
 #define SQUAD_ROLE_LEADER          "leader"
@@ -63,8 +64,17 @@
 
 // Cooldowns (in ticks / deciseconds)
 #define DIRECTOR_EVAL_INTERVAL     30 SECONDS
+#define DIRECTOR_STARTER_DELAY     5 MINUTES
+#define DIRECTOR_LEECH_REVIVAL_DELAY 1 MINUTE
 #define CATALYST_COOLDOWN          5 MINUTES
 #define TELEMETRY_SAMPLE_INTERVAL  10 SECONDS
+#define DIRECTOR_BEAT_COOLDOWN     2 MINUTES
+#define DIRECTOR_ARC_CONTINUITY_BONUS 40
+#define DIRECTOR_ARC_HISTORY_LIMIT 5
+#define DIRECTOR_ARC_MIN_BEATS     2
+#define DIRECTOR_ANTAG_POLICY_GHOSTS "ghosts"
+#define DIRECTOR_ANTAG_POLICY_CREW "crew"
+#define DIRECTOR_ANTAG_POLICY_DISABLED "disabled"
 
 // Minimum antagonist presence maintenance
 #define ANTAG_STALE_THRESHOLD      15 MINUTES // How long an antagonist can go without a hostile action before being replaced

@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/launcher/pneumatic
-	name = "pneumatic cannon"
-	desc = "A large gas-powered cannon."
+	name = "\improper Xenonomix PL-1 Pneumatic Utility Launcher"
+	desc = "A gas-powered utility launcher that uses a pressure-regulated tank to propel stored objects."
 	icon_state = "pneumatic"
 	item_state = "pneumatic"
 	origin_tech = list(TECH_COMBAT = 4, TECH_MATERIAL = 3)
@@ -14,9 +14,9 @@
 	var/fire_pressure                                   // Used in fire checks/pressure checks.
 	var/max_w_class = ITEM_SIZE_NORMAL                                 // Hopper intake size.
 	var/max_storage_space = DEFAULT_BOX_STORAGE         // Total internal storage size.
-	var/obj/item/weapon/tank/tank = null                // Tank of gas for use in firing the cannon.
+	var/obj/item/tank/tank = null                // Tank of gas for use in firing the cannon.
 
-	var/obj/item/weapon/storage/item_storage
+	var/obj/item/storage/item_storage
 	var/pressure_setting = 10                           // Percentage of the gas in the tank used to fire the projectile.
 	var/possible_pressure_amounts = list(5,10,20,25,50) // Possible pressure settings.
 	var/force_divisor = 400                             // Force equates to speed. Speed/5 equates to a damage multiplier for whoever you hit.
@@ -65,7 +65,7 @@
 		return ..()
 
 /obj/item/weapon/gun/launcher/pneumatic/attackby(obj/item/W as obj, mob/user as mob)
-	if(!tank && istype(W,/obj/item/weapon/tank))
+	if(!tank && istype(W,/obj/item/tank))
 		user.drop_from_inventory(W, src)
 		tank = W
 		user.visible_message("[user] jams [W] into [src]'s valve and twists it closed.","You jam [W] into [src]'s valve and twist it closed.")
@@ -185,7 +185,7 @@
 			return
 	else if(isWelder(W))
 		if(buildstate == 1)
-			var/obj/item/weapon/weldingtool/T = W
+			var/obj/item/weldingtool/T = W
 			if(T.remove_fuel(0,user))
 				if(!src || !T.isOn()) return
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -193,7 +193,7 @@
 				buildstate++
 				update_icon()
 		if(buildstate == 3)
-			var/obj/item/weapon/weldingtool/T = W
+			var/obj/item/weldingtool/T = W
 			if(T.remove_fuel(0,user))
 				if(!src || !T.isOn()) return
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -201,7 +201,7 @@
 				buildstate++
 				update_icon()
 		if(buildstate == 5)
-			var/obj/item/weapon/weldingtool/T = W
+			var/obj/item/weldingtool/T = W
 			if(T.remove_fuel(0,user))
 				if(!src || !T.isOn()) return
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -213,7 +213,7 @@
 		..()
 
 /obj/item/weapon/gun/launcher/pneumatic/small
-	name = "small pneumatic cannon"
-	desc = "It looks smaller than your garden variety cannon"
+	name = "\improper Xenonomix PL-1S Compact Pneumatic Launcher"
+	desc = "A compact PL-1 variant configured to launch small objects from a portable gas tank."
 	max_w_class = ITEM_SIZE_TINY
 	w_class = ITEM_SIZE_NORMAL

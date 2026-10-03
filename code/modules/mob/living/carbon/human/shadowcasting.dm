@@ -2,6 +2,7 @@
 #define SHADOWCAST_MIN_FADE 0.5
 #define SHADOWCAST_MAX_FADE 20
 #define SHADOWCAST_DOOR_FADE 2
+#define LOS_CULL_MAX_RANGE 20
 
 var/global/list/los_dither_icons = list()
 
@@ -24,6 +25,7 @@ var/global/enhanced_los_enabled = FALSE
 
 /turf
 	var/shadowcast_inview
+	var/shadowcast_lit
 	var/shadowcast_considered
 	var/shadowcasting_initialized = FALSE
 	var/list/shadowcasting_overlays = list()
@@ -42,7 +44,7 @@ var/global/list/shadowcast_dirty_centers = list()
 
 /// Queues cache invalidation for every turf whose shadow geometry could include T.
 /proc/shadowcast_queue_invalidate(turf/T)
-	if(!enhanced_los_enabled || !shadowcasting_controller.initialized || !istype(T))
+	if(!shadowcasting_controller.initialized || !istype(T))
 		return
 	if(!shadowcast_dirty_centers.len)
 		spawn(1)
@@ -54,11 +56,22 @@ var/global/list/shadowcast_dirty_centers = list()
 	var/list/centers = shadowcast_dirty_centers
 	shadowcast_dirty_centers = list()
 	var/reach = SHADOWCAST_RANGE + 2
+	var/cull_reach = LOS_CULL_MAX_RANGE + 1
 	for(var/turf/C as anything in centers)
 		if(QDELETED(C))
 			continue
-		for(var/turf/T as anything in block(locate(max(C.x - reach, 1), max(C.y - reach, 1), C.z), locate(min(C.x + reach, world.maxx), min(C.y + reach, world.maxy), C.z)))
+		for(var/turf/T as anything in block(locate(max(C.x - cull_reach, 1), max(C.y - cull_reach, 1), C.z), locate(min(C.x + cull_reach, world.maxx), min(C.y + cull_reach, world.maxy), C.z)))
 			T.shadowcasting_initialized = FALSE
+	for(var/client/CL as anything in GLOB.clients)
+		var/turf/cull_turf = CL.los_cull_turf
+		if(!cull_turf)
+			continue
+		for(var/turf/C as anything in centers)
+			if(!QDELETED(C) && C.z == cull_turf.z && get_dist(C, cull_turf) <= cull_reach)
+				CL.update_cull_mask(TRUE)
+				break
+	if(!enhanced_los_enabled)
+		return
 	for(var/client/CL as anything in GLOB.clients)
 		var/turf/last = CL.last_shadow_turf
 		if(!last)
@@ -99,7 +112,10 @@ var/global/shadowcast_generation = 0
 			continue
 		var/dx = wall.x - object_turf.x
 		var/dy = wall.y - object_turf.y
-		if(!(wall in getline(viewer, object_turf)))
+		// Mounts on the wall face the viewer can see stay crisp
+		if(dx && (viewer.x - wall.x) * -dx > 0)
+			continue
+		if(dy && (viewer.y - wall.y) * -dy > 0)
 			continue
 		for(var/obj/O in object_turf)
 			if(dx && O.pixel_x * dx > 0)
@@ -129,9 +145,15 @@ var/global/shadowcast_generation = 0
 						occluded = TRUE
 						break
 			if(!occluded)
+				T.shadowcast_lit = moveid
 				var/list/cutouts = los_wall_occluder_cutouts(locturf, T)
 				new_occluders += make_los_occluder(T.x - locturf.x, T.y - locturf.y, cutouts)
 	END_FOR_DVIEW
+
+	// Unseen tiles get a solid shadow so pixel-offset sprites from visible tiles can't draw over them
+	for(var/turf/T as anything in block(locate(max(locturf.x - vrange, 1), max(locturf.y - vrange, 1), locturf.z), locate(min(locturf.x + vrange, world.maxx), min(locturf.y + vrange, world.maxy), locturf.z)))
+		if(T.shadowcast_inview != moveid || (T.opaque_counter && T.shadowcast_lit != moveid))
+			new_triangles += make_los_square(T.x - locturf.x, T.y - locturf.y)
 
 	var/list/vturfsordered = list()
 	for(var/I in 1 to vrange + 1)
@@ -251,6 +273,26 @@ var/global/shadowcast_generation = 0
 	if(!T)
 		T = new(x1, y1, x2, y2, x3, y3)
 	return T
+
+/atom/movable/los_square
+	name = ""
+	plane = SHADOWCASTING_PLANE
+	mouse_opacity = 0
+	opacity = 0
+	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,32, 0,0,0,0)
+
+/atom/movable/los_square/New(dx, dy, new_tag)
+	icon = get_solid_white_icon()
+	pixel_x = dx * world.icon_size
+	pixel_y = dy * world.icon_size
+	tag = new_tag
+
+/proc/make_los_square(dx, dy)
+	var/tag = "los-square-[dx]-[dy]"
+	var/atom/movable/los_square/S = locate(tag)
+	if(!S)
+		S = new(dx, dy, tag)
+	return S
 
 /atom/movable/los_occluder
 	name = ""
@@ -412,28 +454,186 @@ var/global/shadowcast_generation = 0
 		los_set_coverage(old_index, 0)
 	last_shadow_turf = T
 
+/atom/movable/los_strip
+	name = ""
+	plane = SHADOWCASTING_PLANE
+	mouse_opacity = 0
+	opacity = 0
+	appearance_flags = PIXEL_SCALE
+	color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,32, 0,0,0,0)
+
+/atom/movable/los_strip/New(dx, dy, len, new_tag)
+	var/icon/strip_icon = icon(get_solid_white_icon())
+	strip_icon.Scale(len * world.icon_size, world.icon_size)
+	icon = strip_icon
+	pixel_x = dx * world.icon_size
+	pixel_y = dy * world.icon_size
+	tag = new_tag
+
+/proc/make_los_strip(dx, dy, len)
+	var/tag = "los-strip-[dx]-[dy]-[len]"
+	var/atom/movable/los_strip/S = locate(tag)
+	if(!S)
+		S = new(dx, dy, len, tag)
+	return S
+
+/proc/los_pixel_offset_toward_viewer(atom/movable/object, turf/viewer)
+	if(!object || !viewer || !object.anchored || istype(object, /obj/item))
+		return FALSE
+	var/turf/source = get_turf(object)
+	if(!source || source.z != viewer.z)
+		return FALSE
+	return (object.pixel_x && (viewer.x - source.x) * object.pixel_x > 0) || (object.pixel_y && (viewer.y - source.y) * object.pixel_y > 0)
+
+/// Black strips over every tile within range that BYOND culls for opacity/darkness, so pixel-offset sprites from visible tiles can't draw over them.
+/proc/get_los_cull_strips(turf/center, range, mob/viewer, use_viewer = FALSE)
+	var/list/visible = list()
+	var/turf/visibility_center = center
+	if(viewer && isturf(viewer.loc) && viewer.loc == center)
+		visibility_center = get_turf(viewer)
+		// view() from the mob matches the client's native culling exactly (opacity AND darkness/see_in_dark)
+		for(var/turf/T in view(range, viewer))
+			visible[T] = TRUE
+	else
+		// Remote eyes (cameras etc.) fall back to pure opacity culling
+		FOR_DVIEW(var/turf/T, range, center, INVISIBILITY_MAXIMUM)
+			visible[T] = TRUE
+		END_FOR_DVIEW
+	var/list/visible_faces = list()
+	FOR_DVIEW(var/turf/wall, range, visibility_center, INVISIBILITY_MAXIMUM)
+		if(!wall.opacity || visible[wall] || (wall.lighting_overlay && !wall.lighting_overlay.luminosity))
+			continue
+		for(var/direction in GLOB.cardinal)
+			var/turf/face = get_step(wall, direction)
+			if(!face || face.opaque_counter || !visible[face])
+				continue
+			if((face.x - wall.x) * (visibility_center.x - wall.x) > 0 || (face.y - wall.y) * (visibility_center.y - wall.y) > 0)
+				visible_faces[wall] = TRUE
+				break
+	END_FOR_DVIEW
+	visible |= visible_faces
+	var/list/strips = list()
+	for(var/dy in -range to range)
+		var/run_start = null
+		for(var/dx in -range to range + 1)
+			var/hidden = FALSE
+			if(dx <= range)
+				var/turf/T = locate(center.x + dx, center.y + dy, center.z)
+				hidden = T && !visible[T]
+			if(hidden)
+				if(isnull(run_start))
+					run_start = dx
+			else if(!isnull(run_start))
+				strips += make_los_strip(run_start, dy, dx - run_start)
+				run_start = null
+	return strips
+
+/client
+	var/atom/movable/los_cull_mover
+	var/image/los_cull_image
+	var/turf/los_cull_turf
+	var/los_cull_range = 0
+	var/turf/look_far_target
+	var/turf/look_far_origin
+	var/mob/look_far_owner
+
+/client/proc/look_far_active()
+	if(!look_far_target)
+		return FALSE
+	if(mob != look_far_owner || get_turf(mob) != look_far_origin || !isliving(mob) || mob.incapacitated() || eye != look_far_target)
+		if(mob)
+			mob.reset_view()
+		else
+			look_far_target = null
+			look_far_origin = null
+			look_far_owner = null
+		return FALSE
+	return TRUE
+
+/mob/proc/LookFarClickOn(atom/target)
+	if(!client || !isliving(src) || isAI(src) || incapacitated() || !isturf(loc) || machine || eyeobj || client.adminobs)
+		return FALSE
+	var/mob/living/viewer = src
+	if(viewer.z_eye)
+		return FALSE
+	var/turf/destination = get_turf(target)
+	var/turf/origin = get_turf(src)
+	if(!destination || destination.z != origin.z)
+		return FALSE
+	if(destination == origin || destination == client.look_far_target)
+		reset_view()
+		return TRUE
+	if(client.eye != src && !client.look_far_active())
+		return FALSE
+	var/range = Clamp(ceil(max(client.last_view_x_dim, client.last_view_y_dim) / 2), 7, LOS_CULL_MAX_RANGE)
+	if(!(destination in view(range, src)))
+		return FALSE
+	client.look_far_target = destination
+	client.look_far_origin = origin
+	client.look_far_owner = src
+	client.perspective = EYE_PERSPECTIVE
+	client.eye = destination
+	client.update_opacity_image()
+	client.update_cull_mask(TRUE)
+	return TRUE
+
+/client/proc/create_cull_mask()
+	if(!los_cull_image)
+		los_cull_mover = new
+		los_cull_mover.animate_movement = NO_STEPS
+		los_cull_mover.mouse_opacity = 0
+		los_cull_image = image(loc = los_cull_mover)
+		los_cull_image.plane = SHADOWCASTING_PLANE
+		los_cull_image.appearance_flags = RESET_COLOR | RESET_TRANSFORM | KEEP_APART
+	// mob/Login() wipes client.images, so re-add every time
+	images |= los_cull_image
+	update_cull_mask(TRUE)
+
+/client/proc/update_cull_mask(force = FALSE)
+	if(!los_cull_image)
+		return
+	var/looking_far = look_far_active()
+	var/turf/center = get_turf(eye)
+	if(!center || !mob || isAI(mob) || (mob.sight & (SEE_TURFS|SEE_OBJS|SEE_MOBS)))
+		if(los_cull_turf)
+			los_cull_image.vis_contents.Cut()
+			los_cull_turf = null
+		return
+	var/range = Clamp(ceil(max(last_view_x_dim, last_view_y_dim) / 2), 7, LOS_CULL_MAX_RANGE)
+	if(!force && center == los_cull_turf && range == los_cull_range)
+		return
+	los_cull_turf = center
+	los_cull_range = range
+	los_cull_mover.loc = center
+	los_cull_image.vis_contents = get_los_cull_strips(center, range, mob, looking_far)
+
 /mob/Login()
 	. = ..()
 	if(client)
 		client.create_opacity_image()
+		client.create_cull_mask()
 
 /mob/forceMove()
 	. = ..()
 	if(client)
 		client.update_opacity_image()
+		client.update_cull_mask()
 
 /mob/Move()
 	. = ..()
 	if(client)
 		client.update_opacity_image()
+		client.update_cull_mask()
 
-// Picks up sight flag changes (mesons, thermals) while standing still.
+// Picks up sight flag and lighting changes (mesons, thermals, lights toggling) while standing still.
 /mob/living/Life()
 	. = ..()
 	if(client)
 		client.update_opacity_image()
+		client.update_cull_mask(TRUE)
 
 #undef SHADOWCAST_RANGE
 #undef SHADOWCAST_MIN_FADE
 #undef SHADOWCAST_MAX_FADE
 #undef SHADOWCAST_DOOR_FADE
+#undef LOS_CULL_MAX_RANGE

@@ -47,8 +47,8 @@
 		qdel(src)
 
 /obj/item/weapon/gun/launcher/crossbow
-	name = "powered crossbow"
-	desc = "A 2557AD twist on an old classic. Pick up that can."
+	name = "\improper Frontier Arms FC-5 Compound Crossbow"
+	desc = "A manually drawn compound crossbow that accepts standard arrows and can use an optional power cell to heat metal bolts."
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "crossbow"
 	item_state = "crossbow-solid"
@@ -61,7 +61,7 @@
 	var/tension = 0                         // Current draw on the bow.
 	var/max_tension = 5                     // Highest possible tension.
 	var/release_speed = 5                   // Speed per unit of tension.
-	var/obj/item/weapon/cell/cell = null    // Used for firing superheated rods.
+	var/obj/item/cell/cell = null    // Used for firing superheated rods.
 	var/current_user                        // Used to check if the crossbow has changed hands since being drawn.
 
 /obj/item/weapon/gun/launcher/crossbow/update_release_force()
@@ -153,7 +153,7 @@
 				superheat_rod(user)
 			return
 
-	if(istype(W, /obj/item/weapon/cell))
+	if(istype(W, /obj/item/cell))
 		if(!cell)
 			user.drop_item()
 			cell = W
@@ -229,7 +229,7 @@
 			return
 	else if(isWelder(W))
 		if(buildstate == 1)
-			var/obj/item/weapon/weldingtool/T = W
+			var/obj/item/weldingtool/T = W
 			if(T.remove_fuel(0,user))
 				if(!src || !T.isOn()) return
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -283,8 +283,8 @@
 	throwforce = 4
 
 /obj/item/weapon/gun/launcher/crossbow/RCD
-	name = "rapid crossbow device"
-	desc = "A hacked together RCD turns an innocent construction tool into the penultimate deconstruction tool. Flashforges bolts using matter units when the string is drawn back."
+	name = "\improper NanoTrasen RCD-X Rapid Bolt Projector"
+	desc = "A modified Rapid Construction Device that flashforges a bolt from stored matter as its firing mechanism is drawn back."
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "rxb"
 	slot_flags = null
@@ -313,7 +313,7 @@
 		draw(user)
 
 /obj/item/weapon/gun/launcher/crossbow/RCD/attackby(obj/item/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/rcd_ammo))
+	if(istype(W, /obj/item/rcd_ammo))
 		if((stored_matter + 10) > max_stored_matter)
 			to_chat(user, "<span class='notice'>The RXD can't hold that many additional matter-units.</span>")
 			return

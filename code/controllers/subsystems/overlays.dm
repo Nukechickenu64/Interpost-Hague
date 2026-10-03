@@ -98,6 +98,9 @@ SUBSYSTEM_DEF(overlays)
 		if (!ispath(origin)) { \
 			appearance_bro.dir = origin.dir; \
 		} \
+		if (appearance_bro.plane > SHADOWCASTING_PLANE) { \
+			appearance_bro.plane = FLOAT_PLANE; \
+		} \
 		target = appearance_bro.appearance; \
 	}
 

@@ -118,7 +118,7 @@
 	alive_light = "#585858"
 
 /datum/ai_icon/nanotrasen
-	name = "TetraCorp"
+	name = "Nanotrasen"
 	alive_icon = "ai-nanotrasen"
 	alive_light = "#000029"
 

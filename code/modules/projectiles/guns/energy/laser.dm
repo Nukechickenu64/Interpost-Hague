@@ -1,5 +1,5 @@
 /obj/item/weapon/gun/energy/laser
-	name = "laser carbine"
+	name = "\improper Tarvos T-6B Laser Carbine"
 	desc = "The Tarvos T-6B carbine, designed to kill with concentrated energy blasts."
 	icon_state = "laser"
 	item_state = "laser"
@@ -12,16 +12,18 @@
 	matter = list(DEFAULT_WALL_MATERIAL = 2000)
 	projectile_type = /obj/item/projectile/beam/midlaser
 	wielded_item_state = "laser-wielded"
-	power_supply = /obj/item/weapon/cell/gun
+	power_supply = /obj/item/cell/gun
 
 /obj/item/weapon/gun/energy/laser/mounted
+	name = "\improper Tarvos T-6B-M Mounted Laser System"
+	desc = "A T-6B laser system configured for powered mounting and external cell supply."
 	self_recharge = 1
 	use_external_power = 1
 	one_hand_penalty = 0 //just in case
 
 /obj/item/weapon/gun/energy/advpsyko
-	name = "laser carbine"
-	desc = "The advanced PSYKO military grade laser rifle."
+	name = "\improper NanoTrasen PSYKO-60 Select-Fire Laser Rifle"
+	desc = "A self-recharging military laser rifle with semi-automatic, burst, and automatic fire modes."
 	icon_state = "adv_psyko"
 	item_state = "laser"
 	slot_flags = SLOT_BELT|SLOT_BACK
@@ -43,8 +45,8 @@
 		)
 
 /obj/item/weapon/gun/energy/laser/practice
-	name = "practice laser carbine"
-	desc = "A modified version of the T-6B, this one fires less concentrated energy bolts designed for target practice."
+	name = "\improper Tarvos T-6B-P Training Laser Carbine"
+	desc = "A T-6B variant with reduced output for supervised target practice."
 	icon_state = "laserp"
 	projectile_type = /obj/item/projectile/beam/practice
 	charge_cost = 10 //How much energy is needed to fire.
@@ -72,20 +74,20 @@
 			projectile_type = null
 
 obj/item/weapon/gun/energy/retro
-	name = "retro laser"
+	name = "\improper Zendai Foundries RL-4 Retro Laser Pistol"
 	icon_state = "retro"
 	item_state = "retro"
-	desc = "An older model of the basic lasergun. Nevertheless, it is still quite deadly and easy to maintain, making it a favorite amongst pirates and other outlaws."
+	desc = "An older, mechanically simple laser pistol valued for its ease of maintenance and continued use on the frontier."
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
 	w_class = ITEM_SIZE_NORMAL
 	projectile_type = /obj/item/projectile/beam
 	fire_delay = 15 //old technology, and a pistol
 
 /obj/item/weapon/gun/energy/captain
-	name = "antique laser gun"
+	name = "\improper Luna Works LW-01 Heirloom Laser Pistol"
 	icon_state = "caplaser"
 	item_state = "caplaser"
-	desc = "A rare weapon, handcrafted by a now defunct specialty manufacturer on Luna for a small fortune. It's certainly aged well."
+	desc = "A rare laser pistol handcrafted by a now-defunct Luna specialty maker. Its durable construction has survived generations of careful use."
 	force = 5
 	slot_flags = SLOT_BELT //too unusually shaped to fit in a holster
 	w_class = ITEM_SIZE_NORMAL
@@ -96,8 +98,8 @@ obj/item/weapon/gun/energy/retro
 	self_recharge = 1
 
 /obj/item/weapon/gun/energy/lasercannon
-	name = "laser cannon"
-	desc = "With the laser cannon, the lasing medium is enclosed in a tube lined with uranium-235 and subjected to high neutron flux in a nuclear reactor core. This incredible technology may help YOU achieve high excitation rates with small laser volumes!"
+	name = "\improper Hephaestus Industries HLC-5 Heavy Laser Cannon"
+	desc = "A heavy, cell-powered laser cannon built around a high-output optical assembly. Its large emitter requires a stable two-handed firing position."
 	icon_state = "lasercannon"
 	item_state = null
 	origin_tech = list(TECH_COMBAT = 4, TECH_MATERIAL = 3, TECH_POWER = 3)
@@ -112,7 +114,8 @@ obj/item/weapon/gun/energy/retro
 	wielded_item_state = "gun_wielded"
 
 /obj/item/weapon/gun/energy/lasercannon/mounted
-	name = "mounted laser cannon"
+	name = "\improper Hephaestus Industries HLC-5M Mounted Laser Cannon"
+	desc = "An HLC-5 configured for powered mounting and external cell supply."
 	self_recharge = 1
 	use_external_power = 1
 	recharge_time = 10
@@ -120,8 +123,8 @@ obj/item/weapon/gun/energy/retro
 	one_hand_penalty = 0
 
 /obj/item/weapon/gun/energy/xray
-	name = "x-ray laser carbine"
-	desc = "A high-power laser gun capable of emitting concentrated x-ray blasts, that are able to penetrate laser-resistant armor much more readily than standard photonic beams."
+	name = "\improper NanoTrasen XR-20 X-Ray Laser Carbine"
+	desc = "A high-output carbine that emits concentrated x-ray beams capable of penetrating some laser-resistant armor."
 	icon_state = "xray"
 	item_state = "xray"
 	slot_flags = SLOT_BELT|SLOT_BACK
@@ -135,7 +138,8 @@ obj/item/weapon/gun/energy/retro
 	combustion = 0
 
 /obj/item/weapon/gun/energy/xray/pistol
-	name = "x-ray laser gun"
+	name = "\improper NanoTrasen XR-8 X-Ray Laser Pistol"
+	desc = "A compact XR-series sidearm that emits penetrating x-ray laser beams."
 	icon_state = "oldxray"
 	item_state = "oldxray"
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
@@ -146,8 +150,8 @@ obj/item/weapon/gun/energy/retro
 	fire_delay = 10
 
 /obj/item/weapon/gun/energy/sniperrifle
-	name = "marksman energy rifle"
-	desc = "The HI DMR 9E is an older design of Hephaestus Industries. A designated marksman rifle capable of shooting powerful ionized beams, this is a weapon to kill from a distance."
+	name = "\improper Hephaestus Industries DMR-9E Marksman Laser Rifle"
+	desc = "An older Hephaestus Industries designated-marksman rifle that fires high-energy ionized beams at long range."
 	icon_state = "sniper"
 	item_state = "laser"
 	origin_tech = list(TECH_COMBAT = 6, TECH_MATERIAL = 5, TECH_POWER = 4)

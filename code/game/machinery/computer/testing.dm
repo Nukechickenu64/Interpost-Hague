@@ -44,8 +44,8 @@
 					return
 				src.audible_message("The computer makes a few noises as it dispenses a piece of paper.")
 				playsound(src, 'sound/machines/dotprinter.ogg', 10, 1)
-				var/obj/item/weapon/paper/R = new(src.loc)
-				var/log_text = "<b>LOG 22-10-2167</b>\n\nREPORT\n\nTHE MUSSR HAS FALLEN DOT\n\nRETURN TO DAILY ACTIVITY DOT\n\n<b>LOG 12-12-2188</b>\n\nCRYOGENIC STORAGE ACCESS DENIED DOT\n\nACTIVATING CONSERVATION MODE DOT\n\n<b>LOG 18-07-2258</b>\n\nISHIM REPUBLIC IN FULL ALERT STATE DOT\n\nREQUESTING HELP DOT\n\n<b>LOG 19-10-2263</b>\n\nTHE DOT STATION DOT IS DOT UNDER DOT TETRACORP DOT COMMAND DOT\n\nACTIVATE DOT CRYOGENIC DOT AWAKENING DOT"
+				var/obj/item/paper/R = new(src.loc)
+				var/log_text = "<b>LOG 22-10-2167</b>\n\nREPORT\n\nTHE MUSSR HAS FALLEN DOT\n\nRETURN TO DAILY ACTIVITY DOT\n\n<b>LOG 12-12-2188</b>\n\nCRYOGENIC STORAGE ACCESS DENIED DOT\n\nACTIVATING CONSERVATION MODE DOT\n\n<b>LOG 18-07-2258</b>\n\nISHIM REPUBLIC IN FULL ALERT STATE DOT\n\nREQUESTING HELP DOT\n\n<b>LOG 19-10-2263</b>\n\nTHE DOT STATION DOT IS DOT UNDER DOT NANOTRASEN DOT COMMAND DOT\n\nACTIVATE DOT CRYOGENIC DOT AWAKENING DOT"
 				// Primary objective: exit reserve mode and restore nominal operations
 				var/sname = station_name()
 				var/primary_text = "<b>PRIMARY OBJECTIVE: EXIT RESERVE MODE</b>\n\n[sname] is operating under Reserve Mode protocols. Restore nominal station function in the following sequence:" \
@@ -64,7 +64,7 @@
 				R.name = "Mission Briefing"
 				var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
 				stampoverlay.icon_state = "paper_stamp-hos"
-				R.stamped += /obj/item/weapon/stamp
+				R.stamped += /obj/item/stamp
 				R.overlays += stampoverlay
 				R.stamps += "<HR><i>This paper has been stamped as 'Top Secret'.</i>"
 				dispensed = 1
@@ -83,7 +83,7 @@
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
 			if(usr)
-				var/obj/item/weapon/card/id/id_card = usr.GetIdCard()
+				var/obj/item/card/id/id_card = usr.GetIdCard()
 				crew_announcement.announcer = GetNameAndAssignmentFromId(id_card)
 			else
 				crew_announcement.announcer = "Unknown"
@@ -95,7 +95,7 @@
 				return 1
 			if(GLOB.in_character_filter.len)
 				if(findtext(input, config.ic_filter_regex))
-					to_chat(usr, "<span class='warning'>You rethink your decision and decide that Tetracorp will fire you if you announce that.</span>")
+					to_chat(usr, "<span class='warning'>You rethink your decision and decide that Nanotrasen will fire you if you announce that.</span>")
 					return 1
 			var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 			var/decl/security_level/default/df = security_state.current_security_level
@@ -129,22 +129,9 @@
 				var/min = (seconds - sec) / 60
 				to_chat(usr, "<span class='warning'>Deep-space telemetry sweep cooldown: [min]m [sec]s remaining.</span>")
 				return
-			// Safety guard: don't allow generation if the Mining shuttle is at Station or in the Ruins area
-			if(SSshuttle && SSshuttle.shuttles && ("Mining" in SSshuttle.shuttles))
-				var/datum/shuttle/S = SSshuttle.shuttles["Mining"]
-				if(istype(S))
-					var/obj/effect/shuttle_landmark/CL = S.current_location
-					if(istype(CL))
-						var/blocked_reason = null
-						if(CL.landmark_tag == "nav_mining_start")
-							blocked_reason = "Mining shuttle is docked at Station. Relocate to open space to initiate sweep"
-						else
-							var/area/A = get_area(CL)
-							if(istype(A, /area/space/ruins))
-								blocked_reason = "Mining shuttle is amid debris field. Relocate to a clear sector to initiate sweep"
-						if(blocked_reason)
-							to_chat(usr, "<span class='warning'>Unable to sweep: [blocked_reason].</span>")
-							return
+			var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+			if(!expedition.can_regenerate_ruins(usr))
+				return
 
 			// Compute minutes since world boot (fallback if a dedicated round_start_time isn't tracked)
 			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1)
@@ -164,6 +151,7 @@
 				return
 			// Apply 10-minute cooldown (600 seconds => 6000 deciseconds)
 			next_beacon_scan_time = world.time + 6000
+			expedition.has_last_location = TRUE
 			var/t = 0
 			if(ruins_gen_job)
 				var/list/V = ruins_gen_job:vars

@@ -237,6 +237,71 @@
 		pending_mind.leech_conversion_pending = FALSE
 		to_chat(victim, "<span class='danger'><font size=3>Your dead body stirs. The hunger for blood is yours now. You are a Leech.</font></span>")
 
+/mob/living/carbon/human/proc/begin_starter_leech_death()
+	if(!SSdirector.starter_required || SSdirector.starter_body != src || mind != SSdirector.starter_mind || stat == DEAD)
+		return
+	var/obj/item/organ/internal/heart/heart = get_organ(BP_HEART)
+	if(!heart)
+		SSdirector.clear_starter_candidate()
+		return
+	heart.pulse = PULSE_NONE
+	heart.heartbeat = 0
+	to_chat(src, "<span class='danger'>A crushing pain grips your chest. Your heart stops.</span>")
+	death(FALSE, "clutches their chest and collapses, lifeless...")
+	if(stat != DEAD || mind != SSdirector.starter_mind)
+		SSdirector.clear_starter_candidate()
+		return
+	SSdirector.starter_resurrection_at = world.time + DIRECTOR_LEECH_REVIVAL_DELAY
+	var/client/owner = SSdirector.get_starter_client()
+	if(owner)
+		owner.verbs |= /client/proc/rise_as_leech
+		SSdirector.starter_action_client = owner
+		to_chat(owner, "<span class='danger'>Death has not released you. In one minute, you may choose Rise Again to return to your body. Only then will your hunger awaken.</span>")
+	log_debug("AI Director: Round-start leech [SSdirector.starter_ckey] suffered fatal cardiac arrest.")
+
+/client/proc/rise_as_leech()
+	set name = "Rise Again"
+	set category = "IC"
+	if(!SSdirector || SSdirector.starter_busy || GAME_STATE != RUNLEVEL_GAME || SSdirector.director_state == DIRECTOR_STATE_DORMANT || SSdirector.director_state == DIRECTOR_STATE_CONCLUDED)
+		return
+	if(!SSdirector.starter_awakening_valid() || SSdirector.get_starter_client() != src)
+		verbs -= /client/proc/rise_as_leech
+		return
+	if(world.time < SSdirector.starter_resurrection_at)
+		to_chat(src, "<span class='notice'>Your body is not ready. You must wait [ceil((SSdirector.starter_resurrection_at - world.time) / 10)] seconds.</span>")
+		return
+	SSdirector.complete_starter_leech(TRUE)
+
+/datum/controller/subsystem/director/proc/complete_starter_leech(self_resurrection = FALSE)
+	if(starter_busy || !starter_awakening_valid())
+		return FALSE
+	if(starter_body.stat == DEAD && (!self_resurrection || world.time < starter_resurrection_at))
+		return FALSE
+	starter_busy = TRUE
+	var/client/owner = get_starter_client()
+	if(starter_body.stat == DEAD)
+		starter_body.revive()
+	if(starter_body.stat == DEAD || starter_body.mind != starter_mind || starter_mind.current != starter_body)
+		starter_busy = FALSE
+		return FALSE
+	if(istype(owner.mob, /mob/observer/ghost))
+		var/mob/observer/ghost/observer = owner.mob
+		if(!observer.reenter_corpse())
+			starter_busy = FALSE
+			return FALSE
+	var/datum/antagonist/antag = GLOB.all_antag_types_["leech"]
+	if(!antag.add_antagonist(starter_mind, FALSE, FALSE, FALSE, FALSE, TRUE))
+		clear_starter_candidate()
+		starter_busy = FALSE
+		return FALSE
+	loyalty.set_faction(starter_mind, LOYALTY_NEUTRAL)
+	starter_body.visible_message("<span class='danger'>[starter_body] stirs, their eyes opening with an unnatural hunger.</span>")
+	log_debug("AI Director: Round-start leech [starter_ckey] resurrected and converted.")
+	starter_required = FALSE
+	clear_starter_candidate()
+	starter_busy = FALSE
+	return TRUE
+
 /datum/objective/leech/blood_volume
 	explanation_text = "Maintain a blood volume above 80% when the escape shuttle arrives."
 
@@ -250,7 +315,7 @@
 	if(!owner?.current)
 		return FALSE
 	var/blood_total = 0
-	for(var/obj/item/weapon/reagent_containers/ivbag/bag in owner.current.get_contents())
+	for(var/obj/item/reagent_containers/ivbag/bag in owner.current.get_contents())
 		blood_total += bag.reagents.get_reagent_amount(/datum/reagent/blood)
 	return blood_total >= 500
 

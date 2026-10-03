@@ -1,14 +1,14 @@
 /datum/gear/cane
 	display_name = "cane"
-	path = /obj/item/weapon/cane
+	path = /obj/item/cane
 
 /datum/gear/dice
 	display_name = "dice pack"
-	path = /obj/item/weapon/storage/pill_bottle/dice
+	path = /obj/item/storage/pill_bottle/dice
 
 /datum/gear/dice/nerd
 	display_name = "dice pack (gaming)"
-	path = /obj/item/weapon/storage/pill_bottle/dice_nerd
+	path = /obj/item/storage/pill_bottle/dice_nerd
 
 /datum/gear/cards
 	display_name = "deck of cards"
@@ -32,7 +32,7 @@
 
 /datum/gear/flask
 	display_name = "flask"
-	path = /obj/item/weapon/reagent_containers/food/drinks/flask/barflask
+	path = /obj/item/reagent_containers/food/drinks/flask/barflask
 
 /datum/gear/flask/New()
 	..()
@@ -40,7 +40,7 @@
 
 /datum/gear/vacflask
 	display_name = "vacuum-flask"
-	path = /obj/item/weapon/reagent_containers/food/drinks/flask/vacuumflask
+	path = /obj/item/reagent_containers/food/drinks/flask/vacuumflask
 
 /datum/gear/vacflask/New()
 	..()
@@ -48,7 +48,7 @@
 
 /datum/gear/coffeecup
 	display_name = "coffee cup"
-	path = /obj/item/weapon/reagent_containers/food/drinks/coffeecup
+	path = /obj/item/reagent_containers/food/drinks/coffeecup
 	flags = GEAR_HAS_TYPE_SELECTION
 
 /datum/gear/boot_knife
@@ -60,13 +60,13 @@
 	display_name = "lunchbox"
 	description = "A little lunchbox."
 	cost = 2
-	path = /obj/item/weapon/storage/lunchbox
+	path = /obj/item/storage/lunchbox
 
 /datum/gear/lunchbox/New()
 	..()
 	var/list/lunchboxes = list()
-	for(var/lunchbox_type in typesof(/obj/item/weapon/storage/lunchbox))
-		var/obj/item/weapon/storage/lunchbox/lunchbox = lunchbox_type
+	for(var/lunchbox_type in typesof(/obj/item/storage/lunchbox))
+		var/obj/item/storage/lunchbox/lunchbox = lunchbox_type
 		if(!initial(lunchbox.filled))
 			lunchboxes[initial(lunchbox.name)] = lunchbox_type
 	gear_tweaks += new/datum/gear_tweak/path(lunchboxes)
@@ -74,7 +74,7 @@
 
 /datum/gear/towel
 	display_name = "towel"
-	path = /obj/item/weapon/towel
+	path = /obj/item/towel
 	flags = GEAR_HAS_COLOR_SELECTION
 
 /datum/gear/plush_toy
@@ -96,4 +96,4 @@
 /datum/gear/workvisa
 	display_name = "work visa"
 	description = "A work visa issued by the Sol Central Government for the purpose of work."
-	path = /obj/item/weapon/paper/workvisa
+	path = /obj/item/paper/workvisa

@@ -11,6 +11,12 @@
 	var/ui_template = "shuttle_control_console.tmpl"
 
 
+/obj/machinery/computer/shuttle_control/proc/get_shuttle()
+	return SSshuttle.shuttles[shuttle_tag]
+
+/obj/machinery/computer/shuttle_control/mining/get_shuttle()
+	return get_mining_expedition().get_shuttle()
+
 /obj/machinery/computer/shuttle_control/attack_hand(user as mob)
 	if(..(user))
 		return
@@ -80,7 +86,7 @@
 		return TOPIC_REFRESH
 
 /obj/machinery/computer/shuttle_control/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
-	var/datum/shuttle/autodock/shuttle = SSshuttle.shuttles[shuttle_tag]
+	var/datum/shuttle/autodock/shuttle = get_shuttle()
 	if (!istype(shuttle))
 		to_chat(user,"<span class='warning'>Unable to establish link with the shuttle.</span>")
 		return
@@ -95,7 +101,7 @@
 		ui.set_auto_update(1)
 
 /obj/machinery/computer/shuttle_control/OnTopic(user, href_list)
-	return handle_topic_href(SSshuttle.shuttles[shuttle_tag], href_list, user)
+	return handle_topic_href(get_shuttle(), href_list, user)
 
 /obj/machinery/computer/shuttle_control/emag_act(var/remaining_charges, var/mob/user)
 	if (!hacked)

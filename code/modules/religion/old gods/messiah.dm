@@ -38,11 +38,11 @@
 	requirments =  list("NORTH" = /obj/item/clothing/glasses/sunglasses/,
 						"EAST" = /obj/item/weapon/flame/candle/,
 						"WEST" = /obj/item/weapon/flame/candle/,
-						"SOUTH" = /obj/item/weapon/paper)
+						"SOUTH" = /obj/item/paper)
 	old_god = MESSIAH
 
 	spell_effect(var/mob/living/user, var/list/spell_components)
-		var/obj/item/weapon/paper/target1_paper = spell_components["SOUTH"]
+		var/obj/item/paper/target1_paper = spell_components["SOUTH"]
 		var/mob/living/carbon/human/target = get_player_from_paper(target1_paper)
 		if(!target)	return 0
 		to_chat(target, "<span class='danger'>Your eyes burn horrificly!</span>")
@@ -61,12 +61,12 @@
 	requirments =  list("NORTH" = /obj/item/weapon/flame/candle/,
 						"SOUTHEAST" = /obj/item/weapon/flame/candle/,
 						"SOUTHWEST" = /obj/item/weapon/flame/candle/,
-						"SOUTH" = /obj/item/weapon/wirecutters)
+						"SOUTH" = /obj/item/wirecutters)
 	old_god = MESSIAH
 
 	spell_effect(var/mob/living/user, var/list/spell_components)
 		var/datum/action/uncuff_action = new/datum/action/uncuff
-		uncuff_action.target = new/obj/item/weapon/implant/freedom()
+		uncuff_action.target = new/obj/item/implant/freedom()
 		uncuff_action.Grant(user)
 		spawn(1500)
 			uncuff_action.Remove(user)

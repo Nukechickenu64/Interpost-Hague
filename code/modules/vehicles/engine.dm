@@ -30,10 +30,10 @@
 	icon_state = "engine_electric"
 	trail_type = /datum/effect/effect/system/trail/ion
 	cost_per_move = 200	// W
-	var/obj/item/weapon/cell/cell
+	var/obj/item/cell/cell
 
 /obj/item/weapon/engine/electric/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I,/obj/item/weapon/cell))
+	if(istype(I,/obj/item/cell))
 		if(cell)
 			to_chat(user, "<span class='warning'>There is already a cell in \the [src].</span>")
 		else
@@ -50,7 +50,7 @@
 	..()
 
 /obj/item/weapon/engine/electric/prefill()
-	cell = new /obj/item/weapon/cell/high(src.loc)
+	cell = new /obj/item/cell/high(src.loc)
 
 /obj/item/weapon/engine/electric/use_power()
 	if(!cell)
@@ -89,10 +89,10 @@
 	temp_reagents_holder.atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 
 /obj/item/weapon/engine/thermal/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I,/obj/item/weapon/reagent_containers) && I.is_open_container())
-		if(istype(I,/obj/item/weapon/reagent_containers/food/snacks) || istype(I,/obj/item/weapon/reagent_containers/pill))
+	if(istype(I,/obj/item/reagent_containers) && I.is_open_container())
+		if(istype(I,/obj/item/reagent_containers/food/snacks) || istype(I,/obj/item/reagent_containers/pill))
 			return 0
-		var/obj/item/weapon/reagent_containers/C = I
+		var/obj/item/reagent_containers/C = I
 		C.standard_pour_into(user,src)
 		return 1
 	..()

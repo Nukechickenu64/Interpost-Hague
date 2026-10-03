@@ -64,6 +64,7 @@
  */
 /obj/item/organ/internal/lungs/proc/sync_breath_types()
 	min_breath_pressure = species.breath_pressure
+	safe_exhaled_max = species.safe_exhaled_pressure
 	breath_type = species.breath_type ? species.breath_type : "oxygen"
 	poison_type = species.poison_type ? species.poison_type : "phoron"
 	exhale_type = species.exhale_type ? species.exhale_type : "carbon_dioxide"
@@ -174,13 +175,11 @@
 		// Too much exhaled gas in the air
 		var/word
 		var/warn_prob
-		var/oxyloss
 		var/alert
 
 		if(exhaled_pp > safe_exhaled_max)
 			word = pick("extremely dizzy","short of breath","faint","confused")
 			warn_prob = 15
-			oxyloss = HUMAN_MAX_OXYLOSS
 			alert = 1
 			failed_exhale = 1
 		else if(exhaled_pp > safe_exhaled_max * 0.7)
@@ -188,18 +187,18 @@
 			warn_prob = 1
 			alert = 1
 			failed_exhale = 1
-			var/ratio = 1.0 - (safe_exhaled_max - exhaled_pp)/(safe_exhaled_max*0.3)
-			if (owner.getOxyLoss() < 50*ratio)
-				oxyloss = HUMAN_MAX_OXYLOSS
 		else if(exhaled_pp > safe_exhaled_max * 0.6)
 			word = pick("a little dizzy","short of breath")
 			warn_prob = 1
 		else
 			owner.co2_alert = 0
 
+		if(failed_exhale)
+			var/co2_fail_ratio = clamp((exhaled_pp - safe_exhaled_max * 0.6) / (safe_exhaled_max * 0.4), 0, 1)
+			breath_fail_ratio = max(breath_fail_ratio, co2_fail_ratio)
+
 		if(!owner.co2_alert && word && prob(warn_prob))
 			to_chat(owner, "<span class='warning'>You feel [word].</span>")
-			owner.adjustOxyLoss(oxyloss)
 			owner.co2_alert = alert
 
 	// Too much poison in the air.
@@ -272,7 +271,7 @@
 		else
 			owner.emote(pick("shiver","twitch"))
 
-	owner.adjustOxyLoss(HUMAN_MAX_OXYLOSS*breath_fail_ratio)
+	owner.adjustOxyLoss(HUMAN_MAX_OXYLOSS * species.failed_breath_oxy_loss_multiplier * breath_fail_ratio)
 
 	owner.oxygen_alert = max(owner.oxygen_alert, 2)
 

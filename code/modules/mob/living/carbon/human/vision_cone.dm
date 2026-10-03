@@ -186,7 +186,7 @@ mob/living/carbon/human/proc/SetFov(var/n)
 
 mob/living/carbon/human/proc/check_fov()
 
-	if(resting || lying || client.eye != client.mob)
+	if(resting || lying || (client.eye != client.mob && !client.look_far_active()))
 		src.fov.alpha = 0
 		return
 

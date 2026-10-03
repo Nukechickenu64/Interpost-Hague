@@ -47,31 +47,31 @@
 
 /datum/sin/lust
 	name = "lust"
-	description = "I lust for the flesh of women."
+	description = "Even the dirty apples I find delicious."
 
 /datum/sin/gluttony
 	name = "gluttony"
-	description = "I like to eat A LOT."
+	description = "Every empty plate is just a promise of another."
 
 /datum/sin/greed
 	name = "greed"
-	description = "We need money, a lot of money."
+	description = "My will is justice."
 
 /datum/sin/sloth
 	name = "sloth"
-	description = "Doing work is a fool's game."
+	description = "The dust has had more time with this room than I have."
 
 /datum/sin/wrath
 	name = "wrath"
-	description = "DON'T FUCK AROUND WITH ME!"
+	description = "One spark, and the whole room learns my name."
 
 /datum/sin/envy
 	name = "envy"
-	description = "That captain sure has a nicer salary than me..."
+	description = "Funny how the sun always finds their window first."
 
 /datum/sin/pride
 	name = "pride"
-	description = "I am so proud of my own accomplishments!"
+	description = "Even my shadow seems to stand a little taller."
 
 /mob/living/proc/has_sin(var/datum/sin/this_sin)
 	return istype(sin, this_sin)

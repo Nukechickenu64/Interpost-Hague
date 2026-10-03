@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/projectile/revolver
-	name = "revolver"
-	desc = "The Lumoco Arms HE Colt is a choice revolver for when you absolutely, positively need to put a hole in the other guy. Uses .357 ammo."
+	name = "\improper Lumoco Arms HE-357 Service Revolver"
+	desc = "The Lumoco Arms HE-357 is a double-action service revolver chambered for .357 ammunition."
 	icon_state = "revolver"
 	item_state = "revolver"
 	caliber = "357"
@@ -42,15 +42,16 @@
 	return ..()
 
 /obj/item/weapon/gun/projectile/revolver/mateba
-	name = "mateba"
+	name = "\improper Tirena Arms M-50 Competition Revolver"
+	desc = "A heavy-frame .50-caliber revolver designed for precision shooting and field use."
 	icon_state = "mateba"
 	caliber = ".50"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
 	ammo_type = /obj/item/ammo_casing/a50
 
 /obj/item/weapon/gun/projectile/revolver/detective
-	name = "revolver"
-	desc = "A cheap Martian knock-off of a Smith & Wesson Model 10. Uses .38-Special rounds."
+	name = "\improper HelTek D-38 Detective Revolver"
+	desc = "A low-cost .38-caliber double-action revolver commonly issued to investigators. Uses .38 Special rounds."
 	icon_state = "detective"
 	max_shells = 6
 	caliber = "38"
@@ -76,8 +77,8 @@
 		return 1
 
 /obj/item/weapon/gun/projectile/revolver/capgun
-	name = "cap gun"
-	desc = "Looks almost like the real thing! Ages 8 and up."
+	name = "\improper Kestrel K-7 Toy Revolver"
+	desc = "A brightly marked toy revolver that fires paper caps. For ages 8 and up."
 	icon_state = "revolver-toy"
 	item_state = "revolver"
 	caliber = "caps"
@@ -86,18 +87,18 @@
 	max_shells = 7
 	ammo_type = /obj/item/ammo_casing/cap
 
-/obj/item/weapon/gun/projectile/revolver/capgun/attackby(obj/item/weapon/wirecutters/W, mob/user)
+/obj/item/weapon/gun/projectile/revolver/capgun/attackby(obj/item/wirecutters/W, mob/user)
 	if(!istype(W) || icon_state == "revolver")
 		return ..()
 	to_chat(user, "<span class='notice'>You snip off the toy markings off the [src].</span>")
-	name = "revolver"
+	name = "Kestrel K-7 Unmarked Toy Revolver"
 	icon_state = "revolver"
 	desc += " Someone snipped off the barrel's toy mark. How dastardly."
 	return 1
 
 /obj/item/weapon/gun/projectile/revolver/webley
-	name = "service revolver"
-	desc = "A rugged top break revolver based on the Webley Mk. VI model, with modern improvements. Uses .44 magnum rounds."
+	name = "\improper Hephaestus HI-44 Service Revolver"
+	desc = "A rugged top-break revolver with modernized components, chambered for .44 Magnum ammunition."
 	icon_state = "webley"
 	item_state = "webley"
 	max_shells = 6
@@ -106,8 +107,8 @@
 	ammo_type = /obj/item/ammo_casing/c44
 
 /obj/item/weapon/gun/projectile/revolver/smithwesson32
-	name = "Smith&Wesson 32"
-	desc = "A smith&wesson small revolver chambered in (.32)."
+	name = "\improper Lumoco Arms L-32 Pocket Revolver"
+	desc = "A compact, six-shot .32-caliber revolver intended for concealed carry."
 	icon_state = "smithwesson32"
 	item_state = "pistol1"
 	max_shells = 6
@@ -116,8 +117,8 @@
 	ammo_type = /obj/item/ammo_casing/a32
 
 /obj/item/weapon/gun/projectile/revolver/magnum44
-	name = "Magnum .50"
-	desc = "A magnum 50 heavy revolver chambered in (.50)."
+	name = "\improper Mars Military Industries MI-50 Heavy Revolver"
+	desc = "A heavy-frame revolver chambered for .50-caliber ammunition."
 	icon_state = "magnum44"
 	item_state = "pistol1"
 	max_shells = 6
@@ -126,8 +127,8 @@
 	ammo_type = /obj/item/ammo_casing/a50
 
 /obj/item/weapon/gun/projectile/revolver/ct2
-	name = "CT-2 .50"
-	desc = "A heavy revolver chambered in (.50)."
+	name = "\improper Ward-Takahashi WT-50 Duty Revolver"
+	desc = "A six-shot duty revolver chambered for .50-caliber ammunition."
 	icon_state = "a44rev"
 	item_state = "pistol1"
 	max_shells = 6
@@ -136,8 +137,8 @@
 	ammo_type = /obj/item/ammo_casing/a50
 
 /obj/item/weapon/gun/projectile/revolver/colony/revolver
-	name = "Malice revolver"
-	desc = "A revolver produced on frontier colonies. Chambered in (9mm)."
+	name = "\improper Frontier Arms FR-9 Colony Revolver"
+	desc = "A locally produced 9mm revolver designed for service on frontier colonies."
 	icon_state = "colonyrevolver"
 	item_state = "pistol1"
 	max_shells = 6
@@ -146,8 +147,8 @@
 	ammo_type = /obj/item/ammo_casing/a9mm
 
 /obj/item/weapon/gun/projectile/revolver/colony/enfils
-	name = "enfils revolver"
-	desc = "A very old standard revolver chambered in (.38)."
+	name = "\improper Aussec Armoury A-32 Heritage Revolver"
+	desc = "An obsolete service revolver retained in limited use; chambered for .32-caliber ammunition."
 	icon_state = "colonyrevolver"
 	item_state = "pistol1"
 	max_shells = 6
@@ -166,8 +167,8 @@
 	ammo_type = /obj/item/ammo_casing/a9mm
 
 /obj/item/weapon/gun/projectile/revolver/colony/deckard
-	name = "BC-24 revolver"
-	desc = "A very iconic revolver used to be modern in the 24th century but it's pretty old now. Chambered in (9mm)."
+	name = "\improper Lumoco Arms BC-24 Service Revolver"
+	desc = "A once-modern 24th-century 9mm revolver, now considered a dated but recognizable service design."
 	icon_state = "deckard-loaded"
 	item_state = "pistol1"
 	max_shells = 6

@@ -17,11 +17,11 @@
 	requirments =  list("NORTH" = /obj/item/weapon/flame/candle/,
 						"EAST" = /obj/item/clothing/head/jester,
 						"WEST" = /obj/item/clothing/shoes/jester,
-						"SOUTH" = /obj/item/weapon/paper)
+						"SOUTH" = /obj/item/paper)
 	old_god = HASARD
 
 	spell_effect(var/mob/living/user, mob/living/carbon/C as mob, var/list/spell_components)
-		var/obj/item/weapon/paper/target1_paper = spell_components["SOUTH"]
+		var/obj/item/paper/target1_paper = spell_components["SOUTH"]
 		var/mob/living/carbon/human/target = get_player_from_paper(target1_paper)
 		if(!target)
 			target = user

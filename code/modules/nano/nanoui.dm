@@ -95,8 +95,6 @@ nanoui is used to open and update nano browser uis
 		ref = nref
 
 	add_common_assets()
-	var/datum/asset/assets = get_asset_datum(/datum/asset/nanoui)
-	assets.send(user, ntemplate_filename)
 
 //Do not qdel nanouis. Use close() instead.
 /datum/nanoui/Destroy()
@@ -423,7 +421,14 @@ nanoui is used to open and update nano browser uis
 	if(status == STATUS_CLOSE)
 		return
 
-	user << browse(get_html(), "window=[window_id];[window_size][window_options]")
+	var/html = get_html()
+	var/list/templates_to_send = list()
+	for(var/template in templates)
+		templates_to_send += templates[template]
+	var/datum/asset/assets = get_asset_datum(/datum/asset/nanoui)
+	assets.send(user, templates_to_send)
+
+	user << browse(html, "window=[window_id];[window_size][window_options]")
 	winset(user, "mapwindow.map", "focus=true") // return keyboard focus to map
 	on_close_winset()
 	//onclose(user, window_id)

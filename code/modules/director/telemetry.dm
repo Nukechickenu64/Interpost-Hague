@@ -81,7 +81,7 @@
 	// Count powered vs unpowered APCs on station
 	var/powered = 0
 	var/total = 0
-	for(var/obj/machinery/power/apc/A in SSmachines.machinery)
+	for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)
 		if(!is_station_turf(get_turf(A)))
 			continue
 		total++

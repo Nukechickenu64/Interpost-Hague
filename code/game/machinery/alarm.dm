@@ -53,7 +53,7 @@
 	)
 
 /obj/machinery/alarm
-	name = "alarm"
+	name = "modcon unit"
 	icon = 'icons/obj/monitors.dmi'
 	icon_state = "alarm0"
 	anchored = 1
@@ -63,7 +63,6 @@
 	req_one_access = list(access_atmospherics, access_engine_equip)
 	clicksound = "button"
 	clickvol = 30
-	luminosity = 1
 
 	layer = ABOVE_WINDOW_LAYER
 
@@ -76,6 +75,8 @@
 	var/rcon_setting = 2
 	var/rcon_time = 0
 	var/locked = 1
+	var/output_pressure = ONE_ATMOSPHERE
+	var/obj/item/weapon/chemical_scrubber/cartridge
 	var/wiresexposed = 0 // If it's been screwdrivered open.
 	var/aidisabled = 0
 	var/shorted = 0
@@ -130,11 +131,14 @@
 /obj/machinery/alarm/server/New()
 	..()
 	req_access = list(access_rd, access_atmospherics, access_engine_equip)
-	TLV["temperature"] =	list(T0C-26, T0C, T0C+30, T0C+40) // K
+	TLV["temperature"] =	list(T0C-26, T0C-20, T0C+30, T0C+40) // K
 	target_temperature = T0C+10
 
 /obj/machinery/alarm/Destroy()
 	unregister_radio(src, frequency)
+	if(cartridge)
+		cartridge.forceMove(get_turf(src))
+		cartridge = null
 	qdel(wires)
 	wires = null
 	set_light(0)
@@ -161,8 +165,10 @@
 	. = ..()
 	alarm_area = get_area(src)
 	area_uid = alarm_area.uid
-	if (name == "alarm")
-		SetName("[alarm_area.name] Air Alarm")
+	if (name == "modcon unit")
+		SetName("[alarm_area.name] Modcon Unit")
+	if(buildstage == 2 && !cartridge)
+		cartridge = new(src)
 
 	if(!wires)
 		wires = new(src)
@@ -173,7 +179,7 @@
 	TLV["phoron"] =			list(-1.0, -1.0, 0.2, 0.5) // Partial pressure, kpa
 	TLV["other"] =			list(-1.0, -1.0, 0.5, 1.0) // Partial pressure, kpa
 	TLV["pressure"] =		list(ONE_ATMOSPHERE*0.80,ONE_ATMOSPHERE*0.90,ONE_ATMOSPHERE*1.10,ONE_ATMOSPHERE*1.20) /* kpa */
-	TLV["temperature"] =	list(T0C-26, T0C, T0C+40, T0C+66) // K
+	TLV["temperature"] =	list(T0C-26, T0C-20, T0C+40, T0C+66) // K
 
 	set_frequency(frequency)
 	if (!master_is_operating())
@@ -501,7 +507,7 @@
 	frequency.post_signal(src, alert_signal)
 
 /obj/machinery/alarm/attack_ai(mob/user)
-	ui_interact(user)
+	return interact(user)
 
 /obj/machinery/alarm/attack_hand(mob/user)
 	. = ..()
@@ -510,10 +516,88 @@
 	return interact(user)
 
 /obj/machinery/alarm/interact(mob/user)
-	ui_interact(user)
-	wires.Interact(user)
+	if(locked || (stat & (NOPOWER|BROKEN)))
+		to_chat(user, "<span class='warning'>The modcon controls are locked or offline.</span>")
+		return
+	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(src)
+	var/tank_status = tank ? tank.get_supply_status() : "offline"
+	var/text = "<div class='firstdivmood'><div class='compbox'><b>[name]</b><hr>"
+	text += "Supply: [tank && tank.air_contents ? "[round(tank.air_contents.return_pressure(), 0.1)] kPa ([tank_status ? tank_status : "online"])" : "offline"]<br>"
+	text += "Target: [round(output_pressure, 0.1)] kPa <a href='?src=\ref[src];modcon=pressure'>SET</a><br>"
+	text += "Chemical scrubber: [cartridge ? "[round(cartridge.integrity / cartridge.max_integrity * 100, 0.1)]%" : "missing"]<hr>"
+	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in alarm_area)
+		var/datum/gas_mixture/vent_air = vent.loc.return_air()
+		var/obj/machinery/station_gas_tank/vent_tank = get_station_gas_tank(vent)
+		var/obj/machinery/alarm/controller = vent.initial_loc ? vent.initial_loc.master_air_alarm : null
+		var/vent_status = vent.get_supply_status(vent_tank)
+		if(!vent_status)
+			if(vent.last_flow_rate > 0)
+				vent_status = "flowing"
+			else if(!isnum(vent_tank.supply_allocations[vent]) || vent_tank.supply_allocations[vent] < MINIMUM_MOLES_TO_PUMP)
+				vent_status = "waiting for shared tank allowance"
+			else
+				vent_status = "awaiting vent cycle"
+		text += "[vent.name]: target [controller ? "[round(controller.output_pressure, 0.1)] kPa" : "offline"], actual [vent_air ? "[round(vent_air.return_pressure(), 0.1)] kPa" : "offline"], output [round(vent.last_flow_rate, 0.1)] mol/cycle ([vent_status])<br>"
+	to_chat(user, "[text]</div></div>")
+
+/obj/machinery/alarm/Topic(href, href_list)
+	if(href_list["modcon"] == "pressure")
+		if(locked || (stat & (NOPOWER|BROKEN)) || get_dist(usr, src) > 1 || !allowed(usr))
+			return
+		var/new_pressure = input(usr, "Area vent pressure target (kPa)", "Modcon", output_pressure) as null|num
+		if(isnum_safe(new_pressure) && !locked && get_dist(usr, src) <= 1 && allowed(usr))
+			output_pressure = between(0, new_pressure, MAX_PUMP_PRESSURE)
+			interact(usr)
+		return
+	return ..()
+
+/obj/machinery/alarm/proc/can_supply_air()
+	return buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted && mode != AALARM_MODE_OFF && mode != AALARM_MODE_PANIC && mode != AALARM_MODE_CYCLE
+
+/obj/item/weapon/chemical_scrubber
+	name = "chemical scrubber"
+	desc = "A replaceable filter cartridge for a modcon unit."
+	icon = 'icons/obj/items.dmi'
+	var/max_integrity = 10000
+	var/integrity = 10000
+
+/obj/machinery/alarm/proc/scrub_efficiency()
+	if(buildstage != 2 || (stat & (NOPOWER|BROKEN)) || shorted || !cartridge || !cartridge.max_integrity)
+		return 0
+	return between(0, cartridge.integrity / cartridge.max_integrity, 1)
+
+/obj/machinery/alarm/proc/wear_scrubber(moles)
+	if(cartridge && moles > 0)
+		cartridge.integrity = max(0, cartridge.integrity - moles / 1000)
+
+/obj/machinery/alarm/proc/recover_air(obj/machinery/station_gas_tank/tank, datum/gas_mixture/environment, requested_moles)
+	var/efficiency = scrub_efficiency()
+	if(mode == AALARM_MODE_OFF || !efficiency || !tank || !environment || !tank.air_contents || !tank.enabled || (tank.stat & (NOPOWER|BROKEN)) || environment.temperature <= 0 || environment.total_moles <= 0)
+		return 0
+	var/clean_fraction = (environment.get_gas(GAS_OXYGEN) + environment.get_gas(GAS_NITROGEN)) / environment.total_moles
+	if(clean_fraction <= 0)
+		return 0
+	var/max_temperature = max(tank.air_contents.temperature, environment.temperature)
+	var/capacity = max(0, tank.max_pressure * tank.air_contents.volume * tank.air_contents.group_multiplier / (R_IDEAL_GAS_EQUATION * max_temperature) - tank.air_contents.total_moles)
+	var/sample_moles = min(requested_moles * efficiency, environment.total_moles * environment.group_multiplier, capacity / clean_fraction)
+	if(sample_moles * clean_fraction < MINIMUM_MOLES_TO_PUMP)
+		return 0
+	var/datum/gas_mixture/sample = environment.remove(sample_moles)
+	var/discarded_moles = 0
+	for(var/gas in sample.gas.Copy())
+		if(gas != GAS_OXYGEN && gas != GAS_NITROGEN)
+			var/contaminant_moles = sample.get_gas(gas)
+			discarded_moles += contaminant_moles
+			sample.adjust_gas(gas, -contaminant_moles)
+	var/recovered_moles = tank.receive_gas(sample, sample.total_moles)
+	environment.merge(sample)
+	qdel(sample)
+	wear_scrubber(discarded_moles)
+	return recovered_moles + discarded_moles
 
 /obj/machinery/alarm/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 0)
+	if(locked)
+		return
 	var/data[0]
 	var/remote_connection = 0
 	var/remote_access = 0
@@ -653,6 +737,8 @@
 	return min(..(), .)
 
 /obj/machinery/alarm/OnTopic(user, href_list, var/datum/topic_state/state)
+	if(locked)
+		return TOPIC_HANDLED
 	// hrefs that can always be called -walter0o
 	if(href_list["rcon"])
 		var/attempted_rcon_setting = text2num(href_list["rcon"])
@@ -800,6 +886,18 @@
 /obj/machinery/alarm/attackby(obj/item/W as obj, mob/user as mob)
 	switch(buildstage)
 		if(2)
+			if(istype(W, /obj/item/weapon/chemical_scrubber))
+				if(locked || !allowed(user))
+					to_chat(user, "<span class='warning'>Unlock the modcon to replace its scrubber.</span>")
+					return
+				var/obj/item/weapon/chemical_scrubber/replacement = W
+				user.drop_item()
+				if(cartridge)
+					cartridge.forceMove(get_turf(src))
+				replacement.forceMove(src)
+				cartridge = replacement
+				to_chat(user, "<span class='notice'>You install the chemical scrubber.</span>")
+				return
 			if(isScrewdriver(W))  // Opening that Air Alarm up.
 //				to_chat(user, "You pop the Air Alarm's maintence panel open.")
 				wiresexposed = !wiresexposed
@@ -815,14 +913,14 @@
 				update_icon()
 				return
 
-			if (istype(W, /obj/item/weapon/card/id) || istype(W, /obj/item/device/pda))// trying to unlock the interface with an ID card
+			if (istype(W, /obj/item/card/id) || istype(W, /obj/item/device/pda))// trying to unlock the interface with an ID card
 				if(stat & (NOPOWER|BROKEN))
 					to_chat(user, "It does nothing")
 					return
 				else
 					if(allowed(usr) && !wires.IsIndexCut(AALARM_WIRE_IDSCAN))
 						locked = !locked
-						to_chat(user, "<span class='notice'>You [ locked ? "lock" : "unlock"] the Air Alarm interface.</span>")
+						to_chat(user, "<span class='notice'>You [ locked ? "lock" : "unlock"] the modcon controls.</span>")
 					else
 						to_chat(user, "<span class='warning'>Access denied.</span>")
 			return
@@ -844,13 +942,13 @@
 				playsound(src.loc, 'sound/items/Crowbar.ogg', 50, 1)
 				if(do_after(user,20) && buildstage == 1)
 					to_chat(user, "You pry out the circuit!")
-					var/obj/item/weapon/airalarm_electronics/circuit = new /obj/item/weapon/airalarm_electronics()
+					var/obj/item/airalarm_electronics/circuit = new /obj/item/airalarm_electronics()
 					circuit.dropInto(user.loc)
 					buildstage = 0
 					update_icon()
 				return
 		if(0)
-			if(istype(W, /obj/item/weapon/airalarm_electronics))
+			if(istype(W, /obj/item/airalarm_electronics))
 				to_chat(user, "You insert the circuit!")
 				qdel(W)
 				buildstage = 1
@@ -875,7 +973,7 @@
 AIR ALARM CIRCUIT
 Just a object used in constructing air alarms
 */
-/obj/item/weapon/airalarm_electronics
+/obj/item/airalarm_electronics
 	name = "air alarm electronics"
 	icon = 'icons/obj/doors/door_assembly.dmi'
 	icon_state = "door_electronics"
@@ -1004,12 +1102,12 @@ FIRE ALARM
 					to_chat(user, "You pry out the circuit!")
 					playsound(src.loc, 'sound/items/Crowbar.ogg', 50, 1)
 					spawn(20)
-						var/obj/item/weapon/firealarm_electronics/circuit = new /obj/item/weapon/firealarm_electronics()
+						var/obj/item/firealarm_electronics/circuit = new /obj/item/firealarm_electronics()
 						circuit.dropInto(user.loc)
 						buildstage = 0
 						update_icon()
 			if(0)
-				if(istype(W, /obj/item/weapon/firealarm_electronics))
+				if(istype(W, /obj/item/firealarm_electronics))
 					to_chat(user, "You insert the circuit!")
 					qdel(W)
 					buildstage = 1
@@ -1168,7 +1266,7 @@ FIRE ALARM
 FIRE ALARM CIRCUIT
 Just a object used in constructing fire alarms
 */
-/obj/item/weapon/firealarm_electronics
+/obj/item/firealarm_electronics
 	name = "fire alarm electronics"
 	icon = 'icons/obj/doors/door_assembly.dmi'
 	icon_state = "door_electronics"

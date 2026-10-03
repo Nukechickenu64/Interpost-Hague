@@ -26,7 +26,7 @@
 
 /area/Initialize()
 	. = ..()
-	if(!requires_power || !apc)
+	if(!requires_power || !area_smes)
 		power_light = 0
 		power_equip = 0
 		power_environ = 0
@@ -269,10 +269,9 @@ var/list/mob/living/forced_ambiance_list = new
 		to_chat(mob, "<span class='notice'>The sudden appearance of gravity makes you fall to the floor!</span>")
 
 /area/proc/prison_break()
-	var/obj/machinery/power/apc/theAPC = get_apc()
-	if(theAPC && theAPC.operating)
-		for(var/obj/machinery/power/apc/temp_apc in src)
-			temp_apc.overload_lighting(70)
+	var/obj/machinery/power/area_smes/smes = get_area_smes()
+	if(smes && smes.operating)
+		smes.overload_lighting(70)
 		for(var/obj/machinery/door/airlock/temp_airlock in src)
 			temp_airlock.prison_open()
 		for(var/obj/machinery/door/window/temp_windoor in src)

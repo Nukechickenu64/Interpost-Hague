@@ -143,8 +143,8 @@
 	icon_state = "checkered_jacket"
 
 /obj/item/clothing/accessory/toggleable/nanotrasen_jacket
-	name = "\improper TetraCorp suit jacket"
-	desc = "A jacket that TetraCorp has its executives wear."
+	name = "\improper Nanotrasen suit jacket"
+	desc = "A jacket that Nanotrasen has its executives wear."
 	icon_state = "nt_jacket"
 
 /obj/item/clothing/accessory/toggleable/hawaii

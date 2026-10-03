@@ -10,7 +10,7 @@
 	throwforce = 3
 	force = 3
 	w_class = ITEM_SIZE_TINY
-	var/obj/item/weapon/reagent_containers/syringe/syringe
+	var/obj/item/reagent_containers/syringe/syringe
 
 /obj/item/weapon/syringe_cartridge/update_icon()
 	underlays.Cut()
@@ -19,7 +19,7 @@
 		underlays += syringe.filling
 
 /obj/item/weapon/syringe_cartridge/attackby(obj/item/I, mob/user)
-	if(istype(I, /obj/item/weapon/reagent_containers/syringe))
+	if(istype(I, /obj/item/reagent_containers/syringe))
 		syringe = I
 		to_chat(user, "<span class='notice'>You carefully insert [syringe] into [src].</span>")
 		user.remove_from_mob(syringe)
@@ -62,8 +62,8 @@
 	update_icon()
 
 /obj/item/weapon/gun/launcher/syringe
-	name = "syringe gun"
-	desc = "A spring loaded rifle designed to fit syringes, designed to incapacitate unruly patients from a distance."
+	name = "\improper Zeng-Hu Pharmaceutical SP-1 Syringe Projector"
+	desc = "A spring-loaded medical projector that launches fitted syringes for remote treatment or restraint."
 	icon_state = "syringegun"
 	item_state = "syringegun"
 	w_class = ITEM_SIZE_LARGE
@@ -131,15 +131,15 @@
 		..()
 
 /obj/item/weapon/gun/launcher/syringe/rapid
-	name = "syringe gun revolver"
-	desc = "A modification of the syringe gun design, using a rotating cylinder to store up to five syringes. The spring still needs to be drawn between shots."
+	name = "\improper Zeng-Hu Pharmaceutical SP-5 Rotary Syringe Projector"
+	desc = "An SP-1 variant with a five-syringe rotating magazine. Its spring mechanism must be cocked between shots."
 	icon_state = "rapidsyringegun"
 	item_state = "rapidsyringegun"
 	max_darts = 5
 
 /obj/item/weapon/gun/launcher/syringe/disguised
-	name = "deluxe electronic cigarette"
-	desc = "A premium model eGavana MK3 electronic cigarette, shaped like a cigar."
+	name = "\improper NanoTrasen eGavana MK3 Electronic Cigarette"
+	desc = "A premium, cigar-shaped electronic cigarette concealing a spring-loaded syringe projector."
 	icon = 'icons/obj/ecig.dmi'
 	icon_state = "pcigoff1"
 	item_state = "pcigoff1"

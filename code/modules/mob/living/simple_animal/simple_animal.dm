@@ -252,7 +252,7 @@
 	var/damage = O.force
 	if (O.damtype == PAIN)
 		damage = 0
-	if(supernatural && istype(O,/obj/item/weapon/nullrod))
+	if(supernatural && istype(O,/obj/item/nullrod))
 		damage *= 2
 		purge = 3
 	adjustBruteLoss(damage)

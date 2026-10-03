@@ -2,51 +2,77 @@
 Title: Leverage Shop, the persistent meta-currency shop.
 Used In File(s): \code\modules\economy\meta_shop.dm
 -->
-<H2><span class="white">Leverage Exchange</span></H2>
-<div class="item">
-	<div class="itemLabelNarrow">
-		<b>Balance</b>:
+<style>
+	.metaShop { line-height: 1.5; }
+	.metaShopHeader { display: table; width: 100%; border-bottom: 1px solid #4a4035; padding-bottom: 12px; }
+	.metaShopHeader h2 { display: table-cell; vertical-align: middle; padding: 0; font-size: 18px; }
+	.metaShopBalance { display: table-cell; width: 130px; text-align: right; vertical-align: middle; }
+	.metaShopBalance strong { display: block; color: #f0cf84; font-size: 22px; line-height: 1.2; }
+	.metaShopTabs { padding: 12px 0; overflow: hidden; }
+	.metaShopTabs .link, .metaShopTabs .selected { margin-bottom: 6px; }
+	.metaShopMessage { padding: 8px 0; margin-bottom: 8px; border-bottom: 1px solid #4a4035; }
+	.metaShopCatalog { width: 100%; table-layout: fixed; border-collapse: collapse; }
+	.metaShopCatalog td { padding: 12px 6px; vertical-align: top; border-bottom: 1px solid #383229; }
+	.metaShopCatalog .metaShopArt { width: 40px; padding-left: 0; }
+	.metaShopArt img { width: 32px; height: 32px; image-rendering: pixelated; }
+	.metaShopCatalog .metaShopPurchase { width: 106px; text-align: right; padding-right: 0; }
+	.metaShopPurchase .link, .metaShopPurchase .disabled { float: right; margin: 6px 0 0; }
+	.metaShopName { font-size: 14px; color: #e0d9cd; font-weight: bold; }
+	.metaShopDescription { margin-top: 4px; }
+	.metaShopDelivery { margin-top: 6px; color: #8f8b82; font-size: 11px; }
+	.metaShopRestriction { clear: both; padding-top: 6px; color: #d05b46; font-size: 11px; }
+	.metaShopPrice { color: #f0cf84; font-weight: bold; }
+	.metaShopPending { width: 100%; table-layout: fixed; border-collapse: collapse; }
+	.metaShopPending td { padding: 6px 0; border-bottom: 1px solid #383229; }
+	.metaShopPending .metaShopQuantity { width: 48px; text-align: right; color: #f0cf84; }
+	.metaShopEmpty { color: #8f8b82; padding: 10px 0; }
+	.metaShopDescription, .metaShopName, .metaShopRestriction, .metaShopPending td { word-wrap: break-word; }
+	@media (max-width: 440px) {
+		.metaShopCatalog .metaShopArt { display: none; }
+		.metaShopHeader h2 { font-size: 15px; }
+		.metaShopBalance { width: 95px; }
+		.metaShopCatalog .metaShopPurchase { width: 90px; }
+	}
+</style>
+<div class="metaShop">
+	<div class="metaShopHeader">
+		<h2>Leverage Exchange</h2>
+		<div class="metaShopBalance"><strong>{{:data.leverage}}</strong>Leverage</div>
 	</div>
-	<div class="itemContent">
-		{{:data.leverage}} Leverage
+	<div class="metaShopTabs">
+		{{:helper.link('Gear', 'gear', {'meta_shop_category': 'items'}, data.category == 'items' ? 'selected' : null)}}
+		{{:helper.link('Shift Modifiers', 'plus', {'meta_shop_category': 'modifiers'}, data.category == 'modifiers' ? 'selected' : null)}}
+		{{:helper.link('Antagonist Role', 'alert', {'meta_shop_category': 'antag'}, data.category == 'antag' ? 'selected' : null)}}
 	</div>
+	{{if data.message}}
+		<div class="metaShopMessage {{:data.error ? 'bad' : 'good'}}">{{:data.message}}</div>
+	{{/if}}
+	<table class="metaShopCatalog">
+		{{for data.items}}
+			<tr>
+				<td class="metaShopArt">{{:value.preview}}</td>
+				<td>
+					<div class="metaShopName">{{:value.name}}</div>
+					<div class="metaShopDescription">{{:value.desc}}</div>
+					<div class="metaShopDelivery">{{:value.delivery}}</div>
+				</td>
+				<td class="metaShopPurchase">
+					<div class="metaShopPrice">{{:value.cost}} Leverage</div>
+					{{:helper.link('Buy', 'cart', {'meta_shop_buy': value.ref}, value.can_buy ? null : 'disabled')}}
+					{{if value.restriction}}<div class="metaShopRestriction">{{:value.restriction}}</div>{{/if}}
+				</td>
+			</tr>
+		{{/for}}
+	</table>
+	{{if data.items.length == 0}}<div class="metaShopEmpty">Nothing available in this category.</div>{{/if}}
+	<h2>Awaiting Collection ({{:data.pending_count}})</h2>
+	{{if data.pending_count}}
+		<table class="metaShopPending">
+			{{for data.pending}}
+				<tr><td>{{:value.name}}</td><td class="metaShopQuantity">x{{:value.quantity}}</td></tr>
+			{{/for}}
+		</table>
+	{{else}}
+		<div class="metaShopEmpty">No unclaimed gear.</div>
+	{{/if}}
 </div>
-<br>
-<div class="item">
-	<div class="itemLabelNarrow">
-		<b>Categories</b>:
-	</div>
-	<div class="itemContent">
-		{{if data.category == 'items'}}
-			{{:helper.link('Items', 'gear', {'meta_shop_category' : 'items'}, 'disabled')}}
-		{{else}}
-			{{:helper.link('Items', 'gear', {'meta_shop_category' : 'items'})}}
-		{{/if}}
-		{{if data.category == 'modifiers'}}
-			{{:helper.link('Shift Modifiers', 'gear', {'meta_shop_category' : 'modifiers'}, 'disabled')}}
-		{{else}}
-			{{:helper.link('Shift Modifiers', 'gear', {'meta_shop_category' : 'modifiers'})}}
-		{{/if}}
-		{{if data.category == 'antag'}}
-			{{:helper.link('Antagonist Role', 'gear', {'meta_shop_category' : 'antag'}, 'disabled')}}
-		{{else}}
-			{{:helper.link('Antagonist Role', 'gear', {'meta_shop_category' : 'antag'})}}
-		{{/if}}
-	</div>
-</div>
-<br>
-
-<H2>For Sale:</H2>
-{{for data.items}}
-	<div class="item">
-		{{:helper.link(value.name, 'gear', {'meta_shop_buy' : value.ref}, value.can_buy ? null : 'disabled')}} - {{:value.cost}} Leverage
-	</div>
-	<div class="item">
-		{{:value.desc}}
-	</div>
-{{/for}}
-{{if data.items.length == 0}}
-	<div class="item">
-		Nothing available in this category.
-	</div>
-{{/if}}

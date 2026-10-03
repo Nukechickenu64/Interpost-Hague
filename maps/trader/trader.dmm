@@ -374,8 +374,8 @@
 	icon_state = "rwindow";
 	 dir = 8
 	},
-/obj/item/weapon/paper_bin,
-/obj/item/weapon/pen,
+/obj/item/paper_bin,
+/obj/item/pen,
 /turf/simulated/floor/wood,
 /area/space)
 "br" = (
@@ -425,8 +425,8 @@
 /obj/machinery/door/firedoor,
 /obj/effect/floor_decal/newcorner/yellow/diagonal,
 /obj/structure/table/steel_reinforced,
-/obj/item/weapon/paper_bin,
-/obj/item/weapon/pen,
+/obj/item/paper_bin,
+/obj/item/pen,
 /obj/structure/window/reinforced{
 	icon_state = "rwindow";
 	 dir = 1
@@ -1031,7 +1031,7 @@
 /area/space)
 "cZ" = (
 /obj/structure/table/steel,
-/obj/item/weapon/storage/box/cups,
+/obj/item/storage/box/cups,
 /turf/simulated/floor/tiled,
 /area/space)
 "da" = (
@@ -2471,7 +2471,7 @@
 	icon_state = "warning";
 	 dir = 8
 	},
-/obj/item/weapon/storage/firstaid/regular,
+/obj/item/storage/firstaid/regular,
 /turf/simulated/floor/tiled/freezer,
 /area/space)
 "gM" = (
@@ -2481,9 +2481,9 @@
 	 pixel_x = 11;
 	 pixel_y = 0
 	},
-/obj/item/weapon/reagent_containers/glass/bottle/stoxin,
-/obj/item/weapon/reagent_containers/glass/bottle/stoxin,
-/obj/item/weapon/reagent_containers/syringe,
+/obj/item/reagent_containers/glass/bottle/stoxin,
+/obj/item/reagent_containers/glass/bottle/stoxin,
+/obj/item/reagent_containers/syringe,
 /obj/item/clothing/mask/surgical,
 /obj/item/clothing/gloves/latex,
 /obj/item/weapon/surgicaldrill,
@@ -2492,7 +2492,7 @@
 	 pixel_y = 0;
 	 req_access = list(150)
 	},
-/obj/item/weapon/reagent_containers/syringe/antiviral,
+/obj/item/reagent_containers/syringe/antiviral,
 /obj/effect/floor_decal/industrial/warning{
 	dir = 4
 	},
@@ -2673,7 +2673,7 @@
 /area/space)
 "hn" = (
 /obj/structure/table/gamblingtable,
-/obj/item/weapon/reagent_containers/food/condiment/small/peppermill,
+/obj/item/reagent_containers/food/condiment/small/peppermill,
 /turf/simulated/floor/tiled/bar,
 /area/space)
 "ho" = (
@@ -2696,7 +2696,7 @@
 /area/space)
 "hr" = (
 /obj/structure/table/gamblingtable,
-/obj/item/weapon/reagent_containers/food/condiment/small/saltshaker,
+/obj/item/reagent_containers/food/condiment/small/saltshaker,
 /turf/simulated/floor/carpet/red,
 /area/space)
 "hs" = (
@@ -2727,7 +2727,7 @@
 /area/space)
 "hy" = (
 /obj/structure/table/gamblingtable,
-/obj/item/weapon/reagent_containers/food/condiment/small/peppermill,
+/obj/item/reagent_containers/food/condiment/small/peppermill,
 /turf/simulated/floor/carpet/red,
 /area/space)
 "hz" = (

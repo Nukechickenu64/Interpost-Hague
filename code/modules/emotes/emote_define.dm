@@ -72,7 +72,7 @@
 			use_3p = get_emote_message_3p(user, null, extra_params)
 		use_3p = replacetext(use_3p, "USER_THEM", user_gender.him)
 		use_3p = replacetext(use_3p, "USER_THEIR", user_gender.his)
-		use_3p = replacetext(use_3p, "USER", "<span class='examinebold'><b>\the [user]</b></span>")
+		use_3p = replacetext(use_3p, "USER", "<span class='emote_speaker'><b>\the [user]</b></span>")
 		use_3p = capitalize(use_3p)
 
 	if(message_type == AUDIBLE_MESSAGE)

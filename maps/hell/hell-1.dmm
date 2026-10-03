@@ -180,7 +180,7 @@
 /turf/simulated/floor/carpet/red,
 /area/exoplanet)
 "aU" = (
-/obj/item/weapon/reagent_containers/glass/bucket/wood,
+/obj/item/reagent_containers/glass/bucket/wood,
 /turf/simulated/floor/asteroid,
 /area/exoplanet)
 "aV" = (

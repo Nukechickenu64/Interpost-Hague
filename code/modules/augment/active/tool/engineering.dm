@@ -3,10 +3,10 @@
 	action_button_name = "Deploy engineering tool"
 	desc = "A heavy duty augmentation for the discerning engineer. This one comes with a series of common tools"
 	paths = list(
-		/obj/item/weapon/screwdriver,
-		/obj/item/weapon/wrench,
-		/obj/item/weapon/weldingtool,
-		/obj/item/weapon/crowbar,
+		/obj/item/screwdriver,
+		/obj/item/wrench,
+		/obj/item/weldingtool,
+		/obj/item/crowbar,
 		/obj/item/device/analyzer,
-		/obj/item/weapon/wirecutters
+		/obj/item/wirecutters
 	)

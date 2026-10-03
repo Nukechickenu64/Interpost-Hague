@@ -3,7 +3,7 @@
 ****************************************************/
 
 /mob/living/carbon/human/var/datum/reagents/vessel // Container for blood and BLOOD ONLY. Do not transfer other chems here.
-/mob/living/carbon/human/var/var/pale = 0			//Should affect how mob sprite is drawn, but currently doesn't.
+/mob/living/carbon/human/var/var/pale = 0
 
 //Initializes blood vessels
 /mob/living/carbon/human/proc/make_blood()
@@ -101,7 +101,7 @@
 		return 0
 	var/removed = vessel.remove_reagent(/datum/reagent/blood, amt * (src.mob_size/MOB_MEDIUM))
 	if(removed && stat != DEAD)
-		shock_stage = min(160, shock_stage + round((removed / species.blood_volume) * 100))
+		shock_stage = min(160, shock_stage + (removed / species.blood_volume) * 100)
 	return removed
 
 /****************************************************
@@ -109,7 +109,7 @@
 ****************************************************/
 
 //Gets blood from mob to the container, preserving all data in it.
-/mob/living/carbon/proc/take_blood(obj/item/weapon/reagent_containers/container, var/amount)
+/mob/living/carbon/proc/take_blood(obj/item/reagent_containers/container, var/amount)
 	var/datum/reagent/blood/B = get_blood(container.reagents)
 	if(!B)
 		B = new /datum/reagent/blood
@@ -121,7 +121,7 @@
 	return 1
 
 //For humans, blood does not appear from blue, it comes from vessels.
-/mob/living/carbon/human/take_blood(obj/item/weapon/reagent_containers/container, var/amount)
+/mob/living/carbon/human/take_blood(obj/item/reagent_containers/container, var/amount)
 
 	if(!should_have_organ(BP_HEART))
 		reagents.trans_to_obj(container, amount)

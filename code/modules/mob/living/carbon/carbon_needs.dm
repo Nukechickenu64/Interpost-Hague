@@ -110,7 +110,107 @@
 		var/spoopysound = pick('sound/effects/badmood1.ogg','sound/effects/badmood2.ogg','sound/effects/badmood3.ogg','sound/effects/badmood4.ogg')
 		sound_to(src, spoopysound)
 
+/mob/living/carbon/human
+	var/sanity_crisis_active = FALSE
+	var/sanity_crisis_resolved = FALSE
+	var/sanity_crisis_deadline = 0
+	var/sanity_crisis_started_at = 0
+	var/sanity_crisis_objective = 0
+	var/insanity_active = FALSE
+
+/mob/living/carbon/human/proc/update_sanity_crisis()
+	if(insanity_active)
+		if(chem_effects[CE_MIND] > 0)
+			insanity_active = FALSE
+			sanity_crisis_resolved = TRUE
+			to_chat(src, "<span class='notice'>Your thoughts begin to settle.</span>")
+		else
+			hallucination(20, 10)
+
+	if(happiness > MOOD_LEVEL_SAD4)
+		if(sanity_crisis_active)
+			sanity_crisis_active = FALSE
+			sanity_crisis_deadline = 0
+			sanity_crisis_started_at = 0
+			sanity_crisis_objective = 0
+			to_chat(src, "<span class='notice'>The urgent thoughts pass as your mood improves.</span>")
+		if(!insanity_active)
+			sanity_crisis_resolved = FALSE
+		return
+
+	if(insanity_active || sanity_crisis_resolved)
+		return
+
+	if(sanity_crisis_active)
+		if(world.time < sanity_crisis_deadline)
+			return
+		insanity_active = TRUE
+		sanity_crisis_active = FALSE
+		sanity_crisis_deadline = 0
+		sanity_crisis_started_at = 0
+		sanity_crisis_objective = 0
+		hallucination(20, 10)
+		to_chat(src, "<span class='danger'>The thoughts overwhelm you. Your grip on reality begins to fracture.</span>")
+		return
+
+	sanity_crisis_active = TRUE
+	sanity_crisis_deadline = world.time + (5 MINUTES)
+	sanity_crisis_started_at = world.time
+	sanity_crisis_objective = pick(SANITY_CRISIS_SELF_HARM, SANITY_CRISIS_HARM_OTHER, SANITY_CRISIS_CREATE_ART)
+	switch(sanity_crisis_objective)
+		if(SANITY_CRISIS_SELF_HARM)
+			to_chat(src, "<span class='warning'>You have five minutes to steady yourself: deliberately hurt yourself.</span>")
+		if(SANITY_CRISIS_HARM_OTHER)
+			to_chat(src, "<span class='warning'>You have five minutes to steady yourself: hurt someone else.</span>")
+		if(SANITY_CRISIS_CREATE_ART)
+			to_chat(src, "<span class='warning'>You have five minutes to steady yourself: create a canvas artwork and have someone else examine it deeply.</span>")
+			var/turf/T = get_turf(src)
+			if(T)
+				new /obj/item/frame/canvas(T)
+
+/mob/living/carbon/human/proc/complete_sanity_crisis(var/objective)
+	if(!sanity_crisis_active || sanity_crisis_objective != objective)
+		return FALSE
+	if(world.time >= sanity_crisis_deadline)
+		insanity_active = TRUE
+		sanity_crisis_active = FALSE
+		sanity_crisis_deadline = 0
+		sanity_crisis_started_at = 0
+		sanity_crisis_objective = 0
+		hallucination(20, 10)
+		to_chat(src, "<span class='danger'>The thoughts overwhelm you. Your grip on reality begins to fracture.</span>")
+		return FALSE
+
+	sanity_crisis_active = FALSE
+	sanity_crisis_resolved = TRUE
+	sanity_crisis_deadline = 0
+	sanity_crisis_started_at = 0
+	sanity_crisis_objective = 0
+	to_chat(src, "<span class='notice'>You complete the task and hold on to your sense of reality.</span>")
+	return TRUE
+
+/mob/living/carbon/human/verb/harm_self_for_sanity()
+	set name = "Harm Yourself"
+	set category = "IC"
+	set desc = "Complete an urgent task by causing yourself a minor injury."
+	if(!sanity_crisis_active || sanity_crisis_objective != SANITY_CRISIS_SELF_HARM)
+		to_chat(src, "<span class='warning'>You have no reason to hurt yourself.</span>")
+		return
+
+	var/damage_before = getBruteLoss() + getFireLoss()
+	take_organ_damage(1)
+	if(getBruteLoss() + getFireLoss() <= damage_before)
+		to_chat(src, "<span class='warning'>You fail to injure yourself.</span>")
+		return
+
+	visible_message("<span class='danger'>[src] hurts themselves.</span>")
+	complete_sanity_crisis(SANITY_CRISIS_SELF_HARM)
+
 /mob/living/carbon/proc/handle_happiness()
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		H.update_sanity_crisis()
+
 	if(happiness > MOOD_LEVEL_SAD4)
 		if(horror_loop)
 			to_chat(src, "<span class='phobia'>My nerves relax some... I can think clearly again...</span>")

@@ -20,6 +20,9 @@ GLOBAL_VAR_INIT(infinite_station_power, FALSE)
 // Inter-round persistent admin toggle: resets the supermatter to 100% integrity and deactivates it instead of letting it explode.
 GLOBAL_VAR_INIT(smsafemode, FALSE)
 
+// Inter-round persistent admin toggle: when on, the round may start without a Captain.
+GLOBAL_VAR_INIT(role_debug_mode, FALSE)
+
 // Database connections. A connection is established on world creation.
 // Ideally, the connection dies when the server restarts (After feedback logging.).
 var/DBConnection/dbcon     = new() // Feedback    database (New database)

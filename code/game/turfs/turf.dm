@@ -115,8 +115,8 @@
 	return 1
 
 turf/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/storage))
-		var/obj/item/weapon/storage/S = W
+	if(istype(W, /obj/item/storage))
+		var/obj/item/storage/S = W
 		if(S.use_to_pickup && S.collection_mode)
 			S.gather_all(src, user)
 	return ..()
@@ -191,6 +191,14 @@ var/const/enterloopsanity = 100
 		return
 
 	var/atom/movable/A = atom
+
+	// Items leaving inventory/storage outside remove_from_mob() keep HUD_PLANE and would draw over LOS
+	if(isobj(A) && A.plane > SHADOWCASTING_PLANE && !istype(A, /obj/screen))
+		A.reset_plane_and_layer()
+
+	// Wall-mount offsets feed LOS occluder cutouts
+	if(isobj(A) && A.anchored && (A.pixel_x || A.pixel_y))
+		shadowcast_queue_invalidate(src)
 
 	if(ismob(A))
 		var/mob/M = A

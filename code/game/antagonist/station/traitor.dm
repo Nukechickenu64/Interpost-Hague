@@ -1,5 +1,9 @@
 GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 
+/datum/mind
+	var/traitor_plant_uplink_pending = FALSE
+	var/traitor_plant_uplink_claimed = FALSE
+
 // Inherits most of its vars from the base datum.
 /datum/antagonist/traitor
 	id = MODE_TRAITOR
@@ -62,12 +66,11 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 				steal_objective.find_target()
 				traitor.objectives += steal_objective
 		switch(rand(1,100))
-			if(1 to 100)
+			if(1 to 80)
 				if (!(locate(/datum/objective/escape) in traitor.objectives))
 					var/datum/objective/escape/escape_objective = new
 					escape_objective.owner = traitor
 					traitor.objectives += escape_objective
-
 			else
 				if (!(locate(/datum/objective/hijack) in traitor.objectives))
 					var/datum/objective/hijack/hijack_objective = new
@@ -87,7 +90,9 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 	if(!..())
 		return 0
 
-	spawn_uplink(traitor_mob)
+	if(!traitor_mob.mind.traitor_plant_uplink_claimed)
+		traitor_mob.mind.traitor_plant_uplink_pending = TRUE
+		to_chat(traitor_mob, "<span class='notice'>Your loaded uplink is hidden in a plant. Right-click any plant to collect it.</span>")
 	give_intel(traitor_mob)
 
 /datum/antagonist/traitor/proc/give_intel(mob/living/traitor_mob)

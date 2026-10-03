@@ -30,7 +30,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 /proc/isflamesource(A)
 	if(isWelder(A))
-		var/obj/item/weapon/weldingtool/WT = A
+		var/obj/item/weldingtool/WT = A
 		return (WT.isOn())
 	else if(istype(A, /obj/item/weapon/flame))
 		var/obj/item/weapon/flame/F = A
@@ -379,7 +379,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		return 1
 	return ..()
 
-/obj/item/clothing/mask/smokable/cigarette/afterattack(obj/item/weapon/reagent_containers/glass/glass, var/mob/user, proximity)
+/obj/item/clothing/mask/smokable/cigarette/afterattack(obj/item/reagent_containers/glass/glass, var/mob/user, proximity)
 	..()
 	if(!proximity)
 		return
@@ -497,7 +497,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	w_class = ITEM_SIZE_TINY
 
 //tobacco sold seperately if you're too snobby to grow it yourself.
-/obj/item/weapon/reagent_containers/terrbacco
+/obj/item/reagent_containers/terrbacco
 	name = "tobacco"
 	desc = "A wad of carefully cured and dried tobacco. Ground into a mess."
 	icon = 'icons/obj/clothing/masks.dmi'
@@ -507,16 +507,16 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	var/dry = 1
 	var/list/filling = list(/datum/reagent/tobacco = 5)
 
-/obj/item/weapon/reagent_containers/terrbacco/New()
+/obj/item/reagent_containers/terrbacco/New()
 	..()
 	for(var/R in filling)
 		reagents.add_reagent(R, filling[R])
 
-/obj/item/weapon/reagent_containers/terrbacco/bad
+/obj/item/reagent_containers/terrbacco/bad
 	desc = "A wad of carefully cured and dried tobacco. Ground into a coarse mess."
 	filling = list(/datum/reagent/tobacco/bad = 5)
 
-/obj/item/weapon/reagent_containers/terrbacco/fine
+/obj/item/reagent_containers/terrbacco/fine
 	desc = "A wad of carefully cured and dried tobacco. Ground into a fine mess."
 	filling = list(/datum/reagent/tobacco/fine = 5)
 
@@ -524,8 +524,8 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 /obj/item/paper/cig/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/food/snacks/grown))
-		var/obj/item/weapon/reagent_containers/food/snacks/grown/G = target
+	if(istype(target, /obj/item/reagent_containers/food/snacks/grown))
+		var/obj/item/reagent_containers/food/snacks/grown/G = target
 		if(G.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -541,11 +541,11 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		..()
 
 //and if you are a savage you can just use a sheet of ordinary paper.
-/obj/item/weapon/paper/afterattack(atom/target, mob/user, proximity)
+/obj/item/paper/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/food/snacks/grown))
-		var/obj/item/weapon/reagent_containers/food/snacks/grown/G = target
+	if(istype(target, /obj/item/reagent_containers/food/snacks/grown))
+		var/obj/item/reagent_containers/food/snacks/grown/G = target
 		if(G.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -561,11 +561,11 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		..()
 
 //and finally a use for those magic scrolls that are left over from wizard antags.
-/obj/item/weapon/teleportation_scroll/afterattack(atom/target, mob/user, proximity)
+/obj/item/teleportation_scroll/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/food/snacks/grown))
-		var/obj/item/weapon/reagent_containers/food/snacks/grown/G = target
+	if(istype(target, /obj/item/reagent_containers/food/snacks/grown))
+		var/obj/item/reagent_containers/food/snacks/grown/G = target
 		if(G.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -584,8 +584,8 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 /obj/item/paper/cig/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/terrbacco))
-		var/obj/item/weapon/reagent_containers/terrbacco/Z = target
+	if(istype(target, /obj/item/reagent_containers/terrbacco))
+		var/obj/item/reagent_containers/terrbacco/Z = target
 		if(Z.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -600,11 +600,11 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	else
 		..()
 
-/obj/item/weapon/paper/afterattack(atom/target, mob/user, proximity)
+/obj/item/paper/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/terrbacco))
-		var/obj/item/weapon/reagent_containers/terrbacco/Z = target
+	if(istype(target, /obj/item/reagent_containers/terrbacco))
+		var/obj/item/reagent_containers/terrbacco/Z = target
 		if(Z.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -619,11 +619,11 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	else
 		..()
 
-/obj/item/weapon/teleportation_scroll/afterattack(atom/target, mob/user, proximity)
+/obj/item/teleportation_scroll/afterattack(atom/target, mob/user, proximity)
 	if(!proximity)
 		return
-	if(istype(target, /obj/item/weapon/reagent_containers/terrbacco))
-		var/obj/item/weapon/reagent_containers/terrbacco/Z = target
+	if(istype(target, /obj/item/reagent_containers/terrbacco))
+		var/obj/item/reagent_containers/terrbacco/Z = target
 		if(Z.dry)
 			var/obj/item/clothing/mask/smokable/cigarette/rolled/R = new(user.loc)
 			R.chem_volume = target.reagents.total_volume
@@ -772,8 +772,8 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 	..()
 
-	if (istype(W, /obj/item/weapon/reagent_containers/food/snacks))
-		var/obj/item/weapon/reagent_containers/food/snacks/grown/G = W
+	if (istype(W, /obj/item/reagent_containers/food/snacks))
+		var/obj/item/reagent_containers/food/snacks/grown/G = W
 		if (!G.dry)
 			to_chat(user, "<span class='notice'>[G] must be dried before you stuff it into [src].</span>")
 			return

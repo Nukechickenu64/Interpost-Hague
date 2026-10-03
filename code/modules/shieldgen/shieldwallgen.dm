@@ -97,11 +97,9 @@
 	if(!anchored)
 		power = 0
 		return 0
-	var/turf/T = src.loc
-
-	var/obj/structure/cable/C = T.get_cable_node()
-	var/datum/powernet/PN
-	if(C)	PN = C.powernet		// find the powernet of the connected cable
+	var/area/A = get_area(src)
+	var/obj/machinery/power/area_smes/S = A && A.get_area_smes()
+	var/datum/powernet/PN = S && S.powernet
 
 	if(PN)
 		var/shieldload = between(500, max_stored_power - storedpower, power_draw)	//what we try to draw
@@ -213,7 +211,7 @@
 			src.anchored = 0
 			return
 
-	if(istype(W, /obj/item/weapon/card/id)||istype(W, /obj/item/device/pda))
+	if(istype(W, /obj/item/card/id)||istype(W, /obj/item/device/pda))
 		if (src.allowed(user))
 			src.locked = !src.locked
 			to_chat(user, "Controls are now [src.locked ? "locked." : "unlocked."]")

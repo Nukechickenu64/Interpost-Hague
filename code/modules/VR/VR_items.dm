@@ -67,12 +67,12 @@ GLOBAL_LIST_EMPTY(thunderfield_items)
 
 /datum/thunderfield_item/toolbox
 	name = "Toolbox"
-	item = /obj/item/weapon/storage/toolbox
+	item = /obj/item/storage/toolbox
 	cost = 0
 
 /datum/thunderfield_item/extinguisher
 	name = "Fire extinguisher"
-	item = /obj/item/weapon/extinguisher
+	item = /obj/item/extinguisher
 	cost = 0
 
 /datum/thunderfield_item/hatchet
@@ -92,17 +92,17 @@ GLOBAL_LIST_EMPTY(thunderfield_items)
 
 /datum/thunderfield_item/medkit
 	name = "Advanced medkit"
-	item = /obj/item/weapon/storage/firstaid/adv
+	item = /obj/item/storage/firstaid/adv
 	cost = 2
 
 /datum/thunderfield_item/backpack
 	name = "Backpack"
-	item = /obj/item/weapon/storage/backpack
+	item = /obj/item/storage/backpack
 	cost = 1
 
 /datum/thunderfield_item/medkit
 	name = "Combat medkit"
-	item = /obj/item/weapon/storage/firstaid/combat
+	item = /obj/item/storage/firstaid/combat
 	cost = 2
 
 /datum/thunderfield_item/thermal

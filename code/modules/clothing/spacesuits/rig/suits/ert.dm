@@ -1,4 +1,4 @@
-/obj/item/weapon/rig/ert
+/obj/item/rig/ert
 	name = "asset protection command hardsuit control module"
 	desc = "A hardsuit used by many corporate and private asset protection forces. Has blue highlights. Armoured and space ready."
 	suit_type = "Asset Protection command"
@@ -12,10 +12,10 @@
 	req_access = list(access_cent_specops)
 
 	armor = list(melee = 60, bullet = 50, laser = 50,energy = 15, bomb = 30, bio = 100, rad = 100)
-	allowed = list(/obj/item/device/flashlight, /obj/item/weapon/tank,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/handcuffs, /obj/item/device/t_scanner, /obj/item/weapon/rcd, /obj/item/weapon/crowbar, \
-	/obj/item/weapon/screwdriver, /obj/item/weapon/weldingtool, /obj/item/weapon/wirecutters, /obj/item/weapon/wrench, /obj/item/device/multitool, \
-	/obj/item/device/radio, /obj/item/device/analyzer,/obj/item/weapon/storage/briefcase/inflatable, /obj/item/weapon/melee/baton, /obj/item/weapon/gun, \
-	/obj/item/weapon/storage/firstaid, /obj/item/weapon/reagent_containers/hypospray, /obj/item/roller)
+	allowed = list(/obj/item/device/flashlight, /obj/item/tank,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/handcuffs, /obj/item/device/t_scanner, /obj/item/rcd, /obj/item/crowbar, \
+	/obj/item/screwdriver, /obj/item/weldingtool, /obj/item/wirecutters, /obj/item/wrench, /obj/item/device/multitool, \
+	/obj/item/device/radio, /obj/item/device/analyzer,/obj/item/storage/briefcase/inflatable, /obj/item/weapon/melee/baton, /obj/item/weapon/gun, \
+	/obj/item/storage/firstaid, /obj/item/reagent_containers/hypospray, /obj/item/roller)
 
 	initial_modules = list(
 		/obj/item/rig_module/ai_container,
@@ -39,7 +39,7 @@
 	species_restricted = list(SPECIES_HUMAN)
 
 
-/obj/item/weapon/rig/ert/engineer
+/obj/item/rig/ert/engineer
 	name = "asset protection engineering hardsuit control module"
 	desc = "A hardsuit used by many corporate and private asset protection forces. Has orange highlights. Armoured and space ready."
 	suit_type = "Asset Protection engineer"
@@ -59,7 +59,7 @@
 /obj/item/clothing/gloves/rig/ert/engineer
 	siemens_coefficient = 0
 
-/obj/item/weapon/rig/ert/janitor
+/obj/item/rig/ert/janitor
 	name = "asset protection sanitation hardsuit control module"
 	desc = "A hardsuit used by many corporate and private asset protection forces. Has purple highlights. Armoured and space ready."
 	suit_type = "Asset Protection sanitation"
@@ -75,7 +75,7 @@
 		/obj/item/rig_module/cooling_unit
 		)
 
-/obj/item/weapon/rig/ert/medical
+/obj/item/rig/ert/medical
 	name = "asset protection medical hardsuit control module"
 	desc = "A hardsuit used by many corporate and private asset protection forces. Has white highlights. Armoured and space ready."
 	suit_type = "Asset Protection medic"
@@ -89,7 +89,7 @@
 		/obj/item/rig_module/cooling_unit
 		)
 
-/obj/item/weapon/rig/ert/security
+/obj/item/rig/ert/security
 	name = "asset protection security hardsuit control module"
 	desc = "A hardsuit used by many corporate and private asset protection forces. Has red highlights. Armoured and space ready."
 	suit_type = "Asset Protection security"
@@ -103,7 +103,7 @@
 		/obj/item/rig_module/cooling_unit
 		)
 
-/obj/item/weapon/rig/ert/assetprotection
+/obj/item/rig/ert/assetprotection
 	name = "heavy asset protection suit control module"
 	desc = "A heavy, modified version of a common asset protection hardsuit. Has blood red highlights.  Armoured and space ready."
 	suit_type = "heavy asset protection"

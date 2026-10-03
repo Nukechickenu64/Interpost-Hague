@@ -44,6 +44,8 @@
 	var/citizenship = ""
 	var/personal_faction = ""
 
+	var/job_character_initialized = FALSE
+
 	//Equipment slots
 	var/obj/item/wear_suit = null
 	var/obj/item/w_uniform = null

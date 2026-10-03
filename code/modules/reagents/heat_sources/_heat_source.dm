@@ -20,14 +20,14 @@
 	var/image/on_icon
 
 	var/heater_mode =          HEATER_MODE_HEAT
-	var/list/permitted_types = list(/obj/item/weapon/reagent_containers/glass)
+	var/list/permitted_types = list(/obj/item/reagent_containers/glass)
 	var/max_temperature =      200 CELCIUS
 	var/min_temperature =      40  CELCIUS
 	var/heating_power =        10 // K
 	var/last_temperature
 	var/target_temperature
 	var/obj/item/container
-	var/circuit_type = /obj/item/weapon/circuitboard/reagent_heater
+	var/circuit_type = /obj/item/circuitboard/reagent_heater
 
 /obj/machinery/reagent_temperature/cooler
 	name = "chemical cooler"
@@ -36,7 +36,7 @@
 	heater_mode =      HEATER_MODE_COOL
 	max_temperature =  30 CELCIUS
 	min_temperature = -80 CELCIUS
-	circuit_type =     /obj/item/weapon/circuitboard/reagent_heater/cooler
+	circuit_type =     /obj/item/circuitboard/reagent_heater/cooler
 
 /obj/machinery/reagent_temperature/Initialize()
 
@@ -44,8 +44,8 @@
 
 	component_parts = list(
 		new circuit_type(src),
-		new /obj/item/weapon/stock_parts/micro_laser(src),
-		new /obj/item/weapon/stock_parts/capacitor(src)
+		new /obj/item/stock_parts/micro_laser(src),
+		new /obj/item/stock_parts/capacitor(src)
 	)
 	. = ..()
 	RefreshParts()
@@ -59,10 +59,10 @@
 /obj/machinery/reagent_temperature/RefreshParts()
 	heating_power = initial(heating_power)
 
-	var/obj/item/weapon/stock_parts/comp = locate(/obj/item/weapon/stock_parts/capacitor) in component_parts
+	var/obj/item/stock_parts/comp = locate(/obj/item/stock_parts/capacitor) in component_parts
 	if(comp)
 		heating_power *= comp.rating
-	comp = locate(/obj/item/weapon/stock_parts/micro_laser) in component_parts
+	comp = locate(/obj/item/stock_parts/micro_laser) in component_parts
 	if(comp)
 		change_power_consumption(max(0.5 KILOWATTS, initial(active_power_usage) - (comp.rating * 0.25 KILOWATTS)), POWER_USE_ACTIVE)
 

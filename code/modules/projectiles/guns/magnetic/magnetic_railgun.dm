@@ -1,20 +1,20 @@
 /obj/item/weapon/gun/magnetic/railgun
-	name = "railgun"
+	name = "\improper Mars Military Industries MI-76 Thunderclap Man-Portable Railgun"
 	desc = "The Mars Military Industries MI-76 Thunderclap. A man-portable mass driver for squad support anti-armour and destruction of fortifications and emplacements."
 	gun_unreliable = 0
 	icon_state = "railgun"
 	removable_components = FALSE
-	load_type = /obj/item/weapon/rcd_ammo
+	load_type = /obj/item/rcd_ammo
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 4, TECH_MAGNET = 4)
 	projectile_type = /obj/item/projectile/bullet/magnetic/slug
 	power_cost = 300
 	w_class = ITEM_SIZE_HUGE
 	slot_flags = SLOT_BELT
-	loaded = /obj/item/weapon/rcd_ammo/large
+	loaded = /obj/item/rcd_ammo/large
 	combustion = 1
 
-	var/initial_cell_type = /obj/item/weapon/cell/hyper
-	var/initial_capacitor_type = /obj/item/weapon/stock_parts/capacitor/adv
+	var/initial_cell_type = /obj/item/cell/hyper
+	var/initial_capacitor_type = /obj/item/stock_parts/capacitor/adv
 	var/slowdown_held = 2
 	var/slowdown_worn = 1
 
@@ -37,18 +37,18 @@
 // Not going to check type repeatedly, if you code or varedit
 // load_type and get runtime errors, don't come crying to me.
 /obj/item/weapon/gun/magnetic/railgun/show_ammo(var/mob/user)
-	var/obj/item/weapon/rcd_ammo/ammo = loaded
+	var/obj/item/rcd_ammo/ammo = loaded
 	if (ammo)
 		to_chat(user, "<span class='notice'>There are [ammo.remaining] shot\s remaining in \the [loaded].</span>")
 	else
 		to_chat(user, "<span class='notice'>There is nothing loaded.</span>")
 
 /obj/item/weapon/gun/magnetic/railgun/check_ammo()
-	var/obj/item/weapon/rcd_ammo/ammo = loaded
+	var/obj/item/rcd_ammo/ammo = loaded
 	return ammo && ammo.remaining
 
 /obj/item/weapon/gun/magnetic/railgun/use_ammo()
-	var/obj/item/weapon/rcd_ammo/ammo = loaded
+	var/obj/item/rcd_ammo/ammo = loaded
 	ammo.remaining--
 	if(ammo.remaining <= 0)
 		spawn(3)
@@ -61,12 +61,12 @@
 	visible_message("<span class='warning'>\The [src] beeps and ejects its empty cartridge.</span>")
 
 /obj/item/weapon/gun/magnetic/railgun/automatic // Adminspawn only, this shit is absurd.
-	name = "\improper RHR accelerator"
+	name = "\improper Mars Military Industries MI-227 Meteor Heavy Rail Accelerator"
 	desc = "The Mars Military Industries MI-227 Meteor. Originally a vehicle-mounted turret weapon for heavy anti-vehicular and anti-structural fire, the fact that it was made man-portable is mindboggling in itself."
 	icon_state = "heavy_railgun"
 
-	initial_cell_type = /obj/item/weapon/cell/infinite
-	initial_capacitor_type = /obj/item/weapon/stock_parts/capacitor/super
+	initial_cell_type = /obj/item/cell/infinite
+	initial_capacitor_type = /obj/item/stock_parts/capacitor/super
 
 	slowdown_held = 3
 	slowdown_worn = 2
@@ -86,12 +86,12 @@
 		to_chat(user, "<span class='notice'>Someone has scratched <i>Ultima Ratio Regum</i> onto the side of the barrel.</span>")
 
 /obj/item/weapon/gun/magnetic/railgun/flechette
-	name = "flechette gun"
+	name = "\improper Mars Military Industries MI-12 Skadi Flechette Railgun"
 	desc = "The MI-12 Skadi is a burst fire capable railgun that fires flechette rounds at high velocity. Deadly against armour, but much less effective against soft targets."
 	icon_state = "flechette_gun"
 	item_state = "z8carbine"
-	initial_cell_type = /obj/item/weapon/cell/hyper
-	initial_capacitor_type = /obj/item/weapon/stock_parts/capacitor/adv
+	initial_cell_type = /obj/item/cell/hyper
+	initial_capacitor_type = /obj/item/stock_parts/capacitor/adv
 	slot_flags = SLOT_BACK
 	slowdown_held = 0
 	slowdown_worn = 0

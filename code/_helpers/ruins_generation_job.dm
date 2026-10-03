@@ -12,32 +12,44 @@ var/datum/ruins_generation_job/ruins_gen_job
 	var/profile_type = null
 	var/last_error = null
 	var/sleep_ticks = 2 // deciseconds between areas (~1.2s) to further reduce load
+	var/salvage = FALSE
+	var/skip_wipe = FALSE
 
-/datum/ruins_generation_job/proc/start(var/profile_path)
+/datum/ruins_generation_job/proc/start(var/profile_path, var/salvage_mission = FALSE, var/owned_mission = FALSE, var/fresh_level = FALSE)
 	if(active)
+		return FALSE
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(expedition.mission_pending && !owned_mission)
 		return FALSE
 	cancelled = FALSE
 	last_error = null
+	salvage = salvage_mission
 	areas = list()
-	// Only target ruins on the 6th z-level
-	for(var/area/space/ruins/A in world)
-		if(A)
-			var/list/b = A.get_area_bounds()
-			if(b && b.len >= 5)
-				var/zlev = b[5]
-				if(zlev == 6)
-					areas += A
+	var/area/space/ruins/ruins_area = get_space_ruins_area()
+	if(!ruins_area || !get_space_ruins_z())
+		last_error = "No debris field is ready for generation."
+		return FALSE
+	var/datum/shuttle/autodock/shuttle = owned_mission ? expedition.get_shuttle() : null
+	if(owned_mission)
+		if(!expedition.mission_pending || !shuttle || shuttle.moving_status != SHUTTLE_IDLE || !shuttle.current_location || shuttle.current_location.landmark_tag != "nav_mining_start")
+			last_error = "The expedition shuttle is not holding at the station for preflight."
+			return FALSE
+	if(!expedition.can_regenerate_ruins(null, owned_mission))
+		last_error = "The debris field is occupied or the shuttle is en route."
+		return FALSE
+	areas += ruins_area
+	skip_wipe = owned_mission && fresh_level
 	total = areas.len
 	done = 0
 	profile_type = null
 	if(profile_path && ispath(profile_path, /datum/ruins_generation_profile))
 		profile_type = profile_path
-	// Make sure the Mining shuttle has a Space waypoint on z=6
 	ensure_mining_space_landmark()
 	// Metrics and signal: announce job configured
 	metrics_inc("ruins.total", total)
 	signal_emit("ruins_generation:started", total)
 	active = TRUE
+	expedition.ruins_fresh = FALSE
 	// Kick off background processing
 	spawn(1)
 		processing_loop()
@@ -46,17 +58,14 @@ var/datum/ruins_generation_job/ruins_gen_job
 /datum/ruins_generation_job/proc/ensure_mining_space_landmark()
 	// Ensure a mining space waypoint exists in /area/space/ruins so the Mining shuttle can travel to open space.
 	// Accept both the legacy tag and the canonical "nav_mining_*" tag for compatibility.
-	if(SSshuttle && (SSshuttle.get_landmark("nav_mining_space_ruins") || SSshuttle.get_landmark("mining_space")))
+	if(SSshuttle && SSshuttle.get_landmark("nav_mining_space_ruins"))
 		return
 	
 	var/turf/T = null
 	var/radius = 10
 	
-	// Find the /area/space/ruins area (should be on z=6)
-	var/area/space/ruins/ruins_area = null
-	for(var/area/space/ruins/A in world)
-		ruins_area = A
-		break
+	// Find the /area/space/ruins area
+	var/area/space/ruins/ruins_area = get_space_ruins_area()
 	
 	if(!ruins_area)
 		log_debug("ensure_mining_space_landmark: No /area/space/ruins found in world")
@@ -110,19 +119,37 @@ var/datum/ruins_generation_job/ruins_gen_job
 
 /datum/ruins_generation_job/proc/processing_loop()
 	// Process one area per tick to spread cost. If an area throws, store error and continue.
+	var/list/exclusion = get_mining_dock_exclusion()
 	while(active && !cancelled && done < total)
 		var/area/space/ruins/A = areas[done+1]
 		if(A)
+			var/list/profile_values = list(
+				"perlin_freq" = A.perlin_freq,
+				"perlin_octaves" = A.perlin_octaves,
+				"perlin_persistence" = A.perlin_persistence,
+				"perlin_lacunarity" = A.perlin_lacunarity,
+				"perlin_scale" = A.perlin_scale,
+				"warp_amp" = A.warp_amp,
+				"warp_freq" = A.warp_freq
+			)
 			try
-				A.generate_ruins_turfs(profile_type)
+				if(!skip_wipe)
+					A.wipe_ruins_level()
+				A.generate_ruins_turfs(profile_type, exclusion)
+				if(salvage)
+					A.place_salvage_ruins(rand(2, 4), exclusion)
 			catch(var/exception/e)
 				last_error = "[e] at area #[done+1]"
 				// continue despite error
+			for(var/setting in profile_values)
+				A.vars[setting] = profile_values[setting]
 		done++
 		metrics_inc("ruins.done", 1)
 		signal_emit("ruins_generation:area_done", A)
 		// light throttle between areas
 		sleep(sleep_ticks)
+	if(cancelled)
+		last_error = "Survey cancelled."
 	active = FALSE
 	cancelled = FALSE
 	// Finalize

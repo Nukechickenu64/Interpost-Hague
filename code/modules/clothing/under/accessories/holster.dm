@@ -28,7 +28,7 @@
 	holstered.loc = src
 	holstered.add_fingerprint(user)
 	w_class = max(w_class, holstered.w_class)
-	user.visible_message("<span class='notice'>[user] holsters \the [holstered].</span>", "<span class='notice'>You holster \the [holstered].</span>")
+	user.perceived_visible_message("<span class='notice'>[user] holsters \the [holstered].</span>", "<span class='notice'>You holster \the [holstered].</span>")
 	name = "occupied [initial(name)]"
 
 /obj/item/clothing/accessory/holster/proc/clear_holster()
@@ -43,12 +43,12 @@
 		to_chat(user, "<span class='warning'>You need an empty hand to draw \the [holstered]!</span>")
 	else
 		if(user.a_intent == I_HURT)
-			usr.visible_message(
+			user.perceived_visible_message(
 				"<span class='danger'>[user] draws \the [holstered], ready to go!</span>",
 				"<span class='warning'>You draw \the [holstered], ready to go!</span>"
 				)
 		else
-			user.visible_message(
+			user.perceived_visible_message(
 				"<span class='notice'>[user] draws \the [holstered], pointing it at the ground.</span>",
 				"<span class='notice'>You draw \the [holstered], pointing it at the ground.</span>"
 				)

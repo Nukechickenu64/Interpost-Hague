@@ -97,21 +97,24 @@
 		tally -= combat_mode_speed_modifier
 	return (tally+config.human_delay)
 
+/mob/proc/get_jetpack()
+	return null
+
+/mob/living/carbon/human/get_jetpack()
+	if(back)
+		if(istype(back,/obj/item/tank/jetpack))
+			return back
+		else if(istype(back,/obj/item/rig))
+			var/obj/item/rig/rig = back
+			for(var/obj/item/rig_module/maneuvering_jets/module in rig.installed_modules)
+				return module.jets
+	return null
+
 /mob/living/carbon/human/Process_Spacemove(var/check_drift = 0)
 	//Can we act?
 	if(restrained())	return 0
 
-	//Do we have a working jetpack?
-	var/obj/item/weapon/tank/jetpack/thrust
-	if(back)
-		if(istype(back,/obj/item/weapon/tank/jetpack))
-			thrust = back
-		else if(istype(back,/obj/item/weapon/rig))
-			var/obj/item/weapon/rig/rig = back
-			for(var/obj/item/rig_module/maneuvering_jets/module in rig.installed_modules)
-				thrust = module.jets
-				break
-
+	var/obj/item/tank/jetpack/thrust = get_jetpack()
 	if(thrust)
 		if(((!check_drift) || (check_drift && thrust.stabilization_on)) && (thrust.allow_thrust(0.01, src)))
 			inertia_dir = 0

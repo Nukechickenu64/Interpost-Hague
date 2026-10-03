@@ -39,17 +39,7 @@
 /obj/machinery/disposal/New()
 	..()
 	air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
-	spawn(5)
-		if(QDELETED(src))
-			return
-		trunk = locate() in src.loc
-		if(!trunk)
-			mode = 0
-			flush = 0
-		else
-			trunk.linked = src	// link the pipe trunk to self
-
-		update_icon()
+	update_icon()
 
 /obj/machinery/disposal/Destroy()
 	eject()
@@ -58,9 +48,20 @@
 	QDEL_NULL(air_contents)
 	return ..()
 
+/obj/machinery/disposal/proc/can_load(atom/movable/thing)
+	if(ismob(thing) && !istype(thing, /mob/living/simple_animal/mouse) && !istype(thing, /mob/living/simple_animal/lizard) && !istype(thing, /mob/living/simple_animal/familiar/pet/mouse))
+		return FALSE
+	for(var/mob/living/occupant in thing.GetAllContents(100))
+		if(!istype(occupant, /mob/living/simple_animal/mouse) && !istype(occupant, /mob/living/simple_animal/lizard) && !istype(occupant, /mob/living/simple_animal/familiar/pet/mouse))
+			return FALSE
+	return TRUE
+
 // attack by item places it in to disposal
 /obj/machinery/disposal/attackby(var/obj/item/I, var/mob/user)
 	if(stat & BROKEN || !I || !user)
+		return
+	if(!can_load(I))
+		to_chat(user, "<span class='warning'>This disposal only accepts small creatures.</span>")
 		return
 
 	add_fingerprint(user, 0, I)
@@ -83,7 +84,7 @@
 			if(contents.len > 0)
 				to_chat(user, "Eject the items first!")
 				return
-			var/obj/item/weapon/weldingtool/W = I
+			var/obj/item/weldingtool/W = I
 			if(W.remove_fuel(0,user))
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
 				to_chat(user, "You start slicing the floorweld off the disposal unit.")
@@ -107,8 +108,8 @@
 		to_chat(user, "You can't place that item inside the disposal unit.")
 		return
 
-	if(istype(I, /obj/item/weapon/storage/bag/trash))
-		var/obj/item/weapon/storage/bag/trash/T = I
+	if(istype(I, /obj/item/storage/bag/trash))
+		var/obj/item/storage/bag/trash/T = I
 		to_chat(user, "<span class='notice'>You empty the bag.</span>")
 		for(var/obj/item/O in T.contents)
 			T.remove_from_storage(O,src)
@@ -120,9 +121,12 @@
 	if(istype(G))	// handle grabbed mob
 		if(ismob(G.affecting))
 			var/mob/GM = G.affecting
+			if(!can_load(GM))
+				to_chat(user, "<span class='warning'>This disposal cannot hold [GM].</span>")
+				return
 			for (var/mob/V in viewers(usr))
 				V.show_message("[usr] starts putting [GM.name] into the disposal.", 3)
-			if(do_after(usr, 20, src) && GM && !QDELETED(GM) && G.affecting == GM)
+			if(do_after(usr, 20, src) && GM && !QDELETED(GM) && G.affecting == GM && can_load(GM))
 				if (GM.client)
 					GM.client.perspective = EYE_PERSPECTIVE
 					GM.client.eye = src
@@ -167,12 +171,12 @@
 	var/is_dangerous // To determine css style in messages
 	if(istype(M))
 		is_dangerous = TRUE
-		if(M.buckled)
+		if(M.buckled || !can_load(M))
 			return
 	else if(istype(AM, /obj/item))
 		attackby(AM, user)
 		return
-	else if(!is_type_in_list(AM, allowed_objects))
+	else if(!is_type_in_list(AM, allowed_objects) || !can_load(AM))
 		return
 
 	// Checks completed, start inserting
@@ -193,7 +197,7 @@
 		return
 	if(!AM || old_loc != AM.loc || AM.anchored)
 		return
-	if(istype(M) && M.buckled)
+	if(!can_load(AM) || (istype(M) && M.buckled))
 		return
 
 	// Messages and logging
@@ -233,7 +237,7 @@
 
 // ai as human but can't flush
 /obj/machinery/disposal/attack_ai(mob/user as mob)
-	interact(user, 1)
+	return
 
 // human interact with machine
 /obj/machinery/disposal/attack_hand(mob/user as mob)
@@ -245,54 +249,32 @@
 		to_chat(usr, "<span class='warning'>You cannot reach the controls from inside.</span>")
 		return
 
-	// Clumsy folks can only flush it.
-	if(user.IsAdvancedToolUser(1))
-		interact(user, 0)
-	else
-		flush = !flush
-		update_icon()
+	if(user.a_intent == I_GRAB && !user.get_active_hand())
+		var/list/items = list()
+		for(var/obj/item/item in src)
+			items += item
+		if(items.len)
+			var/obj/item/retrieved = pick(items)
+			retrieved.forceMove(get_turf(src))
+			user.put_in_hands(retrieved)
+			to_chat(user, "<span class='notice'>You retrieve [retrieved] from [src].</span>")
+			update_icon()
+		else
+			to_chat(user, "<span class='notice'>There are no loose items to retrieve.</span>")
+		return
 	return
+
+/obj/machinery/disposal/attack_hand_right(mob/user)
+	if(stat & (BROKEN|NOPOWER) || !Adjacent(user) || user.loc == src)
+		return
+	flush = 1
+	update_icon()
+	to_chat(user, "<span class='notice'>You engage the disposal handle.</span>")
+	return 1
 
 // user interaction
 /obj/machinery/disposal/interact(mob/user, var/ai=0)
-
-	src.add_fingerprint(user)
-	if(stat & BROKEN)
-		user.unset_machine()
-		return
-
-	var/dat = "<head><title>Waste Disposal Unit</title></head><body><TT><B>Waste Disposal Unit</B><HR>"
-
-	if(!ai)  // AI can't pull flush handle
-		if(flush)
-			dat += "Disposal handle: <A href='?src=\ref[src];handle=0'>Disengage</A> <B>Engaged</B>"
-		else
-			dat += "Disposal handle: <B>Disengaged</B> <A href='?src=\ref[src];handle=1'>Engage</A>"
-
-		dat += "<BR><HR><A href='?src=\ref[src];eject=1'>Eject contents</A><HR>"
-
-	if(mode <= 0)
-		dat += "Pump: <B>Off</B> <A href='?src=\ref[src];pump=1'>On</A><BR>"
-	else if(mode == 1)
-		dat += "Pump: <A href='?src=\ref[src];pump=0'>Off</A> <B>On</B> (pressurizing)<BR>"
-	else
-		dat += "Pump: <A href='?src=\ref[src];pump=0'>Off</A> <B>On</B> (idle)<BR>"
-
-	var/per = 100* air_contents.return_pressure() / (SEND_PRESSURE)
-
-	dat += "Pressure: [round(per, 1)]%<BR></body>"
-
-
-	user.set_machine(src)
-	// Build diegetic-styled content
-	var/body = ""
-	body += "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'>"
-	body += "<div><b>Waste Disposal Unit</b></div>"
-	body += "<div><a href='?src=\ref[src];close=1'>Close</a></div>"
-	body += "</div><hr>"
-	body += dat
-	ui_browse_styled(user, "Waste Disposal Unit", body, "window=disposal;size=360x200;can_close=0;can_resize=0;border=0;titlebar=0")
-	onclose(user, "disposal")
+	return
 
 // handle machine interaction
 
@@ -310,29 +292,7 @@
 	return ..()
 
 /obj/machinery/disposal/OnTopic(user, href_list)
-	if(href_list["close"])
-		close_browser(user, "window=disposal")
-		return TOPIC_HANDLED
-
-	if(href_list["pump"])
-		if(text2num(href_list["pump"]))
-			mode = 1
-		else
-			mode = 0
-		update_icon()
-		. = TOPIC_REFRESH
-
-	else if(href_list["handle"])
-		flush = text2num(href_list["handle"])
-		update_icon()
-		. = TOPIC_REFRESH
-
-	else if(href_list["eject"])
-		eject()
-		. = TOPIC_REFRESH
-
-	if(. == TOPIC_REFRESH)
-		interact(user)
+	return TOPIC_HANDLED
 
 // eject the contents of the disposal unit
 /obj/machinery/disposal/proc/eject()
@@ -375,18 +335,7 @@
 		update_use_power(POWER_USE_OFF)
 		return
 
-	flush_count++
-	if( flush_count >= flush_every_ticks )
-		if( contents.len )
-			if(mode == 2)
-				spawn(0)
-					SSstatistics.add_field("disposal_auto_flush",1)
-					flush()
-		flush_count = 0
-
-	src.updateDialog()
-
-	if(flush && air_contents.return_pressure() >= SEND_PRESSURE )	// flush can happen even without power
+	if(flush && !(stat & NOPOWER) && air_contents.return_pressure() >= SEND_PRESSURE)
 		flush()
 
 	if(mode != 1) //if off or ready, no need to charge
@@ -415,25 +364,11 @@
 
 // perform a flush
 /obj/machinery/disposal/proc/flush()
-	if(flushing || !air_contents)
+	if(flushing || !air_contents || (stat & (NOPOWER|BROKEN)))
 		return
 
 	flushing = 1
 	flick("[icon_state]-flush", src)
-
-	var/wrapcheck = 0
-	var/obj/structure/disposalholder/H = new()	// virtual holder object which actually
-												// travels through the pipes.
-	//Hacky test to get drones to mail themselves through disposals.
-	for(var/mob/living/silicon/robot/drone/D in src)
-		wrapcheck = 1
-
-	for(var/obj/item/smallDelivery/O in src)
-		wrapcheck = 1
-
-	if(wrapcheck == 1)
-		H.tomail = 1
-
 
 	sleep(10)
 	if(last_sound < world.time + 1)
@@ -442,13 +377,20 @@
 	sleep(5) // wait for animation to finish
 
 	if(QDELETED(src))
-		qdel(H)
 		return
-
-	H.init(src, air_contents)	// copy the contents of disposer to holder
-	air_contents = new(PRESSURE_TANK_VOLUME)	// new empty gas resv.
-
-	H.start(src) // start the holder processing movement
+	for(var/atom/movable/thing in contents.Copy())
+		if(!can_load(thing))
+			thing.forceMove(get_turf(src))
+			continue
+		for(var/mob/living/occupant in thing.GetAllContents(100))
+			occupant.enter_station_vents(src)
+		if(ismob(thing))
+			var/mob/living/passenger = thing
+			passenger.enter_station_vents(src)
+		else
+			qdel(thing)
+	QDEL_NULL(air_contents)
+	air_contents = new(PRESSURE_TANK_VOLUME)
 	flushing = 0
 	// now reset disposal state
 	flush = 0
@@ -897,8 +839,8 @@
 		if(!T.is_plating())
 			return		// prevent interaction with T-scanner revealed pipes
 		src.add_fingerprint(user, 0, I)
-		if(istype(I, /obj/item/weapon/weldingtool))
-			var/obj/item/weapon/weldingtool/W = I
+		if(istype(I, /obj/item/weldingtool))
+			var/obj/item/weldingtool/W = I
 
 			if(W.remove_fuel(0,user))
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -1541,8 +1483,8 @@
 	if(!T.is_plating())
 		return		// prevent interaction with T-scanner revealed pipes
 	src.add_fingerprint(user, 0, I)
-	if(istype(I, /obj/item/weapon/weldingtool))
-		var/obj/item/weapon/weldingtool/W = I
+	if(istype(I, /obj/item/weldingtool))
+		var/obj/item/weldingtool/W = I
 
 		if(W.remove_fuel(0,user))
 			playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
@@ -1677,8 +1619,8 @@
 				playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
 				to_chat(user, "You attach the screws around the power connection.")
 				return
-		else if(istype(I,/obj/item/weapon/weldingtool) && mode==1)
-			var/obj/item/weapon/weldingtool/W = I
+		else if(istype(I,/obj/item/weldingtool) && mode==1)
+			var/obj/item/weldingtool/W = I
 			if(W.remove_fuel(0,user))
 				playsound(src.loc, 'sound/items/Welder2.ogg', 100, 1)
 				to_chat(user, "You start slicing the floorweld off the disposal outlet.")

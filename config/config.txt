@@ -373,7 +373,7 @@ ALIEN_EGGS_ALLOWED
 RESPAWN_DELAY 3
 
 ## Strength of ambient star light. Set to 0 or less to turn off. A value of 1 is unlikely to have a noticeable effect in most lighting systems.
-STARLIGHT 0
+STARLIGHT 2
 
 ## Defines which races are allowed to join as ERT, in singular form. If unset, defaults to only human. Casing matters, separate using ;
 ## Example races include: Human, Tajara, Skrell, Unathi
@@ -797,7 +797,7 @@ EVENT_CUSTOM_START_MAJOR 80;100
 RESPAWN_DELAY 3
 
 ## Strength of ambient star light. Set to 0 or less to turn off. A value of 1 is unlikely to have a noticeable effect in most lighting systems.
-STARLIGHT 0
+STARLIGHT 2
 
 ## Defines which races are allowed to join as ERT, in singular form. If unset, defaults to only human. Casing matters, separate using ;
 ## Example races include: Human, Tajara, Skrell, Unathi
@@ -847,3 +847,9 @@ ORGANS_CAN_DECAY
 ## Spaces are prohibited in each URL by spec, you must use encoded spaces.
 #RESOURCE_URLS URL
 >>>>>>> 39447965d4516aa51b02f493230856fd3169571a
+
+## Map file loaded on a new z-level the first time the mining shuttle travels to the satellite.
+#SATELLITE_MAP maps/satellite/satellite.dmm
+
+## Director recruitment policy: crew (automatically assign existing human crew), ghosts, or disabled.
+DIRECTOR_ANTAG_POLICY crew

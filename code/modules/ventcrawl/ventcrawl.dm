@@ -5,9 +5,9 @@ var/list/ventcrawl_machinery = list(
 
 // Vent crawling whitelisted items, whoo
 /mob/living/var/list/can_enter_vent_with = list(
-	/obj/item/weapon/implant,
+	/obj/item/implant,
 	/obj/item/device/radio/borg,
-	/obj/item/weapon/holder,
+	/obj/item/holder,
 	/obj/machinery/camera,
 	/mob/living/simple_animal/borer
 	)
@@ -50,13 +50,17 @@ var/list/ventcrawl_machinery = list(
 
 /mob/living/carbon/human/is_allowed_vent_crawl_item(var/obj/item/carried_item)
 	var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
-	if(stomach && (carried_item in stomach.contents))
+	var/inventory_slot = get_inventory_slot(carried_item)
+	if(stomach && stomach.contents.Find(carried_item))
 		return TRUE
-	if(carried_item in organs)
+	if(organs.Find(carried_item))
 		return 1
-	if(carried_item in list(w_uniform, gloves, glasses, wear_mask, l_ear, r_ear, belt) || get_inventory_slot(carried_item) in list(slot_l_store, slot_r_store))
+	var/list/worn_items = list(w_uniform, gloves, glasses, wear_mask, l_ear, r_ear, belt)
+	var/is_worn_item = worn_items.Find(carried_item)
+	var/is_storage_slot = inventory_slot == slot_l_store || inventory_slot == slot_r_store
+	if(is_worn_item || is_storage_slot)
 		return 1
-	if(carried_item in list(l_hand,r_hand))
+	if(carried_item == l_hand || carried_item == r_hand)
 		return carried_item.w_class <= ITEM_SIZE_NORMAL
 	return ..()
 
@@ -119,6 +123,12 @@ var/list/ventcrawl_machinery = list(
 				break
 
 	if(vent_found)
+		if(get_station_gas_tank(vent_found))
+			to_chat(src, "You begin climbing into the ventilation system...")
+			if(!do_after(src, 45, vent_found, 1, 1) || !can_ventcrawl())
+				return
+			enter_station_vents(vent_found)
+			return
 		if(vent_found.network && (vent_found.network.normal_members.len || vent_found.network.line_members.len))
 
 			to_chat(src, "You begin climbing into the ventilation system...")
@@ -156,6 +166,50 @@ var/list/ventcrawl_machinery = list(
 			to_chat(src, "This vent is not connected to anything.")
 	else
 		to_chat(src, "You must be standing on or beside an air vent to enter it.")
+
+/mob/living/proc/enter_station_vents(atom/entry)
+	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(entry)
+	var/list/exits = list()
+	if(tank)
+		for(var/obj/machinery/atmospherics/unary/exit_vent in SSmachines.machinery)
+			if(is_type_in_list(exit_vent, ventcrawl_machinery) && !QDELETED(exit_vent) && exit_vent.can_crawl_through() && get_station_gas_tank(exit_vent) == tank && get_turf(exit_vent))
+				exits += exit_vent
+	if(!exits.len)
+		to_chat(src, "There are no available station vents.")
+		if(istype(loc, /obj/machinery/disposal))
+			forceMove(get_turf(loc))
+		return
+	var/obj/machinery/atmospherics/unary/entrance = istype(entry, /obj/machinery/atmospherics/unary) ? entry : exits[1]
+	forceMove(entrance)
+	is_ventcrawling = TRUE
+	choose_station_vent()
+
+/mob/living/proc/choose_station_vent()
+	if(!is_ventcrawling || !is_type_in_list(loc, ventcrawl_machinery))
+		return
+	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(loc)
+	if(!tank)
+		return
+	var/list/exits = list()
+	for(var/obj/machinery/atmospherics/unary/exit_vent in SSmachines.machinery)
+		if(is_type_in_list(exit_vent, ventcrawl_machinery) && !QDELETED(exit_vent) && exit_vent.can_crawl_through() && get_station_gas_tank(exit_vent) == tank && get_turf(exit_vent))
+			exits += exit_vent
+	if(!exits.len)
+		return
+	var/obj/machinery/atmospherics/unary/chosen
+	if(client)
+		chosen = input(src, "Select a station vent", "Vent travel") as null|anything in exits
+	else
+		chosen = pick(exits)
+	if(!chosen || !is_ventcrawling || !(chosen in exits) || QDELETED(chosen) || get_station_gas_tank(chosen) != tank)
+		return
+	var/turf/exit_turf = get_turf(chosen)
+	if(!exit_turf)
+		return
+	forceMove(exit_turf)
+	is_ventcrawling = FALSE
+	if(client)
+		client.eye = src
 /mob/living/proc/add_ventcrawl(obj/machinery/atmospherics/starting_machine)
 	is_ventcrawling = 1
 	//candrop = 0

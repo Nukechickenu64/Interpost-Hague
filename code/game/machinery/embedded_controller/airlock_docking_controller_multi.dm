@@ -22,29 +22,53 @@
 			child_names[tags[i]] = names[i]
 
 
-/obj/machinery/embedded_controller/radio/docking_port_multi/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/nanoui/master_ui = null, var/datum/topic_state/state = GLOB.default_state)
-	var/data[0]
+/obj/machinery/embedded_controller/radio/docking_port_multi/ui_interact()
+	return
 
-	var/list/airlocks[child_names.len]
-	var/i = 1
-	for (var/child_tag in child_names)
-		airlocks[i++] = list("name"=child_names[child_tag], "override_enabled"=(docking_program.children_override[child_tag] == "enabled"))
+/obj/machinery/embedded_controller/radio/docking_port_multi/proc/get_child_controller(child_tag)
+	if(!docking_program || !(child_tag in docking_program.children_tags))
+		return null
+	for(var/obj/machinery/embedded_controller/radio/airlock/docking_port_multi/child in SSmachines.machinery)
+		if(!QDELETED(child) && child.id_tag == child_tag && child.master_tag == id_tag && child.frequency == frequency)
+			return child
+	return null
 
-	data = list(
-		"docking_status" = docking_program.get_docking_status(),
-		"airlocks" = airlocks,
-	)
+/obj/machinery/embedded_controller/radio/docking_port_multi/proc/can_select_chamber(mob/user)
+	if(!user || !allowed(user))
+		if(user)
+			to_chat(user, "<span class='warning'>Access denied.</span>")
+		return FALSE
+	return on && operable() && !user.stat && !user.lying && user.IsAdvancedToolUser() && CanUseTopic(user, GLOB.default_state) == STATUS_INTERACTIVE
 
-	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
+/obj/machinery/embedded_controller/radio/docking_port_multi/attack_hand(mob/user)
+	if(!can_select_chamber(user) || !docking_program)
+		return FALSE
+	var/list/choices = list()
+	for(var/child_tag in docking_program.children_tags)
+		if(!get_child_controller(child_tag))
+			continue
+		var/child_name = child_names[child_tag] ? child_names[child_tag] : child_tag
+		choices += "<span class='feedback'><a href='?src=\ref[src];action=cycle_chamber;child_tag=[url_encode(child_tag)]'>[rhtml_encode(child_name)]</a></span>"
+	if(!choices.len)
+		to_chat(user, "<span class='warning'>No linked airlock chambers are available.</span>")
+		return FALSE
+	to_chat(user, "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>Select an airlock chamber:</span>\n<hr>[jointext(choices, "\n")]</div></div>")
+	return TRUE
 
-	if (!ui)
-		ui = new(user, src, ui_key, "multi_docking_console.tmpl", name, 470, 290, state = state)
-		ui.set_initial_data(data)
-		ui.open()
-		ui.set_auto_update(1)
+/obj/machinery/embedded_controller/radio/docking_port_multi/attack_ai(mob/user)
+	return attack_hand(user)
 
 /obj/machinery/embedded_controller/radio/docking_port_multi/Topic(href, href_list)
-	return
+	if(..())
+		return
+	if(href_list["action"] != "cycle_chamber" || !can_select_chamber(usr))
+		return STATUS_CLOSE
+	var/obj/machinery/embedded_controller/radio/airlock/docking_port_multi/child = get_child_controller(href_list["child_tag"])
+	if(!child)
+		to_chat(usr, "<span class='warning'>That airlock chamber is no longer available.</span>")
+		return STATUS_CLOSE
+	child.cycle_on_click(usr)
+	return TRUE
 
 
 
@@ -60,54 +84,8 @@
 	airlock_program = new/datum/computer/file/embedded_program/airlock/multi_docking(src)
 	program = airlock_program
 
-/obj/machinery/embedded_controller/radio/airlock/docking_port_multi/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/nanoui/master_ui = null, var/datum/topic_state/state = GLOB.default_state)
-	var/data[0]
-
-	data = list(
-		"chamber_pressure" = round(airlock_program.memory["chamber_sensor_pressure"]),
-		"exterior_status" = airlock_program.memory["exterior_status"],
-		"interior_status" = airlock_program.memory["interior_status"],
-		"processing" = airlock_program.memory["processing"],
-		"docking_status" = airlock_program.master_status,
-		"airlock_disabled" = (airlock_program.docking_enabled && !airlock_program.override_enabled),
-		"override_enabled" = airlock_program.override_enabled,
-	)
-
-	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
-
-	if (!ui)
-		ui = new(user, src, ui_key, "docking_airlock_console.tmpl", name, 470, 290, state = state)
-		ui.set_initial_data(data)
-		ui.open()
-		ui.set_auto_update(1)
-
-/obj/machinery/embedded_controller/radio/airlock/docking_port_multi/Topic(href, href_list)
-	if(..())
-		return
-
-	usr.set_machine(src)
-
-	var/clean = 0
-	switch(href_list["command"])	//anti-HTML-hacking checks
-		if("cycle_ext")
-			clean = 1
-		if("cycle_int")
-			clean = 1
-		if("force_ext")
-			clean = 1
-		if("force_int")
-			clean = 1
-		if("abort")
-			clean = 1
-		if("toggle_override")
-			clean = 1
-
-	if(clean)
-		program.receive_user_command(href_list["command"])
-
-	return 1
-
-
+/obj/machinery/embedded_controller/radio/airlock/docking_port_multi/manual_cycle_enabled()
+	return airlock_program && (!airlock_program.docking_enabled || airlock_program.override_enabled)
 
 /*** DEBUG VERBS ***
 

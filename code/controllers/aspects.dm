@@ -21,7 +21,7 @@
 		if(H.mind.assigned_role == "Security Officer")
 			H.job = "Security Roughneck"
 
-		var/obj/item/weapon/card/id/id_card = H.wear_id
+		var/obj/item/card/id/id_card = H.wear_id
 		if(istype(H.wear_id, /obj/item/device/pda))
 			var/obj/item/device/pda/pda = H.wear_id
 			id_card = pda.id
@@ -77,16 +77,16 @@
 /*
 /datum/round_event/ghetto_medbay
 	id = "ghettomedbay"
-	event_message = "TetraCorp back on the line! Nothing will stop brave doctors from showing their competence again and proving that they are the best of their kind!.. Even despite the low budget."
+	event_message = "Nanotrasen back on the line! Nothing will stop brave doctors from showing their competence again and proving that they are the best of their kind!.. Even despite the low budget."
 
 /datum/round_event/ghetto_medbay/apply_event()
 	for(var/area/medical/M in world)
-		for(var/obj/item/weapon/storage/firstaid/o2/FO in M)
-			var/obj/item/weapon/reagent_containers/syringe/inaprovaline/SI = new(FO.loc)
+		for(var/obj/item/storage/firstaid/o2/FO in M)
+			var/obj/item/reagent_containers/syringe/inaprovaline/SI = new(FO.loc)
 			SI.desc = "Who needs a oxygen deprivation first-aid kit?"
 			qdel(FO)
-		for(var/obj/item/weapon/reagent_containers/spray/sterilizine/SS in M)
-			var/obj/item/weapon/reagent_containers/food/drinks/bottle/vodka/BV = new(SS.loc)
+		for(var/obj/item/reagent_containers/spray/sterilizine/SS in M)
+			var/obj/item/reagent_containers/food/drinks/bottle/vodka/BV = new(SS.loc)
 			BV.name = "Sterilizine"
 			qdel(SS)
 		for(var/obj/structure/morgue/SM in M)
@@ -112,18 +112,18 @@
 			qdel(MP)
 		for(var/obj/machinery/vending/medical/VM in M)
 			qdel(VM)
-		for(var/obj/item/weapon/storage/firstaid/regular/FAR in M)
+		for(var/obj/item/storage/firstaid/regular/FAR in M)
 			var/obj/item/device/healthanalyzer/HA = new(FAR.loc)
 			HA.desc = "Where's my first aid kit?"
 			qdel(FAR)
-		for(var/obj/item/weapon/defibrillator/compact/loaded/DCL in M)
+		for(var/obj/item/defibrillator/compact/loaded/DCL in M)
 			qdel(DCL)
-		for(var/obj/item/weapon/rig/medical/RM in M)
+		for(var/obj/item/rig/medical/RM in M)
 			qdel(RM)
 		for(var/obj/structure/closet/radiation/CR in M)
 			qdel(CR)
-		for(var/obj/item/weapon/storage/firstaid/surgery/FAS in M)
-			var/obj/item/weapon/storage/toolbox/mechanical/TM = new(FAS.loc)
+		for(var/obj/item/storage/firstaid/surgery/FAS in M)
+			var/obj/item/storage/toolbox/mechanical/TM = new(FAS.loc)
 			TM.name = "Surgery Kit"
 			qdel(FAS)
 		for(var/obj/machinery/bodyscanner/BS in M)
@@ -149,22 +149,22 @@
 			qdel(SC)
 		for(var/obj/machinery/resleever/RE in M)
 			qdel(RE)
-		for(var/obj/item/weapon/storage/firstaid/fire/FAF in M)
+		for(var/obj/item/storage/firstaid/fire/FAF in M)
 			var/obj/item/stack/medical/ointment/MO = new(FAF.loc)
 			MO.desc = "Who needs a fire first-aid kit?"
 			qdel(FAF)
-		for(var/obj/item/weapon/storage/firstaid/toxin/FAT in M)
-			var/obj/item/weapon/reagent_containers/syringe/antitoxin/SAT = new(FAT.loc)
+		for(var/obj/item/storage/firstaid/toxin/FAT in M)
+			var/obj/item/reagent_containers/syringe/antitoxin/SAT = new(FAT.loc)
 			SAT.desc = "Who needs a toxin first-aid kit?"
 			qdel(FAT)
-		for(var/obj/item/weapon/reagent_containers/spray/cleaner/SC in M)
-			var/obj/item/weapon/soap/deluxe/SD = new(SC.loc)
+		for(var/obj/item/reagent_containers/spray/cleaner/SC in M)
+			var/obj/item/soap/deluxe/SD = new(SC.loc)
 			SD.name = "Space Cleaner Soap Deluxe"
 			SD.desc = "In 2563 someone need space cleaners?"
 			qdel(SC)
 	for(var/area/crew_quarters/medbreak/M in world)
-		for(var/obj/item/weapon/reagent_containers/spray/cleaner/SC in M)
-			var/obj/item/weapon/soap/deluxe/SD = new(SC.loc)
+		for(var/obj/item/reagent_containers/spray/cleaner/SC in M)
+			var/obj/item/soap/deluxe/SD = new(SC.loc)
 			SD.name = "Space Cleaner Soap Deluxe"
 			SD.desc = "In 2563 someone need space cleaners?"
 			qdel(SC)
@@ -270,7 +270,7 @@
 	event_message = "The identification office lost the entire badge shipment. Everyone will have to explain themselves the old-fashioned way."
 
 /datum/round_event/no_id_cards/apply_event()
-	for(var/obj/item/weapon/card/id/I in world)
+	for(var/obj/item/card/id/I in world)
 		qdel(I)
 		CHECK_TICK
 
@@ -333,10 +333,10 @@
 	event_message = "Medical supplies arrived in miniature quantities. Every treatment will need to count."
 
 /datum/round_event/medical_shortage/apply_event()
-	for(var/obj/item/weapon/storage/firstaid/F in world)
+	for(var/obj/item/storage/firstaid/F in world)
 		qdel(F)
 		CHECK_TICK
-	for(var/obj/item/weapon/defibrillator/D in world)
+	for(var/obj/item/defibrillator/D in world)
 		qdel(D)
 		CHECK_TICK
 
@@ -406,7 +406,7 @@
 	event_message = "The tool supplier sent beautifully organized boxes containing absolutely nothing useful."
 
 /datum/round_event/empty_toolboxes/apply_event()
-	for(var/obj/item/weapon/storage/toolbox/T in world)
+	for(var/obj/item/storage/toolbox/T in world)
 		for(var/obj/item/I in T.contents)
 			qdel(I)
 		CHECK_TICK

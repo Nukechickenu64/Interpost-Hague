@@ -119,6 +119,8 @@
 			if(!attempt_move(destination))
 				attempt_move(start_location) //try to go back to where we started. If that fails, I guess we're stuck in the interim location
 				message_admins("Shuttle [src.name] failed to arrive at its destination and could not return to its origin.")
+		else
+			attempt_move(destination)
 
 		moving_status = SHUTTLE_IDLE
 
@@ -148,6 +150,10 @@
 //	log_debug("move_shuttle() called for [shuttle_tag] leaving [origin] en route to [destination].")
 //	log_degug("area_coming_from: [origin]")
 //	log_debug("destination: [destination]")
+	var/profile_move = config && config.log_debug
+	var/move_start = profile_move ? world.realtime : 0
+	var/stage_start = profile_move ? TICK_USAGE_REAL : 0
+	var/list/stage_timings = profile_move ? list() : null
 	for(var/turf/src_turf in turf_translation)
 		var/turf/dst_turf = turf_translation[src_turf]
 		if(src_turf.is_solid_structure()) //in case someone put a hole in the shuttle and you were lucky enough to be under it
@@ -159,7 +165,6 @@
 					bug.gib()
 				else
 					qdel(AM) //it just gets atomized I guess? TODO throw it into space somewhere, prevents people from using shuttles as an atom-smasher
-	var/list/powernets = list()
 	var/list/jolted_mobs = list()
 	for(var/area/A in shuttle_area)
 		// if there was a zlevel above our origin, erase our ceiling now we're leaving
@@ -172,7 +177,7 @@
 			for(var/mob/M in A)
 				if(M.client)
 					spawn(0)
-						if(M.buckled && !istype(M.buckled, /obj/structure/handrai))
+						if(M.buckled && !istype(M.buckled, /obj/structure/handrail))
 							to_chat(M, "<span class='warning'>Sudden acceleration presses you into your seat!</span>")
 							shake_camera(M, 3, 1)
 						else
@@ -181,17 +186,20 @@
 				if(istype(M, /mob/living/carbon) && !M.buckled)
 					jolted_mobs += M
 
-		for(var/obj/structure/cable/C in A)
-			powernets |= C.powernet
-
 	var/turf/old_turf = get_turf(current_location)
 	var/turf/new_turf = get_turf(destination)
 	var/jolt_dir = 0
 	if(old_turf && new_turf && old_turf.z == new_turf.z)
 		jolt_dir = get_dir(new_turf, old_turf) //inertia throws people backwards
 
+	if(profile_move)
+		stage_timings += "departure_setup=[TICK_DELTA_TO_MS(TICK_USAGE_REAL - stage_start)]ms"
+		stage_start = TICK_USAGE_REAL
 	translate_turfs(turf_translation, current_location.base_area, current_location.base_turf)
 	current_location = destination
+	if(profile_move)
+		stage_timings += "turf_transfer=[TICK_DELTA_TO_MS(TICK_USAGE_REAL - stage_start)]ms"
+		stage_start = TICK_USAGE_REAL
 
 	for(var/mob/living/L in jolted_mobs)
 		if(!L.floor_jolt_act(jolt_dir, rand(3, 6)) && !L.buckled && !L.Check_Shoegrip())
@@ -205,16 +213,14 @@
 				if(istype(TA, get_base_turf_by_area(TA)) || istype(TA, /turf/simulated/open))
 					TA.ChangeTurf(ceiling_type, 1, 1)
 
-	// Remove all powernets that were affected, and rebuild them.
-	var/list/cables = list()
-	for(var/datum/powernet/P in powernets)
-		cables |= P.cables
-		qdel(P)
-	for(var/obj/structure/cable/C in cables)
-		if(!C.powernet)
-			var/datum/powernet/NewPN = new()
-			NewPN.add_cable(C)
-			propagate_network(C,C.powernet)
+	if(profile_move)
+		stage_timings += "arrival_setup=[TICK_DELTA_TO_MS(TICK_USAGE_REAL - stage_start)]ms"
+		stage_start = TICK_USAGE_REAL
+	var/rebuilt_power = power_grid_dirty
+	if(power_grid_dirty)
+		rebuild_power_grid()
+	if(profile_move)
+		stage_timings += "power_rebuild=[TICK_DELTA_TO_MS(TICK_USAGE_REAL - stage_start)]ms rebuilt=[rebuilt_power]"
 
 	if(mothershuttle)
 		var/datum/shuttle/mothership = SSshuttle.shuttles[mothershuttle]
@@ -223,6 +229,8 @@
 				mothership.shuttle_area |= shuttle_area
 			else
 				mothership.shuttle_area -= shuttle_area
+	if(profile_move)
+		log_debug("Shuttle move [name] to [destination.landmark_tag]: turfs=[turf_translation.len] elapsed=[(world.realtime - move_start) / 10]s [jointext(stage_timings, "; ")]")
 
 //returns 1 if the shuttle has a valid arrive time
 /datum/shuttle/proc/has_arrive_time()

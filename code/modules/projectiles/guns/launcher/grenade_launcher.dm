@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/launcher/grenade
-	name = "grenade launcher"
-	desc = "A bulky pump-action grenade launcher. Holds up to 6 grenades in a revolving magazine."
+	name = "\improper Aussec Armoury GL-6 Rotary Grenade Launcher"
+	desc = "A pump-action grenade launcher with a revolving magazine that holds five grenades plus one chambered round."
 	icon_state = "riotgun"
 	item_state = "riotgun"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 3)
@@ -126,8 +126,8 @@
 
 //Underslung grenade launcher to be used with the Z8
 /obj/item/weapon/gun/launcher/grenade/underslung
-	name = "underslung grenade launcher"
-	desc = "Not much more than a tube and a firing mechanism, this grenade launcher is designed to be fitted to a rifle."
+	name = "\improper Hephaestus UGL-1 Underbarrel Grenade Launcher"
+	desc = "A single-shot grenade-launching module designed to mount beneath a compatible rifle barrel."
 	w_class = ITEM_SIZE_NORMAL
 	force = 5
 	max_grenades = 0

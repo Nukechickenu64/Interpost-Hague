@@ -39,6 +39,10 @@
 
 	if(connections) connections.erase_all()
 
+	// Starlight source would otherwise outlive the space turf being replaced.
+	if(light && istype(src, /turf/space))
+		set_light(0)
+
 	overlays.Cut()
 	underlays.Cut()
 

@@ -8,7 +8,7 @@
 	clicksound = 'sound/machines/buttonbeep.ogg'
 	clickvol = 30
 	var/mob/living/carbon/human/occupant = null
-	var/obj/item/weapon/reagent_containers/glass/beaker = null
+	var/obj/item/reagent_containers/glass/beaker = null
 
 	idle_power_usage = 15
 	active_power_usage = 1000 //builtin health analyzer, dialysis machine, injectors.
@@ -85,12 +85,12 @@
 						use_power_oneoff(active_power_usage, POWER_CHAN, TRUE)
 						visible_message("\The [occupant] slowly fades into a phantom state.")
 
-/obj/item/weapon/reagent_containers/glass/beaker/phoron
+/obj/item/reagent_containers/glass/beaker/phoron
 	name = "phoron beaker"
 	desc = "A beaker filled with highly concentrated phoron fuel."
 
 
-/obj/item/weapon/reagent_containers/glass/beaker/phoron/New()
+/obj/item/reagent_containers/glass/beaker/phoron/New()
 	reagents = new()
 	reagents.add_reagent(/datum/reagent/toxin/phoron, 500)
 
@@ -98,7 +98,7 @@
 	return attack_hand(user)
 
 /obj/machinery/bluegate/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I, /obj/item/weapon/reagent_containers/glass))
+	if(istype(I, /obj/item/reagent_containers/glass))
 		add_fingerprint(user)
 		if(!beaker)
 			beaker = I
@@ -256,8 +256,8 @@
 	idle_power_usage = 10
 	active_power_usage = 250
 
-	var/obj/item/weapon/paper/research/loaded_paper = null
-	var/obj/item/weapon/disk/design_disk/loaded_disk = null
+	var/obj/item/paper/research/loaded_paper = null
+	var/obj/item/disk/design_disk/loaded_disk = null
 
 /obj/machinery/research_processor/update_icon()
 	return
@@ -338,21 +338,21 @@
 	return 1
 
 /obj/machinery/research_processor/attackby(obj/item/W, mob/user)
-	if(istype(W, /obj/item/weapon/paper/research))
+	if(istype(W, /obj/item/paper/research))
 		if(loaded_paper)
 			to_chat(user, "<span class='warning'>There is already a paper loaded.</span>")
 			return
-		var/obj/item/weapon/paper/research/R = W
+		var/obj/item/paper/research/R = W
 		user.drop_item()
 		R.forceMove(src)
 		loaded_paper = R
 		visible_message("\The [user] feeds \a [R] into \the [src].")
 		return
-	else if(istype(W, /obj/item/weapon/disk/design_disk))
+	else if(istype(W, /obj/item/disk/design_disk))
 		if(loaded_disk)
 			to_chat(user, "<span class='warning'>There is already a design disk loaded.</span>")
 			return
-		var/obj/item/weapon/disk/design_disk/D = W
+		var/obj/item/disk/design_disk/D = W
 		if(D.blueprint)
 			to_chat(user, "<span class='warning'>That design disk is not empty.</span>")
 			return
@@ -456,12 +456,12 @@
 			user.drop_item()
 
 // Research paper produced from concepts
-/obj/item/weapon/paper/research
+/obj/item/paper/research
 	var/progress = 0           // 0..100 percent
 	var/concept_name = ""
 	var/concept_kind = ""      // "grief" or "fulfillment" (from the concept type)
 
-/obj/item/weapon/paper/research/examine(mob/user)
+/obj/item/paper/research/examine(mob/user)
 	. = ..()
 	to_chat(user, "<span class='notice'>Research progress: [progress]%</span>")
 
@@ -473,38 +473,38 @@
 /obj/concept/proc/has_pen_and_paper(mob/user)
 	if(!user)
 		return FALSE
-	var/obj/item/weapon/pen/pen_in_hands = null
-	var/obj/item/weapon/paper/paper_in_hands = null
-	if(istype(user.get_active_hand(), /obj/item/weapon/pen))
+	var/obj/item/pen/pen_in_hands = null
+	var/obj/item/paper/paper_in_hands = null
+	if(istype(user.get_active_hand(), /obj/item/pen))
 		pen_in_hands = user.get_active_hand()
-	if(istype(user.get_inactive_hand(), /obj/item/weapon/pen))
+	if(istype(user.get_inactive_hand(), /obj/item/pen))
 		pen_in_hands = user.get_inactive_hand()
-	if(istype(user.get_active_hand(), /obj/item/weapon/paper))
+	if(istype(user.get_active_hand(), /obj/item/paper))
 		paper_in_hands = user.get_active_hand()
-	if(!paper_in_hands && istype(user.get_inactive_hand(), /obj/item/weapon/paper))
+	if(!paper_in_hands && istype(user.get_inactive_hand(), /obj/item/paper))
 		paper_in_hands = user.get_inactive_hand()
 	return (pen_in_hands && paper_in_hands)
 
 /obj/concept/proc/get_paper(mob/user)
-	var/obj/item/weapon/paper/P = null
-	if(istype(user.get_active_hand(), /obj/item/weapon/paper))
+	var/obj/item/paper/P = null
+	if(istype(user.get_active_hand(), /obj/item/paper))
 		P = user.get_active_hand()
-	else if(istype(user.get_inactive_hand(), /obj/item/weapon/paper))
+	else if(istype(user.get_inactive_hand(), /obj/item/paper))
 		P = user.get_inactive_hand()
 	return P
 
 /obj/concept/proc/extract_step(mob/user)
-	var/obj/item/weapon/paper/P = get_paper(user)
+	var/obj/item/paper/P = get_paper(user)
 	if(!P)
 		return FALSE
-	var/obj/item/weapon/paper/research/R
-	if(istype(P, /obj/item/weapon/paper/research))
+	var/obj/item/paper/research/R
+	if(istype(P, /obj/item/paper/research))
 		R = P
 	else
 		// Convert plain paper into a research paper tied to this concept
 		var/loc_old = P.loc
 		qdel(P)
-		R = new /obj/item/weapon/paper/research(loc_old)
+		R = new /obj/item/paper/research(loc_old)
 		R.name = "research paper: [src.name]"
 		R.info = "Formalized research notes on [src.name].\n\nThis paper captures a fragment of the underlying idea."
 		R.concept_name = src.name

@@ -1,4 +1,6 @@
 var/list/limb_icon_cache = list()
+var/list/medical_skin_luminance_cache = list()
+/obj/item/organ/external/var/medical_skin_brightness = 0
 
 /obj/item/organ/external/set_dir()
 	return
@@ -86,7 +88,7 @@ var/list/limb_icon_cache = list()
 		icon = 'icons/mob/human_races/r_human.dmi'
 	else if (robotic >= ORGAN_ROBOT)
 		icon = 'icons/mob/human_races/robotic.dmi'
-	else if (status & ORGAN_MUTATED)
+	else if ((status & ORGAN_MUTATED) && !species.medical_skin_appearance)
 		icon = species.deform
 	else if (owner && (SKELETON in owner.mutations))
 		icon = 'icons/mob/human_races/r_skeleton.dmi'
@@ -185,5 +187,66 @@ var/list/robot_hud_colours = list("#ffffff","#cccccc","#aaaaaa","#888888","#6666
 			applying.Blend(rgb(s_col[1], s_col[2], s_col[3]), s_col_blend)
 			icon_cache_key += "_color_[s_col[1]]_[s_col[2]]_[s_col[3]]_[s_col_blend]"
 
+	if(can_show_medical_skin())
+		apply_medical_skin_colour(applying)
+		icon_cache_key += "_medical_[owner.medical_appearance_key()]_[get_medical_skin_pallor()]"
+
 	return applying
+
+/obj/item/organ/external/proc/can_show_medical_skin()
+	return owner && owner.species?.medical_skin_appearance && species?.medical_skin_appearance && robotic < ORGAN_ROBOT && !nonsolid && !force_icon && !(status & ORGAN_DEAD) && !(HUSK in owner.mutations) && !(HULK in owner.mutations) && !(SKELETON in owner.mutations)
+
+/obj/item/organ/external/proc/get_medical_skin_pallor()
+	var/tissue_pallor = genetic_degradation > 30 ? clamp(ceil((genetic_degradation - 30) / 25), 1, 3) : 0
+	return max(owner ? owner.medical_pallor : 0, tissue_pallor)
+
+/obj/item/organ/external/proc/get_medical_skin_luminance(var/icon/applying)
+	var/cache_key = "[icon]_[icon_cache_key]"
+	if(!isnull(medical_skin_luminance_cache[cache_key]))
+		return medical_skin_luminance_cache[cache_key]
+	var/icon/sample = new(applying, dir = SOUTH)
+	var/brightness = 0
+	var/pixel_count = 0
+	for(var/pixel_x in 1 to sample.Width())
+		for(var/pixel_y in 1 to sample.Height())
+			var/pixel = sample.GetPixel(pixel_x, pixel_y)
+			if(!pixel)
+				continue
+			var/list/channels = ReadRGB(pixel)
+			var/luminance = (0.299 * channels[1] + 0.587 * channels[2] + 0.114 * channels[3]) / 255
+			if(luminance < 0.03)
+				continue
+			brightness += luminance
+			pixel_count++
+	brightness = pixel_count ? brightness / pixel_count : 0
+	medical_skin_luminance_cache[cache_key] = brightness
+	return brightness
+
+/obj/item/organ/external/proc/medical_skin_tint(var/icon/applying, red_factor, green_factor, blue_factor, desaturation, lift = 0)
+	applying.MapColors(
+		(1 - desaturation + 0.299 * desaturation) * red_factor, 0.299 * desaturation * green_factor, 0.299 * desaturation * blue_factor, 0,
+		0.587 * desaturation * red_factor, (1 - desaturation + 0.587 * desaturation) * green_factor, 0.587 * desaturation * blue_factor, 0,
+		0.114 * desaturation * red_factor, 0.114 * desaturation * green_factor, (1 - desaturation + 0.114 * desaturation) * blue_factor, 0,
+		0, 0, 0, 1,
+		lift / 255, lift / 255, lift / 255, 0)
+
+/obj/item/organ/external/proc/apply_medical_skin_colour(var/icon/applying)
+	var/pallor = get_medical_skin_pallor()
+	if(!pallor && !owner.medical_cyanosis && !owner.medical_flushing && !owner.medical_jaundice)
+		return
+	var/brightness = get_medical_skin_luminance(applying)
+	medical_skin_brightness = brightness
+	var/visibility = 0.3 + 0.7 * brightness
+	var/strength = owner.medical_jaundice / 3 * visibility
+	if(strength)
+		medical_skin_tint(applying, 1 + 0.04 * strength, 1 + 0.02 * strength, 1 - 0.24 * strength, 0)
+	strength = owner.medical_flushing / 3 * visibility * (1 - pallor / 3)
+	if(strength)
+		medical_skin_tint(applying, 1 + 0.13 * strength, 1 - 0.09 * strength, 1 + (0.04 - 0.1 * brightness) * strength, 0)
+	strength = pallor / 3
+	if(strength)
+		medical_skin_tint(applying, 1 - 0.04 * strength, 1, 1 + 0.035 * strength, 0.22 * strength, 2 * strength)
+	strength = owner.medical_cyanosis / 3
+	if(strength)
+		medical_skin_tint(applying, 1 - 0.13 * strength * visibility, 1 - 0.025 * strength, 1 + 0.09 * strength * visibility, 0.18 * strength)
 

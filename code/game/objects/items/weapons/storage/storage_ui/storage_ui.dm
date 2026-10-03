@@ -1,5 +1,5 @@
 /datum/storage_ui
-	var/obj/item/weapon/storage/storage
+	var/obj/item/storage/storage
 
 /datum/storage_ui/New(var/storage)
 	src.storage = storage
@@ -11,6 +11,9 @@
 
 /datum/storage_ui/proc/show_to(var/mob/user)
 	return
+
+/datum/storage_ui/proc/is_visible_to(var/mob/user)
+	return FALSE
 
 /datum/storage_ui/proc/hide_from(var/mob/user)
 	return

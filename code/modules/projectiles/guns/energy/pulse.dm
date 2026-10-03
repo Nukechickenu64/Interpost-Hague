@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/energy/pulse_rifle
-	name = "pulse rifle"
-	desc = "A weapon that uses advanced pulse-based beam generation technology to emit powerful laser blasts. Because of its complexity and cost, it is rarely seen in use except by specialists."
+	name = "\improper Hephaestus Industries HPR-40 Pulse Rifle"
+	desc = "A high-output pulse rifle with a 36-shot cell capacity. Its cost and maintenance requirements limit issue to specialist units."
 	icon_state = "pulse"
 	item_state = "pulse"
 	slot_flags = SLOT_BACK
@@ -17,8 +17,8 @@
 	wielded_item_state = "gun_wielded"
 
 /obj/item/weapon/gun/energy/pulse_rifle/carbine
-	name = "pulse carbine"
-	desc = "A military grade weapon that uses advanced pulse-based beam generation technology to emit powerful laser blasts."
+	name = "\improper Hephaestus Industries HPC-24 Pulse Carbine"
+	desc = "A compact military pulse weapon with a 24-shot cell capacity, designed for use where the full-length HPR-40 is impractical."
 	icon_state = "pulse_carbine"
 	slot_flags = SLOT_BACK|SLOT_BELT
 	force = 8
@@ -30,8 +30,8 @@
 	move_delay = 2
 
 /obj/item/weapon/gun/energy/pulse_rifle/pistol
-	name = "pulse pistol"
-	desc = "A military grade weapon that uses advanced pulse-based beam generation technology to emit powerful laser blasts."
+	name = "\improper Hephaestus Industries HPP-21 Pulse Pistol"
+	desc = "A sidearm-sized pulse weapon with a 21-shot cell capacity."
 	icon_state = "pulse_pistol"
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
 	force = 6
@@ -44,13 +44,15 @@
 	wielded_item_state = null
 
 /obj/item/weapon/gun/energy/pulse_rifle/mounted
+	name = "\improper Hephaestus Industries HPR-40M Mounted Pulse Cannon"
+	desc = "An HPR-40 pulse system configured for powered mounting and external cell supply."
 	self_recharge = 1
 	use_external_power = 1
 
 /obj/item/weapon/gun/energy/pulse_rifle/destroyer
-	name = "pulse destroyer"
-	desc = "A heavy-duty, pulse-based energy weapon. Because of its complexity and cost, it is rarely seen in use except by specialists."
-	power_supply = /obj/item/weapon/cell/super
+	name = "\improper Hephaestus Industries HPD-80 Pulse Destroyer"
+	desc = "A heavy pulse weapon with a high-output cell and a long firing cycle, restricted to specialist deployment."
+	power_supply = /obj/item/cell/super
 	fire_delay = 25
 	projectile_type=/obj/item/projectile/beam/pulse/destroy
 	charge_cost= 40
@@ -59,8 +61,8 @@
 	to_chat(user, "<span class='warning'>[src.name] has three settings, and they are all DESTROY.</span>")
 
 /obj/item/weapon/gun/energy/pulse_rifle/bogani
-	name = "pulsar cannon"
-	desc = "An alien weapon never before seen by the likes of your species."
+	name = "Uncatalogued Bogani Pulsar Cannon"
+	desc = "An unfamiliar Bogani weapon that emits concentrated pulse energy. Its construction and operating principles are not recognized by human manufacturers."
 	icon_state = "bog_rifle"
 	item_state = "bog_rifle"
 	wielded_item_state = "bog_rifle-wielded"

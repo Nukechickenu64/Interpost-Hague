@@ -10,7 +10,7 @@
 	id_slot = slot_wear_amulet
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/cargo/head
+	id_type = /obj/item/card/id/cargo/head
 	pda_type = /obj/item/device/pda/quartermaster
 	pda_slot = slot_wear_id
 
@@ -23,7 +23,7 @@
 	head = null
 	suit = null
 	pda_slot = slot_wear_id
-	id_type = /obj/item/weapon/card/id/cargo
+	id_type = /obj/item/card/id/cargo
 	pda_type = /obj/item/device/pda/cargo
 
 /decl/hierarchy/outfit/job/cargo/mining
@@ -34,7 +34,7 @@
 	id_slot = slot_wear_amulet
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/cargo/mining
+	id_type = /obj/item/card/id/cargo/mining
 	pda_type = /obj/item/device/pda/shaftminer
 	flags = OUTFIT_EXTENDED_SURVIVAL
 

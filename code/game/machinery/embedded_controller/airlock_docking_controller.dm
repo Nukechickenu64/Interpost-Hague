@@ -14,6 +14,12 @@
 	if(display_name)
 		docking_program.display_name = display_name
 
+/obj/machinery/embedded_controller/radio/airlock/docking_port/get_airlock_program()
+	return airlock_program
+
+/obj/machinery/embedded_controller/radio/airlock/docking_port/manual_cycle_enabled()
+	return docking_program && (docking_program.undocked() || docking_program.override_enabled)
+
 /obj/machinery/embedded_controller/radio/airlock/docking_port/attackby(obj/item/W, mob/user)
 	if(istype(W,/obj/item/device/multitool)) //give them part of code, would take few tries to get full
 		var/code = docking_program.docking_codes
@@ -24,59 +30,6 @@
 		to_chat(user,"[W]'s screen displays '[code]'")
 	else
 		..()
-
-/obj/machinery/embedded_controller/radio/airlock/docking_port/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/nanoui/master_ui = null, var/datum/topic_state/state = GLOB.default_state)
-	var/data[0]
-
-	data = list(
-		"chamber_pressure" = round(airlock_program.memory["chamber_sensor_pressure"]),
-		"exterior_status" = airlock_program.memory["exterior_status"],
-		"interior_status" = airlock_program.memory["interior_status"],
-		"processing" = airlock_program.memory["processing"],
-		"docking_status" = docking_program.get_docking_status(),
-		"airlock_disabled" = !(docking_program.undocked() || docking_program.override_enabled),
-		"override_enabled" = docking_program.override_enabled,
-		"docking_codes" = docking_program.docking_codes,
-		"name" = docking_program.get_name()
-	)
-
-	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
-
-	if (!ui)
-		ui = new(user, src, ui_key, "docking_airlock_console.tmpl", name, 470, 290, state = state)
-		ui.set_initial_data(data)
-		ui.open()
-		ui.set_auto_update(1)
-
-/obj/machinery/embedded_controller/radio/airlock/docking_port/Topic(href, href_list)
-	if(..())
-		return
-
-	usr.set_machine(src)
-
-	var/clean = 0
-	switch(href_list["command"])	//anti-HTML-hacking checks
-		if("cycle_ext")
-			clean = 1
-		if("cycle_int")
-			clean = 1
-		if("force_ext")
-			clean = 1
-		if("force_int")
-			clean = 1
-		if("abort")
-			clean = 1
-		if("toggle_override")
-			clean = 1
-		if("dock")
-			clean = 1
-
-	if(clean)
-		program.receive_user_command(href_list["command"])
-
-	return 1
-
-
 
 //A docking controller for an airlock based docking port
 /datum/computer/file/embedded_program/docking/airlock

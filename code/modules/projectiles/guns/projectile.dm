@@ -5,8 +5,8 @@
 
 
 /obj/item/weapon/gun/projectile
-	name = "gun"
-	desc = "A gun that fires bullets."
+	name = "Uncatalogued K-0 Kinetic Firearm"
+	desc = "An unidentified firearm configured to launch physical ammunition. No manufacturer or model markings are present."
 	icon_state = "revolver"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
 	w_class = ITEM_SIZE_NORMAL

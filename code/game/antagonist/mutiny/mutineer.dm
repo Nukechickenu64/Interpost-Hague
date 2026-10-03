@@ -20,6 +20,6 @@ var/datum/antagonist/mutineer/mutineers
 		return 0
 	if(!istype(player.current, /mob/living/carbon/human))
 		return 0
-	if(M.special_role)
+	if(player.special_role)
 		return 0
 	return 1

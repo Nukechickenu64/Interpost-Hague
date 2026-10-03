@@ -9,7 +9,7 @@
 
 /obj/structure/closet/secure_closet/captains/WillContain()
 	return list(
-		/obj/item/weapon/storage/backpack/satchel_cap,
+		/obj/item/storage/backpack/satchel_cap,
 		/obj/item/clothing/head/capshat,
 		/obj/item/clothing/glasses/sunglasses,
 		/obj/item/clothing/under/rank/captain,
@@ -34,7 +34,7 @@
 	return list(
 		/obj/item/clothing/glasses/sunglasses,
 		/obj/item/clothing/under/rank/eofficer,
-		/obj/item/weapon/storage/box/ids = 2
+		/obj/item/storage/box/ids = 2
 	)
 
 /obj/structure/closet/secure_closet/hos
@@ -69,16 +69,16 @@
 
 /obj/structure/closet/secure_closet/warden/WillContain()
 	return list(
-		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/security, /obj/item/weapon/storage/backpack/satchel_sec)),
-		new/datum/atom_creator/simple(/obj/item/weapon/storage/backpack/dufflebag/sec, 50),
+		new/datum/atom_creator/weighted(list(/obj/item/storage/backpack/security, /obj/item/storage/backpack/satchel_sec)),
+		new/datum/atom_creator/simple(/obj/item/storage/backpack/dufflebag/sec, 50),
 		/obj/item/clothing/glasses/sunglasses/sechud,
 		/obj/item/taperoll/police,
-		/obj/item/weapon/storage/box/flashbangs,
-		/obj/item/weapon/storage/box/teargas,
-		/obj/item/weapon/storage/belt/security,
-		/obj/item/weapon/reagent_containers/spray/pepper,
+		/obj/item/storage/box/flashbangs,
+		/obj/item/storage/box/teargas,
+		/obj/item/storage/belt/security,
+		/obj/item/reagent_containers/spray/pepper,
 		/obj/item/weapon/melee/baton/loaded,
-		/obj/item/weapon/storage/box/holobadge,
+		/obj/item/storage/box/holobadge,
 		/obj/item/clothing/head/beret/sec/corporate/warden,
 		/obj/item/device/holowarrant
 	)
@@ -94,8 +94,8 @@
 
 /obj/structure/closet/secure_closet/security/WillContain()
 	return list(
-		new/datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/satchel_sec)),
-		/obj/item/weapon/storage/belt/security,
+		new/datum/atom_creator/weighted(list(/obj/item/storage/backpack/satchel_sec)),
+		/obj/item/storage/belt/security,
 		/obj/item/weapon/melee/classic_baton,
 		/obj/item/taperoll/police,
 		/obj/item/device/hailer,
@@ -117,11 +117,11 @@
 
 /obj/structure/closet/secure_closet/security/arbiter/WillContain()
 		return list(
-		/obj/item/weapon/storage/backpack/satchel_black,
+		/obj/item/storage/backpack/satchel_black,
 		/obj/item/clothing/suit/storage/vest/arbiter,
 		/obj/item/clothing/under/rank/arbiter,
 		/obj/item/clothing/head/helmet/arbiter,
-		/obj/item/weapon/reagent_containers/spray/pepper,
+		/obj/item/reagent_containers/spray/pepper,
 		/obj/item/weapon/grenade/chem_grenade/teargas,
 		/obj/item/weapon/melee/baton/loaded,
 		/obj/item/taperoll/police,
@@ -173,15 +173,15 @@
 		/obj/item/clothing/head/det,
 		/obj/item/clothing/head/det/grey,
 		/obj/item/clothing/shoes/laceup,
-		/obj/item/weapon/storage/box/evidence,
+		/obj/item/storage/box/evidence,
 		/obj/item/device/radio/headset/headset_sec,
 		/obj/item/clothing/suit/armor/vest/detective,
 		/obj/item/ammo_magazine/c45m/flash,
 		/obj/item/taperoll/police,
 		/obj/item/weapon/gun/projectile/colt/detective,
 		/obj/item/clothing/accessory/holster/armpit,
-		/obj/item/weapon/reagent_containers/food/drinks/flask/detflask,
-		/obj/item/weapon/storage/briefcase/crimekit,
+		/obj/item/reagent_containers/food/drinks/flask/detflask,
+		/obj/item/storage/briefcase/crimekit,
 		/obj/item/device/holowarrant
 	)
 
@@ -190,7 +190,7 @@
 	req_access = list(access_captain)
 
 /obj/structure/closet/secure_closet/injection/WillContain()
-	return list(/obj/item/weapon/reagent_containers/syringe/ld50_syringe/choral = 2)
+	return list(/obj/item/reagent_containers/syringe/ld50_syringe/choral = 2)
 
 /obj/structure/closet/secure_closet/brig
 	name = "brig locker"
@@ -211,10 +211,10 @@
 /obj/structure/closet/secure_closet/courtroom/WillContain()
 	return list(
 		/obj/item/clothing/shoes/brown,
-		/obj/item/weapon/paper/Court = 3,
-		/obj/item/weapon/pen,
+		/obj/item/paper/Court = 3,
+		/obj/item/pen,
 		/obj/item/clothing/suit/judgerobe,
-		/obj/item/weapon/storage/briefcase
+		/obj/item/storage/briefcase
 	)
 
 /obj/structure/closet/secure_closet/wall
@@ -241,5 +241,5 @@
 		/obj/item/device/camera = 2,
 		/obj/item/device/camera_film = 2,
 		/obj/item/device/taperecorder = 2,
-		/obj/item/weapon/storage/secure/briefcase = 2,
+		/obj/item/storage/secure/briefcase = 2,
 	)

@@ -14,8 +14,8 @@
 		goal = goal_number
 	bar = image('icons/effects/progessbar.dmi', target, "prog_bar_0")
 	bar.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA
-	bar.plane = HUD_PLANE
-	bar.layer = HUD_ABOVE_ITEM_LAYER
+	bar.plane = MAP_HUD_PLANE
+	bar.layer = PROGRESSBAR_LAYER
 	bar.pixel_y = WORLD_ICON_SIZE
 	src.user = user
 	if(user)

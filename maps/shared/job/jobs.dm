@@ -216,7 +216,7 @@
 						///datum/job/chaplain,
 						)
 
-/datum/job/equip(var/mob/living/carbon/human/H)
+/datum/job/initialize_character(var/mob/living/carbon/human/H)
 	..()
 	H.assign_random_virtue()
 	H.assign_random_sin()
@@ -235,7 +235,7 @@
 	spawn_positions = 1
 	access = list(access_maint_tunnels)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,11), rand(9,11), rand(7,10))
 		H.generate_stats(STAT_DX)
@@ -260,7 +260,7 @@
 	spawn_positions = 1
 	access = list(access_maint_tunnels)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		// Station-born generalist; a touch nimble like assistants
 		H.religion = ILLEGAL_RELIGION //A christian born on a spaceship? what's that flesh mound?
@@ -269,7 +269,7 @@
 
 /datum/job/captain
 	title = "Captain"
-	supervisors = "your own wits and TetraCorp"
+	supervisors = "your own wits and Nanotrasen"
 	job_desc = "Leader of the ship and its crew, responsible for making tough decisions and ensuring the safety of all aboard."
 	minimal_player_age = 41
 	economic_modifier = 10
@@ -280,7 +280,7 @@
 	sex_lock = MALE
 	rankprefix  = "Captain"
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -302,7 +302,7 @@
 	social_class = SOCIAL_CLASS_HIGH
 	rankprefix  = "Executive Officer"
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -337,7 +337,7 @@
 			access_research, access_robotics, access_xenobiology, access_ai_upload, access_tech_storage,
 			access_RC_announce, access_keycard_auth, access_tcomsat, access_gateway, access_xenoarch, access_network, access_rd, access_research, access_medical, access_morgue, access_medical_equip)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		//H.set_species("Machine")
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -361,7 +361,7 @@
 	access = list(access_robotics, access_tox, access_tox_storage, access_research, access_xenobiology, access_xenoarch, access_robotics)
 	minimal_access = list(access_tox, access_tox_storage, access_research, access_xenoarch, access_robotics)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		//H.set_species("Machine") //rd only for now - 08.03
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -387,7 +387,7 @@
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_tox,
 			access_chemistry, access_virology, access_surgery)
 
-/datum/job/doctor/equip(var/mob/living/carbon/human/H)
+/datum/job/doctor/initialize_character(var/mob/living/carbon/human/H)
 	..()
 	H.newgeneratestats(7,13,10,13,11,14,9,14)
 	H.generate_skills(list("medical","cleaning", "surgery"))
@@ -406,7 +406,7 @@
 	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox, access_chemistry, access_virology, access_cmo, access_surgery, access_maint_tunnels)
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox, access_chemistry, access_virology, access_cmo, access_surgery, access_maint_tunnels)
 
-/datum/job/cmo/equip(var/mob/living/carbon/human/H)
+/datum/job/cmo/initialize_character(var/mob/living/carbon/human/H)
 	..()
 	H.newgeneratestats(8,14,10,13,12,16,10,15)
 	H.generate_skills(list("medical","cleaning", "surgery"))
@@ -434,7 +434,7 @@
 	outfit_type = /decl/hierarchy/outfit/job/security/head_peacekeeper
 	social_class = SOCIAL_CLASS_HIGH
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal())//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -457,7 +457,7 @@
 	minimal_player_age = 0
 	outfit_type = /decl/hierarchy/outfit/job/security/peacekeeper
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -477,7 +477,7 @@
 	minimal_player_age = 0
 	outfit_type = /decl/hierarchy/outfit/job/security/detective
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -500,7 +500,7 @@
 	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
 	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
 			H.religion = LEGAL_RELIGION
@@ -524,7 +524,7 @@
 	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
 	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(10,15), rand(7,10), rand(9,14))
 		H.newgeneratestats(10,14,10,14,11,14,7,14)
@@ -545,7 +545,7 @@
 	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
 	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,16), rand(9,12), rand(6,9))
 		H.newgeneratestats(12,16,8,13,6,11,9,16)
@@ -565,7 +565,7 @@
 	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
 	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,12), rand(9,12), rand(6,9))
 		H.newgeneratestats(11,13,8,13,6,11,9,16)
@@ -575,7 +575,7 @@
 	title = "Machinist"
 	total_positions = 1
 	spawn_positions = 1
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(10,15), rand(7,10), rand(9,14))
 		H.generate_stats(STAT_IQ)
@@ -599,8 +599,8 @@
 	outfit_type = /decl/hierarchy/outfit/job/cargo_kid
 	social_class = SOCIAL_CLASS_MIN
 
-	equip(var/mob/living/carbon/human/H)
-		H.set_species("Child")//Actually makes them a child. Called before ..() so they can get their clothes.
+	initialize_character(var/mob/living/carbon/human/H)
+		H.set_species("Child")
 		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
 		..()
 
@@ -616,7 +616,7 @@
 	minimal_access = list(access_bar, access_kitchen, access_hydroponics)
 	department_flag = SRV
 	rankprefix  = "Nutritionist"
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		H.newgeneratestats(11,13,8,13,6,11,9,16)
 		H.generate_skills(list("cooking","melee"))
@@ -633,7 +633,7 @@
 	access = list(access_hydroponics, access_bar, access_kitchen)
 	minimal_access = list(access_bar)
 	outfit_type = /decl/hierarchy/outfit/job/service/bartender
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		H.newgeneratestats(9,13,8,13,9,13,9,14)
 		H.generate_skills(list("cooking","ranged"))
@@ -648,7 +648,7 @@
 	spawn_positions = 1
 	outfit_type = /decl/hierarchy/outfit/job/priest
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		if(!H.religion_is_legal())//Heretical priests would be weird.
 			H.religion = LEGAL_RELIGION
@@ -668,7 +668,7 @@
 	department_flag = SRV
 	rankprefix  = "Sanitation Technician"
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		//H.add_stats(rand(9,12), rand(9,12), rand(5,9))
 		H.newgeneratestats(12,16,8,13,4,9,9,16)
@@ -687,7 +687,7 @@
 //	alt_titles = list("Hydroponicist")
 	outfit_type = /decl/hierarchy/outfit/job/service/gardener
 
-	equip(var/mob/living/carbon/human/H)
+	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		H.generate_stats(STAT_HT)
 		H.generate_skills(list("gardening","cooking"))
@@ -776,8 +776,8 @@
 			access_chemistry, access_virology, access_cmo, access_surgery)
 	outfit_type = /decl/hierarchy/outfit/job/medassist.
 
-	equip(var/mob/living/carbon/human/H)
-		H.set_species("Child")//Actually makes them a child. Called before ..() so they can get their clothes.
+	initialize_character(var/mob/living/carbon/human/H)
+		H.set_species("Child")
 		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
 		H.generate_skills(list("medical","cleaning", "surgery"))
 		..()

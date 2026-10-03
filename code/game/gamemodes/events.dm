@@ -114,8 +114,9 @@ var/hadevent    = 0
 		sleep(100)
 
 		for(var/area/A in areas)
-			for (var/obj/machinery/power/apc/temp_apc in A)
-				temp_apc.overload_lighting()
+			var/obj/machinery/power/area_smes/temp_smes = A.get_area_smes()
+			if(temp_smes)
+				temp_smes.overload_lighting()
 
 			for (var/obj/structure/closet/secure_closet/brig/temp_closet in A)
 				temp_closet.locked = 0
@@ -164,11 +165,11 @@ var/hadevent    = 0
 			return
 
 		for(var/obj/effect/landmark/epicentre in epicentreList)
-			for(var/obj/machinery/power/apc/apc in range(epicentre,lightsoutRange))
+			for(var/obj/machinery/power/area_smes/apc in range(epicentre,lightsoutRange))
 				apc.overload_lighting()
 
 	else
-		for(var/obj/machinery/power/apc/apc in SSmachines.machinery)
+		for(var/obj/machinery/power/area_smes/apc in SSmachines.machinery)
 			apc.overload_lighting()
 
 	return
@@ -296,7 +297,7 @@ Would like to add a law like "Law x is _______" where x = a number, and _____ is
 	spawn(0)
 		log_debug("Started processing APCs")
 
-		for (var/obj/machinery/power/apc/APC in world)
+		for (var/obj/machinery/power/area_smes/APC in world)
 			if(APC.z in station_levels)
 				APC.ion_act()
 				apcnum++

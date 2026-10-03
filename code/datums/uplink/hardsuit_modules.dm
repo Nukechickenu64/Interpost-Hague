@@ -18,7 +18,7 @@
 /datum/uplink_item/item/hardsuit_modules/ewar_voice
 	name = "\improper Electrowarfare Suite and Voice Synthesiser"
 	item_cost = 24
-	path = /obj/item/weapon/storage/backpack/satchel/syndie_kit/ewar_voice
+	path = /obj/item/storage/backpack/satchel/syndie_kit/ewar_voice
 
 /datum/uplink_item/item/hardsuit_modules/maneuvering_jets
 	name = "\improper Maneuvering Jets"
@@ -44,4 +44,4 @@
 	name = "\improper Mercenary Rig"
 	item_cost = 100
 	antag_costs = list(MODE_MERCENARY = 89)
-	path = /obj/item/weapon/rig/merc/heavy
+	path = /obj/item/rig/merc/heavy

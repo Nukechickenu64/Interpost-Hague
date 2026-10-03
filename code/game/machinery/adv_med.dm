@@ -9,6 +9,7 @@
 	icon_state = "body_scanner_0"
 	density = 1
 	anchored = 1
+	preferred_right_click_verb = /obj/machinery/bodyscanner/verb/eject
 
 	idle_power_usage = 60
 	active_power_usage = 10000	//10 kW. It's a big all-body scanner.
@@ -288,7 +289,7 @@
 		if (!istype(occupant,/mob/living/carbon/human))
 			to_chat(user, "\icon[src]<span class='warning'>The body scanner cannot scan that lifeform.</span>")
 			return TOPIC_REFRESH
-		new/obj/item/weapon/paper/(loc, "<tt>[connected.occupant.get_medical_data()]</tt>", "Body scan report - [occupant]")
+		new/obj/item/paper/(loc, "<tt>[connected.occupant.get_medical_data()]</tt>", "Body scan report - [occupant]")
 		return TOPIC_REFRESH
 
 /proc/get_severity(amount)

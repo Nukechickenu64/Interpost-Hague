@@ -25,9 +25,9 @@ if ($Trusted) { $flags += "-trusted" }
 if ($Invisible) { $flags += "-invisible" }
 $flags += "-logself"
 
-$dmb = Join-Path $PSScriptRoot "..\Marrow.dmb"
+$dmb = Join-Path $PSScriptRoot "..\Interpost-Hague.dmb"
 if (-not (Test-Path $dmb)) {
-    Write-Error "DMB not found at $dmb. Compile Marrow.dme first."
+    Write-Error "DMB not found at $dmb. Compile Interpost-Hague.dme first."
     exit 1
 }
 

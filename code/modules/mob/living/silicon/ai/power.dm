@@ -7,7 +7,7 @@
 		return
 
 	to_chat(src, "<span class='danger'>Main power lost. System switched to internal capacitor. Beginning diagnostics.</span>")
-	var/obj/machinery/power/apc/theAPC = null
+	var/obj/machinery/power/area_smes/theAPC = null
 	var/connection_failures = 0
 	while(aiRestorePowerRoutine)
 		// If the routine is running, proceed to another step.
@@ -40,7 +40,7 @@
 			// step 3 tries to locate an APC. It tries up to three times before failing, relying on external influence to restore power only.
 			if(AI_RESTOREPOWER_CONNECTED)
 				var/area/A = get_area(src)
-				theAPC = A.get_apc()
+				theAPC = A.get_area_smes()
 
 				if(!istype(theAPC))
 					to_chat(src, "<span class='notice'>Error processing connection to APC: Attempt [connection_failures+1]/[AI_POWER_RESTORE_MAX_ATTEMPTS]</span>")
@@ -62,7 +62,7 @@
 					connection_failures = 0
 					continue
 				// Our area has changed.
-				if(get_area(src) != get_area(theAPC))
+				if(!(get_area(src) in theAPC.served_areas))
 					to_chat(src, "<span class='danger'>APC change detected. Attempting to locate new APC.</span>")
 					aiRestorePowerRoutine = AI_RESTOREPOWER_CONNECTING
 					connection_failures = 0
@@ -96,7 +96,7 @@
 	return 0
 
 // Resets passed APC so the AI may function again.
-/mob/living/silicon/ai/proc/reset_apc(var/obj/machinery/power/apc/A)
+/mob/living/silicon/ai/proc/reset_apc(var/obj/machinery/power/area_smes/A)
 	if(!istype(A))
 		return
 
@@ -111,7 +111,7 @@
 	if(admin_powered)
 		return 0
 
-	if(istype(loc, /obj/item/weapon/aicard))
+	if(istype(loc, /obj/item/aicard))
 		return 0
 
 	if(self_shutdown)

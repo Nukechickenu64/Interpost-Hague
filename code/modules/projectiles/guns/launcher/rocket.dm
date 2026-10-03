@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/launcher/rocket
-	name = "rocket launcher"
-	desc = "MAGGOT."
+	name = "\improper Aussec Armoury RL-1 Rocket Launcher"
+	desc = "A single-shot, shoulder-fired launcher designed to fire rocket-propelled ammunition."
 	icon_state = "rocket"
 	item_state = "rocket"
 	w_class = ITEM_SIZE_HUGE
@@ -48,8 +48,8 @@
 	..()
 
 /obj/item/weapon/gun/launcher/god_rocket
-	name = "australium rocket launcher"
-	desc = "MAN UP, LADIES."
+	name = "\improper Central Command AR-100 Australium Rocket System"
+	desc = "An experimental high-capacity rocket system built around an australium-reinforced launch assembly. Not representative of standard ordnance."
 	icon_state = "rocket"
 	item_state = "rocket"
 	w_class = ITEM_SIZE_HUGE

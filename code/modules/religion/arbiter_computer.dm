@@ -5,7 +5,7 @@
 	icon_state = "arbiter_computer"
 	density = 1
 	anchored = 1
-	var/obj/item/weapon/card/id/scan = null
+	var/obj/item/card/id/scan = null
 	var/authenticated = null
 	var/scanner_results = null
 	var/rank = null
@@ -34,7 +34,7 @@
 
 /obj/machinery/computer/arbiter_computer/hear_talk(mob/living/M as mob, msg, var/verb="says", datum/language/speaking=null)
 	if (msg == accepted_prayer && M.religion_is_legal())
-		if(istype(scan, /obj/item/weapon/card/id))  //We have an ID inside
+		if(istype(scan, /obj/item/card/id))  //We have an ID inside
 			if(check_access(scan))
 				if(scan.assignment == "Supervisor Agent" || scan.assignment == "IA Agent")
 					visible_message("<span class='notice'>Welcome [scan.assignment].  Glory to science, and a blessing upon you.</span>")
@@ -82,7 +82,7 @@
 					scan = null
 				else
 					var/obj/item/I = usr.get_active_hand()
-					if (istype(I, /obj/item/weapon/card/id) && usr.unEquip(I))
+					if (istype(I, /obj/item/card/id) && usr.unEquip(I))
 						I.loc = src
 						scan = I
 			if("Log Out")

@@ -456,6 +456,7 @@ var/global/const/MAX_VIEW = 41
 	eye = mob
 	if(eye != last_eye)
 		eye = last_eye
+	update_cull_mask(TRUE)
 
 /client/proc/toggle_fullscreen(new_value)
 	set name = "ToggleFullscreen"

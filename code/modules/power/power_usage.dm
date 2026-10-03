@@ -2,11 +2,62 @@
 This is /obj/machinery level code to properly manage power usage from the area.
 */
 
-// Note that we update the area even if the area is unpowered.
+// Note that we update the area even if the area is unpowered. Machines drawing from a linked bus skip area accounting.
 #define REPORT_POWER_CONSUMPTION_CHANGE(old_power, new_power)\
-	if(old_power != new_power){\
+	if(old_power != new_power && !(power_node && power_node.on_bus)){\
 		var/area/A = get_area(src);\
 		if(A) A.power_use_change(old_power, new_power, power_channel)}
+
+/obj/machinery/is_power_linkable()
+	return TRUE
+
+/obj/machinery/get_description_info()
+	var/base_description = ..()
+	if(use_power == POWER_USE_OFF && !istype(src, /obj/machinery/power) && !power_node)
+		return base_description
+	var/datum/power_node/N = get_power_node()
+	if(!N)
+		return base_description
+	var/list/power_details = list("Power CCID: [N.ccid]")
+	if(N.inputs.len)
+		power_details += "Inputs: [english_list(N.inputs)]"
+	if(N.outputs.len)
+		power_details += "Outputs: [english_list(N.outputs)]"
+	var/power_description = jointext(power_details, "<br>")
+	return base_description ? "[base_description]<br>[power_description]" : power_description
+
+/obj/machinery/power_nets_changed(datum/power_node/N)
+	if(N.in_net && !N.on_bus)
+		var/area/A = get_area(src)
+		if(A)
+			A.power_use_change(get_power_usage(), 0, power_channel)
+		N.on_bus = TRUE
+		N.bus_powered = N.in_net.avail > 0
+		SSmachines.bus_consumers |= src
+		power_change()
+	else if(!N.in_net && N.on_bus)
+		leave_power_bus(N)
+
+/obj/machinery/leave_power_bus(datum/power_node/N)
+	N.on_bus = FALSE
+	N.bus_powered = FALSE
+	SSmachines.bus_consumers -= src
+	if(QDELETED(src))
+		return
+	var/area/A = get_area(src)
+	if(A)
+		A.power_use_change(0, get_power_usage(), power_channel)
+	power_change()
+
+/obj/machinery/get_implicit_power_inputs()
+	if(power_node && power_node.on_bus)
+		return list()
+	var/area/A = get_area(src)
+	var/obj/machinery/power/area_smes/S = A && A.get_area_smes()
+	if(S)
+		var/datum/power_node/supply_node = S.get_power_node()
+		return list("Area supply: [S.name] ([supply_node.ccid])")
+	return list("Area supply: none")
 
 // returns true if the area has power on given channel (or doesn't require power), defaults to power_channel.
 // May also optionally specify an area, otherwise defaults to src.loc.loc
@@ -14,6 +65,9 @@ This is /obj/machinery level code to properly manage power usage from the area.
 
 	if(!src.loc)
 		return 0
+
+	if(power_node && power_node.on_bus)
+		return power_node.bus_powered
 
 	//Don't do this. It allows machines that set use_power to 0 when off (many machines) to
 	//be turned on again and used after a power failure because they never gain the NOPOWER flag.
@@ -54,6 +108,9 @@ This is /obj/machinery level code to properly manage power usage from the area.
 
 // This will have this machine have its area eat this much power next tick, and not afterwards. Do not use for continued power draw.
 /obj/machinery/proc/use_power_oneoff(var/amount, var/chan = POWER_CHAN, var/return_false = FALSE)
+	if(power_node && power_node.on_bus)
+		power_node.bus_oneoff += amount
+		return
 	var/area/A = get_area(src)		// make sure it's in an area
 	if(!A)
 		return
@@ -66,6 +123,8 @@ This is /obj/machinery level code to properly manage power usage from the area.
 	REPORT_POWER_CONSUMPTION_CHANGE(0, get_power_usage())
 	GLOB.moved_event.register(src, src, .proc/update_power_on_move)
 	. = ..()
+	if(ccid || length(ccid_inputs) || length(ccid_outputs))
+		get_power_node()
 
 // Or in Destroy at all, but especially after the ..().
 /obj/machinery/Destroy()
@@ -75,7 +134,7 @@ This is /obj/machinery level code to properly manage power usage from the area.
 
 /obj/machinery/proc/update_power_on_move(atom/movable/mover, atom/old_loc, atom/new_loc)
 	var/power = get_power_usage()
-	if(!power)
+	if(!power || (power_node && power_node.on_bus))
 		return // This is the most likely case anyway.
 	var/area/old_area = get_area(old_loc)
 	var/area/new_area = get_area(new_loc)

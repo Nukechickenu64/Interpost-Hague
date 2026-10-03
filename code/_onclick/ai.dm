@@ -156,7 +156,7 @@
 		Topic(src, list("command"="bolts", "activate" = "1"))
 	return 1
 
-/obj/machinery/power/apc/AICtrlClick() // turns off/on APCs.
+/obj/machinery/power/area_smes/AICtrlClick() // turns off/on area SMES breakers.
 	Topic(src, list("breaker"="1"))
 	return 1
 

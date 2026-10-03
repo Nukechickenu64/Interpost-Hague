@@ -18,7 +18,7 @@
 		/obj/item/clothing/gloves/latex,
 		/obj/item/clothing/under/rank/sci,
 		/obj/item/clothing/under/rank/sci,
-		/obj/item/weapon/clipboard
+		/obj/item/clipboard
 	)
 
 /obj/structure/closet/secure_closet/xenobio
@@ -36,7 +36,7 @@
 		/obj/item/clothing/shoes/white,
 		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/gloves/latex,
-		/obj/item/weapon/clipboard
+		/obj/item/clipboard
 	)
 
 /obj/structure/closet/secure_closet/RD
@@ -57,7 +57,7 @@
 		/obj/item/clothing/gloves/latex,
 		/obj/item/device/radio/headset/heads/rd,
 		/obj/item/clothing/mask/gas,
-		/obj/item/weapon/clipboard
+		/obj/item/clipboard
 	)
 
 /obj/structure/closet/secure_closet/animal
@@ -69,8 +69,8 @@
 		/obj/item/device/assembly/signaler,
 		/obj/item/device/radio/electropack = 3,
 		/obj/item/weapon/gun/launcher/syringe/rapid,
-		/obj/item/weapon/storage/box/syringegun,
-		/obj/item/weapon/storage/box/syringes,
-		/obj/item/weapon/reagent_containers/glass/bottle/chloralhydrate,
-		/obj/item/weapon/reagent_containers/glass/bottle/stoxin
+		/obj/item/storage/box/syringegun,
+		/obj/item/storage/box/syringes,
+		/obj/item/reagent_containers/glass/bottle/chloralhydrate,
+		/obj/item/reagent_containers/glass/bottle/stoxin
 	)

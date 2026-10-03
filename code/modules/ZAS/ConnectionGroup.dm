@@ -95,6 +95,7 @@ Class Procs:
 /connection_edge/proc/recheck()
 
 /connection_edge/proc/flow(list/movable, differential, repelled)
+	var/list/close_turfs_by_turf = list()
 	for(var/i = 1; i <= movable.len; i++)
 		var/atom/movable/M = movable[i]
 
@@ -109,9 +110,13 @@ Class Procs:
 
 		if(M.check_airflow_movable(differential))
 			//Check for things that are in range of the midpoint turfs.
-			var/list/close_turfs = list()
-			for(var/turf/U in connecting_turfs)
-				if(get_dist(M,U) < world.view) close_turfs += U
+			var/turf/source_turf = M.loc
+			var/list/close_turfs = close_turfs_by_turf[source_turf]
+			if(isnull(close_turfs))
+				close_turfs = list()
+				for(var/turf/U in connecting_turfs)
+					if(get_dist(M,U) < world.view) close_turfs += U
+				close_turfs_by_turf[source_turf] = close_turfs
 			if(!close_turfs.len) continue
 
 			M.airflow_dest = pick(close_turfs) //Pick a random midpoint to fly towards.
@@ -130,6 +135,12 @@ Class Procs:
 	src.B = B
 	A.edges.Add(src)
 	B.edges.Add(src)
+	if(!A.zone_edges)
+		A.zone_edges = list()
+	if(!B.zone_edges)
+		B.zone_edges = list()
+	A.zone_edges[B] = src
+	B.zone_edges[A] = src
 	//id = edge_id(A,B)
 //	log_debug("New edge between [A] and [B]")
 
@@ -146,6 +157,10 @@ Class Procs:
 	return A == Z || B == Z
 
 /connection_edge/zone/erase()
+	if(A.zone_edges && A.zone_edges[B] == src)
+		A.zone_edges -= B
+	if(B.zone_edges && B.zone_edges[A] == src)
+		B.zone_edges -= A
 	A.edges.Remove(src)
 	B.edges.Remove(src)
 	. = ..()

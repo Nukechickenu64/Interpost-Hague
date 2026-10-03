@@ -83,7 +83,7 @@
 		// Apply loyalty implant
 		var/mob/living/carbon/human/H = captured.current
 		if(istype(H))
-			var/obj/item/weapon/implant/loyalty/L = new /obj/item/weapon/implant/loyalty(H)
+			var/obj/item/implant/loyalty/L = new /obj/item/implant/loyalty(H)
 			L.imp_in = H
 			L.implanted = 1
 			L.part = H.get_organ(BP_HEAD)

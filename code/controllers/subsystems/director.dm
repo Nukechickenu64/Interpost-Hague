@@ -20,27 +20,36 @@ SUBSYSTEM_DEF(director)
 	var/datum/telemetry/telemetry = null
 	var/datum/loyalty_tracker/loyalty = null
 	var/datum/boiling_point/boiling_point = null
-
-	// Corporate profiles: mind ref -> /datum/corporate_profile
 	var/list/profiles = list()
 
 	// Catalyst events
 	var/list/datum/catalyst_event/catalysts = list()
+	var/datum/director_arc/current_arc
+	var/list/datum/director_arc/arc_history = list()
 
 	// Timing
 	var/last_telemetry_sample = 0
 	var/last_evaluation = 0
+	var/last_director_beat = 0
 	var/round_start_time = 0
+	var/starter_required = FALSE
+	var/starter_role
+	var/datum/mind/starter_mind
+	var/mob/living/carbon/human/starter_body
+	var/starter_ckey
+	var/starter_deadline = 0
+	var/starter_resurrection_at = 0
+	var/starter_notified = FALSE
+	var/starter_busy = FALSE
+	var/client/starter_action_client
 
 	// Configuration
 	var/enabled = TRUE
-	var/debt_probability = 25  // % chance a crewmember starts with a debt
-	var/agenda_probability = 60  // % chance a crewmember starts with an agenda
-
+	var/debt_probability = 25
+	var/agenda_probability = 60
 	// Minimum antagonist presence maintenance
 	var/list/antag_last_activity = list()  // mind -> world.time of last recorded hostile action
 	var/last_antag_maintenance = 0
-	var/last_major_fallback = 0
 
 /datum/controller/subsystem/director/Initialize()
 	telemetry = new()
@@ -55,6 +64,7 @@ SUBSYSTEM_DEF(director)
 		new /datum/catalyst_event/infiltration(),
 		new /datum/catalyst_event/leech(),
 		new /datum/catalyst_event/epicurean(),
+		new /datum/catalyst_event/cargo_incursion(),
 	)
 
 	log_debug("AI Director: Initialized with [catalysts.len] catalyst events.")
@@ -66,8 +76,20 @@ SUBSYSTEM_DEF(director)
 	boiling_point = SSdirector.boiling_point
 	profiles = SSdirector.profiles
 	catalysts = SSdirector.catalysts
+	current_arc = SSdirector.current_arc
+	arc_history = SSdirector.arc_history
 	tension = SSdirector.tension
 	director_state = SSdirector.director_state
+	round_start_time = SSdirector.round_start_time
+	starter_required = SSdirector.starter_required
+	starter_role = SSdirector.starter_role
+	starter_mind = SSdirector.starter_mind
+	starter_body = SSdirector.starter_body
+	starter_ckey = SSdirector.starter_ckey
+	starter_deadline = SSdirector.starter_deadline
+	starter_resurrection_at = SSdirector.starter_resurrection_at
+	starter_notified = SSdirector.starter_notified
+	starter_action_client = SSdirector.starter_action_client
 
 /datum/controller/subsystem/director/fire(resumed = FALSE)
 	if(!enabled)
@@ -75,6 +97,8 @@ SUBSYSTEM_DEF(director)
 
 	if(GAME_STATE != RUNLEVEL_GAME)
 		return
+
+	process_starter_antagonist()
 
 	// Sample telemetry at regular intervals
 	if(world.time - last_telemetry_sample >= TELEMETRY_SAMPLE_INTERVAL)
@@ -108,13 +132,21 @@ SUBSYSTEM_DEF(director)
 		return "DONE"
 	return "???"
 
-/// Called when the round starts to initialize corporate profiles
+/// Called when the round starts to reset Director state for a new narrative.
 /datum/controller/subsystem/director/proc/on_round_start()
+	reset_starter_antagonist()
 	director_state = DIRECTOR_STATE_MONITORING
 	tension = 5  // Start with a small baseline
 	round_start_time = world.time
 	last_telemetry_sample = 0
 	last_evaluation = 0
+	last_director_beat = 0
+	if(current_arc)
+		qdel(current_arc)
+	current_arc = null
+	for(var/datum/director_arc/old_arc in arc_history)
+		qdel(old_arc)
+	arc_history.Cut()
 
 	// Reset components
 	telemetry = new()
@@ -123,40 +155,153 @@ SUBSYSTEM_DEF(director)
 	for(var/datum/catalyst_event/C in catalysts)
 		C.reset()
 	profiles.Cut()
-
-	// Assign corporate profiles to all crew
 	assign_corporate_profiles()
-
+	if(istype(SSticker.mode, /datum/game_mode/dynamic))
+		starter_required = TRUE
+		starter_role = pick("traitor", "leech")
+		starter_deadline = round_start_time + DIRECTOR_STARTER_DELAY
+		select_starter_antagonist()
 	log_debug("AI Director: Round started. Assigned [profiles.len] corporate profiles.")
 
-/// Assign corporate profiles to all crew at round start
+/datum/controller/subsystem/director/proc/clear_starter_candidate()
+	if(starter_action_client)
+		starter_action_client.verbs -= /client/proc/rise_as_leech
+	starter_action_client = null
+	starter_mind = null
+	starter_body = null
+	starter_ckey = null
+	starter_resurrection_at = 0
+
+/datum/controller/subsystem/director/proc/reset_starter_antagonist()
+	clear_starter_candidate()
+	starter_required = FALSE
+	starter_role = null
+	starter_deadline = 0
+	starter_notified = FALSE
+	starter_busy = FALSE
+
+/datum/controller/subsystem/director/proc/starter_candidate_eligible(mob/living/carbon/human/candidate, antag_id)
+	if(!candidate || QDELETED(candidate) || !candidate.client || !candidate.mind || candidate.stat == DEAD || !is_station_turf(get_turf(candidate)))
+		return FALSE
+	if(player_is_antag(candidate.mind) || candidate.mind.leech_conversion_pending)
+		return FALSE
+	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
+	if(!antag || antag.get_antag_count() >= antag.hard_cap || !antag.can_become_antag(candidate.mind, FALSE))
+		return FALSE
+	if(antag_id == "leech")
+		var/obj/item/organ/internal/heart/heart = candidate.get_organ(BP_HEART)
+		if(!heart || heart.robotic >= ORGAN_ROBOT || heart.pulse == PULSE_NONE || (heart.status & ORGAN_DEAD) || !candidate.vessel || candidate.species.blood_volume <= 0)
+			return FALSE
+	return TRUE
+
+/datum/controller/subsystem/director/proc/select_starter_antagonist()
+	clear_starter_candidate()
+	var/list/roles = list(starter_role, starter_role == "traitor" ? "leech" : "traitor")
+	for(var/antag_id in roles)
+		var/list/candidates = list()
+		for(var/mob/living/carbon/human/candidate in GLOB.player_list)
+			if(starter_candidate_eligible(candidate, antag_id))
+				candidates += candidate
+		if(!candidates.len)
+			continue
+		starter_role = antag_id
+		starter_body = pick(candidates)
+		starter_mind = starter_body.mind
+		starter_ckey = starter_body.ckey
+		starter_notified = FALSE
+		log_debug("AI Director: Selected [starter_ckey] as delayed round-start [starter_role].")
+		return TRUE
+	if(!starter_notified)
+		message_admins("AI Director: No eligible crew for the Dynamic starter antagonist. Selection will retry without bypassing antagonist restrictions.")
+		starter_notified = TRUE
+	return FALSE
+
+/datum/controller/subsystem/director/proc/get_starter_client()
+	if(starter_body?.client && starter_body.ckey == starter_ckey)
+		return starter_body.client
+	for(var/mob/observer/ghost/observer in GLOB.player_list)
+		if(observer.client && observer.ckey == starter_ckey && observer.mind == starter_mind && observer.can_reenter_corpse && !observer.pain_possession_object)
+			return observer.client
+	return null
+
+/datum/controller/subsystem/director/proc/starter_awakening_valid()
+	if(!starter_required || !starter_resurrection_at || !starter_mind || QDELETED(starter_mind) || !starter_body || QDELETED(starter_body))
+		return FALSE
+	if(starter_body.mind != starter_mind || starter_mind.current != starter_body || player_is_antag(starter_mind))
+		return FALSE
+	var/client/owner = get_starter_client()
+	if(!owner || (starter_body.client && starter_body.client != owner))
+		return FALSE
+	if(starter_body.key && copytext(starter_body.key, 1, 2) != "@" && starter_body.ckey != starter_ckey)
+		return FALSE
+	var/datum/antagonist/antag = GLOB.all_antag_types_["leech"]
+	if(!antag || antag.get_antag_count() >= antag.hard_cap || !antag.can_become_antag(starter_mind, FALSE) || jobban_isbanned(owner.mob, antag.id))
+		return FALSE
+	if(config.use_age_restriction_for_jobs && isnum_safe(owner.player_age) && isnum_safe(antag.min_player_age) && owner.player_age < antag.min_player_age)
+		return FALSE
+	return TRUE
+
+/datum/controller/subsystem/director/proc/process_starter_antagonist()
+	if(!starter_required || starter_busy || director_state == DIRECTOR_STATE_DORMANT || director_state == DIRECTOR_STATE_CONCLUDED)
+		return
+	if(starter_resurrection_at)
+		if(!starter_awakening_valid())
+			log_debug("AI Director: Replacing unavailable cardiac starter [starter_ckey].")
+			clear_starter_candidate()
+		else
+			var/client/owner = get_starter_client()
+			if(starter_action_client != owner)
+				if(starter_action_client)
+					starter_action_client.verbs -= /client/proc/rise_as_leech
+				starter_action_client = owner
+				owner.verbs |= /client/proc/rise_as_leech
+			if(starter_body.stat != DEAD)
+				complete_starter_leech()
+			return
+	if(starter_mind && (starter_mind.current != starter_body || starter_body?.mind != starter_mind || starter_body?.ckey != starter_ckey || !starter_candidate_eligible(starter_body, starter_role)))
+		log_debug("AI Director: Replacing unavailable starter [starter_ckey].")
+		clear_starter_candidate()
+	if(!starter_mind && !select_starter_antagonist())
+		return
+	if(world.time < starter_deadline)
+		return
+	starter_busy = TRUE
+	if(starter_role == "leech")
+		starter_body.begin_starter_leech_death()
+	else
+		var/datum/antagonist/antag = GLOB.all_antag_types_[starter_role]
+		if(antag.add_antagonist(starter_mind, FALSE, FALSE, FALSE, FALSE, TRUE))
+			loyalty.set_faction(starter_mind, LOYALTY_SYNDICATE)
+			log_debug("AI Director: Activated round-start traitor [starter_ckey].")
+			starter_required = FALSE
+			clear_starter_candidate()
+		else
+			clear_starter_candidate()
+	starter_busy = FALSE
+
+/datum/controller/subsystem/director/proc/can_recruit_antagonist(antag_id)
+	if(starter_deadline && world.time < starter_deadline)
+		return FALSE
+	var/reserved = starter_required ? 1 : 0
+	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
+	if(!antag || antag.get_antag_count() + (starter_role == antag_id ? reserved : 0) >= antag.hard_cap)
+		return FALSE
+	return get_total_antag_count() + reserved < max(1, round(count_living_crew() / 2))
+
 /datum/controller/subsystem/director/proc/assign_corporate_profiles()
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
-		if(!H.mind || !H.client)
+		if(!H.mind || !H.client || !is_station_turf(get_turf(H)) || player_is_antag(H.mind))
 			continue
-		if(!is_station_turf(get_turf(H)))
-			continue
-		if(player_is_antag(H.mind))
-			continue  // Already an antag, skip
-
 		var/datum/corporate_profile/CP = new(H.mind)
-
-		// Roll for debt or agenda
 		var/roll = rand(1, 100)
 		if(roll <= debt_probability)
 			CP.generate_debt()
 		else if(roll <= debt_probability + agenda_probability)
 			CP.generate_agenda()
-		// else: clean profile
-
 		profiles[H.mind] = CP
-
-		// Show profile to player after a short delay
 		spawn(rand(50, 200))
 			if(CP && CP.owner && CP.owner.current)
 				CP.show_to_player()
-
-		// Register initial loyalty
 		loyalty.set_faction(H.mind, LOYALTY_NANOTRASEN)
 
 /// Main evaluation loop - the heart of the Director Engine
@@ -168,20 +313,12 @@ SUBSYSTEM_DEF(director)
 	calculate_tension()
 	apply_time_pressure()
 
-	// Start the ten-minute finale with one evaluation interval to spare so a
-	// Dynamic round concludes before the two-hour hard limit.
-	if(round_start_time && world.time - round_start_time >= DIRECTOR_MAX_ROUND_DURATION - boiling_point.total_duration - DIRECTOR_EVAL_INTERVAL)
-		tension = TENSION_CRITICAL
-		tension_last_change_reason = "Maximum shift duration reached"
-
 	// Update state machine
 	update_state()
 
 	// Check catalyst events
 	if(director_state >= DIRECTOR_STATE_SIMMERING && director_state < DIRECTOR_STATE_BOILING)
 		check_catalysts()
-
-	// Check corporate profile completion
 	check_profiles()
 
 	// Ensure the round always has at least one live antagonist to react to
@@ -215,14 +352,12 @@ SUBSYSTEM_DEF(director)
 	new_tension += (100 - vitality) * 0.10        // Crew vitality: 10%
 	new_tension += (100 - death_rate) * 0.10      // Death rate: 10%
 	new_tension += (100 - research) * 0.05        // Research threshold: 5%
-
-	// Add tension from corporate profiles
 	var/profile_tension = 0
 	for(var/datum/mind/M in profiles)
 		var/datum/corporate_profile/CP = profiles[M]
 		if(CP)
 			profile_tension += CP.tension_contribution
-	new_tension += min(profile_tension, 20)  // Cap profile contribution at 20
+	new_tension += min(profile_tension, 20)
 
 	// Apply natural decay toward the calculated value
 	var/difference = new_tension - tension
@@ -255,7 +390,7 @@ SUBSYSTEM_DEF(director)
 	if(director_state == DIRECTOR_STATE_BOILING)
 		return  // Stay in boiling until concluded
 
-	if(tension >= TENSION_CRITICAL && director_state < DIRECTOR_STATE_BOILING)
+	if(tension >= TENSION_CRITICAL && director_state < DIRECTOR_STATE_BOILING && finale_is_earned())
 		// Trigger boiling point
 		director_state = DIRECTOR_STATE_BOILING
 		boiling_point.start(telemetry)
@@ -277,11 +412,56 @@ SUBSYSTEM_DEF(director)
 
 /// Check all catalyst events and trigger any that meet conditions
 /datum/controller/subsystem/director/proc/check_catalysts()
-	for(var/datum/catalyst_event/C in catalysts)
-		if(C.can_trigger(telemetry, tension))
-			C.trigger(telemetry)
+	if(world.time - last_director_beat < DIRECTOR_BEAT_COOLDOWN)
+		return FALSE
 
-/// Check corporate profiles for completion
+	var/best_score = -1
+	var/list/best_candidates = list()
+	for(var/datum/catalyst_event/C in catalysts)
+		if(!C.is_eligible(telemetry, tension))
+			if(C.warning_active)
+				C.clear_warning()
+			continue
+		var/score = C.director_priority
+		if(current_arc && current_arc.theme == C.arc_theme)
+			score += DIRECTOR_ARC_CONTINUITY_BONUS
+		if(score > best_score)
+			best_score = score
+			best_candidates.Cut()
+			best_candidates += C
+		else if(score == best_score)
+			best_candidates += C
+
+	while(best_candidates.len)
+		var/datum/catalyst_event/selected = pick(best_candidates)
+		best_candidates -= selected
+		if(selected.warning_duration && !selected.can_trigger(telemetry, tension))
+			return FALSE
+		if(!selected.trigger(telemetry))
+			if(selected.warning_active)
+				return FALSE
+			continue
+		last_director_beat = world.time
+		if(!current_arc || current_arc.theme != selected.arc_theme)
+			start_arc(selected)
+		else
+			current_arc.record_beat(selected, "Follow-up selected to preserve [current_arc.title] continuity")
+		log_debug("AI Director: Arc '[current_arc.title]' advanced to beat [current_arc.beat_count] with [selected.name].")
+		return TRUE
+	return FALSE
+
+/datum/controller/subsystem/director/proc/start_arc(var/datum/catalyst_event/first_beat)
+	if(current_arc)
+		arc_history += current_arc
+		while(arc_history.len > DIRECTOR_ARC_HISTORY_LIMIT)
+			var/datum/director_arc/oldest_arc = arc_history[1]
+			arc_history.Cut(1, 2)
+			qdel(oldest_arc)
+	current_arc = new(first_beat.arc_theme, first_beat)
+
+/datum/controller/subsystem/director/proc/finale_is_earned()
+	return current_arc && current_arc.beat_count >= DIRECTOR_ARC_MIN_BEATS
+
 /datum/controller/subsystem/director/proc/check_profiles()
 	for(var/datum/mind/M in profiles)
 		var/datum/corporate_profile/CP = profiles[M]
@@ -303,8 +483,12 @@ SUBSYSTEM_DEF(director)
 	log_debug("AI Director: Tension -[amount] ([reason]). Now at [round(tension)].")
 
 /// Called when a crewmember is arrested (hook from security systems)
-/datum/controller/subsystem/director/proc/register_arrest()
+
+/datum/controller/subsystem/director/proc/register_arrest(var/datum/mind/security_officer, var/record_uid)
 	telemetry.register_arrest()
+	var/datum/corporate_profile/CP = profiles[security_officer]
+	if(CP)
+		CP.credit_arrest(record_uid)
 
 /// Records that an antagonist mind took a hostile/evil action (hooked from admin_attack_log and antagonist creation)
 /datum/controller/subsystem/director/proc/record_antagonist_activity(var/datum/mind/M)
@@ -358,6 +542,8 @@ SUBSYSTEM_DEF(director)
 /datum/controller/subsystem/director/proc/maintain_antagonist_presence()
 	if(director_state == DIRECTOR_STATE_DORMANT || director_state == DIRECTOR_STATE_CONCLUDED)
 		return
+	if(starter_required || !can_recruit_antagonist("traitor"))
+		return
 	if(world.time - last_antag_maintenance < ANTAG_MAINTENANCE_COOLDOWN)
 		return
 	if(!all_active_antagonists_stale())
@@ -366,17 +552,22 @@ SUBSYSTEM_DEF(director)
 
 	var/max_allowed = max(1, round(count_living_crew() / 2))
 	if(get_total_antag_count() >= max_allowed)
-		trigger_major_fallback_event()
 		return
 
 	if(!try_spawn_replacement_antagonist())
-		trigger_major_fallback_event()
+		log_debug("AI Director: No eligible antagonist recruitment; continuing the active narrative arc without a replacement.")
 
 /// Attempts to stand up a fresh traitor from a ghost candidate, or a living opted-in crewmember
 /datum/controller/subsystem/director/proc/try_spawn_replacement_antagonist()
+	if(!can_director_recruit_ghosts() && !can_director_convert_crew())
+		return FALSE
 	var/datum/antagonist/traitor_antag = GLOB.all_antag_types_["traitor"]
 	if(!traitor_antag)
 		return FALSE
+
+	if(can_director_convert_crew() && convert_station_antagonist("traitor"))
+		add_tension(10, "Director recruited an existing crewmember as an antagonist")
+		return TRUE
 
 	var/list/ghost_candidates = list()
 	for(var/mob/observer/ghost/G in GLOB.player_list)
@@ -395,49 +586,20 @@ SUBSYSTEM_DEF(director)
 		if(replacement)
 			qdel(replacement)
 
-	if(convert_station_antagonist("traitor"))
-		add_tension(10, "Director restored a lapsed antagonist")
-		return TRUE
-
 	return FALSE
 
-/// Forces a Major severity random event, used when the Director can't safely add another antagonist
-/datum/controller/subsystem/director/proc/trigger_major_fallback_event()
-	if(world.time - last_major_fallback < MAJOR_FALLBACK_COOLDOWN)
-		return
-	last_major_fallback = world.time
-	if(!SSevent)
-		return
-	var/list/datum/event_container/major_containers = SSevent.event_containers[EVENT_LEVEL_MAJOR]
-	var/event_started = FALSE
-	if(islist(major_containers))
-		for(var/datum/event_container/EC in major_containers)
-			if(EC.start_event())
-				event_started = TRUE
+/datum/controller/subsystem/director/proc/can_director_recruit_ghosts()
+	return config && config.director_antag_policy == DIRECTOR_ANTAG_POLICY_GHOSTS
 
-	if(event_started)
-		add_tension(15, "Director escalated with a major event - no viable antagonist")
-		log_and_message_admins("AI Director forced a major event due to lack of active antagonists.")
-		return
-
-	var/list/datum/event_container/moderate_containers = SSevent.event_containers[EVENT_LEVEL_MODERATE]
-	if(islist(moderate_containers))
-		for(var/datum/event_container/EC in moderate_containers)
-			if(EC.start_event())
-				event_started = TRUE
-
-	if(event_started)
-		add_tension(10, "Director escalated with a moderate event - no viable major event")
-		log_and_message_admins("AI Director could not start a major event and forced a moderate event instead.")
-	else
-		log_and_message_admins("AI Director could not start a major or moderate fallback event.")
+/datum/controller/subsystem/director/proc/can_director_convert_crew()
+	return config && config.director_antag_policy == DIRECTOR_ANTAG_POLICY_CREW
 
 /// Returns a cryptic hint about an impending catalyst or the Boiling Point, for fluff systems like dreaming. Null if nothing looms.
 /datum/controller/subsystem/director/proc/get_foreshadowing()
 	if(!enabled || director_state == DIRECTOR_STATE_DORMANT || director_state == DIRECTOR_STATE_CONCLUDED)
 		return null
 
-	if(director_state == DIRECTOR_STATE_BOILING || tension >= TENSION_CRITICAL)
+	if(boiling_point.active || (tension >= TENSION_CRITICAL && finale_is_earned()))
 		return pick("the station screaming as it tears itself apart", "steel doors sealing forever", "the reactor breathing its last")
 
 	var/list/omens = list()
@@ -464,15 +626,12 @@ SUBSYSTEM_DEF(director)
 
 /// Called at round end to evaluate all profiles
 /datum/controller/subsystem/director/proc/on_round_end()
+	reset_starter_antagonist()
 	director_state = DIRECTOR_STATE_CONCLUDED
-
-	// Evaluate all corporate profiles
 	for(var/datum/mind/M in profiles)
 		var/datum/corporate_profile/CP = profiles[M]
 		if(CP)
 			CP.round_end_evaluation()
-
-	// Print profile summaries
 	var/list/summaries = list()
 	for(var/datum/mind/M in profiles)
 		var/datum/corporate_profile/CP = profiles[M]
@@ -480,7 +639,6 @@ SUBSYSTEM_DEF(director)
 			var/summary = CP.get_summary()
 			if(summary)
 				summaries += "[M.name] ([M.key]): [summary]"
-
 	if(summaries.len)
 		to_world("<br><br><b>Corporate Profiles:</b><br>[jointext(summaries, "<br>")]")
 
@@ -497,6 +655,12 @@ SUBSYSTEM_DEF(director)
 	html += "<b>State:</b> [state_name()]<br>"
 	html += "<b>Tension:</b> [round(tension)]/100<br>"
 	html += "<b>Last Change:</b> [tension_last_change_reason]<br>"
+	if(starter_required)
+		html += "<b>Starter:</b> [starter_role] / [starter_ckey ? starter_ckey : "awaiting eligible crew"]<br>"
+		if(starter_resurrection_at)
+			html += "Awaiting resurrection; self-revival ready in [max(0, round((starter_resurrection_at - world.time) / 10))] seconds<br>"
+		else
+			html += "Activation in [max(0, round((starter_deadline - world.time) / 10))] seconds<br>"
 	html += "<br><b>Telemetry:</b><br>"
 	html += "<table border='1'>"
 	html += "<tr><td>Power Grid</td><td>[round(telemetry.get_value(TELEMETRY_POWER_GRID))]</td></tr>"
@@ -516,6 +680,19 @@ SUBSYSTEM_DEF(director)
 	html += "<br><b>Catalyst Events:</b><br>"
 	for(var/datum/catalyst_event/C in catalysts)
 		html += "[C.name]: [C.uses_this_round]/[C.max_uses_per_round] uses<br>"
+	var/antag_policy = config ? config.director_antag_policy : DIRECTOR_ANTAG_POLICY_CREW
+	html += "<br><b>Antagonist Policy:</b> [antag_policy]<br>"
+	if(current_arc)
+		html += "<br><b>Active Arc:</b> [current_arc.title] ([current_arc.beat_count] beats)<br>"
+		html += "Last beat rationale: [current_arc.last_selection_reason]<br>"
+		html += "Finale readiness: [finale_is_earned() ? "earned" : "developing"]<br>"
+	else
+		html += "<br><b>Active Arc:</b> None<br>"
+	if(last_director_beat)
+		var/beat_wait = max(0, DIRECTOR_BEAT_COOLDOWN - (world.time - last_director_beat))
+		html += "Next beat eligible in: [round(beat_wait / 10)] seconds<br>"
+	else
+		html += "Next beat eligible: Ready<br>"
 	if(boiling_point.active)
 		html += "<br><b>BOILING POINT ACTIVE:</b> [boiling_point.scenario]<br>"
 		html += "Time remaining: [round(boiling_point.time_remaining / 600)] minutes<br>"
@@ -531,9 +708,13 @@ SUBSYSTEM_DEF(director)
 /datum/controller/subsystem/director/proc/admin_force_catalyst(var/catalyst_type)
 	for(var/datum/catalyst_event/C in catalysts)
 		if(C.catalyst_type == catalyst_type)
-			C.last_triggered = 0
-			C.uses_this_round = 0
-			C.trigger(telemetry)
+			C.clear_warning()
+			// Forcing skips tension, condition and warning gating, which trigger() would enforce.
+			if(!C.execute(telemetry))
+				log_and_message_admins("tried to force catalyst event '[C.name]', but it could not execute right now.")
+				return
+			C.last_triggered = world.time
+			C.uses_this_round++
 			log_and_message_admins("forced catalyst event '[C.name]'.")
 			return
 

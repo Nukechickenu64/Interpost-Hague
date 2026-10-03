@@ -227,6 +227,41 @@
 	build_destinations_cache()
 	return destinations_cache
 
+/datum/shuttle/autodock/multi/mining/process_launch()
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(expedition.mission_pending && (!next_location || !next_location.is_valid(src)))
+		expedition.mission_error = "TRANSIT NAVIGATION IS NOT READY."
+		expedition.finish_mission()
+		process_state = IDLE_STATE
+		in_use = null
+		return
+	if(next_location && expedition.is_expedition_landmark(next_location))
+		next_location.force_clear_footprint(src)
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/cancel_launch(var/user)
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(can_cancel() && expedition.mission_pending)
+		expedition.finish_mission()
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/attempt_move(var/obj/effect/shuttle_landmark/destination)
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(destination && expedition.is_expedition_landmark(destination))
+		if(destination.landmark_tag == "nav_mining_space_ruins" && ruins_gen_job)
+			if(ruins_gen_job.is_active() || ruins_gen_job.last_error || (expedition.mission_pending && !expedition.mission_ready))
+				return FALSE
+		destination.force_clear_footprint(src)
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/process_arrived()
+	next_location = current_location
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(expedition.mission_pending && current_location == expedition.mission_dock)
+		expedition.has_last_location = TRUE
+		expedition.finish_mission()
+	return ..()
+
 /obj/effect/shuttle_landmark/mining/station
 	name = "Station"
 	landmark_tag = "nav_mining_start"
@@ -251,6 +286,7 @@
 	landmark_tag = "nav_mining_space_ruins"
 	// No docking controller: this is a free space location
 	base_turf = /turf/space
+	base_area = /area/space/ruins
 
 // Ensure the space waypoint clears enough room for the mining shuttle to arrive
 /obj/effect/shuttle_landmark/mining/space

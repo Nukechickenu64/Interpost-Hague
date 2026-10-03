@@ -12,6 +12,12 @@
 /proc/Default(a, b)
 	return a ? a : b
 
+// Box-Muller normal sample.
+/proc/gaussian(mean = 0, stddev = 1)
+	var/u1 = max(rand(), 0.000001)
+	var/u2 = rand()
+	return mean + stddev * sqrt(-2 * log(u1)) * cos(360 * u2)
+
 // Trigonometric functions.
 /proc/Tan(x)
 	return sin(x) / cos(x)

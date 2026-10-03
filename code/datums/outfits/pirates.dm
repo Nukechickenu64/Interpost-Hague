@@ -12,5 +12,5 @@
 /decl/hierarchy/outfit/pirate/space
 	name = "Pirate - Space"
 	head = /obj/item/clothing/suit/space/pirate
-	back = /obj/item/weapon/tank/jetpack/oxygen
+	back = /obj/item/tank/jetpack/oxygen
 	flags = OUTFIT_HAS_JETPACK|OUTFIT_RESET_EQUIPMENT

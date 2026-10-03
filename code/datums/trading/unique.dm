@@ -30,8 +30,8 @@
 	origin = "SGS Severance"
 
 	possible_wanted_items = list(
-							/obj/item/weapon/reagent_containers/food/snacks/human                      = TRADER_SUBTYPES_ONLY,
-							/obj/item/weapon/reagent_containers/food/snacks/meat/human                 = TRADER_THIS_TYPE,
+							/obj/item/reagent_containers/food/snacks/human                      = TRADER_SUBTYPES_ONLY,
+							/obj/item/reagent_containers/food/snacks/meat/human                 = TRADER_THIS_TYPE,
 							/mob/living/carbon/human                                                   = TRADER_ALL
 							)
 
@@ -65,9 +65,9 @@
 	name = "Bobo"
 	origin = "Floating rock"
 
-	possible_wanted_items  = list(/obj/item/weapon/ore                        = TRADER_ALL)
+	possible_wanted_items  = list(/obj/item/ore                        = TRADER_ALL)
 	possible_trading_items = list(/obj/machinery/power/supermatter            = TRADER_ALL,
-								/obj/item/weapon/aiModule                     = TRADER_SUBTYPES_ONLY)
+								/obj/item/aiModule                     = TRADER_SUBTYPES_ONLY)
 	want_multiplier = 5000
 
 	speech = list("hail_generic"     = "Blub am MERCHANT. Blub hunger for things. Boo bring them to blub, yes?",

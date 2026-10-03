@@ -123,7 +123,7 @@ SUBSYSTEM_DEF(supply)
 /datum/controller/subsystem/supply/proc/forbidden_atoms_check(atom/A)
 	if(istype(A,/mob/living))
 		return 1
-	if(istype(A,/obj/item/weapon/disk/nuclear))
+	if(istype(A,/obj/item/disk/nuclear))
 		return 1
 	if(istype(A,/obj/machinery/nuclearbomb))
 		return 1
@@ -139,8 +139,14 @@ SUBSYSTEM_DEF(supply)
 	var/list/material_count = list()
 	// Sell manifests
 	var/atom/A = atom
-	if(istype(A,/obj/item/weapon/paper/manifest))
-		var/obj/item/weapon/paper/manifest/slip = A
+	if(istype(A, /obj/item/contraband) && A.fingerprintslast)
+		var/mob/deliverer = get_mob_by_key(A.fingerprintslast)
+		if(deliverer && deliverer.mind && SSdirector)
+			var/datum/corporate_profile/CP = SSdirector.profiles[deliverer.mind]
+			if(CP)
+				CP.deliver_contraband()
+	if(istype(A,/obj/item/paper/manifest))
+		var/obj/item/paper/manifest/slip = A
 		if(!slip.is_copy && slip.stamped && slip.stamped.len) //Any stamp works.
 			add_points_from_source(points_per_slip, "manifest")
 			return 1
@@ -152,8 +158,8 @@ SUBSYSTEM_DEF(supply)
 				return 1
 
 	// Must sell ore detector disks
-	if(istype(A, /obj/item/weapon/disk/survey))
-		var/obj/item/weapon/disk/survey/D = A
+	if(istype(A, /obj/item/disk/survey))
+		var/obj/item/disk/survey/D = A
 		add_points_from_source(round(D.Value() * 0.005), "gep")
 		return 1
 
@@ -224,7 +230,7 @@ SUBSYSTEM_DEF(supply)
 		A.SetName("[SP.containername][SO.comment ? " ([SO.comment])":"" ]")
 		//supply manifest generation begin
 
-		var/obj/item/weapon/paper/manifest/slip
+		var/obj/item/paper/manifest/slip
 		if(!SP.contraband)
 			var/info = list()
 			info +="<h3>[command_name()] Shipping Manifest</h3><hr><br>"
@@ -233,7 +239,7 @@ SUBSYSTEM_DEF(supply)
 			info +="[shoppinglist.len] PACKAGES IN THIS SHIPMENT<br>"
 			info +="CONTENTS:<br><ul>"
 
-			slip = new /obj/item/weapon/paper/manifest(A, JOINTEXT(info))
+			slip = new /obj/item/paper/manifest(A, JOINTEXT(info))
 			slip.is_copy = 0
 
 		//spawn the stuff, finish generating the manifest while you're at it

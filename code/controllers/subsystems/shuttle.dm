@@ -20,6 +20,11 @@ SUBSYSTEM_DEF(shuttle)
 	last_landmark_registration_time = world.time
 	initialize_shuttles()
 	. = ..()
+	var/datum/shuttle/autodock/multi/mining/mining_shuttle = shuttles["Mining"]
+	if(istype(mining_shuttle))
+		var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+		if(!expedition.ensure_ruins_level(null, TRUE))
+			log_error("Mining debris field reservation failed during shuttle initialization.")
 
 /datum/controller/subsystem/shuttle/fire(resumed = FALSE)
 	if (!resumed)

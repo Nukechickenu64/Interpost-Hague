@@ -136,7 +136,7 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/gun/energy/crossbow
 	l_pocket = /obj/item/weapon/melee/energy/sword
 	r_pocket = /obj/item/device/radio
@@ -148,7 +148,7 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/device/multitool/hacktool
 	l_pocket = /obj/item/device/encryptionkey/syndicate
 	r_pocket = /obj/item/device/radio
@@ -160,7 +160,7 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/gun/projectile/automatic
 	l_pocket = /obj/item/ammo_magazine/a10mm
 	r_pocket = /obj/item/weapon/grenade/empgrenade
@@ -172,10 +172,10 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/grenade/empgrenade
 	l_pocket = /obj/item/weapon/melee/energy/sword
-	r_pocket = /obj/item/weapon/card/emag
+	r_pocket = /obj/item/card/emag
 
 /decl/hierarchy/outfit/syndicate_strike/medic
 	name = "Syndicate Medic"
@@ -184,9 +184,9 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
-	belt = /obj/item/weapon/storage/firstaid/adv
-	l_pocket = /obj/item/weapon/storage/firstaid/surgery
+	back = /obj/item/storage/backpack/satchel_norm
+	belt = /obj/item/storage/firstaid/adv
+	l_pocket = /obj/item/storage/firstaid/surgery
 	r_pocket = /obj/item/device/radio
 
 /decl/hierarchy/outfit/mercenary_squad
@@ -198,7 +198,7 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/gun/energy/crossbow
 	l_pocket = /obj/item/weapon/melee/energy/sword
 	r_pocket = /obj/item/device/radio
@@ -210,7 +210,7 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/gun/projectile/automatic
 	l_pocket = /obj/item/ammo_magazine/a10mm
 
@@ -221,9 +221,9 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
+	back = /obj/item/storage/backpack/satchel_norm
 	belt = /obj/item/weapon/grenade/empgrenade
-	l_pocket = /obj/item/weapon/card/emag
+	l_pocket = /obj/item/card/emag
 
 /decl/hierarchy/outfit/mercenary_squad/medic
 	name = "Mercenary Medic"
@@ -232,6 +232,6 @@
 	shoes = /obj/item/clothing/shoes/swat
 	gloves = /obj/item/clothing/gloves/thick/swat
 	head = /obj/item/clothing/head/helmet/swat
-	back = /obj/item/weapon/storage/backpack/satchel_norm
-	belt = /obj/item/weapon/storage/firstaid/adv
-	l_pocket = /obj/item/weapon/storage/firstaid/surgery
+	back = /obj/item/storage/backpack/satchel_norm
+	belt = /obj/item/storage/firstaid/adv
+	l_pocket = /obj/item/storage/firstaid/surgery

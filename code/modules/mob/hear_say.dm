@@ -137,16 +137,15 @@
 		if(H.voice)
 			speaker_name = H.voice
 
-		if(H.age && H.gender)//If they have an age and gender
-			var/ageAndGender
-			jobname = H.get_assignment()
-
-			if(H.get_assignment() == "No id")//If they don't have an ID then we don't know their job.
-				jobname = ""
-
-			ageAndGender = ageAndGender2Desc(H.age, H.gender)//Get their age and gender
-
-			speaker_name += " \[" + "[jobname] " + "[ageAndGender]" + "]"//Print it out.
+		jobname = H.get_assignment("", "")
+		if(jobname)
+			var/obj/item/card/id/id = H.get_idcard()
+			var/datum/job/J = id && job_master.GetJob(id.rank)
+			if(J && (J.department_flag & (MED|SCI)))
+				var/list/name_parts = splittext(speaker_name, " ")
+				speaker_name = "Dr. [name_parts[name_parts.len]] \[[jobname]]"
+			else
+				speaker_name = "[jobname] [speaker_name]"
 
 	if(hard_to_hear)
 		speaker_name = "unknown"
@@ -173,7 +172,7 @@
 
 				// If I's display name is currently different from the voice name and using an agent ID then don't impersonate
 				// as this would allow the AI to track I and realize the mismatch.
-				if(I && !(I.name != speaker_name && I.wear_id && istype(I.wear_id,/obj/item/weapon/card/id/syndicate)))
+				if(I && !(I.name != speaker_name && I.wear_id && istype(I.wear_id,/obj/item/card/id/syndicate)))
 					impersonating = I
 					jobname = impersonating.get_assignment()
 				else
@@ -260,7 +259,7 @@
 		message = "<B>[speaker]</B> [verb][adverb]."
 
 	if(src.status_flags & PASSEMOTES)
-		for(var/obj/item/weapon/holder/H in src.contents)
+		for(var/obj/item/holder/H in src.contents)
 			H.show_message(message)
 		for(var/mob/living/M in src.contents)
 			M.show_message(message)

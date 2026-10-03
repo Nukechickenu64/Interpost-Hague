@@ -596,7 +596,7 @@
 /obj/proc/on_loc_moved(atom/oldloc)
 	return
 
-/obj/item/weapon/storage/on_loc_moved(atom/oldloc)
+/obj/item/storage/on_loc_moved(atom/oldloc)
 	for(var/obj/O in contents)
 		O.on_loc_moved(oldloc)
 

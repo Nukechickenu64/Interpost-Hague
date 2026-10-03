@@ -124,6 +124,8 @@ var/list/gamemode_cache = list()
 
 	var/welder_vision = 1
 	var/generate_map = 0
+	var/satellite_map = ""
+	var/director_antag_policy = DIRECTOR_ANTAG_POLICY_CREW
 	var/no_click_cooldown = 0
 
 	//Used for modifying movement speed for mobs.
@@ -354,6 +356,16 @@ var/list/gamemode_cache = list()
 
 				if ("generate_asteroid")
 					config.generate_map = 1
+
+				if ("satellite_map")
+					config.satellite_map = value
+
+				if ("director_antag_policy")
+					var/policy = lowertext(value)
+					if(policy in list(DIRECTOR_ANTAG_POLICY_GHOSTS, DIRECTOR_ANTAG_POLICY_CREW, DIRECTOR_ANTAG_POLICY_DISABLED))
+						config.director_antag_policy = policy
+					else
+						log_debug("Invalid director_antag_policy '[value]'; using [DIRECTOR_ANTAG_POLICY_CREW].")
 
 				if ("no_click_cooldown")
 					config.no_click_cooldown = 1

@@ -5,14 +5,14 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/gold
+	id_type = /obj/item/card/id/gold
 	pda_type = /obj/item/device/pda/captain
 
 /decl/hierarchy/outfit/job/captain/New()
 	..()
-	backpack_overrides[/decl/backpack_outfit/backpack]      = /obj/item/weapon/storage/backpack/captain
-	backpack_overrides[/decl/backpack_outfit/satchel]       = /obj/item/weapon/storage/backpack/satchel_cap
-	backpack_overrides[/decl/backpack_outfit/messenger_bag] = /obj/item/weapon/storage/backpack/messenger/com
+	backpack_overrides[/decl/backpack_outfit/backpack]      = /obj/item/storage/backpack/captain
+	backpack_overrides[/decl/backpack_outfit/satchel]       = /obj/item/storage/backpack/satchel_cap
+	backpack_overrides[/decl/backpack_outfit/messenger_bag] = /obj/item/storage/backpack/messenger/com
 
 /decl/hierarchy/outfit/job/captain/post_equip(var/mob/living/carbon/human/H)
 	..()
@@ -34,5 +34,5 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/silver
+	id_type = /obj/item/card/id/silver
 	pda_type = /obj/item/device/pda/heads/hop

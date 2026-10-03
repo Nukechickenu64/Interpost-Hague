@@ -1,4 +1,4 @@
-/obj/item/weapon/goldnugget
+/obj/item/goldnugget
 	name = "gold nugget"
 	desc = "A medium sized gold nugget, woah it shines!"
 	icon = 'icons/obj/lux.dmi'
@@ -19,14 +19,14 @@
 	icon_state = "rubel"
 	w_class = ITEM_SIZE_SMALL
 
-/obj/item/weapon/gem
+/obj/item/gem
 	name = "crystal stone"
 	desc = "A rare crystal gem."
 	icon = 'icons/obj/lux.dmi'
 	icon_state = "gem"
 	w_class = ITEM_SIZE_SMALL
 
-/obj/item/weapon/goldring
+/obj/item/goldring
 	name = "gold ring"
 	desc = "A gold ring."
 	icon = 'icons/obj/lux.dmi'

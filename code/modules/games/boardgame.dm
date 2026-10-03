@@ -1,4 +1,4 @@
-/obj/item/weapon/board
+/obj/item/board
 	name = "board"
 	desc = "A standard 16\" checkerboard. Well used." //Goddamn imperial system.
 	icon = 'icons/obj/pieces.dmi'
@@ -9,24 +9,24 @@
 	var/board = list()
 	var/selected = -1
 
-/obj/item/weapon/board/examine(mob/user, var/distance = -1)
+/obj/item/board/examine(mob/user, var/distance = -1)
 	if(in_range(user,src))
 		user.set_machine(src)
 		interact(user)
 		return
 	..()
 
-/obj/item/weapon/board/attack_hand(mob/living/carbon/human/M as mob)
+/obj/item/board/attack_hand(mob/living/carbon/human/M as mob)
 	if(M.machine == src)
 		..()
 	else
 		src.examine(M)
 
-obj/item/weapon/board/attackby(obj/item/I as obj, mob/user as mob)
+obj/item/board/attackby(obj/item/I as obj, mob/user as mob)
 	if(!addPiece(I,user))
 		..()
 
-/obj/item/weapon/board/proc/addPiece(obj/item/I as obj, mob/user as mob, var/tile = 0)
+/obj/item/board/proc/addPiece(obj/item/I as obj, mob/user as mob, var/tile = 0)
 	if(I.w_class != ITEM_SIZE_TINY) //only small stuff
 		user.show_message("<span class='warning'>\The [I] is too big to be used as a board piece.</span>")
 		return 0
@@ -61,7 +61,7 @@ obj/item/weapon/board/attackby(obj/item/I as obj, mob/user as mob)
 	return 1
 
 
-/obj/item/weapon/board/interact(mob/user as mob)
+/obj/item/board/interact(mob/user as mob)
 	if(user.is_physically_disabled() || (!isAI(user) && !user.Adjacent(src))) //can't see if you arent conscious. If you are not an AI you can't see it unless you are next to it, either.
 		user << browse(null, "window=boardgame")
 		user.unset_machine()
@@ -102,7 +102,7 @@ obj/item/weapon/board/attackby(obj/item/I as obj, mob/user as mob)
 	user << browse(jointext(dat, null),"window=boardgame;size=430x500") // 50px * 8 squares + 30 margin
 	onclose(usr, "boardgame")
 
-/obj/item/weapon/board/Topic(href, href_list)
+/obj/item/board/Topic(href, href_list)
 	if(!usr.Adjacent(src))
 		usr.unset_machine()
 		usr << browse(null, "window=boardgame")
@@ -164,7 +164,7 @@ obj/item/weapon/board/attackby(obj/item/I as obj, mob/user as mob)
 
 //Checkers
 
-/obj/item/weapon/reagent_containers/food/snacks/checker
+/obj/item/reagent_containers/food/snacks/checker
 	name = "checker"
 	desc = "It is plastic and shiny."
 	icon = 'icons/obj/pieces.dmi'
@@ -175,56 +175,56 @@ obj/item/weapon/board/attackby(obj/item/I as obj, mob/user as mob)
 	nutriment_amt = 1
 	var/piece_color ="black"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/New()
+/obj/item/reagent_containers/food/snacks/checker/New()
 	..()
 	icon_state = "[name]_[piece_color]"
 	name = "[piece_color] [name]"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/red
+/obj/item/reagent_containers/food/snacks/checker/red
 	piece_color ="red"
 
 //Chess
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/pawn
+/obj/item/reagent_containers/food/snacks/checker/pawn
 	name = "pawn"
 	desc = "How many pawns will die in your war?"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/pawn/red
+/obj/item/reagent_containers/food/snacks/checker/pawn/red
 	piece_color ="red"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/knight
+/obj/item/reagent_containers/food/snacks/checker/knight
 	name = "knight"
 	desc = "The piece chess deserves, and needs to actually play."
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/knight/red
+/obj/item/reagent_containers/food/snacks/checker/knight/red
 	piece_color ="red"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/bishop
+/obj/item/reagent_containers/food/snacks/checker/bishop
 	name = "bishop"
 	desc = "What corruption occured, urging holy men to fight?"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/bishop/red
+/obj/item/reagent_containers/food/snacks/checker/bishop/red
 	piece_color ="red"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/rook
+/obj/item/reagent_containers/food/snacks/checker/rook
 	name = "rook"
 	desc = "Representing ancient moving towers. So powerful and fast they were banned from wars, forever."
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/rook/red
+/obj/item/reagent_containers/food/snacks/checker/rook/red
 	piece_color ="red"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/queen
+/obj/item/reagent_containers/food/snacks/checker/queen
 	name = "queen"
 	desc = "A queen of battle and pain. She dances across the battlefield."
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/queen/red
+/obj/item/reagent_containers/food/snacks/checker/queen/red
 	piece_color ="red"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/king
+/obj/item/reagent_containers/food/snacks/checker/king
 	name = "king"
 	desc = "Why does a chess game end when the king dies?"
 
-/obj/item/weapon/reagent_containers/food/snacks/checker/king/red
+/obj/item/reagent_containers/food/snacks/checker/king/red
 	piece_color ="red"
 
 // You could eat fucking checkers previously. Nice.
@@ -234,7 +234,7 @@ CONTAINS:
 THAT STUPID GAME KIT
 */
 
-/obj/item/weapon/game_kit
+/obj/item/game_kit
 	name = "Gaming Kit"
 	icon = 'icons/obj/items.dmi'
 	icon_state = "game_kit"
@@ -260,11 +260,11 @@ THAT STUPID GAME KIT
 		"board_none.png"		= 'icons/chess/board_none.png',
 	)
 
-/obj/item/weapon/game_kit/New()
+/obj/item/game_kit/New()
 	src.board_stat = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
 	src.selected = "CR"
 
-/obj/item/weapon/game_kit/MouseDrop_T(mob/user as mob)
+/obj/item/game_kit/MouseDrop_T(mob/user as mob)
 	if (user == usr && !usr.incapacitated() && (usr.contents.Find(src) || in_range(src, usr)))
 		if (usr.hand)
 			if (!usr.l_hand)
@@ -275,7 +275,7 @@ THAT STUPID GAME KIT
 				spawn (0)
 					src.attack_hand(usr, 0, 1)
 
-/obj/item/weapon/game_kit/proc/update()
+/obj/item/game_kit/proc/update()
 	var/datum/asset/assets = get_asset_datum(/datum/asset/simple/chess)
 	assets.send(usr)
 
@@ -305,11 +305,11 @@ THAT STUPID GAME KIT
 		dat += "<a href='?src=\ref[src];s_piece=[piece]'><img src='board_[piece].png' width=32 height=32 border=0></a>"
 	src.data = dat
 
-/obj/item/weapon/game_kit/attack_ai(mob/user as mob, unused, flag)
+/obj/item/game_kit/attack_ai(mob/user as mob, unused, flag)
 	src.add_hiddenprint(user)
 	return src.attack_hand(user, unused, flag)
 
-/obj/item/weapon/game_kit/attack_hand(mob/user as mob, unused, flag)
+/obj/item/game_kit/attack_hand(mob/user as mob, unused, flag)
 
 	if (flag)
 		return ..()
@@ -321,7 +321,7 @@ THAT STUPID GAME KIT
 		onclose(user, "game_kit")
 		return 1
 
-/obj/item/weapon/game_kit/Topic(href, href_list)
+/obj/item/game_kit/Topic(href, href_list)
 	..()
 	if ((usr.stat || usr.restrained()))
 		return

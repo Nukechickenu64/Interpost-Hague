@@ -59,7 +59,7 @@
 
 /obj/machinery/disposal/toilet/attackby(obj/item/I as obj, mob/living/user as mob)
 
-	if(istype(I, /obj/item/weapon/crowbar))	//removing/replacing the cistern lid.
+	if(istype(I, /obj/item/crowbar))	//removing/replacing the cistern lid.
 
 		if(cistern_open)
 			to_chat(user, "<span class='notice'>You start to replace the lid on the cistern.</span>")
@@ -118,7 +118,7 @@
 		return
 
 	//deconstruction part 1 (required because toilets don't have a control panel)
-	if(istype(I, /obj/item/weapon/screwdriver))
+	if(istype(I, /obj/item/screwdriver))
 		if(mode >= DISPOSAL_CHARGING) // It's on
 			if(contents.len > 0)
 				to_chat(user, "You start emptying the content of \the [src]... gross.")

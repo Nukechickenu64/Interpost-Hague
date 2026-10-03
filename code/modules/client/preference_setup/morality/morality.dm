@@ -1,24 +1,24 @@
 // Morality selection: sins and virtues side panel for character preferences
 
-// Data registry: simple lists and descriptions
+// Preference labels mapped to the datums that define their behavior and descriptions.
 var/global/list/MORAL_SINS = list(
-	"Pride" = "An unshakable confidence in oneself, often at odds with humility.",
-	"Greed" = "A hunger for more than one needs, be it wealth or power.",
-	"Wrath" = "A tendency toward anger and vengeance.",
-	"Envy" = "A restless longing for what others possess.",
-	"Lust" = "Desire that can distract from duty or reason.",
-	"Gluttony" = "Excess and indulgence beyond necessity.",
-	"Sloth" = "A reluctance to act when action is needed."
+	"Pride" = /datum/sin/pride,
+	"Greed" = /datum/sin/greed,
+	"Wrath" = /datum/sin/wrath,
+	"Envy" = /datum/sin/envy,
+	"Lust" = /datum/sin/lust,
+	"Gluttony" = /datum/sin/gluttony,
+	"Sloth" = /datum/sin/sloth
 )
 
 var/global/list/MORAL_VIRTUES = list(
-	"Humility" = "Grounded self-regard; the antidote to pride.",
-	"Charity" = "Willingness to give freely for others' good.",
-	"Chastity" = "Ordered desire; fidelity to commitments.",
-	"Patience" = "Measured temper and forbearance.",
-	"Kindness" = "Goodwill toward others without envy.",
-	"Temperance" = "Restraint and measured action.",
-	"Diligence" = "Steady effort and responsibility."
+	"Humility" = /datum/virtue/humility,
+	"Charity" = /datum/virtue/charity,
+	"Chastity" = /datum/virtue/chastity,
+	"Patience" = /datum/virtue/patience,
+	"Kindness" = /datum/virtue/kindness,
+	"Temperance" = /datum/virtue/temperance,
+	"Diligence" = /datum/virtue/diligence
 )
 
 // Opposites map: a sin's contrary virtue
@@ -105,9 +105,11 @@ var/global/list/MORAL_OPPOSITES = list(
 	. += "<b>Description</b><br>"
 	var/list/desc_parts = list()
 	if(pref.selected_sin && (pref.selected_sin in MORAL_SINS))
-		desc_parts += "<b>Sin: [pref.selected_sin]</b><br><span class='notice'>[MORAL_SINS[pref.selected_sin]]</span><br>"
+		var/datum/sin/sin_type = MORAL_SINS[pref.selected_sin]
+		desc_parts += "<b>Sin: [pref.selected_sin]</b><br><span class='notice'>[initial(sin_type.description)]</span><br>"
 	if(pref.selected_virtue && (pref.selected_virtue in MORAL_VIRTUES))
-		desc_parts += "<b>Virtue: [pref.selected_virtue]</b><br><span class='notice'>[MORAL_VIRTUES[pref.selected_virtue]]</span><br>"
+		var/datum/virtue/virtue_type = MORAL_VIRTUES[pref.selected_virtue]
+		desc_parts += "<b>Virtue: [pref.selected_virtue]</b><br><span class='notice'>[initial(virtue_type.description)]</span><br>"
 	if(!length(desc_parts))
 		desc_parts += "<span class='notice'>Select a sin and a virtue to see their descriptions here.</span>"
 	. += jointext(desc_parts, "<br>")

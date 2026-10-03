@@ -197,7 +197,7 @@
 /datum/surgery_step/generic/retract_skin
 	allowed_tools = list(
 	/obj/item/weapon/surgery_tool/retractor = 100, 	\
-	/obj/item/weapon/crowbar = 75,
+	/obj/item/crowbar = 75,
 	/obj/item/weapon/material/knife = 50,	\
 	/obj/item/weapon/material/kitchen/utensil/fork = 50
 	)
@@ -225,7 +225,7 @@
 	var/datum/wound/W = affected.get_incision()
 	W.open_wound(min(W.damage * 2, W.damage_list[1] - W.damage)) //damage up to the max of the wound.
 	if(!affected.encased)
-		for(var/obj/item/weapon/implant/I in affected.implants)
+		for(var/obj/item/implant/I in affected.implants)
 			I.exposed()
 
 /datum/surgery_step/generic/retract_skin/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
@@ -242,7 +242,7 @@
 	/obj/item/weapon/surgery_tool/cautery = 100,			\
 	/obj/item/clothing/mask/smokable/cigarette = 75,	\
 	/obj/item/weapon/flame/lighter = 50,			\
-	/obj/item/weapon/weldingtool = 25
+	/obj/item/weldingtool = 25
 	)
 
 	min_duration = 70

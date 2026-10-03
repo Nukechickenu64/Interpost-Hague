@@ -65,12 +65,12 @@
 <p><a href='?src=\ref[src];action=create_area'>Mark this place as new area.</a></p>
 "}
 		if (AREA_STATION)
-			if (A.apc)
+			if (A.area_smes)
 				text += {"
 <p>According the blueprints, you are now in <b>\"[A.name]\"</b>.</p>
 <p>You may <a href='?src=\ref[src];action=edit_area'>
 move an amendment</a> to the drawing.</p>
-<p>You can't erase this area, because it has an APC.</p>
+<p>You can't erase this area, because it is powered by an area SMES.</p>
 "}
 			else
 				text += {"
@@ -180,7 +180,7 @@ move an amendment</a> to the drawing, or <a href='?src=\ref[src];action=delete_a
 
 /obj/item/blueprints/proc/delete_area()
 	var/area/A = get_area()
-	if (get_area_type(A)!=AREA_STATION || A.apc) //let's just check this one last time, just in case
+	if (get_area_type(A)!=AREA_STATION || A.area_smes) //let's just check this one last time, just in case
 		interact()
 		return
 	to_chat(usr, "<span class='notice'>You scrub [A.name] off the blueprint.</span>")
@@ -196,7 +196,7 @@ move an amendment</a> to the drawing, or <a href='?src=\ref[src];action=delete_a
 
 	for(var/obj/machinery/alarm/M in A)
 		M.SetName(replacetext(M.name,oldtitle,title))
-	for(var/obj/machinery/power/apc/M in A)
+	for(var/obj/machinery/power/area_smes/M in A)
 		M.SetName(replacetext(M.name,oldtitle,title))
 	for(var/obj/machinery/atmospherics/unary/vent_scrubber/M in A)
 		M.SetName(replacetext(M.name,oldtitle,title))

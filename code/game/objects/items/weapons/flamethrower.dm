@@ -17,9 +17,9 @@
 	var/lit = 0	//on or off
 	var/operating = 0//cooldown
 	var/turf/previousturf = null
-	var/obj/item/weapon/weldingtool/weldtool = null
+	var/obj/item/weldingtool/weldtool = null
 	var/obj/item/device/assembly/igniter/igniter = null
-	var/obj/item/weapon/tank/hydrogen/ptank = null
+	var/obj/item/tank/hydrogen/ptank = null
 
 
 /obj/item/weapon/flamethrower/Destroy()
@@ -99,7 +99,7 @@
 		update_icon()
 		return
 
-	if(istype(W,/obj/item/weapon/tank/hydrogen))
+	if(istype(W,/obj/item/tank/hydrogen))
 		if(ptank)
 			to_chat(user, "<span class='notice'>There appears to already be a hydrogen tank loaded in [src]!</span>")
 			return
@@ -201,7 +201,7 @@
 
 /obj/item/weapon/flamethrower/full/New(var/loc)
 	..()
-	weldtool = new /obj/item/weapon/weldingtool(src)
+	weldtool = new /obj/item/weldingtool(src)
 	weldtool.status = 0
 	igniter = new /obj/item/device/assembly/igniter(src)
 	igniter.secured = 0

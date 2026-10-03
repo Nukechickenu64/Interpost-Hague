@@ -373,7 +373,7 @@
 	new /obj/item/clothing/head/helmet/tactical(src)
 	new /obj/item/clothing/mask/balaclava/tactical(src)
 	new /obj/item/clothing/glasses/tacgoggles(src)
-	new /obj/item/weapon/storage/belt/security/tactical(src)
+	new /obj/item/storage/belt/security/tactical(src)
 	new /obj/item/clothing/shoes/tactical(src)
 	new /obj/item/clothing/gloves/tactical(src)
 	return
@@ -423,6 +423,6 @@
 	new /obj/item/clothing/shoes/brown(src)
 	new /obj/item/clothing/glasses/sunglasses/big(src)
 	new /obj/item/clothing/glasses/sunglasses/big(src)
-	new /obj/item/weapon/storage/briefcase(src)
-	new /obj/item/weapon/storage/briefcase(src)
+	new /obj/item/storage/briefcase(src)
+	new /obj/item/storage/briefcase(src)
 	return

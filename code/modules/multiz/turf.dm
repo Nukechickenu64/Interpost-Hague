@@ -34,6 +34,26 @@
 
 	z_flags = ZM_MIMIC_DEFAULTS | ZM_MIMIC_OVERWRITE | ZM_MIMIC_NO_AO | ZM_ALLOW_ATMOS
 
+/turf/simulated/open/crawlspace
+	name = "crawlspace"
+	icon = 'icons/turf/flooring/plating.dmi'
+	icon_state = "plating"
+
+/turf/simulated/open/crawlspace/CanPass(atom/movable/mover, turf/target, height=1.5, air_group=0)
+	if(ismob(mover))
+		var/mob/M = mover
+		if(!M.lying)
+			return FALSE
+	return ..()
+
+/turf/simulated/open/crawlspace/Enter(atom/movable/mover as mob|obj, atom/forget as mob|obj|turf|area)
+	if(ismob(mover))
+		var/mob/M = mover
+		if(!M.lying)
+			to_chat(M, SPAN_WARNING("You need to be crawling to move into [src]."))
+			return FALSE
+	return ..()
+
 /turf/simulated/open/update_dirt()
 	return 0
 
@@ -87,12 +107,6 @@
 			return
 		else
 			to_chat(user, "<span class='warning'>The plating is going to need some support.</span>")
-
-	//To lay cable.
-	if(isCoil(C))
-		var/obj/item/stack/cable_coil/coil = C
-		coil.turf_place(src, user)
-		return
 
 	for(var/atom/movable/M in below)
 		if(M.movable_flags & MOVABLE_FLAG_Z_INTERACT)

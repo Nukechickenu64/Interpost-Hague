@@ -175,7 +175,7 @@
 /area/marooned/marooned_hut)
 "aG" = (
 /obj/structure/bed,
-/obj/item/weapon/bedsheet,
+/obj/item/bedsheet,
 /obj/effect/landmark/corpse/marooned_officer,
 /turf/simulated/floor/wood,
 /area/marooned/marooned_hut)
@@ -242,7 +242,7 @@
 	},
 /obj/machinery/power/port_gen/pacman/mrs,
 /obj/item/stack/cable_coil,
-/obj/item/weapon/wirecutters,
+/obj/item/wirecutters,
 /obj/effect/decal/cleanable/dirt,
 /turf/simulated/floor/wood,
 /area/marooned/marooned_hut)
@@ -295,7 +295,7 @@
 /area/marooned/marooned_snow)
 "aZ" = (
 /obj/item/weapon/material/wirerod{
-	desc = "Metal rod with wiró attached to it.";
+	desc = "Metal rod with wirï¿½ attached to it.";
 	 name = "Jurry-rigged antenna"
 	},
 /turf/simulated/floor/marooned/snow,
@@ -310,7 +310,7 @@
 /turf/simulated/floor/marooned/snow,
 /area/marooned/marooned_snow)
 "bc" = (
-/obj/item/weapon/storage/box/matches,
+/obj/item/storage/box/matches,
 /turf/simulated/floor/marooned/snow,
 /area/marooned/marooned_snow)
 "bd" = (
@@ -318,26 +318,26 @@
 	dir = 8
 	},
 /obj/structure/table/woodentable,
-/obj/item/weapon/pen,
-/obj/item/weapon/paper/marooned/note1{
+/obj/item/pen,
+/obj/item/paper/marooned/note1{
 	pixel_x = 2;
 	 pixel_y = -1
 	},
-/obj/item/weapon/paper/marooned/note2{
+/obj/item/paper/marooned/note2{
 	pixel_x = -3;
 	 pixel_y = -5
 	},
-/obj/item/weapon/paper/marooned/note3{
+/obj/item/paper/marooned/note3{
 	pixel_x = 2;
 	 pixel_y = 2
 	},
-/obj/item/weapon/paper/marooned/note4,
-/obj/item/weapon/paper/marooned/note5{
+/obj/item/paper/marooned/note4,
+/obj/item/paper/marooned/note5{
 	pixel_x = -3;
 	 pixel_y = 1
 	},
-/obj/item/weapon/paper/marooned/note6,
-/obj/item/weapon/paper/marooned/note7{
+/obj/item/paper/marooned/note6,
+/obj/item/paper/marooned/note7{
 	pixel_x = 6
 	},
 /turf/simulated/floor/wood,
@@ -348,7 +348,7 @@
 	pixel_x = -10;
 	 pixel_y = -5
 	},
-/obj/item/weapon/computer_hardware/battery_module{
+/obj/item/computer_hardware/battery_module{
 	pixel_x = -7;
 	 pixel_y = 7
 	},
@@ -386,7 +386,7 @@
 "bj" = (
 /obj/structure/table/woodentable,
 /obj/item/clothing/gloves/duty,
-/obj/item/weapon/screwdriver,
+/obj/item/screwdriver,
 /turf/simulated/floor/wood,
 /area/marooned/marooned_hut)
 "bk" = (
@@ -407,15 +407,15 @@
 /obj/item/stack/material/wood,
 /obj/item/stack/material/wood,
 /obj/item/stack/material/wood,
-/obj/item/weapon/storage/box/matches,
+/obj/item/storage/box/matches,
 /turf/simulated/floor/wood,
 /area/marooned/marooned_hut)
 "bn" = (
-/obj/item/weapon/ore/slag,
+/obj/item/ore/slag,
 /turf/simulated/floor/marooned/snow,
 /area/marooned/marooned_snow)
 "bo" = (
-/obj/item/weapon/ore/slag{
+/obj/item/ore/slag{
 	pixel_x = -10;
 	 pixel_y = 3
 	},
@@ -428,7 +428,7 @@
 /turf/simulated/floor/wood,
 /area/marooned/marooned_hut)
 "bq" = (
-/obj/item/weapon/ore/slag{
+/obj/item/ore/slag{
 	pixel_x = -5;
 	 pixel_y = 5
 	},
@@ -453,7 +453,7 @@
 /area/marooned/marooned_snow)
 "bv" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/item/weapon/ore/slag,
+/obj/item/ore/slag,
 /turf/simulated/floor/beach/sand,
 /area/marooned/marooned_snow)
 "bw" = (

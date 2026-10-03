@@ -101,12 +101,13 @@
 /// Reactor meltdown: escalating radiation, power failures, explosions
 /datum/boiling_point/proc/start_reactor_meltdown()
 	// Start cutting power to non-critical areas
-	for(var/obj/machinery/power/apc/A in SSmachines.machinery)
+	for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)
 		if(!is_station_turf(get_turf(A)))
 			continue
-		var/area/AR = get_area(A)
+		var/area/AR = A.area
 		if(AR && (findtext(AR.name, "Maintenance") || findtext(AR.name, "Storage")))
 			A.operating = 0
+			A.update()
 			A.update_icon()
 	// Spawn radiation hazards near engineering
 	spawn_radiation_hazards()
@@ -114,20 +115,16 @@
 /datum/boiling_point/proc/process_reactor_meltdown()
 	// Every 30 seconds, cause random power failures and radiation pulses
 	if(prob(10))
-		var/obj/machinery/power/apc/target = null
+		var/obj/machinery/power/area_smes/target = null
 		var/list/apcs = list()
-		for(var/obj/machinery/power/apc/A in SSmachines.machinery)
+		for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)
 			if(is_station_turf(get_turf(A)))
 				apcs += A
 		if(apcs.len)
 			target = pick(apcs)
 			target.operating = 0
 			target.update_icon()
-			var/area/AR = get_area(target)
-			if(AR)
-				AR.power_light = 0
-				AR.power_equip = 0
-				AR.power_environ = 0
+			target.update()
 
 	// Radiation pulses
 	if(prob(5))

@@ -49,7 +49,10 @@
 
 			visible_message("<span class='danger'>[H] has punched \the [src]!</span>")
 
+			var/hologlove_harm_before = getBruteLoss() + getFireLoss() + getHalLoss()
 			apply_damage(damage, PAIN, affecting, armor_block)
+			if(H != src && getBruteLoss() + getFireLoss() + getHalLoss() > hologlove_harm_before)
+				H.complete_sanity_crisis(SANITY_CRISIS_HARM_OTHER)
 			if(damage >= 9)
 				visible_message("<span class='danger'>[H] has weakened \the [src]!</span>")
 				apply_effect(4, WEAKEN, armor_block)
@@ -294,7 +297,10 @@
 				real_damage = attack:ensure_nonzero_damage(real_damage)
 
 			// Finally, apply damage to target
+			var/harm_before = getBruteLoss() + getFireLoss() + getHalLoss()
 			apply_damage(real_damage, (attack.deal_halloss ? PAIN : BRUTE), hit_zone, armour, damage_flags=attack.damage_flags())
+			if(H != src && getBruteLoss() + getFireLoss() + getHalLoss() > harm_before)
+				H.complete_sanity_crisis(SANITY_CRISIS_HARM_OTHER)
 			receive_damage()
 
 		if(I_DISARM)
@@ -322,7 +328,12 @@
 	var/dam_zone = pick(organs_by_name)
 	var/obj/item/organ/external/affecting = get_organ(ran_zone(dam_zone))
 	var/armor_block = run_armor_check(affecting, armorcheck)
+	var/harm_before = getBruteLoss() + getFireLoss() + getHalLoss()
 	apply_damage(damage, damtype, affecting, armor_block)
+	if(istype(user, /mob/living/carbon/human) && getBruteLoss() + getFireLoss() + getHalLoss() > harm_before)
+		var/mob/living/carbon/human/attacker = user
+		if(attacker != src)
+			attacker.complete_sanity_crisis(SANITY_CRISIS_HARM_OTHER)
 	updatehealth()
 	return 1
 

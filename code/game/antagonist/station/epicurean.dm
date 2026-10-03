@@ -141,7 +141,7 @@ GLOBAL_DATUM_INIT(epicureans, /datum/antagonist/epicurean, new)
 	name = "prion starter"
 	desc = "A flavorless culture that turns prepared food into a latent infectious course."
 
-/obj/item/weapon/epicurean/prion_starter/afterattack(obj/item/weapon/reagent_containers/food/snacks/target, mob/user, proximity)
+/obj/item/weapon/epicurean/prion_starter/afterattack(obj/item/reagent_containers/food/snacks/target, mob/user, proximity)
 	if(!proximity)
 		return
 	target.reagents.add_reagent(/datum/reagent/epicurean_prion, 5)
@@ -152,7 +152,7 @@ GLOBAL_DATUM_INIT(epicureans, /datum/antagonist/epicurean, new)
 	name = "catalyst starter"
 	desc = "A bitter concentrate that awakens the latent prion in every infected diner."
 
-/obj/item/weapon/epicurean/catalyst_starter/afterattack(obj/item/weapon/reagent_containers/food/snacks/target, mob/user, proximity)
+/obj/item/weapon/epicurean/catalyst_starter/afterattack(obj/item/reagent_containers/food/snacks/target, mob/user, proximity)
 	if(!proximity)
 		return
 	target.reagents.add_reagent(/datum/reagent/epicurean_catalyst, 5)

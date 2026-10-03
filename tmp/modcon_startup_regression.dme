@@ -1,0 +1,7 @@
+#define UNIT_TEST
+#include "../Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	queue = list(new /datum/unit_test/atmos_machinery/modcon_cold_start)
+	log_unit_test("Running focused cold-start modcon regression.")
+	. = ..()

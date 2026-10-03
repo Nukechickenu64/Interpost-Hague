@@ -1,4 +1,4 @@
-/obj/item/weapon/storage/briefcase
+/obj/item/storage/briefcase
 	name = "briefcase"
 	desc = "It's made of AUTHENTIC faux-leather and has a price-tag still attached. The owner must be a real professional."
 	icon_state = "briefcase"
@@ -11,7 +11,7 @@
 	storage_slots_w = 9
 	storage_slots_h = 3
 
-/obj/item/weapon/storage/hardcase
+/obj/item/storage/hardcase
 	name = "hardcase"
 	desc = "A very fine steel made hardcase."
 	icon_state = "hard_case"

@@ -1,11 +1,11 @@
 /obj/item/weapon/gun/energy
-	name = "energy gun"
-	desc = "A basic energy-based gun."
+	name = "Uncatalogued E-0 Energy Weapon"
+	desc = "An unidentified cell-powered weapon configured to discharge energy projectiles. No manufacturer or model markings are present."
 	icon_state = "energy"
 	fire_sound = 'sound/weapons/Taser.ogg'
 	fire_sound_text = "laser blast"
 
-	var/obj/item/weapon/cell/power_supply // What type of power cell this starts with. Uses accepts_cell_type or variable cell if unset.
+	var/obj/item/cell/power_supply // What type of power cell this starts with. Uses accepts_cell_type or variable cell if unset.
 	var/charge_cost = 20           // How much energy is needed to fire.
 	var/max_shots = 10             // Determines the capacity of the weapon's power cell. Setting power_supply or accepts_cell_type will override this value.
 	var/modifystate                // Changes the icon_state used for the charge overlay.
@@ -41,7 +41,7 @@
 	else if(accepts_cell_type)
 		power_supply = new accepts_cell_type(src)
 	else
-		power_supply = new /obj/item/weapon/cell/device/variable(src, max_shots*charge_cost)
+		power_supply = new /obj/item/cell/device/variable(src, max_shots*charge_cost)
 
 	. = ..()
 
@@ -64,7 +64,7 @@
 			return 0 // check if we actually need to recharge
 
 		if(use_external_power)
-			var/obj/item/weapon/cell/external = get_external_power_supply()
+			var/obj/item/cell/external = get_external_power_supply()
 			if(!external || !external.use(charge_cost)) //Take power from the borg...
 				return 0
 
@@ -90,7 +90,7 @@
 		if(module.holder && module.holder.wearer)
 			var/mob/living/carbon/human/H = module.holder.wearer
 			if(istype(H) && H.back)
-				var/obj/item/weapon/rig/suit = H.back
+				var/obj/item/rig/suit = H.back
 				if(istype(suit))
 					return suit.cell
 	return null
@@ -142,7 +142,7 @@
 
 /obj/item/weapon/gun/energy/attackby(var/obj/item/A, mob/user)
 
-	if(istype(A, /obj/item/weapon/cell))
+	if(istype(A, /obj/item/cell))
 
 		if(isnull(accepts_cell_type))
 			to_chat(user, SPAN_WARNING("\The [src] cannot accept a cell."))

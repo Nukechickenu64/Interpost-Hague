@@ -73,6 +73,7 @@
 // These guys are going to need full resprites of all the suits/etc so I'm going to
 // define them and commit the sprites, but leave the clothing for another day.
 /datum/species/human/chimpanzee
+	medical_skin_appearance = FALSE
 	name = "uplifted Chimpanzee"
 	name_plural = "uplifted Chimpanzees"
 	blurb = "Ook ook."

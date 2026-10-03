@@ -1,0 +1,7 @@
+#define UNIT_TEST
+#include "../Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	queue = list(new /datum/unit_test/icon_test/los_pixel_offsets_shall_follow_viewer)
+	log_unit_test("Running focused pixel offset culling regression test.")
+	. = ..()

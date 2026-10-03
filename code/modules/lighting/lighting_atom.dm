@@ -2,6 +2,9 @@
 	var/light_power = 1 // intensity of the light
 	var/light_range = 0 // range in tiles of the light
 	var/light_color		// Hexadecimal RGB string representing the colour of the light
+	var/light_cone_angle = 0 // half-width in degrees; 0 = omnidirectional
+	var/light_cone_dir = 0   // degrees, 0 = north, clockwise
+	var/light_glow_range = 0 // omnidirectional glow radius around a cone light
 
 	var/datum/light_source/light
 	var/list/light_sources
@@ -24,6 +27,18 @@
 	if(.) update_light()
 
 #undef NONSENSICAL_VALUE
+
+/atom/proc/set_light_cone(angle, cone_dir, glow_range)
+	cone_dir = round(cone_dir, 5)
+	if(cone_dir >= 360 || cone_dir < 0)
+		cone_dir = (cone_dir % 360 + 360) % 360
+	if(angle == light_cone_angle && cone_dir == light_cone_dir && glow_range == light_glow_range)
+		return FALSE
+	light_cone_angle = angle
+	light_cone_dir = cone_dir
+	light_glow_range = glow_range
+	update_light()
+	return TRUE
 
 /atom/proc/update_light()
 	set waitfor = FALSE
@@ -80,7 +95,10 @@ if(loc != old_loc) {\
 /obj/item/pickup(mob/user)
 	. = ..()
 	update_light()
-	drawsound(user)
+	if(istype(src, /obj/item/weapon) && user)
+		user.perceived_visible_message("<span class='danger'>[user] reaches for a weapon!</span>")
+	if(drawsound)
+		playsound(user, drawsound, 50, 1)
 
 /obj/item/dropped()
 	. = ..()

@@ -245,7 +245,7 @@ BLIND		// can't see anything
 	icon = 'icons/obj/clothing/gloves.dmi'
 	siemens_coefficient = 0.75
 	var/wired = 0
-	var/obj/item/weapon/cell/cell = 0
+	var/obj/item/cell/cell = 0
 	var/clipped = 0
 	var/obj/item/clothing/ring/ring = null		//Covered ring
 	var/mob/living/carbon/human/wearer = null	//Used for covered rings when dropping
@@ -281,7 +281,7 @@ BLIND		// can't see anything
 	return 0 // return 1 to cancel attack_hand()
 
 /obj/item/clothing/gloves/attackby(obj/item/weapon/W, mob/user)
-	if(istype(W, /obj/item/weapon/wirecutters) || istype(W, /obj/item/weapon/surgery_tool/scalpel))
+	if(istype(W, /obj/item/wirecutters) || istype(W, /obj/item/weapon/surgery_tool/scalpel))
 		if (clipped)
 			to_chat(user, "<span class='notice'>\The [src] have already been modified!</span>")
 			update_icon()
@@ -603,7 +603,7 @@ BLIND		// can't see anything
 	name = "suit"
 	var/fire_resist = T0C+100
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS|LEGS
-	allowed = list(/obj/item/weapon/tank/emergency)
+	allowed = list(/obj/item/tank/emergency)
 	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0)
 	slot_flags = SLOT_OCLOTHING
 	blood_overlay_type = "suit"
@@ -654,8 +654,8 @@ BLIND		// can't see anything
 	var/displays_id = 1
 	var/rolled_down = -1 //0 = unrolled, 1 = rolled, -1 = cannot be toggled
 	var/rolled_sleeves = -1 //0 = unrolled, 1 = rolled, -1 = cannot be toggled
-	var/obj/item/weapon/storage/internal/pockets/left_pocket
-	var/obj/item/weapon/storage/internal/pockets/right_pocket
+	var/obj/item/storage/internal/pockets/left_pocket
+	var/obj/item/storage/internal/pockets/right_pocket
 
 	//convenience var for defining the icon state for the overlay used when the clothing is worn.
 	//Also used by rolling/unrolling.
@@ -686,8 +686,8 @@ BLIND		// can't see anything
 		verbs -= /obj/item/clothing/under/verb/rollsuit
 	if(rolled_sleeves == -1)
 		verbs -= /obj/item/clothing/under/verb/rollsleeves
-	left_pocket = new/obj/item/weapon/storage/internal/pockets(src, slots = 2, slot_size = 2)
-	right_pocket = new/obj/item/weapon/storage/internal/pockets(src, slots = 2, slot_size = 2)
+	left_pocket = new/obj/item/storage/internal/pockets(src, slots = 2, slot_size = 2)
+	right_pocket = new/obj/item/storage/internal/pockets(src, slots = 2, slot_size = 2)
 	if(worn_state)
 		if(!item_state_slots)
 			item_state_slots = list()

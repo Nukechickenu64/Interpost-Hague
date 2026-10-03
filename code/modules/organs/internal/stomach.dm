@@ -58,7 +58,7 @@
 			return DEVOUR_SLOW
 		else if(species.gluttonous & GLUT_ANYTHING) // Eat anything ever
 			return DEVOUR_FAST
-	else if(istype(food, /obj/item) && !istype(food, /obj/item/weapon/holder)) //Don't eat holders. They are special.
+	else if(istype(food, /obj/item) && !istype(food, /obj/item/holder)) //Don't eat holders. They are special.
 		var/obj/item/I = food
 		var/cost = I.get_storage_cost()
 		if(cost != ITEM_SIZE_NO_CONTAINER)
@@ -235,14 +235,14 @@
 
 		//Poo in the loo.
 		var/obj/structure/hygiene/toilet/T = locate() in src.loc
-		var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
+		var/obj/item/reagent_containers/RC = locate() in src.loc
 		var/mob/living/M = locate() in src.loc
 		if(T && T.open) //&& M.buckled removed until buckling is actually fixed
 			message = "<B>[H]</B><span class='hygiene'> defecates into \the [T].</span>"
 
 		else if(w_uniform)
 			message = "<B>[H]</B><span class='hygiene'> shits \his pants.</span>"
-			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
+			var/obj/item/reagent_containers/food/snacks/poo/V = new/obj/item/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
 			adjust_hygiene(-25)
@@ -256,7 +256,7 @@
 			M.unlock_achievement(new/datum/achievement/shit_on())
 
 		//Poo in the food.
-		else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
+		else if(RC && (istype(RC,/obj/item/reagent_containers/food/drinks || istype(RC,/obj/item/reagent_containers/glass))))
 			if(RC.is_open_container())
 				//Inside a beaker, glass, drink, etc.
 				message = "<B>[H]</B><span class='hygiene'> shits in \the [RC].</span>"
@@ -268,7 +268,7 @@
 		//Poo on the floor.
 		else
 			message = "<B>[H]</B> [pick("shits", "craps", "poops")]."
-			var/obj/item/weapon/reagent_containers/food/snacks/poo/V = new/obj/item/weapon/reagent_containers/food/snacks/poo(src.loc)
+			var/obj/item/reagent_containers/food/snacks/poo/V = new/obj/item/reagent_containers/food/snacks/poo(src.loc)
 			if(reagents)
 				reagents.trans_to(V, rand(1,5))
 
@@ -294,7 +294,7 @@
 	var/obj/structure/hygiene/toilet/TT = locate() in src.loc
 	//var/obj/structure/toilet/T2 = locate() in src.loc
 	var/obj/structure/hygiene/sink/S = locate() in src.loc
-	var/obj/item/weapon/reagent_containers/RC = locate() in src.loc
+	var/obj/item/reagent_containers/RC = locate() in src.loc
 	if((U || S) && gender != FEMALE)//In the urinal or sink.
 		message = "<B>[H]</B><span class='hygiene'> urinates into [U ? U : S].</span>"
 		reagents.remove_any(rand(1,8))
@@ -303,7 +303,7 @@
 		message = "<B>[H]</B><span class='hygiene'> urinates into [TT].</span>"
 		reagents.remove_any(rand(1,8))
 
-	else if(RC && (istype(RC,/obj/item/weapon/reagent_containers/food/drinks || istype(RC,/obj/item/weapon/reagent_containers/glass))))
+	else if(RC && (istype(RC,/obj/item/reagent_containers/food/drinks || istype(RC,/obj/item/reagent_containers/glass))))
 		if(RC.is_open_container())
 			//Inside a beaker, glass, drink, etc.
 			message = "<B>[H]</B><span class='hygiene'> urinates into [RC].</span>"

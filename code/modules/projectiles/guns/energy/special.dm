@@ -1,5 +1,5 @@
 /obj/item/weapon/gun/energy/ionrifle
-	name = "ion rifle"
+	name = "\improper Tarvos T-12I Herllion Ion Rifle"
 	desc = "The Tarvos T-12I Herllion is a man portable anti-armor weapon designed to disable mechanical threats, produced by Tarvos."
 	icon_state = "ionrifle"
 	item_state = "ionrifle"
@@ -19,7 +19,7 @@
 	..(max(severity, 2)) //so it doesn't EMP itself, I guess
 
 /obj/item/weapon/gun/energy/ionrifle/small
-	name = "ion pistol"
+	name = "\improper NanoTrasen Mk72 EW Preston Ion Pistol"
 	desc = "The NT Mk72 EW Preston is a personal defense weapon designed to disable mechanical threats."
 	icon_state = "ionpistol"
 	item_state = "ionpistol"
@@ -33,8 +33,8 @@
 	projectile_type = /obj/item/projectile/ion/small
 
 /obj/item/weapon/gun/energy/decloner
-	name = "biological demolecularisor"
-	desc = "A gun that discharges high amounts of controlled radiation to slowly break a target into component elements."
+	name = "\improper Xenonomix CD-4 Cellular Disruptor"
+	desc = "A high-radiation weapon that progressively breaks biological matter into its constituent elements."
 	icon_state = "decloner"
 	item_state = "decloner"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 4, TECH_POWER = 3)
@@ -43,8 +43,8 @@
 	combustion = 0
 
 /obj/item/weapon/gun/energy/floragun
-	name = "floral somatoray"
-	desc = "A tool that discharges controlled radiation which induces mutation in plant cells."
+	name = "\improper Zeng-Hu Pharmaceutical FS-3 Flora Somatoray"
+	desc = "A self-recharging horticultural projector with selectable modes for inducing mutations, increasing yield, or targeting a specific plant gene."
 	icon_state = "floramut100"
 	item_state = "floramut"
 	charge_cost = 10
@@ -94,22 +94,22 @@
 		G.gene = gene
 
 /obj/item/weapon/gun/energy/meteorgun
-	name = "meteor gun"
-	desc = "For the love of god, make sure you're aiming this the right way!"
+	name = "\improper Frontier Foundry MP-1 Meteor Projector"
+	desc = "A self-recharging novelty projector that launches a small meteor-like projectile. Keep the muzzle clear of bystanders."
 	icon_state = "riotgun"
 	item_state = "c20r"
 	slot_flags = SLOT_BELT|SLOT_BACK
 	w_class = ITEM_SIZE_HUGE
 	projectile_type = /obj/item/projectile/meteor
-	power_supply = /obj/item/weapon/cell/potato
+	power_supply = /obj/item/cell/potato
 	self_recharge = 1
 	recharge_time = 5 //Time it takes for shots to recharge (in ticks)
 	charge_meter = 0
 	combustion = 0
 
 /obj/item/weapon/gun/energy/meteorgun/pen
-	name = "meteor pen"
-	desc = "The pen is mightier than the sword."
+	name = "\improper Frontier Foundry MP-1P Meteor Pen"
+	desc = "A functional meteor projector concealed in a pen-shaped housing."
 	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "pen"
 	item_state = "pen"
@@ -118,15 +118,15 @@
 
 
 /obj/item/weapon/gun/energy/mindflayer
-	name = "mind flayer"
-	desc = "A custom-built weapon of some kind."
+	name = "Uncatalogued Neural Disruptor"
+	desc = "An unidentified energy weapon that emits a beam capable of disrupting higher cognitive function. Its construction does not match known human designs."
 	icon_state = "xray"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MAGNET = 4)
 	projectile_type = /obj/item/projectile/beam/mindflayer
 
 /obj/item/weapon/gun/energy/toxgun
-	name = "phoron pistol"
-	desc = "A specialized firearm designed to fire lethal bolts of phoron."
+	name = "\improper Xenonomix PX-4 Phoron Projector"
+	desc = "A specialized sidearm that launches concentrated, highly toxic phoron projectiles."
 	icon_state = "toxgun"
 	w_class = ITEM_SIZE_NORMAL
 	origin_tech = list(TECH_COMBAT = 5, TECH_PHORON = 4)
@@ -135,8 +135,8 @@
 /* Staves */
 
 /obj/item/weapon/gun/energy/staff
-	name = "staff of change"
-	desc = "An artefact that spits bolts of coruscating energy which cause the target's very form to reshape itself."
+	name = "Uncatalogued Transformative Staff"
+	desc = "An artifact that projects energy bolts which alter the physical form of the target. Its operating principle remains unknown."
 	icon = 'icons/obj/gun.dmi'
 	item_icons = null
 	icon_state = "staffofchange"
@@ -166,14 +166,14 @@
 	playsound(src.loc, 'sound/effects/sparks1.ogg', 100, 1)
 
 /obj/item/weapon/gun/energy/staff/animate
-	name = "staff of animation"
-	desc = "An artefact that spits bolts of life-force which causes objects which are hit by it to animate and come to life! This magic doesn't affect machines."
+	name = "Uncatalogued Animating Staff"
+	desc = "An artifact that projects a force that animates struck objects. The effect does not work on machines."
 	projectile_type = /obj/item/projectile/animate
 	max_shots = 10
 
 obj/item/weapon/gun/energy/staff/focus
-	name = "mental focus"
-	desc = "An artefact that channels the will of the user into destructive bolts of force. If you aren't careful with it, you might poke someone's brain out."
+	name = "Uncatalogued Psionic Force Focus"
+	desc = "An artifact that channels its user's will into destructive force bolts. Its output can cause severe penetrating injuries."
 	icon = 'icons/obj/wizard.dmi'
 	icon_state = "focus"
 	item_state = "focus"

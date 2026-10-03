@@ -1,6 +1,87 @@
 /datum/unit_test/icon_test
 	name = "ICON STATE template"
 
+/datum/unit_test/icon_test/los_pixel_offsets_shall_follow_viewer
+	name = "ICON STATE - Pixel offset culling shall follow the viewer"
+
+/datum/unit_test/icon_test/los_pixel_offsets_shall_follow_viewer/start_test()
+	var/turf/center = locate(2, 2, 1)
+	if(!center || world.maxx < 3 || world.maxy < 3)
+		fail("Pixel offset culling needs a three-by-three test region.")
+		return 1
+	var/obj/test_object = new(center)
+	var/list/cases = list(
+		list(1, 0, 1, 0, TRUE),
+		list(-1, 0, 1, 0, FALSE),
+		list(-1, 0, -1, 0, TRUE),
+		list(1, 0, -1, 0, FALSE),
+		list(0, 1, 0, 1, TRUE),
+		list(0, -1, 0, 1, FALSE),
+		list(0, -1, 0, -1, TRUE),
+		list(0, 1, 0, -1, FALSE),
+		list(1, 0, 32, 0, TRUE),
+		list(-1, 0, -32, 0, TRUE),
+		list(0, 1, 0, 32, TRUE),
+		list(0, -1, 0, -32, TRUE),
+		list(1, 1, 1, -1, TRUE),
+		list(1, 1, -1, 1, TRUE),
+		list(1, 1, -1, -1, FALSE),
+		list(-1, -1, 1, 1, FALSE),
+		list(0, 1, 32, 0, FALSE),
+		list(1, 0, 0, 32, FALSE),
+		list(0, 0, 32, 32, FALSE),
+		list(1, 1, 0, 0, FALSE)
+	)
+	var/obj/item/test_item = new(center)
+	for(var/list/test_case as anything in cases)
+		var/turf/viewer = locate(center.x + test_case[1], center.y + test_case[2], center.z)
+		test_object.pixel_x = test_case[3]
+		test_object.pixel_y = test_case[4]
+		if(los_pixel_offset_toward_viewer(test_object, viewer) != test_case[5])
+			fail("Unexpected culling for viewer delta ([test_case[1]], [test_case[2]]) and pixel offset ([test_case[3]], [test_case[4]]).")
+			qdel(test_object)
+			qdel(test_item)
+			return 1
+		test_item.pixel_x = test_case[3]
+		test_item.pixel_y = test_case[4]
+		if(los_pixel_offset_toward_viewer(test_item, viewer))
+			fail("Items must never be hidden by pixel offset culling.")
+			qdel(test_object)
+			qdel(test_item)
+			return 1
+	qdel(test_item)
+	test_object.pixel_x = 32
+	test_object.pixel_y = 32
+	var/turf/other_level = locate(3, 3, 2)
+	if(other_level && los_pixel_offset_toward_viewer(test_object, other_level))
+		fail("Pixel offsets must not hide objects from a viewer on another z-level.")
+		qdel(test_object)
+		return 1
+	if(los_pixel_offset_toward_viewer(test_object, null) || los_pixel_offset_toward_viewer(null, center))
+		fail("Pixel offset culling must accept missing objects and viewers.")
+		qdel(test_object)
+		return 1
+	var/obj/container = new(center)
+	test_object.loc = container
+	if(los_pixel_offset_toward_viewer(test_object, locate(3, 3, 1)))
+		fail("Pixel offset culling must not affect inventory contents.")
+		qdel(test_object)
+		qdel(container)
+		return 1
+	test_object.loc = null
+	if(los_pixel_offset_toward_viewer(test_object, center))
+		fail("Pixel offset culling must ignore objects outside the map.")
+		qdel(test_object)
+		qdel(container)
+		return 1
+	qdel(test_object)
+	qdel(container)
+	if(los_pixel_offset_toward_viewer(test_object, center))
+		fail("Pixel offset culling must ignore deleted objects.")
+		return 1
+	pass("Pixel offset culling followed viewer coordinates for cardinal, diagonal, aligned, and invalid inputs.")
+	return 1
+
 /datum/unit_test/icon_test/depth_layer_crop_shall_preserve_airlock_states
 	name = "ICON STATE - Depth layer crop shall preserve airlock states"
 

@@ -131,7 +131,7 @@
 
 	origin.move_contents_to(destination)
 
-	if((locate(/obj/machinery/power) in destination) || (locate(/obj/structure/cable) in destination))
+	if(locate(/obj/machinery/power) in destination)
 		SSmachines.makepowernets()
 
 	current_floor = next_floor
@@ -148,6 +148,7 @@
 			message_admins("... because the floor was not in the lift's floor list")
 		else
 			message_admins("... because the floor was already queued")
+		return
 	control_panel_interior.visible_message("The elevator chimes softly.")
 	floor.pending_move(src)
 	queued_floors |= floor

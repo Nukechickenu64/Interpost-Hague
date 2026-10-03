@@ -4,7 +4,7 @@
 	result = null
 	time = 30
 	base_chance = 100
-	tools = list(/obj/item/weapon/screwdriver = 1)
+	tools = list(/obj/item/screwdriver = 1)
 	related_skill = SKILL_ENG
 
 /datum/crafting_recipe/structure/barricade_wood
@@ -17,7 +17,7 @@
 	name = "Steel Barricade"
 	parts = list(MATERIAL_STEEL_TYPE = 5)
 	result = list(/obj/structure/barricade/steel = 1)
-	tools = list(/obj/item/weapon/weldingtool = 1)
+	tools = list(/obj/item/weldingtool = 1)
 	time = 60
 
 /datum/crafting_recipe/structure/railing

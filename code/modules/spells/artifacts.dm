@@ -27,10 +27,10 @@
 
 
 /////////////////////////Cursed Dice///////////////////////////
-/obj/item/weapon/dice/d20/cursed
+/obj/item/dice/d20/cursed
 	desc = "A dice with twenty sides said to have an ill effect on those that are unlucky..."
 
-/obj/item/weapon/dice/d20/cursed/attack_self(mob/living/user)
+/obj/item/dice/d20/cursed/attack_self(mob/living/user)
 	..()
 	if(icon_state == "[name][sides]")
 		user.adjustBruteLoss(-30)

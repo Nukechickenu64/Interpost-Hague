@@ -11,6 +11,9 @@
 	var/light_power    // Intensity of the emitter light.
 	var/light_range      // The range of the emitted light.
 	var/light_color    // The colour of the light, string, decomposed by parse_light_color()
+	var/light_cone_angle
+	var/light_cone_dir
+	var/light_glow_range
 
 	// Variables for keeping track of the colour.
 	var/lum_r
@@ -56,6 +59,9 @@
 	light_power = source_atom.light_power
 	light_range = source_atom.light_range
 	light_color = source_atom.light_color
+	light_cone_angle = source_atom.light_cone_angle
+	light_cone_dir = source_atom.light_cone_dir
+	light_glow_range = source_atom.light_glow_range
 
 	parse_light_color()
 
@@ -147,6 +153,12 @@
 	if(light_range && light_power && !applied)
 		. = 1
 
+	if(source_atom.light_cone_angle != light_cone_angle || source_atom.light_cone_dir != light_cone_dir || source_atom.light_glow_range != light_glow_range)
+		light_cone_angle = source_atom.light_cone_angle
+		light_cone_dir = source_atom.light_cone_dir
+		light_glow_range = source_atom.light_glow_range
+		. = 1
+
 	if(source_atom.light_color != light_color)
 		light_color = source_atom.light_color
 		parse_light_color()
@@ -170,7 +182,7 @@
 // The braces and semicolons are there to be able to do this on a single line.
 
 #define APPLY_CORNER(C)              \
-	. = LUM_FALLOFF(C, source_turf); \
+	. = light_cone_angle ? cone_falloff(C) : LUM_FALLOFF(C, source_turf); \
 	. *= light_power/2;              \
 	effect_str[C] = .;               \
 	C.update_lumcount                \
@@ -204,6 +216,40 @@
 #define GET_LUM_DIST(DISTX, DISTY) (DISTX + DISTY + abs(DISTX - DISTY)*0.4)
 #define LUM_FALLOFF(C, T) (1 - CLAMP01((GET_LUM_DIST(abs(C.x - T.x), abs(C.y - T.y))) / max(1, light_range+1)))
 #endif
+
+#define LIGHT_CONE_SOFT_EDGE 12
+
+/datum/light_source/proc/cone_falloff(datum/lighting_corner/C)
+	var/dx = C.x - source_turf.x
+	var/dy = C.y - source_turf.y
+	. = 0
+	if(light_glow_range)
+		. = 1 - CLAMP01(sqrt(dx * dx + dy * dy) / light_glow_range)
+
+	var/angle
+	if(!dy)
+		angle = dx >= 0 ? 90 : 270
+	else
+		angle = arctan(dx / dy)
+		if(dy < 0)
+			angle += 180
+		else if(dx < 0)
+			angle += 360
+	var/diff = angle - light_cone_dir
+	while(diff > 180)
+		diff -= 360
+	while(diff < -180)
+		diff += 360
+	diff = abs(diff)
+	if(diff >= light_cone_angle)
+		return
+
+	var/cone = LUM_FALLOFF(C, source_turf)
+	if(diff > light_cone_angle - LIGHT_CONE_SOFT_EDGE)
+		cone *= (light_cone_angle - diff) / LIGHT_CONE_SOFT_EDGE
+	. = max(., cone)
+
+#undef LIGHT_CONE_SOFT_EDGE
 
 /datum/light_source/proc/apply_lum()
 	var/static/update_gen = 1
@@ -240,7 +286,7 @@
 		T.affecting_lights += src
 		affecting_turfs    += T
 
-		if (T.z_flags & ZM_ALLOW_LIGHTING)
+		if ((T.z_flags & ZM_ALLOW_LIGHTING) && T.below)
 			T = T.below
 			goto check_t
 

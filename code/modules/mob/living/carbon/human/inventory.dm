@@ -1,4 +1,11 @@
 #define REMOVE_INTERNALS if(internal){ if(internals){ internals.icon_state = "internal0" }; internal = null }
+
+/mob/living/carbon/human/proc/clear_preference_starting_gear()
+	QDEL_NULL_LIST(worn_underwear)
+	worn_underwear = list()
+	QDEL_NULL(backpack_setup)
+	update_underwear()
+
 /*
 Add fingerprints to items when we put them in our hands.
 This saves us from having to call add_fingerprint() any time something is put in a human's hands programmatically.
@@ -82,7 +89,7 @@ This saves us from having to call add_fingerprint() any time something is put in
 	return null
 
 /mob/living/carbon/human/proc/get_pocket_items(var/slot)
-	var/obj/item/weapon/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
+	var/obj/item/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
 	if(pocket_storage)
 		return pocket_storage.contents.Copy()
 	return list()
@@ -235,8 +242,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 			update_inv_l_hand()
 		update_inv_l_hand()
 	else
-		var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
-		var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
+		var/obj/item/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
+		var/obj/item/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
 		if(left_pocket_storage && W.loc == left_pocket_storage)
 			left_pocket_storage.remove_from_storage(W, src)
 			update_inv_pockets()
@@ -263,7 +270,7 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(!has_organ_for_slot(slot)) return
 	if(!species || !species.hud || !(slot in species.hud.equip_slots)) return
 	if(slot == slot_l_store || slot == slot_r_store)
-		var/obj/item/weapon/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
+		var/obj/item/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
 		if(!pocket_storage || !pocket_storage.can_be_inserted(W, src, -1, -1, 1))
 			return
 		pocket_storage.handle_item_insertion(W, prevent_warning = 1, NoUpdate = !redraw_mob)
@@ -401,10 +408,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	return 1
 
 /mob/living/carbon/human/get_inventory_slot(obj/item/I)
-	var/obj/item/weapon/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
+	var/obj/item/storage/internal/pockets/left_pocket_storage = get_pocket_storage(slot_l_store)
 	if(left_pocket_storage && I.loc == left_pocket_storage)
 		return slot_l_store
-	var/obj/item/weapon/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
+	var/obj/item/storage/internal/pockets/right_pocket_storage = get_pocket_storage(slot_r_store)
 	if(right_pocket_storage && I.loc == right_pocket_storage)
 		return slot_r_store
 	return ..()

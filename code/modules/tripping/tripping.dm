@@ -27,15 +27,6 @@
 		return FALSE
 	. = ..()
 
-// Cables
-/obj/structure/cable/trip_check(mob/user as mob)
-	var/turf/T = src.loc
-	if(!T.is_plating())
-		return FALSE
-	if((user.dir == d1 || user.dir == d2))
-		return FALSE
-	. = ..()
-
 // Disposals
 /obj/structure/disposalpipe/trip_check(mob/user as mob)
 	var/turf/T = src.loc

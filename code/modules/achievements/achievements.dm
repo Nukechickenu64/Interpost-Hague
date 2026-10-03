@@ -51,7 +51,7 @@
 	difficulty = DIFF_MEDIUM
 
 /datum/achievement/winner
-	name = "To Hell With TetraCorp"
+	name = "To Hell With Nanotrasen"
 	description = "Manage to complete all your antagonist objectives."
 	difficulty = DIFF_HARD
 	announced = TRUE

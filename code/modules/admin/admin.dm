@@ -800,6 +800,19 @@ var/global/floorIsLava = 0
 	log_and_message_admins("toggled supermatter safemode ([GLOB.smsafemode ? "on" : "off"]).")
 	SSstatistics.add_field_details("admin_verb","TSMSAFE") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc
 
+/datum/admins/proc/toggle_role_debug_mode()
+	set category = "Server"
+	set desc = "Toggles inter-round persistent role debug mode (rounds can start without a Captain)"
+	set name = "Toggle Role Debug Mode"
+
+	if(!check_rights(R_ADMIN))
+		return
+
+	GLOB.role_debug_mode = !GLOB.role_debug_mode
+	world.save_role_debug_mode(GLOB.role_debug_mode)
+	log_and_message_admins("toggled role debug mode ([GLOB.role_debug_mode ? "on" : "off"]).")
+	SSstatistics.add_field_details("admin_verb","TROLEDEBUG")
+
 /datum/admins/proc/toggleoocdead()
 	set category = "Server"
 	set desc="Toggle Dead OOC."
@@ -1534,7 +1547,7 @@ var/global/floorIsLava = 0
 
 			var/replyorigin = input(src.owner, "Please specify who the fax is coming from", "Origin") as text|null
 
-			var/obj/item/weapon/paper/admin/P = new /obj/item/weapon/paper/admin( null ) //hopefully the null loc won't cause trouble for us
+			var/obj/item/paper/admin/P = new /obj/item/paper/admin( null ) //hopefully the null loc won't cause trouble for us
 			faxreply = P
 
 			P.admindatum = src
@@ -1544,9 +1557,9 @@ var/global/floorIsLava = 0
 			P.adminbrowse()
 
 
-datum/admins/var/obj/item/weapon/paper/admin/faxreply // var to hold fax replies in
+datum/admins/var/obj/item/paper/admin/faxreply // var to hold fax replies in
 
-/datum/admins/proc/faxCallback(var/obj/item/weapon/paper/admin/P, var/obj/machinery/photocopier/faxmachine/destination)
+/datum/admins/proc/faxCallback(var/obj/item/paper/admin/P, var/obj/machinery/photocopier/faxmachine/destination)
 	var/customname = input(src.owner, "Pick a title for the report", "Title") as text|null
 
 	P.SetName("[P.origin] - [customname]")
@@ -1578,7 +1591,7 @@ datum/admins/var/obj/item/weapon/paper/admin/faxreply // var to hold fax replies
 
 		if(!P.stamped)
 			P.stamped = new
-		P.stamped += /obj/item/weapon/stamp/centcomm
+		P.stamped += /obj/item/stamp/centcomm
 		P.overlays += stampoverlay
 
 	var/obj/item/rcvdcopy

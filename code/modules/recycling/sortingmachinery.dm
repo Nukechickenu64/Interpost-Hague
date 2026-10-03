@@ -41,7 +41,7 @@
 		else
 			to_chat(user, "<span class='warning'>You need to set a destination first!</span>")
 
-	else if(istype(W, /obj/item/weapon/pen))
+	else if(istype(W, /obj/item/pen))
 		switch(alert("What would you like to alter?",,"Title","Description", "Cancel"))
 			if("Title")
 				var/str = sanitizeSafe(input(usr,"Label text?","Set label",""), MAX_NAME_LEN)
@@ -166,7 +166,7 @@
 		else
 			to_chat(user, "<span class='warning'>You need to set a destination first!</span>")
 
-	else if(istype(W, /obj/item/weapon/pen))
+	else if(istype(W, /obj/item/pen))
 		switch(alert("What would you like to alter?",,"Title","Description", "Cancel"))
 			if("Title")
 				var/str = sanitizeSafe(input(usr,"Label text?","Set label",""), MAX_NAME_LEN)
@@ -253,7 +253,7 @@
 	if(!istype(target))	//this really shouldn't be necessary (but it is).	-Pete
 		return
 	if(istype(target, /obj/item/smallDelivery) || istype(target,/obj/structure/bigDelivery) \
-	|| istype(target, /obj/item/weapon/gift) || istype(target, /obj/item/weapon/evidencebag))
+	|| istype(target, /obj/item/weapon/gift) || istype(target, /obj/item/evidencebag))
 		return
 	if(target.anchored)
 		return
@@ -262,7 +262,7 @@
 	if(user in target) //no wrapping closets that you are inside - it's not physically possible
 		return
 
-	if (istype(target, /obj/item) && !(istype(target, /obj/item/weapon/storage) && !istype(target,/obj/item/weapon/storage/box)))
+	if (istype(target, /obj/item) && !(istype(target, /obj/item/storage) && !istype(target,/obj/item/storage/box)))
 		var/obj/item/O = target
 		if (src.amount > 1)
 			var/obj/item/smallDelivery/P = new /obj/item/smallDelivery(get_turf(O.loc))	//Aaannd wrap it up!
@@ -405,6 +405,8 @@
 	if(flushing)
 		return
 	if(istype(AM, /obj/item/projectile) || istype(AM, /obj/effect))	return
+	if(!can_load(AM))
+		return
 	switch(dir)
 		if(NORTH)
 			if(AM.loc.y != src.loc.y+1) return
@@ -421,48 +423,10 @@
 	else if(istype(AM, /mob))
 		var/mob/M = AM
 		M.forceMove(src)
-	src.flush()
+	flush = 1
 
 /obj/machinery/disposal/deliveryChute/flush()
-	if(flushing)
-		return
-	flushing = 1
-	flick("intake-closing", src)
-	var/obj/structure/disposalholder/H = new()	// virtual holder object which actually
-												// travels through the pipes.
-
-	sleep(10)
-	if(QDELETED(src))
-		qdel(H)
-		return
-	playsound(src, 'sound/machines/disposalflush.ogg', 50, 0, 0)
-	sleep(5) // wait for animation to finish
-	if(QDELETED(src))
-		qdel(H)
-		return
-
-	if(prob(35))
-		for(var/mob/living/carbon/human/L in src)
-			var/list/obj/item/organ/external/crush = L.get_damageable_organs()
-			if(crush.len)
-				var/obj/item/organ/external/E = pick(crush)
-
-				E.take_external_damage(45, used_weapon = "Blunt Trauma")
-				to_chat(L, "\The [src]'s mechanisms crush your [E.name]!")
-
-	if(!air_contents)
-		air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
-	H.init(src, air_contents)	// copy the contents of disposer to holder
-	air_contents = new/datum/gas_mixture(PRESSURE_TANK_VOLUME)
-
-	H.start(src) // start the holder processing movement
-	flushing = 0
-	// now reset disposal state
-	flush = 0
-	if(mode == 2)	// if was ready,
-		mode = 1	// switch to charging
-	update_icon()
-	return
+	return ..()
 
 /obj/machinery/disposal/deliveryChute/attackby(var/obj/item/I, var/mob/user)
 	if(!I || !user)
@@ -480,7 +444,7 @@
 			to_chat(user, "You attach the screws around the power connection.")
 			return
 	else if(isWelder(I) && c_mode==1)
-		var/obj/item/weapon/weldingtool/W = I
+		var/obj/item/weldingtool/W = I
 		if(W.remove_fuel(1,user))
 			to_chat(user, "You start slicing the floorweld off the delivery chute.")
 			if(do_after(user,20, src))

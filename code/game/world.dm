@@ -514,6 +514,24 @@ var/world_topic_spam_protect_time = world.timeofday
 	fdel(F)
 	F << "[the_value]"
 
+/hook/startup/proc/loadRoleDebugMode()
+	world.load_role_debug_mode()
+	return 1
+
+/world/proc/load_role_debug_mode()
+	if(!fexists("data/roledebugmode.txt"))
+		return
+
+	var/list/Lines = file2list("data/roledebugmode.txt")
+	if(Lines.len && Lines[1])
+		GLOB.role_debug_mode = text2num(Lines[1])
+		log_misc("Saved role debug mode is '[GLOB.role_debug_mode]'")
+
+/world/proc/save_role_debug_mode(var/the_value)
+	var/F = file("data/roledebugmode.txt")
+	fdel(F)
+	F << "[the_value]"
+
 /hook/startup/proc/loadMOTD()
 	world.load_motd()
 	return 1

@@ -22,8 +22,10 @@
 	var/mode = 0					// 0 = off, 1=clamped (off), 2=operating
 	var/drained_this_tick = 0		// This is unfortunately necessary to ensure we process powersinks BEFORE other machinery such as APCs.
 
-	var/datum/powernet/PN			// Our powernet
-	var/obj/structure/cable/attached		// the attached cable
+	var/datum/powernet/PN			// Our input bus
+
+/obj/item/device/powersink/is_power_linkable()
+	return TRUE
 
 /obj/item/device/powersink/Destroy()
 	if(mode == 2)
@@ -33,26 +35,27 @@
 /obj/item/device/powersink/attackby(var/obj/item/I, var/mob/user)
 	if(isScrewdriver(I))
 		if(mode == 0)
-			var/turf/T = loc
-			if(isturf(T) && !!T.is_plating())
-				attached = locate() in T
-				if(!attached)
-					to_chat(user, "No exposed cable here to attach to.")
-					return
-				else
-					anchored = 1
-					mode = 1
-					src.visible_message("<span class='notice'>[user] attaches [src] to the cable!</span>")
-					return
-			else
-				to_chat(user, "Device must be placed over an exposed cable to attach to it.")
+			if(!isturf(loc))
 				return
+			var/datum/power_node/N = get_power_node()
+			if(!length(N.inputs))
+				var/area/A = get_area(src)
+				var/obj/machinery/power/area_smes/S = A && A.get_area_smes()
+				if(S)
+					link_power_nodes(S.get_power_node(), N)
+			if(!length(N.inputs))
+				to_chat(user, "There is no power feed here to clamp onto.")
+				return
+			anchored = 1
+			mode = 1
+			src.visible_message("<span class='notice'>[user] clamps [src] onto the local power feed!</span>")
+			return
 		else
 			if (mode == 2)
 				STOP_PROCESSING_POWER_OBJECT(src)
 			anchored = 0
 			mode = 0
-			src.visible_message("<span class='notice'>[user] detaches [src] from the cable!</span>")
+			src.visible_message("<span class='notice'>[user] detaches [src] from the power feed!</span>")
 			set_light(0)
 			icon_state = "powersink0"
 
@@ -80,7 +83,7 @@
 			STOP_PROCESSING_POWER_OBJECT(src)
 
 /obj/item/device/powersink/pwr_drain()
-	if(!attached)
+	if(!anchored)
 		return 0
 
 	if(drained_this_tick)
@@ -97,19 +100,17 @@
 	// found a powernet, so drain up to max power from it
 	drained = PN.draw_power(drain_rate)
 	// if tried to drain more than available on powernet
-	// now look for APCs and drain their cells
+	// now look for area SMES units on the bus and drain their cells
 	if(drained < drain_rate)
-		for(var/obj/machinery/power/terminal/T in PN.nodes)
-			// Enough power drained this tick, no need to torture more APCs
+		for(var/obj/machinery/power/area_smes/A in PN.nodes)
+			// Enough power drained this tick, no need to torture more units
 			if(drained >= drain_rate)
 				break
-			if(istype(T.master, /obj/machinery/power/apc))
-				var/obj/machinery/power/apc/A = T.master
-				if(A.operating && A.cell)
-					var/cur_charge = A.cell.charge / CELLRATE
-					var/drain_val = min(apc_drain_rate, cur_charge)
-					A.cell.use(drain_val * CELLRATE)
-					drained += drain_val
+			if(A.operating && A.cell)
+				var/cur_charge = A.cell.charge / CELLRATE
+				var/drain_val = min(apc_drain_rate, cur_charge)
+				A.cell.use(drain_val * CELLRATE)
+				drained += drain_val
 	power_drained += drained
 	return 1
 
@@ -123,7 +124,7 @@
 		explosion(src.loc, 3,6,9,12)
 		qdel(src)
 		return
-	if(attached && attached.powernet)
-		PN = attached.powernet
+	if(anchored && power_node)
+		PN = power_node.in_net
 	else
 		PN = null

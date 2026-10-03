@@ -1,0 +1,7 @@
+#define UNIT_TEST
+#include "../Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	queue = list(new /datum/unit_test/mining_expedition_round_trip, new /datum/unit_test/mining_shuttle_uses_open_space_as_initial_waypoint, new /datum/unit_test/mining_shuttle_connection)
+	log_unit_test("Running focused mining shuttle regression tests.")
+	. = ..()

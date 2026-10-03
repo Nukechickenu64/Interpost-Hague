@@ -4,6 +4,7 @@
 	mouse_opacity = 0
 	simulated = 0
 	anchored = 1
+	luminosity = 1
 	icon = LIGHTING_ICON
 	plane = LIGHTING_PLANE
 	layer = LIGHTING_LAYER
@@ -111,7 +112,9 @@
 			00, 00, 00, 01
 		)
 
-	luminosity = set_luminosity
+	luminosity = enhanced_los_enabled ? TRUE : set_luminosity
+	// Enhanced LOS gives humans SEE_TURFS, which bypasses native blackness culling of dark
+	// turfs - the black overlay must always be drawn (luminous) or dark rooms render fullbright.
 	// if (T.above && T.above.shadower)
 	// 	T.above.shadower.copy_lighting(src)
 

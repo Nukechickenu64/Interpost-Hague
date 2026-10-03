@@ -1,0 +1,94 @@
+{{if !data.linked}}
+	<h3>Status</h3>
+	<div class='item'>
+		<span class="bad">NO REACTOR LINKED</span>
+	</div>
+{{else}}
+<h3>Reactor</h3>
+<div class='item'>
+	<div class="itemLabel">State:</div>
+	<div class="itemContent">
+		{{if data.state == 1}}
+			<span class="good">RUNNING</span>
+		{{else data.state == 2}}
+			<span class="average">SCRAMMED</span>
+			{{if data.scram_left > 0}}<span class="average"> - lockout {{:data.scram_left}}s</span>{{/if}}
+		{{else data.state == 3}}
+			<span class="bad">DELAMINATION IN PROGRESS</span>
+		{{else}}
+			<span class="average">OFFLINE</span>
+		{{/if}}
+	</div>
+	<div class="itemLabel">Control:</div>
+	<div class="itemContent">
+		{{:helper.link('START', 'power', {'action' : 'start'}, (data.state == 1 || data.state == 3 || data.scram_left > 0 || data.fuel <= 0) ? 'disabled' : null)}}
+		{{:helper.link('SCRAM', 'alert', {'action' : 'scram'}, data.state != 1 ? 'disabled' : null, 'redButton')}}
+	</div>
+	<div class="itemLabel">Output Level:</div>
+	<div class="itemContent">
+		{{:helper.link('-', null, {'action' : 'level', 'change' : -1}, data.output_level <= 1 ? 'disabled' : null)}}
+		<span class="{{:data.output_level > 7 ? 'bad' : (data.output_level > 4 ? 'average' : 'good')}}">{{:data.output_level}} / {{:data.max_output_level}}</span>
+		{{:helper.link('+', null, {'action' : 'level', 'change' : 1}, data.output_level >= data.max_output_level ? 'disabled' : null)}}
+	</div>
+	<div class="itemLabel">Power Output:</div>
+	<div class="itemContent">{{:data.output_kw}} kW</div>
+	<div class="itemLabel">Phoron:</div>
+	<div class="itemContent">
+		{{:helper.displayBar(data.fuel, 0, data.max_fuel, data.fuel > 20 ? 'good' : 'bad')}}
+		<br>{{:data.fuel}} / {{:data.max_fuel}} sheets
+	</div>
+</div>
+<h3>Containment</h3>
+<div class='item'>
+	<div class="itemLabel">Field:</div>
+	<div class="itemContent">
+		{{:helper.displayBar(data.field, 0, 100, data.field >= 50 ? 'good' : (data.field >= 25 ? 'average' : 'bad'))}}
+		<br>{{:data.field}}%
+	</div>
+	<div class="itemLabel">Integrity:</div>
+	<div class="itemContent">
+		{{:helper.displayBar(data.integrity, 0, 100, data.integrity >= 75 ? 'good' : (data.integrity >= 40 ? 'average' : 'bad'))}}
+		<br>{{:data.integrity}}%
+	</div>
+	<div class="itemLabel">Resonance Window:</div>
+	<div class="itemContent">
+		{{if data.window_open}}
+			<span class="good">OPEN - {{:data.window_left}}s</span>
+		{{else}}
+			<span class="average">CLOSED</span>
+		{{/if}}
+	</div>
+	<div class="itemLabel">Field Pulse:</div>
+	<div class="itemContent">
+		{{:helper.link('PULSE FIELD', 'refresh', {'action' : 'pulse'}, data.state != 1 ? 'disabled' : null)}}
+		{{if !data.window_open}}<span class="average"> Pulsing outside a window stresses the core.</span>{{/if}}
+	</div>
+</div>
+<h3>Anomalies</h3>
+<div class='item'>
+	{{for data.anomalies}}
+		<div class="itemLabel">
+			{{if value.id == 'surge'}}Phoron Surge
+			{{else value.id == 'cascade'}}Harmonic Cascade
+			{{else value.id == 'fracture'}}Lattice Fracture
+			{{else value.id == 'runaway'}}Thermal Runaway
+			{{/if}}
+		</div>
+		<div class="itemContent">
+			{{if value.id == 'surge'}}
+				<span class="bad">{{:value.time_left}}s</span> {{:helper.link('THROTTLE FEED', null, {'action' : 'throttle'})}}
+			{{else value.id == 'cascade'}}
+				<span class="average">{{:value.time_left}}s</span> {{:helper.link('DAMP HARMONICS', null, {'action' : 'damp'})}}
+			{{else value.id == 'fracture'}}
+				<span class="bad">Weld the reactor housing on site.</span>
+			{{else value.id == 'runaway'}}
+				<span class="bad">{{:value.time_left}}s</span> {{:helper.link('COOLANT FLUSH', null, {'action' : 'flush'}, data.coolant_charges <= 0 ? 'disabled' : null)}}
+			{{/if}}
+		</div>
+	{{empty}}
+		<span class="good">None detected.</span>
+	{{/for}}
+	<div class="itemLabel">Coolant Charges:</div>
+	<div class="itemContent">{{:data.coolant_charges}} / {{:data.max_coolant_charges}}</div>
+</div>
+{{/if}}

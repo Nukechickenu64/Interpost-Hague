@@ -29,8 +29,8 @@
 			check_progress() //check progress after adding item
 			return 1 //selling successful
 
-	if(istype(A, /obj/item/weapon/reagent_containers)) //if item is reagent container
-		var/obj/item/weapon/reagent_containers/P = A
+	if(istype(A, /obj/item/reagent_containers)) //if item is reagent container
+		var/obj/item/reagent_containers/P = A
 		var/datum/reagents/RS = P.reagents //get reagents datum
 		for(var/datum/reagent/R in RS.reagent_list) //for every reagent in datum
 			if(wanted[R.type]) //if we want this reagent

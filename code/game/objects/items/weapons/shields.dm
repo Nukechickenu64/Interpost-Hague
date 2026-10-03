@@ -184,7 +184,7 @@
 
 
 /obj/item/weapon/shield/riot/handmade/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/extinguisher) || istype(W, /obj/item/weapon/storage/toolbox) || istype(W, /obj/item/weapon/melee))
+	if(istype(W, /obj/item/extinguisher) || istype(W, /obj/item/storage/toolbox) || istype(W, /obj/item/weapon/melee))
 		on_bash(W, user)
 	else
 		..()

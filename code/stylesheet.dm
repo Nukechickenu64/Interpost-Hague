@@ -62,6 +62,7 @@ em						{font-style: normal;font-weight: bold;}
 
 /* Miscellaneous */
 .name					{font-weight: bold;}
+.emote_speaker			{color: #287c86;}
 .say					{}
 .alert					{color: #ff0000; text-shadow: 0 0 1px red;}
 h1.alert, h2.alert		{color: #000000;}

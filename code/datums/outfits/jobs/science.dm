@@ -16,7 +16,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/science/head
+	id_type = /obj/item/card/id/science/head
 	pda_type = /obj/item/device/pda/heads/rd
 
 /decl/hierarchy/outfit/job/science/scientist
@@ -26,11 +26,11 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/science
+	id_type = /obj/item/card/id/science
 
 /decl/hierarchy/outfit/job/science/xenobiologist
 	name = OUTFIT_JOB_NAME("Xenobiologist")
-	id_type = /obj/item/weapon/card/id/science/xenobiologist
+	id_type = /obj/item/card/id/science/xenobiologist
 	suit = /obj/item/clothing/suit/storage/toggle/labcoat/science
 
 /decl/hierarchy/outfit/job/science/roboticist
@@ -40,7 +40,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/science/roboticist
+	id_type = /obj/item/card/id/science/roboticist
 	pda_type = /obj/item/device/pda/roboticist
 
 /decl/hierarchy/outfit/job/science/roboticist/New()

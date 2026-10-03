@@ -39,7 +39,7 @@
 	var/sign_state = ""
 
 /obj/item/sign/attackby(obj/item/tool as obj, mob/user as mob)	//construction
-	if(istype(tool, /obj/item/weapon/screwdriver) && isturf(user.loc))
+	if(istype(tool, /obj/item/screwdriver) && isturf(user.loc))
 		var/direction = input("In which direction?", "Select direction.") in list("North", "East", "South", "West", "Cancel")
 		if(direction == "Cancel") return
 		var/obj/structure/sign/S = new(user.loc)
@@ -438,8 +438,8 @@
 	name = "DECK V"
 	icon_state = "deck5"
 
-/obj/structure/sign/nanotrasen
-	name = "\improper Tetracorp"
+/obj/structure/sign/nanotrasen_nt
+	name = "\improper Nanotrasen"
 	desc = "Serving in the best interests of humanity."
 	icon_state = "NT"
 
@@ -548,15 +548,15 @@
 	desc = "Do no harm."
 	icon_state = "hippocrates"
 
-/obj/structure/sign/tetracorp
-	name = "TetraCorp"
+/obj/structure/sign/nanotrasen
+	name = "Nanotrasen"
 	desc = "You serve them!"
-	icon_state = "tetracorp"
+	icon_state = "nanotrasen"
 
-/obj/structure/sign/tetracorpbig
-	name = "TetraCorp"
+/obj/structure/sign/nanotrasenbig
+	name = "Nanotrasen"
 	desc = "You serve them!"
-	icon_state = "tetracorpbig"
+	icon_state = "nanotrasenbig"
 
 /obj/structure/sign/priceboard
 	name = "Priceboard"

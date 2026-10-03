@@ -80,7 +80,7 @@ var/list/ai_verbs_default = list(
 	var/malfunctioning = 0						// Master var that determines if AI is malfunctioning.
 	var/datum/malf_hardware/hardware = null		// Installed piece of hardware.
 	var/datum/malf_research/research = null		// Malfunction research datum.
-	var/obj/machinery/power/apc/hack = null		// APC that is currently being hacked.
+	var/obj/machinery/power/area_smes/hack = null		// Area SMES that is currently being hacked.
 	var/list/hacked_apcs = null					// List of all hacked APCs
 	var/APU_power = 0							// If set to 1 AI runs on APU power
 	var/hacking = 0								// Set to 1 if AI is hacking APC, cyborg, other AI, or running system override.
@@ -411,6 +411,8 @@ var/list/ai_verbs_default = list(
 /mob/living/silicon/ai/Topic(href, href_list)
 	if(usr != src)
 		return
+	if(href_list["meta_shop_category"] || href_list["meta_shop_buy"])
+		return ..()
 	if(..())
 		return
 	if (href_list["mach_close"])
@@ -616,9 +618,9 @@ var/list/ai_verbs_default = list(
 
 
 /mob/living/silicon/ai/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/aicard))
+	if(istype(W, /obj/item/aicard))
 
-		var/obj/item/weapon/aicard/card = W
+		var/obj/item/aicard/card = W
 		card.grab_ai(src, user)
 
 	else if(isWrench(W))
@@ -719,7 +721,7 @@ var/list/ai_verbs_default = list(
 	set category = "IC"
 
 	resting = 0
-	var/obj/item/weapon/rig/rig = src.get_rig()
+	var/obj/item/rig/rig = src.get_rig()
 	if(rig)
 		rig.force_rest(src)
 

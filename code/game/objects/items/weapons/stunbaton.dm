@@ -17,12 +17,12 @@
 	var/stunforce = 1 //10 was way to high
 	var/agonyforce = 30
 	var/status = 0		//whether the thing is on or not
-	var/obj/item/weapon/cell/bcell
+	var/obj/item/cell/bcell
 	var/hitcost = 7
 	parry_sounds = list('sound/weapons/blade_parry1.ogg', 'sound/weapons/blade_parry2.ogg', 'sound/weapons/blade_parry3.ogg')
 
 /obj/item/weapon/melee/baton/loaded
-	bcell = /obj/item/weapon/cell/device/high
+	bcell = /obj/item/cell/device/high
 
 /obj/item/weapon/melee/baton/New()
 	if(ispath(bcell))
@@ -76,7 +76,7 @@
 		to_chat(user, "<span class='warning'>The baton does not have a power source installed.</span>")
 
 /obj/item/weapon/melee/baton/attackby(obj/item/weapon/W, mob/user)
-	if(istype(W, /obj/item/weapon/cell/device))
+	if(istype(W, /obj/item/cell/device))
 		if(!bcell && user.unEquip(W))
 			W.forceMove(src)
 			bcell = W

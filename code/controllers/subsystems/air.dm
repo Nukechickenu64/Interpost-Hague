@@ -399,8 +399,13 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 
 /datum/controller/subsystem/air/proc/get_edge(zone/A, zone/B)
 	if(istype(B))
-		for(var/connection_edge/zone/edge in A.edges)
-			if(edge.contains_zone(B))
+		if(A.invalid || B.invalid)
+			for(var/connection_edge/zone/edge in A.edges)
+				if(edge.contains_zone(B))
+					return edge
+		else if(A.zone_edges)
+			var/connection_edge/zone/edge = A.zone_edges[B]
+			if(edge)
 				return edge
 		var/connection_edge/edge = new/connection_edge/zone(A,B)
 		edges += edge

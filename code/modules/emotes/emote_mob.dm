@@ -79,7 +79,7 @@
 	else
 		use_emote.do_emote(src, message)
 
-	for (var/obj/item/weapon/implant/I in src)
+	for (var/obj/item/implant/I in src)
 		if (I.implanted)
 			I.trigger(act, src)
 
@@ -95,7 +95,7 @@
 		return
 
 	// Store the player's name in a nice bold, naturalement
-	nametext = "<B>[source]</B>"
+	nametext = "<span class='emote_speaker'><b>[source]</b></span>"
 
 	name_anchor = findtext(message, "^")
 	if(name_anchor > 0) // User supplied emote with a carat

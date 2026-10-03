@@ -15,20 +15,44 @@
 /mob/proc/zMove(direction)
 	if(eyeobj)
 		return eyeobj.zMove(direction)
-	if(!can_ztravel())
-		to_chat(src, "<span class='warning'>You lack means of travel in that direction.</span>")
-		return
+	if(direction != UP && direction != DOWN)
+		return FALSE
 
 	var/turf/start = loc
 	if(!istype(start))
 		to_chat(src, "<span class='notice'>You are unable to move from here.</span>")
 		return
-	var/turf/simulated/open/O = (direction == UP) ? GetAbove(src) : GetBelow(src)
+	var/turf/O = (direction == UP) ? GetAbove(src) : GetBelow(src)
 	if(!O)
 		to_chat(src, "<span class='notice'>There is nothing of interest in this direction.</span>")
 		return
+	var/obj/item/tank/jetpack/thrust = get_jetpack()
+	if(thrust && (istype(start, /turf/space) || !mob_has_gravity(start)))
+		if(!canmove || incapacitated() || restrained() || buckled || anchored || pinned.len)
+			return FALSE
+		if(O.density || !start.CanZPass(src, direction) || !O.CanZPass(src, direction))
+			to_chat(src, "<span class='warning'>The passage is blocked.</span>")
+			return FALSE
+		for(var/atom/obstacle in O)
+			if(!obstacle.CanMoveOnto(src, start, 1.5, direction))
+				to_chat(src, "<span class='warning'>\The [obstacle] blocks your path.</span>")
+				return FALSE
+		if(!thrust.allow_thrust(0.01, src))
+			to_chat(src, "<span class='warning'>Your jetpack cannot provide thrust.</span>")
+			return FALSE
+		var/previous_last_move = last_move
+		last_move = 0
+		if(!SelfMove(O, dir))
+			last_move = previous_last_move
+			return FALSE
+		inertia_dir = 0
+		zPull(direction)
+		return TRUE
+	if(!can_ztravel())
+		to_chat(src, "<span class='warning'>You lack means of travel in that direction.</span>")
+		return FALSE
 	var/atom/climb_target
-	if(istype(O))
+	if(isopenspace(O))
 		for(var/turf/T in trange(1,O))
 			if(!isopenspace(T) && T.is_floor())
 				climb_target = T
@@ -45,9 +69,9 @@
 			var/mob/living/carbon/human/H = src
 			switch(direction)
 				if(UP)
-					H.climb_up(climb_target)
+					return H.climb_up(climb_target)
 				if(DOWN)
-					H.climb_down(climb_target)
+					return H.climb_down(climb_target)
 
 /mob/proc/zPull(direction)
 	//checks and handles pulled items across z levels
@@ -99,7 +123,7 @@
 
 		//Last check, list of items that could plausibly be used to climb but aren't climbable themselves
 		var/list/objects_to_stand_on = list(
-				/obj/item/weapon/stool,
+				/obj/item/stool,
 				/obj/structure/bed,
 			)
 		for(var/type in objects_to_stand_on)

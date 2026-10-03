@@ -26,6 +26,7 @@ SUBSYSTEM_DEF(ticker)
 	var/list/antag_pool = list()
 	var/looking_for_antags = 0
 	var/round_started_without_captain = 0
+	var/bypass_captain_check = 0
 
 	var/datum/round_event/eof
 
@@ -95,7 +96,7 @@ SUBSYSTEM_DEF(ticker)
 		"upstanding citizen",
 		"saint"
 	)
-	to_world("<B><span class='blueglow'>Welcome back<B><strong><span class = 'tetracorp'> [pick(greeting)].</span></strong></B>")
+	to_world("<B><span class='blueglow'>Welcome back<B><strong><span class = 'nanotrasen'> [pick(greeting)].</span></strong></B>")
 	to_world("Choose your face, and prepare to act out your part. The game will start in [round(pregame_timeleft/10)] seconds.")
 	return ..()
 
@@ -140,6 +141,17 @@ SUBSYSTEM_DEF(ticker)
 			return
 
 	// This means we succeeded in picking a game mode.
+	var/skip_captain_check = GLOB.role_debug_mode || bypass_captain_check
+	bypass_captain_check = 0
+	if(!skip_captain_check && !captain_assigned())
+		mode.fail_setup()
+		job_master.ResetOccupations()
+		mode = null
+		pregame_timeleft = initial(pregame_timeleft)
+		Master.SetRunLevel(RUNLEVEL_LOBBY)
+		to_world("<B>A <font color='blue'>Captain</font> must sacrifice everything for their crew.</B>")
+		return
+
 	GLOB.using_map.setup_economy()
 	Master.SetRunLevel(RUNLEVEL_GAME)
 	create_characters() //Create player characters and transfer them
@@ -154,8 +166,10 @@ SUBSYSTEM_DEF(ticker)
 		if(!H.mind || player_is_antag(H.mind, only_offstation_roles = 1) || !job_master.ShouldCreateRecords(H.mind.assigned_role))
 			continue
 		CreateModularRecord(H)
+		file_crew_id(H)
 
 	callHook("roundstart")
+	GLOB.cryo_startup_effect.start()
 
 	spawn(0)//Forking here so we dont have to wait for this to finish
 		mode.post_setup()
@@ -336,6 +350,12 @@ Helpers
 	else
 		mode.announce()
 
+/datum/controller/subsystem/ticker/proc/captain_assigned()
+	for(var/mob/new_player/player in GLOB.player_list)
+		if(player.ready && player.mind && istype(player.mind.assigned_job, /datum/job/captain))
+			return TRUE
+	return FALSE
+
 /datum/controller/subsystem/ticker/proc/create_characters()
 	for(var/mob/new_player/player in GLOB.player_list)
 		if(player && player.ready && player.mind)
@@ -358,8 +378,7 @@ Helpers
 			if(istype(player.mind.assigned_job, /datum/job/captain) || player.mind.assigned_role == "Captain")
 				captainless=0
 			if(!player_is_antag(player.mind, only_offstation_roles = 1))
-				job_master.EquipRank(player, player.mind.assigned_role, 0)
-				equip_custom_items(player)
+				job_master.EquipRank(player, player.mind.assigned_role, 0, TRUE)
 	return captainless
 
 /datum/controller/subsystem/ticker/proc/attempt_late_antag_spawn(var/list/antag_choices)
@@ -565,5 +584,6 @@ Helpers
 	if(istype(SSvote.active_vote, /datum/vote/gamemode))
 		SSvote.cancel_vote(user)
 		bypass_gamemode_vote = 1
+	bypass_captain_check = 1
 	Master.SetRunLevel(RUNLEVEL_SETUP)
 	return 1

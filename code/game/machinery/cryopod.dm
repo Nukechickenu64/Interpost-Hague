@@ -7,6 +7,117 @@
  */
 
 
+GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
+
+/datum/cryo_startup_effect
+	var/active = FALSE
+	var/started = FALSE
+	var/end_time = 0
+	var/intensity = 0.15
+	var/alarm_channel = 7
+	var/pulse_timer
+	var/stop_timer
+	var/next_sound_update = 0
+	var/list/rooms = list()
+	var/list/fixtures = list()
+	var/list/listeners = list()
+
+/datum/cryo_startup_effect/proc/start()
+	if(started)
+		return
+	started = TRUE
+	end_time = round_start_time + 5 MINUTES
+	if(world.time >= end_time)
+		return
+	for(var/obj/machinery/cryopod/pod in world)
+		var/area/room = get_area(pod)
+		if(!room || istype(room, /area/crew_quarters/captain) || istype(room, /area/crew_quarters/heads/hop))
+			continue
+		rooms |= room
+	if(!length(rooms))
+		return
+	active = TRUE
+	for(var/area/room in rooms)
+		room.set_lightswitch(TRUE)
+		for(var/obj/machinery/light/fixture in room)
+			fixtures |= fixture
+	stop_timer = addtimer(CALLBACK(src, /datum/cryo_startup_effect/proc/stop), end_time - world.time, TIMER_STOPPABLE)
+	pulse()
+
+/datum/cryo_startup_effect/proc/affects(var/obj/machinery/light/fixture)
+	return active && world.time < end_time && (get_area(fixture) in rooms)
+
+/datum/cryo_startup_effect/proc/register_light(var/obj/machinery/light/fixture)
+	if(affects(fixture))
+		fixtures |= fixture
+
+/datum/cryo_startup_effect/proc/unregister_light(var/obj/machinery/light/fixture)
+	fixtures -= fixture
+
+/datum/cryo_startup_effect/proc/pulse()
+	pulse_timer = null
+	if(!active)
+		return
+	if(world.time >= end_time)
+		stop()
+		return
+	var/phase = ((world.time - round_start_time) % (10 SECONDS)) / (10 SECONDS)
+	intensity = 0.15 + 0.85 * (1 - cos(phase * 360)) / 2
+	for(var/obj/machinery/light/fixture in fixtures.Copy())
+		if(QDELETED(fixture))
+			fixtures -= fixture
+		else
+			fixture.refresh_light_emission()
+	if(world.time >= next_sound_update)
+		update_alarm()
+		next_sound_update = world.time + 1 SECOND
+	pulse_timer = addtimer(CALLBACK(src, /datum/cryo_startup_effect/proc/pulse), 0.2 SECONDS, TIMER_STOPPABLE)
+
+/datum/cryo_startup_effect/proc/update_alarm()
+	var/list/current_listeners = list()
+	for(var/client/listener in GLOB.clients)
+		var/turf/location = get_turf(listener.mob)
+		if(!location || !isStationLevel(location.z) || istype(listener.mob, /mob/new_player))
+			continue
+		var/mob/living/living_listener = listener.mob
+		if(istype(living_listener) && ((living_listener.sdisabilities & DEAF) || living_listener.ear_deaf))
+			continue
+		current_listeners += listener
+	for(var/client/listener in listeners - current_listeners)
+		if(listener in GLOB.clients)
+			sound_to(listener, sound(null, channel = alarm_channel))
+	for(var/client/listener in current_listeners)
+		var/alarm_playing = FALSE
+		for(var/sound/playing_sound in listener.SoundQuery())
+			if(playing_sound.channel == alarm_channel)
+				alarm_playing = TRUE
+				break
+		if(!alarm_playing)
+			sound_to(listener, sound('sound/ambience/CRYOLARM.ogg', repeat = TRUE, wait = FALSE, volume = 100, channel = alarm_channel))
+	listeners = current_listeners
+
+/datum/cryo_startup_effect/proc/stop()
+	active = FALSE
+	if(pulse_timer)
+		deltimer(pulse_timer)
+		pulse_timer = null
+	if(stop_timer)
+		deltimer(stop_timer)
+		stop_timer = null
+	for(var/client/listener in listeners)
+		if(listener in GLOB.clients)
+			sound_to(listener, sound(null, channel = alarm_channel))
+	listeners.Cut()
+	for(var/obj/machinery/light/fixture in fixtures)
+		if(!QDELETED(fixture))
+			fixture.refresh_light_emission()
+	fixtures.Cut()
+	rooms.Cut()
+
+/datum/cryo_startup_effect/Destroy()
+	stop()
+	return ..()
+
 //Main cryopod console.
 
 /obj/machinery/computer/cryopod
@@ -14,7 +125,7 @@
 	desc = "An interface between crew and the cryogenic storage oversight systems."
 	icon = 'icons/obj/Cryogenic2.dmi'
 	icon_state = "cellconsole"
-	circuit = /obj/item/weapon/circuitboard/cryopodcontrol
+	circuit = /obj/item/circuitboard/cryopodcontrol
 	density = 0
 	interact_offline = 1
 	var/mode = null
@@ -39,7 +150,7 @@
 	desc = "An interface between crew and the robotic storage systems."
 	icon = 'icons/obj/robot_storage.dmi'
 	icon_state = "console"
-	circuit = /obj/item/weapon/circuitboard/robotstoragecontrol
+	circuit = /obj/item/circuitboard/robotstoragecontrol
 
 	storage_type = "cyborgs"
 	storage_name = "Robotic Storage Control"
@@ -201,12 +312,12 @@
 
 	attack_hand(user)
 
-/obj/item/weapon/circuitboard/cryopodcontrol
+/obj/item/circuitboard/cryopodcontrol
 	name = "Circuit board (Cryogenic Oversight Console)"
 	build_path = /obj/machinery/computer/cryopod
 	origin_tech = list(TECH_DATA = 3)
 
-/obj/item/weapon/circuitboard/robotstoragecontrol
+/obj/item/circuitboard/robotstoragecontrol
 	name = "Circuit board (Robotic Storage Console)"
 	build_path = /obj/machinery/computer/cryopod/robot
 	origin_tech = list(TECH_DATA = 3)
@@ -253,17 +364,17 @@
 	var/list/preserve_items = list(
 		/obj/item/integrated_circuit/manipulation/bluespace_rift,
 		/obj/item/integrated_circuit/input/teleporter_locator,
-		/obj/item/weapon/card/id/captains_spare,
-		/obj/item/weapon/aicard,
+		/obj/item/card/id/captains_spare,
+		/obj/item/aicard,
 		/obj/item/device/mmi,
 		/obj/item/device/paicard,
 		/obj/item/weapon/gun,
-		/obj/item/weapon/pinpointer,
+		/obj/item/pinpointer,
 		/obj/item/clothing/suit,
 		/obj/item/clothing/shoes/magboots,
 		/obj/item/blueprints,
 		/obj/item/clothing/head/helmet/space,
-		/obj/item/weapon/storage/internal
+		/obj/item/storage/internal
 	)
 
 /obj/machinery/cryopod/robot
@@ -416,7 +527,7 @@
 
 		if(W.contents.len) //Make sure we catch anything not handled by qdel() on the items.
 			for(var/obj/item/O in W.contents)
-				if(istype(O,/obj/item/weapon/storage/internal)) //Stop eating pockets, you fuck!
+				if(istype(O,/obj/item/storage/internal)) //Stop eating pockets, you fuck!
 					continue
 				O.forceMove(src)
 
@@ -515,7 +626,7 @@
 			return
 
 		var/willing = null //We don't want to allow people to be forced into despawning.
-		var/mob/M = G:affecting
+		var/mob/M = grab.affecting
 
 		if(M.client)
 			if(alert(M,"Would you like to enter long-term storage?",,"Yes","No") == "Yes")

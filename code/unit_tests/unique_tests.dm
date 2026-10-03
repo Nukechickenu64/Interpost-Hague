@@ -29,16 +29,18 @@
 /datum/unit_test/mining_shuttle_uses_open_space_as_initial_waypoint/start_test()
 	var/datum/shuttle/autodock/multi/mining/mining_shuttle = SSshuttle.shuttles["Mining"]
 	if(!istype(mining_shuttle))
-		skip("The active map has no multi-destination Mining shuttle.")
+		if(istype(GLOB.using_map, /datum/map/alpha))
+			fail("Alpha did not register its Mining shuttle.")
+		else
+			skip("The active map has no multi-destination Mining shuttle.")
 		return 1
 	if(mining_shuttle.move_time != 120)
 		fail("The Mining shuttle transit time is [mining_shuttle.move_time] seconds, expected 120.")
 		return 1
 
 	var/obj/effect/shuttle_landmark/open_space = SSshuttle.get_landmark("mining_space")
-	var/obj/effect/shuttle_landmark/space_ruins = SSshuttle.get_landmark("nav_mining_space_ruins")
-	if(!istype(open_space) || !istype(space_ruins))
-		skip("The active map does not register both Mining space waypoints.")
+	if(!istype(open_space))
+		fail("The Mining shuttle has no open-space waypoint.")
 		return 1
 
 	var/valid = mining_shuttle.get_station_space_waypoint() == open_space
@@ -46,6 +48,106 @@
 		pass("The initial Space destination resolves to open Space, not Space Ruins.")
 	else
 		fail("The initial Space destination bypasses the open-Space waypoint.")
+	return 1
+
+/datum/unit_test/mining_shuttle_connection
+	name = "MINING: Console Connection and Registry Recovery"
+
+/datum/unit_test/mining_shuttle_connection/start_test()
+	if(!istype(GLOB.using_map, /datum/map/alpha))
+		skip("This test requires Alpha's mapped Mining shuttle.")
+		return 1
+	var/obj/effect/shuttle_landmark/mining/station/station = SSshuttle.get_landmark("nav_mining_start")
+	if(!istype(station) || !get_turf(station))
+		fail("Alpha's Mining station landmark is missing, untagged, or incorrectly typed.")
+		return 1
+	if(!istype(get_area(station), /area/shuttle/mining/station))
+		fail("Alpha's Mining station landmark is outside the mapped shuttle area.")
+		return 1
+	var/datum/mining_expedition_controller/controller = get_mining_expedition()
+	var/datum/shuttle/autodock/shuttle = SSshuttle.shuttles["Mining"]
+	if(!istype(shuttle) || !shuttle.current_location || !shuttle.landmark_transition)
+		fail("The mapped Mining shuttle did not initialize its station and transit origins.")
+		return 1
+	if(shuttle.current_location != station || shuttle.landmark_transition != SSshuttle.get_landmark("mining_transition"))
+		fail("The mapped Mining shuttle is not linked to its station and transit landmarks.")
+		return 1
+	var/old_maxz = world.maxz
+	var/obj/machinery/computer/shuttle_control/mining/console = new
+	var/valid = console.get_shuttle() == shuttle
+	controller.status_text()
+	valid = valid && world.maxz == old_maxz
+	var/obj/effect/shuttle_landmark/origin = shuttle.current_location
+	var/process_count = SSshuttle.process_shuttles.len
+	SSshuttle.shuttles -= "Mining"
+	valid = valid && console.get_shuttle() == shuttle
+	valid = valid && SSshuttle.shuttles["Mining"] == shuttle && SSshuttle.process_shuttles.len == process_count
+	valid = valid && shuttle.current_location == origin && world.maxz == old_maxz
+	SSshuttle.shuttles["Mining"] = shuttle
+	qdel(console)
+	if(valid)
+		pass("Console lookup repairs the registry without replacing the shuttle or allocating a ruins level.")
+	else
+		fail("Console recovery duplicated, moved, or failed to find the Mining shuttle.")
+	return 1
+
+/datum/unit_test/mining_expedition_round_trip
+	name = "MINING: Lazy Debris Field Mission and Reuse"
+
+/datum/unit_test/mining_expedition_round_trip/start_test()
+	if(!istype(GLOB.using_map, /datum/map/alpha))
+		skip("This test requires Alpha's mapped Mining shuttle.")
+		return 1
+	var/datum/mining_expedition_controller/controller = get_mining_expedition()
+	var/datum/shuttle/autodock/multi/mining/shuttle = controller.get_shuttle()
+	if(!istype(shuttle))
+		fail("Alpha did not register its Mining shuttle.")
+		return 1
+	if(controller.ruins_z || get_space_ruins_z())
+		fail("The debris field was allocated before the first mission.")
+		return 1
+	var/datum/ruins_generation_job/empty_job = new
+	var/valid = !empty_job.start(null) && !empty_job.is_active()
+	qdel(empty_job)
+	var/old_maxz = world.maxz
+	var/old_warmup = shuttle.warmup_time
+	shuttle.warmup_time = 0
+	shuttle.next_location = null
+	if(!controller.start_mission(null, FALSE))
+		shuttle.warmup_time = old_warmup
+		fail("The first mining mission could not launch without a preselected destination.")
+		return 1
+	shuttle.move_time = 1
+	var/obj/effect/shuttle_landmark/dock = SSshuttle.get_landmark("nav_mining_space_ruins")
+	valid = valid && controller.ruins_z == old_maxz + 1 && world.maxz == old_maxz + 1
+	valid = valid && dock && dock.z == controller.ruins_z && dock.base_area == controller.ruins_area
+	valid = valid && GLOB.using_map.base_turf_by_z[num2text(controller.ruins_z)] == /turf/space
+	valid = valid && (controller.ruins_z in GLOB.using_map.player_levels)
+	var/deadline = world.time + 90 SECONDS
+	while(!controller.shuttle_is_idle(shuttle) && world.time < deadline)
+		sleep(5)
+	valid = valid && controller.shuttle_is_idle(shuttle) && shuttle.current_location == dock
+	valid = valid && ruins_gen_job && !ruins_gen_job.is_active() && !ruins_gen_job.last_error && ruins_gen_job.done == 1
+	valid = valid && !controller.can_regenerate_ruins(null)
+	if(controller.shuttle_is_idle(shuttle) && shuttle.current_location == dock)
+		valid = valid && controller.return_station(null)
+		shuttle.move_time = 1
+		deadline = world.time + 30 SECONDS
+		while(!controller.shuttle_is_idle(shuttle) && world.time < deadline)
+			sleep(5)
+	valid = valid && controller.shuttle_is_idle(shuttle) && shuttle.current_location.landmark_tag == "nav_mining_start"
+	valid = valid && controller.get_ruins_dock() == dock && world.maxz == old_maxz + 1
+	if(ruins_gen_job)
+		var/old_error = ruins_gen_job.last_error
+		ruins_gen_job.last_error = "Test survey failure"
+		valid = valid && !shuttle.attempt_move(dock)
+		ruins_gen_job.last_error = old_error
+	shuttle.warmup_time = old_warmup
+	shuttle.move_time = initial(shuttle.move_time)
+	if(valid)
+		pass("First mission allocates one field, lands safely, returns, and reuses the same dock; failed surveys cannot land.")
+	else
+		fail("Lazy field allocation, survey safety, round-trip movement, or level reuse failed.")
 	return 1
 
 /datum/unit_test/research_processor_only_offers_buildable_designs
@@ -166,7 +268,7 @@
 	var/datum/sell_order/order = new
 	order.wanted = list(/datum/reagent/water = 10)
 	order.max_progress = 10
-	var/obj/item/weapon/reagent_containers/glass/beaker/beaker = new
+	var/obj/item/reagent_containers/glass/beaker/beaker = new
 	beaker.reagents.add_reagent(/datum/reagent/water, 20)
 	var/accepted = order.add_item(beaker)
 	var/valid = accepted && order.wanted[/datum/reagent/water] == 0 && order.progress == order.max_progress

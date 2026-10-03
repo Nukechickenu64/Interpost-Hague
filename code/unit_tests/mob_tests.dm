@@ -12,6 +12,76 @@
 #define SUCCESS 1
 #define FAILURE 0
 
+datum/unit_test/human_sanity_crisis
+	name = "MOOD: Sanity Crisis Objective Lifecycle"
+
+datum/unit_test/human_sanity_crisis/start_test()
+	var/failures = 0
+	var/mob/living/carbon/human/success_subject = new(null, SPECIES_HUMAN)
+	success_subject.happiness = MOOD_LEVEL_SAD4
+	success_subject.update_sanity_crisis()
+	var/first_deadline = success_subject.sanity_crisis_deadline
+	success_subject.update_sanity_crisis()
+	if(!success_subject.sanity_crisis_active || success_subject.sanity_crisis_deadline != first_deadline)
+		fail("A low-mood update restarted or failed to start the sanity crisis deadline.")
+		failures++
+	if(!success_subject.complete_sanity_crisis(success_subject.sanity_crisis_objective) || !success_subject.sanity_crisis_resolved || success_subject.insanity_active)
+		fail("Completing the assigned objective did not resolve the pending crisis.")
+		failures++
+	success_subject.happiness = MOOD_LEVEL_SAD4 + 1
+	success_subject.update_sanity_crisis()
+	success_subject.happiness = MOOD_LEVEL_SAD4
+	success_subject.update_sanity_crisis()
+	success_subject.happiness = MOOD_LEVEL_SAD4 + 1
+	success_subject.update_sanity_crisis()
+	if(success_subject.sanity_crisis_active || success_subject.sanity_crisis_resolved)
+		fail("Recovering above the severe mood threshold did not cancel the crisis episode.")
+		failures++
+	qdel(success_subject)
+
+	var/mob/living/carbon/human/timeout_subject = new(null, SPECIES_HUMAN)
+	timeout_subject.happiness = MOOD_LEVEL_SAD4
+	timeout_subject.update_sanity_crisis()
+	timeout_subject.sanity_crisis_deadline = world.time
+	timeout_subject.update_sanity_crisis()
+	if(!timeout_subject.insanity_active || timeout_subject.sanity_crisis_active || !timeout_subject.hallucination_power)
+		fail("An expired crisis did not transition to persistent insanity.")
+		failures++
+	timeout_subject.chem_effects[CE_MIND] = 1
+	timeout_subject.update_sanity_crisis()
+	if(timeout_subject.insanity_active)
+		fail("Positive mind-treatment chemistry did not clear persistent insanity.")
+		failures++
+	qdel(timeout_subject)
+
+	var/mob/living/carbon/human/self_harm_subject = new(null, SPECIES_HUMAN)
+	self_harm_subject.sanity_crisis_active = TRUE
+	self_harm_subject.sanity_crisis_deadline = world.time + (5 MINUTES)
+	self_harm_subject.sanity_crisis_objective = SANITY_CRISIS_SELF_HARM
+	self_harm_subject.harm_self_for_sanity()
+	if(!self_harm_subject.sanity_crisis_resolved)
+		fail("The explicit self-harm action did not complete its crisis objective.")
+		failures++
+	qdel(self_harm_subject)
+
+	var/mob/living/carbon/human/attacker = new(null, SPECIES_HUMAN)
+	var/mob/living/carbon/human/target = new(null, SPECIES_HUMAN)
+	attacker.sanity_crisis_active = TRUE
+	attacker.sanity_crisis_deadline = world.time + (5 MINUTES)
+	attacker.sanity_crisis_objective = SANITY_CRISIS_HARM_OTHER
+	target.attack_generic(attacker, 5, "struck", FALSE)
+	if(!attacker.sanity_crisis_resolved)
+		fail("An actual damaging attack did not complete the harm-other objective.")
+		failures++
+	qdel(attacker)
+	qdel(target)
+
+	if(failures)
+		fail("[failures] sanity crisis lifecycle checks failed.")
+	else
+		pass("Sanity crisis deadlines, cancellation, timeout, treatment, and damage objectives behaved correctly.")
+	return 1
+
 //
 // Tests Life() and mob breathing in space.
 //

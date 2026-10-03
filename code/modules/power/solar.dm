@@ -257,14 +257,14 @@ var/list/solars_list = list()
 			return 1
 
 	if(!tracker)
-		if(istype(W, /obj/item/weapon/tracker_electronics))
+		if(istype(W, /obj/item/tracker_electronics))
 			tracker = 1
 			qdel(W)
 			user.visible_message("<span class='notice'>[user] inserts the electronics into the solar assembly.</span>")
 			return 1
 	else
 		if(isCrowbar(W))
-			new /obj/item/weapon/tracker_electronics(src.loc)
+			new /obj/item/tracker_electronics(src.loc)
 			tracker = 0
 			user.visible_message("<span class='notice'>[user] takes out the electronics from the solar assembly.</span>")
 			return 1
@@ -293,12 +293,14 @@ var/list/solars_list = list()
 	var/nexttime = 0		// time for a panel to rotate of 1° in manual tracking
 	var/obj/machinery/power/tracker/connected_tracker = null
 	var/list/connected_panels = list()
+	var/auto_discover = FALSE
+	var/devices_need_refresh = FALSE
 
 /obj/machinery/power/solar_control/drain_power()
 	return -1
 
 /obj/machinery/power/solar_control/Destroy()
-	for(var/obj/machinery/power/solar/M in connected_panels)
+	for(var/obj/machinery/power/solar/M in connected_panels.Copy())
 		M.unset_control()
 	if(connected_tracker)
 		connected_tracker.unset_control()
@@ -308,14 +310,24 @@ var/list/solars_list = list()
 	..()
 	solars_list.Remove(src)
 
-/obj/machinery/power/solar_control/connect_to_network()
-	var/to_return = ..()
-	if(powernet) //if connected and not already in solar_list...
-		solars_list |= src //... add it
-	return to_return
+/obj/machinery/power/solar_control/power_nets_changed(datum/power_node/N)
+	..()
+	if(powernet)
+		solars_list |= src
+	else
+		solars_list -= src
+	devices_need_refresh = TRUE
+
+/obj/machinery/power/solar_control/proc/refresh_connected()
+	for(var/obj/machinery/power/solar/panel in connected_panels.Copy())
+		if(!powernet || panel.powernet != powernet)
+			panel.unset_control()
+	if(connected_tracker && (!powernet || connected_tracker.powernet != powernet))
+		connected_tracker.unset_control()
 
 //search for unconnected panels and trackers in the computer powernet and connect them
 /obj/machinery/power/solar_control/proc/search_for_connected()
+	refresh_connected()
 	if(powernet)
 		for(var/obj/machinery/power/M in powernet.nodes)
 			if(istype(M, /obj/machinery/power/solar))
@@ -406,7 +418,7 @@ var/list/solars_list = list()
 				to_chat(user, "<span class='notice'>The broken glass falls out.</span>")
 				var/obj/structure/computerframe/A = new /obj/structure/computerframe( src.loc )
 				new /obj/item/weapon/material/shard( src.loc )
-				var/obj/item/weapon/circuitboard/solar_control/M = new /obj/item/weapon/circuitboard/solar_control( A )
+				var/obj/item/circuitboard/solar_control/M = new /obj/item/circuitboard/solar_control( A )
 				for (var/obj/C in src)
 					C.loc = src.loc
 				A.circuit = M
@@ -417,7 +429,7 @@ var/list/solars_list = list()
 			else
 				to_chat(user, "<span class='notice'>You disconnect the monitor.</span>")
 				var/obj/structure/computerframe/A = new /obj/structure/computerframe( src.loc )
-				var/obj/item/weapon/circuitboard/solar_control/M = new /obj/item/weapon/circuitboard/solar_control( A )
+				var/obj/item/circuitboard/solar_control/M = new /obj/item/circuitboard/solar_control( A )
 				for (var/obj/C in src)
 					C.loc = src.loc
 				A.circuit = M
@@ -432,6 +444,14 @@ var/list/solars_list = list()
 /obj/machinery/power/solar_control/Process()
 	lastgen = gen
 	gen = 0
+
+	if(devices_need_refresh)
+		devices_need_refresh = FALSE
+		refresh_connected()
+		if(auto_discover && powernet)
+			search_for_connected()
+			if(GLOB.sun)
+				update()
 
 	if(stat & (NOPOWER | BROKEN))
 		return
@@ -513,19 +533,13 @@ var/list/solars_list = list()
 // Used for mapping in solar array which automatically starts itself (telecomms, for example)
 /obj/machinery/power/solar_control/autostart
 	track = 2 // Auto tracking mode
-
-/obj/machinery/power/solar_control/autostart/Initialize()
-	search_for_connected()
-	if(connected_tracker && track == 2)
-		connected_tracker.set_angle(GLOB.sun.angle)
-		set_panels(cdir)
-	. = ..()
+	auto_discover = TRUE
 
 //
 // MISC
 //
 
-/obj/item/weapon/paper/solar
+/obj/item/paper/solar
 	name = "paper- 'Going green! Setup your own solar array instructions.'"
 	info = "<h1>Welcome</h1><p>At greencorps we love the environment, and space. With this package you are able to help mother nature and produce energy without any usage of fossil fuel or phoron! Singularity energy is dangerous while solar energy is safe, which is why it's better. Now here is how you setup your own solar array.</p><p>You can make a solar panel by wrenching the solar assembly onto a cable node. Adding a glass panel, reinforced or regular glass will do, will finish the construction of your solar panel. It is that easy!</p><p>Now after setting up 19 more of these solar panels you will want to create a solar tracker to keep track of our mother nature's gift, the GLOB.sun. These are the same steps as before except you insert the tracker equipment circuit into the assembly before performing the final step of adding the glass. You now have a tracker! Now the last step is to add a computer to calculate the sun's movements and to send commands to the solar panels to change direction with the GLOB.sun. Setting up the solar computer is the same as setting up any computer, so you should have no trouble in doing that. You do need to put a wire node under the computer, and the wire needs to be connected to the tracker.</p><p>Congratulations, you should have a working solar array. If you are having trouble, here are some tips. Make sure all solar equipment are on a cable node, even the computer. You can always deconstruct your creations if you make a mistake.</p><p>That's all to it, be safe, be green!</p>"
 

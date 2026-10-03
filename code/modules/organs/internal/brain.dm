@@ -190,11 +190,11 @@
 				if(BLOOD_VOLUME_SAFE to INFINITY)
 					if(can_heal)
 						damage--
-					if(owner.pale)
+					if(owner.pale && !owner.species.medical_skin_appearance)
 						owner.pale = 0
 						owner.update_body()
 				if(BLOOD_VOLUME_OKAY to BLOOD_VOLUME_SAFE)
-					if(!owner.pale)
+					if(!owner.pale && !owner.species.medical_skin_appearance)
 						owner.pale = 1
 						owner.update_body()
 					if(prob(1))
@@ -203,7 +203,7 @@
 					if(!past_damage_threshold(2) && prob(damprob))
 						take_internal_damage(1)
 				if(BLOOD_VOLUME_BAD to BLOOD_VOLUME_OKAY)
-					if(!owner.pale)
+					if(!owner.pale && !owner.species.medical_skin_appearance)
 						owner.pale = 1
 						owner.update_body()
 					owner.add_event("bleeding", /datum/happiness_event/bleedingout)
@@ -215,7 +215,7 @@
 						owner.Paralyse(rand(1,3))
 						to_chat(owner, "<span class='warning'>You feel extremely [pick("dizzy","woozy","faint")]...</span>")
 				if(BLOOD_VOLUME_SURVIVE to BLOOD_VOLUME_BAD)
-					if(!owner.pale)
+					if(!owner.pale && !owner.species.medical_skin_appearance)
 						owner.pale = 1
 						owner.update_body()
 					owner.add_event("bleeding", /datum/happiness_event/bleedingouthard)
@@ -227,7 +227,7 @@
 						owner.Paralyse(3,5)
 						to_chat(owner, "<span class='warning'>You feel extremely [pick("dizzy","woozy","faint")]...</span>")
 				if(-(INFINITY) to BLOOD_VOLUME_SURVIVE) // Also see heart.dm, being below this point puts you into cardiac arrest.
-					if(!owner.pale)
+					if(!owner.pale && !owner.species.medical_skin_appearance)
 						owner.pale = 1
 						owner.update_body()
 					owner.eye_blurry = max(owner.eye_blurry,6)

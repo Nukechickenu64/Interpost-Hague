@@ -17,16 +17,16 @@
 	station_name  = "Outpost Epsilon"
 	station_short = "Serenity"
 	dock_name     = "TCTM1-54 GR-32 ST"
-	boss_name     = "TetraCorp Announcement Relay"
-	boss_short    = "TetraCorp"
-	company_name  = "TetraCorp Announcement Relay"
+	boss_name     = "Nanotrasen Announcement Relay"
+	boss_short    = "Nanotrasen"
+	company_name  = "Nanotrasen Announcement Relay"
 	company_short = "TRC"
 	system_name = "Zvesda"
 
 	id_hud_icons = 'maps/dreyfus/icons/assignment_hud.dmi'
 
 
-	map_admin_faxes = list("TetraCorp Central Committee")
+	map_admin_faxes = list("Nanotrasen Central Committee")
 
 	shuttle_docked_message = "The shuttle has docked."
 	shuttle_leaving_dock = "The shuttle has departed from home dock."

@@ -16,7 +16,7 @@
 		if("computer")
 			commence_updates(severity)
 		if("power")
-			for(var/obj/machinery/power/apc/A in SSmachines.machinery)
+			for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)
 				if(affected_apcs.len >= max(1, severity * 2))
 					break
 				var/turf/T = get_turf(A)

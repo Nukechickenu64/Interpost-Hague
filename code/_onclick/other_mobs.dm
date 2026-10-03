@@ -31,6 +31,68 @@
 		return
 	return attack_hand(user)
 
+/obj/var/preferred_right_click_verb
+
+/obj/proc/get_right_click_verbs()
+	var/static/list/supported_verbs = list(
+		/obj/machinery/bodyscanner/verb/eject,
+		/obj/machinery/dna_scannernew/verb/eject,
+		/obj/machinery/dnaforensics/verb/toggle_lid,
+		/obj/machinery/recharge_station/verb/move_eject,
+		/obj/machinery/iv_drip/verb/toggle_mode,
+		/obj/machinery/papershredder/verb/empty_contents,
+		/obj/item/device/flashlight/lamp/verb/toggle_light,
+		/obj/structure/closet/verb/verb_toggleopen,
+		/obj/structure/bed/chair/verb/rotate,
+		/obj/structure/ore_box/verb/empty_box,
+		/obj/structure/flora/verb/collect_purchase
+	)
+	return supported_verbs
+
+/obj/proc/select_right_click_verb()
+	if(!isturf(loc))
+		return
+	var/list/supported_verbs = get_right_click_verbs()
+	var/best_owner
+	var/list/best_verbs = list()
+	for(var/verb_path in verbs)
+		if(!(verb_path in supported_verbs) || verb_path:invisibility || verb_path:category != "Object")
+			continue
+		var/path_text = "[verb_path]"
+		var/verb_separator = findtext(path_text, "/verb/")
+		if(!verb_separator)
+			continue
+		var/owner_type = text2path(copytext(path_text, 1, verb_separator))
+		if(!ispath(type, owner_type))
+			continue
+		var/verb_name = copytext(path_text, verb_separator + 6)
+		if(verb_name in list("examine", "use", "use_right", "pull", "context_give", "context_bite"))
+			continue
+		if(verb_path == preferred_right_click_verb)
+			return verb_path
+		if(!best_owner || (owner_type != best_owner && ispath(owner_type, best_owner)))
+			best_owner = owner_type
+			best_verbs.Cut()
+		if(owner_type == best_owner)
+			best_verbs[verb_name] = verb_path
+	if(best_verbs.len == 1)
+		return best_verbs[best_verbs[1]]
+
+/obj/attack_hand_right(mob/user as mob)
+	var/verb_path = select_right_click_verb()
+	if(!verb_path)
+		return ..()
+	if(!user || user != usr || QDELETED(src) || QDELETED(user))
+		return TRUE
+	if(!isliving(user) || !isturf(user.loc) || !user.canClick() || user.incapacitated() || user.restrained() || user.lying)
+		return TRUE
+	if(!Adjacent(user) || !(src in view(1, user)))
+		return TRUE
+	if(!(verb_path in verbs))
+		return TRUE
+	call(src, verb_path)()
+	return TRUE
+
 /mob/proc/attack_empty_hand(var/bp_hand)
 	return
 

@@ -43,13 +43,10 @@
 	var/list/turf/turfs = list()
 	var/list/obj/machinery/atmospherics/atmos_machines = list()
 	var/list/obj/machinery/machines = list()
-	var/list/obj/structure/cable/cables = list()
 
 	for(var/atom/A in atoms)
 		if(istype(A, /turf))
 			turfs += A
-		if(istype(A, /obj/structure/cable))
-			cables += A
 		if(istype(A, /obj/machinery/atmospherics))
 			atmos_machines += A
 		if(istype(A, /obj/machinery))
@@ -57,7 +54,7 @@
 
 	SSatoms.InitializeAtoms(atoms)
 
-	SSmachines.setup_powernets_for_cables(cables)
+	rebuild_power_grid()
 	SSmachines.setup_atmos_machinery(atmos_machines)
 
 	for (var/obj/machinery/machine in machines)
@@ -70,10 +67,10 @@
 	for (var/shuttle_type in shuttles_to_initialise)
 		SSshuttle.initialise_shuttle(shuttle_type)
 
-/datum/map_template/proc/load_new_z()
+/datum/map_template/proc/load_new_z(var/x_override, var/y_override)
 
-	var/x = round((world.maxx - width)/2)
-	var/y = round((world.maxy - height)/2)
+	var/x = x_override || round((world.maxx - width)/2)
+	var/y = y_override || round((world.maxy - height)/2)
 
 	if (x < 1) x = 1
 	if (y < 1) y = 1

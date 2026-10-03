@@ -22,7 +22,7 @@
 	for(var/d = 1, d < 16, d *= 2)
 	#endif
 
-		var/turf/unsim = get_step(src, d)
+		var/turf/unsim = get_zstep(src, d)
 
 		if(!unsim)
 			continue
@@ -125,7 +125,7 @@
 	for(var/d = 1, d < 16, d *= 2)
 	#endif
 
-		var/turf/unsim = get_step(src, d)
+		var/turf/unsim = get_zstep(src, d)
 
 		if(!unsim) //edge of map
 			continue
@@ -240,11 +240,18 @@
 
 /turf/return_air()
 	//Create gas mixture to hold data for passing
-	var/datum/gas_mixture/GM = new
+	return create_initial_air()
 
+/turf/proc/create_initial_air()
+	var/datum/gas_mixture/GM = new
 	if(initial_gas)
 		GM.gas = initial_gas.Copy()
 	GM.temperature = temperature
+	var/turf/default_turf = /turf
+	if(temperature == initial(default_turf.temperature) && length(initial_gas) == 2 && initial_gas[GAS_OXYGEN] == MOLES_O2STANDARD && initial_gas[GAS_NITROGEN] == MOLES_N2STANDARD)
+		var/temperature_ratio = T20C / temperature
+		GM.gas[GAS_OXYGEN] *= temperature_ratio
+		GM.gas[GAS_NITROGEN] *= temperature_ratio
 	GM.update_values()
 
 	return GM
@@ -283,11 +290,7 @@
 		return air
 
 /turf/proc/make_air()
-	air = new/datum/gas_mixture
-	air.temperature = temperature
-	if(initial_gas)
-		air.gas = initial_gas.Copy()
-	air.update_values()
+	air = create_initial_air()
 
 /turf/simulated/proc/c_copy_air()
 	if(!air) air = new/datum/gas_mixture

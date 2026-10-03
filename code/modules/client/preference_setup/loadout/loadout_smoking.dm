@@ -8,7 +8,7 @@
 
 /datum/gear/matchbook
 	display_name = "matchbook"
-	path = /obj/item/weapon/storage/box/matches
+	path = /obj/item/storage/box/matches
 
 /datum/gear/lighter
 	display_name = "cheap lighter"
@@ -24,7 +24,7 @@
 
 /datum/gear/cigars
 	display_name = "fancy cigar case"
-	path = /obj/item/weapon/storage/fancy/cigar
+	path = /obj/item/storage/fancy/cigar
 	cost = 2
 
 /datum/gear/cigar

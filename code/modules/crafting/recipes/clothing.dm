@@ -17,4 +17,4 @@
 /datum/crafting_recipe/clothing/combat_helmet
 	name = "combat helmet"
 	result = list(/obj/item/clothing/head/helmet/handmade = 1)
-	parts = list(/obj/item/weapon/reagent_containers/glass/bucket = 1,  /obj/item/stack/material/steel/ = 2, /obj/item/stack/cable_coil = 2)
+	parts = list(/obj/item/reagent_containers/glass/bucket = 1,  /obj/item/stack/material/steel/ = 2, /obj/item/stack/cable_coil = 2)

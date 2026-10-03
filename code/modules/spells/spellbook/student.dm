@@ -17,5 +17,5 @@
 				/spell/targeted/ethereal_jaunt = 				1,
 				/spell/targeted/projectile/magic_missile = 		1,
 				/obj/item/weapon/gun/energy/staff/focus = 		1,
-				/obj/item/weapon/contract/wizard/xray = 		1
+				/obj/item/contract/wizard/xray = 		1
 					)

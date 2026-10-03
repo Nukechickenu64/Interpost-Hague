@@ -2,7 +2,7 @@
 	category = "Machinery"
 	time = 120
 	related_skill = SKILL_ENG
-	tools = list(/obj/item/weapon/weldingtool = 1)
+	tools = list(/obj/item/weldingtool = 1)
 	int_required = 12
 
 /datum/crafting_recipe/machinery/machine_frame
@@ -74,10 +74,6 @@
 /datum/crafting_recipe/machinery/wall/lightfixture/small
 	name = "small light fixture frame"
 	result = list(/obj/item/frame/light/small = 1)
-
-/datum/crafting_recipe/machinery/wall/apc
-	name = "apc frame"
-	result = list(/obj/item/frame/apc = 1)
 
 /datum/crafting_recipe/machinery/wall/air_alarm
 	name = "air alarm frame"

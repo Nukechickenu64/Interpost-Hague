@@ -1,6 +1,6 @@
 /obj/item/weapon/gun/projectile/handmade_pistol
-	name = "handmade pistol"
-	desc = "Looks unreliable. May blow up in your hands. Due to a strange design, this one can be reload only after shot. Or with the use of a screwdriver."
+	name = "frontier-built FP-38 Single-Shot Pistol"
+	desc = "A crude, hand-built .38-caliber pistol with a single-shot chamber. The chamber must be opened with a tool before reloading; its improvised construction makes it unreliable."
 	icon_state = "hm_pistol"
 	item_state = "pistol"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
@@ -18,7 +18,7 @@
 
 /obj/item/weapon/gun/projectile/handmade_pistol/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	if(!chamber_open)
-		if(istype(W, /obj/item/weapon/screwdriver) || istype(W, /obj/item/weapon/material/kitchen/utensil) || W.sharp)
+		if(istype(W, /obj/item/screwdriver) || istype(W, /obj/item/weapon/material/kitchen/utensil) || W.sharp)
 			open_chamber()
 			unjam(user)
 			to_chat(user, SPAN_NOTICE("You force open chamber with [W]."))

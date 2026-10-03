@@ -3,7 +3,7 @@
 	l_ear = null
 	uniform = null
 	shoes = null
-	id_type = /obj/item/weapon/card/id/dreyfus/gold
+	id_type = /obj/item/card/id/dreyfus/gold
 	id_slot = slot_wear_amulet
 	pda_type = /obj/item/device/pda/captain
 	pda_slot = slot_wear_id
@@ -13,7 +13,7 @@
 /decl/hierarchy/outfit/job/dreyfus/adjoint
 	name = OUTFIT_JOB_NAME("Directeur Adjoint")
 	l_ear = /obj/item/device/radio/headset/heads/hop
-	id_type = /obj/item/weapon/card/id/dreyfus/hop
+	id_type = /obj/item/card/id/dreyfus/hop
 	pda_type = /obj/item/device/pda/heads/hop
 
 /decl/hierarchy/outfit/job/dreyfus/employe
@@ -21,25 +21,25 @@
 	l_ear = /obj/item/device/radio/headset/headset_com
 	uniform = /obj/item/clothing/under/rank/internalaffairs/plain/nt
 	shoes = /obj/item/clothing/shoes/black
-	l_hand = /obj/item/weapon/storage/briefcase
-	//id_type = /obj/item/weapon/card/id/dreyfus/civilian/employe
+	l_hand = /obj/item/storage/briefcase
+	//id_type = /obj/item/card/id/dreyfus/civilian/employe
 	pda_type = /obj/item/device/pda/lawyer
 /*
 /decl/hierarchy/outfit/job/dreyfus/inge
 	hierarchy_type = /decl/hierarchy/outfit/job/engineering
-	belt = /obj/item/weapon/storage/belt/utility/full
+	belt = /obj/item/storage/belt/utility/full
 	l_ear = /obj/item/device/radio/headset/headset_eng
 	shoes = /obj/item/clothing/shoes/workboots
-	backpack = /obj/item/weapon/storage/backpack/industrial
-	satchel_one = /obj/item/weapon/storage/backpack/satchel_eng
-	messenger_bag = /obj/item/weapon/storage/backpack/messenger/engi
-	id_type = /obj/item/weapon/card/id/dreyfus/engineer
+	backpack = /obj/item/storage/backpack/industrial
+	satchel_one = /obj/item/storage/backpack/satchel_eng
+	messenger_bag = /obj/item/storage/backpack/messenger/engi
+	id_type = /obj/item/card/id/dreyfus/engineer
 	pda_slot = slot_l_store
 	flags = OUTFIT_HAS_BACKPACK|OUTFIT_EXTENDED_SURVIVAL
 */
 /decl/hierarchy/outfit/job/dreyfus/inge/inge
 	name = OUTFIT_JOB_NAME("Ingenieur")
-	id_type = /obj/item/weapon/card/id/engineering
+	id_type = /obj/item/card/id/engineering
 	pda_type = /obj/item/device/pda/engineering
 
 /decl/hierarchy/outfit/job/science/superviseur
@@ -49,7 +49,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/science/head
+	id_type = /obj/item/card/id/science/head
 	pda_type = /obj/item/device/pda/heads/rd
 
 /decl/hierarchy/outfit/job/security/peacekeeper
@@ -59,7 +59,7 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/dreyfus/sec
+	id_type = /obj/item/card/id/dreyfus/sec
 	pda_type = /obj/item/device/pda/security
 
 /*
@@ -83,32 +83,32 @@
 	shoes = null
 	head = null
 	suit = null
-	id_type = /obj/item/weapon/card/id/dreyfus/hos
+	id_type = /obj/item/card/id/dreyfus/hos
 	pda_type = /obj/item/device/pda/heads/hos
 
 /decl/hierarchy/outfit/job/cargo_kid
 	name = OUTFIT_JOB_NAME("Cargo Kid")
 	//uniform = /obj/item/clothing/under/child_jumpsuit
 	//shoes = /obj/item/clothing/shoes/child_shoes
-	id = /obj/item/weapon/card/id/dreyfus/cargo
+	id = /obj/item/card/id/dreyfus/cargo
 
 /decl/hierarchy/outfit/job/cadet
 	name = OUTFIT_JOB_NAME("Cadet")
 	//uniform = /obj/item/clothing/under/child_jumpsuit
 	//shoes = /obj/item/clothing/shoes/child_shoes
-	id = /obj/item/weapon/card/id/dreyfus/sec
+	id = /obj/item/card/id/dreyfus/sec
 
 /decl/hierarchy/outfit/job/medassist
 	name = OUTFIT_JOB_NAME("Medical Assistant")
 //	uniform = /obj/item/clothing/under/child_jumpsuit
 //	shoes = /obj/item/clothing/shoes/child_shoes
-	id = /obj/item/weapon/card/id/medical
+	id = /obj/item/card/id/medical
 
 /decl/hierarchy/outfit/job/jr_upkeep
 	name = OUTFIT_JOB_NAME("Junior Upkeeper")
 //	uniform = /obj/item/clothing/under/child_jumpsuit
 //	shoes = /obj/item/clothing/shoes/child_shoes
-	id = /obj/item/weapon/card/id/dreyfus/engineer
+	id = /obj/item/card/id/dreyfus/engineer
 
 //Raider outfit.
 /decl/hierarchy/outfit/shipraiders
@@ -117,7 +117,7 @@
 //	uniform = /obj/item/clothing/under/ert/raider
 	shoes = /obj/item/clothing/shoes/jackboots
 	l_ear = /obj/item/device/radio/headset/raider
-	r_pocket = /obj/item/weapon/card/emag
+	r_pocket = /obj/item/card/emag
 	//belt = /obj/item/weapon/gun/projectile/pistol
 	suit = /obj/item/clothing/suit/storage/vest/opvest
 	//mask = /obj/item/clothing/mask/gas
