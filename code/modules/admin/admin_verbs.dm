@@ -132,7 +132,9 @@ var/list/admin_verbs_fun = list(
 	/datum/admins/proc/call_supply_drop,
 	/datum/admins/proc/call_drop_pod,
 	/client/proc/create_dungeon,
-	/datum/admins/proc/ai_hologram_set
+	/datum/admins/proc/ai_hologram_set,
+	/client/proc/toggle_spoken_magic,
+	/client/proc/magic_lexicon
 	)
 
 var/list/admin_verbs_spawn = list(
@@ -171,6 +173,8 @@ var/list/admin_verbs_server = list(
 	/client/proc/nanomapgen_DumpImage
 	)
 var/list/admin_verbs_debug = list(
+	/client/proc/toggle_spoken_magic,
+	/client/proc/magic_lexicon,
 	/client/proc/getruntimelog,                     // allows us to access runtime logs to somebody,
 	/client/proc/cmd_admin_list_open_jobs,
 	/client/proc/Debug2,

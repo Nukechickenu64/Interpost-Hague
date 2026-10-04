@@ -35,7 +35,7 @@
 #define DNA_UI_HAIR_STYLE  16
 #define DNA_UI_LENGTH      16 // Update this when you add something, or you WILL break shit.
 
-#define DNA_SE_LENGTH 27
+#define DNA_SE_LENGTH 33
 // For later:
 //#define DNA_SE_LENGTH 50 // Was STRUCDNASIZE, size 27. 15 new blocks added = 42, plus room to grow.
 
@@ -347,6 +347,18 @@ var/global/list/datum/dna/gene/dna_genes[0]
 	//testing("New SE: [struc_enzymes]")
 	dirtySE=0
 
+/datum/dna/proc/migrate_legacy_se()
+	if(length(struc_enzymes) != 3 * (DNA_SE_LENGTH - 6))
+		return FALSE
+	for(var/block = 1; block <= DNA_SE_LENGTH - 7; block++)
+		SE[block] = hex2num(copytext(struc_enzymes, (block - 1) * 3 + 1, block * 3 + 1))
+	// The legacy final block was MONKEYBLOCK; keep it in the new final slot.
+	SE[DNA_SE_LENGTH] = hex2num(copytext(struc_enzymes, (DNA_SE_LENGTH - 7) * 3 + 1, (DNA_SE_LENGTH - 6) * 3 + 1))
+	for(var/block = DNA_SE_LENGTH - 6; block < DNA_SE_LENGTH; block++)
+		SE[block] = 1
+	UpdateSE()
+	return TRUE
+
 // BACK-COMPAT!
 //  Just checks our character has all the crap it needs.
 /datum/dna/proc/check_integrity(var/mob/living/carbon/human/character)
@@ -355,7 +367,8 @@ var/global/list/datum/dna/gene/dna_genes[0]
 			ResetUIFrom(character)
 
 		if(length(struc_enzymes)!= 3*DNA_SE_LENGTH)
-			ResetSE()
+			if(!migrate_legacy_se())
+				ResetSE()
 
 		if(length(unique_enzymes) != 32)
 			unique_enzymes = md5(character.real_name)
@@ -363,7 +376,8 @@ var/global/list/datum/dna/gene/dna_genes[0]
 		if(length(uni_identity) != 3*DNA_UI_LENGTH)
 			uni_identity = "00600200A00E0110148FC01300B0095BD7FD3F4"
 		if(length(struc_enzymes)!= 3*DNA_SE_LENGTH)
-			struc_enzymes = "43359156756131E13763334D1C369012032164D4FE4CD61544B6C03F251B6C60A42821D26BA3B0FD6"
+			if(!migrate_legacy_se())
+				struc_enzymes = "43359156756131E13763334D1C369012032164D4FE4CD61544B6C03F251B6C60A42821D26BA3B0001001001001001001FD6"
 
 // BACK-COMPAT!
 //  Initial DNA setup.  I'm kind of wondering why the hell this doesn't just call the above.

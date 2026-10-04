@@ -14,6 +14,8 @@
 	var/light_cone_angle
 	var/light_cone_dir
 	var/light_glow_range
+	var/light_cone_target_x
+	var/light_cone_target_y
 
 	// Variables for keeping track of the colour.
 	var/lum_r
@@ -62,6 +64,8 @@
 	light_cone_angle = source_atom.light_cone_angle
 	light_cone_dir = source_atom.light_cone_dir
 	light_glow_range = source_atom.light_glow_range
+	light_cone_target_x = source_atom.light_cone_target_x
+	light_cone_target_y = source_atom.light_cone_target_y
 
 	parse_light_color()
 
@@ -153,10 +157,12 @@
 	if(light_range && light_power && !applied)
 		. = 1
 
-	if(source_atom.light_cone_angle != light_cone_angle || source_atom.light_cone_dir != light_cone_dir || source_atom.light_glow_range != light_glow_range)
+	if(source_atom.light_cone_angle != light_cone_angle || source_atom.light_cone_dir != light_cone_dir || source_atom.light_glow_range != light_glow_range || source_atom.light_cone_target_x != light_cone_target_x || source_atom.light_cone_target_y != light_cone_target_y)
 		light_cone_angle = source_atom.light_cone_angle
 		light_cone_dir = source_atom.light_cone_dir
 		light_glow_range = source_atom.light_glow_range
+		light_cone_target_x = source_atom.light_cone_target_x
+		light_cone_target_y = source_atom.light_cone_target_y
 		. = 1
 
 	if(source_atom.light_color != light_color)
@@ -226,28 +232,34 @@
 	if(light_glow_range)
 		. = 1 - CLAMP01(sqrt(dx * dx + dy * dy) / light_glow_range)
 
-	var/angle
-	if(!dy)
-		angle = dx >= 0 ? 90 : 270
-	else
-		angle = arctan(dx / dy)
-		if(dy < 0)
-			angle += 180
-		else if(dx < 0)
-			angle += 360
-	var/diff = angle - light_cone_dir
-	while(diff > 180)
-		diff -= 360
-	while(diff < -180)
-		diff += 360
-	diff = abs(diff)
-	if(diff >= light_cone_angle)
+	var/target_x = light_cone_target_x
+	var/target_y = light_cone_target_y
+	if(isnull(target_x) || isnull(target_y))
+		target_x = source_turf.x + sin(light_cone_dir) * light_range
+		target_y = source_turf.y + cos(light_cone_dir) * light_range
+	var/target_dx = target_x - source_turf.x
+	var/target_dy = target_y - source_turf.y
+	var/target_dist = sqrt(target_dx * target_dx + target_dy * target_dy)
+	if(!target_dist)
 		return
-
-	var/cone = LUM_FALLOFF(C, source_turf)
-	if(diff > light_cone_angle - LIGHT_CONE_SOFT_EDGE)
-		cone *= (light_cone_angle - diff) / LIGHT_CONE_SOFT_EDGE
-	. = max(., cone)
+	if(target_dist > light_range)
+		target_dx = target_dx / target_dist * light_range
+		target_dy = target_dy / target_dist * light_range
+		target_x = source_turf.x + target_dx
+		target_y = source_turf.y + target_dy
+		target_dist = light_range
+	var/unit_x = target_dx / target_dist
+	var/unit_y = target_dy / target_dist
+	var/along = dx * unit_x + dy * unit_y
+	var/across = abs(dx * unit_y - dy * unit_x)
+	var/beam_width = 0.35 + 0.75 * CLAMP01(along / target_dist)
+	var/beam = 0
+	if(along >= 0 && along <= target_dist && across < beam_width)
+		beam = 0.75 * (1 - across / beam_width)
+	var/spot_dist_x = C.x - target_x
+	var/spot_dist_y = C.y - target_y
+	var/spot = 1 - CLAMP01(sqrt(spot_dist_x * spot_dist_x + spot_dist_y * spot_dist_y) / 1.4)
+	. = max(., beam, spot)
 
 #undef LIGHT_CONE_SOFT_EDGE
 

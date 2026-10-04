@@ -357,6 +357,8 @@ proc/get_radio_key_from_channel(var/channel)
 		else
 			playsound(src, "sound/voice/speech/[gender][speechwords].ogg", 75)
 		log_say("[name]/[key] : [message]")
+	if(magic_interpreter.can_attempt(src))
+		magic_interpreter.try_cast(src, message)
 	return 1
 
 /mob/living/proc/say_signlang(var/message, var/verb="gestures", var/datum/language/language)

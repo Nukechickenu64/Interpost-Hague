@@ -57,6 +57,7 @@
 #define MODE_GODCULTIST "god cultist"
 #define MODE_CRUSADE "crusader"
 #define MODE_DELVER "delver"
+#define MODE_LOGOMANCER "logomancer"
 
 #define DEFAULT_TELECRYSTAL_AMOUNT 100
 #define IMPLANT_TELECRYSTAL_AMOUNT(x) (round(x * 0.49)) // If this cost is ever greater than half of DEFAULT_TELECRYSTAL_AMOUNT then it is possible to buy more TC than you spend

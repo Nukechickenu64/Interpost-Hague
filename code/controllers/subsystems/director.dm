@@ -33,6 +33,7 @@ SUBSYSTEM_DEF(director)
 	var/last_director_beat = 0
 	var/round_start_time = 0
 	var/starter_required = FALSE
+	var/list/starter_role_weights = list(MODE_TRAITOR = 40, "leech" = 40, MODE_LOGOMANCER = 20)
 	var/starter_role
 	var/datum/mind/starter_mind
 	var/mob/living/carbon/human/starter_body
@@ -158,7 +159,7 @@ SUBSYSTEM_DEF(director)
 	assign_corporate_profiles()
 	if(istype(SSticker.mode, /datum/game_mode/dynamic))
 		starter_required = TRUE
-		starter_role = pick("traitor", "leech")
+		starter_role = pickweight(starter_role_weights.Copy())
 		starter_deadline = round_start_time + DIRECTOR_STARTER_DELAY
 		select_starter_antagonist()
 	log_debug("AI Director: Round started. Assigned [profiles.len] corporate profiles.")
@@ -196,7 +197,13 @@ SUBSYSTEM_DEF(director)
 
 /datum/controller/subsystem/director/proc/select_starter_antagonist()
 	clear_starter_candidate()
-	var/list/roles = list(starter_role, starter_role == "traitor" ? "leech" : "traitor")
+	var/list/roles = list(starter_role)
+	var/list/remaining = starter_role_weights.Copy()
+	remaining -= starter_role
+	while(remaining.len)
+		var/next_role = pickweight(remaining)
+		roles += next_role
+		remaining -= next_role
 	for(var/antag_id in roles)
 		var/list/candidates = list()
 		for(var/mob/living/carbon/human/candidate in GLOB.player_list)
@@ -271,8 +278,8 @@ SUBSYSTEM_DEF(director)
 	else
 		var/datum/antagonist/antag = GLOB.all_antag_types_[starter_role]
 		if(antag.add_antagonist(starter_mind, FALSE, FALSE, FALSE, FALSE, TRUE))
-			loyalty.set_faction(starter_mind, LOYALTY_SYNDICATE)
-			log_debug("AI Director: Activated round-start traitor [starter_ckey].")
+			loyalty.set_faction(starter_mind, starter_role == MODE_TRAITOR ? LOYALTY_SYNDICATE : LOYALTY_NEUTRAL)
+			log_debug("AI Director: Activated round-start [starter_role] [starter_ckey].")
 			starter_required = FALSE
 			clear_starter_candidate()
 		else

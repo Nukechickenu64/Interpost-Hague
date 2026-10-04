@@ -5,8 +5,8 @@
 
 /datum/game_mode/dynamic
 	name = "Dynamic"
-	round_description = "An AI Director monitors telemetry and scales threats dynamically. One hidden traitor or leech is selected at round start and awakens after five minutes."
-	extended_round_description = "A hidden traitor or leech is selected from the crew at round start. After five minutes, a traitor receives their assignment, while a leech suffers a fatal heart attack and may rise again one minute later. The AI Director continues monitoring live station telemetry and triggering Catalyst Events tailored to the environment."
+	round_description = "An AI Director monitors telemetry and scales threats dynamically. One hidden traitor, leech or logomancer is selected at round start and awakens after five minutes."
+	extended_round_description = "A hidden traitor, leech or logomancer is selected from the crew at round start. After five minutes, a traitor receives their assignment, a logomancer awakens to words that bend the world, while a leech suffers a fatal heart attack and may rise again one minute later. The AI Director continues monitoring live station telemetry and triggering Catalyst Events tailored to the environment."
 	config_tag = "dynamic"
 	votable = 1
 	probability = 10

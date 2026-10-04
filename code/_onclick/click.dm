@@ -44,6 +44,9 @@
 
 	next_click = world.time + 1
 
+	if(src.client)
+		src.client.magic_note_click(A)
+
 	var/list/modifiers = params2list(params)
 	// Handle right-clicks first so we can customize RMB behavior
 	if(modifiers["right"]) {

@@ -19,6 +19,8 @@
 	var/cone_range = 6
 	var/glow_range = 2
 	var/aim_angle
+	var/aim_target_x
+	var/aim_target_y
 	var/mob/cone_holder
 
 /obj/item/device/flashlight/Initialize()
@@ -47,9 +49,13 @@
 
 /obj/item/device/flashlight/proc/update_cone()
 	if(!on || !cone_angle)
-		set_light_cone(0, 0, 0)
+		set_light_cone(0, 0, 0, null, null)
 		return
-	set_light_cone(cone_angle, get_cone_dir(), glow_range)
+	var/mob/M = loc
+	if(!istype(M) || M.get_active_hand() != src || isnull(aim_angle))
+		set_light_cone(cone_angle, get_cone_dir(), glow_range, null, null)
+	else
+		set_light_cone(cone_angle, get_cone_dir(), glow_range, aim_target_x, aim_target_y)
 
 /obj/item/device/flashlight/proc/get_cone_dir()
 	var/mob/M = loc
@@ -153,6 +159,10 @@
 		if(user.facing_dir)
 			user.facing_dir = face
 		user.set_dir(face)
+	var/turf/target_turf = get_turf(A)
+	if(target_turf && target_turf.z == U.z)
+		aim_target_x = target_turf.x + (px - (target_turf.x - 1) * world.icon_size) / world.icon_size - 0.5
+		aim_target_y = target_turf.y + (py - (target_turf.y - 1) * world.icon_size) / world.icon_size - 0.5
 	update_cone()
 
 /client
