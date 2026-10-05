@@ -13,9 +13,14 @@
 	antaghud_indicator = "huddead"
 	porco_actions = list(
 		list("ToggleLeechFangs", "Extend / Retract Fangs"),
-		list("LeechMesmerize", "Mesmerizing Gaze")
+		list("LeechMesmerize", "Mesmerizing Gaze"),
+		list("leech_blood_strength", "Blood Strength (50 blood)"),
+		list("leech_fortitude", "Fortitude (50 blood)"),
+		list("leech_celerity", "Celerity (250 blood)"),
+		list("leech_heal", "Heal (150 blood)"),
+		list("leech_dead_eyes", "Dead Eyes")
 	)
-	welcome_text = "You died, but the blood in your veins drags you onward. Your heart is silent, your lungs still, and pain is a distant memory. Fresh human blood is the only thing that keeps your dead flesh moving."
+	welcome_text = "You died, but the blood in your veins drags you onward. Your heart is silent, your lungs still, and pain is a distant memory. Fresh human blood sustains you and fuels your disciplines: Blood Strength, Fortitude, Celerity, and healing. Dead Eyes reveals spirits and pierces darkness. Fire, silver, and intense light are your enemies."
 
 /datum/antagonist/afflicted/create_objectives(var/datum/mind/leech_mind)
 	if(!..())
@@ -41,9 +46,22 @@
 	. = ..()
 	if(. && istype(target.current, /mob/living/carbon/human))
 		var/mob/living/carbon/human/leech = target.current
+		leech.clear_leech_powers()
+		leech.stats[STAT_IQ] += 5
+		leech.leech_stat_bonuses[STAT_IQ] = 5
 		leech.leech_fangs_extended = FALSE
+		leech.leech_last_meal = world.time
+		leech.leech_last_hunger_update = world.time
+		leech.leech_meal_blood = 0
 		leech.verbs += /mob/living/carbon/human/proc/toggle_leech_fangs
 		leech.verbs += /mob/living/carbon/human/proc/leech_mesmerize
+		leech.verbs += /mob/living/carbon/human/proc/leech_blood_strength
+		leech.verbs += /mob/living/carbon/human/proc/leech_fortitude
+		leech.verbs += /mob/living/carbon/human/proc/leech_celerity
+		leech.verbs += /mob/living/carbon/human/proc/leech_heal
+		leech.verbs += /mob/living/carbon/human/proc/leech_dead_eyes
+		leech.handle_happiness()
+		leech.update_stamina_hud()
 
 /datum/antagonist/afflicted/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
 	. = ..()
@@ -51,7 +69,16 @@
 		var/mob/living/carbon/human/leech = player.current
 		leech.verbs -= /mob/living/carbon/human/proc/toggle_leech_fangs
 		leech.verbs -= /mob/living/carbon/human/proc/leech_mesmerize
+		leech.verbs -= /mob/living/carbon/human/proc/leech_blood_strength
+		leech.verbs -= /mob/living/carbon/human/proc/leech_fortitude
+		leech.verbs -= /mob/living/carbon/human/proc/leech_celerity
+		leech.verbs -= /mob/living/carbon/human/proc/leech_heal
+		leech.verbs -= /mob/living/carbon/human/proc/leech_dead_eyes
+		leech.clear_leech_powers()
 		leech.leech_fangs_extended = FALSE
+		leech.update_happiness()
+		leech.handle_happiness()
+		leech.update_stamina_hud()
 
 /datum/mind
 	var/leech_diagnosed = FALSE
@@ -63,7 +90,22 @@
 /mob/living/carbon/human/proc/is_leech()
 	return mind?.is_leech()
 
-/mob/living/carbon/human/adjustStaminaLoss(var/amount)
+/mob/living/carbon/human/ssd_check()
+	if(leech_starving)
+		return FALSE
+	return ..()
+
+/mob/living/carbon/human/get_client()
+	if(leech_starving && leech_witness)
+		return leech_witness.client
+	return ..()
+
+/mob/living/carbon/human/show_message(msg, type, alt, alt_type)
+	if(leech_starving && leech_witness?.client)
+		return leech_witness.show_message(msg, type, alt, alt_type)
+	return ..()
+
+/mob/living/carbon/human/adjustStaminaLoss(var/amount, var/passive = FALSE)
 	if(is_leech())
 		staminaloss = 0
 		return
@@ -75,11 +117,132 @@
 		return
 	..()
 
+/mob/living/carbon/human/update_stamina_hud()
+	if(nutrition_icon)
+		nutrition_icon.name = is_leech() ? "blood hunger and thirst" : "nutrition"
+		if(is_leech())
+			nutrition_icon.icon_state = leech_is_hungry() ? "hunger2" : "hunger0"
+	if(is_leech())
+		update_happiness()
+	if(!stamina_icon)
+		return
+	if(!is_leech())
+		stamina_icon.name = "stamina"
+		stamina_icon.color = null
+		return ..()
+	var/blood_percentage = get_blood_volume()
+	stamina_icon.name = "blood ([blood_percentage]%)"
+	stamina_icon.cut_overlays()
+	stamina_icon.icon_state = "v[Clamp(round(blood_percentage * 12 / 100), 0, 12)]"
+	stamina_icon.color = null
+
 /mob/living/carbon/human
 	var/leech_fangs_extended = FALSE
 	var/leech_last_light_damage = 0
 	var/leech_lure_cooldown = 0
+	var/list/leech_stat_bonuses = list()
+	var/list/leech_power_expiry = list()
+	var/leech_power_generation = 0
+	var/leech_dead_eyes_active = FALSE
+	var/leech_fire_fear_cooldown = 0
+	var/leech_last_meal = 0
+	var/leech_last_hunger_update = 0
+	var/leech_meal_blood = 0
+	var/leech_starving = FALSE
+	var/leech_starvation_deadline = 0
+	var/datum/leech_starvation_ai/leech_starvation_ai
+	var/mob/observer/virtual/mob/leech_starvation/leech_witness
 	// TODO: Add a fang sprite or overlay to the human appearance update when art is available.
+
+/mob/living/carbon/human/proc/clear_leech_powers()
+	stop_leech_starvation()
+	leech_power_generation++
+	for(var/stat_name in leech_stat_bonuses)
+		stats[stat_name] -= leech_stat_bonuses[stat_name]
+	leech_stat_bonuses.Cut()
+	leech_power_expiry.Cut()
+	leech_dead_eyes_active = FALSE
+	handle_vision()
+
+/mob/living/carbon/human/proc/leech_spend_blood(amount)
+	if(!is_leech() || incapacitated() || !vessel)
+		return FALSE
+	if(vessel.get_reagent_amount(/datum/reagent/blood) <= amount)
+		to_chat(src, "<span class='warning'>You need more than [amount] units of blood.</span>")
+		return FALSE
+	vessel.remove_reagent(/datum/reagent/blood, amount)
+	update_stamina_hud()
+	return TRUE
+
+/mob/living/carbon/human/proc/leech_stat_power(stat_name, bonus, cost, duration, maximum = 0, refresh = TRUE)
+	if(!is_leech() || incapacitated())
+		return FALSE
+	if(!refresh && leech_stat_bonuses[stat_name])
+		to_chat(src, "<span class='warning'>That discipline is already active.</span>")
+		return FALSE
+	var/old_bonus = leech_stat_bonuses[stat_name]
+	if(!isnum(old_bonus))
+		old_bonus = 0
+	var/base_stat = stats[stat_name] - old_bonus
+	if(maximum)
+		bonus = min(bonus, maximum - base_stat)
+	if(bonus <= 0)
+		to_chat(src, "<span class='warning'>Your [uppertext(stat_name)] cannot be increased further.</span>")
+		return FALSE
+	if(!leech_spend_blood(cost))
+		return FALSE
+	stats[stat_name] += bonus - old_bonus
+	leech_stat_bonuses[stat_name] = bonus
+	var/expires_at = world.time + duration
+	var/generation = leech_power_generation
+	leech_power_expiry[stat_name] = expires_at
+	spawn(duration)
+		if(!QDELETED(src) && generation == leech_power_generation && leech_power_expiry[stat_name] == expires_at)
+			stats[stat_name] -= leech_stat_bonuses[stat_name]
+			leech_stat_bonuses -= stat_name
+			leech_power_expiry -= stat_name
+	return TRUE
+
+/mob/living/carbon/human/proc/leech_blood_strength()
+	set name = "Blood Strength"
+	set desc = "Spend 50 blood for +5 ST for two minutes, up to 30 ST. Reuse refreshes the duration."
+	set category = "IC"
+	if(leech_stat_power(STAT_ST, 5, 50, 1200, 30))
+		to_chat(src, "<span class='notice'>Blood floods your muscles with unnatural strength.</span>")
+
+/mob/living/carbon/human/proc/leech_fortitude()
+	set name = "Fortitude"
+	set desc = "Spend 50 blood for +4 HT for two minutes, up to 30 HT. Reuse refreshes the duration."
+	set category = "IC"
+	if(leech_stat_power(STAT_HT, 4, 50, 1200, 30))
+		to_chat(src, "<span class='notice'>Your dead flesh hardens with stolen vitality.</span>")
+
+/mob/living/carbon/human/proc/leech_celerity()
+	set name = "Celerity"
+	set desc = "Spend 250 blood for +6 DX and supernatural speed for ninety seconds."
+	set category = "IC"
+	if(leech_stat_power(STAT_DX, 6, 250, 900, refresh = FALSE))
+		to_chat(src, "<span class='notice'>The world seems to slow around you.</span>")
+
+/mob/living/carbon/human/proc/leech_heal()
+	set name = "Heal"
+	set desc = "Spend 150 blood to restore your dead flesh without replenishing your blood."
+	set category = "IC"
+	if(!leech_spend_blood(150))
+		return
+	dizziness = 0
+	rejuvenate(preserve_blood = TRUE)
+	to_chat(src, "<span class='notice'>Your wounds close as stolen blood repairs your body.</span>")
+
+/mob/living/carbon/human/proc/leech_dead_eyes()
+	set name = "Dead Eyes"
+	set desc = "Toggle the ability to see spirits and see in the dark."
+	set category = "IC"
+	if(!is_leech() || incapacitated())
+		return
+	leech_dead_eyes_active = !leech_dead_eyes_active
+	handle_vision()
+	to_chat(src, "<span class='notice'>Your sight [leech_dead_eyes_active ? "opens to the world of the dead" : "returns to normal"].</span>")
 
 /mob/living/carbon/human/proc/toggle_leech_fangs()
 	set name = "Extend / Retract Fangs"
@@ -133,40 +296,272 @@
 /mob/living/carbon/human/proc/handle_leech_decay()
 	if(!mind?.is_leech() || stat == DEAD || !vessel)
 		return
+	staminaloss = 0
+	fatigue = 0
+	set_nutrition(450)
+	set_thirst(THIRST_LEVEL_FILLED)
+	leech_touch_silver(l_hand)
+	leech_touch_silver(r_hand)
+	handle_leech_fire_fear()
 	var/obj/structure/closet/coffin/refuge = loc
-	if(!(istype(refuge) && (resting || lying)))
-		remove_blood(1)
+	var/hunger_elapsed = max(0, world.time - leech_last_hunger_update)
+	leech_last_hunger_update = world.time
+	if(istype(refuge) && (resting || lying) && !leech_starving)
+		leech_last_meal += hunger_elapsed
+	update_stamina_hud()
 	var/blood_volume = get_blood_volume()
 	if(blood_volume <= 0)
 		to_chat(src, "<span class='danger'>The last blood leaves your veins. Your dead body finally goes still.</span>")
 		death()
 		return
-	if(blood_volume <= 25)
-		pale = 1
-		adjustStaminaLoss(5)
-		adjustToxLoss(3)
-		if(internal_organs.len)
-			var/obj/item/organ/internal/organ = pick(internal_organs)
-			organ.take_internal_damage(1)
-		if(prob(15))
-			if(l_hand)
-				drop_l_hand()
-			else if(r_hand)
-				drop_r_hand()
-		to_chat(src, "<span class='danger'>Your limbs are failing. You need blood immediately.</span>")
-	else if(blood_volume <= 50)
-		pale = 1
-		adjustStaminaLoss(3)
-		eye_blurry = max(eye_blurry, 3)
-		apply_effect(2, STUTTER)
-		if(prob(10))
-			emote(pick("groan", "cough"))
-	else if(blood_volume <= 75)
-		pale = 1
-		adjustStaminaLoss(2)
-		make_jittery(3)
-	else
-		pale = 0
+	pale = leech_is_hungry()
+	if(!leech_starving && world.time >= leech_last_meal + 30 MINUTES)
+		start_leech_starvation()
+
+/mob/living/carbon/human/proc/leech_is_hungry()
+	return is_leech() && (leech_starving || world.time >= leech_last_meal + 15 MINUTES)
+
+/mob/living/carbon/human/proc/leech_digest_blood(amount)
+	leech_meal_blood += amount
+	if(leech_meal_blood >= 200)
+		leech_meal_blood = 0
+		leech_last_meal = world.time
+		if(leech_starving)
+			stop_leech_starvation()
+			to_chat(src, "<span class='notice'>Your hunger recedes. Your body is yours again.</span>")
+	update_stamina_hud()
+
+/mob/living/carbon/human/proc/start_leech_starvation()
+	if(leech_starving || !is_leech() || stat == DEAD)
+		return
+	leech_starving = TRUE
+	leech_starvation_deadline = world.time + 1 MINUTE
+	leech_meal_blood = 0
+	leech_starvation_ai = new(src)
+	visible_message("<span class='danger'>[src]'s expression twists into a feral hunger!</span>")
+	to_chat(leech_witness ? leech_witness : src, "<span class='danger'>Starvation takes your body. You can only watch through its eyes. It must drink 200 blood within one minute, or you will die.</span>")
+	update_stamina_hud()
+
+/mob/living/carbon/human/proc/stop_leech_starvation()
+	leech_starving = FALSE
+	leech_starvation_deadline = 0
+	QDEL_NULL(leech_starvation_ai)
+	QDEL_NULL(leech_witness)
+
+/mob/observer/virtual/mob/leech_starvation
+	name = "captive consciousness"
+	alpha = 0
+	ghost_image_flag = GHOST_IMAGE_NONE
+	anchored = TRUE
+	var/allow_departure = FALSE
+
+/mob/observer/virtual/mob/leech_starvation/uses_side_ui()
+	return TRUE
+
+/mob/observer/virtual/mob/leech_starvation/get_client()
+	return client
+
+/mob/observer/virtual/mob/leech_starvation/is_blind()
+	var/mob/living/carbon/human/body = host
+	return !body || body.is_blind()
+
+/mob/observer/virtual/mob/leech_starvation/is_deaf()
+	var/mob/living/carbon/human/body = host
+	return !body || body.is_deaf()
+
+/mob/observer/virtual/mob/leech_starvation/Login()
+	..()
+	if(host)
+		sync_sight(host)
+		client.eye = host
+		client.perspective = EYE_PERSPECTIVE
+		var/mob/living/carbon/human/body = host
+		for(var/obj/screen/meter in list(body.stamina_icon, body.nutrition_icon, body.happiness_icon, body.healths))
+			client.screen |= meter
+
+/mob/observer/virtual/mob/leech_starvation/Move()
+	return FALSE
+
+/mob/observer/virtual/mob/leech_starvation/ClickOn(atom/target, params, mob/user, client/player_client)
+	return
+
+/mob/observer/virtual/mob/leech_starvation/ghostize(can_reenter_corpse = CORPSE_CAN_REENTER)
+	if(allow_departure)
+		return ..()
+
+/mob/observer/virtual/mob/leech_starvation/Destroy()
+	var/mob/living/carbon/human/body = host
+	if(key)
+		if(!QDELETED(host))
+			body.key = key
+		else if(client)
+			mind = body?.mind
+			allow_departure = TRUE
+			ghostize(FALSE)
+	return ..()
+
+/datum/leech_starvation_ai
+	var/mob/living/carbon/human/owner
+	var/datum/humanized_mover/mover
+	var/mob/living/carbon/human/target
+	var/list/unreachable_targets = list()
+	var/next_bite = 0
+	var/saved_attack_intent
+	var/saved_combat_intent
+	var/saved_combat_mode
+	var/saved_fangs
+	var/saved_resting
+	var/saved_eye_closed
+
+/datum/leech_starvation_ai/New(mob/living/carbon/human/body)
+	..()
+	owner = body
+	saved_attack_intent = owner.a_intent
+	saved_combat_intent = owner.c_intent
+	saved_combat_mode = owner.combat_mode
+	saved_fangs = owner.leech_fangs_extended
+	saved_resting = owner.resting
+	saved_eye_closed = owner.eye_closed
+	owner.a_intent = I_HURT
+	owner.c_intent = I_QUICK
+	owner.combat_mode = TRUE
+	owner.leech_fangs_extended = TRUE
+	owner.leech_witness = new(get_turf(owner), owner)
+	owner.leech_witness.real_name = owner.real_name
+	if(owner.key)
+		owner.leech_witness.key = owner.key
+	mover = new(owner)
+	mover.in_combat = TRUE
+	START_PROCESSING(SSobj, src)
+
+/datum/leech_starvation_ai/Destroy()
+	STOP_PROCESSING(SSobj, src)
+	QDEL_NULL(mover)
+	if(!QDELETED(owner))
+		var/obj/item/grab/mouth/hold = owner.wear_mask
+		if(istype(hold))
+			qdel(hold)
+		owner.a_intent = saved_attack_intent
+		owner.c_intent = saved_combat_intent
+		owner.combat_mode = saved_combat_mode
+		owner.leech_fangs_extended = saved_fangs
+		owner.SetResting(saved_resting)
+		owner.eye_closed = saved_eye_closed
+		QDEL_NULL(owner.leech_witness)
+	owner = null
+	target = null
+	unreachable_targets = null
+	return ..()
+
+/datum/leech_starvation_ai/proc/feeding_zone(mob/living/carbon/human/victim)
+	for(var/zone in list(BP_CHEST, BP_HEAD, BP_L_ARM, BP_R_ARM, BP_L_LEG, BP_R_LEG))
+		var/obj/item/organ/external/organ = victim.get_organ(zone)
+		if(organ && !organ.is_stump() && organ.robotic < ORGAN_ROBOT && victim.run_armor_check(zone, "melee") < 100)
+			return zone
+	return null
+
+/datum/leech_starvation_ai/proc/valid_target(mob/living/carbon/human/victim)
+	return !QDELETED(victim) && victim != owner && !victim.is_leech() && victim.z == owner.z && victim.vessel?.get_reagent_amount(/datum/reagent/blood) > 0 && feeding_zone(victim)
+
+/datum/leech_starvation_ai/Process()
+	if(QDELETED(owner) || owner.stat == DEAD || !owner.is_leech() || !owner.leech_starving)
+		if(!QDELETED(owner))
+			owner.stop_leech_starvation()
+		return PROCESS_KILL
+	if(world.time >= owner.leech_starvation_deadline)
+		var/mob/living/carbon/human/body = owner
+		body.stop_leech_starvation()
+		to_chat(body, "<span class='danger'>Your body fails to satisfy its hunger and goes still.</span>")
+		body.death()
+		return PROCESS_KILL
+	owner.handle_vision()
+	if(owner.client && owner.leech_witness)
+		owner.leech_witness.key = owner.key
+	if(owner.leech_witness?.client)
+		owner.leech_witness.client.eye = owner
+		owner.leech_witness.client.update_cull_mask(TRUE)
+		owner.leech_witness.set_fullscreen(owner.eye_closed || owner.eye_blind, "blind", /obj/screen/fullscreen/blind)
+		owner.leech_witness.set_fullscreen(owner.stat == UNCONSCIOUS, "blackout", /obj/screen/fullscreen/blackout)
+	if(owner.incapacitated())
+		return
+	if(owner.resting && !mover.crawling)
+		owner.SetResting(FALSE)
+	owner.eye_closed = FALSE
+	if(!valid_target(target) || get_dist(owner, target) > 15)
+		var/obj/item/grab/mouth/old_hold = owner.wear_mask
+		if(istype(old_hold))
+			qdel(old_hold)
+		target = null
+		for(var/mob/living/carbon/human/candidate in view(7, owner))
+			if(unreachable_targets[candidate] > world.time)
+				continue
+			if(valid_target(candidate) && (!target || get_dist(owner, candidate) < get_dist(owner, target)))
+				target = candidate
+	if(!target)
+		if(!mover.goal)
+			var/list/destinations = list()
+			for(var/turf/simulated/floor/destination in view(7, owner))
+				if(!destination.density)
+					destinations += destination
+			if(destinations.len)
+				mover.set_goal(pick(destinations))
+		mover.tick()
+		return
+	if(!owner.Adjacent(target))
+		mover.set_goal(get_turf(target), 1)
+		if(!mover.try_tick())
+			unreachable_targets[target] = world.time + 100
+			target = null
+		return
+	mover.clear()
+	if(world.time < next_bite)
+		return
+	next_bite = world.time + 10
+	var/obj/item/grab/mouth/hold = owner.wear_mask
+	if(istype(hold) && hold.affecting == target)
+		hold.bite_down()
+		return
+	if(owner.wear_mask)
+		owner.drop_from_inventory(owner.wear_mask)
+	for(var/obj/item/clothing/cover in list(owner.head, owner.wear_suit))
+		if((cover.body_parts_covered & FACE) && (cover.item_flags & ITEM_FLAG_THICKMATERIAL))
+			owner.drop_from_inventory(cover)
+	var/zone = feeding_zone(target)
+	if(!zone)
+		return
+	hold = new(owner, target, zone)
+	if(!hold.pre_check() || !hold.can_grab() || !hold.bite_down(TRUE))
+		qdel(hold)
+		return
+	hold.init()
+
+/mob/living/carbon/human/proc/leech_touch_silver(obj/item/item)
+	if(!is_leech() || gloves || !item || (l_hand != item && r_hand != item))
+		return FALSE
+	var/material/item_material = item.get_material()
+	if(item_material?.name != "silver" && !(item.matter && item.matter["silver"]) && !istype(item, /obj/item/coin/silver))
+		return FALSE
+	var/hand_zone = l_hand == item ? BP_L_HAND : BP_R_HAND
+	drop_from_inventory(item)
+	apply_damage(rand(5, 10), BRUTE, hand_zone, 0, 0, "silver contact")
+	visible_message("<span class='danger'>[src] recoils from [item], their hand blistering!</span>")
+	to_chat(src, "<span class='danger'>The silver sears your dead flesh!</span>")
+	return TRUE
+
+/mob/living/carbon/human/proc/handle_leech_fire_fear()
+	if(world.time < leech_fire_fear_cooldown)
+		return
+	var/near_fire = on_fire
+	for(var/obj/fire/fire in view(1, src))
+		if(fire.firelevel > 0)
+			near_fire = TRUE
+			break
+	if(!near_fire)
+		return
+	leech_fire_fear_cooldown = world.time + 100
+	make_jittery(10)
+	dizziness = max(dizziness, 10)
+	to_chat(src, "<span class='danger'>The flames fill you with an instinctive terror!</span>")
 
 /mob/living/carbon/human/proc/handle_leech_light_exposure(var/damage = 1)
 	if(!is_leech() || stat == DEAD || world.time < leech_last_light_damage + 20)
@@ -176,51 +571,50 @@
 	visible_message("<span class='danger'>[src]'s skin blisters under the harsh light!</span>")
 
 /mob/living/carbon/human/proc/leech_drain_bite(mob/living/carbon/human/victim, target_zone)
-	if(!is_leech() || !leech_fangs_extended)
+	if(!can_use_leech_fangs())
 		to_chat(src, "<span class='warning'>Your fangs must be extended to bite and draw blood.</span>")
 		return FALSE
-	if(!victim || victim.stat == DEAD || !victim.lying)
+	if(incapacitated() || !victim || victim == src || !Adjacent(victim) || !check_has_mouth() || check_mouth_coverage())
 		return FALSE
-	var/is_neck_bite = target_zone == BP_THROAT
-	var/bite_zone = is_neck_bite ? BP_CHEST : target_zone
-	if(victim.run_armor_check(bite_zone, "melee") > 0)
+	var/bite_zone = target_zone == BP_THROAT ? BP_CHEST : target_zone
+	if(victim.run_armor_check(bite_zone, "melee") >= 100)
 		to_chat(src, "<span class='warning'>You cannot reach blood through [victim]'s armor.</span>")
 		return FALSE
 	var/obj/item/organ/external/target_organ = victim.get_organ(bite_zone)
-	if(!target_organ)
+	if(!target_organ || target_organ.is_stump())
 		return FALSE
-	visible_message("<span class='warning'>[src] presses their mouth against [victim]'s [is_neck_bite ? "neck" : target_organ.name].</span>")
-	if(!do_after(src, 10, victim, progress = 0))
-		return FALSE
-	if(!Adjacent(victim) || victim.stat == DEAD || !victim.lying)
-		return FALSE
-	var/amount = leech_siphon_blood(victim, 5)
+	var/amount = leech_siphon_blood(victim, 40)
 	if(amount <= 0)
-		to_chat(src, "<span class='warning'>There is no fresh blood left to draw.</span>")
+		to_chat(src, "<span class='warning'>There is no blood left to draw.</span>")
 		return FALSE
-	victim.apply_damage(3, BRUTE, bite_zone, victim.run_armor_check(bite_zone, "melee"), 0, "fangs")
-	if(is_neck_bite || target_zone == BP_HEAD)
-		target_organ.sever_artery()
-	victim.receive_damage()
+	if(victim.stat != DEAD)
+		victim.druggy += 200
+		victim.add_event("leech_feeding", /datum/happiness_event/leech_feeding)
+		victim.Stun(10)
 	adjustHalLoss(-10)
-	visible_message("<span class='danger'>[src] buries their teeth in [victim] and begins to drink!</span>")
+	visible_message("<span class='danger'>[src] drinks [victim]'s blood through their embedded fangs!</span>")
 	playsound(get_turf(src), 'sound/weapons/bite.ogg', 50, 1, -1)
-	admin_attack_log(src, victim, "Drained blood from their victim.", "Had their blood drained.", "drained blood from")
+	admin_attack_log(src, victim, "Drained [amount] units of blood from their victim.", "Had [amount] units of blood drained.", "drained blood from")
 	return TRUE
 
 /mob/living/carbon/human/proc/leech_siphon_blood(mob/living/carbon/human/victim, amount)
-	if(!is_leech() || !victim?.vessel || !vessel)
+	if(!is_leech() || !victim?.vessel || victim == src || !vessel || amount <= 0)
 		return 0
 	var/blood_available = victim.vessel.get_reagent_amount(/datum/reagent/blood)
-	var/blood_capacity = species.blood_volume - vessel.total_volume
-	var/blood_to_transfer = min(amount, blood_available, blood_capacity)
-	if(blood_to_transfer <= 0)
+	var/blood_consumed = min(amount, blood_available)
+	if(blood_consumed <= 0)
 		return 0
-	victim.vessel.trans_to_holder(vessel, blood_to_transfer)
+	var/blood_to_store = max(0, min(blood_consumed, species.blood_volume - vessel.total_volume, vessel.get_free_space()))
+	if(blood_to_store > 0)
+		vessel.add_reagent(/datum/reagent/blood, blood_to_store, victim.vessel.get_data(/datum/reagent/blood), safety = TRUE)
+	victim.vessel.remove_reagent(/datum/reagent/blood, blood_consumed)
+	leech_digest_blood(blood_consumed)
+	update_stamina_hud()
+	victim.update_stamina_hud()
 	if(victim.vessel.get_reagent_amount(/datum/reagent/blood) <= 0 && victim.stat != DEAD)
 		victim.death()
 		leech_schedule_conversion(victim)
-	return blood_to_transfer
+	return blood_consumed
 
 /mob/living/carbon/human/proc/leech_schedule_conversion(mob/living/carbon/human/victim)
 	if(!victim?.mind || victim.mind.leech_conversion_pending)
@@ -231,7 +625,8 @@
 		if(!victim || victim.mind != pending_mind || victim.stat != DEAD || pending_mind.is_leech())
 			pending_mind.leech_conversion_pending = FALSE
 			return
-		if(!victim.revive() || !GLOB.leech_antagonist.add_antagonist(pending_mind, 1, 0, 0, 1))
+		victim.revive()
+		if(victim.stat == DEAD || victim.mind != pending_mind || pending_mind.current != victim || !GLOB.leech_antagonist.add_antagonist(pending_mind, 1, 0, 0, 1))
 			pending_mind.leech_conversion_pending = FALSE
 			return
 		pending_mind.leech_conversion_pending = FALSE

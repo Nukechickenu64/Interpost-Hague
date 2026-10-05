@@ -586,6 +586,53 @@
 		"Emergency Alert", \
 		)
 
+/datum/catalyst_event/pony_incursion
+	name = "Pony Incursion"
+	catalyst_type = "pony_incursion"
+	arc_theme = "dimensional_breach"
+	director_priority = 55
+	description = "Hostile ponies emerge to exterminate the station's humanoids."
+	tension_threshold = TENSION_ELEVATED
+	max_uses_per_round = 1
+	omen_text = "hooves beyond the veil and a hatred of hands"
+
+/datum/catalyst_event/pony_incursion/check_conditions(var/datum/telemetry/T)
+	return istype(SSticker.mode, /datum/game_mode/dynamic) && config && config.director_antag_policy != DIRECTOR_ANTAG_POLICY_DISABLED && SSdirector.can_recruit_antagonist("pony")
+
+/datum/catalyst_event/pony_incursion/execute(var/datum/telemetry/T)
+	if(!check_conditions(T))
+		return FALSE
+	var/datum/antagonist/pony/antag = GLOB.all_antag_types_["pony"]
+	var/list/candidates = list()
+	for(var/mob/observer/ghost/ghost in GLOB.player_list)
+		if(!ghost.client?.prefs || !ghost.key || ghost.pony_creation || (SSdirector.starter_mind && ghost.mind == SSdirector.starter_mind))
+			continue
+		if(!("pony" in ghost.client.prefs.be_special_role) || jobban_isbanned(ghost, "pony"))
+			continue
+		if(config.use_age_restriction_for_antags && ghost.client.player_age < antag.minimum_player_age)
+			continue
+		candidates += ghost
+	if(!candidates.len)
+		return FALSE
+	var/list/spawn_turfs = list()
+	for(var/turf/simulated/floor/floor in world)
+		if(is_station_turf(floor) && !floor.contains_dense_objects() && !floor.density)
+			var/datum/gas_mixture/air = floor.return_air()
+			if(air && air.return_pressure() >= 80 && air.temperature >= 270 && air.temperature <= 320)
+				spawn_turfs += floor
+	if(!spawn_turfs.len)
+		return FALSE
+	var/team_size = min(candidates.len, clamp(round(SSdirector.count_living_crew() / 10), 1, 3))
+	var/invited = 0
+	for(var/member_index = 1 to team_size)
+		if(!candidates.len || !SSdirector.can_recruit_antagonist("pony"))
+			break
+		var/mob/observer/ghost/chosen = pick(candidates)
+		candidates -= chosen
+		new /datum/nano_module/appearance_changer/pony_creation(chosen, pick(spawn_turfs))
+		invited++
+	return invited > 0
+
 /proc/director_spawn_ghost_body(var/mob/observer/ghost/ghost, var/name)
 	if(!ghost || !ghost.client || !ghost.key)
 		return null

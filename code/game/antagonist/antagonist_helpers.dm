@@ -6,7 +6,9 @@
 
 	var/datum/job/J = job_master.GetJob(player.assigned_role)
 	if(is_type_in_list(J,blacklisted_jobs))
-		return 0
+		var/mob/living/carbon/human/H = player.current
+		if(!(istype(src, /datum/antagonist/cultist) && H && get_cult_by_religion(H.religion) == src))
+			return 0
 
 	if(!ignore_role)
 		if(player.current && player.current.client)

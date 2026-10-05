@@ -64,3 +64,7 @@
 GLOBAL_LIST_EMPTY(all_antag_types_)
 GLOBAL_LIST_EMPTY(all_antag_spawnpoints_)
 GLOBAL_LIST_EMPTY(antag_names_to_ids_)
+GLOBAL_LIST_INIT(enabled_antag_types, list("traitor", "leech", "pony", MODE_CULTIST, MODE_CULTIST_FIRE, MODE_CULTIST_DEATH))
+
+/proc/is_antagonist_enabled(var/antag_id)
+	return antag_id in GLOB.enabled_antag_types

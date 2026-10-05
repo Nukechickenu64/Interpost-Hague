@@ -379,6 +379,7 @@ Helpers
 				captainless=0
 			if(!player_is_antag(player.mind, only_offstation_roles = 1))
 				job_master.EquipRank(player, player.mind.assigned_role, 0, TRUE)
+			player.equip_medical_bracelet()
 	return captainless
 
 /datum/controller/subsystem/ticker/proc/attempt_late_antag_spawn(var/list/antag_choices)
@@ -545,14 +546,12 @@ Helpers
 	round_end_stats += "Number of deaths in space: <font color='red'><B>[GLOB.deaths_in_space]</B></font>.\n"
 	round_end_stats += "Total teeth lost: <font color='red'><B>[GLOB.teeth_lost]</B></font>.\n"
 	round_end_stats += "Total bloodshed: <font color='red'><B>[GLOB.total_deaths]</B></font>.\n"
-	for(var/old_god in GLOB.all_religions)
-		if(old_god != LEGAL_RELIGION)
-			var/datum/religion/R = GLOB.all_religions[old_god]
-			var/list/followers = R ? R.followers : null
-			if(followers && followers.len > 0)
-				round_end_stats += "<b>The [old_god] worshippers were:</b>\n"
-				for(var/H in followers)
-					round_end_stats += "<font color='red'><b>[H]</b></font>\n"
+	for(var/religion_name in GLOB.all_religions)
+		var/datum/religion/faith = GLOB.all_religions[religion_name]
+		if(faith.cult_id && faith.followers.len)
+			round_end_stats += "<b>The [religion_name] followers were:</b>\n"
+			for(var/H in faith.followers)
+				round_end_stats += "<font color='red'><b>[H]</b></font>\n"
 	to_world(round_end_stats)
 
 	//Ask the event manager to print round end information

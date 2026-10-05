@@ -71,7 +71,7 @@
 	if(seed.get_trait(TRAIT_REQUIRES_WATER) && prob(35))
 		health += (waterlevel < 10 ? -healthmod : healthmod)
 
-	// Check that pressure, heat and light are all within bounds.
+	// Check that gas amount, heat and light are all within bounds.
 	// First, handle an open system or an unconnected closed system.
 	var/turf/T = loc
 	var/datum/gas_mixture/environment
@@ -82,7 +82,7 @@
 	if(!environment && istype(T)) environment = T.return_air()
 	if(!environment) return
 
-	// Seed datum handles gasses, light and pressure.
+	// Seed datum handles gases, light and gas amount.
 	if(mechanical && closed_system)
 		health -= seed.handle_environment(T,environment,tray_light)
 	else

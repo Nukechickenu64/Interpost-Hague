@@ -54,7 +54,7 @@ var/list/flooring_types
 	var/space_smooth = SMOOTH_ALL
 	//There are no lists for spaces
 
-/decl/flooring/proc/on_remove()
+/decl/flooring/proc/on_remove(turf/simulated/floor/floor)
 	return
 
 /decl/flooring/grass
@@ -840,8 +840,10 @@ var/list/flooring_types
 	flags = TURF_ACID_IMMUNE | TURF_CAN_BREAK | TURF_REMOVE_WRENCH
 	can_paint = null
 
-/decl/flooring/reinforced/cult/on_remove()
-	GLOB.cult.remove_cultiness(CULTINESS_PER_TURF)
+/decl/flooring/reinforced/cult/on_remove(turf/simulated/floor/floor)
+	if(floor && floor.cult_owner)
+		floor.cult_owner.remove_cultiness(CULTINESS_PER_TURF)
+		floor.cult_owner = null
 
 /decl/flooring/reinforced/shuttle
 	name = "floor"

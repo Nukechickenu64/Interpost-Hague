@@ -52,6 +52,8 @@
 	var/obj/item/shoes = null
 	var/obj/item/belt = null
 	var/obj/item/gloves = null
+	var/obj/item/wrist_l = null
+	var/obj/item/wrist_r = null
 	var/obj/item/glasses = null
 	var/obj/item/head = null
 	var/obj/item/l_ear = null
@@ -59,6 +61,7 @@
 	var/obj/item/wear_id = null
 	var/obj/item/wear_amulet = null
 	var/obj/item/s_store = null
+	var/obj/item/mouth_item = null
 
 	var/used_skillpoints = 0
 
@@ -88,6 +91,15 @@
 	var/full_prosthetic    // We are a robutt.
 	var/robolimb_count = 0 // Number of robot limbs.
 	var/last_attack = 0    // The world_time where an unarmed attack was done
+	var/last_attack_delay = 0
+	var/right_hand_ready_until = 0
+	var/left_hand_ready_until = 0
+	var/special_action_ready_until = 0
+	var/guard_stance_until = 0
+	var/guard_stance_charges = 0
+	var/mob/living/carbon/human/feint_target = null
+	var/feint_margin = 0
+	var/feint_expires = 0
 	var/coldbreath = FALSE
 
 	mob_bump_flag = HUMAN
@@ -123,6 +135,9 @@
 	var/skin_state = SKIN_NORMAL
 	var/obj/screen/fov = null//The screen object because I can't figure out how the hell TG does their screen objects so I'm just using legacy code.
 	var/obj/screen/text/atm/hovertext
+	var/obj/screen/awake = null
+	var/eye_closed = FALSE
+	var/toggle_resisting = FALSE
 	var/usefov = TRUE
 	var/decaylevel = 0 //For rotting bodies
 	var/branded = null	//For whether or not they've been branded, and what they've been branded with.

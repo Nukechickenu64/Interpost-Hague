@@ -263,7 +263,7 @@
 	initialize_character(var/mob/living/carbon/human/H)
 		..()
 		// Station-born generalist; a touch nimble like assistants
-		H.religion = ILLEGAL_RELIGION //A christian born on a spaceship? what's that flesh mound?
+		H.religion = NARSIE_RELIGION //A christian born on a spaceship? what's that flesh mound?
 		H.newgeneratestats(9,14,9,13,9,15,10,16)
 		H.generate_skills(list("crafting","cleaning","mining","medical","cooking","melee", "gardening","ranged"))
 

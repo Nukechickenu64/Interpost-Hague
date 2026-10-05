@@ -185,7 +185,7 @@
 	var/upper_limit = 76 + power_output * temperature_gain
 	/*
 		Hot or cold environments can affect the equilibrium temperature
-		The lower the pressure the less effect it has. I guess it cools using a radiator or something when in vacuum.
+		The less ambient gas there is, the less effect it has.
 		Gives traitors more opportunities to sabotage the generator or allows enterprising engineers to build additional
 		cooling in order to get more power out.
 	*/
@@ -199,7 +199,7 @@
 				heat_transfer = min(heat_transfer, heating_power)
 				environment.add_thermal_energy(heat_transfer)
 
-		var/ratio = min(environment.return_pressure()/ONE_ATMOSPHERE, 1)
+		var/ratio = min(environment.get_tile_moles()/MOLES_CELLSTANDARD, 1)
 		var/ambient = environment.temperature - T20C
 		lower_limit += ambient*ratio
 		upper_limit += ambient*ratio
@@ -219,7 +219,7 @@
 	var/cooling_temperature = 20
 	var/datum/gas_mixture/environment = loc.return_air()
 	if (environment)
-		var/ratio = min(environment.return_pressure()/ONE_ATMOSPHERE, 1)
+		var/ratio = min(environment.get_tile_moles()/MOLES_CELLSTANDARD, 1)
 		var/ambient = environment.temperature - T20C
 		cooling_temperature += ambient*ratio
 

@@ -241,10 +241,10 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
             <div class="item">
                 {{if data.aircontents.reading == 1}}
                     <div class="itemLabel">
-                        Pressure:
+                        Gas Amount:
                     </div>
                     <div class = "itemContent">
-				        {{:helper.string('<span class="{0}">{1} kPa</span>', data.aircontents.pressure < 80 || data.aircontents.pressure > 120 ? 'bad' : data.aircontents.pressure < 95 || data.aircontents.pressure > 110 ? 'average' : 'good' , data.aircontents.pressure)}}
+				        {{:helper.string('<span class="{0}">{1} mol/tile</span>', data.aircontents.amountstate, data.aircontents.tile_moles)}}
                     </div>
                     <div class="itemLabel">
                         Temperature:

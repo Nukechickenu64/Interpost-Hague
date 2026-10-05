@@ -131,9 +131,9 @@
 	dat += "It thrives in a temperature of [grown_seed.get_trait(TRAIT_IDEAL_HEAT)] Kelvin."
 
 	if(grown_seed.get_trait(TRAIT_LOWKPA_TOLERANCE) < 20)
-		dat += "<br>It is well adapted to low pressure levels."
+		dat += "<br>It is well adapted to sparse atmospheres."
 	if(grown_seed.get_trait(TRAIT_HIGHKPA_TOLERANCE) > 220)
-		dat += "<br>It is well adapted to high pressure levels."
+		dat += "<br>It is well adapted to dense atmospheres."
 
 	if(grown_seed.get_trait(TRAIT_HEAT_TOLERANCE) > 30)
 		dat += "<br>It is well adapted to a range of temperatures."

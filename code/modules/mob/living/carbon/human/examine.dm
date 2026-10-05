@@ -178,7 +178,7 @@
 			msg += "<span class='warning'><b>\"[branded]\" IS BRANDED ON THEIR FACE!</b></span>"
 			if(ishuman(user))
 				var/mob/living/carbon/human/H = user
-				if(H.religion == LEGAL_RELIGION && H != src && branded == "HERETIC")
+				if(H.religion_is_legal() && H != src && branded == "HERETIC")
 					msg += "<span class='notice'> Viewing such a spectacle fills you with pleasure.</span>"
 					H.add_event("punishedheretic", /datum/happiness_event/punished_heretic)
 				else
@@ -470,4 +470,3 @@
 	HTML +="<a href='?src=\ref[src];flavor_change=done'>\[Done\]</a>"
 	HTML += "<tt>"
 	src << browse(jointext(HTML,null), "window=flavor_changes;size=430x300")
-

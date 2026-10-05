@@ -8,11 +8,6 @@
 	w_class = ITEM_SIZE_SMALL
 	gas_transfer_coefficient = 0.10
 	permeability_coefficient = 0.50
-	down_gas_transfer_coefficient = 1
-	down_body_parts_covered = null
-	down_item_flags = ITEM_FLAG_THICKMATERIAL
-	down_icon_state = "breathdown"
-	pull_mask = 1
 
 /obj/item/clothing/mask/breath/medical
 	desc = "A close-fitting sterile mask that can be manually connected to an air supply for treatment."

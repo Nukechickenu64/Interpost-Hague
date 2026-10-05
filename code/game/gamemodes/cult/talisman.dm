@@ -1,10 +1,15 @@
 /obj/item/paper/talisman
 	icon_state = "paper_talisman"
 	var/imbue = null
+	var/datum/antagonist/cultist/cult
 	info = "<center><img src='talisman.png'></center><br/><br/>"
 
+/obj/item/paper/talisman/New()
+	cult = GLOB.cult
+	..()
+
 /obj/item/paper/talisman/attack_self(var/mob/living/user)
-	if(iscultist(user))
+	if(same_cult(user, cult))
 		to_chat(user, "Attack your target to use this talisman.")
 	else
 		to_chat(user, "You see strange symbols on the paper. Are they supposed to mean something?")
@@ -13,12 +18,12 @@
 	return
 
 /obj/item/paper/talisman/emp/attack_self(var/mob/living/user)
-	if(iscultist(user))
+	if(same_cult(user, cult))
 		to_chat(user, "This is an emp talisman.")
 	..()
 
 /obj/item/paper/talisman/emp/afterattack(var/atom/target, var/mob/user, var/proximity)
-	if(!iscultist(user))
+	if(!same_cult(user, cult))
 		return
 	if(!proximity)
 		return

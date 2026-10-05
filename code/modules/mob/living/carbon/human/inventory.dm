@@ -100,6 +100,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 			return has_organ(BP_CHEST)
 		if(slot_wear_mask)
 			return has_organ(BP_HEAD)
+		if(slot_wrist_l)
+			return has_organ(BP_L_HAND)
+		if(slot_wrist_r)
+			return has_organ(BP_R_HAND)
 		if(slot_handcuffed)
 			return has_organ(BP_L_HAND) && has_organ(BP_R_HAND)
 		if(slot_legcuffed)
@@ -145,7 +149,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 /mob/living/carbon/human/u_equip(obj/W as obj)
 	if(!W)	return 0
 
-	if (W == wear_suit)
+	if (W == mouth_item)
+		mouth_item = null
+		update_inv_wear_mask()
+	else if (W == wear_suit)
 		if(s_store)
 			drop_from_inventory(s_store)
 		wear_suit = null
@@ -171,6 +178,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 	else if (W == gloves)
 		gloves = null
 		update_inv_gloves()
+	else if (W == wrist_l)
+		wrist_l = null
+	else if (W == wrist_r)
+		wrist_r = null
 	else if (W == glasses)
 		glasses = null
 		update_inv_glasses()
@@ -301,12 +312,12 @@ This saves us from having to call add_fingerprint() any time something is put in
 		if(slot_l_hand)
 			src.l_hand = W
 			W.equipped(src, slot)
-			W.screen_loc = ui_lhand
+			W.screen_loc = hud_used && hud_used.l_hand_hud_object ? hud_used.l_hand_hud_object.screen_loc : ui_lhand
 			update_inv_l_hand(redraw_mob)
 		if(slot_r_hand)
 			src.r_hand = W
 			W.equipped(src, slot)
-			W.screen_loc = ui_rhand
+			W.screen_loc = hud_used && hud_used.r_hand_hud_object ? hud_used.r_hand_hud_object.screen_loc : ui_rhand
 			update_inv_r_hand(redraw_mob)
 		if(slot_belt)
 			src.belt = W
@@ -342,6 +353,12 @@ This saves us from having to call add_fingerprint() any time something is put in
 			src.gloves = W
 			W.equipped(src, slot)
 			update_inv_gloves(redraw_mob)
+		if(slot_wrist_l)
+			src.wrist_l = W
+			W.equipped(src, slot)
+		if(slot_wrist_r)
+			src.wrist_r = W
+			W.equipped(src, slot)
 		if(slot_head)
 			src.head = W
 			if(head.flags_inv & (BLOCKHAIR|BLOCKHEADHAIR|HIDEMASK))
@@ -450,6 +467,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 		if(slot_wear_amulet) return wear_amulet
 		if(slot_glasses)     return glasses
 		if(slot_gloves)      return gloves
+		if(slot_wrist_l)     return wrist_l
+		if(slot_wrist_r)     return wrist_r
 		if(slot_head)        return head
 		if(slot_shoes)       return shoes
 		if(slot_belt)        return belt
@@ -467,6 +486,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(r_ear)       . += r_ear
 	if(glasses)     . += glasses
 	if(gloves)      . += gloves
+	if(wrist_l)     . += wrist_l
+	if(wrist_r)     . += wrist_r
 	if(head)        . += head
 	if(shoes)       . += shoes
 	if(wear_id)     . += wear_id

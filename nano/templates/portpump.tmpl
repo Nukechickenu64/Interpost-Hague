@@ -65,7 +65,7 @@
 <h3>Power Regulator Status</h3>
 <div class="item">
 	<div class="itemLabel">
-		Target Pressure:
+		{{:data.targetLabel}}:
 	</div>
 	<div class="itemContent">
 		{{:helper.displayBar(data.targetpressure, data.minpressure, data.maxpressure)}}
@@ -74,7 +74,7 @@
 			{{:helper.link('-', null, {'pressure_adj' : -100}, (data.targetpressure > data.minpressure) ? null : 'disabled')}}
 			{{:helper.link('-', null, {'pressure_adj' : -10}, (data.targetpressure > data.minpressure) ? null : 'disabled')}}
 			{{:helper.link('-', null, {'pressure_adj' : -1}, (data.targetpressure > data.minpressure) ? null : 'disabled')}}
-			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.targetpressure}} kPa&nbsp;</div>
+			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.targetpressure}} {{:data.targetUnits}}&nbsp;</div>
 			{{:helper.link('+', null, {'pressure_adj' : 1}, (data.targetpressure < data.maxpressure) ? null : 'disabled')}}
 			{{:helper.link('+', null, {'pressure_adj' : 10}, (data.targetpressure < data.maxpressure) ? null : 'disabled')}}
 			{{:helper.link('+', null, {'pressure_adj' : 100}, (data.targetpressure < data.maxpressure) ? null : 'disabled')}}

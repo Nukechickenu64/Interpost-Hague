@@ -9,7 +9,7 @@
 #define TARGET_INOPEN		-1
 #define TARGET_OUTOPEN		-2
 
-#define SENSOR_TOLERANCE 1
+#define SENSOR_TOLERANCE PRESSURE_TO_MOLES(1)
 
 /datum/computer/file/embedded_program/airlock
 	var/tag_exterior_door
@@ -31,13 +31,14 @@
 /datum/computer/file/embedded_program/airlock/New(var/obj/machinery/embedded_controller/M)
 	..(M)
 
-	memory["chamber_sensor_pressure"] = ONE_ATMOSPHERE
+	// Legacy memory keys now hold mol/tile, including the pump target.
+	memory["chamber_sensor_pressure"] = MOLES_CELLSTANDARD
 	memory["external_sensor_pressure"] = 0					//assume vacuum for simple airlock controller
-	memory["internal_sensor_pressure"] = ONE_ATMOSPHERE
+	memory["internal_sensor_pressure"] = MOLES_CELLSTANDARD
 	memory["exterior_status"] = list(state = "closed", lock = "locked")		//assume closed and locked in case the doors dont report in
 	memory["interior_status"] = list(state = "closed", lock = "locked")
 	memory["pump_status"] = "unknown"
-	memory["target_pressure"] = ONE_ATMOSPHERE
+	memory["target_pressure"] = MOLES_CELLSTANDARD
 	memory["purge"] = 0
 	memory["secure"] = 0
 
@@ -66,14 +67,16 @@
 	if(!receive_tag) return
 
 	if(receive_tag==tag_chamber_sensor)
-		if(signal.data["pressure"])
-			memory["chamber_sensor_pressure"] = text2num(signal.data["pressure"])
+		if(!isnull(signal.data["tile_moles"]))
+			memory["chamber_sensor_pressure"] = text2num(signal.data["tile_moles"])
 
 	else if(receive_tag==tag_exterior_sensor)
-		memory["external_sensor_pressure"] = text2num(signal.data["pressure"])
+		if(!isnull(signal.data["tile_moles"]))
+			memory["external_sensor_pressure"] = text2num(signal.data["tile_moles"])
 
 	else if(receive_tag==tag_interior_sensor)
-		memory["internal_sensor_pressure"] = text2num(signal.data["pressure"])
+		if(!isnull(signal.data["tile_moles"]))
+			memory["internal_sensor_pressure"] = text2num(signal.data["tile_moles"])
 
 	else if(receive_tag==tag_exterior_door)
 		memory["exterior_status"]["state"] = signal.data["door_status"]
@@ -210,7 +213,7 @@
 						signalPump(tag_airpump, 1, 0, target_pressure)	//send a signal to start depressurizing
 					else
 						signalPump(tag_pump_out_internal, 1, 0, target_pressure) // if going inside, pump external air out of the airlock
-						signalPump(tag_pump_out_external, 1, 1, 1000) // make sure the air is actually going outside
+						signalPump(tag_pump_out_external, 1, 1, PRESSURE_TO_MOLES(1000)) // make sure the air is actually going outside
 
 				else if(chamber_pressure <= target_pressure)
 					state = STATE_PRESSURIZE
@@ -307,14 +310,15 @@
 	signal.data["command"] = command
 	post_signal(signal, RADIO_AIRLOCK)
 
-/datum/computer/file/embedded_program/airlock/proc/signalPump(var/tag, var/power, var/direction, var/pressure)
+/datum/computer/file/embedded_program/airlock/proc/signalPump(var/tag, var/power, var/direction, var/target_moles)
 	var/datum/signal/signal = new
 	signal.data = list(
 		"tag" = tag,
 		"sigtype" = "command",
 		"power" = power,
 		"direction" = direction,
-		"set_external_pressure" = pressure
+		// Vent radio configuration retains legacy units; no ambient pressure is measured.
+		"set_external_pressure" = isnull(target_moles) ? null : target_moles * ONE_ATMOSPHERE / MOLES_CELLSTANDARD
 	)
 	post_signal(signal)
 

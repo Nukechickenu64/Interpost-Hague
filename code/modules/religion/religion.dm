@@ -6,18 +6,21 @@
 	var/favor = 0
 	var/obj/item/holy_item = null
 	var/shrine = null
-	var/followers = list()
-	var/territories = list()
+	var/list/followers = list()
+	var/list/territories = list()
 	var/datum/request/request = null
 	var/selectable_requests = list()
 	var/selectable_rewards = list()
 	var/selectable_punishments = list()
 	var/whisper_lines = list()
 	var/offering_items = list(/obj/item/paper)
+	var/cult_id = null
 // Cult-specific religion aligned with Nar-Sie
 /datum/religion/narsie
 	name = NARSIE_RELIGION
+	cult_id = MODE_CULTIST
 	holy_item = /obj/item/book/tome
+	shrine = /obj/old_god_shrine/narsie
 	favor = 0
 	whisper_lines = list(
 		"The geometer must be completed.",
@@ -26,6 +29,54 @@
 		"The veil thins with every stroke."
 	)
 	offering_items = list(/obj/item/book/tome, /obj/item/weapon/material/knife/ritual)
+
+/datum/religion/narsie/fire
+	name = KHARIN_RELIGION
+	cult_id = MODE_CULTIST_FIRE
+	holy_item = /obj/item/book/tome/fire
+	shrine = /obj/old_god_shrine/kharin
+	whisper_lines = list("Feed the flame.", "The veil will burn.", "Kha'Rin consumes all.")
+	offering_items = list(/obj/item/book/tome/fire, /obj/item/weapon/flame/candle)
+
+/datum/religion/narsie/death
+	name = REAPER_RELIGION
+	cult_id = MODE_CULTIST_DEATH
+	holy_item = /obj/item/book/tome/death
+	shrine = /obj/old_god_shrine/reaper
+	whisper_lines = list("All will cross the river.", "The Reaper waits.", "The veil is a shroud.")
+	offering_items = list(/obj/item/book/tome/death, /obj/item/stack/teeth)
+
+/datum/religion/proc/can_use_magic(mob/living/user)
+	if(!user || user.religion != name)
+		return FALSE
+	if(cult_id)
+		return same_cult(user, get_cult_by_religion(name))
+	return name != LEGAL_RELIGION
+
+/datum/religion/proc/show_rituals(mob/living/user)
+	if(!can_use_magic(user))
+		to_chat(user, "<span class='warning'>The rituals of this faith are closed to you.</span>")
+		return
+	to_chat(user, "<span class='notice'>The shrine rituals of [name]:</span>")
+	for(var/spell_name in GLOB.all_spells)
+		var/datum/old_god_spell/ritual = GLOB.all_spells[spell_name]
+		if(ritual.old_god != name)
+			continue
+		var/list/ingredients = list()
+		for(var/direction in ritual.requirments)
+			var/obj/component_type = ritual.requirments[direction]
+			ingredients += "[lowertext(direction)]: [initial(component_type.name)]"
+		to_chat(user, "<span class='notice'><b>[ritual.name]</b>: [english_list(ingredients)]. Say: [ritual.phrase]</span>")
+
+/mob/living/proc/update_religion_magic()
+	verbs -= /mob/living/proc/praise_god
+	verbs -= /mob/living/proc/make_shrine
+	verbs -= /mob/living/proc/getBrothers
+	var/datum/religion/faith = GLOB.all_religions[religion]
+	if(faith && faith.can_use_magic(src))
+		verbs |= /mob/living/proc/praise_god
+		verbs |= /mob/living/proc/make_shrine
+		verbs |= /mob/living/proc/getBrothers
 
 /datum/religion/New()
 	selectable_requests =  subtypesof(/datum/request)
@@ -49,17 +100,15 @@
 
 //Stupidly simplistic? Probably. But I'm too tired to write something more complex.
 /mob/living/proc/religion_is_legal()
-	if(religion != LEGAL_RELIGION)
-		return 0
-	return 1
+	return !is_cult_religion(religion)
 
 //Reveals self as a heretic
 /mob/living/proc/reveal_self()
 	var/msg = ""
 	if (religion_is_legal())  //Non-heretics will still deny
-		msg = "I'm not one, I swear it!"
+		msg = "I'm not a cultist, I swear it!"
 	else
-		msg = "YES!! I BELIEVE IN THE GODS!"
+		msg = "YES!! I SERVE [uppertext(religion)]!"
 	agony_scream()
 	say(NewStutter(msg))
 
@@ -96,23 +145,23 @@ proc/generate_random_prayer()//This generates a new one.
 	var/mob/living/carbon/human/T = input(src, "Who will we interrogate?") as null|anything in victims
 	if(!T) return
 	if(!(T in view(1))) return
-	say("[T], are you a dirty heretic!?")
+	say("[T], are you a cultist!?")
 	if(prob((T.getHalLoss()/3) - T.stats[STAT_HT]))  //Higher con helps your resist torture
 		T.reveal_self()
 		return
 
 //Reveals a random heretic
 /mob/living/proc/reveal_heretics()
-	var/msg = " is one of them!"
+	var/msg = " is one of Nar-Sie's cultists!"
 	var/name = ""
 	if (religion_is_legal())  //Non-heretics will say nothing
 		msg = "I don't know anything!"
 		say(NewStutter(msg))
 		return
 	else
-		var/datum/religion/R_illegal = GLOB.all_religions[ILLEGAL_RELIGION]
-		if(istype(R_illegal))
-			name = pick(R_illegal.followers)  //Wow the datums saves us an entire for loop
+		var/datum/religion/R_narsie = GLOB.all_religions[religion]
+		if(istype(R_narsie) && R_narsie.followers.len)
+			name = pick(R_narsie.followers)
 		if(name)
 			say(NewStutter("[name] is one of them!"))
 		else
@@ -122,19 +171,19 @@ proc/generate_random_prayer()//This generates a new one.
 /datum/religion/proc/claim_territory(area/territory,var/claiming_religion)
 	var/datum/religion/R = GLOB.all_religions[claiming_religion]
 	if(istype(R))
-		R.territories |= territory.name
+		R.territories |= territory
 	return
 
 /datum/religion/proc/lose_territory(area/territory,var/claiming_religion)
 	var/datum/religion/R = GLOB.all_religions[claiming_religion]
 	if(istype(R))
-		R.territories -= territory.name
+		R.territories -= territory
 	return
 
 /datum/religion/proc/territory_claimed(area/territory, mob/user)
 	for (var/name in GLOB.all_religions)
 		var/datum/religion/R = GLOB.all_religions[name]
-		if(istype(R) && (territory.name in R.territories))
+		if(istype(R) && (territory in R.territories))
 			return name
 	return null
 
@@ -177,16 +226,16 @@ proc/generate_random_prayer()//This generates a new one.
 	//Check the area for if there's another shrine already, or the arbiters have already claimed it with TODO:?????
 	var/area/A = get_area(target)
 	if(!A)
-		to_chat(user, "<span class='warning'>The old gods refuse your petty offering.</span>")
+		to_chat(user, "<span class='warning'>[name] refuses your offering.</span>")
 		return FALSE
 
 	var/occupying_religion = territory_claimed(A, user)
-	if(occupying_religion == ILLEGAL_RELIGION)
+	if(occupying_religion == name)
 		to_chat(user,"<span class='danger'>There is already a shrine in this area!</span>")
 		return FALSE
 
 	if(occupying_religion)
-		to_chat(user, "<span class='danger'>Something in the area is blocking your connection to the Old Gods! Find and destroy it!</span>")
+		to_chat(user, "<span class='danger'>Something in the area is blocking your connection to [name]! Find and destroy it!</span>")
 		return FALSE
 
 	// If you pass the gaunlet of checks, you're good to proceed
@@ -197,12 +246,12 @@ proc/generate_random_prayer()//This generates a new one.
 	var/datum/religion/user_religion = GLOB.all_religions[user.religion]
 	for(var/obj/old_god_shrine/shrine in view(user, 5))
 		//If we can see an allied shrine nearby, we have more chance to spawn a reward.
-		if(istype(user_religion) && shrine.shrine_religion.name == user_religion.name)
+		if(istype(user_religion) && shrine.shrine_religion == user_religion)
 			divisor = 1
 		if(istype(user_religion) && prob(user_religion.favor * divisor))
 			var/S = pick(GLOB.all_spells)
 			var/datum/old_god_spell/OGS = GLOB.all_spells[S]
-			if(istype(OGS) && OGS.requirments)
+			if(istype(OGS) && OGS.old_god == name && OGS.requirments.len)
 				var/reward = pick(OGS.requirments)
 				var/obj/reward_obj = OGS.requirments[reward]
 				new reward_obj(T)
@@ -212,12 +261,15 @@ proc/generate_random_prayer()//This generates a new one.
 	set name = "PraiseyourGod"
 
 	var/datum/religion/user_religion = GLOB.all_religions[religion]
+	if(!user_religion || !user_religion.can_use_magic(src))
+		to_chat(src, "<span class='warning'>Your faith does not grant this magic.</span>")
+		return
 	var/timer = 30
 	var/praise_sound = "sound/effects/Cultistemessage[pick(1,10)].ogg"
 	//You need your god's item to do this
 	if(!istype(get_active_hand(), user_religion.holy_item) && !istype(get_inactive_hand(), user_religion.holy_item))
 		if(isnull(religion_token))
-			if(do_after(src, timer))
+			if(do_after(src, timer) && user_religion.can_use_magic(src))
 				var/T =  get_turf(src)
 				playsound(get_turf(src), praise_sound,30,0)
 				to_chat(src, "<span class='danger'>A [user_religion.holy_item] appears at your feet!</span>")
@@ -235,10 +287,10 @@ proc/generate_random_prayer()//This generates a new one.
 			to_chat(src, "<span class='warning'>You can't praise your god without your [user_religion.holy_item]!</span>")
 		return 0
 	if(!doing_something)
-		var/self = "You raise your [user_religion.holy_item] and chant praise to your god."
+		var/self = "You raise your [initial(user_religion.holy_item.name)] and chant praise to your god."
 		visible_message("<span class='warning'>\The [src] begins speaking praise for their god.</span>", "<span class='notice'>[self]</span>", "[src] praises their god! .")
 		doing_something = 1
-		if(do_after(src, timer))
+		if(do_after(src, timer) && user_religion.can_use_magic(src))
 			//These variables used to just be functions that returned a hard coded value.  So don't blame me, this is actually faster.
 			user_religion.favor += 10
 			playsound(get_turf(src), praise_sound,30,0)
@@ -247,7 +299,7 @@ proc/generate_random_prayer()//This generates a new one.
 			if(user_religion.request)
 				if(user_religion.request.check_complete(src))
 					user_religion.reward(src)
-					user_religion.request = null
+					QDEL_NULL(user_religion.request)
 			return 1
 		else
 			to_chat(src, "<span class='notice'>Your prayer is interrupted.</span>")
@@ -263,6 +315,9 @@ proc/generate_random_prayer()//This generates a new one.
 	set name = "CreateShrine"
 	var/turf/T = get_turf(src)
 	var/datum/religion/user_religion = GLOB.all_religions[religion]
+	if(!user_religion || !user_religion.can_use_magic(src) || !ispath(user_religion.shrine))
+		to_chat(src, "<span class='warning'>Your faith does not grant shrine creation.</span>")
+		return
 	//You need your god's item to do this
 	if(!istype(get_active_hand(), user_religion.holy_item) && !istype(get_inactive_hand(), user_religion.holy_item))
 		to_chat(src, "<span class='warning'>You can't draw a rune without your [user_religion.holy_item]!</span>")
@@ -276,7 +331,7 @@ proc/generate_random_prayer()//This generates a new one.
 	if(user_religion.can_claim_for_gods(src,T) && !doing_something)
 		visible_message("<span class='warning'>\The [src] quickly draws on the floor and begins to whisper quietly to themselves.</span>", "<span class='notice'>[self]</span>", "You hear scratching.")
 		doing_something = 1
-		if(do_after(src, timer))
+		if(do_after(src, timer) && user_religion.can_use_magic(src) && user_religion.favor >= 30 && user_religion.can_claim_for_gods(src, T))
 			//These variables used to just be functions that returned a hard coded value.  So don't blame me, this is actually faster.
 			new user_religion.shrine(T)
 			doing_something = 0
@@ -288,16 +343,14 @@ proc/generate_random_prayer()//This generates a new one.
 
 /mob/living/proc/getBrothers()
 	set name = "getBrothers"
-	for(var/old_god in GLOB.all_religions)
-		if(old_god != LEGAL_RELIGION)
-			var/datum/religion/R_old = GLOB.all_religions[old_god]
-			if(istype(R_old))
-				var/list/followers = R_old.followers
-				if(islist(followers) && followers.len > 0)
-					var/brothers_message = "<span class='info'>Your brothers are:<br></span>"
-					for(var/H in followers)
-						brothers_message += "<span class='danger'><b>[H], who loves [religion].</b></span>\n"
-					to_chat(src, brothers_message)
-				else if(islist(followers) && followers.len <= 1)
-					var/brothers_message = "<span class='info'>I'll have to do this alone.<br></span>"
-					to_chat(src, brothers_message)
+	var/datum/religion/narsie_religion = GLOB.all_religions[religion]
+	if(!narsie_religion || !narsie_religion.can_use_magic(src))
+		to_chat(src, "<span class='warning'>You have no fellow worshippers to contact.</span>")
+		return
+	if(istype(narsie_religion) && narsie_religion.followers.len > 1)
+		var/brothers_message = "<span class='info'>Your fellow cultists are:<br></span>"
+		for(var/H in narsie_religion.followers)
+			brothers_message += "<span class='danger'><b>[H], who follows [religion].</b></span>\n"
+		to_chat(src, brothers_message)
+	else
+		to_chat(src, "<span class='info'>You appear to be serving [religion] alone.</span>")

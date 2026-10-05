@@ -59,4 +59,4 @@
 	return max(immunity/100 * (1+antibiotic_boost), antibiotic_boost)
 
 /mob/living/carbon/proc/immunity_weakness()
-	return max(2-virus_immunity(), 0)
+	return max(2-virus_immunity(), 0) * (species ? species.infection_modifier : 1)

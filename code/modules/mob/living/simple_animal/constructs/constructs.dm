@@ -60,6 +60,9 @@
 
 /mob/living/simple_animal/construct/attack_generic(var/mob/user)
 	if(istype(user, /mob/living/simple_animal/construct/builder))
+		if(get_cult(user) != get_cult(src))
+			to_chat(user, "<span class='warning'>You cannot repair a rival cult's construct.</span>")
+			return
 		if(health < maxHealth)
 			adjustBruteLoss(-5)
 			user.visible_message("<span class='notice'>\The [user] mends some of \the [src]'s wounds.</span>")

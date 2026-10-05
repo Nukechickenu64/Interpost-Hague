@@ -225,9 +225,9 @@
 					dat	+= "<font color='red'>VINE </font>"
 			if ("pressure" in scanner)
 				if(seed.get_trait(TRAIT_LOWKPA_TOLERANCE) < 20)
-					dat += "LP "
+					dat += "THIN "
 				if(seed.get_trait(TRAIT_HIGHKPA_TOLERANCE) > 220)
-					dat += "HP "
+					dat += "DENSE "
 			if ("temperature" in scanner)
 				if(seed.get_trait(TRAIT_HEAT_TOLERANCE) > 30)
 					dat += "TEMRES "

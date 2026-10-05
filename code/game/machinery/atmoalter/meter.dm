@@ -29,17 +29,17 @@
 		icon_state = "meterX"
 		return 0
 
-	var/env_pressure = environment.return_pressure()
-	if(env_pressure <= 0.15*ONE_ATMOSPHERE)
+	var/gas_level = isturf(target) ? environment.get_tile_moles() / MOLES_CELLSTANDARD : environment.return_pressure() / ONE_ATMOSPHERE
+	if(gas_level <= 0.15)
 		icon_state = "meter0"
-	else if(env_pressure <= 1.8*ONE_ATMOSPHERE)
-		var/val = round(env_pressure/(ONE_ATMOSPHERE*0.3) + 0.5)
+	else if(gas_level <= 1.8)
+		var/val = round(gas_level/0.3 + 0.5)
 		icon_state = "meter1_[val]"
-	else if(env_pressure <= 30*ONE_ATMOSPHERE)
-		var/val = round(env_pressure/(ONE_ATMOSPHERE*5)-0.35) + 1
+	else if(gas_level <= 30)
+		var/val = round(gas_level/5 - 0.35) + 1
 		icon_state = "meter2_[val]"
-	else if(env_pressure <= 59*ONE_ATMOSPHERE)
-		var/val = round(env_pressure/(ONE_ATMOSPHERE*5) - 6) + 1
+	else if(gas_level <= 59)
+		var/val = round(gas_level/5 - 6) + 1
 		icon_state = "meter3_[val]"
 	else
 		icon_state = "meter4"
@@ -55,9 +55,12 @@
 		signal.data = list(
 			"tag" = id,
 			"device" = "AM",
-			"pressure" = round(env_pressure),
 			"sigtype" = "status"
 		)
+		if(isturf(target))
+			signal.data["tile_moles"] = round(environment.get_tile_moles(), 0.1)
+		else
+			signal.data["pressure"] = round(environment.return_pressure())
 		radio_connection.post_signal(src, signal)
 
 /obj/machinery/meter/examine(mob/user)
@@ -72,7 +75,8 @@
 	else if(src.target)
 		var/datum/gas_mixture/environment = target.return_air()
 		if(environment)
-			to_chat(user, "The pressure gauge reads [round(environment.return_pressure(), 0.01)] kPa; [round(environment.temperature,0.01)]K ([round(environment.temperature-T0C,0.01)]&deg;C)")
+			var/reading = isturf(target) ? "[round(environment.get_tile_moles(), 0.01)] mol/tile" : "[round(environment.return_pressure(), 0.01)] kPa"
+			to_chat(user, "The gas gauge reads [reading]; [round(environment.temperature,0.01)]K ([round(environment.temperature-T0C,0.01)]&deg;C)")
 		else
 			to_chat(user, "The sensor error light is blinking.")
 	else

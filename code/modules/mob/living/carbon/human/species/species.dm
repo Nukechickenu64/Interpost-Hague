@@ -119,6 +119,8 @@
 	var/warning_high_pressure = WARNING_HIGH_PRESSURE // High pressure warning.
 	var/warning_low_pressure = WARNING_LOW_PRESSURE   // Low pressure warning.
 	var/hazard_low_pressure = HAZARD_LOW_PRESSURE     // Dangerously low pressure.
+	var/safe_air_moles_min                            // If set, mol/tile limits outside which the species is harmed.
+	var/safe_air_moles_max
 	var/body_temperature = 310.15	                  // Species will try to stabilize at this temperature.
 	                                                  // (also affects temperature processing)
 
@@ -152,6 +154,9 @@
 	var/medical_skin_appearance = FALSE
 	var/spawn_flags = 0           // Flags that specify who can spawn as this species
 	var/slowdown = 0              // Passive movement speed malus (or boost, if negative)
+	var/list/stat_modifiers = list()
+	var/infection_modifier = 1
+	var/pathogen_bodytype
 	var/primitive_form            // Lesser form, if any (ie. monkey for humans)
 	var/greater_form              // Greater form, if any, ie. human for monkeys.
 	var/holder_type
@@ -190,6 +195,8 @@
 		BP_L_FOOT = list("path" = /obj/item/organ/external/foot),
 		BP_R_FOOT = list("path" = /obj/item/organ/external/foot/right)
 		)
+	var/list/stance_limbs = list(BP_L_LEG, BP_R_LEG, BP_L_FOOT, BP_R_FOOT)
+	var/stance_damage_multiplier = 1
 
 	// The basic skin colours this species uses
 	var/list/base_skin_colours
@@ -399,6 +406,8 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	return
 
 /datum/species/proc/handle_vision(var/mob/living/carbon/human/H)
+	if(!H.can_sense_blind_tiles())
+		H.clear_blind_tiles()
 	H.update_sight()
 	H.set_sight(H.sight|get_vision_flags(H)|H.equipment_vision_flags)
 
@@ -416,7 +425,7 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	if(!H.client)//no client, no screen to update
 		return 1
 
-	H.set_fullscreen(H.eye_blind && !H.equipment_prescription, "blind", /obj/screen/fullscreen/blind)
+	H.set_fullscreen(H.eye_closed || (H.eye_blind && !H.equipment_prescription), "blind", /obj/screen/fullscreen/blind)
 	H.set_fullscreen(H.stat == UNCONSCIOUS, "blackout", /obj/screen/fullscreen/blackout)
 
 	if(config.welder_vision)

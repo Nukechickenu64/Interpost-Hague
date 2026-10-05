@@ -1,4 +1,13 @@
 /*
+Current behavior:
+All /obj/item/modular_computer subtypes, including consoles, laptops, tablets, and telescreens,
+display one random space-science word in the interacting user's chat when used.
+They do not open computer or program interfaces, execute programs (including autorun), or connect to NTNet.
+There is no speech formatting, voice, broadcast, or overhead bubble. Physical hardware maintenance is unchanged.
+Standalone PDAs and non-modular computers are unaffected.
+
+The design notes below describe the former program-based functionality.
+
 Program-based computers, designed to replace computer3 project and eventually most consoles on station
 
 

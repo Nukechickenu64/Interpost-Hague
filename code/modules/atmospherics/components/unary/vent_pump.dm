@@ -174,9 +174,9 @@
 	if(!environment)
 		return "no room atmosphere"
 	var/target_pressure = get_target_pressure()
-	if(environment.return_pressure() > target_pressure + 0.5)
-		return last_flow_rate > 0 ? "recovering excess pressure" : "above target"
-	if(environment.return_pressure() >= target_pressure)
+	if(environment.get_tile_moles() > PRESSURE_TO_MOLES(target_pressure + 0.5))
+		return last_flow_rate > 0 ? "recovering excess gas" : "above target"
+	if(environment.get_tile_moles() >= PRESSURE_TO_MOLES(target_pressure))
 		return "at target"
 	if(!tank)
 		tank = get_station_gas_tank(src)
@@ -189,18 +189,8 @@
 		return 0
 	var/datum/gas_mixture/environment = loc.return_air()
 	var/target_pressure = get_target_pressure()
-	var/pressure_delta = target_pressure - environment.return_pressure()
-	var/max_temperature = max(environment.temperature, tank.air_contents.temperature)
-	if(max_temperature <= 0)
-		return 0
-	var/pressure_temperature = max_temperature
-	if(environment.total_moles > 0 && tank.air_contents.total_moles > 0)
-		var/room_molar_heat_capacity = environment.heat_capacity() / (environment.total_moles * environment.group_multiplier)
-		var/supply_molar_heat_capacity = tank.air_contents.heat_capacity() / (tank.air_contents.total_moles * tank.air_contents.group_multiplier)
-		if(room_molar_heat_capacity > 0)
-			pressure_temperature *= max(1, supply_molar_heat_capacity / room_molar_heat_capacity)
-	var/pressure_limit_moles = pressure_delta * environment.volume * environment.group_multiplier / (R_IDEAL_GAS_EQUATION * pressure_temperature)
-	return min(pressure_limit_moles, calculate_transfer_moles(tank.air_contents, environment, pressure_delta))
+	var/moles_delta = PRESSURE_TO_MOLES(target_pressure) - environment.get_tile_moles()
+	return max(0, moles_delta * environment.volume * environment.group_multiplier / CELL_VOLUME)
 
 /obj/machinery/atmospherics/unary/vent_pump/Process()
 	..()
@@ -219,9 +209,9 @@
 		return 0
 	if(pump_direction)
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
-		var/excess_pressure = environment.return_pressure() - get_target_pressure()
-		if(area_modcon && area_modcon.can_supply_air() && excess_pressure > 0.5)
-			var/recovery_moles = min(tank.max_output_moles, calculate_transfer_moles(environment, environment, excess_pressure))
+		var/excess_moles = environment.get_tile_moles() - PRESSURE_TO_MOLES(get_target_pressure())
+		if(area_modcon && area_modcon.can_supply_air() && excess_moles > PRESSURE_TO_MOLES(0.5))
+			var/recovery_moles = min(tank.max_output_moles, excess_moles * environment.volume * environment.group_multiplier / CELL_VOLUME)
 			last_flow_rate = area_modcon.recover_air(tank, environment, recovery_moles)
 			if(last_flow_rate)
 				last_power_draw = min(power_rating, last_flow_rate * 10)
@@ -232,10 +222,9 @@
 			return 0
 		last_flow_rate = tank.supply(environment, transfer_moles, src)
 	else
-		var/pressure_delta = get_pressure_delta(environment)
-		if(pressure_delta <= 0.5)
+		var/transfer_moles = get_transfer_moles(environment)
+		if(transfer_moles < MINIMUM_MOLES_TO_PUMP)
 			return 0
-		var/transfer_moles = calculate_transfer_moles(environment, environment, pressure_delta)
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
 		if(area_modcon)
 			last_flow_rate = area_modcon.recover_air(tank, environment, transfer_moles)
@@ -244,22 +233,15 @@
 		use_power_oneoff(last_power_draw)
 	return 1
 
-/obj/machinery/atmospherics/unary/vent_pump/proc/get_pressure_delta(datum/gas_mixture/environment)
-	var/pressure_delta = DEFAULT_PRESSURE_DELTA
-	var/environment_pressure = environment.return_pressure()
-
-	if(pump_direction) //internal -> external
-		if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
-			pressure_delta = min(pressure_delta, external_pressure_bound - environment_pressure) //increasing the pressure here
-		if(pressure_checks & PRESSURE_CHECK_INTERNAL)
-			pressure_delta = min(pressure_delta, air_contents.return_pressure() - internal_pressure_bound) //decreasing the pressure here
-	else //external -> internal
-		if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
-			pressure_delta = min(pressure_delta, environment_pressure - external_pressure_bound) //decreasing the pressure here
-		if(pressure_checks & PRESSURE_CHECK_INTERNAL)
-			pressure_delta = min(pressure_delta, internal_pressure_bound - air_contents.return_pressure()) //increasing the pressure here
-
-	return pressure_delta
+/obj/machinery/atmospherics/unary/vent_pump/proc/get_transfer_moles(datum/gas_mixture/environment)
+	var/transfer_moles = environment.get_total_moles()
+	if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
+		var/excess_moles = environment.get_tile_moles() - PRESSURE_TO_MOLES(external_pressure_bound)
+		transfer_moles = min(transfer_moles, max(0, excess_moles * environment.volume * environment.group_multiplier / CELL_VOLUME))
+	if(pressure_checks & PRESSURE_CHECK_INTERNAL)
+		var/pressure_delta = max(0, internal_pressure_bound - air_contents.return_pressure())
+		transfer_moles = min(transfer_moles, calculate_transfer_moles(environment, air_contents, pressure_delta))
+	return transfer_moles
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/broadcast_status()
 	if(!radio_connection)
@@ -433,9 +415,7 @@
 	if (node && node.level==1 && isturf(T) && !T.is_plating())
 		to_chat(user, "<span class='warning'>You must remove the plating first.</span>")
 		return 1
-	var/datum/gas_mixture/int_air = return_air()
-	var/datum/gas_mixture/env_air = loc.return_air()
-	if ((int_air.return_pressure()-env_air.return_pressure()) > 2*ONE_ATMOSPHERE)
+	if (air_contents.return_pressure() > 2*ONE_ATMOSPHERE)
 		to_chat(user, "<span class='warning'>You cannot unwrench \the [src], it is too exerted due to internal pressure.</span>")
 		add_fingerprint(user)
 		return 1

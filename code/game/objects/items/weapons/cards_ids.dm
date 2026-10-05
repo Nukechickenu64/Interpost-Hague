@@ -196,6 +196,30 @@ var/global/const/NO_EMAG_ACT = -50
 /obj/item/card/id/GetIdCard()
 	return src
 
+/obj/item/card/id/cryo_temporary
+	name = "temporary cryogenic access card"
+	desc = "A temporary access card dispensed by a cryopod. It is dissolving in the air and will disappear three minutes after being dispensed."
+	var/expires_at
+
+/obj/item/card/id/cryo_temporary/New()
+	..()
+	expires_at = world.time + 3 MINUTES
+	addtimer(CALLBACK(src, /obj/item/card/id/cryo_temporary/proc/dissolve), 3 MINUTES)
+
+/obj/item/card/id/cryo_temporary/update_name()
+	var/job_name = assignment ? assignment : rank
+	SetName("temporary [job_name ? job_name : "cryogenic"] access card")
+
+/obj/item/card/id/cryo_temporary/GetAccess()
+	if(world.time >= expires_at)
+		return list()
+	return ..()
+
+/obj/item/card/id/cryo_temporary/proc/dissolve()
+	access = list()
+	visible_message("<span class='notice'>\The [src] finishes dissolving in the air and disappears.</span>")
+	qdel(src)
+
 /obj/item/card/id/verb/read()
 	set name = "Read ID Card"
 	set category = "Object"

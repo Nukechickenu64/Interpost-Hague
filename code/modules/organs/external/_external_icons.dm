@@ -95,7 +95,14 @@ var/list/medical_skin_luminance_cache = list()
 	else
 		icon = species.get_icobase(owner)
 
+	if(species)
+		icon = species.get_limb_icon(src, icon)
+		icon_state = species.get_limb_icon_state(src, icon_state)
+		icon_cache_key = "[icon_state]_[species.name]"
+
 	mob_icon = apply_colouration(new/icon(icon, icon_state))
+	if(species)
+		mob_icon = species.process_limb_icon(src, mob_icon)
 
 	//Body markings, does not include head, duplicated (sadly) above.
 	for(var/M in markings)
@@ -249,4 +256,3 @@ var/list/robot_hud_colours = list("#ffffff","#cccccc","#aaaaaa","#888888","#6666
 	strength = owner.medical_cyanosis / 3
 	if(strength)
 		medical_skin_tint(applying, 1 - 0.13 * strength * visibility, 1 - 0.025 * strength, 1 + 0.09 * strength * visibility, 0.18 * strength)
-

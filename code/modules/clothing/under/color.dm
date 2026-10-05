@@ -9,12 +9,10 @@
 
 /obj/item/clothing/under/color/orange
 	name = "orange jumpsuit"
-	desc = "It's standardised prisoner-wear. Its suit sensor controls are permanently set to the \"Fully On\" position."
+	desc = "It's standardised prisoner-wear."
 	icon_state = "orange"
 	item_state = "o_suit"
 	worn_state = "orange"
-	has_sensor = 2
-	sensor_mode = 3
 
 /obj/item/clothing/under/color/blackjumpshorts
 	name = "black jumpsuit shorts"

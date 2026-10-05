@@ -524,10 +524,10 @@ datum/projectile_data
 	return mixedcolor
 
 /**
-* Gets the highest and lowest pressures from the tiles in cardinal directions
+* Gets the highest and lowest gas amounts from the tiles in cardinal directions
 * around us, then checks the difference.
 */
-/proc/getOPressureDifferential(var/turf/loc)
+/proc/getOAirAmountDifferential(var/turf/loc)
 	var/minp=16777216;
 	var/maxp=0;
 	for(var/dir in GLOB.cardinal)
@@ -535,7 +535,7 @@ datum/projectile_data
 		var/cp=0
 		if(T && istype(T) && T.zone)
 			var/datum/gas_mixture/environment = T.return_air()
-			cp = environment.return_pressure()
+			cp = environment.get_tile_moles()
 		else
 			if(istype(T,/turf/simulated))
 				continue
@@ -567,8 +567,8 @@ datum/projectile_data
 		if(T && istype(T) && T.zone)
 			var/datum/gas_mixture/environment = T.return_air()
 			for(var/i=1;i<=stats.len;i++)
-				if(stats[i] == "pressure")
-					rstats[i] = environment.return_pressure()
+				if(stats[i] == "tile_moles")
+					rstats[i] = environment.get_tile_moles()
 				else
 					rstats[i] = environment.vars[stats[i]]
 		else if(istype(T, /turf/simulated))
@@ -577,8 +577,8 @@ datum/projectile_data
 			// Should still work.  (/turf/return_air())
 			var/datum/gas_mixture/environment = T.return_air()
 			for(var/i=1;i<=stats.len;i++)
-				if(stats[i] == "pressure")
-					rstats[i] = environment.return_pressure()
+				if(stats[i] == "tile_moles")
+					rstats[i] = environment.get_tile_moles()
 				else
 					rstats[i] = environment.vars[stats[i]]
 		temps[direction] = rstats
@@ -591,7 +591,10 @@ datum/projectile_data
 	return seconds * 10
 
 /proc/round_is_spooky(var/spookiness_threshold = config.cult_ghostwriter_req_cultists)
-	return (GLOB.cult.current_antagonists.len > spookiness_threshold)
+	var/cultists = 0
+	for(var/datum/antagonist/cultist/cult in get_cults())
+		cultists += cult.current_antagonists.len
+	return cultists > spookiness_threshold
 
 /proc/getviewsize(view)
 	var/viewX

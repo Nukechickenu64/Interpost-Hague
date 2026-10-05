@@ -16,20 +16,71 @@
 	visible_message("<span class='combat'>[assailant] has grabbed [affecting]'s [O.name]!</span>")
 	affecting.grabbed_by += src
 
-	if(!(affecting.a_intent == I_HELP))
-		upgrade(TRUE)
-
 /datum/grab/normal
 	type_name = GRAB_NORMAL
 
 	var/drop_headbutt = 1
 
-	icon = 'icons/mob/screen1.dmi'
+	icon = 'icons/mob/screen/os13.dmi'
 
 	help_action = "inspect"
 	disarm_action = "pin"
 	grab_action = "jointlock"
 	harm_action = "dislocate"
+
+/datum/grab/normal/attack_self_act(var/obj/item/grab/normal/G)
+	if(!G || !G.assailant || !G.affecting)
+		return
+	var/mob/living/carbon/human/assailant = G.assailant
+	var/mob/living/carbon/human/affecting = G.affecting
+	if(!assailant.canClick())
+		return
+	if(!assailant.canmove || assailant.lying)
+		qdel(G)
+		return
+	if(world.time < G.last_action + G.current_grab.upgrade_cooldown)
+		to_chat(assailant, "<span class='combat'>It's too soon to change your grip.</span>")
+		return
+	G.last_action = world.time
+	if(assailant.a_intent == I_HELP)
+		if(!G.current_grab.downgrab)
+			assailant.visible_message("<span class='notice'>[assailant] lets go of [affecting].</span>")
+			G.current_grab.let_go(G)
+		else
+			switch(G.current_grab.state_name)
+				if(NORM_AGGRESSIVE)
+					assailant.visible_message("<span class='notice'>[assailant] relaxes \his grip on [affecting]'s hands.</span>")
+				if(NORM_NECK)
+					assailant.visible_message("<span class='notice'>[assailant] relaxes \his grip on [affecting]'s neck.</span>")
+				if(NORM_KILL)
+					assailant.visible_message("<span class='notice'>[assailant] relaxes \his grip on [affecting]'s throat.</span>")
+			G.downgrade()
+		return
+	if((G.current_grab.state_name in list(NORM_PASSIVE, NORM_AGGRESSIVE)) && !G.allow_upgrade)
+		to_chat(assailant, "<span class='warning'>You can't tighten that grip while holding someone else.</span>")
+		return
+	var/previous_state = G.current_grab.state_name
+	if(previous_state == NORM_PASSIVE)
+		if(!affecting.lying || G.current_grab.size_difference(affecting, assailant) > 0)
+			assailant.visible_message("<span class='warning'>[assailant] grabs [affecting] aggressively!</span>")
+		else
+			assailant.visible_message("<span class='warning'>[assailant] pins [affecting] down to the ground!</span>")
+			G.force_down = TRUE
+			affecting.forceMove(assailant.loc)
+			affecting.set_dir(SOUTH)
+			affecting.Weaken(2)
+	if(!G.upgrade(TRUE))
+		return
+	if(previous_state == NORM_AGGRESSIVE && G.current_grab.state_name == NORM_NECK)
+		assailant.visible_message("<span class='warning'>[assailant] reinforces \his grip on [affecting]'s neck!</span>")
+		admin_attack_log(assailant, affecting, "Grabbed the neck of their victim.", "Had their neck grabbed", "grabbed the neck of")
+		affecting.Stun(10)
+	else if(previous_state == NORM_NECK && G.current_grab.state_name == NORM_KILL)
+		assailant.visible_message("<span class='danger'>[assailant] tightens \his grip on [affecting]'s neck!</span>")
+		admin_attack_log(assailant, affecting, "Strangled their victim.", "Was strangled.", "strangled")
+		affecting.setClickCooldown(10)
+		affecting.set_dir(SOUTH)
+		affecting.losebreath++
 
 /datum/grab/normal/on_hit_help(var/obj/item/grab/normal/G)
 	var/obj/item/organ/external/O = G.get_targeted_organ()
@@ -133,7 +184,7 @@
 			else
 				if(headbutt(G))
 					if(drop_headbutt)
-						let_go()
+						let_go(G)
 					return 1
 	return 0
 
@@ -192,6 +243,8 @@
 
 // Handles special targeting like eyes and mouth being covered.
 /datum/grab/normal/special_target_effect(var/obj/item/grab/G)
+	if(G.current_grab.state_name == NORM_PASSIVE)
+		return
 	if(G.special_target_functional)
 		switch(G.last_target)
 			if(BP_MOUTH)
@@ -203,6 +256,8 @@
 
 // Handles when they change targeted areas and something is supposed to happen.
 /datum/grab/normal/special_target_change(var/obj/item/grab/G, var/diff_zone)
+	if(G.current_grab.state_name == NORM_PASSIVE)
+		return
 	if(G.target_zone != BP_HEAD && G.target_zone != BP_CHEST)
 		return
 	switch(diff_zone)

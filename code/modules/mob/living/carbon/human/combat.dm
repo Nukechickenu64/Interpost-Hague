@@ -1,4 +1,3 @@
-
 /mob/living/carbon/human/proc/toggle_combat_mode()
 	if(!ishuman(usr))
 		return
@@ -7,11 +6,11 @@
 	var/mob/living/carbon/human/C = usr
 	if(!C.combat_mode)
 		C.combat_mode = 1
-		C.combat_icon.icon_state = "combat1"
+		C.combat_icon.icon_state = "cmbt1"
 		to_chat(src, "<span class='warning'>You toggle on combat mode.</span>")
 	else
 		combat_mode = 0
-		C.combat_icon.icon_state = "combat0"
+		C.combat_icon.icon_state = "cmbt0"
 		to_chat(src, "<span class='danger'>You toggle off combat mode.</span>")
 
 /mob/living/carbon/human/proc/toggle_dodge_parry()
@@ -19,11 +18,11 @@
 		var/mob/living/carbon/human/E = usr
 		if(E.defense_intent == I_DODGE)
 			E.defense_intent = I_PARRY
-			E.dodge_intent_icon.icon_state = "parry"
+			E.dodge_intent_icon.icon_state = "dodge0"
 			to_chat(src, "<span class='danger'>You will now parry.</span>")
 		else
 			E.defense_intent = I_DODGE
-			E.dodge_intent_icon.icon_state = "dodge"
+			E.dodge_intent_icon.icon_state = "dodge1"
 			to_chat(src, "<span class='warning'>You will now dodge.</span>")
 
 /mob/living/carbon/human/verb/dodgeparry_hotkey()
@@ -44,23 +43,27 @@
 		if(staminaloss < 90)
 			adjustStaminaLoss(1)
 
-/mob/living/proc/attempt_dodge()//Handle parry is an object proc and it's, its own thing.
-	var/dodge_modifier = c_intent == I_DEFEND ? 4 : 0 //If they are in defend mode, they dodge more
-	if (defense_intent != I_DODGE || buckled || resting || lying || zoomed)  // If they are not trying to dodge, lying down, not buckled, or zoomed in.
+/mob/living/proc/attempt_dodge(mob/living/carbon/human/attacker = null) // Handle parry is an object proc, it's, its own thing.
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		if(H.toggle_resisting)
+			return 0
+	var/dodge_modifier = c_intent == I_DEFEND ? 4 : 0
+	if(defense_intent != I_DODGE || buckled || resting || lying || zoomed)
 		return 0
-	if(combat_mode)//Todo, make use of the check_shield_arc proc to make sure you can't dodge from behind.
-		var/dodge_difficulty = 10 + min(round(staminaloss / 10), 8) - dodge_modifier
-		if(staminaloss < 50 && statcheck(stats[STAT_DX], dodge_difficulty, "We couldn't dodge in time!", "dex"))//You gotta be the master of dexterity to dodge every time.
+	var/feint_penalty = ishuman(attacker) ? attacker.consume_feint_bonus(src) : 0
+	if(combat_mode)
+		var/dodge_difficulty = 10 + min(round(staminaloss / 10), 8) - dodge_modifier + feint_penalty
+		if(staminaloss < 50 && statcheck(stats[STAT_DX], dodge_difficulty, "We couldn't dodge in time!", "dex"))
 			do_dodge()
-			return	1
-		else if(staminaloss >= 50 && statcheck(stats[STAT_DX], dodge_difficulty + 2, "I'm getting too exhausted to dodge!", "dex")) //It's harder to dodge when you're tired
+			return 1
+		else if(staminaloss >= 50 && statcheck(stats[STAT_DX], dodge_difficulty + 2, "I'm getting too exhausted to dodge!", "dex"))
 			do_dodge()
-			return	1
-	else if(prob(5))
-		if(statcheck(stats[STAT_DX], 12, "I can't dodge something I'm not ready for!", "dex"))  //If you're not in combat mode, you're probably getting messed up
-			do_dodge()
-			return	1
-	return 0  //If we fail everything
+			return 1
+	else if(prob(5) && statcheck(stats[STAT_DX], 12 + feint_penalty, "I can't dodge something I'm not ready for!", "dex"))
+		do_dodge()
+		return 1
+	return 0
 
 /mob/living/proc/do_dodge()
 	var/lol = pick(GLOB.cardinal)//get a direction.
@@ -98,8 +101,57 @@
 		update_canmove()
 		//For stopping runtimes with NPCs
 		rest?.icon_state = "rest1"
-		fixeye?.icon_state = "fixeye"
+		fixeye?.icon_state = "fixed_e0"
 		walk_to(src,0)
+
+/mob/living/carbon/human/proc/toggle_eye()
+	if(stat != CONSCIOUS || sleeping || voluntary_sleeping || waking_up)
+		eye_closed = TRUE
+		to_chat(src, "<span class='warning'>You can't open your eyes while asleep.</span>")
+		update_awake_hud()
+		return
+	eye_closed = !eye_closed
+	if(eye_closed)
+		to_chat(src, "<span class='notice'>You close your eyes.</span>")
+	else
+		to_chat(src, "<span class='notice'>You open your eyes.</span>")
+	update_body()
+	species.handle_vision(src)
+	update_awake_hud()
+
+/mob/living/carbon/human/proc/update_awake_hud()
+	if(!awake)
+		return
+	if(waking_up)
+		awake.icon_state = "sleep2"
+	else if(stat != CONSCIOUS || sleeping || voluntary_sleeping)
+		awake.icon_state = "sleep1"
+	else
+		awake.icon_state = "sleep0"
+	awake.overlays.Cut()
+	if(eye_closed)
+		awake.overlays += image(awake.icon, "eyeso")
+
+/mob/living/carbon/human/proc/update_hand_ready_hud()
+	if(!readycd)
+		return
+	readycd.icon_state = "ready000"
+	readycd.overlays.Cut()
+	if(world.time < right_hand_ready_until)
+		readycd.overlays += image(readycd.icon, "ready100")
+	if(world.time < special_action_ready_until)
+		readycd.overlays += image(readycd.icon, "ready010")
+	if(world.time < left_hand_ready_until)
+		readycd.overlays += image(readycd.icon, "ready001")
+
+/mob/living/carbon/human/proc/set_hand_ready_cooldown(var/left_hand, var/cooldown_until)
+	if(left_hand)
+		left_hand_ready_until = max(left_hand_ready_until, cooldown_until)
+	else
+		right_hand_ready_until = max(right_hand_ready_until, cooldown_until)
+
+/mob/living/carbon/human/proc/set_special_action_cooldown(var/cooldown_until)
+	special_action_ready_until = max(special_action_ready_until, cooldown_until)
 
 /mob/verb/mob_rest_hotkey()
 	set name = ".mob_rest"

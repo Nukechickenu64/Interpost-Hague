@@ -1,3 +1,5 @@
+#include "..\modules\director\_defines.dm"
+
 var/list/gamemode_cache = list()
 
 /datum/configuration

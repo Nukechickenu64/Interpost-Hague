@@ -9,7 +9,7 @@
 	var/home_system = "Unset"           //System of birth.
 	var/citizenship = "None"            //Current home system.
 	var/faction = "None"                //Antag faction/general associated faction.
-	var/religion = "Atheism"               //Religious association.
+	var/religion = "Atheism"               //Character's religious affiliation.
 	var/family = TRUE
 /*
 /datum/category_item/player_setup_item/general/background
@@ -44,7 +44,9 @@
 	if(!pref.home_system)		 pref.home_system = "Unset"
 	if(!pref.citizenship) 		pref.citizenship = "None"
 	if(!pref.faction)    		pref.faction =     "None"
-	if(!pref.religion)    		pref.religion =    "Deo Machina"
+	if(!pref.religion)    		pref.religion =    LEGAL_RELIGION
+	if(pref.religion == "Old Gods" || pref.religion == "Narsie")
+		pref.religion = NARSIE_RELIGION
 
 	pref.nanotrasen_relation = sanitize_inlist(pref.nanotrasen_relation, COMPANY_ALIGNMENTS, initial(pref.nanotrasen_relation))
 
@@ -54,7 +56,7 @@
 	. += "Home System: <a href='?src=\ref[src];home_system=1'>[pref.home_system]</a><br/>"
 	. += "Citizenship: <a href='?src=\ref[src];citizenship=1'>[pref.citizenship]</a><br/>"
 	. += "Faction: <a href='?src=\ref[src];faction=1'>[pref.faction]</a><br/>"
-	. += "Religion: <a href='?src=\ref[src];religion=1'>[pref.religion]</a><br/>"
+	. += "Faith: <a href='?src=\ref[src];religion=1'>[pref.religion]</a><br/>"
 
 	. += "<br/><b>Records</b>:<br/>"
 	if(jobban_isbanned(user, "Records"))
@@ -113,13 +115,13 @@
 		return TOPIC_REFRESH
 
 	else if(href_list["religion"])
-		var/choice = input(user, "Please choose a religion.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in GLOB.using_map.religion_choices + list("None","Other")
+		var/choice = input(user, "Choose your character's religious affiliation. The blood, fire, and mortality cults each have an independent 1-in-20 chance per round to grant their competing Cultist role. Jes, Judas, and Hasard retain their Old God magic.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in GLOB.using_map.religion_choices + list("None","Other")
 		if(!choice || !CanUseTopic(user))
 			return TOPIC_NOACTION
 		if(choice == "Other")
-			var/raw_choice = sanitize(input(user, "Please enter a religon.", CHARACTER_PREFERENCE_INPUT_TITLE)  as text|null, MAX_NAME_LEN)
+			var/raw_choice = sanitize(input(user, "Enter your character's faith or religious affiliation.", CHARACTER_PREFERENCE_INPUT_TITLE) as text|null, MAX_NAME_LEN)
 			if(raw_choice)
-				pref.religion = sanitize(raw_choice)
+				pref.religion = raw_choice
 		else
 			pref.religion = choice
 		return TOPIC_REFRESH

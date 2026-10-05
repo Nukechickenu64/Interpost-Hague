@@ -1,39 +1,36 @@
-// Fluid Loyalties & Dynamic Defection System
-// Faction alignment is fluid and trackable in real-time.
+// Political allegiance is stored on the mind; this datum indexes those values.
 // Players can be bribed, defect, or be converted through gameplay actions.
 
 /datum/loyalty_tracker
 	var/list/faction_members = list()  // faction_name -> list of datum/mind
-	var/list/mind_factions = list()    // mind ref -> faction_name
 
 /datum/loyalty_tracker/New()
 	for(var/faction in list(LOYALTY_NANOTRASEN, LOYALTY_SYNDICATE, LOYALTY_REVOLUTIONARY, LOYALTY_CULT, LOYALTY_NEUTRAL))
 		faction_members[faction] = list()
 
-/// Get the faction a mind belongs to
+/// Get a mind's primary allegiance; antagonist roles remain separate memberships.
 /datum/loyalty_tracker/proc/get_faction(var/datum/mind/M)
 	if(!M)
 		return LOYALTY_NEUTRAL
-	return mind_factions[M] || LOYALTY_NANOTRASEN
+	return M.primary_allegiance || LOYALTY_NANOTRASEN
 
-/// Set a mind's faction
+/// Set a mind's primary allegiance without changing its combat-AI faction.
 /datum/loyalty_tracker/proc/set_faction(var/datum/mind/M, var/faction)
 	if(!M || !faction)
 		return
-	// Compare against the raw entry, not get_faction()'s NT fallback, so first-time
-	// registration to the default faction still actually gets recorded.
-	var/old_faction = mind_factions[M]
-	if(old_faction == faction)
+	var/old_faction = M.primary_allegiance
+	var/list/current_members = faction_members[faction]
+	if(old_faction == faction && current_members && (M in current_members))
 		return
-	// Remove from old faction
+
 	if(old_faction && faction_members[old_faction])
 		faction_members[old_faction] -= M
-	// Add to new faction
 	if(!faction_members[faction])
 		faction_members[faction] = list()
 	faction_members[faction] |= M
-	mind_factions[M] = faction
-	log_debug("[key_name(M)] loyalty shifted from [old_faction || "unassigned"] to [faction].")
+	M.primary_allegiance = faction
+	if(old_faction != faction)
+		log_debug("[key_name(M)] loyalty shifted from [old_faction || "unassigned"] to [faction].")
 
 /// Get all members of a faction
 /datum/loyalty_tracker/proc/get_members(var/faction)
@@ -110,7 +107,9 @@
 
 /// Reset all loyalties (round end)
 /datum/loyalty_tracker/proc/reset()
+	var/list/tracked_minds = list()
 	for(var/faction in faction_members)
 		var/list/members = faction_members[faction]
-		members.Cut()
-	mind_factions.Cut()
+		tracked_minds |= members
+	for(var/datum/mind/M in tracked_minds)
+		set_faction(M, LOYALTY_NANOTRASEN)

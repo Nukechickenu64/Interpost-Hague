@@ -234,6 +234,41 @@ macro "borghotkeymode"
 		name = "."
 		command = "move-down"
 
+macro "keypadentry"
+	elem
+		name = "0"
+		command = ".airlock_keypad_digit_0"
+	elem
+		name = "1"
+		command = ".airlock_keypad_digit_1"
+	elem
+		name = "2"
+		command = ".airlock_keypad_digit_2"
+	elem
+		name = "3"
+		command = ".airlock_keypad_digit_3"
+	elem
+		name = "4"
+		command = ".airlock_keypad_digit_4"
+	elem
+		name = "5"
+		command = ".airlock_keypad_digit_5"
+	elem
+		name = "6"
+		command = ".airlock_keypad_digit_6"
+	elem
+		name = "7"
+		command = ".airlock_keypad_digit_7"
+	elem
+		name = "8"
+		command = ".airlock_keypad_digit_8"
+	elem
+		name = "9"
+		command = ".airlock_keypad_digit_9"
+	elem
+		name = "Escape"
+		command = ".airlock_keypad_cancel"
+
 macro "macro"
 	elem 
 		name = "Center+REP"
@@ -847,6 +882,7 @@ window "mapwindow"
 		anchor2 = 100,100
 		font-family = "Arial Rounded MT Bold,Arial Black,Arial,sans-serif"
 		font-size = 7
+		icon-size = 0
 		is-default = true
 		saved-params = "icon-size;zoom-mode"
 		on-show = ".winset\"mainwindow.mainvsplit.left=mapwindow\""

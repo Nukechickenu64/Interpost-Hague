@@ -41,6 +41,8 @@ datum/preferences
 	pref.spawnpoint         = sanitize_inlist(pref.spawnpoint, spawntypes(), initial(pref.spawnpoint))
 	pref.be_random_name     = sanitize_integer(pref.be_random_name, 0, 1, initial(pref.be_random_name))
 	if(!pref.religion)    pref.religion =  LEGAL_RELIGION
+	if(pref.religion == "Old Gods" || pref.religion == "Narsie")
+		pref.religion = NARSIE_RELIGION
 
 /datum/category_item/player_setup_item/general/basic/content()
 	. = list()
@@ -49,7 +51,7 @@ datum/preferences
 	. += "<b>Gender:</b> <a href='?src=\ref[src];gender=1'><b>[pref.gender == MALE ? "Male" : "Female"]</b></a><br>"
 	. += "<b>Age:</b> <a href='?src=\ref[src];age=1'>[pref.age]</a><br>"
 	//. += "<b>Spawn Point</b>: <a href='?src=\ref[src];spawnpoint=1'>[pref.spawnpoint]</a><br>"
-	. += "<b>RELIGION</b> "
+	. += "<b>Faith:</b> "
 	. += "<a href='?src=\ref[src];religion=1'>[pref.religion]</a><br/>"
 	//. += "<b>Join Families</b> "
 	//. += "<a href='?src=\ref[src];family=1'>[pref.family ? "Yes" : "No"]</a><br/>"
@@ -105,11 +107,17 @@ datum/preferences
 		pref.spawnpoint = choice
 		return TOPIC_REFRESH
 	else if(href_list["religion"])
-
-		if(pref.religion == LEGAL_RELIGION)
-			pref.religion = ILLEGAL_RELIGION
+		var/list/religion_options = GLOB.using_map.religion_choices + list("None", "Other")
+		var/choice = input(user, "Choose your character's religious affiliation. All faiths are roleplay-only except the Cult of Nar-Sie, which has an independent 1-in-20 chance per round to grant the Cultist antagonist role.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in religion_options
+		if(!choice || !CanUseTopic(user))
+			return TOPIC_NOACTION
+		if(choice == "Other")
+			var/custom_religion = sanitize(input(user, "Enter your character's faith or religious affiliation.", CHARACTER_PREFERENCE_INPUT_TITLE) as text|null, MAX_NAME_LEN)
+			if(!custom_religion || !CanUseTopic(user))
+				return TOPIC_NOACTION
+			pref.religion = custom_religion
 		else
-			pref.religion = LEGAL_RELIGION
+			pref.religion = choice
 		return TOPIC_REFRESH
 
 	else if(href_list["family"])

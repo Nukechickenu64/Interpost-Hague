@@ -10,9 +10,17 @@
 	throwforce = 10
 	hitsound = 'sound/weapons/bladeslice.ogg'
 	attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
+	var/datum/antagonist/cultist/cult
+
+/obj/item/weapon/melee/cultblade/New(loc, datum/antagonist/cultist/owning_cult = null)
+	cult = owning_cult ? owning_cult : GLOB.cult
+	..()
+	if(cult != GLOB.cult)
+		color = cult.theme_color
+	desc = "An arcane weapon wielded by the followers of [cult.entity_name]."
 
 /obj/item/weapon/melee/cultblade/attack(mob/living/M, mob/living/user, var/target_zone)
-	if(iscultist(user) || (user.mind in GLOB.godcult.current_antagonists))
+	if(same_cult(user, cult) || (user.mind in GLOB.godcult.current_antagonists))
 		return ..()
 
 	var/zone = (user.hand ? BP_L_ARM : BP_R_ARM)
@@ -40,7 +48,7 @@
 	return 1
 
 /obj/item/weapon/melee/cultblade/pickup(mob/living/user as mob)
-	if(!iscultist(user))
+	if(!same_cult(user, cult))
 		to_chat(user, "<span class='warning'>An overwhelming feeling of dread comes over you as you pick up the cultist's sword. It would be wise to be rid of this blade quickly.</span>")
 		user.make_dizzy(120)
 

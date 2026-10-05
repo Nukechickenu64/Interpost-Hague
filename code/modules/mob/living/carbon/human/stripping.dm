@@ -130,16 +130,16 @@
 
 // Modify the current target sensor level.
 /mob/living/carbon/human/proc/toggle_sensors(var/mob/living/user)
-	var/obj/item/clothing/under/suit = w_uniform
-	if(!suit)
-		to_chat(user, "<span class='warning'>\The [src] is not wearing a suit with sensors.</span>")
+	var/obj/item/device/medical_bracelet/bracelet = get_medical_bracelet()
+	if(!bracelet)
+		to_chat(user, "<span class='warning'>\The [src] is not wearing a medical bracelet.</span>")
 		return
-	if (suit.has_sensor >= 2)
-		to_chat(user, "<span class='warning'>\The [src]'s suit sensor controls are locked.</span>")
+	if(bracelet.has_sensor >= SUIT_LOCKED_SENSORS)
+		to_chat(user, "<span class='warning'>\The [src]'s medical bracelet controls are locked.</span>")
 		return
 
-	admin_attack_log(user, src, "Toggled their suit sensors.", "Toggled their suit sensors.", "toggled the suit sensors of")
-	suit.set_sensors(user)
+	admin_attack_log(user, src, "Adjusted their medical bracelet.", "Had their medical bracelet adjusted.", "adjusted the medical bracelet of")
+	bracelet.set_sensors(user)
 
 // Remove all splints.
 /mob/living/carbon/human/proc/remove_splints(var/mob/living/user)

@@ -7,6 +7,10 @@
 		/area/shuttle/specops/centcom,
 	)
 
+/area/maintenance/radiation_bunker
+	name = "Radiation Bunker"
+	area_flags = AREA_FLAG_RAD_SHIELDED
+
 ////////////
 //SHUTTLES//
 ////////////

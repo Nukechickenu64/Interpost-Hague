@@ -375,6 +375,10 @@
 		if(isliving(src.loc))
 			return
 	if(user.put_in_active_hand(src))
+		if(ishuman(user))
+			var/mob/living/carbon/human/leech = user
+			if(leech.leech_touch_silver(src))
+				return
 		if (isturf(old_loc))
 			var/obj/effect/temporary/item_pickup_ghost/ghost = new(old_loc, src)
 			ghost.animate_towards(user)
@@ -517,6 +521,8 @@ var/list/global/slot_flags_enumeration = list(
 	"[slot_back]" = SLOT_BACK,
 	"[slot_wear_suit]" = SLOT_OCLOTHING,
 	"[slot_gloves]" = SLOT_GLOVES,
+	"[slot_wrist_l]" = SLOT_WRIST_L,
+	"[slot_wrist_r]" = SLOT_WRIST_R,
 	"[slot_shoes]" = SLOT_FEET,
 	"[slot_belt]" = SLOT_BELT,
 	"[slot_glasses]" = SLOT_EYES,
@@ -734,6 +740,9 @@ var/list/global/slot_flags_enumeration = list(
 		return 0
 
 	user.adjustStaminaLoss(10)
+	if(ishuman(attacker))
+		var/mob/living/carbon/human/feinting_attacker = attacker
+		defense_mode_modifier -= feinting_attacker.consume_feint_bonus(user)
 
 	if(!user.skillcheck(user.skills["melee"], 45 - defense_mode_modifier, 0, "Melee")) //Need to be decent at melee fighting to parry everything
 		return 0

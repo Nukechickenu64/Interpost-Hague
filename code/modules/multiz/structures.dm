@@ -158,6 +158,9 @@
 
 	playsound(src, pick(climbsounds), 50)
 	playsound(target_ladder, pick(climbsounds), 50)
+	if(isliving(user))
+		var/mob/living/L = user
+		L.adjustStaminaLoss(rand(5,10))
 	return user.Move(T)
 
 /obj/structure/ladder/CanPass(obj/mover, turf/source, height, airflow)
@@ -287,6 +290,7 @@
 		A.forceMove(target)
 		if(isliving(A))
 			var/mob/living/L = A
+			L.adjustStaminaLoss(rand(2,5))
 			if(L.pulling)
 				L.pulling.forceMove(target)
 			for(var/obj/item/grab/G in L)

@@ -16,9 +16,10 @@
 
 /mob/living/cultify()
 	if(iscultist(src) && client)
+		var/datum/antagonist/cultist/cult = get_cult(src)
 		var/mob/living/simple_animal/construct/harvester/C = new(get_turf(src))
 		mind.transfer_to(C)
-		to_chat(C, "<span class='sinister'>The Geometer of Blood is overjoyed to be reunited with its followers, and accepts your body in sacrifice. As reward, you have been gifted with the shell of an Harvester.<br>Your tendrils can use and draw runes without need for a tome, your eyes can see beings through walls, and your mind can open any door. Use these assets to serve Nar-Sie and bring him any remaining living human in the world.<br>You can teleport yourself back to Nar-Sie along with any being under yourself at any time using your \"Harvest\" spell.</span>")
+		to_chat(C, "<span class='sinister'>[cult.entity_name] accepts your body in sacrifice and grants you the shell of a Harvester.<br>Your tendrils can use and draw runes without a tome. Serve [cult.religion_name] and bring your deity the remaining living humans.<br>Your Harvest spell returns you and your prey to your own deity, never a rival cult's.</span>")
 		dust()
 	else if(client)
 		var/mob/observer/ghost/G = (ghostize())

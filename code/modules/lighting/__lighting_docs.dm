@@ -41,6 +41,14 @@ atom: (lighting_atom.dm)
   - proc/update_light():
 	  - Updates the light var on this atom, deleting or creating as needed and calling .update()
 
+Directional lights:
+  - Beam geometry is cached per source, rather than recalculated for each corner.
+  - Cone-only changes reuse visible turfs and corners, applying only intensity deltas.
+  - Movement, range/color/power changes, and forced updates still rebuild the footprint.
+  - Visibility changes still update membership before applying any pending cone changes.
+  - Flashlight aiming checks every tick but only recalculates when the cursor, holder
+    position/direction, or target position changes; beam range and brightness are unchanged.
+
 
 turf: (lighting_turf.dm)
   - var/list/affecting_lights; list of light sources that are shining onto this turf

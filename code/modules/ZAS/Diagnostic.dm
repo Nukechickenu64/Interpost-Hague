@@ -6,7 +6,7 @@ client/proc/Zone_Info(turf/T as null|turf)
 		else
 			to_chat(mob, "No zone here.")
 			var/datum/gas_mixture/mix = T.return_air()
-			to_chat(mob, "[mix.return_pressure()] kPa [mix.temperature]C")
+			to_chat(mob, "[mix.get_tile_moles()] mol/tile [mix.temperature]K")
 			for(var/g in mix.gas)
 				to_chat(mob, "[g]: [mix.gas[g]]\n")
 	else

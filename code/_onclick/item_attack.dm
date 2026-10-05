@@ -52,7 +52,15 @@ avoid code duplication. This includes items that may sometimes act as a standard
 		if(blocked)
 			to_chat(user, "<span class='warning'>\The [blocked] is in the way!</span>")
 			return 1
+		if(src.mouth_item)
+			to_chat(user, "<span class='warning'>\The [src.mouth_item] is already in your mouth!</span>")
+			return 1
 		else if(devour(I))
+			return 1
+		else if(I.w_class <= ITEM_SIZE_SMALL && src.unEquip(I, target = src))
+			src.mouth_item = I
+			src.update_inv_wear_mask()
+			visible_message("<span class='notice'>[src] holds [I] in [src]'s mouth.</span>")
 			return 1
 	return ..()
 
@@ -63,6 +71,7 @@ avoid code duplication. This includes items that may sometimes act as a standard
 
 //I would prefer to rename this attack_as_weapon(), but that would involve touching hundreds of files.
 /obj/item/proc/attack(mob/living/M, mob/living/user, var/target_zone)
+	user.attack_quality = null
 	if(!force || (item_flags & ITEM_FLAG_NO_BLUDGEON))
 		return 0
 	if(M == user && user.a_intent != I_HURT)
@@ -100,8 +109,15 @@ avoid code duplication. This includes items that may sometimes act as a standard
 	var/hit_zone = M.resolve_item_attack(src, user, target_zone)
 	if(hit_zone)
 		apply_hit_effect(M, user, hit_zone)
+	user.attack_quality = null
 
 	next_attack_time = world.time + (weapon_speed_delay)//by default, that's 25 - 10. Which is 15. Which should be what the average attack is. People who are weaker will swing heavy objects slower.
+	if(ishuman(user))
+		var/mob/living/carbon/human/human_user = user
+		var/left_hand = human_user.hand
+		if(src == human_user.get_inactive_hand())
+			left_hand = !human_user.hand
+		human_user.set_hand_ready_cooldown(left_hand, next_attack_time)
 
 	return 1
 
@@ -114,4 +130,3 @@ avoid code duplication. This includes items that may sometimes act as a standard
 	if(HULK in user.mutations)
 		power *= 2
 	return target.hit_with_weapon(src, user, power, hit_zone)
-

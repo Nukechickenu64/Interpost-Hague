@@ -16,3 +16,10 @@ Unit-test work is not wanted in this BYOND repository. This rule applies to ever
 - Use normal BYOND project compilation and focused static/code inspection when appropriate.
 - Describe relevant manual in-game checks when runtime verification is needed.
 - Report validation limitations honestly; do not substitute unit tests for unavailable manual verification.
+- Always build from interpost-Hague.
+
+## Never open byond dream maker
+
+- Do not open the BYOND Dream Maker IDE for any reason.
+- Do not modify project files through the Dream Maker interface.
+- All edits should be made through standard text editors or IDEs that do not invoke Dream Maker.

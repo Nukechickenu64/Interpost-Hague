@@ -139,9 +139,10 @@
 		return 1
 	if (locate(/obj/machinery/portable_atmospherics, src.loc))
 		return 1
-	var/datum/gas_mixture/int_air = return_air()
-	var/datum/gas_mixture/env_air = loc.return_air()
-	if ((int_air.return_pressure()-env_air.return_pressure()) > 2*ONE_ATMOSPHERE)
+	var/internal_pressure = get_networks_max_pressure(list(network))
+	if(connected_device)
+		internal_pressure = max(internal_pressure, connected_device.air_contents.return_pressure())
+	if(internal_pressure > 2*ONE_ATMOSPHERE)
 		to_chat(user, "<span class='warning'>You cannot unwrench \the [src], it too exerted due to internal pressure.</span>")
 		add_fingerprint(user)
 		return 1

@@ -303,13 +303,30 @@ default behaviour is:
 /mob/living/proc/getStaminaLoss()//Stamina shit.
 	return staminaloss
 
-/mob/living/proc/adjustStaminaLoss(var/amount)
+// Every action that costs stamina also builds fatigue; passive upkeep ticks pass passive = TRUE to skip it.
+#define FATIGUE_PER_STAMINA 0.25
+
+/mob/living/proc/adjustStaminaLoss(var/amount, var/passive = FALSE)
 	if(status_flags & GODMODE)	return 0
 	staminaloss = min(max(staminaloss + amount, 0),(maxHealth*2))
+	if(!passive && amount > 0)
+		fatigue = Clamp(fatigue + amount * FATIGUE_PER_STAMINA, 0, max_fatigue)
 
 /mob/living/proc/setStaminaLoss(var/amount)
 	if(status_flags & GODMODE)	return 0
 	staminaloss = amount
+
+/mob/living/proc/update_stamina_hud()
+	if(!stamina_icon)
+		return
+	var/current_fatigue = Clamp(fatigue, 0, max_fatigue)
+	var/fatigue_level = round(min(current_fatigue, 50) * 10 / 50)
+	stamina_icon.icon_state = "fatigue[10 - Clamp(fatigue_level, 0, 10)]"
+	stamina_icon.cut_overlays()
+	if(current_fatigue > 50 && max_fatigue > 50)
+		var/overfatigue_level = round((current_fatigue - 50) * 10 / (max_fatigue - 50))
+		overfatigue_level = Clamp(overfatigue_level, 1, 10)
+		stamina_icon.add_overlay(image(stamina_icon.icon, "overfatigue[overfatigue_level]"))
 
 /mob/living/proc/getBrainLoss()
 	return 0
@@ -666,9 +683,14 @@ default behaviour is:
 		else
 			adjustStaminaLoss(-1)
 
-	if(m_intent == "run" && staminaloss < 50)
-		adjustStaminaLoss(1)
-	else
+	var/is_sprinting = FALSE
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		is_sprinting = H.sprinting
+
+	if(!is_sprinting && m_intent == "run" && staminaloss < 50)
+		adjustStaminaLoss(1, TRUE)
+	else if(!is_sprinting)
 		adjustStaminaLoss(-2)
 
 	if(staminaloss >= STAMINA_EXHAUST && !stat)//Oh shit we've lost too much stamina and now we're tired!
@@ -758,14 +780,21 @@ default behaviour is:
 			return
 
 /mob/living/proc/resist_grab()
-	var/resisting = 0
 	if(grabbed_by == src)
 		return
+	var/list/grabs_to_resist = list()
 	for(var/obj/item/grab/G in grabbed_by)
-		resisting++
-		G.handle_resist()
-	if(resisting)
-		visible_message("<span class='danger'>[src] tries to resist!</span>")
+		grabs_to_resist += G
+	if(!grabs_to_resist.len)
+		return
+
+	visible_message(
+		"<span class='danger'>[src] tries to resist!</span>",
+		"<span class='warning'>You try to resist!</span>"
+	)
+	for(var/obj/item/grab/G in grabs_to_resist)
+		if(G && !QDELETED(G))
+			G.handle_resist()
 
 /mob/living/verb/lay_down()
 	set name = "Rest"

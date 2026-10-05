@@ -1045,9 +1045,9 @@ mob/proc/yank_out_object()
 	var/mob/living/carbon/human/C = usr
 	C.face_direction()
 	if(C.facing_dir)
-		C.fixeye.icon_state = "fixeye_on"
+		C.fixeye.icon_state = "fixed_e1"
 	else
-		C.fixeye.icon_state = "fixeye"
+		C.fixeye.icon_state = "fixed_e0"
 
 
 /mob/living/carbon/human/verb/fixeye_hotkey()
@@ -1081,6 +1081,8 @@ mob/proc/yank_out_object()
 	update_target()
 
 /mob/MiddleClick(mob/M)
+	if(M.middle_click_intent in list("kick", "steal", "jump", "bite"))
+		return middle_click_intent_check(M)
 	var/mob/targeted = M
 	var/mob/targeting = usr
 	var/obj/targeting_overlay/TO

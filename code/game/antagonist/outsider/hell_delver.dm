@@ -23,6 +23,10 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	var/mob/living/carbon/human/M = ..()
 	if(istype(M)) M.age = rand(25,45)
 
+/datum/antagonist/delver/place_mob(var/mob/living/mob)
+	get_starting_locations()
+	..()
+
 /datum/antagonist/delver/Initialize()
 	..()
 	leader_welcome_text = "You have no leaders."

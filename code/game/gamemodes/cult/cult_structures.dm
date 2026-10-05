@@ -2,6 +2,11 @@
 	density = 1
 	anchored = 1
 	icon = 'icons/obj/cult.dmi'
+	var/datum/antagonist/cultist/cult
+
+/obj/structure/cult/New(loc, datum/antagonist/cultist/owning_cult = null)
+	cult = owning_cult ? owning_cult : GLOB.cult
+	..()
 
 /obj/structure/cult/talisman
 	name = "Altar"
@@ -92,6 +97,11 @@
 	unacidable = 1
 	anchored = 1.0
 	var/spawnable = null
+	var/datum/antagonist/cultist/cult
+
+/obj/effect/gateway/New(loc, datum/antagonist/cultist/owning_cult = null)
+	cult = owning_cult ? owning_cult : GLOB.cult
+	..()
 
 /obj/effect/gateway/Bumped(mob/M as mob|obj)
 	spawn(0)
@@ -122,9 +132,11 @@
 	)
 
 /obj/effect/gateway/active/New()
+	..()
 	spawn(rand(30,60) SECONDS)
 		var/t = pick(spawnable)
-		new t(src.loc)
+		var/mob/living/creature = new t(src.loc)
+		creature.faction = cult.faction
 		qdel(src)
 
 /obj/effect/gateway/active/Crossed(var/atom/A)
@@ -139,7 +151,7 @@
 		if(M.has_brain_worms())
 			return //Borer stuff - RR
 
-		if(iscultist(M)) return
+		if(same_cult(M, cult)) return
 		if(!ishuman(M) && !isrobot(M)) return
 
 		M.transforming = 1
@@ -167,4 +179,3 @@
 			new_mob.key = M.key
 
 		to_chat(new_mob, "<B>Your form morphs into that of a corgi.</B>")//Because we don't have cluwnes
-

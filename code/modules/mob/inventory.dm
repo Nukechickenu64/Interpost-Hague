@@ -62,6 +62,8 @@ var/list/slot_equipment_priority = list( \
 		slot_head,\
 		slot_shoes,\
 		slot_gloves,\
+		slot_wrist_l,\
+		slot_wrist_r,\
 		slot_l_ear,\
 		slot_r_ear,\
 		slot_glasses,\
@@ -253,6 +255,8 @@ var/list/slot_equipment_priority = list( \
 	if(!O) // Nothing to remove, so we succeed.
 		return 1
 	src.u_equip(O)
+	if(QDELETED(O))
+		return 1
 	if (src.client)
 		src.client.screen -= O
 	O.reset_plane_and_layer()

@@ -1,5 +1,5 @@
 /datum/grab/special
-	icon = 'icons/mob/screen1.dmi'
+	icon = 'icons/mob/screen/os13.dmi'
 	stop_move = 1
 	can_absorb = 1
 	shield_assailant = 0
@@ -60,7 +60,7 @@
 
 /datum/grab/special/wrench
 	type_name = GRAB_WRENCH
-	icon_state = "wrench_grab"
+	icon_state = "wrench"
 	state_name = GRAB_WRENCH
 
 /datum/grab/special/wrench/attack_self_act(var/obj/item/grab/G)
@@ -158,4 +158,4 @@
 		return 0
 
 /datum/grab/special/self
-	icon_state = "self"
+	icon_state = "grabbed"

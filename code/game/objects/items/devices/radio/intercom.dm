@@ -1,7 +1,9 @@
 /obj/item/device/radio/intercom
 	name = "intercom (General)"
+	icon = 'icons/obj/intercom.dmi'
 	desc = "Talk through this."
-	icon_state = "intercom"
+	icon_state = "tintercom"
+	var/unpowered_icon_state = "tintercom2"
 	randpixel = 0
 	anchored = 1
 	w_class = ITEM_SIZE_HUGE
@@ -11,6 +13,10 @@
 	layer = ABOVE_WINDOW_LAYER
 	var/number = 0
 	var/last_tick //used to delay the powercheck
+
+/obj/item/device/radio/intercom/big
+	icon_state = "tintercombig"
+	unpowered_icon_state = "tintercombig"
 
 /obj/item/device/radio/intercom/get_storage_cost()
 	return ITEM_SIZE_NO_CONTAINER
@@ -123,9 +129,9 @@
 		on = A.powered(EQUIP) // set "on" to the power status
 
 	if(!on)
-		icon_state = "intercom-p"
+		icon_state = unpowered_icon_state
 	else
-		icon_state = "intercom"
+		icon_state = initial(icon_state)
 
 /obj/item/device/radio/intercom/broadcasting
 	broadcasting = 1

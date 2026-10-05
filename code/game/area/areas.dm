@@ -178,12 +178,22 @@
 	//	new lighting behaviour with obj lights
 		icon_state = null
 
-/area/proc/set_lightswitch(var/new_switch)
+/area/proc/set_lightswitch(var/new_switch, var/bridge_startup = FALSE)
+	var/startup_cancelled = FALSE
+	if(!bridge_startup)
+		if(GLOB.station_wake_sequence.active)
+			GLOB.station_wake_sequence.enabled_rooms |= src
+		for(var/obj/machinery/light/fixture in src)
+			if(fixture.bridge_startup_pending)
+				fixture.bridge_startup_pending = FALSE
+				startup_cancelled = TRUE
 	if(lightswitch != new_switch)
 		lightswitch = new_switch
 		for(var/obj/machinery/light_switch/L in src)
 			L.sync_state()
 		update_icon()
+		power_change()
+	else if(startup_cancelled)
 		power_change()
 
 /area/proc/set_emergency_lighting(var/enable)
@@ -305,4 +315,3 @@ var/list/mob/living/forced_ambiance_list = new
 
 /area/proc/has_turfs()
 	return !!(locate(/turf) in src)
-

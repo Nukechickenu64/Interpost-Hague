@@ -263,8 +263,8 @@
 	if(!HH)
 		if(player && player.current && istype(player.current, /mob/living/carbon/human))
 			HH = player.current
-	if(HH && HH.religion != LEGAL_RELIGION)
-		log_debug("[player.key] was selected for [role_text] by lottery, but they are not of the legal religion.")
+	if(HH && is_cult_religion(HH.religion) && get_cult_by_religion(HH.religion) != src)
+		log_debug("[player.key] was selected for [role_text] by lottery, but they already follow [HH.religion].")
 		return 0
 
 	pending_antagonists |= player

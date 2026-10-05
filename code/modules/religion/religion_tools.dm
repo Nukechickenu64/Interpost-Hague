@@ -2,7 +2,7 @@
 //The brander
 /obj/item/weapon/brander
 	name = "branding device"
-	desc = "A special baton, heated red hot by electricity for branding heretics, and other criminals. Activate it to select the brand."
+	desc = "A special baton, heated red hot by electricity for branding Nar-Sie cultists and other criminals. Activate it to select the brand."
 	icon_state = "brander"
 	item_state = "baton"
 	var/brand = "HERETIC"

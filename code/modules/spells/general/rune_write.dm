@@ -13,6 +13,24 @@
 	hud_state = "const_rune"
 
 	smoke_amt = 1
+	var/scribing = FALSE
+	var/rune_created = FALSE
+
+/spell/rune_write/perform(mob/user = usr, skipcharge = 0)
+	if(scribing)
+		to_chat(user, "<span class='warning'>You are already choosing or scribing a rune.</span>")
+		return
+	if(!holder)
+		holder = user
+	if(!cast_check(skipcharge, user))
+		return
+	scribing = TRUE
+	rune_created = FALSE
+	// The menu and material checks happen inside cast(); only completed runes spend charge.
+	. = ..(user, TRUE)
+	if(rune_created)
+		take_charge(user, skipcharge)
+	scribing = FALSE
 
 /spell/rune_write/choose_targets(mob/user = usr)
 	return list(user)
@@ -20,7 +38,8 @@
 /spell/rune_write/cast(null, mob/user = usr)
 	if(!user)
 		return
-	if(!iscultist(user))
+	var/datum/antagonist/cultist/cult = get_cult(user)
+	if(!cult)
 		to_chat(user, "<span class='warning'>The forbidden knowledge eludes you.</span>")
 		return
 	// Need a sharp implement in either hand
@@ -52,7 +71,7 @@
 		"Tear Reality" = /obj/effect/rune/tearreality,
 		"Weapon" = /obj/effect/rune/weapon,
 		"Shell" = /obj/effect/rune/shell,
-		"Imbue" = /obj/effect/rune/imbue
+		"Imbue" = /obj/effect/rune/imbue/emp
 	)
 
 	var/choice = input(user, "Choose a rune to scribe (requires cult tome in inventory unless summoning one)", "Rune Scribing") as null|anything in choices
@@ -67,6 +86,8 @@
 	if(choice != "Summon Tome")
 		var/has_tome = 0
 		for(var/obj/item/book/tome/T in user.contents)
+			if(T.religion_name != cult.religion_name)
+				continue
 			has_tome = 1; break
 		if(!has_tome)
 			to_chat(user, "<span class='warning'>You need your cult tome on you to recall the words for that rune.</span>")
@@ -110,6 +131,9 @@
 	if(!do_after(user, delay, T))
 		to_chat(user, "<span class='warning'>Your concentration breaks and the carving fails.</span>")
 		return
+	if(!same_cult(user, cult) || get_turf(user) != T || T.holy || user.incapacitated() || !(tool_or_weapon in list(user.get_active_hand(), user.get_inactive_hand())) || (locate(/obj/effect/rune) in T))
+		to_chat(user, "<span class='warning'>You can no longer complete this ritual here.</span>")
+		return
 
 	// Determine blood cost per rune, then pay it as the carving completes.
 	// Costs aligned roughly with make_rune() defaults.
@@ -132,8 +156,9 @@
 	// Pay the blood cost using existing ritual helpers.
 	user.pay_for_rune(blood_cost)
 
-	var/obj/effect/rune/R = new path(T)
+	var/obj/effect/rune/R = new path(T, user.get_rune_color(), user.get_blood_name(), cult)
 	if(R)
+		rune_created = TRUE
 		var/area/A = get_area(T)
 		log_and_message_admins("inscribed a [choice] rune at [A?.name] - [T.x]-[T.y]-[T.z] (blood cost [blood_cost]).", user)
 		to_chat(user, "<span class='cult'>The blood takes shape as the rune forms.</span>")

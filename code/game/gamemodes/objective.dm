@@ -791,6 +791,13 @@ var/global/list/all_objectives = list()
 		return 1
 	return 0
 
+/datum/objective/cult
+	var/datum/antagonist/cultist/cult
+
+/datum/objective/cult/New(text, datum/antagonist/cultist/owning_cult = null)
+	cult = owning_cult ? owning_cult : GLOB.cult
+	..(text)
+
 /datum/objective/cult/survive
 	explanation_text = "Our knowledge must live on."
 	target_amount = 5
@@ -801,23 +808,27 @@ var/global/list/all_objectives = list()
 
 /datum/objective/cult/survive/check_completion()
 	var/acolytes_survived = 0
-	if(!GLOB.cult)
+	if(!cult)
 		return 0
-	for(var/datum/mind/cult_mind in GLOB.cult.current_antagonists)
+	for(var/datum/mind/cult_mind in cult.current_antagonists)
 		if (cult_mind.current && cult_mind.current.stat!=2)
 			var/area/A = get_area(cult_mind.current )
 			if (is_type_in_list(A, GLOB.using_map.post_round_safe_areas))
 				acolytes_survived++
-	if(acolytes_survived >= target_amount)
-		return 0
-	else
-		return 1
+	return acolytes_survived >= target_amount
 
 /datum/objective/cult/eldergod
 	explanation_text = "Summon Nar-Sie via the use of the appropriate rune (Hell join self). It will only work if nine cultists stand on and around it. The convert rune is join blood self."
 
+/datum/objective/cult/eldergod/New()
+	..()
+	explanation_text = "Summon [cult.entity_name] with a Tear Reality rune and members of [cult.religion_name]. Rival cultists do not count toward the ritual."
+
 /datum/objective/cult/eldergod/check_completion()
-	return (locate(/obj/singularity/narsie/large) in SSmachines.machinery)
+	for(var/obj/singularity/narsie/large/deity in narsie_list)
+		if(deity.cult == cult && deity.type == cult.deity_type)
+			return TRUE
+	return FALSE
 
 /datum/objective/cult/sacrifice
 	explanation_text = "Conduct a ritual sacrifice for the glory of Nar-Sie."
@@ -826,14 +837,14 @@ var/global/list/all_objectives = list()
 	var/list/possible_targets = list()
 	if(!possible_targets.len)
 		for(var/mob/living/carbon/human/player in GLOB.player_list)
-			if(player.mind && !(player.mind in GLOB.cult.current_antagonists))
+			if(player.mind && !(player.mind in cult.current_antagonists))
 				possible_targets += player.mind
 	if(possible_targets.len > 0)
 		target = pick(possible_targets)
 	if(target) explanation_text = "Sacrifice [target.name], the [target.assigned_role]. You will need the sacrifice rune (Hell blood join) and three acolytes to do so."
 
 /datum/objective/cult/sacrifice/check_completion()
-	return (target && GLOB.cult && !GLOB.cult.sacrificed.Find(target))
+	return target && cult && (target in cult.sacrificed)
 
 /datum/objective/rev/find_target()
 	..()
@@ -885,6 +896,6 @@ var/global/list/all_objectives = list()
 			return 1
 
 		for(var/mob/living/carbon/human/H in world)
-			if(H.religion == LEGAL_RELIGION && H.stat == 2)
+			if(H.religion_is_legal() && H.stat == 2)
 				return 1
 		return 0

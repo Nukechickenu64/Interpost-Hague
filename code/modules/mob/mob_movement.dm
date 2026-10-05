@@ -13,6 +13,11 @@
 	if(client)
 		client.move_delay = max(world.time + timeout, client.move_delay)
 
+/mob/proc/get_move_intent_delay()
+	if(m_intent == "walk")
+		return 7 + config.walk_speed
+	return 1 + config.run_speed
+
 /client/North()
 	..()
 
@@ -193,7 +198,7 @@
 		if(istype(ghost) && ghost.pain_possession_object)
 			if(world.time < move_delay)
 				return
-			move_delay = world.time + (mob.m_intent == "walk" ? 7 + config.walk_speed : 1 + config.run_speed)
+			move_delay = world.time + mob.get_move_intent_delay()
 			if(ghost.pain_possession_object.anchored || !prob(5))
 				return
 			var/turf/next_turf = get_step(ghost.pain_possession_object, direct)
@@ -221,7 +226,7 @@
 	if(mob.incorporeal_move && isobserver(mob))
 		if(world.time < move_delay)
 			return
-		move_delay = world.time + (mob.m_intent == "walk" ? 7 + config.walk_speed : 1 + config.run_speed)
+		move_delay = world.time + mob.get_move_intent_delay()
 		Process_Incorpmove(direct)
 		return
 
@@ -301,15 +306,9 @@
 			to_chat(src, "<span class='notice'>You're pinned to a wall by [mob.pinned[1]]!</span>")
 			return 0
 
-		move_delay = world.time//set move delay
-
-		switch(mob.m_intent)
-			if("run")
-				if(mob.drowsyness > 0)
-					move_delay += 6
-				move_delay += 1+config.run_speed
-			if("walk")
-				move_delay += 7+config.walk_speed
+		move_delay = world.time + mob.get_move_intent_delay()
+		if(mob.m_intent == "run" && mob.drowsyness > 0)
+			move_delay += 6
 		move_delay += mob.movement_delay()
 
 		if(istype(mob.buckled, /obj/vehicle))
@@ -413,6 +412,8 @@
 	return
 
 /mob/proc/SelfMove(turf/n, direct)
+	if(client && updating_glide_size)
+		set_glide_size(DELAY_TO_GLIDE_SIZE(client.move_delay - world.time))
 	return Move(n, direct)
 
 

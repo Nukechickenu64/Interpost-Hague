@@ -71,6 +71,7 @@
 	//queue_ao(FALSE)
 
 /turf/Destroy()
+	QDEL_NULL(liquids)
 	remove_cleanables()
 
 	fluid_update()

@@ -382,7 +382,7 @@ var/global/list/additional_antag_types = list()
 
 	var/list/all_antag_types = GLOB.all_antag_types_
 	var/datum/antagonist/antag_template = all_antag_types[antag_id]
-	if(!antag_template)
+	if(!antag_template || !is_antagonist_enabled(antag_id))
 		return candidates
 
 	// If this is being called post-roundstart then it doesn't care about ready status.

@@ -8,7 +8,7 @@
 // X  X  X
 // X  X  X
 /obj/old_god_shrine
-	name = "Old God Shrine"
+	name = "Old God shrine"
 	icon = 'icons/obj/religion.dmi'
 	icon_state = "woodcross"
 	density = 1
@@ -16,38 +16,64 @@
 	var/datum/religion/shrine_religion = null
 	var/toughness = 5 //sorta fragile
 	var/sounds = list('sound/hallucinations/behind_you1.ogg', 'sound/hallucinations/behind_you2.ogg', 'sound/hallucinations/growl1.ogg','sound/hallucinations/turn_around2.ogg')
+	var/area/claimed_area
 
 
 /obj/old_god_shrine/New()
-	var/turf/T = get_area(src)
+	..()
 	var/area/A = get_area(src)
-	if(findtext(T.name,"Chapel"))
+	if(!istype(shrine_religion))
+		shrine_religion = GLOB.all_religions[shrine_religion]
+	if(!A || findtext(A.name,"Chapel"))
 		anim(get_turf(src), src, 'icons/effects/effects.dmi', "fire",null,20,null)
 		qdel(src)
 		return
-	shrine_religion = GLOB.all_religions[shrine_religion]
+	if(!shrine_religion)
+		log_debug("Old God shrine [type] has no registered religion.")
+		qdel(src)
+		return
 	shrine_religion.favor -= 30
 	near_camera()
 	shrine_religion.claim_territory(A,shrine_religion.name)
+	claimed_area = A
+	GLOB.old_god_shrines |= src
 	log_and_message_admins("created \an [src.name] rune at \the [A.name] - [loc.x]-[loc.y]-[loc.z].")
 	return
 
 //Used when someone breaks a shrine
 /obj/old_god_shrine/proc/destroy()
-	shrine_religion.lose_territory(get_area(src), shrine_religion.name)
 	qdel(src)
+
+/obj/old_god_shrine/Destroy()
+	GLOB.old_god_shrines -= src
+	if(istype(shrine_religion) && claimed_area)
+		var/another_shrine = FALSE
+		for(var/obj/old_god_shrine/shrine in GLOB.old_god_shrines)
+			if(shrine.claimed_area == claimed_area && shrine.shrine_religion == shrine_religion && !QDELETED(shrine))
+				another_shrine = TRUE
+				break
+		if(!another_shrine)
+			shrine_religion.lose_territory(claimed_area, shrine_religion.name)
+	claimed_area = null
+	return ..()
+
+/obj/old_god_shrine/examine(mob/user)
+	. = ..()
+	if(isliving(user) && shrine_religion && shrine_religion.can_use_magic(user))
+		shrine_religion.show_rituals(user)
 
 /obj/old_god_shrine/attackby(obj/item/W as obj, var/mob/living/user)
 	//If you attack it with your holy_item, it just disapears
 	var/datum/religion/rel = null
 	if(islist(GLOB.all_religions))
 		rel = GLOB.all_religions[shrine_religion.name]
-	var/holy_item_type = rel ? rel.vars["holy_item"] : null
-	if(ispath(holy_item_type) && (W.type == holy_item_type))
+	var/holy_item_type = rel ? rel.holy_item : null
+	if(rel && rel.can_use_magic(user) && ispath(holy_item_type) && istype(W, holy_item_type))
 		visible_message("<span class='warning'><b>[user] waves their [W] and the shrine dissolves into mist!</b></span>")
 		playsound(loc, pick(GLOB.rustle_sound), 50, 1, -1)
 		shrine_religion.favor += 30
 		destroy()
+		return
 	playsound(src.loc, pick(sounds), 100, 1)
 	if(W.damtype == BRUTE || W.damtype == BURN)
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
@@ -79,11 +105,13 @@
 //  It looks up all spells with your God's tag, and then checks the requirments.  If you meet them, runs the spell's
 /obj/old_god_shrine/hear_talk(mob/living/M as mob, msg, var/verb="says", datum/language/speaking=null)
 	//Hopefully this will cut down on it this being called lots of times
-	if(M.religion == LEGAL_RELIGION)
+	if(!istype(shrine_religion) || !shrine_religion.can_use_magic(M))
 		return
 	for(var/S in GLOB.all_spells)
-		var/datum/spell_datum = GLOB.all_spells[S]
-		var/phrase = spell_datum ? spell_datum.vars["phrase"] : null
+		var/datum/old_god_spell/spell_datum = GLOB.all_spells[S]
+		if(!spell_datum || spell_datum.old_god != shrine_religion.name)
+			continue
+		var/phrase = spell_datum.phrase
 		if(phrase && findtext(msg, phrase))
 			var/datum/old_god_spell/selected_spell = spell_datum
 			var/list/spell_components = list()
@@ -91,7 +119,8 @@
 				// First check if it's empty
 				var/found = FALSE
 				//get turf contents
-				for(var/obj/a in get_step(src, DIRECTION_TO_VAL(direction)).contents)
+				var/turf/component_turf = get_step(src, DIRECTION_TO_VAL(direction))
+				for(var/obj/a in component_turf)
 					if(istype(a, selected_spell.requirments[direction]))
 						found = TRUE
 						spell_components[direction] = a
@@ -103,5 +132,19 @@
 					return
 			visible_message("<span class='notice'>The shrine responds to your words, and pulses with unholy power.</span>")
 			playsound(loc, "sound/effects/ghost.ogg", 50, 1, -1)
-			selected_spell.spell_consume(spell_components)
 			selected_spell.spell_effect(M,spell_components)
+			selected_spell.spell_consume(spell_components)
+
+/obj/old_god_shrine/narsie
+	name = "Nar-Sie cult shrine"
+	shrine_religion = NARSIE_RELIGION
+
+/obj/old_god_shrine/kharin
+	name = "Kha'Rin cult shrine"
+	shrine_religion = KHARIN_RELIGION
+	color = "#ff6600"
+
+/obj/old_god_shrine/reaper
+	name = "Mortality cult shrine"
+	shrine_religion = REAPER_RELIGION
+	color = "#800020"

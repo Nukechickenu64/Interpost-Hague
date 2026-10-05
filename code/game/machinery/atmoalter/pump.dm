@@ -71,21 +71,26 @@
 		else
 			environment = loc.return_air()
 
-		var/pressure_delta
-		var/output_volume
-		var/air_temperature
-		if(direction_out)
-			pressure_delta = target_pressure - environment.return_pressure()
-			output_volume = environment.volume * environment.group_multiplier
-			air_temperature = environment.temperature? environment.temperature : air_contents.temperature
+		var/transfer_moles = 0
+		if(!holding)
+			var/amount_delta = direction_out ? PRESSURE_TO_MOLES(target_pressure) - environment.get_tile_moles() : environment.get_tile_moles() - PRESSURE_TO_MOLES(target_pressure)
+			transfer_moles = max(0, amount_delta) * environment.volume * environment.group_multiplier / CELL_VOLUME
 		else
-			pressure_delta = environment.return_pressure() - target_pressure
-			output_volume = air_contents.volume * air_contents.group_multiplier
-			air_temperature = air_contents.temperature? air_contents.temperature : environment.temperature
+			var/pressure_delta
+			var/output_volume
+			var/air_temperature
+			if(direction_out)
+				pressure_delta = target_pressure - environment.return_pressure()
+				output_volume = environment.volume * environment.group_multiplier
+				air_temperature = environment.temperature ? environment.temperature : air_contents.temperature
+			else
+				pressure_delta = environment.return_pressure() - target_pressure
+				output_volume = air_contents.volume * air_contents.group_multiplier
+				air_temperature = air_contents.temperature ? air_contents.temperature : environment.temperature
+			if(air_temperature > 0)
+				transfer_moles = max(0, pressure_delta)*output_volume/(air_temperature * R_IDEAL_GAS_EQUATION)
 
-		var/transfer_moles = pressure_delta*output_volume/(air_temperature * R_IDEAL_GAS_EQUATION)
-
-		if (pressure_delta > 0.01)
+		if(transfer_moles >= MINIMUM_MOLES_TO_PUMP)
 			if (direction_out)
 				power_draw = pump_gas(src, air_contents, environment, transfer_moles, power_rating)
 			else
@@ -126,10 +131,12 @@
 	data["portConnected"] = connected_port ? 1 : 0
 	data["tankPressure"] = round(air_contents.return_pressure() > 0 ? air_contents.return_pressure() : 0)
 	data["tankPercent"] = gas_remaining_percent()
-	data["targetpressure"] = round(target_pressure)
+	data["targetpressure"] = round(holding ? target_pressure : PRESSURE_TO_MOLES(target_pressure), 0.1)
+	data["targetUnits"] = holding ? "kPa" : "mol/tile"
+	data["targetLabel"] = holding ? "Target Pressure" : "Target Gas Amount"
 	data["pump_dir"] = direction_out
-	data["minpressure"] = round(pressuremin)
-	data["maxpressure"] = round(pressuremax)
+	data["minpressure"] = round(holding ? pressuremin : PRESSURE_TO_MOLES(pressuremin), 0.1)
+	data["maxpressure"] = round(holding ? pressuremax : PRESSURE_TO_MOLES(pressuremax), 0.1)
 	data["powerDraw"] = round(last_power_draw)
 	data["cellCharge"] = cell ? cell.charge : 0
 	data["cellMaxCharge"] = cell ? cell.maxcharge : 1
@@ -160,6 +167,8 @@
 		. = TOPIC_REFRESH
 	if (href_list["pressure_adj"])
 		var/diff = text2num(href_list["pressure_adj"])
+		if(!holding)
+			diff *= ONE_ATMOSPHERE / MOLES_CELLSTANDARD
 		target_pressure = min(10*ONE_ATMOSPHERE, max(0, target_pressure+diff))
 		. = TOPIC_REFRESH
 

@@ -32,6 +32,21 @@
 /obj/screen/inventory
 	var/slot_id	//The indentifier for the slot. It has nothing to do with ID cards.
 	var/list/object_overlays = list() // Required for inventory/screen overlays.
+	var/occupied = FALSE
+	var/unoccupied_color
+
+/obj/screen/inventory/proc/update_occupancy(obj/item/item)
+	var/new_occupied = !!item
+	if(occupied == new_occupied)
+		return
+	occupied = new_occupied
+	if(occupied)
+		unoccupied_color = color
+		animate(src, color = "#444444", time = 1, loop = -1)
+		animate(color = unoccupied_color, time = 1, loop = -1)
+	else
+		animate(src)
+		color = unoccupied_color
 
 /obj/screen/close
 	name = "close"
@@ -89,82 +104,102 @@
 	var/mob/living/carbon/C = usr
 	C.print_happiness(C)
 
+// Ported from OpenSourceWeb: one 32x64 selector, so icon-y spans the whole doll (1-64).
 /obj/screen/zone_sel
 	name = "damage zone"
 	icon_state = "zone_sel"
 	screen_loc = ui_zonesel
 	var/selecting = BP_CHEST
 
-/obj/screen/zone_sel/Click(location, control,params)
-	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
+/obj/screen/zone_sel/Click(location, control, params)
 	var/list/PL = params2list(params)
 	var/icon_x = text2num(PL["icon-x"])
 	var/icon_y = text2num(PL["icon-y"])
 	var/old_selecting = selecting //We're only going to update_icon() if there's been a change
-	//var/old_src_aim = src_aim
 
-	switch(icon_y)
-		if(5 to 8) //Feet
-			switch(icon_x)
-				if(7 to 15)
-					selecting = BP_R_FOOT
-				if(18 to 26)
-					selecting = BP_L_FOOT
-				else
-					return 1
-		if(9 to 27) //Legs
-			switch(icon_x)
-				if(10 to 16)
-					selecting = BP_R_LEG
-				if(18 to 23)
-					selecting = BP_L_LEG
-				else
-					return 1
-		if(28 to 34) //Hands and groin
-			switch(icon_x)
-				if(4 to 8)
-					selecting = BP_R_HAND
-				if(12 to 21)
-					selecting = BP_GROIN
-				if(24 to 29)
-					selecting = BP_L_HAND
-				else
-					return 1
-		if(31 to 49) //Chest and arms to shoulders
-			switch(icon_x)
-				if(7 to 11)
-					selecting = BP_R_ARM
-				if(12 to 21)
-					selecting = BP_CHEST
-				if(22 to 26)
-					selecting = BP_L_ARM
-				else
-					return 1
-
-		if(50 to 52)//Neck
-			switch(icon_x)
-				if(14 to 19)
-					selecting = BP_THROAT
-
-		if(53 to 60) //Head, but we need to check for eye or mouth
-			switch(icon_x)
-				if(10 to 23)
-					selecting = BP_HEAD
-		if(69 to 72)
-			switch(icon_x)
-				if(13 to 20)
-					selecting = BP_MOUTH
-
-		if(77 to 81)
-			switch(icon_x)
-				if(11 to 22)
-					selecting = BP_EYES
-
+	if(PL["right"])
+		selecting = pick(BP_R_FOOT, BP_L_FOOT, BP_R_LEG, BP_L_LEG, BP_GROIN, BP_R_HAND, BP_L_HAND, BP_VITALS, BP_THROAT, BP_CHEST, BP_R_ARM, BP_L_ARM, BP_MOUTH, BP_FACE, BP_EYES, BP_HEAD)
+	else
+		switch(icon_y)
+			if(1 to 7) //Feet
+				switch(icon_x)
+					if(1 to 16)
+						selecting = BP_R_FOOT
+					if(17 to 32)
+						selecting = BP_L_FOOT
+					else
+						return TRUE
+			if(8 to 18) //Legs
+				switch(icon_x)
+					if(1 to 16)
+						selecting = BP_R_LEG
+					if(17 to 32)
+						selecting = BP_L_LEG
+					else
+						return TRUE
+			if(19 to 22) //Legs and groin
+				switch(icon_x)
+					if(1 to 11)
+						selecting = BP_R_LEG
+					if(12 to 22)
+						selecting = BP_GROIN
+					if(23 to 32)
+						selecting = BP_L_LEG
+					else
+						return TRUE
+			if(23 to 25) //Hands and groin/vitals
+				switch(icon_x)
+					if(2 to 11)
+						selecting = BP_R_HAND
+					if(12 to 22)
+						selecting = (icon_y == 23) ? BP_GROIN : BP_VITALS
+					if(23 to 31)
+						selecting = BP_L_HAND
+					else
+						return TRUE
+			if(26 to 32) //Hands and vitals
+				switch(icon_x)
+					if(2 to 11)
+						selecting = BP_R_HAND
+					if(12 to 22)
+						selecting = BP_VITALS
+					if(23 to 31)
+						selecting = BP_L_HAND
+					else
+						return TRUE
+			if(33 to 44) //Chest and arms to shoulders
+				switch(icon_x)
+					if(4 to 10)
+						selecting = BP_R_ARM
+					if(11 to 22)
+						selecting = BP_CHEST
+					if(23 to 29)
+						selecting = BP_L_ARM
+					else
+						return TRUE
+			if(45 to 64) //Throat, face, mouth, eyes, head
+				switch(icon_x)
+					if(11 to 22)
+						selecting = BP_FACE
+						switch(icon_y)
+							if(45 to 48)
+								if(icon_x >= 13 && icon_x <= 20)
+									selecting = BP_THROAT
+							if(49 to 51)
+								if(icon_x >= 13 && icon_x <= 20)
+									selecting = BP_MOUTH
+							if(53 to 55)
+								if((icon_x >= 14 && icon_x <= 15) || (icon_x >= 18 && icon_x <= 19))
+									selecting = BP_EYES
+							if(56 to 61)
+								selecting = BP_HEAD
+					else
+						return TRUE
 
 	if(old_selecting != selecting)
 		update_icon()
-	playsound(usr, pick(clicksound), 30, 0)
-	return 1
+		playsound(usr, pick('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg'), 30, 0)
+	return TRUE
 
 /obj/screen/zone_sel/proc/set_selected_zone(bodypart)
 	var/old_selecting = selecting
@@ -174,17 +209,21 @@
 
 /obj/screen/zone_sel/update_icon()
 	overlays.Cut()
-	overlays += image('icons/mob/zone_sel_newer.dmi', "[selecting]")
-
-/*
-/obj/screen/zone_sel/update_icon()
-	overlays.Cut()
-	overlays += image('icons/mob/zone_sel.dmi', "[selecting]")
-*/
+	if(icon != 'icons/mob/screen/zone_sel_osw.dmi')
+		overlays += image('icons/mob/zone_sel.dmi', "[selecting]")
+		return
+	switch(selecting)
+		if(BP_EYES)
+			overlays += image(icon, "right eye")
+			overlays += image(icon, "left eye")
+		if(BP_BELLY)
+			overlays += image(icon, "vitals")
+		else
+			overlays += image(icon, "[selecting]")
 /obj/screen/intent
 	name = "intent"
 	//icon = 'icons/mob/screen/dark.dmi'
-	icon_state = "intent_help"
+	icon_state = "intent1"
 	screen_loc = ui_drop_throw//ui_acti
 	var/intent = I_HELP
 
@@ -194,70 +233,141 @@
 	var/icon_x = text2num(P["icon-x"])
 	var/icon_y = text2num(P["icon-y"])
 	playsound(usr, pick(clicksound), 30, 0)
-	intent = I_GRAB
+	intent = I_DISARM
 	if(icon_x <= world.icon_size/2)
 		if(icon_y <= world.icon_size/2)
 			intent = I_HELP
 		else
 			intent = I_HURT
 	else if(icon_y <= world.icon_size/2)
-		intent = I_DISARM
+		intent = I_GRAB
 	update_icon()
 	usr.a_intent = intent
 
 /obj/screen/intent/update_icon()
-	icon_state = "intent_[intent]"
+	if(icon == 'icons/mob/screen/os13.dmi')
+		switch(intent)
+			if(I_HELP)
+				icon_state = "intent1"
+			if(I_DISARM)
+				icon_state = "intent3"
+			if(I_GRAB)
+				icon_state = "intent2"
+			if(I_HURT)
+				icon_state = "intent4"
+	else
+		icon_state = "intent_[intent]"
 
 /obj/screen/combat
 	name = "Combat Intent"
-	icon = 'icons/mob/screen/dark.dmi'
+	icon = 'icons/mob/screen/os13.dmi'
 	icon_state = "aim"
 	screen_loc = ui_atk_intents
 	var/intent = I_STRONG
 
 /obj/screen/combat/Click(var/location, var/control, var/params)
+	if(!usr || !usr.hud_used || !usr.hud_used.combat_intent_popup)
+		return 1
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
+	playsound(usr, pick(clicksound), 30, 0)
+	var/obj/screen/combat_popup/popup = usr.hud_used.combat_intent_popup
+	popup.screen_loc = popup.screen_loc ? null : ui_os13_combat_popup
+	return 1
+
+
+/obj/screen/combat/update_icon()
+	if(icon == 'icons/mob/screen/os13.dmi')
+		switch(intent)
+			if(I_AIM)
+				icon_state = "aimed"
+			if(I_STRONG)
+				icon_state = "max_st"
+			if(I_DEFEND)
+				icon_state = "defend"
+			if(I_QUICK)
+				icon_state = "fury"
+			if(I_WEAK)
+				icon_state = "min_st"
+			if(I_GUARD)
+				icon_state = "guard"
+			if(I_DUAL)
+				icon_state = "dual"
+			if(I_FEINT)
+				icon_state = "feint"
+	else
+		icon_state = "[intent]"
+
+/obj/screen/combat_popup
+	name = "combat popup"
+	icon = 'icons/mob/screen/screen2.dmi'
+	icon_state = "cstyle2"
+	screen_loc = null
+	layer = HUD_ABOVE_HUD_LAYER
+
+/obj/screen/combat_popup/Click(var/location, var/control, var/params)
+	if(!ishuman(usr) || !usr.hud_used || !usr.hud_used.combat_intent_button)
+		return 1
+	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
+	var/list/P = params2list(params)
+	var/icon_x = text2num(P["icon-x"])
+	var/icon_y = text2num(P["icon-y"])
+	if(icon_x < 33 || icon_x > 62)
+		return 1
+	var/selected_intent
+	switch(icon_y)
+		if(55 to 64)
+			selected_intent = I_WEAK
+		if(48 to 54)
+			selected_intent = I_AIM
+		if(40 to 47)
+			selected_intent = I_QUICK
+		if(33 to 39)
+			selected_intent = I_STRONG
+		if(25 to 32)
+			selected_intent = I_DEFEND
+		if(18 to 24)
+			selected_intent = I_GUARD
+		if(9 to 17)
+			selected_intent = I_DUAL
+		if(1 to 8)
+			selected_intent = I_FEINT
+	if(!selected_intent)
+		return 1
+	playsound(usr, pick(clicksound), 30, 0)
+	var/mob/living/carbon/human/H = usr
+	H.c_intent = selected_intent
+	var/obj/screen/combat/button = H.hud_used.combat_intent_button
+	button.intent = selected_intent
+	button.update_icon()
+	screen_loc = null
+	return 1
+
+/obj/screen/skills_family
+	name = "cutebuttons"
+	icon = 'icons/mob/screen/os13.dmi'
+	icon_state = "cutebuttons"
+	screen_loc = ui_skills_family//ui_acti
+	layer = HUD_ABOVE_HUD_LAYER
+
+/obj/screen/skills_family/Click(var/location, var/control, var/params)
 	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	var/list/P = params2list(params)
 	var/icon_x = text2num(P["icon-x"])
 	var/icon_y = text2num(P["icon-y"])
 	playsound(usr, pick(clicksound), 30, 0)
-	intent = I_STRONG
-	if(icon_x <= world.icon_size/2)
-		if(icon_y <= world.icon_size/2)
-			intent = I_DEFEND
+	if(!ishuman(usr))
+		return 1
+	var/mob/living/carbon/human/H = usr
+	if(icon_y > world.icon_size/2)
+		if(icon_x <= world.icon_size/2)
+			H.open_craft_menu()
 		else
-			intent = I_AIM
-	else if(icon_y <= world.icon_size/2)
-		intent = I_QUICK
-	update_icon()
-	usr.c_intent = intent
-
-/obj/screen/combat/update_icon()
-	icon_state = "[intent]"
-
-/obj/screen/skills_family
-	name = "skills_family"
-	icon = 'icons/mob/screen/dark.dmi'
-	icon_state = "skills_family"
-	screen_loc = ui_skills_family//ui_acti
-
-/obj/screen/skills_family/Click(var/location, var/control, var/params)
-	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
-	var/list/P = params2list(params)
-	if(P["right"])
-		if(ishuman(usr))
-			var/mob/living/carbon/human/H = usr
-			H.check_all_skills()
-		return
-	var/icon_y = text2num(P["icon-y"])
-	playsound(usr, pick(clicksound), 30, 0)
-	if(icon_y <= world.icon_size/2)
-		if(ishuman(usr))
-			var/mob/living/carbon/human/H = usr
-			H.check_skills()
-	else
-		if(ishuman(usr))
 			chat_crew_manifest()
+	else if(icon_x > world.icon_size/2)
+		usr << browse('html/help.html', "window=help")
+	else
+		H.check_skills()
+	return 1
 
 /obj/screen/Click(location, control, params)
 	if(!usr)	return 1
@@ -287,22 +397,53 @@
 				H.quick_equip()
 			playsound(usr, pick(clicksound), 30, 0)
 
+		if("moreactions")
+			if(!ishuman(usr))
+				return 1
+			var/mob/living/carbon/human/H = usr
+			var/icon_y = text2num(modifiers["icon-y"])
+			if(icon_y >= 23)
+				H.do_wield()
+			else if(icon_y >= 16)
+				H.lookup()
+			else if(icon_y >= 9)
+				H.hide()
+			else
+				var/turf/front = get_step(H, H.dir)
+				if(front)
+					H.ClickOn(front, "", H, H.client)
+			playsound(usr, pick(clicksound), 30, 0)
+
 		if("resist")
-			if(isliving(usr))
+			if(modifiers["right"])
+				if(ishuman(usr))
+					var/mob/living/carbon/human/H = usr
+					H.toggle_resisting = !H.toggle_resisting
+					src.icon_state = H.toggle_resisting ? "act_resist2" : "act_resist"
+			else if(isliving(usr))
 				var/mob/living/L = usr
 				L.resist()
 			playsound(usr, pick(clicksound), 30, 0)
 
 
-		if("mov_intent")
+		if("move_mode")
+			if(ishuman(usr))
+				var/mob/living/carbon/human/H = usr
+				H.m_intent = H.m_intent == "walk" ? "run" : "walk"
+				H.update_movement_hud()
 			playsound(usr, pick(clicksound), 30, 0)
-			switch(usr.m_intent)
-				if("run")
-					usr.m_intent = "walk"
-					usr.hud_used.move_intent.icon_state = "walking"
-				if("walk")
-					usr.m_intent = "run"
-					usr.hud_used.move_intent.icon_state = "running"
+
+		if("sprint")
+			if(ishuman(usr))
+				var/mob/living/carbon/human/H = usr
+				if(H.sprinting)
+					H.sprinting = FALSE
+				else if(H.m_intent == "run" && H.canmove && !H.resting)
+					H.sprinting = TRUE
+				else
+					to_chat(H, SPAN_NOTICE("You need to be able to move and set your intent to Run to sprint."))
+				H.update_movement_hud()
+			playsound(usr, pick(clicksound), 30, 0)
 
 		if("Reset Machine")
 			usr.unset_machine()
@@ -431,7 +572,12 @@
 
 		if("throw")
 			if(!usr.stat && isturf(usr.loc) && !usr.restrained())
-				usr:toggle_throw_mode()
+				var/icon_y = text2num(modifiers["icon-y"])
+				if(usr.throw_icon && usr.throw_icon.icon == 'icons/mob/screen/os13.dmi' && icon_y && icon_y <= world.icon_size/2)
+					if(usr.client)
+						usr.client.drop_item()
+				else
+					usr:toggle_throw_mode()
 				playsound(usr, pick(clicksound), 30, 0)
 		if("drop")
 			if(usr.client)
@@ -445,34 +591,39 @@
 				return
 			I.attempt_wield(HH)
 			playsound(usr, pick(clicksound), 30, 0)
-		if("kick")
-			playsound(usr, pick(clicksound), 30, 0)
-			if(usr.middle_click_intent == "kick")
-				usr.middle_click_intent = null
-				usr.kick_icon.icon_state = "kick"
+		if("actions1")
+			if(!ishuman(usr))
+				return 1
+			var/mob/living/carbon/human/H = usr
+			var/icon_y = text2num(modifiers["icon-y"])
+			var/new_intent
+			if(icon_y >= 23)
+				new_intent = "kick"
+			else if(icon_y >= 16 && icon_y <= 22)
+				new_intent = "steal"
+			else if(icon_y >= 9 && icon_y <= 15)
+				new_intent = "jump"
+			else if(icon_y >= 1 && icon_y <= 8)
+				new_intent = "bite"
 			else
-				usr.middle_click_intent = "kick"
-				usr.kick_icon.icon_state = "kick_on"
-				usr.jump_icon.icon_state = "jump"
-		if("jump")
-			playsound(usr, pick(clicksound), 30, 0)
-			if(usr.middle_click_intent == "jump")
-				usr.middle_click_intent = null
-				usr.jump_icon.icon_state = "jump"
+				return 1
+			if(H.middle_click_intent == new_intent)
+				H.middle_click_intent = null
+				H.kick_icon.icon_state = "actions"
 			else
-				usr.middle_click_intent = "jump"
-				usr.jump_icon.icon_state = "jump_on"
-				usr.kick_icon.icon_state = "kick"
+				H.middle_click_intent = new_intent
+				H.kick_icon.icon_state = "actions[new_intent]"
+			playsound(usr, pick(clicksound), 30, 0)
 		if("combat mode")
 			if(!ishuman(usr))	return
 			usr << 'sound/effects/ui_toggle.ogg'
 			var/mob/living/carbon/human/C = usr
 			if(C.combat_mode)
 				C.combat_mode = 0
-				C.combat_icon.icon_state = "combat0"
+				C.combat_icon.icon_state = "cmbt0"
 			else
 				C.combat_mode = 1
-				C.combat_icon.icon_state = "combat1"
+				C.combat_icon.icon_state = "cmbt1"
 
 		if("dodge intent")
 			if(ishuman(usr))
@@ -480,17 +631,30 @@
 				var/mob/living/carbon/human/E = usr
 				if(E.defense_intent == I_PARRY)
 					E.defense_intent = I_DODGE
-					E.dodge_intent_icon.icon_state = "dodge"
+					E.dodge_intent_icon.icon_state = "dodge1"
 				else
 					E.defense_intent = I_PARRY
-					E.dodge_intent_icon.icon_state = "parry"
+					E.dodge_intent_icon.icon_state = "dodge0"
 		if("fixeye")
 			usr.face_direction()
 			playsound(usr, pick(clicksound), 30, 0)
 			if(usr.facing_dir)
-				usr.fixeye.icon_state = "fixeye_on"
+				usr.fixeye.icon_state = "fixed_e1"
 			else
-				usr.fixeye.icon_state = "fixeye"
+				usr.fixeye.icon_state = "fixed_e0"
+		if("awake")
+			if(!ishuman(usr))
+				return 1
+			var/mob/living/carbon/human/H = usr
+			var/icon_y = text2num(modifiers["icon-y"])
+			if(icon_y in 12 to 21)
+				H.toggle_eye()
+			else if(icon_y in 22 to 32)
+				H.mob_sleep()
+			else
+				return 1
+			H.update_awake_hud()
+			playsound(usr, pick(clicksound), 30, 0)
 
 		if("mood")
 			playsound(usr, pick(clicksound), 30, 0)
@@ -550,7 +714,7 @@
 			return 0
 	return 1
 
-/obj/screen/inventory/Click()
+/obj/screen/inventory/Click(location, control, params)
 	// At this point in client Click() code we have passed the 1/10 sec check and little else
 	// We don't even know if it's a middle click
 	if(!usr.canClick())
@@ -559,6 +723,10 @@
 		return 1
 	if (istype(usr.loc,/obj/mecha)) // stops inventory actions in a mech
 		return 1
+	var/obj/item/grab/mouth/bite_grab = usr.get_equipped_item(slot_id)
+	if(istype(bite_grab))
+		if(bite_grab.handle_hud_click(usr, params))
+			return 1
 	switch(name)
 		if("r_hand")
 			if(iscarbon(usr))

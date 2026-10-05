@@ -19,7 +19,7 @@
 	force_danger = 1
 	restrains = 1
 
-	icon_state = "kill"
+	icon_state = "grabbed+1"
 
 	break_chance_table = list(3, 18, 45, 100)
 
@@ -28,8 +28,5 @@
 
 	affecting.drop_l_hand()
 	affecting.drop_r_hand()
-
-	if(affecting.lying)
-		affecting.Weaken(4)
-
+	affecting.Stun(3)
 	affecting.adjustOxyLoss(1)

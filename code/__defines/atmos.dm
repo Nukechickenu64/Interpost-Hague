@@ -1,6 +1,19 @@
 
 #define CELL_VOLUME        2500 // Liters in a cell.
 #define MOLES_CELLSTANDARD (ONE_ATMOSPHERE*CELL_VOLUME/(T20C*R_IDEAL_GAS_EQUATION)) // Moles in a 2.5 m^3 cell at 101.325 kPa and 20 C.
+#define PRESSURE_TO_MOLES(value) ((value) * MOLES_CELLSTANDARD / ONE_ATMOSPHERE) // Translate legacy device settings into fixed mol/tile limits.
+
+// Humans are only unharmed between the safe mol/tile limits.
+#define HUMAN_SAFE_AIR_MOLES_MIN   100
+#define HUMAN_SAFE_AIR_MOLES_MAX   110
+#define HUMAN_DANGER_AIR_MOLES_MIN 90
+#define HUMAN_DANGER_AIR_MOLES_MAX 120
+
+// Hypoxia per breath at full vacuum; oxygen deprivation is out of species.total_health.
+#define HYPOXIA_MAX_OXYLOSS          40
+#define HYPOXIA_MAX_BRAIN_DAMAGE     10
+#define HYPOXIA_BLACKOUT_OXYLOSS     50 // getOxyLoss() percentage
+#define HYPOXIA_BRAIN_DAMAGE_OXYLOSS 75 // getOxyLoss() percentage
 
 #define O2STANDARD 0.21 // Percentage.
 #define N2STANDARD 0.79

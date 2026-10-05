@@ -17,7 +17,7 @@
 	downgrade_on_action = 1
 	downgrade_on_move = 1
 
-	icon_state = "kill1"
+	icon_state = "grabbed+1"
 
 	break_chance_table = list(5, 20, 40, 80, 100)
 
@@ -26,12 +26,11 @@
 
 	affecting.drop_l_hand()
 	affecting.drop_r_hand()
-
-	if(affecting.lying)
-		affecting.Weaken(4)
+	affecting.Stun(3)
 
 	affecting.adjustOxyLoss(1)
 
 	affecting.apply_effect(STUTTER, 5) //It will hamper your voice, being choked and all.
-	affecting.Weaken(5)	//Should keep you down unless you get help.
+	if(affecting.lying)
+		affecting.Weaken(5)	//Should keep you down unless you get help.
 	affecting.losebreath = max(affecting.losebreath + 2, 3)

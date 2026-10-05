@@ -5,6 +5,18 @@
 */
 var/const/tk_maxrange = 15
 
+/mob/proc/can_use_telekinesis()
+	return TK in mutations
+
+/mob/proc/telekinesis_range()
+	return tk_maxrange
+
+/mob/proc/prepare_telekinesis(var/atom/target)
+	return TRUE
+
+/mob/proc/telekinetic_grab_type()
+	return /obj/item/tk_grab
+
 /*
 	Telekinetic attack:
 
@@ -31,17 +43,25 @@ var/const/tk_maxrange = 15
 		..()
 		return
 
-	var/obj/item/tk_grab/O = new(src)
-	user.put_in_active_hand(O)
+	var/grab_type = user.telekinetic_grab_type()
+	var/obj/item/tk_grab/O = new grab_type(src)
+	if(!user.put_in_active_hand(O))
+		qdel(O)
+		to_chat(user, "<span class='warning'>You cannot hold a telekinetic grip in that hand.</span>")
+		return
 	O.host = user
 	O.focus_object(src)
 	return
 
 /obj/item/attack_tk(mob/user)
 	if(user.stat || !isturf(loc)) return
-	if((TK in user.mutations) && !user.get_active_hand()) // both should already be true to get here
-		var/obj/item/tk_grab/O = new(src)
-		user.put_in_active_hand(O)
+	if(user.can_use_telekinesis() && !user.get_active_hand())
+		var/grab_type = user.telekinetic_grab_type()
+		var/obj/item/tk_grab/O = new grab_type(src)
+		if(!user.put_in_active_hand(O))
+			qdel(O)
+			to_chat(user, "<span class='warning'>You cannot hold a telekinetic grip in that hand.</span>")
+			return
 		O.host = user
 		O.focus_object(src)
 	else
@@ -101,20 +121,20 @@ var/const/tk_maxrange = 15
 	if(!host || host != user)
 		qdel(src)
 		return
-	if(!(TK in host.mutations))
+	if(!host.can_use_telekinesis())
 		qdel(src)
 		return
 	if(isobj(target) && !isturf(target.loc))
 		return
-
-	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 	var/d = get_dist(user, target)
 	if(focus)
 		d = max(d, get_dist(user, focus)) // whichever is further
-	if(d > tk_maxrange)
+	if(d > user.telekinesis_range())
 		to_chat(user, "<span class='notice'>Your mind won't reach that far.</span>")
 		return
-
+	if(!user.prepare_telekinesis(target))
+		return
+	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 	if(!focus)
 		focus_object(target, user)
 		return

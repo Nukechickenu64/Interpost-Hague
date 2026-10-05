@@ -72,13 +72,13 @@
 		return
 
 	var/limb_pain
-	for(var/limb_tag in list(BP_L_LEG, BP_R_LEG, BP_L_FOOT, BP_R_FOOT))
+	for(var/limb_tag in species.stance_limbs)
 		var/obj/item/organ/external/E = organs_by_name[limb_tag]
 		if(!E || !E.is_usable())
-			stance_damage += 2 // let it fail even if just foot&leg
+			stance_damage += 2 * species.stance_damage_multiplier // let it fail even if just foot&leg
 		else if (E.is_malfunctioning())
 			//malfunctioning only happens intermittently so treat it as a missing limb when it procs
-			stance_damage += 2
+			stance_damage += 2 * species.stance_damage_multiplier
 			if(prob(10))
 				visible_message("\The [src]'s [E.name] [pick("twitches", "shudders")] and sparks!")
 				var/datum/effect/effect/system/spark_spread/spark_system = new ()
@@ -89,9 +89,9 @@
 					qdel(spark_system)
 
 		else if(E.is_broken() || (E.get_pain() >= E.pain_disability_threshold))
-			stance_damage += 1
+			stance_damage += species.stance_damage_multiplier
 		else if (E.is_dislocated())
-			stance_damage += 0.5
+			stance_damage += 0.5 * species.stance_damage_multiplier
 
 		if(E) limb_pain = E.can_feel_pain()
 

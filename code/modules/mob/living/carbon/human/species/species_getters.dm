@@ -28,6 +28,15 @@
 /datum/species/proc/get_icobase(var/mob/living/carbon/human/H, var/get_deform)
 	return (get_deform ? deform : icobase)
 
+/datum/species/proc/get_limb_icon(var/obj/item/organ/external/limb, var/selected_icon)
+	return selected_icon
+
+/datum/species/proc/get_limb_icon_state(var/obj/item/organ/external/limb, var/selected_state)
+	return selected_state
+
+/datum/species/proc/process_limb_icon(var/obj/item/organ/external/limb, var/icon/limb_icon)
+	return limb_icon
+
 /datum/species/proc/get_station_variant()
 	return name
 

@@ -1,6 +1,9 @@
 // Dynamic State-Machine Framework – Tension & Catalyst System
 // Defines and constants for the AI Director Engine
 
+#ifndef DIRECTOR_DEFINES
+#define DIRECTOR_DEFINES
+
 // Tension meter thresholds (0-100 scale)
 #define TENSION_CALM        20
 #define TENSION_RISING      40
@@ -86,3 +89,5 @@
 #define DIRECTOR_MAX_ROUND_DURATION 2 HOURS
 #define DIRECTOR_IMPATIENCE_START   20 MINUTES
 #define DIRECTOR_MAX_TIME_PRESSURE  40
+
+#endif

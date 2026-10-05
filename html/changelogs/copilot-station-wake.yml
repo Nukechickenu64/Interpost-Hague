@@ -1,0 +1,5 @@
+author: Copilot
+delete-after: True
+changes:
+  - tweak: "Lights flicker only on loss of their electrical supply or when started by the bridge computer, not when a light switch is used."
+  - tweak: "WAKE STATION starts individual lights in sequence, then sets individual air alarm thermostats to 20C, with half a second between devices. Local light switches override queued startups."

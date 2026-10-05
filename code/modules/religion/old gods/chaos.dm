@@ -20,7 +20,7 @@
 						"SOUTH" = /obj/item/paper)
 	old_god = HASARD
 
-	spell_effect(var/mob/living/user, mob/living/carbon/C as mob, var/list/spell_components)
+	spell_effect(var/mob/living/user, var/list/spell_components)
 		var/obj/item/paper/target1_paper = spell_components["SOUTH"]
 		var/mob/living/carbon/human/target = get_player_from_paper(target1_paper)
 		if(!target)

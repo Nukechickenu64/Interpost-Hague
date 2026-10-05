@@ -41,8 +41,8 @@
 	path = /obj/item/weapon/shield_diffuser
 
 /datum/uplink_item/item/tools/suit_sensor_mobile
-	name = "Suit Sensor Jamming Device"
-	desc = "This device will affect suit sensor data using method and radius defined by the user."
+	name = "Medical Bracelet Jamming Device"
+	desc = "This device will affect medical bracelet data using method and radius defined by the user."
 	item_cost = 20
 	path = /obj/item/device/suit_sensor_jammer
 

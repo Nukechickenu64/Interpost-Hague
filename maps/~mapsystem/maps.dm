@@ -143,13 +143,22 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 		)
 
 	var/list/religion_choices = list(
+		"Atheism",
+		"Agnosticism",
+		"Deism",
 		"Unitarianism",
+		"Christianity",
+		"Islam",
+		"Judaism",
 		"Hinduism",
-		"Buddhist",
-		"Islamic",
-		"Christian",
-		"Agnostic",
-		"Deist"
+		"Buddhism",
+		"Deo Machina",
+		"Cult of Nar-Sie",
+		"Cult of Kha'Rin",
+		"Cult of Mortality",
+		"Jes, the Messiah",
+		"Judas",
+		"Hasard, the God of Chaos"
 		)
 
 	// List of /datum/department types to instantiate at roundstart.

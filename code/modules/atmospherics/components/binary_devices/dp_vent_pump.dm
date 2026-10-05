@@ -112,21 +112,17 @@
 
 	var/power_draw = -1
 
-	//Figure out the target pressure difference
-	var/pressure_delta = get_pressure_delta(environment)
+	var/transfer_moles = get_transfer_moles(environment)
 
-	if(pressure_delta > 0.5)
+	if(transfer_moles >= MINIMUM_MOLES_TO_PUMP)
 		if(pump_direction) //internal -> external
 			if (node1 && (environment.temperature || air1.temperature))
-				var/transfer_moles = calculate_transfer_moles(air1, environment, pressure_delta)
 				power_draw = pump_gas(src, air1, environment, transfer_moles, power_rating)
 
 				if(power_draw >= 0 && network1)
 					network1.update = 1
 		else //external -> internal
 			if (node2 && (environment.temperature || air2.temperature))
-				var/transfer_moles = calculate_transfer_moles(environment, air2, pressure_delta, (network2)? network2.volume : 0)
-
 				//limit flow rate from turfs
 				transfer_moles = min(transfer_moles, environment.total_moles*air2.volume/environment.volume)	//group_multiplier gets divided out here
 				power_draw = pump_gas(src, environment, air2, transfer_moles, power_rating)
@@ -140,22 +136,20 @@
 
 	return 1
 
-/obj/machinery/atmospherics/binary/dp_vent_pump/proc/get_pressure_delta(datum/gas_mixture/environment)
-	var/pressure_delta = DEFAULT_PRESSURE_DELTA
-	var/environment_pressure = environment.return_pressure()
-
-	if(pump_direction) //internal -> external
-		if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
-			pressure_delta = min(pressure_delta, external_pressure_bound - environment_pressure) //increasing the pressure here
-		if(pressure_checks & PRESSURE_CHECK_INPUT)
-			pressure_delta = min(pressure_delta, air1.return_pressure() - input_pressure_min) //decreasing the pressure here
-	else //external -> internal
-		if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
-			pressure_delta = min(pressure_delta, environment_pressure - external_pressure_bound) //decreasing the pressure here
-		if(pressure_checks & PRESSURE_CHECK_OUTPUT)
-			pressure_delta = min(pressure_delta, output_pressure_max - air2.return_pressure()) //increasing the pressure here
-
-	return pressure_delta
+/obj/machinery/atmospherics/binary/dp_vent_pump/proc/get_transfer_moles(datum/gas_mixture/environment)
+	var/transfer_moles = pump_direction ? air1.get_total_moles() : environment.get_total_moles()
+	if(pressure_checks & PRESSURE_CHECK_EXTERNAL)
+		var/moles_delta = PRESSURE_TO_MOLES(external_pressure_bound) - environment.get_tile_moles()
+		if(!pump_direction)
+			moles_delta = -moles_delta
+		transfer_moles = min(transfer_moles, max(0, moles_delta * environment.volume * environment.group_multiplier / CELL_VOLUME))
+	if(pump_direction && (pressure_checks & PRESSURE_CHECK_INPUT))
+		var/minimum_moles = air1.temperature > 0 ? input_pressure_min * air1.volume / (R_IDEAL_GAS_EQUATION * air1.temperature) : 0
+		transfer_moles = min(transfer_moles, max(0, air1.total_moles - minimum_moles))
+	else if(!pump_direction && (pressure_checks & PRESSURE_CHECK_OUTPUT))
+		var/pressure_delta = max(0, output_pressure_max - air2.return_pressure())
+		transfer_moles = min(transfer_moles, calculate_transfer_moles(environment, air2, pressure_delta, network2 ? network2.volume : 0))
+	return transfer_moles
 
 
 //Radio remote control

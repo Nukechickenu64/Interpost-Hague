@@ -6,6 +6,7 @@
 	var/list/valid_species = list()
 	var/list/valid_hairstyles = list()
 	var/list/valid_facial_hairstyles = list()
+	var/ui_type = /datum/nanoui
 
 	var/check_whitelist
 	var/list/whitelist
@@ -134,12 +135,16 @@
 
 	data["change_hair_color"] = can_change(APPEARANCE_HAIR_COLOR)
 	data["change_facial_hair_color"] = can_change(APPEARANCE_FACIAL_HAIR_COLOR)
+	data |= extra_appearance_data(user)
 	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
-		ui = new(user, src, ui_key, "appearance_changer.tmpl", "[src]", 800, 450, state = state)
+		ui = new ui_type(user, src, ui_key, "appearance_changer.tmpl", name, 800, 450, state = state)
 		ui.set_initial_data(data)
 		ui.open()
 		ui.set_auto_update(1)
+
+/datum/nano_module/appearance_changer/proc/extra_appearance_data(var/mob/user)
+	return list()
 
 /datum/nano_module/appearance_changer/proc/update_dna()
 	if(owner && (flags & APPEARANCE_UPDATE_DNA))
@@ -156,7 +161,7 @@
 
 /datum/nano_module/appearance_changer/proc/cut_and_generate_data()
 	// Making the assumption that the available species remain constant
-	valid_facial_hairstyles.Cut()
+	valid_hairstyles.Cut()
 	valid_facial_hairstyles.Cut()
 	generate_data()
 

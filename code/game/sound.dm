@@ -405,7 +405,7 @@ var/const/FALLOFF_SOUNDS = 0.5
 		else if (vary)
 			S.frequency = get_rand_frequency()
 
-	//sound volume falloff with pressure
+	// Sound volume falloff with gas amount.
 	var/pressure_factor = 1.0
 
 	var/turf/T = get_turf(src)
@@ -421,10 +421,10 @@ var/const/FALLOFF_SOUNDS = 0.5
 
 		if(use_pressure)
 			if (hearer_env && source_env)
-				var/pressure = min(hearer_env.return_pressure(), source_env.return_pressure())
+				var/tile_moles = min(hearer_env.get_tile_moles(), source_env.get_tile_moles())
 
-				if (pressure < ONE_ATMOSPHERE)
-					pressure_factor = max((pressure - SOUND_MINIMUM_PRESSURE)/(ONE_ATMOSPHERE - SOUND_MINIMUM_PRESSURE), 0)
+				if(tile_moles < MOLES_CELLSTANDARD)
+					pressure_factor = max((tile_moles - PRESSURE_TO_MOLES(SOUND_MINIMUM_PRESSURE))/(MOLES_CELLSTANDARD - PRESSURE_TO_MOLES(SOUND_MINIMUM_PRESSURE)), 0)
 			else //in space
 				pressure_factor = 0
 

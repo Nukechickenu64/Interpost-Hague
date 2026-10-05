@@ -97,7 +97,7 @@ var/icon/medical_sclera_mask
 	..()
 
 	if(owner)
-		if(eye_icon)
+		if(eye_icon && !owner.eye_closed)
 			var/icon/eyes_icon = new/icon(eye_icon_location, eye_icon)
 			var/obj/item/organ/internal/eyes/eyes = owner.internal_organs_by_name[owner.species.vision_organ ? owner.species.vision_organ : BP_EYES]
 			if(can_show_medical_skin() && owner.medical_jaundice && eyes && eyes.robotic < ORGAN_ROBOT && !(eyes.status & ORGAN_DEAD) && eye_icon == "eyes_s" && eye_icon_location == 'icons/mob/human_face.dmi')

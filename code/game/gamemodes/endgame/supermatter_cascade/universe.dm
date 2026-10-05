@@ -51,8 +51,9 @@ var/global/universe_has_ended = 0
 	APCSet()
 	OverlayAndAmbientSet()
 
-	// Disable Nar-Sie.
-	GLOB.cult.allow_narsie = 0
+	// Disable deity summoning for every cult during the cascade.
+	for(var/datum/antagonist/cultist/cult in get_cults())
+		cult.allow_narsie = 0
 
 	PlayerSet()
 	SSskybox.change_skybox("cascade", FALSE)

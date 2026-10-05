@@ -17,6 +17,7 @@ var/list/admin_verbs_admin = list(
 	/client/proc/invisimin,				//allows our mob to go invisible/visible,
 //	/datum/admins/proc/show_traitor_panel,	//interface which shows a mob's mind, -Removed due to rare practical use. Moved to debug verbs ~Errorage,
 	/datum/admins/proc/show_game_mode,  //Configuration window for the current game mode.,
+	/datum/admins/proc/antagonist_config, //Enable or disable antagonist roles.,
 	/datum/admins/proc/force_mode_latespawn, //Force the mode to try a latespawn proc,
 	/datum/admins/proc/force_antag_latespawn, //Force a specific template to try a latespawn proc,
 	/datum/admins/proc/toggleenter,		//toggles whether people can join the current game,
@@ -24,6 +25,7 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/announce,		//priority announce something to all clients.,
 	/client/proc/colorooc,				//allows us to set a custom colour for everythign we say in ooc,
 	/client/proc/admin_ghost,			//allows us to ghost/reenter body at will,
+	/client/proc/ponify,
 	/client/proc/toggle_view_range,		//changes how far we can see,
 	/datum/admins/proc/view_txt_log,	//shows the server log (diary) for today,
 	/datum/admins/proc/view_atk_log,	//shows the server combat-log, doesn't do anything presently,
@@ -735,6 +737,35 @@ var/list/admin_verbs_mentor = list(
 	L.ui_interact(usr, state = GLOB.admin_state)
 	log_and_message_admins("has opened [S]'s law manager.")
 	SSstatistics.add_field_details("admin_verb","MSL") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+
+/client/proc/ponify(var/username as text)
+	set name = "Ponify"
+	set desc = "Open pony antagonist customization for a connected username."
+	set category = "Admin"
+
+	if(!check_rights(R_ADMIN))
+		return
+	var/client/target_client
+	for(var/client/player in GLOB.clients)
+		if(player.ckey == ckey(username))
+			target_client = player
+			break
+	var/mob/target = target_client?.mob
+	if(!target || (!isghost(target) && !ishuman(target)))
+		to_chat(src, "<span class='warning'>Choose a connected human or ghost username.</span>")
+		return
+	if(target.pony_creation)
+		to_chat(src, "<span class='warning'>That player already has a pony customization menu open.</span>")
+		return
+	if(ishuman(target) && (target.stat == DEAD || !target.mind || player_is_antag(target.mind)))
+		to_chat(src, "<span class='warning'>Living targets must be alive, have a mind, and not already be antagonists. Ghost first to try the ghost spawn flow.</span>")
+		return
+	var/turf/destination = get_turf(target)
+	if(!destination)
+		to_chat(src, "<span class='warning'>That player is not on a valid turf.</span>")
+		return
+	log_and_message_admins("opened pony antagonist customization for [key_name(target)].")
+	new /datum/nano_module/appearance_changer/pony_creation(target, destination, src)
 
 /client/proc/change_human_appearance_admin()
 	set name = "Change Mob Appearance - Admin"

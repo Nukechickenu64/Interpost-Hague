@@ -51,6 +51,7 @@
 	var/embed = 0 // whether or not the projectile can embed itself in the mob
 	var/penetration_modifier = 0.2 //How much internal damage this projectile can deal, as a multiplier.
 	var/hitchance_mod = 0
+	var/attack_margin = null
 
 	var/hitscan = 0		// whether the projectile should be hitscan
 	var/step_delay = 0.7	// the delay between iterations if not a hitscan projectile
@@ -226,16 +227,18 @@
 	if(result == PROJECTILE_FORCE_MISS)
 		if(!silenced)
 			var/miss_sounds = "sound/weapons/guns/misc/miss[rand(1,4)].ogg"
-			target_mob.visible_message("<span class='notice'>\The [src] misses [target_mob] narrowly!</span>")
+			var/miss_quality = (ismob(firer) && !isnull(attack_margin)) ? firer.attack_quality_from_margin(attack_margin, FALSE) : "narrowly"
+			target_mob.visible_message("<span class='notice'>\The [src] misses [target_mob] [miss_quality]!</span>")
 			if(LAZYLEN(miss_sounds))
 				playsound(target_mob.loc, pick(miss_sounds), 60, 1)
 		return 0
 
 	//hit messages
+	var/hit_quality = (ismob(firer) && !isnull(attack_margin)) ? firer.attack_quality_from_margin(attack_margin, TRUE) : "cleanly"
 	if(silenced)
-		to_chat(target_mob, "<span class='danger'>You've been hit in the [parse_zone(def_zone)] by \the [src]!</span>")
+		to_chat(target_mob, "<span class='danger'>You've been hit [hit_quality] in the [parse_zone(def_zone)] by \the [src]!</span>")
 	else
-		target_mob.visible_message("<span class='danger'>\The [target_mob] is hit by \the [src] in the [parse_zone(def_zone)]!</span>")//X has fired Y is now given by the guns so you cant tell who shot you if you could not see the shooter
+		target_mob.visible_message("<span class='danger'>\The [target_mob] is hit [hit_quality] by \the [src] in the [parse_zone(def_zone)]!</span>")//X has fired Y is now given by the guns so you cant tell who shot you if you could not see the shooter
 	playsound(target_mob, pick(mob_hit_sound), 60, 1)
 	//admin logs
 	if(!no_attack_log)

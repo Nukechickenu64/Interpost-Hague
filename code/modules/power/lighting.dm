@@ -156,6 +156,9 @@
 
 	var/on = 0					// 1 if on, 0 if off
 	var/flickering = 0
+	var/flicker_generation = 0
+	var/had_power = FALSE
+	var/bridge_startup_pending = FALSE
 	var/light_type = /obj/item/light/tube		// the type of light item
 	var/construct_type = /obj/machinery/light_construct
 
@@ -212,6 +215,7 @@
 		if(prob(lightbulb.broken_chance))
 			broken(1)
 
+	had_power = powered(ignore_switch = TRUE)
 	on = powered()
 	update_icon(0)
 	GLOB.cryo_startup_effect.register_light(src)
@@ -350,6 +354,8 @@
 // attempt to set the light's on/off status
 // will not switch on if broken/burned/empty
 /obj/machinery/light/proc/seton(var/state)
+	flicker_generation++
+	flickering = FALSE
 	on = (state && get_status() == LIGHT_OK)
 	update_icon()
 
@@ -447,29 +453,40 @@
 
 // returns whether this light has power
 // true if area has power and lightswitch is on
-/obj/machinery/light/powered()
+/obj/machinery/light/powered(var/chan = -1, var/area/check_area = null, var/ignore_switch = FALSE)
+	var/has_power = ..(chan, check_area)
+	if(ignore_switch)
+		return has_power
 	var/area/A = get_area(src)
-	return A && A.lightswitch && ..(power_channel)
+	return A && A.lightswitch && !bridge_startup_pending && has_power
 
-/obj/machinery/light/proc/flicker(var/amount = rand(10, 20))
-	if(flickering) return
-	flickering = 1
+/obj/machinery/light/proc/flicker(var/amount = rand(10, 20), var/power_loss = FALSE, var/bridge_startup = FALSE)
+	if((!power_loss && !bridge_startup) || flickering || get_status() != LIGHT_OK)
+		return
+	var/area/room = get_area(src)
+	if(!room || !room.lightswitch || bridge_startup_pending || (bridge_startup && !powered()))
+		return
+	flickering = TRUE
+	var/generation = ++flicker_generation
 	playsound(src, 'sound/machines/lflick.ogg', 40)
 	spawn(0)
-		if(on && get_status() == LIGHT_OK)
-			for(var/i = 0; i < amount; i++)
-				if(get_status() != LIGHT_OK) break
-				on = !on
-				update_icon(0)
-				sleep(rand(5, 12))
-			on = (get_status() == LIGHT_OK)
+		for(var/i = 0; i < amount; i++)
+			if(QDELETED(src) || generation != flicker_generation)
+				return
+			if(get_status() != LIGHT_OK || !room.lightswitch || bridge_startup_pending)
+				break
+			if(power_loss ? powered(ignore_switch = TRUE) : !powered())
+				break
+			on = !on
 			update_icon(0)
-		flickering = 0
-
-// ai attack - make lights flicker, because why not
+			sleep(rand(1, 3))
+		if(!QDELETED(src) && generation == flicker_generation)
+			on = powered() && get_status() == LIGHT_OK
+			update_icon(0)
+			flickering = FALSE
 
 /obj/machinery/light/attack_ai(mob/user)
-	src.flicker(1)
+	return
 
 // attack with hand - remove tube/bulb
 // if hands aren't protected and the light is on, burn the player
@@ -506,7 +523,7 @@
 
 		if(prot > 0 || (COLD_RESISTANCE in user.mutations))
 			to_chat(user, "You remove the [get_fitting_name()]")
-		else if(TK in user.mutations)
+		else if(user.can_use_telekinesis())
 			to_chat(user, "You telekinetically remove the [get_fitting_name()].")
 		else
 			to_chat(user, "You try to remove the [get_fitting_name()], but it's too hot and you don't want to burn your hand.")
@@ -525,12 +542,6 @@
 
 	to_chat(user, "You telekinetically remove the [get_fitting_name()].")
 	remove_bulb()
-
-// ghost attack - make lights flicker like an AI, but even spookier!
-/obj/machinery/light/attack_ghost(mob/user)
-	if(round_is_spooky())
-		src.flicker(rand(2,5))
-	else return ..()
 
 // break the light and make sparks if was on
 /obj/machinery/light/proc/broken(var/skip_sound_and_sparks = 0)
@@ -573,7 +584,16 @@
 
 // called when area power state changes
 /obj/machinery/light/power_change()
-	spawn(10)
+	var/area/room = get_area(src)
+	var/has_power = powered(ignore_switch = TRUE)
+	var/lost_power = had_power && !has_power
+	var/restored_power = !had_power && has_power
+	had_power = has_power
+	if(lost_power && room.lightswitch && !bridge_startup_pending && (on || flickering) && get_status() == LIGHT_OK)
+		flicker_generation++
+		flickering = FALSE
+		flicker(6, power_loss = TRUE)
+	else if(!flickering || restored_power || !room || !room.lightswitch || bridge_startup_pending)
 		seton(powered())
 
 // called when on fire

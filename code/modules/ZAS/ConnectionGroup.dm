@@ -11,7 +11,7 @@ Class Vars:
 
 	A - This always holds a zone. In unsimulated edges, it holds the only zone.
 
-	connecting_turfs - This holds a list of connected turfs, mainly for the sake of airflow.
+	connecting_turfs - This holds a list of connected turfs.
 
 	coefficent - This is a marker for how many connections are on this edge. Used to determine the ratio of flow.
 
@@ -46,11 +46,6 @@ Class Procs:
 	tick()
 		Called every air tick on edges in the processing list. Equalizes gas.
 
-	flow(list/movable, differential, repelled)
-		Airflow proc causing all objects in movable to be checked against a pressure differential.
-		If repelled is true, the objects move away from any turf in connecting_turfs, otherwise they approach.
-		A check against vsc.lightest_airflow_pressure should generally be performed before calling this.
-
 	get_connected_zone(zone/from)
 		Helper proc that allows getting the other zone of an edge given one of them.
 		Only on /connection_edge/zone, otherwise use A.
@@ -65,11 +60,13 @@ Class Procs:
 /connection_edge/var/sleeping = 1
 
 /connection_edge/var/coefficient = 0
+/connection_edge/var/list/airflow_connections = list()
 
 /connection_edge/New()
 	CRASH("Cannot make connection edge without specifications.")
 
 /connection_edge/proc/add_connection(connection/c)
+	airflow_connections += c
 	coefficient++
 	if(c.direct()) direct++
 //	log_debug("Connection added: [type] Coefficient: [coefficient]")
@@ -78,6 +75,7 @@ Class Procs:
 /connection_edge/proc/remove_connection(connection/c)
 //	log_debug("Connection removed: [type] Coefficient: [coefficient-1]")
 
+	airflow_connections -= c
 	coefficient--
 	if(coefficient <= 0)
 		erase()
@@ -94,38 +92,30 @@ Class Procs:
 
 /connection_edge/proc/recheck()
 
-/connection_edge/proc/flow(list/movable, differential, repelled)
-	var/list/close_turfs_by_turf = list()
-	for(var/i = 1; i <= movable.len; i++)
-		var/atom/movable/M = movable[i]
-
-		//If they're already being tossed, don't do it again.
-		if(M.last_airflow > world.time - vsc.airflow_delay) continue
-		if(M.airflow_speed) continue
-
-		//Check for knocking people over
-		if(ismob(M) && differential > vsc.airflow_stun_pressure)
-			if(M:status_flags & GODMODE) continue
-			M:airflow_stun()
-
-		if(M.check_airflow_movable(differential))
-			//Check for things that are in range of the midpoint turfs.
-			var/turf/source_turf = M.loc
-			var/list/close_turfs = close_turfs_by_turf[source_turf]
-			if(isnull(close_turfs))
-				close_turfs = list()
-				for(var/turf/U in connecting_turfs)
-					if(get_dist(M,U) < world.view) close_turfs += U
-				close_turfs_by_turf[source_turf] = close_turfs
-			if(!close_turfs.len) continue
-
-			M.airflow_dest = pick(close_turfs) //Pick a random midpoint to fly towards.
-
-			if(repelled) spawn if(M) M.RepelAirflowDest(differential/5)
-			else spawn if(M) M.GotoAirflowDest(differential/10)
-
-
-
+/connection_edge/proc/flow(datum/gas_mixture/other, zone/other_zone)
+	if(!SSair.times_fired)
+		return
+	var/mole_delta = A.air.get_tile_moles() - other.get_tile_moles()
+	var/strength = abs(mole_delta) * R_IDEAL_GAS_EQUATION * T20C / CELL_VOLUME / ONE_ATMOSPHERE * 100
+	if(strength < min(vsc.airflow_lightest_pressure, vsc.airflow_stun_pressure))
+		return
+	var/list/affected = list()
+	var/list/our_openings = list()
+	var/list/other_openings = list()
+	for(var/connection/opening in airflow_connections)
+		if(!opening.valid())
+			continue
+		var/turf/simulated/our_turf = opening.A
+		var/turf/other_turf = opening.B
+		if(our_turf.zone != A)
+			our_turf = opening.B
+			other_turf = opening.A
+		our_openings[our_turf] = other_turf
+		if(other_zone)
+			other_openings[other_turf] = our_turf
+	A.airflow(our_openings, strength, mole_delta > 0, affected)
+	if(other_zone)
+		other_zone.airflow(other_openings, strength, mole_delta < 0, affected)
 
 /connection_edge/zone/var/zone/B
 
@@ -170,21 +160,8 @@ Class Procs:
 		erase()
 		return
 
-	var/equiv = A.air.share_ratio(B.air, coefficient)
-
-	var/differential = A.air.return_pressure() - B.air.return_pressure()
-	if(abs(differential) >= vsc.airflow_lightest_pressure)
-		var/list/attracted
-		var/list/repelled
-		if(differential > 0)
-			attracted = A.movables()
-			repelled = B.movables()
-		else
-			attracted = B.movables()
-			repelled = A.movables()
-
-		flow(attracted, abs(differential), 0)
-		flow(repelled, abs(differential), 1)
+	flow(B.air, B)
+	var/equiv = A.air.share_ratio(B.air, coefficient, transfer_ratio = 1)
 
 	if(equiv)
 		if(direct)
@@ -192,14 +169,13 @@ Class Procs:
 			SSair.merge(A, B)
 			return
 		else
-			A.air.equalize(B.air)
 			SSair.mark_edge_sleeping(src)
 
 	SSair.mark_zone_update(A)
 	SSair.mark_zone_update(B)
 
 /connection_edge/zone/recheck()
-	if(!A.air.compare(B.air, vacuum_exception = 1))
+	if(!A.air.compare(B.air, vacuum_exception = 1, compare_pressure = FALSE))
 	// Edges with only one side being vacuum need processing no matter how close.
 		SSair.mark_edge_active(src)
 
@@ -242,24 +218,17 @@ Class Procs:
 		erase()
 		return
 
-	var/equiv = A.air.share_space(air)
-
-	var/differential = A.air.return_pressure() - air.return_pressure()
-	if(abs(differential) >= vsc.airflow_lightest_pressure)
-		var/list/attracted = A.movables()
-		flow(attracted, abs(differential), differential < 0)
-
-	if(equiv)
-		A.air.copy_from(air)
-		SSair.mark_edge_sleeping(src)
+	flow(air)
+	A.air.copy_from(air)
+	SSair.mark_edge_sleeping(src)
 
 	SSair.mark_zone_update(A)
 
 /connection_edge/unsimulated/recheck()
 	// Edges with only one side being vacuum need processing no matter how close.
-	// Note: This handles the glaring flaw of a room holding pressure while exposed to space, but
+	// Note: This prevents a room retaining gas while exposed to space, but
 	// does not specially handle the less common case of a simulated room exposed to an unsimulated pressurized turf.
-	if(!A.air.compare(air, vacuum_exception = 1))
+	if(!A.air.compare(air, vacuum_exception = 1, compare_pressure = FALSE))
 		SSair.mark_edge_active(src)
 
 proc/ShareHeat(datum/gas_mixture/A, datum/gas_mixture/B, connecting_tiles)

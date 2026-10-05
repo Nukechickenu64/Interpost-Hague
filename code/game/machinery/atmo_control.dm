@@ -13,7 +13,7 @@
 	var/on = 1
 	var/output = 3
 	//Flags:
-	// 1 for pressure
+	// 1 for gas amount (mol/tile)
 	// 2 for temperature
 	// Output >= 4 includes gas composition
 	// 4 for oxygen concentration
@@ -37,7 +37,7 @@
 		var/datum/gas_mixture/air_sample = return_air()
 
 		if(output&1)
-			signal.data["pressure"] = num2text(round(air_sample.return_pressure(),0.1),)
+			signal.data["tile_moles"] = num2text(round(air_sample.get_tile_moles(),0.1))
 		if(output&2)
 			signal.data["temperature"] = round(air_sample.temperature,0.1)
 
@@ -127,8 +127,10 @@ obj/machinery/computer/general_air_control/Destroy()
 			var/sensor_part = "<B>[long_name]</B>:<BR>"
 
 			if(data)
-				if(data["pressure"])
-					sensor_part += "   <B>Pressure:</B> [data["pressure"]] kPa<BR>"
+				if(!isnull(data["tile_moles"]))
+					sensor_part += "   <B>Gas amount:</B> [data["tile_moles"]] mol/tile<BR>"
+				else if(!isnull(data["pressure"]))
+					sensor_part += "   <B>Internal pressure:</B> [data["pressure"]] kPa<BR>"
 				if(data["temperature"])
 					sensor_part += "   <B>Temperature:</B> [data["temperature"]] K<BR>"
 				if(data["oxygen"]||data["phoron"]||data["nitrogen"]||data["carbon_dioxide"]||data["hydrogen"])
@@ -412,7 +414,5 @@ Rate: [volume_rate] L/sec<BR>"}
 		)
 
 		radio_connection.post_signal(src, signal, filter = RADIO_ATMOSIA)
-
-
 
 

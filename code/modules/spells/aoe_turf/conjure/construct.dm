@@ -89,12 +89,12 @@
 
 	hud_state = "const_pylon"
 
-/spell/aoe_turf/conjure/pylon/cast(list/targets)
+/spell/aoe_turf/conjure/pylon/cast(list/targets, mob/user)
 	..()
 	var/turf/spawn_place = pick(targets)
 	for(var/obj/structure/cult/pylon/P in spawn_place.contents)
-		if(P.isbroken)
-			P.repair(usr)
+		if(P.isbroken && same_cult(user, P.cult))
+			P.repair(user)
 		continue
 	return
 

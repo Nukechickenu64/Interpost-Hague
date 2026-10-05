@@ -25,6 +25,9 @@
 	var/color = "#000000"
 	var/color_weight = 1
 	var/flags = 0
+	var/liquid_evaporation_rate = 0
+	var/liquid_fire_power = 0
+	var/liquid_slippery = FALSE
 
 	var/glass_icon = DRINK_ICON_DEFAULT
 	var/glass_name = "something"

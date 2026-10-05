@@ -15,6 +15,8 @@
 	var/special_target_functional = 1
 
 	var/attacking = 0
+	var/allow_upgrade = TRUE
+	var/force_down = FALSE
 	var/target_zone
 
 	w_class = ITEM_SIZE_NO_CONTAINER
@@ -23,12 +25,12 @@
 /*
 	This section is for overrides of existing procs.
 */
-/obj/item/grab/New(mob/living/carbon/human/attacker, mob/living/carbon/human/victim)
+/obj/item/grab/New(mob/living/carbon/human/attacker, mob/living/carbon/human/victim, zone_override)
 	..()
 
 	assailant = attacker
 	affecting = victim
-	target_zone = attacker.zone_sel.selecting
+	target_zone = zone_override ? zone_override : attacker.zone_sel.selecting
 	var/obj/item/O = get_targeted_organ()
 	SetName("[name] ([O.name])")
 
@@ -41,6 +43,28 @@
 	to_chat(user,"A grab on \the [affecting]'s [O.name].")
 
 /obj/item/grab/Process()
+	if(!assailant || !affecting || !current_grab)
+		qdel(src)
+		return
+	if(type_name == GRAB_NORMAL && (current_grab.state_name in list(NORM_PASSIVE, NORM_AGGRESSIVE)))
+		allow_upgrade = TRUE
+		for(var/obj/item/grab/other_grab in list(assailant.l_hand, assailant.r_hand))
+			if(other_grab && other_grab != src && other_grab.affecting != affecting)
+				allow_upgrade = FALSE
+		if(current_grab.state_name == NORM_AGGRESSIVE)
+			for(var/obj/item/grab/other_grab in affecting.grabbed_by)
+				if(other_grab != src && other_grab.current_grab.state_name == NORM_AGGRESSIVE)
+					allow_upgrade = FALSE
+	if(type_name == GRAB_NORMAL && (current_grab.state_name in list(NORM_AGGRESSIVE, NORM_NECK, NORM_KILL)))
+		affecting.drop_l_hand()
+		affecting.drop_r_hand()
+		if(force_down)
+			if(affecting.loc != assailant.loc || current_grab.size_difference(affecting, assailant) > 0)
+				force_down = FALSE
+			else
+				affecting.Weaken(2)
+	if(assailant.pulling == affecting)
+		assailant.stop_pulling()
 	current_grab.process(src)
 
 /obj/item/grab/attack_self(mob/user)
@@ -63,6 +87,7 @@
 		qdel(src)
 
 /obj/item/grab/Destroy()
+	STOP_PROCESSING(SSobj, src)
 	if(affecting)
 		reset_position()
 		affecting.grabbed_by -= src
@@ -128,6 +153,7 @@
 	adjust_position()
 	update_icons()
 	action_used()
+	START_PROCESSING(SSobj, src)
 
 // Returns the organ of the grabbed person that the grabber is targeting
 /obj/item/grab/proc/get_targeted_organ()
@@ -151,7 +177,7 @@
 /obj/item/grab/proc/upgrade(var/bypass_cooldown = FALSE)
 	if(!check_upgrade_cooldown() && !bypass_cooldown)
 		to_chat(assailant, "<span class='combat'>It's too soon to upgrade.</span>")
-		return
+		return FALSE
 
 	var/datum/grab/upgrab = current_grab.upgrade(src)
 	if(upgrab)
@@ -160,12 +186,22 @@
 		adjust_position()
 		update_icons()
 		current_grab.enter_as_up(src)
+		return TRUE
+	return FALSE
 
 /obj/item/grab/proc/downgrade()
+	var/datum/grab/previous_grab = current_grab
 	var/datum/grab/downgrab = current_grab.downgrade(src)
 	if(downgrab)
 		current_grab = downgrab
+		last_upgrade = world.time
+		adjust_position()
 		update_icons()
+		return TRUE
+	if(!previous_grab.downgrab)
+		previous_grab.let_go(src)
+		return TRUE
+	return FALSE
 
 /obj/item/grab/proc/update_icons()
 	if(current_grab.icon)

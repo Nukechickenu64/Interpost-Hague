@@ -10,7 +10,26 @@
 	<link rel="stylesheet" type="text/css" href="jquery.jscrollpane.css" />
 	<script type="text/javascript" src="jquery.min.js"></script>
 	<script type="text/javascript" src="json2.min.js"></script>
+	<script type="text/javascript" src="jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="jquery.jscrollpane.min.js"></script>
+	<style>
+		.scroll-pane-split {
+			position: relative;
+			z-index: 0;
+		}
+		.topimg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: calc(100% - 16px);
+			height: 50px;
+			z-index: 1;
+			pointer-events: none;
+		}
+		#loading, #userBar, #ping, #newMessages, .popup {
+			z-index: 2;
+		}
+	</style>
 </head>
 <body>
 	<div id="loading">
@@ -26,6 +45,7 @@
 			
 		</span>
 	</div>
+	<img src="tchatshadow.png" class="topimg" alt="" aria-hidden="true" />
 <script>
 	var settings = {
 		showArrows: true,
@@ -43,13 +63,3 @@
 
 </body>
 </html>
-
-<style>
-.topimg {
-    position: absolute;
-    top: 0px;
-    width: 100%;
-    height: 50px;
-}
-</style>
-<img src="tchatshadow.png" class="topimg"/>

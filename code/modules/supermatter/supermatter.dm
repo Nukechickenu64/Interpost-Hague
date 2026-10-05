@@ -374,7 +374,7 @@
 		damage = max(0, damage + between(-DAMAGE_RATE_LIMIT, (removed.temperature - CRITICAL_TEMPERATURE) / 150, damage_inc_limit))
 
 		//Ok, 100% oxygen atmosphere = best reaction
-		//Maxes out at 100% oxygen pressure
+		//Maxes out at 100% oxygen concentration
 		oxygen = clamp((removed.get_by_flag(XGM_GAS_OXIDIZER) - (removed.gas["nitrogen"] * NITROGEN_RETARDATION_FACTOR)) / removed.total_moles, 0, 1)
 
 		//calculate power gain for oxygen reaction
@@ -469,10 +469,10 @@
 
 	if(!env)
 		data["ambient_temp"] = 0
-		data["ambient_pressure"] = 0
+		data["ambient_moles"] = 0
 	else
 		data["ambient_temp"] = round(env.temperature)
-		data["ambient_pressure"] = round(env.return_pressure())
+		data["ambient_moles"] = round(env.get_tile_moles(), 0.1)
 	data["detonating"] = grav_pulling
 	data["energy"] = power
 

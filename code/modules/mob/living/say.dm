@@ -291,11 +291,11 @@ proc/get_radio_key_from_channel(var/channel)
 	if(T)
 		//make sure the air can transmit speech - speaker's side
 		var/datum/gas_mixture/environment = T.return_air()
-		var/pressure = (environment)? environment.return_pressure() : 0
-		if(pressure < SOUND_MINIMUM_PRESSURE)
+		var/tile_moles = environment ? environment.get_tile_moles() : 0
+		if(tile_moles < PRESSURE_TO_MOLES(SOUND_MINIMUM_PRESSURE))
 			message_range = 1
 
-		if (pressure < ONE_ATMOSPHERE*0.4) //sound distortion pressure, to help clue people in that the air is thin, even if it isn't a vacuum yet
+		if(tile_moles < MOLES_CELLSTANDARD * 0.4)
 			italics = 1
 			sound_vol *= 0.5 //muffle the sound a bit, so it's like we're actually talking through contact
 

@@ -81,7 +81,8 @@
 	if(loc != holder)
 		set_cone_holder(null)
 		return
-	update_cone()
+	if(on && old_dir != new_dir)
+		update_cone()
 
 /obj/item/device/flashlight/proc/hands_swapped(mob/user)
 	if(user.get_active_hand() != src)
@@ -186,9 +187,30 @@
 /client/proc/flashlight_aim_loop(obj/item/device/flashlight/F)
 	set waitfor = FALSE
 	flashlight_aiming = TRUE
+	var/atom/last_target
+	var/last_params
+	var/turf/last_user_turf
+	var/turf/last_target_turf
+	var/last_target_pixel_x
+	var/last_target_pixel_y
+	var/last_user_dir
+	var/last_canface
 	while(flashlight_aim_target && mob && !QDELETED(F) && F.on && mob.get_active_hand() == F && !mob.incapacitated() && mob.a_intent != I_HURT)
-		if(!QDELETED(flashlight_aim_target))
+		if(QDELETED(flashlight_aim_target))
+			break
+		var/turf/user_turf = get_turf(mob)
+		var/turf/target_turf = get_turf(flashlight_aim_target)
+		var/canface = mob.canface()
+		if(isnull(F.aim_angle) || last_target != flashlight_aim_target || last_params != flashlight_aim_params || last_user_turf != user_turf || last_target_turf != target_turf || last_target_pixel_x != flashlight_aim_target.pixel_x || last_target_pixel_y != flashlight_aim_target.pixel_y || last_user_dir != mob.dir || last_canface != canface)
 			F.aim_at(flashlight_aim_target, mob, flashlight_aim_params)
+			last_target = flashlight_aim_target
+			last_params = flashlight_aim_params
+			last_user_turf = user_turf
+			last_target_turf = target_turf
+			last_target_pixel_x = flashlight_aim_target.pixel_x
+			last_target_pixel_y = flashlight_aim_target.pixel_y
+			last_user_dir = mob.dir
+			last_canface = canface
 		sleep(world.tick_lag)
 	flashlight_aim_target = null
 	flashlight_aiming = FALSE
@@ -597,4 +619,3 @@
 	START_PROCESSING(SSobj, src)
 	update_icon()
 	return 1
-

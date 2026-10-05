@@ -1,0 +1,6 @@
+author: Copilot
+delete-after: True
+changes:
+  - tweak: "Removed deep-space sweeps from the bridge computer."
+  - rscadd: "Bridge STATION STATUS now displays AI Director operational telemetry, sample age, trends and maintenance guidance without revealing hidden antagonist information."
+  - tweak: "Communication log printing disappears after use on each console. WAKE STATION can be initiated only once station-wide and disappears after initiation."

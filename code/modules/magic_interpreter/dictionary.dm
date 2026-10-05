@@ -11,15 +11,30 @@ var/global/list/magic_color_names = list(
 /proc/build_magic_dictionary()
 	magic_dictionary = list(
 		"iacere" = list("modifier", "project"),
+		"proicere" = list("modifier", "project"),
+		"mittere" = list("modifier", "project"),
 		"circum" = list("modifier", "area"),
+		"ubique" = list("modifier", "area"),
+		"omnes" = list("modifier", "area"),
 
 		"ego" = list("target", "self"),
+		"mihi" = list("target", "self"),
+		"ipse" = list("target", "self"),
 		"tact" = list("target", "held"),
+		"manus" = list("target", "held"),
 		"visus" = list("target", "visus"),
+		"illud" = list("target", "visus"),
+		"ille" = list("target", "visus"),
 
 		"mutare" = list("operator", "="),
+		"fiat" = list("operator", "="),
+		"esto" = list("operator", "="),
 		"plus" = list("operator", "+"),
+		"auge" = list("operator", "+"),
+		"magis" = list("operator", "+"),
 		"minus" = list("operator", "-"),
+		"minue" = list("operator", "-"),
+		"deme" = list("operator", "-"),
 
 		"nihil" = list("value", 0),
 		"unus" = list("value", 1),
@@ -32,6 +47,14 @@ var/global/list/magic_color_names = list(
 		"octo" = list("value", 8),
 		"novem" = list("value", 9),
 		"decem" = list("value", 10),
+		"undecim" = list("value", 11),
+		"duodecim" = list("value", 12),
+		"quindecim" = list("value", 15),
+		"viginti" = list("value", 20),
+		"quinquaginta" = list("value", 50),
+		"centum" = list("value", 100),
+		"ducenti" = list("value", 200),
+		"mille" = list("value", 1000),
 		"maximus" = list("value", 100),
 
 		"rubrum" = list("value", "#ff0000"),
@@ -39,12 +62,21 @@ var/global/list/magic_color_names = list(
 		"caeruleum" = list("value", "#0000ff"),
 		"nigrum" = list("value", "#000000"),
 		"album" = list("value", "#ffffff"),
+		"flavum" = list("value", "#ffff00"),
+		"purpureum" = list("value", "#800080"),
+		"croceum" = list("value", "#ff8c00"),
+		"roseum" = list("value", "#ff69b4"),
+		"griseum" = list("value", "#808080"),
 
 		"ferrum" = list("material", "steel"),
 		"vitrum" = list("material", "glass"),
 		"aurum" = list("material", "gold"),
 		"argentum" = list("material", "silver"),
-		"lignum" = list("material", "wood")
+		"lignum" = list("material", "wood"),
+		"adamas" = list("material", "diamond"),
+		"marmor" = list("material", "marble"),
+		"chalybs" = list("material", "plasteel"),
+		"corium" = list("material", "leather")
 	)
 
 	magic_aliases = list(

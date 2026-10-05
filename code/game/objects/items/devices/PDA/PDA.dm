@@ -478,7 +478,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		if(!isnull(T))
 			var/datum/gas_mixture/environment = T.return_air()
 
-			var/pressure = environment.return_pressure()
+			var/tile_moles = environment.get_tile_moles()
 			var/total_moles = environment.total_moles
 
 			if (total_moles)
@@ -488,7 +488,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				var/phoron_level = environment.gas["phoron"]/total_moles
 				var/unknown_level =  1-(o2_level+n2_level+co2_level+phoron_level)
 				data["aircontents"] = list(\
-					"pressure" = "[round(pressure,0.1)]",\
+					"tile_moles" = "[round(tile_moles,0.1)]",\
+					"amountstate" = tile_moles < PRESSURE_TO_MOLES(80) || tile_moles > PRESSURE_TO_MOLES(120) ? "bad" : tile_moles < PRESSURE_TO_MOLES(95) || tile_moles > PRESSURE_TO_MOLES(110) ? "average" : "good",\
 					"nitrogen" = "[round(n2_level*100,0.1)]",\
 					"oxygen" = "[round(o2_level*100,0.1)]",\
 					"carbon_dioxide" = "[round(co2_level*100,0.1)]",\

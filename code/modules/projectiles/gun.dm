@@ -343,6 +343,8 @@
 	if(!istype(P))
 		return //default behaviour only applies to true projectiles
 
+	P.attack_margin = user.skillcheck_margin(user.skills[SKILL_RANGE], SKILL_RANGE)
+
 	var/acc_mod = burst_accuracy[min(burst, burst_accuracy.len)]
 	var/disp_mod = dispersion[min(burst, dispersion.len)]
 
@@ -556,7 +558,7 @@
 	if(!safety && (slot == slot_l_hand || slot == slot_r_hand))
 		user.client.mouse_pointer_icon = file("icons/misc/pointer.dmi")
 	else
-		user.client.mouse_pointer_icon = null
+		user.client.mouse_pointer_icon = initial(user.client.mouse_pointer_icon)
 
 /obj/item/weapon/gun/dropped(mob/user)
 	..()

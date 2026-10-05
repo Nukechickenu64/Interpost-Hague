@@ -1,34 +1,34 @@
 <div class="item" style="padding-top: 10px">
 	<div class="item">
 		<div class="itemLabel">
-			External Pressure:
+			External Gas Amount:
 		</div>
 		<div class="itemContent">
-			{{:helper.displayBar(data.external_pressure, 0, 200, (data.external_pressure < 80 || data.external_pressure > 120) ? 'bad' : (data.external_pressure < 95 || data.external_pressure > 110) ? 'average' : 'good')}}
+			{{:helper.displayBar(data.external_pressure, 0, 200 * 2500 / (293.15 * 8.31), (data.external_pressure < 80 * 2500 / (293.15 * 8.31) || data.external_pressure > 120 * 2500 / (293.15 * 8.31)) ? 'bad' : (data.external_pressure < 95 * 2500 / (293.15 * 8.31) || data.external_pressure > 110 * 2500 / (293.15 * 8.31)) ? 'average' : 'good')}}
 			<div class="statusValue">
-				{{:data.external_pressure}} kPa
+				{{:data.external_pressure}} mol/tile
 			</div>
 		</div>
 	</div>
 	<div class="item">
 		<div class="itemLabel">
-			Chamber Pressure:
+			Chamber Gas Amount:
 		</div>
 		<div class="itemContent">
-			{{:helper.displayBar(data.chamber_pressure, 0, 200, (data.chamber_pressure < 80 || data.chamber_pressure > 120) ? 'bad' : (data.chamber_pressure < 95 || data.chamber_pressure > 110) ? 'average' : 'good')}}
+			{{:helper.displayBar(data.chamber_pressure, 0, 200 * 2500 / (293.15 * 8.31), (data.chamber_pressure < 80 * 2500 / (293.15 * 8.31) || data.chamber_pressure > 120 * 2500 / (293.15 * 8.31)) ? 'bad' : (data.chamber_pressure < 95 * 2500 / (293.15 * 8.31) || data.chamber_pressure > 110 * 2500 / (293.15 * 8.31)) ? 'average' : 'good')}}
 			<div class="statusValue">
-				{{:data.chamber_pressure}} kPa
+				{{:data.chamber_pressure}} mol/tile
 			</div>
 		</div>
 	</div>
 	<div class="item">
 		<div class="itemLabel">
-			Internal Pressure:
+			Internal Gas Amount:
 		</div>
 		<div class="itemContent">
-			{{:helper.displayBar(data.internal_pressure, 0, 200, (data.internal_pressure < 80 || data.internal_pressure > 120) ? 'bad' : (data.internal_pressure < 95 || data.internal_pressure > 110) ? 'average' : 'good')}}
+			{{:helper.displayBar(data.internal_pressure, 0, 200 * 2500 / (293.15 * 8.31), (data.internal_pressure < 80 * 2500 / (293.15 * 8.31) || data.internal_pressure > 120 * 2500 / (293.15 * 8.31)) ? 'bad' : (data.internal_pressure < 95 * 2500 / (293.15 * 8.31) || data.internal_pressure > 110 * 2500 / (293.15 * 8.31)) ? 'average' : 'good')}}
 			<div class="statusValue">
-				{{:data.internal_pressure}} kPa
+				{{:data.internal_pressure}} mol/tile
 			</div>
 		</div>
 	</div>

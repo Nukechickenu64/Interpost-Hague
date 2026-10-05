@@ -25,6 +25,7 @@ obj/structure/closet/crate
 		object_shaken()
 	. = ..()
 	if(.)
+		density = 1
 		if(rigged)
 			visible_message("<span class='danger'>There are wires attached to the lid of [src]...</span>")
 			for(var/obj/item/device/assembly_holder/H in src)

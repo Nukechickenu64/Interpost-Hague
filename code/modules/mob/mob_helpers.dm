@@ -59,19 +59,36 @@ proc/iscuffed(A)
 	return 0
 
 proc/hassensorlevel(A, var/level)
-	var/mob/living/carbon/human/H = A
-	if(istype(H) && istype(H.w_uniform, /obj/item/clothing/under))
-		var/obj/item/clothing/under/U = H.w_uniform
-		return U.sensor_mode >= level
-	return 0
+	return getsensorlevel(A) >= level
 
 proc/getsensorlevel(A)
 	var/mob/living/carbon/human/H = A
-	if(istype(H) && istype(H.w_uniform, /obj/item/clothing/under))
-		var/obj/item/clothing/under/U = H.w_uniform
-		return U.sensor_mode
+	if(istype(H))
+		var/obj/item/device/medical_bracelet/bracelet = H.get_medical_bracelet()
+		if(bracelet && bracelet.has_sensor)
+			return bracelet.sensor_mode
 	return SUIT_SENSOR_OFF
 
+/mob/living/carbon/human/proc/get_medical_bracelet()
+	var/obj/item/device/medical_bracelet/left_bracelet = wrist_l
+	var/obj/item/device/medical_bracelet/right_bracelet = wrist_r
+	if(istype(left_bracelet) && istype(right_bracelet))
+		return left_bracelet.sensor_mode >= right_bracelet.sensor_mode ? left_bracelet : right_bracelet
+	if(istype(left_bracelet))
+		return left_bracelet
+	if(istype(right_bracelet))
+		return right_bracelet
+	return null
+
+/mob/living/carbon/human/proc/equip_medical_bracelet()
+	if(get_medical_bracelet())
+		return
+	var/obj/item/device/medical_bracelet/bracelet = new(src)
+	if(equip_to_slot_if_possible(bracelet, slot_wrist_l, disable_warning = TRUE))
+		return
+	if(equip_to_slot_if_possible(bracelet, slot_wrist_r, disable_warning = TRUE))
+		return
+	qdel(bracelet)
 
 /proc/is_admin(var/mob/user)
 	return check_rights(R_ADMIN, 0, user) != 0
@@ -126,6 +143,10 @@ var/list/global/organ_rel_size = list(
 			zone = BP_HEAD
 		if(BP_THROAT)
 			zone = BP_HEAD
+		if(BP_FACE)
+			zone = BP_HEAD
+		if(BP_VITALS, BP_BELLY)
+			zone = BP_GROIN
 	return zone
 
 // Returns zone with a certain probability. If the probability fails, or no zone is specified, then a random body part is chosen.
@@ -406,7 +427,12 @@ var/list/intents = list(I_HELP,I_DISARM,I_GRAB,I_HURT)
 			if("left")
 				a_intent = intent_numeric((intent_numeric(a_intent)+3) % 4)
 		if(hud_used && hud_used.action_intent)
-			hud_used.action_intent.icon_state = "intent_[a_intent]"
+			var/obj/screen/intent/intent_button = hud_used.action_intent
+			if(istype(intent_button))
+				intent_button.intent = a_intent
+				intent_button.update_icon()
+			else
+				hud_used.action_intent.icon_state = "intent_[a_intent]"
 
 	else if(isrobot(src))
 		switch(input)

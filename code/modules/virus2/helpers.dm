@@ -87,7 +87,7 @@ proc/infection_chance(var/mob/living/carbon/M, var/vector = "Airborne")
 	if(!disease.affected_species.len)
 		return
 
-	if (!(M.species.get_bodytype(M) in disease.affected_species))
+	if (!(M.species.get_bodytype(M) in disease.affected_species) && (!M.species.pathogen_bodytype || !(M.species.pathogen_bodytype in disease.affected_species)))
 		if (forced)
 			disease.affected_species[1] = M.species.get_bodytype(M)
 		else

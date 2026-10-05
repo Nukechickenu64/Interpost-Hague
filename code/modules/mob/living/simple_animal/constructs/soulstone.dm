@@ -17,12 +17,14 @@
 	var/mob/living/simple_animal/shade = null
 	var/smashing = 0
 	var/soulstatus = null
+	var/datum/antagonist/cultist/cult
 
 /obj/item/device/soulstone/full
 	full = SOULSTONE_ESSENCE
 	icon_state = "soulstone2"
 
-/obj/item/device/soulstone/New()
+/obj/item/device/soulstone/New(loc, datum/antagonist/cultist/owning_cult = null)
+	cult = owning_cult ? owning_cult : GLOB.cult
 	..()
 	shade = new /mob/living/simple_animal/shade(src)
 
@@ -53,6 +55,9 @@
 	if(is_evil && istype(I, /obj/item/nullrod))
 		to_chat(user, "<span class='notice'>You cleanse \the [src] of taint, purging its shackles to its creator..</span>")
 		is_evil = 0
+		var/datum/antagonist/cultist/shade_cult = get_cult(shade)
+		if(shade_cult)
+			shade_cult.remove_antagonist(shade.mind, TRUE)
 		return
 	if(I.force > 10)
 		if(!smashing)
@@ -110,6 +115,7 @@
 	icon = 'icons/obj/wizard.dmi'
 	icon_state = "construct"
 	desc = "A wicked machine used by those skilled in magical arts. It is inactive."
+	var/datum/antagonist/cultist/cult
 
 /obj/structure/constructshell/cult
 	icon_state = "construct-cult"
@@ -124,6 +130,9 @@
 		if(S.shade.loc != S)
 			to_chat(user, "<span class='notice'>Recapture the shade back into \the [I] first.</span>")
 			return
+		if(cult && S.is_evil && S.cult != cult)
+			to_chat(user, "<span class='warning'>This shell rejects a soul bound to a rival deity.</span>")
+			return
 		var/construct = alert(user, "Please choose which type of construct you wish to create.",,"Artificer", "Wraith", "Juggernaut")
 		var/ctype
 		switch(construct)
@@ -133,11 +142,18 @@
 				ctype = /mob/living/simple_animal/construct/wraith
 			if("Juggernaut")
 				ctype = /mob/living/simple_animal/construct/armoured
+		if(!ctype || QDELETED(src) || QDELETED(S) || S.shade.loc != S || S.loc != user || !Adjacent(user))
+			to_chat(user, "<span class='warning'>You must keep the occupied soulstone in your possession to complete the shell.</span>")
+			return
+		if(!S.shade.mind)
+			to_chat(user, "<span class='warning'>The spirit has no mind to bind to this shell.</span>")
+			log_debug("Occupied soulstone [S] had no shade mind during construct creation.")
+			return
 		var/mob/living/simple_animal/construct/C = new ctype(get_turf(src))
-		C.key = S.shade.key
+		S.shade.mind.transfer_to(C)
 		//C.cancel_camera()
-		if(S.is_evil)
-			GLOB.cult.add_antagonist(C.mind)
+		if(S.is_evil && !same_cult(C, S.cult))
+			S.cult.add_antagonist(C.mind)
 		qdel(S)
 		qdel(src)
 

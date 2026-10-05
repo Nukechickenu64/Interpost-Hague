@@ -89,7 +89,7 @@
 
 /datum/grab/proc/downgrade(var/obj/item/grab/G)
 	// Starts the process of letting go if there's no downgrade grab
-	if(can_downgrade())
+	if(can_downgrade(G))
 		downgrade_effect(G)
 		return downgrab
 	else
@@ -157,12 +157,23 @@
 /datum/grab/proc/adjust_position(var/obj/item/grab/G)
 	var/mob/living/carbon/human/affecting = G.affecting
 	var/mob/living/carbon/human/assailant = G.assailant
+	if(!affecting || !assailant || affecting.buckled)
+		return
+	if(istype(G, /obj/item/grab/normal) && affecting.lying && G.current_grab.state_name != NORM_KILL)
+		animate(affecting, pixel_x = 0, pixel_y = 0, 5, 1, LINEAR_EASING)
+		if(G.force_down)
+			affecting.set_dir(SOUTH)
+		return
 	var/adir = get_dir(assailant, affecting)
 
 	if(same_tile)
 		affecting.forceMove(assailant.loc)
-		adir = assailant.dir
-		affecting.set_dir(assailant.dir)
+		if(istype(G, /obj/item/grab/normal) && G.current_grab.state_name == NORM_KILL)
+			adir = NORTH
+			affecting.set_dir(SOUTH)
+		else
+			adir = assailant.dir
+			affecting.set_dir(assailant.dir)
 
 	switch(adir)
 		if(NORTH)
@@ -261,34 +272,131 @@
 	return 0
 
 /datum/grab/proc/handle_resist(var/obj/item/grab/G)
+	if(!G || !G.affecting || !G.assailant)
+		return
 	var/mob/living/carbon/human/affecting = G.affecting
 	var/mob/living/carbon/human/assailant = G.assailant
 	var/break_strength = 1
+	var/list/effective_break_chance_table = break_chance_table
+	var/list/modifier_lines = list("<span class='good'>+1 base resistance</span>")
+	var/grip_modifier = 0
+	var/relative_size = size_difference(affecting, assailant)
+	var/strength_difference = affecting.stats[STAT_ST] - assailant.stats[STAT_ST]
+	var/modifier_sign
+	var/modifier_class
+
+	if(istype(G, /obj/item/grab/normal))
+		switch(state_name)
+			if(NORM_PASSIVE)
+				if(!affecting.incapacitated(INCAPACITATION_KNOCKDOWN))
+					grip_modifier = 2
+				effective_break_chance_table = list(15, 60, 100)
+			if(NORM_AGGRESSIVE)
+				if(!affecting.incapacitated(INCAPACITATION_KNOCKDOWN))
+					grip_modifier = 1
+				effective_break_chance_table = list(15, 60, 100)
+			if(NORM_NECK)
+				if(world.time - assailant.l_move_time < 30 || !affecting.stunned)
+					grip_modifier = 1
+				effective_break_chance_table = list(3, 18, 45, 100)
+			if(NORM_KILL)
+				effective_break_chance_table = list(5, 20, 40, 80, 100)
+		modifier_sign = grip_modifier >= 0 ? "+" : ""
+		modifier_class = grip_modifier >= 0 ? "good" : "bad"
+		modifier_lines += "<span class='[modifier_class]'>[modifier_sign][grip_modifier] [state_name] grip</span>"
+	else
+		modifier_sign = breakability >= 0 ? "+" : ""
+		modifier_class = breakability >= 0 ? "good" : "bad"
+		modifier_lines += "<span class='[modifier_class]'>[modifier_sign][breakability] grip breakability</span>"
+
+	if(istype(G, /obj/item/grab/normal))
+		relative_size = max(relative_size, 0)
+	modifier_sign = relative_size >= 0 ? "+" : ""
+	modifier_class = relative_size >= 0 ? "good" : "bad"
+	modifier_lines += "<span class='[modifier_class]'>[modifier_sign][relative_size] relative size ([affecting] vs [assailant])</span>"
+	modifier_sign = strength_difference >= 0 ? "+" : ""
+	modifier_class = strength_difference >= 0 ? "good" : "bad"
+	modifier_lines += "<span class='[modifier_class]'>[modifier_sign][strength_difference] strength ([affecting] [affecting.stats[STAT_ST]] vs [assailant] [assailant.stats[STAT_ST]])</span>"
 
 	if(affecting.incapacitated(INCAPACITATION_KNOCKOUT | INCAPACITATION_STUNNED))
 		to_chat(G.assailant, "<span class='combat'>You can't resist in your current state!</span>")
 
-	break_strength = breakability + size_difference(affecting, assailant)
-	break_strength = affecting.stats[STAT_ST] - assailant.stats[STAT_ST]  //Stats are used for grab
-
-	if(affecting.incapacitated(INCAPACITATION_ALL))
-		break_strength--
-	if(affecting.confused)
-		break_strength--
+	if(istype(G, /obj/item/grab/normal))
+		break_strength += grip_modifier
+		break_strength += relative_size
+		break_strength += strength_difference
+	else
+		break_strength += breakability + relative_size
+		break_strength += strength_difference
+		if(affecting.incapacitated(INCAPACITATION_ALL))
+			break_strength--
+			modifier_lines += "<span class='bad'>-1 incapacitated</span>"
+		if(affecting.confused)
+			break_strength--
+			modifier_lines += "<span class='bad'>-1 confused</span>"
 
 	if(break_strength < 1)
 		to_chat(G.assailant, "<span class='combat'>You try to break free but feel that unless something changes, you'll never escape!</span>")
+		report_resist_contest(G, modifier_lines, break_strength, 0, "The assailant maintains the hold; resist success chance is 0%.")
+		affecting.visible_message(
+			"<span class='warning'>[affecting] struggles against [assailant]'s grip, but can't break free!</span>",
+			"<span class='warning'>You struggle against [assailant]'s grip, but can't break free!</span>"
+		)
 		return
 
-	var/break_chance = break_chance_table[clamp(break_strength, 1, break_chance_table.len)]
+	if(!LAZYLEN(effective_break_chance_table))
+		report_resist_contest(G, modifier_lines, break_strength, 0, "No resist success chance is available for this grip.")
+		affecting.visible_message(
+			"<span class='warning'>[affecting] struggles against [assailant]'s grip, but can't break free!</span>",
+			"<span class='warning'>You struggle against [assailant]'s grip, but can't break free!</span>"
+		)
+		return
+	var/break_chance = effective_break_chance_table[clamp(break_strength, 1, effective_break_chance_table.len)]
 	if(prob(break_chance))
-		if(can_downgrade_on_resist && !prob((break_chance+100)/2))
-			affecting.visible_message("<span class='combat'>[affecting] has loosened [assailant]'s grip!</span>")
+		if(istype(G, /obj/item/grab/normal) && state_name == NORM_KILL && !prob((break_chance + 100) / 2))
+			report_resist_contest(G, modifier_lines, break_strength, break_chance, "[affecting] loosens the stranglehold.")
+			affecting.visible_message(
+				"<span class='warning'>[affecting] has loosened [assailant]'s stranglehold!</span>",
+				"<span class='notice'>You loosen [assailant]'s stranglehold!</span>"
+			)
+			G.downgrade()
+			return
+		if(!istype(G, /obj/item/grab/normal) && can_downgrade_on_resist && !prob((break_chance+100)/2))
+			report_resist_contest(G, modifier_lines, break_strength, break_chance, "[affecting] loosens the grip.")
+			affecting.visible_message(
+				"<span class='combat'>[affecting] has loosened [assailant]'s grip!</span>",
+				"<span class='notice'>You loosen [assailant]'s grip!</span>"
+			)
 			G.downgrade()
 			return
 		else
-			affecting.visible_message("<span class='combat'>[affecting] has broken free of [assailant]'s grip!</span>")
+			report_resist_contest(G, modifier_lines, break_strength, break_chance, "[affecting] breaks free.")
+			affecting.visible_message(
+				"<span class='combat'>[affecting] has broken free of [assailant]'s grip!</span>",
+				"<span class='notice'>You break free of [assailant]'s grip!</span>"
+			)
 			let_go(G)
+	else
+		report_resist_contest(G, modifier_lines, break_strength, break_chance, "[assailant] keeps the hold.")
+		affecting.visible_message(
+			"<span class='warning'>[affecting] struggles against [assailant]'s grip, but fails to break free!</span>",
+			"<span class='warning'>You struggle against [assailant]'s grip, but fail to break free!</span>"
+		)
+
+/datum/grab/proc/report_resist_contest(var/obj/item/grab/G, var/list/modifier_lines, var/break_strength, var/break_chance, var/outcome)
+	var/message = "<div class='firstdivexamineplyr'><div class='boxexamineplyr'><span class='uppertext'>Resist contest</span><br>"
+	message += "<span class='info'>Victim: [G.affecting]</span><br>"
+	for(var/modifier_line in modifier_lines)
+		message += "[modifier_line]<br>"
+	message += "<span class='info'>Escape strength: [break_strength]</span><br>"
+	message += "<span class='danger'>Assailant: [G.assailant]</span><br>"
+	message += "<span class='warning'>Grip: [state_name]</span><br>"
+	message += "<span class='notice'>Assailant strength: [G.assailant.stats[STAT_ST]] | size: [G.assailant.mob_size]</span><br>"
+	message += "<span class='notice'>Resist success chance: [break_chance]%</span><br>"
+	message += "<span class='combatbold'>[outcome]</span></div></div>"
+	to_chat(G.affecting, message)
+	if(G.assailant != G.affecting)
+		to_chat(G.assailant, message)
 
 /datum/grab/proc/size_difference(mob/A, mob/B)
 	return mob_size_difference(A.mob_size, B.mob_size)

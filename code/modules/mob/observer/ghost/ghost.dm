@@ -70,8 +70,8 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		name = capitalize(pick(GLOB.first_names_male)) + " " + capitalize(pick(GLOB.last_names))
 	real_name = name
 
-	if(GLOB.cult)
-		GLOB.cult.add_ghost_magic(src)
+	for(var/datum/antagonist/cultist/cult in get_cults())
+		cult.add_ghost_magic(src)
 
 	ghost_multitool = new(src)
 

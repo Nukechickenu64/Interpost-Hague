@@ -95,8 +95,8 @@
 
 /proc/is_below_sound_pressure(var/turf/T)
 	var/datum/gas_mixture/environment = T ? T.return_air() : null
-	var/pressure =  environment ? environment.return_pressure() : 0
-	if(pressure < SOUND_MINIMUM_PRESSURE)
+	var/tile_moles = environment ? environment.get_tile_moles() : 0
+	if(tile_moles < PRESSURE_TO_MOLES(SOUND_MINIMUM_PRESSURE))
 		return TRUE
 	return FALSE
 

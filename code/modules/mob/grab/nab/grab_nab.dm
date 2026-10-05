@@ -23,7 +23,7 @@
 
 	type_name = GRAB_NAB
 
-	icon = 'icons/mob/screen1.dmi'
+	icon = 'icons/mob/screen/os13.dmi'
 
 	stop_move = 1
 	force_stand = 1

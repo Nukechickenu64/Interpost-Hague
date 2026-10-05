@@ -28,6 +28,9 @@
 /datum/gas_mixture/proc/get_total_moles()
 	return total_moles * group_multiplier
 
+/datum/gas_mixture/proc/get_tile_moles()
+	return total_moles * CELL_VOLUME / volume
+
 //Takes a gas string and the amount of moles to adjust by.  Calls update_values() if update isn't 0.
 /datum/gas_mixture/proc/adjust_gas(gasid, moles, update = 1)
 	if(moles == 0)
@@ -304,7 +307,7 @@
 
 
 //Checks if we are within acceptable range of another gas_mixture to suspend processing or merge.
-/datum/gas_mixture/proc/compare(const/datum/gas_mixture/sample, var/vacuum_exception = 0)
+/datum/gas_mixture/proc/compare(const/datum/gas_mixture/sample, var/vacuum_exception = 0, compare_pressure = TRUE)
 	if(!sample) return 0
 
 	if(vacuum_exception)
@@ -324,7 +327,7 @@
 		(our_moles > (1 + MINIMUM_AIR_RATIO_TO_SUSPEND) * sample_moles)))
 			return 0
 
-	if(abs(return_pressure() - sample.return_pressure()) > MINIMUM_PRESSURE_DIFFERENCE_TO_SUSPEND)
+	if(compare_pressure && abs(return_pressure() - sample.return_pressure()) > MINIMUM_PRESSURE_DIFFERENCE_TO_SUSPEND)
 		return 0
 
 	for(var/g in sample_gases)
@@ -414,7 +417,7 @@
 
 
 //Shares gas with another gas_mixture based on the amount of connecting tiles and a fixed lookup table.
-/datum/gas_mixture/proc/share_ratio(datum/gas_mixture/other, connecting_tiles, share_size = null, one_way = 0)
+/datum/gas_mixture/proc/share_ratio(datum/gas_mixture/other, connecting_tiles, share_size = null, one_way = 0, transfer_ratio = null)
 	var/static/list/sharing_lookup_table = list(0.30, 0.40, 0.48, 0.54, 0.60, 0.66)
 	//Shares a specific ratio of gas between mixtures using simple weighted averages.
 	var/ratio = sharing_lookup_table[6]
@@ -435,6 +438,8 @@
 	if(sharing_lookup_table.len >= connecting_tiles) //6 or more interconnecting tiles will max at 42% of air moved per tick.
 		ratio = sharing_lookup_table[connecting_tiles]
 	//WOOT WOOT TOUCH THIS AND YOU ARE A RETARD
+	if(!isnull(transfer_ratio))
+		ratio = clamp(transfer_ratio, 0, 1)
 
 	var/remaining_ratio = 1 - ratio
 	var/list/our_gases = gas
@@ -456,7 +461,7 @@
 	update_values()
 	other.update_values()
 
-	return compare(other)
+	return compare(other, compare_pressure = FALSE)
 
 
 //A wrapper around share_ratio for spacing gas at the same rate as if it were going into a large airless room.

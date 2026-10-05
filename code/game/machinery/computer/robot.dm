@@ -35,7 +35,7 @@
 /obj/machinery/computer/robotics/OnTopic(var/mob/user, href_list)
 	// Locks or unlocks the cyborg
 	if (href_list["lockdown"])
-		var/mob/living/silicon/robot/target = get_cyborg_by_name(href_list["lockdown"])
+		var/mob/living/silicon/robot/target = get_cyborg_by_ref(href_list["lockdown"])
 		if(!target || !istype(target))
 			return TOPIC_HANDLED
 
@@ -67,7 +67,7 @@
 
 	// Remotely hacks the cyborg. Only antag AIs can do this and only to linked cyborgs.
 	else if (href_list["hack"])
-		var/mob/living/silicon/robot/target = get_cyborg_by_name(href_list["hack"])
+		var/mob/living/silicon/robot/target = get_cyborg_by_ref(href_list["hack"])
 		if(!target || !istype(target))
 			return TOPIC_HANDLED
 
@@ -94,7 +94,7 @@
 		. = TOPIC_REFRESH
 
 	else if (href_list["message"])
-		var/mob/living/silicon/robot/target = get_cyborg_by_name(href_list["message"])
+		var/mob/living/silicon/robot/target = get_cyborg_by_ref(href_list["message"])
 		if(!target || !istype(target))
 			return
 
@@ -123,6 +123,7 @@
 
 		var/list/robot = list()
 		robot["name"] = R.name
+		robot["ref"] = ref(R)
 		var/turf/T = get_turf(R)
 		var/area/A = get_area(T)
 
@@ -156,12 +157,15 @@
 		robots.Add(list(robot))
 	return robots
 
-// Proc: get_cyborg_by_name()
-// Parameters: 1 (name - Cyborg we are trying to find)
-// Description: Helper proc for finding cyborg by name
-/obj/machinery/computer/robotics/proc/get_cyborg_by_name(var/name)
-	if (!name)
+// Proc: get_cyborg_by_ref()
+// Parameters: 1 (robot_ref - Reference of the cyborg we are trying to find)
+// Description: Finds a listed cyborg that is visible on the console.
+/obj/machinery/computer/robotics/proc/get_cyborg_by_ref(var/robot_ref)
+	if (!robot_ref)
 		return
-	for(var/mob/living/silicon/robot/R in GLOB.silicon_mob_list)
-		if(R.name == name)
-			return R
+	var/mob/living/silicon/robot/target = locate(robot_ref)
+	if(!istype(target) || !(target in GLOB.silicon_mob_list))
+		return
+	if(istype(target, /mob/living/silicon/robot/drone) || target.scrambledcodes)
+		return
+	return target

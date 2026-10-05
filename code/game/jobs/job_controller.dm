@@ -476,6 +476,7 @@ var/global/datum/controller/occupations/job_master
 		else
 			to_chat(H, "Your job is [rank] and the game just can't handle it! Please report this bug to an administrator.")
 
+		H.equip_medical_bracelet()
 		H.job = rank
 
 		var/turf/greyhound_turf = (rank == "Greyhound") ? get_greyhound_spawn_turf() : null
@@ -642,7 +643,7 @@ var/global/datum/controller/occupations/job_master
 				//Pick an old god other then the template
 				//to_world("RELIGION TESTING FIX THIS")
 				//H.religion = "Your god here"
-				H.religion = pick(GLOB.all_religions - ILLEGAL_RELIGION - LEGAL_RELIGION)
+				H.religion = pick(GLOB.all_religions - NARSIE_RELIGION - KHARIN_RELIGION - REAPER_RELIGION - LEGAL_RELIGION)
 				H.verbs += /mob/living/proc/make_shrine
 				H.verbs += /mob/living/proc/praise_god
 				var/datum/religion/HR = GLOB.all_religions[H.religion]

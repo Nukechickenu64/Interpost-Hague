@@ -22,14 +22,14 @@
 		mixture = target.return_air()
 
 	if(mixture)
-		var/pressure = mixture.return_pressure()
 		var/total_moles = mixture.total_moles
 
 		if (total_moles>0)
-			if(abs(pressure - ONE_ATMOSPHERE) < 10)
-				. += "<span class='notice'>Pressure: [round(pressure,0.1)] kPa</span>"
+			if(istype(target, /obj/item/tank) || istype(target, /obj/machinery/atmospherics/pipe) || istype(target, /obj/machinery/portable_atmospherics))
+				. += "<span class='notice'>Internal pressure: [round(mixture.return_pressure(),0.1)] kPa</span>"
 			else
-				. += "<span class='warning'>Pressure: [round(pressure,0.1)] kPa</span>"
+				var/tile_moles = mixture.get_tile_moles()
+				. += "<span class='[abs(tile_moles - MOLES_CELLSTANDARD) < PRESSURE_TO_MOLES(10) ? "notice" : "warning"]'>Gas amount: [round(tile_moles,0.1)] mol/tile</span>"
 			for(var/mix in mixture.gas)
 				var/percentage = round(mixture.gas[mix]/total_moles * 100, advanced ? 0.01 : 1)
 				if(!percentage)

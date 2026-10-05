@@ -63,6 +63,7 @@ SUBSYSTEM_DEF(director)
 		new /datum/catalyst_event/anomaly(),
 		new /datum/catalyst_event/mutiny(),
 		new /datum/catalyst_event/infiltration(),
+		new /datum/catalyst_event/pony_incursion(),
 		new /datum/catalyst_event/leech(),
 		new /datum/catalyst_event/epicurean(),
 		new /datum/catalyst_event/cargo_incursion(),
@@ -182,6 +183,8 @@ SUBSYSTEM_DEF(director)
 	starter_busy = FALSE
 
 /datum/controller/subsystem/director/proc/starter_candidate_eligible(mob/living/carbon/human/candidate, antag_id)
+	if(!is_antagonist_enabled(antag_id))
+		return FALSE
 	if(!candidate || QDELETED(candidate) || !candidate.client || !candidate.mind || candidate.stat == DEAD || !is_station_turf(get_turf(candidate)))
 		return FALSE
 	if(player_is_antag(candidate.mind) || candidate.mind.leech_conversion_pending)
@@ -291,7 +294,7 @@ SUBSYSTEM_DEF(director)
 		return FALSE
 	var/reserved = starter_required ? 1 : 0
 	var/datum/antagonist/antag = GLOB.all_antag_types_[antag_id]
-	if(!antag || antag.get_antag_count() + (starter_role == antag_id ? reserved : 0) >= antag.hard_cap)
+	if(!is_antagonist_enabled(antag_id) || !antag || antag.get_antag_count() + (starter_role == antag_id ? reserved : 0) >= antag.hard_cap)
 		return FALSE
 	return get_total_antag_count() + reserved < max(1, round(count_living_crew() / 2))
 
@@ -655,6 +658,44 @@ SUBSYSTEM_DEF(director)
 
 	// Reset loyalty tracker
 	loyalty.reset()
+
+/datum/controller/subsystem/director/proc/station_status_report()
+	var/html = "<h2>Station Operational Status</h2><p>Source: AI Director station telemetry.</p>"
+	if(!telemetry || !last_telemetry_sample)
+		return html + "<p><b>Telemetry unavailable:</b> No station sample has been collected yet. Check local power controllers and air alarms.</p>"
+	var/sample_age = max(0, round((world.time - last_telemetry_sample) / 10))
+	html += "<p>Last sample: [sample_age] seconds ago. Reopen STATION STATUS to refresh this report.</p>"
+	if(!enabled)
+		html += "<p><b>Monitoring offline:</b> AI Director updates are disabled; these are the last recorded readings.</p>"
+	else if(world.time - last_telemetry_sample > 2 * TELEMETRY_SAMPLE_INTERVAL)
+		html += "<p><b>Warning:</b> Telemetry is stale. Verify conditions locally.</p>"
+	var/list/metrics = list(
+		list("key" = TELEMETRY_POWER_GRID, "name" = "Power supply", "meaning" = "Station area power controllers operating.", "advice" = "Check engine output, cabling and area power controllers."),
+		list("key" = TELEMETRY_ATMOS_INTEGRITY, "name" = "Atmosphere", "meaning" = "Station areas passing temperature, oxygen and phoron checks.", "advice" = "Inspect air alarms, isolate unsafe compartments and restore breathable air."),
+		list("key" = TELEMETRY_STRUCTURAL, "name" = "Hull integrity", "meaning" = "Estimated intact structure; exposed station edges count as possible breaches.", "advice" = "Inspect damaged walls and exposed compartments; seal confirmed hull breaches."),
+		list("key" = TELEMETRY_COMMS_STATUS, "name" = "Communications", "meaning" = "Station telecomms relays enabled.", "advice" = "Inspect relay power and telecomms equipment; establish local communications."),
+		list("key" = TELEMETRY_CREW_VITALITY, "name" = "Crew survival", "meaning" = "Living share of human crew currently on station, including unconscious crew.", "advice" = "Coordinate medical triage and search for missing or injured personnel.")
+	)
+	var/list/recommendations = list()
+	html += "<table border='1' cellpadding='5'><tr><th>System</th><th>Reading</th><th>Trend</th><th>Interpretation</th></tr>"
+	for(var/list/metric in metrics)
+		var/key = metric["key"]
+		var/value = round(telemetry.get_value(key))
+		var/trend = telemetry.get_trend(key)
+		var/trend_text = trend > 0 ? "Improving" : (trend < 0 ? "Declining" : "Stable")
+		html += "<tr><td>[metric["name"]]</td><td>[value]%</td><td>[trend_text]</td><td>[metric["meaning"]]</td></tr>"
+		if(value < 100)
+			recommendations += metric["advice"]
+	html += "</table><h3>Recommended Actions</h3>"
+	if(length(recommendations))
+		html += "<ul>"
+		for(var/advice in recommendations)
+			html += "<li>[advice]</li>"
+		html += "</ul>"
+	else
+		html += "<p>No issues flagged by these sampled indicators. Continue local inspections and routine maintenance.</p>"
+	html += "<p>These are station-wide estimates, not a guarantee that every room or device is safe.</p>"
+	return html
 
 /// Admin verb to get a status report
 /datum/controller/subsystem/director/proc/status_report()

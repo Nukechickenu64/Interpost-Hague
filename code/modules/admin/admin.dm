@@ -851,6 +851,38 @@ var/global/floorIsLava = 0
 	message_admins("[key_name_admin(usr)] toggled Traitor Scaling [config.traitor_scaling ? "on" : "off"].", 1)
 	SSstatistics.add_field_details("admin_verb","TTS") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
+/datum/admins/proc/antagonist_config()
+	set category = "Server"
+	set name = "Antagonist Configuration"
+	set desc = "Enable or disable antagonist roles for automatic and non-admin assignment."
+
+	if(!check_rights(R_ADMIN))
+		return
+
+	while(TRUE)
+		var/list/antag_options = list()
+		for(var/role_id in GLOB.all_antag_types_)
+			var/datum/antagonist/role_datum = GLOB.all_antag_types_[role_id]
+			if(role_datum)
+				antag_options["[role_datum.role_text] ([role_datum.id]) - [is_antagonist_enabled(role_id) ? "Enabled" : "Disabled"]"] = role_id
+		antag_options["Done"] = "DONE"
+
+		var/choice = input("Select an antagonist role to toggle.", "Antagonist Configuration") as null|anything in antag_options
+		if(!choice || choice == "Done")
+			return
+
+		var/selected_role_id = antag_options[choice]
+		var/datum/antagonist/selected_role = GLOB.all_antag_types_[selected_role_id]
+		if(!selected_role)
+			continue
+
+		if(is_antagonist_enabled(selected_role_id))
+			GLOB.enabled_antag_types -= selected_role_id
+			log_and_message_admins("disabled the [selected_role.role_text] antagonist role.")
+		else
+			GLOB.enabled_antag_types |= selected_role_id
+			log_and_message_admins("enabled the [selected_role.role_text] antagonist role.")
+
 /datum/admins/proc/startnow()
 	set category = "Server"
 	set desc="Start the round RIGHT NOW"

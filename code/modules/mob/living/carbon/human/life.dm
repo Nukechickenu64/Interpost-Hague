@@ -100,6 +100,14 @@
 
 /mob/living/carbon/human/set_stat(var/new_stat)
 	. = ..()
+	if(. && species)
+		if(new_stat == CONSCIOUS)
+			eye_closed = FALSE
+		else if(new_stat != CONSCIOUS)
+			eye_closed = TRUE
+		update_body()
+		species.handle_vision(src)
+		update_awake_hud()
 	if(stat)
 		update_skin(1)
 
@@ -194,13 +202,8 @@
 	else //We are in an overpressure or standard atmosphere.
 		pressure_difference = pressure - ONE_ATMOSPHERE
 
-	if(pressure_difference < 5) // If the difference is small, don't bother calculating the fraction.
-		pressure_difference = 0
-
-	else
-		// Otherwise calculate how much of that absolute pressure difference affects us, can be 0 to 1 (equals 0% to 100%).
-		// This is our relative difference.
-		pressure_difference *= get_pressure_weakness()
+	// Calculate how much of that absolute pressure difference affects us, can be 0 to 1 (equals 0% to 100%).
+	pressure_difference *= get_pressure_weakness()
 
 	// The difference is always positive to avoid extra calculations.
 	// Apply the relative difference on a standard atmosphere to get the final result.
@@ -327,7 +330,11 @@
 			src.spread_disease_to(M)
 
 
+/mob/living/carbon/human
+	var/breath_from_oxygen_tank = FALSE
+
 /mob/living/carbon/human/get_breath_from_internal(volume_needed=BREATH_VOLUME)
+	breath_from_oxygen_tank = FALSE
 	if(internal)
 
 		var/obj/item/tank/rig_supply
@@ -340,7 +347,9 @@
 			internal = null
 
 		if(internal)
-			return internal.remove_air_volume(volume_needed)
+			var/datum/gas_mixture/breath = internal.remove_air_volume(volume_needed)
+			breath_from_oxygen_tank = breath && breath.gas["oxygen"] > 0
+			return breath
 		else if(internals)
 			internals.icon_state = "internal0"
 	return null
@@ -353,10 +362,12 @@
 		return
 
 	var/obj/item/organ/internal/lungs/L = internal_organs_by_name[species_organ]
-	if(!L || nervous_system_failure())
+	if(!L)
 		failed_last_breath = 1
+	else if(nervous_system_failure())
+		failed_last_breath = L.handle_breath(null)
 	else
-		failed_last_breath = L.handle_breath(breath) //if breath is null or vacuum, the lungs will handle it for us
+		failed_last_breath = L.handle_breath(breath, supplied_oxygen = breath_from_oxygen_tank) //if breath is null or vacuum, the lungs will handle it for us
 	return !failed_last_breath
 
 /mob/living/carbon/human/handle_environment(datum/gas_mixture/environment)
@@ -366,9 +377,29 @@
 	//Stuff like the xenomorph's plasma regen happens here.
 	species.handle_environment_special(src)
 
-	//Moved pressure calculations here for use in skip-processing check.
-	var/pressure = environment.return_pressure()
+	// Use nominal pressure so gas amount, not temperature, determines pressure injury.
+	var/pressure = environment.get_tile_moles() * ONE_ATMOSPHERE / MOLES_CELLSTANDARD
 	var/adjusted_pressure = calculate_affecting_pressure(pressure)
+	var/adjusted_moles = PRESSURE_TO_MOLES(adjusted_pressure)
+	var/safe_moles_min = species.safe_air_moles_min ? species.safe_air_moles_min : PRESSURE_TO_MOLES(species.warning_low_pressure)
+	var/safe_moles_max = species.safe_air_moles_max ? species.safe_air_moles_max : PRESSURE_TO_MOLES(species.warning_high_pressure)
+	if(adjusted_moles > safe_moles_max)
+		pressure_alert = adjusted_pressure >= species.hazard_high_pressure ? 2 : 1
+		var/pressure_damage = 0
+		if(species.safe_air_moles_max)
+			pressure_damage = min(((adjusted_moles / safe_moles_max) - 1) * PRESSURE_DAMAGE_COEFFICIENT, MAX_HIGH_PRESSURE_DAMAGE)
+		else if(pressure_alert == 2)
+			pressure_damage = min(((adjusted_pressure / species.hazard_high_pressure) - 1) * PRESSURE_DAMAGE_COEFFICIENT, MAX_HIGH_PRESSURE_DAMAGE)
+		if(pressure_damage && !(status_flags & GODMODE))
+			take_overall_damage(brute=pressure_damage, used_weapon = "High Pressure")
+	else if(adjusted_moles >= safe_moles_min)
+		pressure_alert = 0
+	else if(adjusted_pressure >= species.hazard_low_pressure)
+		pressure_alert = -1
+	else
+		pressure_alert = -2
+		if(!(status_flags & GODMODE))
+			take_overall_damage(brute=LOW_PRESSURE_DAMAGE, used_weapon = "Low Pressure")
 
 	//Check for contaminants before anything else because we don't want to skip it.
 	for(var/g in environment.gas)
@@ -390,8 +421,7 @@
 	if(relative_density > 0.02) //don't bother if we are in vacuum or near-vacuum
 		var/loc_temp = environment.temperature
 
-		if(adjusted_pressure < species.warning_high_pressure && adjusted_pressure > species.warning_low_pressure && abs(loc_temp - bodytemperature) < 20 && bodytemperature < species.heat_level_1 && bodytemperature > species.cold_level_1 && species.body_temperature)
-			pressure_alert = 0
+		if(abs(loc_temp - bodytemperature) < 20 && bodytemperature < species.heat_level_1 && bodytemperature > species.cold_level_1 && species.body_temperature)
 			return // Temperatures are within normal ranges, fuck all this processing. ~Ccomp
 
 		//Body temperature adjusts depending on surrounding atmosphere based on your thermal protection (convection)
@@ -439,24 +469,6 @@
 		if(!chem_effects[CE_CRYO])
 			take_overall_damage(burn=burn_dam, used_weapon = "Low Body Temperature")
 			fire_alert = max(fire_alert, 1)
-
-	// Account for massive pressure differences.  Done by Polymorph
-	// Made it possible to actually have something that can protect against high pressure... Done by Errorage. Polymorph now has an axe sticking from his head for his previous hardcoded nonsense!
-	if(status_flags & GODMODE)	return 1	//godmode
-
-	if(adjusted_pressure >= species.hazard_high_pressure)
-		var/pressure_damage = min( ( (adjusted_pressure / species.hazard_high_pressure) -1 )*PRESSURE_DAMAGE_COEFFICIENT , MAX_HIGH_PRESSURE_DAMAGE)
-		take_overall_damage(brute=pressure_damage, used_weapon = "High Pressure")
-		pressure_alert = 2
-	else if(adjusted_pressure >= species.warning_high_pressure)
-		pressure_alert = 1
-	else if(adjusted_pressure >= species.warning_low_pressure)
-		pressure_alert = 0
-	else if(adjusted_pressure >= species.hazard_low_pressure)
-		pressure_alert = -1
-	else
-		take_overall_damage(brute=LOW_PRESSURE_DAMAGE, used_weapon = "Low Pressure")
-		pressure_alert = -2
 
 	return
 
@@ -634,7 +646,6 @@
 			Paralyse(10) //This should be 80 total health
 			adjustBrainLoss(3)
 		if(paralysis || sleeping)
-			blinded = 1
 			set_stat(UNCONSCIOUS)
 			animate_tail_reset()
 			adjustHalLoss(-3)
@@ -643,7 +654,7 @@
 				handle_dreams()
 				if (mind)
 					//Are they SSD? If so we'll keep them asleep but work off some of that sleep var in case of stoxin or similar.
-					if(client || sleeping > 3)
+					if(!voluntary_sleeping && (client || sleeping > 3))
 						AdjustSleeping(-1)
 				if(prob(2) && !failed_last_breath && !isSynthetic())
 					if(!paralysis)
@@ -723,19 +734,22 @@
 /mob/living/carbon/human/proc/handle_fatigue()
 	// Ensure bounds
 	fatigue = Clamp(fatigue, 0, max_fatigue)
+	if(sprinting && (m_intent != "run" || !canmove || resting))
+		update_movement_hud()
 
 	// Accumulation
-	if(m_intent == "run" && canmove && !resting)
+	var/is_moving = !client || client.moving
+	if(m_intent == "run" && canmove && !resting && is_moving)
 		fatigue = min(max_fatigue, fatigue + 1)
 	else if(combat_mode && canmove)
 		fatigue = min(max_fatigue, fatigue + 1)
+	if(sprinting && canmove && !resting && is_moving)
+		fatigue = min(max_fatigue, fatigue + 1)
 
 	// Recovery
-	var/recovery = 0
+	var/recovery = 2
 	if(resting || lying)
-		recovery += 2
-	else
-		recovery += 1
+		recovery++
 
 	// Better nutrition/hydration speeds recovery slightly
 	if(nutrition_icon && hydration_icon)
@@ -743,12 +757,13 @@
 		recovery += 0
 
 	fatigue = max(0, fatigue - recovery)
+	update_stamina_hud()
 
 	// Adjust stamina regeneration based on fatigue level
 	// We cannot directly change CheckStamina() here, so apply a compensating effect:
 	if(fatigue >= 75)
 		// High fatigue dampens stamina recovery and increases drain
-		adjustStaminaLoss(1)
+		adjustStaminaLoss(1, TRUE)
 	else if(fatigue >= 50)
 		adjustStaminaLoss(0)
 	else if(fatigue >= 25)
@@ -904,34 +919,25 @@
 				healths.overlays += health_images
 
 		if(nutrition_icon)
-			switch(nutrition)
-				if(450 to INFINITY)				nutrition_icon.icon_state = "nutrition0"
-				if(350 to 450)					nutrition_icon.icon_state = "nutrition1"
-				if(250 to 350)					nutrition_icon.icon_state = "nutrition2"
-				if(150 to 250)					nutrition_icon.icon_state = "nutrition3"
-				else							nutrition_icon.icon_state = "nutrition4"
-
-		if(hydration_icon)
-			switch(thirst)
-				if(450 to INFINITY)				hydration_icon.icon_state = "hydration0"
-				if(350 to 450)					hydration_icon.icon_state = "hydration1"
-				if(250 to 350)					hydration_icon.icon_state = "hydration2"
-				if(150 to 250)					hydration_icon.icon_state = "hydration3"
-				else							hydration_icon.icon_state = "hydration4"
+			var/is_hungry = nutrition < 250
+			var/is_thirsty = thirst < 250
+			if(is_leech())
+				nutrition_icon.icon_state = leech_is_hungry() ? "hunger2" : "hunger0"
+			else if(is_hungry && is_thirsty)
+				nutrition_icon.icon_state = "hunger3"
+			else if(is_thirsty)
+				nutrition_icon.icon_state = "hunger4"
+			else if(is_hungry)
+				nutrition_icon.icon_state = "hunger1"
+			else
+				nutrition_icon.icon_state = "hunger0"
 
 		if(stamina_icon)
-			switch((staminaloss))
-				if(200 to INFINITY)		stamina_icon.icon_state = "stamina10"
-				if(180 to 200)			stamina_icon.icon_state = "stamina9"
-				if(160 to 180)			stamina_icon.icon_state = "stamina8"
-				if(140 to 160)			stamina_icon.icon_state = "stamina7"
-				if(120 to 140)			stamina_icon.icon_state = "stamina6"
-				if(100 to 120)			stamina_icon.icon_state = "stamina5"
-				if(80 to 100)			stamina_icon.icon_state = "stamina4"
-				if(60 to 80)			stamina_icon.icon_state = "stamina3"
-				if(40 to 60)			stamina_icon.icon_state = "stamina2"
-				if(20 to 40)			stamina_icon.icon_state = "stamina1"
-				else					stamina_icon.icon_state = "stamina0"
+			update_stamina_hud()
+		if(awake)
+			update_awake_hud()
+		if(readycd)
+			update_hand_ready_hud()
 
 		if(isSynthetic())
 			var/obj/item/organ/internal/cell/C = internal_organs_by_name[BP_CELL]
@@ -943,12 +949,20 @@
 
 		if(pressure)
 			pressure.icon_state = "pressure[pressure_alert]"
+		if(internals && internals.icon == 'icons/mob/screen/os13.dmi')
+			// OS13 internals gauge: blue while on internals, green for safe air, flashing red otherwise.
+			if(internal)
+				internals.icon_state = "internal1"
+			else if(pressure_alert || oxygen_alert)
+				internals.icon_state = "internal00"
+			else
+				internals.icon_state = "internal0"
 		if(toxin)
 			if(phoron_alert)	toxin.icon_state = "tox1"
 			else									toxin.icon_state = "tox0"
 		if(oxygen)
-			if(oxygen_alert)	oxygen.icon_state = "oxy1"
-			else									oxygen.icon_state = "oxy0"
+			if(oxygen_alert)	oxygen.icon_state = "oxy"
+			else								oxygen.icon_state = "blank"
 		if(fire)
 			if(fire_alert)							fire.icon_state = "fire[fire_alert]" //fire_alert is either 0 if no alert, 1 for cold and 2 for heat.
 			else									fire.icon_state = "fire0"
@@ -1280,8 +1294,9 @@
 		if(!(E.body_part & protected_limbs) && prob(20))
 			E.take_external_damage(burn = round(species_heat_mod * log(10, (burn_temperature + 10)), 0.1), used_weapon = fire)
 
-/mob/living/carbon/human/rejuvenate()
-	restore_blood()
+/mob/living/carbon/human/rejuvenate(var/preserve_blood = FALSE)
+	if(!preserve_blood)
+		restore_blood()
 	full_prosthetic = null
 	shock_stage = 0
 	..()
@@ -1317,6 +1332,9 @@
 
 	update_equipment_vision()
 	species.handle_vision(src)
+	if(is_leech() && leech_dead_eyes_active && stat != DEAD)
+		set_see_in_dark(8)
+		set_see_invisible(SEE_INVISIBLE_OBSERVER)
 
 /mob/living/carbon/human/update_living_sight()
 	..()

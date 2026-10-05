@@ -26,7 +26,7 @@
 		phrase = ""
 	..()
 
-/datum/old_god_spell/proc/spell_effect(var/mob/living/user)
+/datum/old_god_spell/proc/spell_effect(var/mob/living/user, var/list/spell_components)
 	to_world("Something is fucked up, you should not be seeing this. It's from old gods spell code, go tell a coder.")
 
 	//Helper to make spells involving paper easier TODO: same thing for blood/limbs/organs
@@ -39,6 +39,26 @@
 /datum/old_god_spell/proc/spell_consume(var/list/spell_components)
 	for(var/direction in spell_components)
 		qdel(spell_components[direction])
+
+/datum/old_god_spell/cult_tome
+	name = "Blood scriptures"
+	old_god = NARSIE_RELIGION
+	requirments = list("NORTH" = /obj/item/paper)
+
+/datum/old_god_spell/cult_tome/spell_effect(mob/living/user, list/spell_components)
+	var/datum/antagonist/cultist/cult = get_cult(user)
+	if(!cult || cult.religion_name != old_god)
+		to_chat(user, "<span class='warning'>The shrine rejects your invocation.</span>")
+		return
+	new cult.tome_type(get_turf(user))
+
+/datum/old_god_spell/cult_tome/fire
+	name = "Infernal scriptures"
+	old_god = KHARIN_RELIGION
+
+/datum/old_god_spell/cult_tome/death
+	name = "Mortuary scriptures"
+	old_god = REAPER_RELIGION
 
 /* // Demonstration of working order.
 /datum/old_god_spell/smoke_example

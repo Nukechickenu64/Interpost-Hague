@@ -1,6 +1,71 @@
 /client
 	control_freak = CONTROL_FREAK_ALL | CONTROL_FREAK_MACROS | CONTROL_FREAK_SKIN
 
+/client/proc/route_airlock_keypad_digit(digit)
+	if(!mob)
+		return
+	var/obj/machinery/airlock_keypad/keypad = mob.machine
+	if(istype(keypad))
+		keypad.press_digit(mob, digit)
+
+/client/verb/airlock_keypad_digit_0()
+	set name = ".airlock_keypad_digit_0"
+	set hidden = 1
+	route_airlock_keypad_digit("0")
+
+/client/verb/airlock_keypad_digit_1()
+	set name = ".airlock_keypad_digit_1"
+	set hidden = 1
+	route_airlock_keypad_digit("1")
+
+/client/verb/airlock_keypad_digit_2()
+	set name = ".airlock_keypad_digit_2"
+	set hidden = 1
+	route_airlock_keypad_digit("2")
+
+/client/verb/airlock_keypad_digit_3()
+	set name = ".airlock_keypad_digit_3"
+	set hidden = 1
+	route_airlock_keypad_digit("3")
+
+/client/verb/airlock_keypad_digit_4()
+	set name = ".airlock_keypad_digit_4"
+	set hidden = 1
+	route_airlock_keypad_digit("4")
+
+/client/verb/airlock_keypad_digit_5()
+	set name = ".airlock_keypad_digit_5"
+	set hidden = 1
+	route_airlock_keypad_digit("5")
+
+/client/verb/airlock_keypad_digit_6()
+	set name = ".airlock_keypad_digit_6"
+	set hidden = 1
+	route_airlock_keypad_digit("6")
+
+/client/verb/airlock_keypad_digit_7()
+	set name = ".airlock_keypad_digit_7"
+	set hidden = 1
+	route_airlock_keypad_digit("7")
+
+/client/verb/airlock_keypad_digit_8()
+	set name = ".airlock_keypad_digit_8"
+	set hidden = 1
+	route_airlock_keypad_digit("8")
+
+/client/verb/airlock_keypad_digit_9()
+	set name = ".airlock_keypad_digit_9"
+	set hidden = 1
+	route_airlock_keypad_digit("9")
+
+/client/verb/airlock_keypad_cancel()
+	set name = ".airlock_keypad_cancel"
+	set hidden = 1
+	if(mob)
+		var/obj/machinery/airlock_keypad/keypad = mob.machine
+		if(istype(keypad))
+			keypad.clear_attempt(mob)
+
 var/list/registered_macros_by_ckey_
 
 // Disables click and double-click macros, as per http://www.byond.com/forum/?post=2219001

@@ -17,27 +17,25 @@
 	force_danger = 1
 	breakability = 3
 
-	icon_state = "reinforce1"
+	icon_state = "grabbed1"
 
 	break_chance_table = list(5, 20, 40, 80, 100)
 /datum/grab/normal/aggressive/process_effect(var/obj/item/grab/G)
 	var/mob/living/carbon/human/affecting = G.affecting
 
-	if(G.target_zone in list(BP_L_HAND, BP_R_HAND))
-		affecting.drop_l_hand()
-		affecting.drop_r_hand()
-
 	// Keeps those who are on the ground down
 	if(affecting.lying)
 		affecting.Weaken(4)
 
+/datum/grab/normal/aggressive/downgrade_effect(var/obj/item/grab/G)
+	if(G.force_down)
+		to_chat(G.assailant, "<span class='warning'>You are no longer pinning [G.affecting] to the ground.</span>")
+		G.force_down = FALSE
+
 /datum/grab/normal/aggressive/can_upgrade(var/obj/item/grab/G)
-	if(!(G.target_zone in list(BP_CHEST, BP_HEAD)))
-		to_chat(G.assailant, "<span class='warning'>You need to be grabbing their torso or head for this!</span>")
+	if(!G.allow_upgrade)
 		return FALSE
-	var/obj/item/clothing/C = G.affecting.head
-	if(istype(C)) //hardsuit helmets etc
-		if((C.item_flags & ITEM_FLAG_STOPPRESSUREDAMAGE) && C.armor["melee"] > 20)
-			to_chat(G.assailant, "<span class='warning'>\The [C] is in the way!</span>")
-			return FALSE
+	if(isslime(G.affecting))
+		to_chat(G.assailant, "<span class='notice'>You squeeze [G.affecting], but nothing interesting happens.</span>")
+		return FALSE
 	return TRUE

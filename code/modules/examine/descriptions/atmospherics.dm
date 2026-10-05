@@ -142,7 +142,7 @@
 //Portable pumps
 /obj/machinery/portable_atmospherics/powered/pump
 	description_info = "Invaluable for filling air in a room rapidly after a breach repair.  The internal gas container can be filled by \
-	connecting it to a connector port.  The pump can pump the air in (sucking) or out (blowing), at a specific target pressure.  The powercell inside can be \
+	connecting it to a connector port.  The pump can pump the air in (sucking) or out (blowing), targeting a gas amount in mol/tile for rooms or pressure for an attached tank.  The powercell inside can be \
 	replaced by using a screwdriver, and then adding a new cell.  A tank of gas can also be attached to the air pump."
 
 //Portable scrubbers
@@ -159,4 +159,3 @@
 /obj/machinery/pipedispenser
 	description_info = "This can be moved by using a wrench.  You will need to wrench it again when you want to use it.  You can put \
 	excess (atmospheric) pipes into the dispenser, as well.  The dispenser requires electricity to function."
-

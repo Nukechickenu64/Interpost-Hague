@@ -32,6 +32,8 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 		return 0
 
 	var/igniting = 0
+	if(liquids && liquids.ignite())
+		igniting = 1
 	var/obj/effect/decal/cleanable/liquid_fuel/liquid = locate() in src
 
 	if(air_contents.check_combustability(liquid))
@@ -151,7 +153,7 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 		set_light(3, 1)
 
 	for(var/mob/living/L in loc)
-		L.FireBurn(firelevel, air_contents.temperature, air_contents.return_pressure())  //Burn the mobs!
+		L.FireBurn(firelevel, air_contents.temperature, air_contents.get_tile_moles())  //Burn the mobs!
 
 	loc.fire_act(air_contents, air_contents.temperature, air_contents.volume)
 	for(var/atom/A in loc)
@@ -324,7 +326,7 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 
 		#ifdef FIREDBG
 		log_debug("used_gas_fuel = [used_gas_fuel]; used_liquid_fuel = [used_liquid_fuel]; total = [used_fuel]")
-		log_debug("new temperature = [temperature]; new pressure = [return_pressure()]")
+		log_debug("new temperature = [temperature]; gas amount = [get_tile_moles()] mol/tile")
 		#endif
 
 		return firelevel
@@ -397,12 +399,12 @@ datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
 	return max( 0, firelevel)
 
 
-/mob/living/proc/FireBurn(var/firelevel, var/last_temperature, var/pressure)
-	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(pressure / ONE_ATMOSPHERE, 1)
+/mob/living/proc/FireBurn(var/firelevel, var/last_temperature, var/gas_amount)
+	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(gas_amount / MOLES_CELLSTANDARD, 1)
 	apply_damage(2.5*mx, BURN)
 
 
-/mob/living/carbon/human/FireBurn(var/firelevel, var/last_temperature, var/pressure)
+/mob/living/carbon/human/FireBurn(var/firelevel, var/last_temperature, var/gas_amount)
 	//Burns mobs due to fire. Respects heat transfer coefficients on various body parts.
 	//Due to TG reworking how fireprotection works, this is kinda less meaningful.
 
@@ -429,8 +431,8 @@ datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
 				legs_exposure = 0
 			if(C.body_parts_covered & ARMS)
 				arms_exposure = 0
-	//minimize this for low-pressure enviroments
-	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(pressure / ONE_ATMOSPHERE, 1)
+	//Less gas transfers less heat.
+	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(gas_amount / MOLES_CELLSTANDARD, 1)
 
 	//Always check these damage procs first if fire damage isn't working. They're probably what's wrong.
 

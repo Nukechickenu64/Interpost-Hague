@@ -55,9 +55,9 @@
 	set_trait(TRAIT_WEED_TOLERANCE,       5)            // Threshold for weeds to impact health.
 	set_trait(TRAIT_IDEAL_LIGHT,          5)            // Preferred light level in luminosity.
 	set_trait(TRAIT_HEAT_TOLERANCE,       20)           // Departure from ideal that is survivable.
-	set_trait(TRAIT_LOWKPA_TOLERANCE,     25)           // Low pressure capacity.
+	set_trait(TRAIT_LOWKPA_TOLERANCE,     25)           // Legacy gas amount limits, converted by handle_environment.
 	set_trait(TRAIT_ENDURANCE,            100)          // Maximum plant HP when growing.
-	set_trait(TRAIT_HIGHKPA_TOLERANCE,    200)          // High pressure capacity.
+	set_trait(TRAIT_HIGHKPA_TOLERANCE,    200)
 	set_trait(TRAIT_IDEAL_HEAT,           293)          // Preferred temperature in Kelvin.
 	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.25)         // Plant eats this much per tick.
 	set_trait(TRAIT_PLANT_COLOUR,         "#46b543")    // Colour of the plant icon.
@@ -284,8 +284,8 @@
 			health_change += missing_gas * HYDRO_SPEED_MULTIPLIER
 
 	// Process it.
-	var/pressure = environment.return_pressure()
-	if(pressure < get_trait(TRAIT_LOWKPA_TOLERANCE)|| pressure > get_trait(TRAIT_HIGHKPA_TOLERANCE))
+	var/tile_moles = environment.get_tile_moles()
+	if(tile_moles < PRESSURE_TO_MOLES(get_trait(TRAIT_LOWKPA_TOLERANCE)) || tile_moles > PRESSURE_TO_MOLES(get_trait(TRAIT_HIGHKPA_TOLERANCE)))
 		health_change += rand(1,3) * HYDRO_SPEED_MULTIPLIER
 
 	if(abs(environment.temperature - get_trait(TRAIT_IDEAL_HEAT)) > get_trait(TRAIT_HEAT_TOLERANCE))

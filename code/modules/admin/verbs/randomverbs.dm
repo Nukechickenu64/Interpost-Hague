@@ -427,6 +427,10 @@ Traitors and the like can also be revived with the previous role mostly intact.
 		to_chat(usr, "<font color='red'>There is no active key like that in the game or the person is not currently a ghost.</font>")
 		return
 
+	if(!LAZYLEN(GLOB.latejoin))
+		to_chat(usr, "<font color='red'>No latejoin spawnpoints are currently available.</font>")
+		return
+
 	var/mob/living/carbon/human/new_character = new(pick(GLOB.latejoin))//The mob being spawned.
 
 	var/datum/computer_file/crew_record/record_found			//Referenced to later to either randomize or not randomize the character.

@@ -57,12 +57,12 @@
 <div class="item" style="padding-top: 10px">
 	<div class="item">
 		<div class="itemLabel">
-			Chamber Pressure:
+			Chamber Gas Amount:
 		</div>
 		<div class="itemContent">
-			{{:helper.displayBar(data.chamber_pressure, 0, 200, (data.chamber_pressure < 80 || data.chamber_pressure > 120) ? 'bad' : (data.chamber_pressure < 95 || data.chamber_pressure > 110) ? 'average' : 'good')}}
+			{{:helper.displayBar(data.chamber_pressure, 0, 200 * 2500 / (293.15 * 8.31), (data.chamber_pressure < 80 * 2500 / (293.15 * 8.31) || data.chamber_pressure > 120 * 2500 / (293.15 * 8.31)) ? 'bad' : (data.chamber_pressure < 95 * 2500 / (293.15 * 8.31) || data.chamber_pressure > 110 * 2500 / (293.15 * 8.31)) ? 'average' : 'good')}}
 			<div class="statusValue">
-				{{:data.chamber_pressure}} kPa
+				{{:data.chamber_pressure}} mol/tile
 			</div>
 		</div>
 	</div>

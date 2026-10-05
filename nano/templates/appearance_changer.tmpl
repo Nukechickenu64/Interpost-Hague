@@ -1,3 +1,23 @@
+{{if data.pony_creation}}
+    <div style="text-align: center; height: 112px;">
+        <img src="data:image/png;base64,{{:data.pony_preview}}" alt="Pony preview" style="max-height: 112px; image-rendering: pixelated;" />
+    </div>
+    <div class="item">
+        <div class="itemLabelNarrow">Name:</div>
+        <div class="itemContentWide" style="word-wrap: break-word;">
+            {{:helper.link(data.pony_name, null, { 'pony_name' : 1})}}
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemLabelNarrow">Time remaining:</div>
+        <div class="itemContentWide">{{:data.pony_time_left}}s</div>
+    </div>
+    <div class="item">
+        {{:helper.link('Spawn', 'check', { 'pony_spawn' : 1})}}
+        {{:helper.link('Cancel', 'close', { 'pony_cancel' : 1})}}
+    </div>
+{{/if}}
+
 {{if data.change_race}}
     <div class="item">
         <div class="itemLabelNarrow">
@@ -37,10 +57,10 @@
                 {{:helper.link('Change skin tone', null, { 'skin_tone' : 1})}}
             {{/if}}
             {{if data.change_skin_color}}
-                {{:helper.link('Change skin color', null, { 'skin_color' : 1})}}
+                {{:helper.link(data.pony_creation ? 'Change coat color' : 'Change skin color', null, { 'skin_color' : 1})}}
             {{/if}}
             {{if data.change_hair_color}}
-                {{:helper.link('Change hair color', null, { 'hair_color' : 1})}}
+                {{:helper.link(data.pony_creation ? 'Change mane color' : 'Change hair color', null, { 'hair_color' : 1})}}
             {{/if}}
             {{if data.change_facial_hair_color}}
                 {{:helper.link('Change facial hair color', null, { 'facial_hair_color' : 1})}}
@@ -52,9 +72,9 @@
 {{if data.change_hair}}
     <div class="item">
         <div class="itemLabelNarrow">
-            Hair styles:
+            {{if data.pony_creation}}Mane styles:{{else}}Hair styles:{{/if}}
         </div>
-        <div class="itemContentWide">
+        <div class="itemContentWide" style="max-height: 180px; overflow-y: auto; word-wrap: break-word;">
             {{for data.hair_styles}}
                 {{:helper.link(value.hairstyle, null, { 'hair' : value.hairstyle}, null, data.hair_style == value.hairstyle ? 'selected' : null)}}
             {{/for}}

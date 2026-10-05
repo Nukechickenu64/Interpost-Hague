@@ -61,7 +61,7 @@
 	layer = PLATING_LAYER
 
 	if(flooring)
-		flooring.on_remove()
+		flooring.on_remove(src)
 		if(flooring.build_type && place_product)
 			new flooring.build_type(src)
 		flooring = null

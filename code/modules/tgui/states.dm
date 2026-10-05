@@ -105,6 +105,6 @@
 	return UI_CLOSE // Otherwise, we got nothing.
 
 /mob/living/carbon/human/shared_living_ui_distance(atom/movable/src_object)
-	if((TK in mutations))
+	if((TK in mutations) || (can_use_telekinesis() && (src_object in view(telekinesis_range(), src))))
 		return UI_INTERACTIVE
 	return ..()

@@ -46,6 +46,15 @@ Pipelines + Other Objects -> Pipe network
 /obj/machinery/atmospherics/proc/atmos_init()
 	atmos_initalized = TRUE
 
+/proc/get_networks_max_pressure(list/networks)
+	var/max_pressure = 0
+	for(var/datum/pipe_network/network in networks)
+		if(!network)
+			continue
+		for(var/datum/gas_mixture/air in network.gases)
+			max_pressure = max(max_pressure, air.return_pressure())
+	return max_pressure
+
 /obj/machinery/atmospherics/hide(var/do_hide)
 	if(do_hide && level == 1)
 		layer = PIPE_LAYER

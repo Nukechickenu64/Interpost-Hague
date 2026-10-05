@@ -17,6 +17,11 @@
 	key ="nod"
 	emote_message_3p = "USER nods USER_THEIR head."
 
+/decl/emote/visible/nod/do_extra(atom/user, atom/target)
+	if(ishuman(user))
+		var/mob/living/carbon/human/student = user
+		student.accept_lessons()
+
 /decl/emote/visible/sway
 	key ="sway"
 	emote_message_3p = "USER sways around dizzily."

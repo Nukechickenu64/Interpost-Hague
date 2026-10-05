@@ -20,7 +20,7 @@
 
 /datum/request/public_prayer/check_complete(var/mob/living/target)
 	for(var/mob/living/M in view(target, 8))
-		if(M.religion == LEGAL_RELIGION)
+		if(M.religion_is_legal())
 			return 1
 	return 0
 
@@ -39,7 +39,20 @@
 	offering_item = new offering_item
 	message += "   Place \the [offering_item] before a shrine and praise your god."
 
+/datum/request/offering/Destroy()
+	qdel(offering_item)
+	offering_item = null
+	return ..()
+
 /datum/request/offering/check_complete(var/mob/living/target)
+	var/obj/old_god_shrine/owned_shrine
+	for(var/obj/old_god_shrine/shrine in view(target, 5))
+		if(shrine.shrine_religion && shrine.shrine_religion.name == target.religion)
+			owned_shrine = shrine
+			break
+	if(!owned_shrine)
+		to_chat(target, "<span class='warning'>Your offering must be made before a shrine of your own faith.</span>")
+		return FALSE
 	for(var/obj/O in view(target, 5))
 		if(istype(O,offering_item))
 			qdel(O)

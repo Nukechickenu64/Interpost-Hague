@@ -7,6 +7,7 @@ GLOBAL_DATUM_INIT(temp_reagents_holder, /obj, new)
 	var/list/datum/reagent/addiction_list = list()
 	var/atom/my_atom = null
 	var/temperature = 0
+	var/floor_liquid_exposure = FALSE
 
 /datum/reagents/New(var/maximum_volume = 120, var/atom/my_atom)
 	if(!istype(my_atom))
@@ -294,7 +295,8 @@ GLOBAL_DATUM_INIT(temp_reagents_holder, /obj, new)
 //If for some reason touch effects are bypassed (e.g. injecting stuff directly into a reagent container or person),
 //call the appropriate trans_to_*() proc.
 /datum/reagents/proc/trans_to(var/atom/target, var/amount = 1, var/multiplier = 1, var/copy = 0)
-	touch(target) //First, handle mere touch effects
+	if(!isturf(target))
+		touch(target)
 
 	if(ismob(target))
 		return splash_mob(target, amount, copy)
@@ -403,13 +405,19 @@ GLOBAL_DATUM_INIT(temp_reagents_holder, /obj, new)
 		R.touch_mob(target)
 		qdel(R)
 
-/datum/reagents/proc/trans_to_turf(var/turf/target, var/amount = 1, var/multiplier = 1, var/copy = 0) // Turfs don't have any reagents (at least, for now). Just touch it.
-	if(!target || !target.simulated)
+/datum/reagents/proc/trans_to_turf(var/turf/target, var/amount = 1, var/multiplier = 1, var/copy = 0)
+	if(!target || !target.simulated || amount <= 0 || multiplier <= 0)
 		return
 
 	var/datum/reagents/R = new /datum/reagents(amount * multiplier, GLOB.temp_reagents_holder)
 	. = trans_to_holder(R, amount, multiplier, copy)
+	R.floor_liquid_exposure = istype(target, /turf/simulated/floor) && !target.density
 	R.touch_turf(target)
+	if(R.floor_liquid_exposure && R.total_volume)
+		if(!target.liquids)
+			target.liquids = new(target)
+		target.liquids.reagents.maximum_volume = max(target.liquids.reagents.maximum_volume, target.liquids.reagents.total_volume + R.total_volume / multiplier)
+		R.trans_to_holder(target.liquids.reagents, R.total_volume, 1 / multiplier)
 	qdel(R)
 	return
 
@@ -435,3 +443,6 @@ GLOBAL_DATUM_INIT(temp_reagents_holder, /obj, new)
 	else
 		reagents = new/datum/reagents(max_vol, src)
 	return reagents
+
+/turf
+	var/obj/effect/floor_liquid/liquids

@@ -48,12 +48,12 @@
 
 /obj/item/clothing/gloves/arbiter
 	name = "agent's gloves"
-	desc = "The perfect gloves to wrap around an old god follower neck."
+	desc = "The perfect gloves to wrap around a Nar-Sie cultist's neck."
 	icon_state = "arbiter"
 	item_state = "arbiter"
 
 /obj/item/clothing/shoes/jackboots/arbiter//Child of jackboots to avoid copy and paste.
 	name = "agent boots"
-	desc = "Sleek, and red as the blood of the heretics."
+	desc = "Sleek, and red as the blood of Nar-Sie's cultists."
 	icon_state = "arbiter"
 	item_state = "arbiter"

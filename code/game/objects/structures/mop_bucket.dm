@@ -20,6 +20,17 @@
 
 /obj/structure/mopbucket/attackby(obj/item/I, mob/user)
 	if(istype(I, /obj/item/mop))
+		if(user.a_intent == I_HURT)
+			if(!I.reagents.total_volume)
+				to_chat(user, SPAN_WARNING("\The [I] is dry."))
+				return
+			if(reagents.get_free_space() < 1)
+				to_chat(user, SPAN_WARNING("\The [src] is full."))
+				return
+			var/collected = I.reagents.trans_to_holder(reagents, I.reagents.total_volume)
+			to_chat(user, SPAN_NOTICE("You wring [round(collected, 0.1)] units out of \the [I] into \the [src]."))
+			playsound(loc, 'sound/effects/slosh.ogg', 25, 1)
+			return
 		if(reagents.total_volume < 1)
 			to_chat(user, "<span class='warning'>\The [src] is out of water!</span>")
 		else

@@ -95,3 +95,38 @@
 	refresh_client_images()
 	reload_fullscreen() // Reload any fullscreen overlays this mob has.
 	add_click_catcher()
+	update_client_view()
+
+/mob/proc/uses_side_ui()
+	return TRUE
+
+/mob/new_player/uses_side_ui()
+	return FALSE
+
+/mob/observer/uses_side_ui()
+	return FALSE
+
+/client
+	var/view_widened = FALSE
+
+// Mobs without the human-style side UI get a view that fills the map control, so no empty black bars show beside it.
+// Returns the view width in tiles.
+/mob/proc/update_client_view()
+	if(!client)
+		return 15
+	if(uses_side_ui())
+		if(client.view_widened)
+			client.view = world.view
+			client.view_widened = FALSE
+		return 15
+	var/list/map_size = splittext(winget(client, "mapwindow.map", "size"), "x")
+	var/map_w = text2num(map_size[1])
+	var/map_h = length(map_size) > 1 ? text2num(map_size[2]) : 0
+	if(!map_w || !map_h)
+		return 15
+	var/view_w = max(15, ceil(15 * map_w / map_h))
+	if(!(view_w % 2))
+		view_w++
+	client.view = "[view_w]x15"
+	client.view_widened = TRUE
+	return view_w

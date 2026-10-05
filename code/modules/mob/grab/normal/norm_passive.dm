@@ -2,7 +2,7 @@
 	state_name = NORM_PASSIVE
 	fancy_desc = "holding"
 
-	upgrab_name = NORM_STRUGGLE
+	upgrab_name = NORM_AGGRESSIVE
 
 	shift = 8
 
@@ -13,7 +13,7 @@
 	point_blank_mult = 1
 	same_tile = 0
 
-	icon_state = "reinforce"
+	icon_state = "grabbed"
 
 	break_chance_table = list(15, 60, 100)
 

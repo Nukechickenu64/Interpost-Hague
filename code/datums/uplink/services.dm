@@ -11,8 +11,8 @@
 	path = /obj/item/device/uplink_service/fake_ion_storm
 
 /datum/uplink_item/item/services/suit_sensor_garble
-	name = "Complete Suit Sensor Jamming"
-	desc = "Garbles all suit sensor data for 10 minutes."
+	name = "Complete Medical Bracelet Jamming"
+	desc = "Garbles all medical bracelet data for 10 minutes."
 	item_cost = 16
 	path = /obj/item/device/uplink_service/jamming/garble
 
@@ -29,8 +29,8 @@
 	path = /obj/item/device/uplink_service/fake_crew_announcement
 
 /datum/uplink_item/item/services/suit_sensor_shutdown
-	name = "Complete Suit Sensor Shutdown"
-	desc = "Completely disables all suit sensors for 10 minutes."
+	name = "Complete Medical Bracelet Shutdown"
+	desc = "Completely disables all medical bracelet transmissions for 10 minutes."
 	item_cost = 40
 	path = /obj/item/device/uplink_service/jamming
 
@@ -124,7 +124,7 @@
 *****************/
 /obj/item/device/uplink_service/jamming
 	service_duration = 10 MINUTES
-	service_label = "Suit Sensor Shutdown"
+	service_label = "Medical Bracelet Shutdown"
 	var/suit_sensor_jammer_method/ssjm = /suit_sensor_jammer_method/cap_off
 
 /obj/item/device/uplink_service/jamming/New()
@@ -144,7 +144,7 @@
 	ssjm.disable()
 
 /obj/item/device/uplink_service/jamming/garble
-	service_label = "Suit Sensor Garble"
+	service_label = "Medical Bracelet Garble"
 	ssjm = /suit_sensor_jammer_method/random/moderate
 
 /*****************

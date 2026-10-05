@@ -1,0 +1,20 @@
+Pony sprites from tiiktaaaliik/Ponystation13
+https://github.com/tiiktaaaliik/Ponystation13
+Source revision: cbebc7b1488d22983678d5de5c5c6f489c72348b
+
+bodyparts.dmi is an unchanged copy of icons/mob/human/species/pony/bodyparts.dmi.
+face.dmi is an unchanged copy of icons/mob/human/human_face.dmi, including
+the Equestrian mane, eye, and eyelid sprites.
+
+Upstream assets are licensed under Creative Commons Attribution-ShareAlike
+3.0 unless otherwise indicated, as documented in the upstream README:
+https://github.com/tiiktaaaliik/Ponystation13/blob/cbebc7b1488d22983678d5de5c5c6f489c72348b/README.md
+https://creativecommons.org/licenses/by-sa/3.0/
+
+Species, anatomy, and ability adaptations are based on upstream
+code/modules/mob/living/carbon/human/species_types/pony.dm and
+code/modules/surgery/bodyparts/species_parts/pony_bodyparts.dm (AGPL-3.0).
+Ponish is adapted from code/modules/language/ponish.dm with ASCII syllable
+transliteration. config/names/pony.txt reproduces strings/names/pony.txt.
+The Bay organ and GURPS integration is new; no upstream character preferences
+or roundstart eligibility were imported.

@@ -44,6 +44,10 @@
 		adjust_nutrition(-nut_removed)
 		adjust_thirst(-hyd_removed)
 
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		if(H.sprinting)
+			H.adjustStaminaLoss((FAT in H.mutations) ? rand(2,5) : rand(1,3))
 	// Moving around increases germ_level faster
 	if(germ_level < GERM_LEVEL_MOVE_CAP && prob(8))
 		germ_level++
@@ -151,17 +155,25 @@
 /mob/living/carbon/swap_hand()
 	src.hand = !( src.hand )
 	if(hud_used.l_hand_hud_object && hud_used.r_hand_hud_object)
-		if(hand)	//This being 1 means the left hand is in use
-			hud_used.l_hand_hud_object.icon_state = "l_hand_active"
-			hud_used.r_hand_hud_object.icon_state = "r_hand_inactive"
+		if(hud_used.l_hand_hud_object.icon == 'icons/mob/screen/os13.dmi')
+			hud_used.l_hand_hud_object.icon_state = "l_hand"
+			hud_used.r_hand_hud_object.icon_state = "r_hand"
+			hud_used.update_selected_hand_overlay()
 		else
-			hud_used.l_hand_hud_object.icon_state = "l_hand_inactive"
-			hud_used.r_hand_hud_object.icon_state = "r_hand_active"
+			if(hand)	//This being 1 means the left hand is in use
+				hud_used.l_hand_hud_object.icon_state = "l_hand_active"
+				hud_used.r_hand_hud_object.icon_state = "r_hand_inactive"
+			else
+				hud_used.l_hand_hud_object.icon_state = "l_hand_inactive"
+				hud_used.r_hand_hud_object.icon_state = "r_hand_active"
 	if(hud_used.swaphands_hud_object)
-		if(hand)	//This being 1 means the left hand is in use
-			hud_used.swaphands_hud_object.dir = 2
+		if(hud_used.swaphands_hud_object.icon == 'icons/mob/screen/os13.dmi')
+			hud_used.swaphands_hud_object.icon_state = hand ? "hand_l" : "hand_r"
 		else
-			hud_used.swaphands_hud_object.dir = 1
+			if(hand)	//This being 1 means the left hand is in use
+				hud_used.swaphands_hud_object.dir = 2
+			else
+				hud_used.swaphands_hud_object.dir = 1
 	for(var/obj/item/device/flashlight/F in list(l_hand, r_hand))
 		F.hands_swapped(src)
 	return
@@ -381,18 +393,35 @@
 	set name = "Sleep"
 	set category = "IC"
 
-	if(usr.sleeping)
-		to_chat(usr, "<span class='warning'>You can't awaken from a dream you've already entered.</span>")
+	if(stat == DEAD)
 		return
-	if(alert(src,"You sure you want to sleep for a while?","Sleep","Yes","No") == "Yes")
-		usr.sleeping = 40 //longish nap
-		var/turf/T = get_turf(src)
-		var/list/mobs = list()
-		var/list/objs = list()
-		get_mobs_and_objs_in_view_fast(T,0,mobs,objs)
-		for (var/object in objs)
-			if (istype(object,/obj/structure/bed/))
-				in_bed = 1
+	if(voluntary_sleeping)
+		if(waking_up)
+			return
+		waking_up = TRUE
+		if(ishuman(src))
+			var/mob/living/carbon/human/H = src
+			H.update_awake_hud()
+		spawn(20)
+			if(!src || !src.voluntary_sleeping || !src.waking_up)
+				return
+			voluntary_sleeping = FALSE
+			waking_up = FALSE
+			sleeping = 0
+			if(stat != DEAD && !paralysis)
+				set_stat(CONSCIOUS)
+			if(ishuman(src))
+				var/mob/living/carbon/human/H = src
+				H.update_awake_hud()
+		return
+	if(stat != CONSCIOUS || sleeping || paralysis)
+		return
+	voluntary_sleeping = TRUE
+	sleeping = 1
+	set_stat(UNCONSCIOUS)
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		H.update_awake_hud()
 
 /mob/living/carbon/Bump(var/atom/movable/AM, yes)
 	if(now_pushing || !yes)

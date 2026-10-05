@@ -7,6 +7,10 @@
 	tally += species.handle_movement_delay_special(src)
 
 	if (istype(loc, /turf/space)) return -1 // It's hard to be slowed down in space by... anything
+	if(isturf(loc) && !is_floating && !buckled)
+		var/turf/floor = loc
+		if(floor.liquids && floor.liquids.liquid_state > 1)
+			tally += (floor.liquids.liquid_state - 1) * 2
 
 	var/obj/item/organ/internal/stomach/stomach = internal_organs_by_name[BP_STOMACH]
 	if(embedded_flag || (stomach && stomach.contents.len))
@@ -95,7 +99,12 @@
 	combat_mode_speed_modifier -= c_intent == I_DEFEND ? 0.005 : 0 //If they are in defensive mode, then we !SUBTRACT! because we will be subtracting this number from tally
 	if(c_intent == I_QUICK)
 		tally -= combat_mode_speed_modifier
-	return (tally+config.human_delay)
+	if(sprinting && m_intent == "run" && canmove && !resting)
+		tally -= 1
+	var/movement_delay = tally + config.human_delay
+	if(is_leech() && leech_stat_bonuses[STAT_DX])
+		movement_delay /= 3
+	return movement_delay
 
 /mob/proc/get_jetpack()
 	return null
@@ -113,6 +122,9 @@
 /mob/living/carbon/human/Process_Spacemove(var/check_drift = 0)
 	//Can we act?
 	if(restrained())	return 0
+	if(pony_can_fly())
+		inertia_dir = 0
+		return 1
 
 	var/obj/item/tank/jetpack/thrust = get_jetpack()
 	if(thrust)

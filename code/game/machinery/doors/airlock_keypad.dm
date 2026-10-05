@@ -120,18 +120,27 @@
 
 /obj/machinery/airlock_keypad/proc/start_attempt(mob/user)
 	clear_attempt(user)
-	active_attempts[user] = list("start_turf" = get_turf(user), "digits" = "")
+	var/current_macro = user.client ? winget(user.client, "mainwindow", "macro") : null
+	active_attempts[user] = list("start_turf" = get_turf(user), "digits" = "", "previous_macro" = current_macro)
 	GLOB.moved_event.register(user, src, .proc/on_user_moved)
 	user.set_machine(src)
-	show_entry(user)
+	if(user.client)
+		winset(user.client, "mainwindow", "macro=keypadentry mapwindow.map.focus=true")
+	to_chat(user, "<span class='notice'>Enter the five-digit combination using the number keys. Moving will cancel the attempt.</span>")
 
 /obj/machinery/airlock_keypad/proc/clear_attempt(mob/user)
-	if(!user || isnull(active_attempts[user]))
+	if(!user)
+		return
+	var/list/attempt = active_attempts[user]
+	if(!attempt)
 		return
 	active_attempts -= user
 	GLOB.moved_event.unregister(user, src, .proc/on_user_moved)
 	if(user.client)
-		show_browser(user, null, "window=airlock_keypad")
+		var/previous_macro = attempt["previous_macro"]
+		if(!length(previous_macro))
+			previous_macro = "macro"
+		winset(user.client, "mainwindow", "macro=[previous_macro] mapwindow.map.focus=true")
 	if(user.machine == src)
 		user.unset_machine()
 
@@ -153,43 +162,20 @@
 /obj/machinery/airlock_keypad/attack_hand(mob/user)
 	if(!valid_attempt(user))
 		to_chat(user, "<span class='notice'>Examine the keypad to begin an entry attempt.</span>")
-		return
-	show_entry(user)
+	else
+		to_chat(user, "<span class='notice'>Use the number keys to enter the combination. Press Escape to cancel.</span>")
 
-/obj/machinery/airlock_keypad/proc/show_entry(mob/user)
-	var/list/attempt = active_attempts[user]
-	if(!attempt)
-		return
-	var/entered_digits = attempt["digits"]
-	var/dat = "<TT><B>[src]</B><BR>Enter the five-digit combination:<BR>Code: [entered_digits]<BR><BR>"
-	dat += "<A href='?src=\ref[src];digit=1'>1</A> - <A href='?src=\ref[src];digit=2'>2</A> - <A href='?src=\ref[src];digit=3'>3</A><BR>"
-	dat += "<A href='?src=\ref[src];digit=4'>4</A> - <A href='?src=\ref[src];digit=5'>5</A> - <A href='?src=\ref[src];digit=6'>6</A><BR>"
-	dat += "<A href='?src=\ref[src];digit=7'>7</A> - <A href='?src=\ref[src];digit=8'>8</A> - <A href='?src=\ref[src];digit=9'>9</A><BR>"
-	dat += "<A href='?src=\ref[src];cancel=1'>Cancel</A> - <A href='?src=\ref[src];digit=0'>0</A></TT>"
-	show_browser(user, dat, "window=airlock_keypad;size=260x220")
 
-/obj/machinery/airlock_keypad/Topic(href, href_list)
-	if(..())
-		return 1
-	var/mob/user = usr
+/obj/machinery/airlock_keypad/proc/press_digit(mob/user, digit)
 	if(!valid_attempt(user))
 		clear_attempt(user)
 		return
-
-	if(href_list["cancel"])
-		clear_attempt(user)
-		return
-
-	if(isnull(href_list["digit"]) || !isnum_safe(href_list["digit"]))
-		return
-	var/digit = text2num(href_list["digit"])
-	if(digit < 0 || digit > 9)
+	if(!istext(digit) || length(digit) != 1 || !(digit in list("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")))
 		return
 
 	var/list/attempt = active_attempts[user]
-	attempt["digits"] += "[digit]"
+	attempt["digits"] += digit
 	if(length(attempt["digits"]) < 5)
-		show_entry(user)
 		return
 
 	if(attempt["digits"] != code)

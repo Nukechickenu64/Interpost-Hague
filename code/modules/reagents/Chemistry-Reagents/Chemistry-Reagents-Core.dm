@@ -135,6 +135,8 @@
 #define WATER_LATENT_HEAT 19000 // How much heat is removed when applied to a hot turf, in J/unit (19000 makes 120 u of water roughly equivalent to 4L)
 /datum/reagent/water
 	name = "Water"
+	liquid_evaporation_rate = 0.1
+	liquid_slippery = TRUE
 	description = "A ubiquitous chemical substance that is composed of hydrogen and oxygen."
 	reagent_state = LIQUID
 	color = "#a0bfeb"
@@ -213,6 +215,9 @@
 
 /datum/reagent/fuel
 	name = "Welding fuel"
+	liquid_evaporation_rate = 0.02
+	liquid_fire_power = 10
+	liquid_slippery = TRUE
 	description = "Required for welders. Flamable."
 	taste_description = "gross metal"
 	reagent_state = LIQUID
@@ -223,6 +228,8 @@
 	glass_desc = "Unless you are an industrial tool, this is probably not safe for consumption."
 
 /datum/reagent/fuel/touch_turf(var/turf/T)
+	if(holder.floor_liquid_exposure)
+		return
 	new /obj/effect/decal/cleanable/liquid_fuel(T, volume)
 	remove_self(volume)
 	return

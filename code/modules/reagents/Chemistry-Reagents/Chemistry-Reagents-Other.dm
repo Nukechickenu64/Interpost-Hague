@@ -181,7 +181,8 @@
 	if(ishuman(M)) // Any location
 		if(iscultist(M))
 			if(prob(10))
-				GLOB.cult.offer_uncult(M)
+				var/datum/antagonist/cultist/cult = get_cult(M)
+				cult.offer_uncult(M)
 			if(prob(2))
 				var/obj/effect/spider/spiderling/S = new /obj/effect/spider/spiderling(M.loc)
 				M.visible_message("<span class='warning'>\The [M] coughs up \the [S]!</span>")
@@ -289,6 +290,7 @@
 
 /datum/reagent/lube // TODO: spraying on borgs speeds them up
 	name = "Space Lube"
+	liquid_slippery = TRUE
 	description = "Lubricant is a substance introduced between two moving surfaces to reduce the friction and wear between them. giggity."
 	taste_description = "slime"
 	reagent_state = LIQUID

@@ -172,7 +172,7 @@ obj/machinery/airlock_sensor
 
 	var/on = 1
 	var/alert = 0
-	var/previousPressure
+	var/previousMoles
 
 obj/machinery/airlock_sensor/update_icon()
 	if(on)
@@ -195,20 +195,20 @@ obj/machinery/airlock_sensor/attack_hand(mob/user)
 obj/machinery/airlock_sensor/Process()
 	if(on)
 		var/datum/gas_mixture/air_sample = return_air()
-		var/pressure = round(air_sample.return_pressure(),0.1)
+		var/tile_moles = round(air_sample.get_tile_moles(),0.1)
 
-		if(abs(pressure - previousPressure) > 0.001 || previousPressure == null)
+		if(abs(tile_moles - previousMoles) > 0.001 || previousMoles == null)
 			var/datum/signal/signal = new
 			signal.transmission_method = 1 //radio signal
 			signal.data["tag"] = id_tag
 			signal.data["timestamp"] = world.time
-			signal.data["pressure"] = num2text(pressure)
+			signal.data["tile_moles"] = num2text(tile_moles)
 
 			radio_connection.post_signal(src, signal, range = AIRLOCK_CONTROL_RANGE, filter = RADIO_AIRLOCK)
 
-			previousPressure = pressure
+			previousMoles = tile_moles
 
-			alert = (pressure < ONE_ATMOSPHERE*0.8)
+			alert = (tile_moles < MOLES_CELLSTANDARD*0.8)
 
 			update_icon()
 

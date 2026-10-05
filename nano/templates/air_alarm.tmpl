@@ -128,24 +128,24 @@ Used In File(s): \code\game\machinery\alarm.dm
 					Operation Mode:
 				</div>
 				<div class="itemContent">
-					{{:value.direction == "siphon" ? 'Siphoning' : 'Pressurizing'}}
+					{{:value.direction == "siphon" ? 'Siphoning' : 'Adding Gas'}}
 				</div>
 			</div>
 			<div class="item">
 				<div class="itemLabel">
-					Pressure Checks:
+					Gas Amount / Internal Pressure Checks:
 				</div>
 				<div class="itemContent">
-					{{:helper.link('External', null, { 'id_tag' : value.id_tag, 'command' : 'checks', 'val' : value.checks^1}, null, value.checks&1 ? 'selected' : null)}}
-					{{:helper.link('Internal', null, { 'id_tag' : value.id_tag, 'command' : 'checks', 'val' : value.checks^2}, null, value.checks&2 ? 'selected' : null)}}
+					{{:helper.link('Room Gas Amount', null, { 'id_tag' : value.id_tag, 'command' : 'checks', 'val' : value.checks^1}, null, value.checks&1 ? 'selected' : null)}}
+					{{:helper.link('Pipe Pressure', null, { 'id_tag' : value.id_tag, 'command' : 'checks', 'val' : value.checks^2}, null, value.checks&2 ? 'selected' : null)}}
 				</div>
 			</div>
 			<div class="item">
 				<div class="itemLabel">
-					External Pressure Bound:
+					External Gas Bound (mol/tile):
 				</div>
 				<div class="itemContent">
-					{{:helper.link(helper.fixed(value.external,2), null, { 'id_tag' : value.id_tag, 'command' : 'set_external_pressure'})}}
+					{{:helper.link(helper.fixed(value.external,2) + ' mol/tile', null, { 'id_tag' : value.id_tag, 'command' : 'set_external_pressure'})}}
 					{{:helper.link('Reset', null, { 'id_tag' : value.id_tag, 'command' : 'reset_external_pressure'})}}
 				</div>
 			</div>			
@@ -203,7 +203,7 @@ Used In File(s): \code\game\machinery\alarm.dm
 		{{/for}}
     {{else data.screen == 5}}
 		<H3>Alarm Threshold</H3>
-		Partial pressure for gases.
+		Gas amounts in mol/tile; temperature in Kelvin.
 		<table class='fixed'>
 		<tr>
 			<td></td><td><span class='bad'>min2</span></td><td><span class='average'>min1</span></td><td><span class='average'>max1</span></td><td><span class='bad'>max2</span></td>

@@ -23,6 +23,24 @@
 	var/moppable
 	if(istype(A, /turf))
 		var/turf/T = A
+		if(T.liquids)
+			if(T.liquids.liquid_state > 1)
+				to_chat(user, SPAN_WARNING("There is too much liquid here to mop up."))
+				return
+			if(reagents.get_free_space() < 1)
+				to_chat(user, SPAN_WARNING("Your mop is saturated. Wring it into a bucket on harm intent first."))
+				return
+			user.visible_message(SPAN_NOTICE("\The [user] begins to mop up \the [T]."))
+			if(do_after(user, max(10, 100 - user.skills["cleaning"]), T) && T.liquids)
+				if(T.liquids.liquid_state > 1)
+					to_chat(user, SPAN_WARNING("There is too much liquid here to mop up."))
+					return
+				var/collected = T.liquids.take_reagents(reagents, reagents.get_free_space())
+				if(collected && (reagents.has_reagent(/datum/reagent/water, 1) || reagents.has_reagent(/datum/reagent/space_cleaner, 1)))
+					T.clean_blood()
+					T.remove_cleanables()
+				to_chat(user, SPAN_NOTICE("You mop up [round(collected, 0.1)] units of liquid."))
+			return
 		var/obj/effect/fluid/F = locate() in T
 		if(F && F.fluid_amount > 0)
 			if(F.fluid_amount > FLUID_SHALLOW)

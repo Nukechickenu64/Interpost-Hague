@@ -26,6 +26,7 @@
 	var/fullscreen = FALSE
 
 	perspective = EYE_PERSPECTIVE
+	mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
 
 	var/widescreen = 0
 	var/vert_split = 0

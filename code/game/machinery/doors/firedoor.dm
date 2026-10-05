@@ -1,5 +1,5 @@
 
-#define FIREDOOR_MAX_PRESSURE_DIFF 25 // kPa
+#define FIREDOOR_MAX_PRESSURE_DIFF PRESSURE_TO_MOLES(25)
 #define FIREDOOR_MAX_TEMP 50 // °C
 #define FIREDOOR_MIN_TEMP 0
 
@@ -79,7 +79,7 @@
 		return
 
 	if(pdiff >= FIREDOOR_MAX_PRESSURE_DIFF)
-		to_chat(user, "<span class='warning'>WARNING: Current pressure differential is [pdiff]kPa! Opening door may result in injury!</span>")
+		to_chat(user, "<span class='warning'>WARNING: Current gas amount differential is [round(pdiff, 0.1)] mol/tile! Opening door may result in injury!</span>")
 	to_chat(user, "<b>Sensor readings:</b>")
 	for(var/index = 1; index <= tile_info.len; index++)
 		var/o = "&nbsp;&nbsp;"
@@ -97,11 +97,11 @@
 			to_chat(user, o)
 			continue
 		var/celsius = convert_k2c(tile_info[index][1])
-		var/pressure = tile_info[index][2]
+		var/tile_moles = tile_info[index][2]
 		o += "<span class='[(dir_alerts[index] & (FIREDOOR_ALERT_HOT|FIREDOOR_ALERT_COLD)) ? "warning" : "color:blue"]'>"
 		o += "[celsius]&deg;C</span> "
 		o += "<span style='color:blue'>"
-		o += "[pressure]kPa</span></li>"
+		o += "[round(tile_moles, 0.1)] mol/tile</span></li>"
 		to_chat(user, o)
 	if(islist(users_to_open) && users_to_open.len)
 		var/users_to_open_string = users_to_open[1]
@@ -271,7 +271,7 @@
 
 	return FA
 
-// CHECK PRESSURE
+// CHECK GAS AMOUNTS
 /obj/machinery/door/firedoor/Process()
 	..()
 
@@ -279,8 +279,8 @@
 		next_process_time = world.time + 100		// 10 second delays between process updates
 		var/changed = 0
 		lockdown=0
-		// Pressure alerts
-		pdiff = getOPressureDifferential(src.loc)
+		// Gas amount alerts
+		pdiff = getOAirAmountDifferential(src.loc)
 		if(pdiff >= FIREDOOR_MAX_PRESSURE_DIFF)
 			lockdown = 1
 			if(!pdiff_alert)
@@ -291,7 +291,7 @@
 				pdiff_alert = 0
 				changed = 1 // update_icon()
 
-		tile_info = getCardinalAirInfo(src.loc,list("temperature","pressure"))
+		tile_info = getCardinalAirInfo(src.loc,list("temperature","tile_moles"))
 		var/old_alerts = dir_alerts
 		for(var/index = 1; index <= 4; index++)
 			var/list/tileinfo=tile_info[index]

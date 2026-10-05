@@ -248,6 +248,11 @@
 	happiness = 10
 	timeout = 1800
 
+/datum/happiness_event/leech_feeding
+	description = "<span class='info'>An unnatural calm lingers after that bite.</span>\n"
+	happiness = 15
+	timeout = 9000
+
 /datum/happiness_event/booze
 	description = "<span class='binfo'>Alcohol makes the pain go away.</span>\n"
 	happiness = 10

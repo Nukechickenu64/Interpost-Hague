@@ -112,6 +112,14 @@
 	if(storage_types & CLOSET_STORAGE_STRUCTURES)
 		stored_units += store_structures(stored_units)
 
+/obj/structure/closet/Bumped(atom/movable/AM)
+	..()
+	if(ishuman(AM))
+		var/mob/living/carbon/human/H = AM
+		if(H.stat || H.resting || H.sleeping || !H.canmove)
+			return
+		H.adjustStaminaLoss(rand(3,6))
+
 /obj/structure/closet/proc/open()
 	if(src.opened)
 		return 0

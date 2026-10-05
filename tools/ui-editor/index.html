@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Human HUD Editor</title>
+<style>
+  :root{
+    --bg:#1b1e24; --panel:#242832; --panel2:#2c313c; --border:#3a4150;
+    --text:#dfe4ee; --muted:#8e97a8; --accent:#5aa9e6; --accent2:#e6b45a;
+    --good:#6abf69; --bad:#e06464;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;}
+  h1{font-size:16px;margin:0;padding:10px 14px;background:var(--panel2);border-bottom:1px solid var(--border);}
+  h1 span{color:var(--muted);font-weight:normal;font-size:12px;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--border);}
+  .toolbar label{color:var(--muted);margin-right:4px;}
+  .toolbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+  button{background:var(--accent);color:#0c1420;border:none;border-radius:4px;padding:6px 10px;cursor:pointer;font-weight:600;}
+  button:hover{filter:brightness(1.1);}
+  button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);}
+  button.good{background:var(--good);color:#06240a;}
+  input[type=number]{width:58px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:3px;}
+  select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:3px;}
+  input[type=text]{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:4px 6px;}
+  .layout{display:flex;height:calc(100vh - 92px);}
+  .stage-wrap{flex:1 1 55%;overflow:auto;padding:16px;background:
+      repeating-linear-gradient(45deg,#15171c,#15171c 10px,#17191f 10px,#17191f 20px);}
+  #stage{position:relative;image-rendering:pixelated;box-shadow:0 0 0 2px var(--border);}
+  .elbox{position:absolute;display:flex;align-items:center;justify-content:center;
+      text-align:center;font-size:9px;line-height:1.1;color:#fff;cursor:grab;
+      background-size:cover;background-repeat:no-repeat;user-select:none;
+      border:1px solid rgba(255,255,255,0.35);z-index:1;}
+  .elbox.placeholder{background:repeating-conic-gradient(#5aa9e6 0% 25%, #3d78a6 0% 50%) 50%/8px 8px;}
+  .elbox.bg-el{z-index:0;border-style:dashed;}
+  .elbox.bg-el.placeholder{background:repeating-conic-gradient(#555b66 0% 25%, #3a3e47 0% 50%) 50%/16px 16px;}
+  .elbox.dragging{cursor:grabbing;outline:2px solid var(--accent2);z-index:50;}
+  .elbox.hidden-el{display:none;}
+  .sidebar{flex:1 1 45%;min-width:420px;overflow-y:auto;border-left:1px solid var(--border);background:var(--panel);}
+  .group-filters{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;border-bottom:1px solid var(--border);}
+  .group-filters label{display:flex;align-items:center;gap:4px;background:var(--panel2);padding:3px 8px;border-radius:12px;cursor:pointer;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:4px 6px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+  th{position:sticky;top:0;background:var(--panel2);color:var(--muted);font-weight:600;z-index:2;}
+  tr:hover td{background:#2a2f3a;}
+  code{background:#141720;padding:1px 5px;border-radius:3px;color:var(--accent2);}
+  .define-name{color:var(--accent);font-family:Consolas,monospace;}
+  .raw-value{font-family:Consolas,monospace;color:var(--muted);}
+  .panel{padding:10px 14px;border-top:1px solid var(--border);}
+  textarea{width:100%;background:#12141a;color:#cfe3ff;border:1px solid var(--border);border-radius:4px;
+      font-family:Consolas,monospace;font-size:12px;padding:8px;resize:vertical;}
+  details summary{cursor:pointer;color:var(--accent);margin:4px 0;}
+  .hint{color:var(--muted);font-size:12px;}
+  .unmatched-row{display:flex;gap:6px;align-items:center;padding:3px 0;}
+  .pill{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--muted);}
+  .badge-changed{background:var(--accent2);color:#2a1c00;border-radius:3px;padding:0 4px;font-size:10px;margin-left:4px;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<h1>Human HUD Editor <span>— drag-and-drop editor for BYOND <code>screen_loc</code> HUD defines (os13 skin)</span></h1>
+
+<div class="toolbar">
+  <button id="btnAutoLoad" class="good">🔄 Auto-load from repo</button>
+  <button id="btnPickFolder" class="good hidden" title="Grants one-time folder access so auto-load works on file:// pages in Chrome/Edge">📁 Grant folder access…</button>
+  <button id="btnLoadDefines">📄 Load _defines_alt.dm…</button>
+  <button id="btnLoadSheet" class="secondary">🖼️ Load os13.dmi…</button>
+  <button id="btnLoadBgSheet" class="secondary">🖼️ Load backgrounds.dmi…</button>
+  <span class="sep"></span>
+  <label>View tiles <input type="number" id="viewTiles" value="15" min="5" max="31"></label>
+  <label>Icon px <input type="number" id="iconPx" value="32" min="8" max="128"></label>
+  <label>Zoom <input type="number" id="zoom" value="2" min="1" max="4" step="0.5"></label>
+  <span class="sep"></span>
+  <label><input type="checkbox" id="snapEnabled" checked> Snap to grid</label>
+  <label>Tile snap
+    <select id="snapTile">
+      <option value="1" selected>1 tile</option>
+      <option value="0.5">½ tile</option>
+      <option value="0.25">¼ tile</option>
+    </select>
+  </label>
+  <label>Pixel snap
+    <select id="snapPx">
+      <option value="0" selected>Off (free)</option>
+      <option value="1">1px</option>
+      <option value="2">2px</option>
+      <option value="4">4px</option>
+      <option value="8">8px</option>
+      <option value="16">16px</option>
+    </select>
+  </label>
+  <span class="sep"></span>
+  <button id="btnUndo" class="secondary" title="Ctrl+Z">↩ Undo</button>
+  <button id="btnReset" class="secondary">↺ Reset positions</button>
+  <button id="btnExport" class="good">⬇ Generate updated file</button>
+  <span class="hint" id="status"></span>
+</div>
+
+<div class="layout">
+  <div class="stage-wrap">
+    <div id="stage"></div>
+    <p class="hint">Drag a box to move it. Double-click a box to remove it from the board (use "Reset" or Ctrl+Z to bring it back).</p>
+  </div>
+  <div class="sidebar">
+    <div class="group-filters" id="groupFilters"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Element</th><th>Define</th>
+          <th>Anchor X</th><th>Tile X</th><th>px X</th>
+          <th>Anchor Y</th><th>Tile Y</th><th>px Y</th>
+          <th>screen_loc</th>
+        </tr>
+      </thead>
+      <tbody id="elTable"></tbody>
+    </table>
+
+    <div class="panel">
+      <details id="unmatchedPanel">
+        <summary>Other <code>ui_*</code> defines found in the loaded file (not shown on the board)</summary>
+        <div id="unmatchedList" class="hint">Load a defines file to see these.</div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <details id="literalPanel">
+        <summary>Hardcoded positions (not <code>#define</code>s — edit the source file directly)</summary>
+        <div id="literalList" class="hint"></div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <strong>Export</strong>
+      <p class="hint">Click "Generate updated file" above after loading the original <code>_defines_alt.dm</code> and
+      dragging/editing elements. This rebuilds the file with only the changed <code>#define</code> lines modified,
+      everything else left untouched.</p>
+      <textarea id="output" rows="10" placeholder="Generated file contents will appear here…"></textarea>
+      <div style="margin-top:6px;display:flex;gap:8px;">
+        <button id="btnCopy" class="secondary">Copy to clipboard</button>
+        <button id="btnDownload" class="secondary">Download _defines_alt.dm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileDefines" accept=".dm,.dmf,.txt" style="display:none">
+<input type="file" id="fileSheet" accept=".dmi,.png" style="display:none">
+<input type="file" id="fileBgSheet" accept=".dmi,.png" style="display:none">
+
+<script>
+/* ---------------------------------------------------------------------
+ * Data model: the HUD elements we know how to visualise. "define" must
+ * match the #define name used in code/_onclick/hud/_defines_alt.dm so
+ * edits can be written straight back into that file. "state" is the
+ * icon_state drawn from icons/mob/screen/os13.dmi for preview purposes
+ * (falls back to a labelled placeholder box if not found/loaded).
+ * ------------------------------------------------------------------- */
+const DEFAULT_ELEMENTS = [
+  // The HUD backdrop bar isn't a #define — it's a literal screen_loc string set directly in
+  // code/_onclick/hud/human_alt.dm, and its icon (96x480px, 3x15 tiles) comes from a separate
+  // sprite sheet than the rest of the HUD.
+  {id:'upperbar', define:null, label:'HUD Backdrop Bar', state:'1', group:'background', sheetKey:'backgrounds',
+   wTiles:3, hTiles:15, literal:true, literalDefault:'WEST-3:12,SOUTH', literalFile:'code/_onclick/hud/human_alt.dm',
+   literalLine:(v)=>`using.screen_loc = "${v}"`},
+
+  {id:'iclothing', define:'ui_os13_iclothing', label:'Uniform',       state:'center',        group:'gear'},
+  {id:'oclothing', define:'ui_os13_oclothing', label:'Suit',          state:'o_clothing',    group:'gear'},
+  {id:'mask',      define:'ui_os13_mask',      label:'Mask',          state:'mask',          group:'gear'},
+  {id:'gloves',    define:'ui_os13_gloves',    label:'Gloves',        state:'gloves',        group:'gear'},
+  {id:'glasses',   define:'ui_os13_glasses',   label:'Glasses',       state:'glasses',       group:'gear'},
+  {id:'l_ear',     define:'ui_os13_l_ear',     label:'Left Ear',      state:'ears',          group:'gear'},
+  {id:'r_ear',     define:'ui_os13_r_ear',     label:'Right Ear',     state:'ears',          group:'gear'},
+  {id:'head',      define:'ui_os13_head',      label:'Hat',           state:'hair',          group:'gear'},
+  {id:'shoes',     define:'ui_os13_shoes',     label:'Shoes',         state:'shoes',         group:'gear'},
+  {id:'sstore',    define:'ui_os13_sstore',    label:'Suit Storage',  state:'back2',         group:'gear'},
+  {id:'back',      define:'ui_os13_back',      label:'Back',          state:'back',          group:'gear'},
+  {id:'id',        define:'ui_os13_id',        label:'ID',            state:'card',          group:'gear'},
+  {id:'amulet',    define:'ui_os13_amulet',    label:'Amulet',        state:'amulet',        group:'gear'},
+  {id:'storage1',  define:'ui_os13_storage1',  label:'Left Pocket',   state:'pocket',        group:'gear'},
+  {id:'storage2',  define:'ui_os13_storage2',  label:'Right Pocket',  state:'pocket',        group:'gear'},
+  {id:'belt',      define:'ui_os13_belt',      label:'Belt',          state:'belt',          group:'gear'},
+
+  {id:'rhand',     define:'ui_os13_rhand',     label:'Right Hand',    state:'r_hand',        group:'hands'},
+  {id:'lhand',     define:'ui_os13_lhand',     label:'Left Hand',     state:'l_hand',        group:'hands'},
+  {id:'swaphand',  define:'ui_os13_swaphand',  label:'Swap Hand',     state:'hand_l',        group:'hands'},
+
+  {id:'move',      define:'ui_os13_move',      label:'Move Mode',     state:'walking',       group:'status'},
+  {id:'zonesel',   define:'ui_os13_zonesel',   label:'Zone Select',   state:'',              group:'status'},
+  {id:'internal',  define:'ui_os13_internal',  label:'Internals',     state:'internal0',     group:'status'},
+  {id:'temp',      define:'ui_os13_temp',      label:'Body Temp',     state:'temp1',         group:'status'},
+  {id:'nutrition', define:'ui_os13_nutrition', label:'Nutrition',     state:'hunger0',       group:'status'},
+  {id:'surrender', define:'ui_os13_surrender', label:'Surrender',     state:'surrender',     group:'status'},
+  {id:'fixeye',    define:'ui_os13_fixeye',    label:'Fix Eye',       state:'',              group:'status'},
+  {id:'stamina',   define:'ui_os13_stamina',  label:'Stamina',       state:'fatigue0',      group:'status'},
+  {id:'health',    define:'ui_os13_health',    label:'Health',        state:'health0',       group:'status'},
+  {id:'happiness', define:'ui_os13_happiness', label:'Happiness',     state:'',              group:'status'},
+
+  {id:'combat',    define:'ui_os13_combat',    label:'Combat Intent', state:'cmbt0',         group:'intent'},
+  {id:'defense',   define:'ui_os13_defense',   label:'Defense Intent',state:'',              group:'intent'},
+  {id:'sprint',    define:'ui_os13_sprint',    label:'Sprint',        state:'sprint0',       group:'intent'},
+
+  // These four reuse the original (non-os13) defines because human_alt.dm never gave them
+  // os13-specific anchors — they're real screen objects on the human HUD that were previously
+  // missing from this tool entirely.
+  {id:'action_intent', define:'ui_drop_throw',  label:'Action Intent (Help/Disarm/Grab/Harm)', state:'intent1',       group:'intent'},
+  {id:'combat_intent',  define:'ui_atk_intents', label:'Combat Intent Wheel',                  state:'max_st',        group:'intent'},
+  {id:'skills_family',  define:'ui_skills_family', label:'Skills/Family Select',               state:'skills_family', group:'intent'},
+  {id:'kickjump',       define:'ui_atk',         label:'Kick / Jump',                          state:'actionskick',   group:'buttons'},
+  {id:'wield',          define:'ui_wield',       label:'Wield',                                state:'guardsword',    group:'buttons'},
+
+  {id:'resist',    define:'ui_resist',         label:'Resist',        state:'act_resist',    group:'buttons'},
+  {id:'dropbtn',   define:'ui_dropbutton',     label:'Drop / Throw',  state:'act_throw_off', group:'buttons'},
+  {id:'pull',      define:'ui_pull',           label:'Pull',          state:'pull0',         group:'buttons'},
+];
+
+const GROUP_COLORS = {gear:'#5aa9e6', hands:'#9b6fe0', status:'#e6b45a', intent:'#e06464', buttons:'#6abf69', custom:'#8e97a8', background:'#555b66'};
+const ANCHOR_NAMES = ['', 'WEST', 'EAST', 'CENTER'];     // '' = absolute / no anchor
+const ANCHOR_NAMES_Y = ['', 'SOUTH', 'NORTH', 'CENTER'];
+
+let state = {
+  viewTiles: 15,
+  iconPx: 32,
+  zoom: 2,
+  elements: {},         // id -> {define,label,state,group,visible,x:{anchor,tile,px},y:{...}}
+  originalFileText: null,
+  originalLines: null,  // array of {name, lineIndex, raw}
+  sheets: {os13: null, backgrounds: null}, // key -> {url, iconW, iconH, sheetW, sheetH, stateIndex: Map(name->index)}
+};
+
+/* ---------------- undo history (Ctrl+Z) ---------------- */
+
+const UNDO_LIMIT = 100;
+let undoHistory = [];
+
+function snapshotElements(){
+  // Shallow-clone each element (preserving function props like literalLine) but deep-clone the
+  // mutable x/y position objects so later drags/edits don't retroactively alter old snapshots.
+  const snap = {};
+  for(const id in state.elements){
+    const el = state.elements[id];
+    snap[id] = {...el, x:{...el.x}, y:{...el.y}};
+  }
+  return snap;
+}
+
+function pushUndo(){
+  undoHistory.push(snapshotElements());
+  if(undoHistory.length > UNDO_LIMIT) undoHistory.shift();
+}
+
+function undo(){
+  if(!undoHistory.length){ setStatus('Nothing to undo.'); return; }
+  state.elements = undoHistory.pop();
+  render();
+  setStatus(`Undid last change. (${undoHistory.length} more step${undoHistory.length===1?'':'s'} available)`);
+}
+
+document.addEventListener('keydown', e => {
+  const z = e.key === 'z' || e.key === 'Z';
+  if((e.ctrlKey || e.metaKey) && z && !e.shiftKey){
+    e.preventDefault();
+    undo();
+  }
+});
+
+/* ---------------- screen_loc <-> {anchor,tile,px} parsing ---------------- */
+
+function parseToken(tok){
+  tok = tok.trim();
+  const m = tok.match(/^(WEST|EAST|NORTH|SOUTH|CENTER)?([+-]?\d*\.?\d+)?(?::(-?\d*\.?\d+))?$/i);
+  if(!m) return {anchor:'', tile:0, px:0, raw:tok, unparsed:true};
+  return {
+    anchor: m[1] ? m[1].toUpperCase() : '',
+    tile: (m[2] !== undefined && m[2] !== '') ? parseFloat(m[2]) : 0,
+    px: (m[3] !== undefined && m[3] !== '') ? parseFloat(m[3]) : 0,
+  };
+}
+
+function formatNum(n){
+  n = Math.round(n * 1000) / 1000; // avoid float noise
+  return (Number.isInteger(n) ? n : n.toFixed(3).replace(/0+$/,'').replace(/\.$/,'')).toString();
+}
+
+function formatToken(t){
+  let s = '';
+  if(t.anchor){
+    s += t.anchor;
+    if(t.tile) s += (t.tile > 0 ? '+' : '') + formatNum(t.tile);
+  } else {
+    s += formatNum(t.tile);
+  }
+  if(t.px) s += ':' + formatNum(t.px);
+  return s || '0';
+}
+
+function parseScreenLoc(value){
+  // Multi-part locs like "WEST,SOUTH to EAST,NORTH" aren't single-point elements; flag as unsupported.
+  if(/\bto\b/i.test(value)) return null;
+  const parts = value.split(',');
+  if(parts.length !== 2) return null;
+  return {x: parseToken(parts[0]), y: parseToken(parts[1])};
+}
+
+function formatScreenLoc(el){
+  return formatToken(el.x) + ',' + formatToken(el.y);
+}
+
+/* ---------------- anchor <-> pixel math ---------------- */
+
+function anchorBase(anchor, isY){
+  const view = state.viewTiles;
+  if(anchor === 'WEST' || anchor === 'SOUTH') return 1;
+  if(anchor === 'EAST' || anchor === 'NORTH') return view;
+  if(anchor === 'CENTER') return Math.round((view + 1) / 2);
+  return 0; // absolute: tile already holds the 1-based position
+}
+
+const PAD_TILES = 4; // extra margin so negative/off-grid tile tricks remain visible & draggable
+
+function tileScreenPx(){ return state.iconPx * state.zoom; }
+function stageSizePx(){ return (state.viewTiles + PAD_TILES*2) * tileScreenPx(); }
+
+// Icons bigger than one tile (e.g. the HUD backdrop bar) are anchored at their
+// bottom-left tile cell and extend up/right from there, matching BYOND's screen_loc behaviour.
+function elementToPixel(el){
+  const t = tileScreenPx();
+  const hT = el.hTiles || 1;
+  const absCol = anchorBase(el.x.anchor) + el.x.tile; // 1-based
+  const absRow = anchorBase(el.y.anchor, true) + el.y.tile;
+  const px = (PAD_TILES + (absCol - 1)) * t + el.x.px * state.zoom;
+  const anchorPy = (PAD_TILES + (state.viewTiles - absRow)) * t - el.y.px * state.zoom;
+  const py = anchorPy - (hT - 1) * t;
+  return {px, py};
+}
+
+function getSnapSettings(){
+  const enabled = document.getElementById('snapEnabled').checked;
+  return {
+    enabled,
+    tile: enabled ? parseFloat(document.getElementById('snapTile').value) || 1 : 0,
+    px: enabled ? parseFloat(document.getElementById('snapPx').value) || 0 : 0,
+  };
+}
+
+function snapTo(value, increment){
+  if(!increment) return value;
+  return Math.round(value / increment) * increment;
+}
+
+// Snap `value` to the nearest multiple of `increment`, but measured from `phase`
+// instead of zero, so the resulting grid can be offset to line up with anything
+// (e.g. the HUD backdrop's edge) rather than always starting at the view origin.
+function snapToPhase(value, increment, phase){
+  if(!increment) return value;
+  return phase + Math.round((value - phase) / increment) * increment;
+}
+
+// Converts a raw stage pixel position into the "raw" (anchor-independent) tile
+// column/row used internally for snapping math - the same coordinate space
+// elementToPixel()/pixelToElement() work in before subtracting an anchor's base.
+function rawColRow(px, py){
+  const t = tileScreenPx();
+  return {
+    col: (px / t) - PAD_TILES + 1,
+    row: state.viewTiles - ((py / t) - PAD_TILES),
+  };
+}
+
+// The HUD backdrop bar ("upperbar") is the visual anchor everything else should
+// revolve around: its edges define where the snap grid's lines actually fall.
+// Returns the raw col/row of its top-left corner, or null if it isn't loaded.
+function backgroundGridPhase(){
+  const bgEl = state.elements['upperbar'];
+  if(!bgEl) return null;
+  const {px, py} = elementToPixel(bgEl);
+  return rawColRow(px, py);
+}
+
+function pixelToElement(px, pyTop, anchorX, anchorY, hTiles){
+  const t = tileScreenPx();
+  const anchorPy = pyTop + ((hTiles || 1) - 1) * t;
+  const rawCol = (px / t) - PAD_TILES + 1;
+  const rawRow = state.viewTiles - ((anchorPy / t) - PAD_TILES);
+  const baseCol = anchorBase(anchorX);
+  const baseRow = anchorBase(anchorY, true);
+  let tileX = rawCol - baseCol;
+  let tileY = rawRow - baseRow;
+  const snap = getSnapSettings();
+  // Phase the tile snap to the background's edges (falls back to the view origin,
+  // i.e. phase 0, if the background sprite sheet hasn't been loaded yet).
+  const phase = backgroundGridPhase();
+  const phaseX = phase ? phase.col - baseCol : 0;
+  const phaseY = phase ? phase.row - baseRow : 0;
+  // Split into a whole/snapped tile part + leftover pixel nudge, like the hand-authored defines do.
+  const tileXSnapped = snap.tile ? snapToPhase(tileX, snap.tile, phaseX) : tileX;
+  const tileYSnapped = snap.tile ? snapToPhase(tileY, snap.tile, phaseY) : tileY;
+  let pxX = Math.round((tileX - tileXSnapped) * t / state.zoom);
+  let pxY = Math.round((tileYSnapped - tileY) * t / state.zoom) * -1;
+  if(snap.px){ pxX = snapTo(pxX, snap.px); pxY = snapTo(pxY, snap.px); }
+  return {tileX: tileXSnapped, tileY: tileYSnapped, pxX, pxY};
+}
+
+/* ---------------- sprite sheet (os13.dmi) parsing ---------------- */
+
+async function inflateZlib(bytes){
+  const ds = new DecompressionStream('deflate');
+  const stream = new Blob([bytes]).stream().pipeThrough(ds);
+  const buf = await new Response(stream).arrayBuffer();
+  return new TextDecoder('utf-8').decode(buf);
+}
+
+function readPNGChunks(buf){
+  const view = new DataView(buf);
+  const bytes = new Uint8Array(buf);
+  let offset = 8;
+  const chunks = [];
+  while(offset + 8 <= buf.byteLength){
+    const length = view.getUint32(offset);
+    const type = String.fromCharCode(bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7]);
+    const data = bytes.slice(offset + 8, offset + 8 + length);
+    chunks.push({type, data});
+    offset += 8 + length + 4;
+  }
+  return chunks;
+}
+
+function parseDmiDescription(text){
+  const lines = text.split(/\r?\n/);
+  let iconW = 32, iconH = 32;
+  const states = [];
+  let current = null;
+  for(const raw of lines){
+    const line = raw.trim();
+    let m;
+    if((m = line.match(/^width\s*=\s*(\d+)/))) iconW = parseInt(m[1], 10);
+    else if((m = line.match(/^height\s*=\s*(\d+)/))) iconH = parseInt(m[1], 10);
+    else if((m = line.match(/^state\s*=\s*"((?:[^"\\]|\\.)*)"/))){
+      current = {name: m[1].replace(/\\"/g, '"'), dirs: 1, frames: 1};
+      states.push(current);
+    }
+    else if(current && (m = line.match(/^dirs\s*=\s*(\d+)/))) current.dirs = parseInt(m[1], 10);
+    else if(current && (m = line.match(/^frames\s*=\s*(\d+)/))) current.frames = parseInt(m[1], 10);
+  }
+  const stateIndex = new Map();
+  let idx = 0;
+  for(const s of states){
+    if(!stateIndex.has(s.name)) stateIndex.set(s.name, idx);
+    idx += s.dirs * s.frames;
+  }
+  return {iconW, iconH, stateIndex};
+}
+
+async function loadSheetFile(file, key){
+  const buf = await file.arrayBuffer();
+  const chunks = readPNGChunks(buf);
+  let width = 0, height = 0, desc = null;
+  for(const c of chunks){
+    if(c.type === 'IHDR'){
+      const dv = new DataView(c.data.buffer, c.data.byteOffset, c.data.byteLength);
+      width = dv.getUint32(0);
+      height = dv.getUint32(4);
+    }
+    if(c.type === 'zTXt' && !desc){
+      const nullIdx = c.data.indexOf(0);
+      const compressed = c.data.slice(nullIdx + 2); // skip keyword\0 + compression method byte
+      try{ desc = await inflateZlib(compressed); }
+      catch(e){ console.warn('Could not inflate DMI metadata', e); }
+    }
+    if(c.type === 'tEXt' && !desc){
+      const nullIdx = c.data.indexOf(0);
+      desc = new TextDecoder().decode(c.data.slice(nullIdx + 1));
+    }
+  }
+  const url = URL.createObjectURL(new Blob([buf], {type:'image/png'}));
+  let iconW = state.iconPx, iconH = state.iconPx, stateIndex = new Map();
+  if(desc){
+    const parsed = parseDmiDescription(desc);
+    iconW = parsed.iconW; iconH = parsed.iconH; stateIndex = parsed.stateIndex;
+  }
+  state.sheets[key] = {url, iconW, iconH, sheetW: width, sheetH: height, stateIndex};
+  if(key === 'os13'){
+    // The main sheet's icon size drives the whole tile grid; secondary sheets (e.g. backgrounds.dmi)
+    // keep their own native icon size via el.wTiles/hTiles instead.
+    document.getElementById('iconPx').value = iconW;
+    state.iconPx = iconW;
+  }
+  setStatus(`Loaded ${key} sprite sheet: ${width}x${height}px, ${stateIndex.size} icon_states found.`);
+  render();
+}
+
+/* ---------------- building / rendering the element list ---------------- */
+
+function initElements(){
+  state.elements = {};
+  for(const def of DEFAULT_ELEMENTS){
+    const defaultValue = def.literal ? def.literalDefault : defaultScreenLocFor(def.define);
+    const loc = parseScreenLoc(defaultValue) || {x:{anchor:'',tile:0,px:0}, y:{anchor:'',tile:0,px:0}};
+    state.elements[def.id] = {...def, visible:true, x:loc.x, y:loc.y};
+  }
+}
+
+// Fallback screen_loc strings baked in, used until a real defines file is loaded.
+const FALLBACK_LOCS = {
+  ui_os13_combat:"-1.5,SOUTH", ui_os13_defense:"-0.5,SOUTH", ui_os13_sprint:"0.5,SOUTH",
+  ui_os13_back:"WEST-2:12,NORTH-1:16", ui_os13_r_ear:"WEST-3:12,NORTH-2:16", ui_os13_head:"WEST-2:12,NORTH-2:16",
+  ui_os13_l_ear:"WEST-1:12,NORTH-2:16", ui_os13_mask:"WEST-3:12,NORTH-3:16", ui_os13_amulet:"WEST-2:12,NORTH-3:16",
+  ui_os13_glasses:"WEST-1:12,NORTH-3:16", ui_os13_rhand:"WEST-3:12,NORTH-4:16", ui_os13_iclothing:"WEST-2:12,NORTH-4:16",
+  ui_os13_lhand:"WEST-1:12,NORTH-4:16", ui_os13_storage1:"WEST-3:12,NORTH-6:16", ui_os13_swaphand:"WEST-2:12,NORTH-5:16",
+  ui_os13_storage2:"WEST-1:12,NORTH-6:16", ui_os13_sstore:"WEST-3:12,NORTH-7:16", ui_os13_id:"WEST-2:12,NORTH-7:16",
+  ui_os13_belt:"WEST-1:12,NORTH-7:16", ui_os13_gloves:"WEST-3:12,NORTH-8:16", ui_os13_oclothing:"WEST-2:12,NORTH-8:16",
+  ui_os13_shoes:"WEST-1:12,NORTH-8:16", ui_os13_move:"EAST+3,SOUTH+7", ui_os13_zonesel:"EAST+3,NORTH-2",
+  ui_os13_internal:"EAST+3,NORTH-3",
+  ui_os13_temp:"EAST+3,NORTH-6",
+  ui_os13_nutrition:"EAST+3,NORTH-9", ui_os13_surrender:"EAST+3,NORTH-10", ui_os13_fixeye:"EAST+3,NORTH-11",
+  ui_os13_stamina:"EAST+3,NORTH-12", ui_os13_health:"EAST+3,NORTH-13", ui_os13_happiness:"EAST+3,NORTH-14",
+  ui_resist:"-2,3", ui_dropbutton:"0,3", ui_pull:"-2,1",
+  ui_drop_throw:"0,2", ui_atk_intents:"-2,2", ui_skills_family:"-1,2", ui_atk:"0,4", ui_wield:"-1,3",
+};
+
+function defaultScreenLocFor(define){
+  if(state.originalLines){
+    const found = state.originalLines.find(l => l.name === define);
+    if(found) return found.value;
+  }
+  return FALLBACK_LOCS[define] || "0,0";
+}
+
+function setStatus(msg){ document.getElementById('status').textContent = msg; }
+
+function buildGroupFilters(){
+  const groups = [...new Set(DEFAULT_ELEMENTS.map(e=>e.group)), 'custom'];
+  const wrap = document.getElementById('groupFilters');
+  wrap.innerHTML = '';
+  for(const g of groups){
+    const label = document.createElement('label');
+    label.style.borderLeft = `4px solid ${GROUP_COLORS[g]||'#8e97a8'}`;
+    label.innerHTML = `<input type="checkbox" checked data-group="${g}"> ${g}`;
+    label.querySelector('input').addEventListener('change', render);
+    wrap.appendChild(label);
+  }
+}
+
+function activeGroups(){
+  return new Set([...document.querySelectorAll('#groupFilters input:checked')].map(i=>i.dataset.group));
+}
+
+function render(){
+  state.viewTiles = parseFloat(document.getElementById('viewTiles').value) || 15;
+  state.iconPx = parseFloat(document.getElementById('iconPx').value) || 32;
+  state.zoom = parseFloat(document.getElementById('zoom').value) || 2;
+
+  renderStage();
+  renderTable();
+  renderUnmatched();
+  renderLiteral();
+}
+
+function renderStage(){
+  const stage = document.getElementById('stage');
+  const size = stageSizePx();
+  const t = tileScreenPx();
+  stage.style.width = size + 'px';
+  stage.style.height = size + 'px';
+
+  // grid background drawn as CSS so it doesn't need to be rebuilt per-drag.
+  // Phased to the HUD backdrop bar's own corner (falls back to the view origin
+  // if it isn't loaded yet) so the grid - and therefore snapping - always
+  // revolves around wherever the background actually sits, not an arbitrary spot.
+  const view = state.viewTiles;
+  const bgEl = state.elements['upperbar'];
+  const bgPixel = bgEl ? elementToPixel(bgEl) : null;
+  const originX = bgPixel ? bgPixel.px : PAD_TILES * t;
+  const originY = bgPixel ? bgPixel.py : PAD_TILES * t;
+  stage.style.backgroundImage = `
+    linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px),
+    linear-gradient(135deg,#20242d,#282d38)`;
+  stage.style.backgroundSize = `${t}px ${t}px, ${t}px ${t}px, cover`;
+  stage.style.backgroundPosition = `${originX}px ${originY}px, ${originX}px ${originY}px, 0 0`;
+  stage.style.outline = `2px solid rgba(90,169,230,.5)`;
+
+  const groups = activeGroups();
+  const existing = new Map([...stage.children].map(c => [c.dataset.id, c]));
+  const seen = new Set();
+
+  for(const id in state.elements){
+    const el = state.elements[id];
+    seen.add(id);
+    let div = existing.get(id);
+    if(!div){
+      div = document.createElement('div');
+      div.className = 'elbox';
+      div.dataset.id = id;
+      makeDraggable(div);
+      stage.appendChild(div);
+    }
+    const visible = groups.has(el.group);
+    div.classList.toggle('hidden-el', !visible);
+    if(!visible) continue;
+
+    div.style.width = (t * (el.wTiles || 1)) + 'px';
+    div.style.height = (t * (el.hTiles || 1)) + 'px';
+    const {px, py} = elementToPixel(el);
+    div.style.left = px + 'px';
+    div.style.top = py + 'px';
+    div.style.borderColor = GROUP_COLORS[el.group] || '#8e97a8';
+    div.classList.toggle('bg-el', el.group === 'background');
+    div.title = el.literal ? `${el.label} (hardcoded in ${el.literalFile})` : `${el.label} (${el.define})`;
+
+    const sheet = state.sheets[el.sheetKey || 'os13'];
+    const frame = sheet && sheet.stateIndex.has(el.state) ? el.state : null;
+    if(sheet && frame){
+      const idx = sheet.stateIndex.get(frame);
+      const cols = Math.max(1, Math.floor(sheet.sheetW / sheet.iconW));
+      const col = idx % cols, row = Math.floor(idx / cols);
+      div.classList.remove('placeholder');
+      div.style.backgroundImage = `url(${sheet.url})`;
+      div.style.backgroundSize = `${sheet.sheetW * state.zoom}px ${sheet.sheetH * state.zoom}px`;
+      div.style.backgroundPosition = `-${col * sheet.iconW * state.zoom}px -${row * sheet.iconH * state.zoom}px`;
+      div.textContent = '';
+    } else {
+      div.classList.add('placeholder');
+      div.style.backgroundImage = '';
+      div.textContent = el.label;
+    }
+  }
+  for(const [id, div] of existing) if(!seen.has(id)) div.remove();
+}
+
+function makeDraggable(div){
+  let dragging = null;
+  div.addEventListener('pointerdown', e => {
+    const id = div.dataset.id;
+    pushUndo();
+    const stageRect = document.getElementById('stage').getBoundingClientRect();
+    dragging = {id, offX: e.clientX - stageRect.left - parseFloat(div.style.left), offY: e.clientY - stageRect.top - parseFloat(div.style.top)};
+    div.classList.add('dragging');
+    div.setPointerCapture(e.pointerId);
+  });
+  div.addEventListener('pointermove', e => {
+    if(!dragging) return;
+    const stageRect = document.getElementById('stage').getBoundingClientRect();
+    const px = e.clientX - stageRect.left - dragging.offX;
+    const py = e.clientY - stageRect.top - dragging.offY;
+    const el = state.elements[dragging.id];
+    const res = pixelToElement(px, py, el.x.anchor, el.y.anchor, el.hTiles);
+    el.x.tile = res.tileX; el.x.px = res.pxX;
+    el.y.tile = res.tileY; el.y.px = res.pxY;
+    const snapped = elementToPixel(el);
+    div.style.left = snapped.px + 'px';
+    div.style.top = snapped.py + 'px';
+    updateRowInputs(dragging.id);
+  });
+  const stop = e => { if(dragging){ div.classList.remove('dragging'); dragging = null; render(); } };
+  div.addEventListener('pointerup', stop);
+  div.addEventListener('pointercancel', stop);
+  div.addEventListener('dblclick', e => {
+    e.preventDefault();
+    const id = div.dataset.id;
+    const el = state.elements[id];
+    if(!el) return;
+    pushUndo();
+    delete state.elements[id];
+    render();
+    setStatus(`Removed "${el.label}" from the board (Ctrl+Z or "Reset" to bring it back).`);
+  });
+}
+
+function renderTable(){
+  const tbody = document.getElementById('elTable');
+  const groups = activeGroups();
+  tbody.innerHTML = '';
+  for(const id in state.elements){
+    const el = state.elements[id];
+    if(!groups.has(el.group)) continue;
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    tr.innerHTML = `
+      <td style="border-left:4px solid ${GROUP_COLORS[el.group]||'#8e97a8'}">${el.label}</td>
+      <td class="define-name">${el.define}</td>
+      <td>${selectHtml('x-anchor', ANCHOR_NAMES, el.x.anchor)}</td>
+      <td><input type="number" step="0.5" class="x-tile" value="${el.x.tile}"></td>
+      <td><input type="number" class="x-px" value="${el.x.px}"></td>
+      <td>${selectHtml('y-anchor', ANCHOR_NAMES_Y, el.y.anchor)}</td>
+      <td><input type="number" step="0.5" class="y-tile" value="${el.y.tile}"></td>
+      <td><input type="number" class="y-px" value="${el.y.px}"></td>
+      <td class="raw-value">${formatScreenLoc(el)}${isChanged(el) ? '<span class="badge-changed">changed</span>' : ''}</td>
+    `;
+    tbody.appendChild(tr);
+    tr.querySelector('.x-anchor').addEventListener('change', e => { pushUndo(); el.x.anchor = e.target.value; render(); });
+    tr.querySelector('.y-anchor').addEventListener('change', e => { pushUndo(); el.y.anchor = e.target.value; render(); });
+    tr.querySelector('.x-tile').addEventListener('focus', pushUndo);
+    tr.querySelector('.x-px').addEventListener('focus', pushUndo);
+    tr.querySelector('.y-tile').addEventListener('focus', pushUndo);
+    tr.querySelector('.y-px').addEventListener('focus', pushUndo);
+    tr.querySelector('.x-tile').addEventListener('input', e => { el.x.tile = parseFloat(e.target.value)||0; render(); });
+    tr.querySelector('.x-px').addEventListener('input', e => { el.x.px = parseFloat(e.target.value)||0; render(); });
+    tr.querySelector('.y-tile').addEventListener('input', e => { el.y.tile = parseFloat(e.target.value)||0; render(); });
+    tr.querySelector('.y-px').addEventListener('input', e => { el.y.px = parseFloat(e.target.value)||0; render(); });
+  }
+}
+
+function isChanged(el){
+  const original = el.literal ? el.literalDefault : defaultScreenLocFor(el.define);
+  const parsed = parseScreenLoc(original);
+  if(!parsed) return false;
+  return formatScreenLoc(el) !== formatScreenLoc({x:parsed.x, y:parsed.y});
+}
+
+function selectHtml(cls, options, selected){
+  return `<select class="${cls}">${options.map(o=>`<option value="${o}" ${o===selected?'selected':''}>${o||'(none)'}</option>`).join('')}</select>`;
+}
+
+function updateRowInputs(id){
+  const tr = document.querySelector(`#elTable tr[data-id="${id}"]`);
+  if(!tr) return;
+  const el = state.elements[id];
+  tr.querySelector('.x-tile').value = el.x.tile;
+  tr.querySelector('.x-px').value = el.x.px;
+  tr.querySelector('.y-tile').value = el.y.tile;
+  tr.querySelector('.y-px').value = el.y.px;
+}
+
+function renderUnmatched(){
+  const list = document.getElementById('unmatchedList');
+  if(!state.originalLines){ list.textContent = 'Load a defines file to see these.'; return; }
+  const known = new Set(DEFAULT_ELEMENTS.map(e=>e.define));
+  const extra = state.originalLines.filter(l => !known.has(l.name) && l.name.startsWith('ui_'));
+  if(!extra.length){ list.innerHTML = '<span class="hint">None — every ui_* define is already on the board.</span>'; return; }
+  list.innerHTML = '';
+  for(const l of extra){
+    const row = document.createElement('div');
+    row.className = 'unmatched-row';
+    row.innerHTML = `<span class="pill">${l.name}</span><span class="raw-value">${l.value}</span>
+      <button class="secondary add-btn" data-name="${l.name}" data-value="${l.value.replace(/"/g,'&quot;')}">+ Add to board</button>`;
+    list.appendChild(row);
+  }
+  list.querySelectorAll('.add-btn').forEach(btn => btn.addEventListener('click', () => {
+    const name = btn.dataset.name, value = btn.dataset.value;
+    const loc = parseScreenLoc(value);
+    if(!loc){ alert(`"${name}" uses a multi-part screen_loc (e.g. "A to B") and can't be edited on the board.`); return; }
+    pushUndo();
+    state.elements[name] = {id:name, define:name, label:name.replace(/^ui_/, ''), state:'', group:'custom', visible:true, x:loc.x, y:loc.y};
+    render();
+  }));
+}
+
+function renderLiteral(){
+  const list = document.getElementById('literalList');
+  const literals = Object.values(state.elements).filter(el => el.literal);
+  if(!literals.length){ list.innerHTML = '<span class="hint">None.</span>'; return; }
+  list.innerHTML = '';
+  for(const el of literals){
+    const value = formatScreenLoc(el);
+    const line = el.literalLine ? el.literalLine(value) : `screen_loc = "${value}"`;
+    const row = document.createElement('div');
+    row.className = 'unmatched-row';
+    row.innerHTML = `<span class="pill">${el.label}</span><span class="raw-value">${line}</span>
+      <span class="hint">in ${el.literalFile}</span>
+      <button class="secondary copy-literal-btn" data-line="${line.replace(/"/g,'&quot;')}">Copy snippet</button>`;
+    list.appendChild(row);
+  }
+  list.querySelectorAll('.copy-literal-btn').forEach(btn => btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(btn.dataset.line).then(
+      () => setStatus('Copied snippet — paste it into the file shown next to the button.'),
+      () => setStatus('Could not copy automatically; select and copy the text manually.')
+    );
+  }));
+}
+
+/* ---------------- file loading / export ---------------- */
+
+function parseDefinesFile(text){
+  const lines = text.split(/\r?\n/);
+  const defines = [];
+  lines.forEach((raw, i) => {
+    const m = raw.match(/^(\s*#define\s+)(\w+)(\s+)"([^"]*)"(.*)$/);
+    if(m) defines.push({lineIndex: i, name: m[2], value: m[4]});
+  });
+  return {lines, defines};
+}
+
+async function handleDefinesFile(file){
+  const text = await file.text();
+  const {lines, defines} = parseDefinesFile(text);
+  state.originalFileText = text;
+  state.originalLines = defines;
+  state.originalRawLines = lines;
+  initElements();
+  render();
+  setStatus(`Loaded ${file.name}: ${defines.length} #define lines parsed.`);
+}
+
+function generateUpdatedFile(){
+  if(!state.originalFileText){
+    alert('Load the original _defines_alt.dm first (so unrelated lines are preserved).');
+    return;
+  }
+  const lines = [...state.originalRawLines];
+  for(const id in state.elements){
+    const el = state.elements[id];
+    const entry = state.originalLines.find(l => l.name === el.define);
+    if(!entry) continue; // custom/added define not present in the original file, skip silently
+    const newValue = formatScreenLoc(el);
+    lines[entry.lineIndex] = lines[entry.lineIndex].replace(
+      new RegExp(`(#define\\s+${el.define}\\s+)"[^"]*"`),
+      `$1"${newValue}"`
+    );
+  }
+  const result = lines.join('\n');
+  document.getElementById('output').value = result;
+  setStatus('Generated updated file contents below.');
+}
+
+/* ---------------- auto-load straight from the repo (no file pickers) ---------------- */
+
+// index.html lives at tools/ui-editor/, so fetch() paths climb up two levels; `parts` is the
+// same file expressed as a path from the repo root, used by the File System Access fallback.
+const AUTO_LOAD_FILES = [
+  {path:'../../code/_onclick/hud/_defines_alt.dm', parts:['code','_onclick','hud','_defines_alt.dm'],
+   name:'_defines_alt.dm', mime:'text/plain', load: f => handleDefinesFile(f)},
+  {path:'../../icons/mob/screen/os13.dmi', parts:['icons','mob','screen','os13.dmi'],
+   name:'os13.dmi', mime:'image/png', load: f => loadSheetFile(f, 'os13')},
+  {path:'../../icons/mob/screen/backgrounds.dmi', parts:['icons','mob','screen','backgrounds.dmi'],
+   name:'backgrounds.dmi', mime:'image/png', load: f => loadSheetFile(f, 'backgrounds')},
+];
+
+async function fetchAsFile(path, name, mime){
+  const resp = await fetch(path);
+  if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const buf = await resp.arrayBuffer();
+  return new File([buf], name, {type: mime});
+}
+
+async function tryFetchLoad(){
+  let okCount = 0;
+  const failures = [];
+  for(const job of AUTO_LOAD_FILES){
+    try{
+      const file = await fetchAsFile(job.path, job.name, job.mime);
+      await job.load(file);
+      okCount++;
+    }catch(e){
+      failures.push(job.name);
+    }
+  }
+  return {okCount, failures};
+}
+
+/* ---- File System Access API fallback (Chrome/Edge) ----
+ * Chrome blocks fetch() for file:// pages (like Firefox), but it does support
+ * showDirectoryPicker(), which can grant read access to the repo folder once
+ * and remember that grant (via a handle we persist in IndexedDB) so later
+ * visits can re-use it without a server and, ideally, without re-prompting. */
+
+const IDB_NAME = 'ui-editor-store', IDB_STORE = 'handles', IDB_KEY = 'repoRoot';
+
+function idbOpen(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet(key){
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbSet(key, value){
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function verifyPermission(handle, requestIfNeeded){
+  const opts = {mode: 'read'};
+  if((await handle.queryPermission(opts)) === 'granted') return true;
+  if(requestIfNeeded && (await handle.requestPermission(opts)) === 'granted') return true;
+  return false;
+}
+
+async function loadFilesFromDirectoryHandle(rootHandle){
+  let okCount = 0;
+  const failures = [];
+  for(const job of AUTO_LOAD_FILES){
+    try{
+      let dir = rootHandle;
+      for(let i = 0; i < job.parts.length - 1; i++) dir = await dir.getDirectoryHandle(job.parts[i]);
+      const fileHandle = await dir.getFileHandle(job.parts[job.parts.length - 1]);
+      const file = await fileHandle.getFile();
+      await job.load(file);
+      okCount++;
+    }catch(e){
+      failures.push(job.name);
+    }
+  }
+  return {okCount, failures};
+}
+
+// Tries a remembered folder handle without any prompt (queryPermission needs no user
+// gesture). Returns true only if it fully succeeded, so callers know whether to fall
+// back to showing the "grant access" button instead.
+async function trySilentDirectoryLoad(){
+  if(!window.showDirectoryPicker) return false;
+  let handle;
+  try{ handle = await idbGet(IDB_KEY); }catch(e){ return false; }
+  if(!handle) return false;
+  if(!(await verifyPermission(handle, false).catch(() => false))) return false;
+  const r = await loadFilesFromDirectoryHandle(handle);
+  if(r.failures.length === 0){
+    setStatus(`Auto-loaded all ${r.okCount} files from the remembered repo folder.`);
+    document.getElementById('btnPickFolder').classList.add('hidden');
+    return true;
+  }
+  return false;
+}
+
+// User-gesture-driven: lets the person pick the repo root once, remembers the handle,
+// and loads immediately. This is what actually makes auto-load work on a plain
+// file:// page in Chrome/Edge, since fetch() can't read sibling files there.
+async function pickRepoFolder(){
+  if(!window.showDirectoryPicker){
+    setStatus('This browser doesn\'t support folder access. Run "python tools/ui-editor/serve.py" and open the printed http://localhost link instead, or use the "Load…" buttons.');
+    return;
+  }
+  let handle;
+  try{
+    handle = await window.showDirectoryPicker({id: 'ui-editor-repo-root', mode: 'read'});
+  }catch(e){
+    if(e.name !== 'AbortError') setStatus('Folder access was not granted: ' + e.message);
+    return;
+  }
+  await idbSet(IDB_KEY, handle).catch(() => {});
+  const r = await loadFilesFromDirectoryHandle(handle);
+  if(r.failures.length === 0){
+    setStatus(`Auto-loaded all ${r.okCount} files from the selected folder. It'll be remembered next time you open this page.`);
+    document.getElementById('btnPickFolder').classList.add('hidden');
+  } else if(r.failures.length < AUTO_LOAD_FILES.length){
+    setStatus(`Loaded ${r.okCount}/${AUTO_LOAD_FILES.length} from the selected folder. Could not find: ${r.failures.join(', ')} — make sure you picked the Interpost-Hague repo root (the folder containing "code" and "icons").`);
+  } else {
+    setStatus('Could not find the expected files in that folder. Make sure you pick the Interpost-Hague repo root (the folder containing "code" and "icons").');
+  }
+}
+
+async function autoLoadFromRepo(){
+  setStatus('Auto-loading files from the repo…');
+  const fetched = await tryFetchLoad();
+  if(fetched.failures.length === 0){
+    setStatus(`Auto-loaded all ${fetched.okCount} files straight from the repo.`);
+    return;
+  }
+  if(fetched.failures.length < AUTO_LOAD_FILES.length){
+    setStatus(`Auto-loaded ${fetched.okCount}/${AUTO_LOAD_FILES.length} files from the repo. Could not load: ${fetched.failures.join(', ')} — use its "Load…" button to pick it manually.`);
+    return;
+  }
+  // All fetches failed - typical of a plain file:// page in Chrome/Edge/Firefox. Try a
+  // previously-granted folder handle silently before asking the user to do anything.
+  if(await trySilentDirectoryLoad()) return;
+  if(window.showDirectoryPicker){
+    document.getElementById('btnPickFolder').classList.remove('hidden');
+    setStatus('This browser blocks background file access on file:// pages. Click "📁 Grant folder access…" above (one-time; pick the Interpost-Hague repo root folder) to enable auto-load — it\'ll be remembered for next time. Or run "python tools/ui-editor/serve.py" and open the printed http://localhost link instead.');
+  } else {
+    setStatus('Your browser blocks fetch() for file:// pages. Run "python tools/ui-editor/serve.py" and open the printed http://localhost link instead — auto-load works there in every browser. Or use the "Load…" buttons to pick files manually.');
+  }
+}
+
+/* ---------------- wiring ---------------- */
+
+document.getElementById('btnAutoLoad').addEventListener('click', autoLoadFromRepo);
+document.getElementById('btnPickFolder').addEventListener('click', pickRepoFolder);
+
+document.getElementById('btnLoadDefines').addEventListener('click', () => document.getElementById('fileDefines').click());
+document.getElementById('fileDefines').addEventListener('change', e => { if(e.target.files[0]) handleDefinesFile(e.target.files[0]); });
+
+document.getElementById('btnLoadSheet').addEventListener('click', () => document.getElementById('fileSheet').click());
+document.getElementById('fileSheet').addEventListener('change', e => { if(e.target.files[0]) loadSheetFile(e.target.files[0], 'os13'); });
+
+document.getElementById('btnLoadBgSheet').addEventListener('click', () => document.getElementById('fileBgSheet').click());
+document.getElementById('fileBgSheet').addEventListener('change', e => { if(e.target.files[0]) loadSheetFile(e.target.files[0], 'backgrounds'); });
+
+document.getElementById('snapEnabled').addEventListener('change', render);
+document.getElementById('snapTile').addEventListener('change', render);
+document.getElementById('snapPx').addEventListener('change', render);
+
+document.getElementById('btnUndo').addEventListener('click', undo);
+document.getElementById('btnReset').addEventListener('click', () => { pushUndo(); initElements(); render(); setStatus('Positions reset to loaded/default values.'); });
+document.getElementById('btnExport').addEventListener('click', generateUpdatedFile);
+
+document.getElementById('btnCopy').addEventListener('click', async () => {
+  const ta = document.getElementById('output');
+  if(!ta.value) return;
+  await navigator.clipboard.writeText(ta.value);
+  setStatus('Copied to clipboard.');
+});
+document.getElementById('btnDownload').addEventListener('click', () => {
+  const ta = document.getElementById('output');
+  if(!ta.value){ alert('Nothing to download yet — click "Generate updated file" first.'); return; }
+  const blob = new Blob([ta.value], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '_defines_alt.dm';
+  a.click();
+});
+
+['viewTiles','iconPx','zoom'].forEach(id => document.getElementById(id).addEventListener('input', render));
+
+if(typeof DecompressionStream === 'undefined'){
+  setStatus('Note: this browser has no DecompressionStream support, so sprite previews will show as placeholder boxes instead of real icons. Positions/export still work normally.');
+}
+
+buildGroupFilters();
+initElements();
+render();
+autoLoadFromRepo();
+</script>
+</body>
+</html>

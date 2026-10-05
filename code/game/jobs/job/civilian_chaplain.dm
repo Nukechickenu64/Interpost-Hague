@@ -31,7 +31,7 @@
 
 		while(!accepted)
 			if(!B) break // prevents possible runtime errors
-			new_book_style = input(H,"Which holy book style would you like?") in list("Bible", "Scrapbook", "White Bible", "Holy Light", "Atheist", "Tome", "The King in Yellow", "Ithaqua", "the bible melts", "Necronomicon")
+			new_book_style = input(H, "Choose the appearance of your holy book. This is cosmetic and does not determine your character's faith.") in list("Bible", "Scrapbook", "White Bible", "Holy Light", "Atheist", "Tome", "The King in Yellow", "Ithaqua", "the bible melts", "Necronomicon")
 			switch(new_book_style)
 				if("Scrapbook")
 					B.icon_state = "scrapbook"

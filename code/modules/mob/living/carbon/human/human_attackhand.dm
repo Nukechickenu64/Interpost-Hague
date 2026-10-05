@@ -11,6 +11,15 @@
 	return null
 
 /mob/living/carbon/human/attack_hand(mob/living/carbon/M as mob)
+	if(M == src && zone_sel.selecting == BP_MOUTH && mouth_item)
+		var/obj/item/item_to_remove = mouth_item
+		mouth_item = null
+		update_inv_wear_mask()
+		visible_message("<span class='notice'>[src] takes [item_to_remove] out of [src]'s mouth.</span>")
+		if(!put_in_hands(item_to_remove))
+			item_to_remove.forceMove(loc)
+			update_icons()
+		return 1
 
 	var/mob/living/carbon/human/H = M
 	if(istype(H))
@@ -130,7 +139,7 @@
 					to_chat(H, "There is nothing to grab!")
 					return
 				if(M != src)
-					if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+					if(try_guard_block(H) || attempt_dodge(H))//Trying to dodge or block before they even have the chance to miss us.
 						return
 
 				switch(H.zone_sel.selecting)
@@ -138,7 +147,13 @@
 					if(BP_THROAT)
 						return H.make_grab(H, src, GRAB_STRANGLE)
 
+					//Covering the mouth
+					if(BP_MOUTH)
+						return H.make_grab(H, src, GRAB_MOUTH_COVER)
+
 					//Wrenching
+					if(BP_FACE)
+						return H.make_grab(H, src, GRAB_WRENCH)
 					if(BP_L_LEG)
 						return H.make_grab(H, src, GRAB_WRENCH)
 					if(BP_R_LEG)
@@ -174,12 +189,14 @@
 				return
 			var/rand_damage = rand(1, 5)
 			var/damage_modifier = 0
+			var/effective_strength = H.combat_strength()
 			if(H.c_intent == I_STRONG) // If H is using STRONG combat mod
-				damage_modifier = (stat_to_modifier(H.stats[STAT_ST]) > 0) ?  strToDamageModifier(H.stats[STAT_ST]) : 1 //This is to prevent low str from fucking you up
-			rand_damage += strToDamageModifier(H.stats[STAT_ST]) + damage_modifier
-			log_debug("Real damage: [rand_damage].  StrMod: [strToDamageModifier(H.stats[STAT_ST])])") //Debugging
+				damage_modifier = (stat_to_modifier(effective_strength) > 0) ?  strToDamageModifier(effective_strength) : 1 //This is to prevent low str from fucking you up
+			rand_damage += strToDamageModifier(effective_strength) + damage_modifier
+			log_debug("Real damage: [rand_damage].  StrMod: [strToDamageModifier(effective_strength)]") //Debugging
 			var/block = 0
 			var/accurate = 0
+			var/feint_block_penalty = 0
 			var/hit_zone = H.zone_sel.selecting
 			var/obj/item/organ/external/affecting = get_organ(hit_zone)
 
@@ -190,18 +207,23 @@
 			var/cooldown_modifier = H.c_intent == I_QUICK ? -2 : 0 //Quick mode lowers attack cooldown by 1/2th
 			cooldown_modifier += H.c_intent == I_STRONG ? 3 : 0 //Strong mode raises attack cooldown by 1/2th
 			cooldown_modifier += H.c_intent == I_DEFEND ? 3 : 0 //Defense mode raises attack cooldown by 1/2th
-			if(world.time < H.last_attack + attack.delay)
+			var/hand_ready_until = H.hand ? H.left_hand_ready_until : H.right_hand_ready_until
+			if(world.time < hand_ready_until)
 				to_chat(H, "<span class='notice'>You can't attack again so soon.</span>")
 				return 0
 			else
 				H.last_attack = world.time + cooldown_modifier
+				H.last_attack_delay = attack.delay
+				H.set_hand_ready_cooldown(H.hand, world.time + cooldown_modifier + attack.delay)
 
 			if(!affecting || affecting.is_stump())
 				to_chat(M, "<span class='danger'>You cannot attack something the enemy doesn't have.</span>")
 				return 1
 
+			var/attack_margin = H.skillcheck_margin(H.skills[SKILL_MELEE], SKILL_MELEE)
+
 			if(M != src)
-				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+				if(try_guard_block(H) || attempt_dodge(H))//Trying to dodge or block before they even have the chance to miss us.
 					return
 
 			switch(src.combat_mode)
@@ -210,8 +232,10 @@
 					accurate = 1
 				if(1)
 					// We're in a fighting stance, there's a chance we block
-					if(src.canmove && src!=H && prob(20))
-						block = 1
+					if(src.canmove && src!=H && !(src.grabbed_by.len || src.buckled) && !(H.species.species_flags & SPECIES_FLAG_NO_BLOCK))
+						feint_block_penalty = H.consume_feint_bonus(src)
+						if(prob(max(20 - (feint_block_penalty * 5), 0)))
+							block = 1
 
 			if(src.grabbed_by.len || src.buckled || !src.canmove || src==H || H.species.species_flags & SPECIES_FLAG_NO_BLOCK)
 				accurate = 1 // certain circumstances make it impossible for us to evade punches
@@ -246,9 +270,9 @@
 							H.resolve_critical_miss_unarmed()
 							attack_message = null
 						else
-							attack_message = "[H] attempted to strike [src], but missed!"
+							attack_message = "[H] attempted to strike [src], but missed [H.attack_quality_from_margin(attack_margin, FALSE)]!"
 					else
-						attack_message = "[H] attempted to strike [src], but \he rolled out of the way!"
+						attack_message = "[H] missed [src] [H.attack_quality_from_margin(attack_margin, FALSE)] as \he rolled out of the way!"
 						src.set_dir(pick(GLOB.cardinal))
 					miss_type = 1
 
@@ -265,7 +289,10 @@
 
 			//H.do_attack_animation(src)
 			if(!attack_message)
+				if(!miss_type && istype(attack, /datum/unarmed_attack/punch))
+					H.attack_quality = H.attack_quality_from_margin(attack_margin, TRUE)
 				attack.show_attack(H, src, hit_zone, rand_damage)
+				H.attack_quality = null
 			else
 				H.visible_message("<span class='danger'>[attack_message]</span>")
 
@@ -309,7 +336,7 @@
 				H.species.disarm_attackhand(H, src)
 
 			if(M != src)
-				if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+				if(try_guard_block(H) || attempt_dodge(H))//Trying to dodge or block before they even have the chance to miss us.
 					return
 
 	return

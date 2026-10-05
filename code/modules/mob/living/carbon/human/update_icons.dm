@@ -150,7 +150,8 @@ Please contact me on #coderbus IRC. ~Carn x
 #define TARGETED_LAYER			31		//BS12: Layer for the target overlay from weapon targeting system
 #define FLIES_LAYER				32
 #define COLDBREATH_LAYER		33
-#define TOTAL_LAYERS			33
+#define MOUTH_ITEM_LAYER		34
+#define TOTAL_LAYERS			34
 
 /mob/living/carbon/human
 	var/list/overlays_standing[TOTAL_LAYERS]
@@ -709,7 +710,16 @@ var/global/list/damage_icon_parts = list()
 
 
 /mob/living/carbon/human/update_inv_wear_mask(var/update_icons=1)
-	if( wear_mask && ( istype(wear_mask, /obj/item/clothing/mask) || istype(wear_mask, /obj/item/clothing/accessory) ) && !(head && head.flags_inv & HIDEMASK))
+	if(mouth_item)
+		overlays_standing[MOUTH_ITEM_LAYER] = mouth_item.get_mob_overlay(src, slot_wear_mask_str)
+	else
+		overlays_standing[MOUTH_ITEM_LAYER] = null
+
+	var/mask_visible = !(head && head.flags_inv & HIDEMASK)
+	if(!mask_visible && istype(head, /obj/item/clothing/head/helmet/space) && istype(wear_mask, /obj/item/clothing/mask/breath))
+		mask_visible = TRUE
+
+	if(wear_mask && (istype(wear_mask, /obj/item/clothing/mask) || istype(wear_mask, /obj/item/clothing/accessory)) && mask_visible)
 		var/image/mask_overlay = wear_mask.get_mob_overlay(src,slot_wear_mask_str)
 		if(head && (head.flags_inv & BLOCKHAIR))
 			var/icon/helmet_icon = head.get_mob_icon(src, slot_head_str)
@@ -756,6 +766,8 @@ var/global/list/damage_icon_parts = list()
 
 /mob/living/carbon/human/update_inv_r_hand(var/update_icons=1)
 	if(r_hand)
+		if(hud_used && hud_used.r_hand_hud_object)
+			r_hand.screen_loc = hud_used.r_hand_hud_object.screen_loc
 		var/image/standing = r_hand.get_mob_overlay(src,slot_r_hand_str)
 		if(standing)
 			standing.appearance_flags |= RESET_ALPHA
@@ -770,6 +782,8 @@ var/global/list/damage_icon_parts = list()
 
 /mob/living/carbon/human/update_inv_l_hand(var/update_icons=1)
 	if(l_hand)
+		if(hud_used && hud_used.l_hand_hud_object)
+			l_hand.screen_loc = hud_used.l_hand_hud_object.screen_loc
 		var/image/standing = l_hand.get_mob_overlay(src,slot_l_hand_str)
 		if(standing)
 			standing.appearance_flags |= RESET_ALPHA

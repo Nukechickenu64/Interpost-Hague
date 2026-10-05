@@ -90,9 +90,9 @@
 		return
 	if(affecting)
 		if(assailant.r_hand == src)
-			hud.screen_loc = ui_rhand
+			hud.screen_loc = assailant.hud_used && assailant.hud_used.r_hand_hud_object ? assailant.hud_used.r_hand_hud_object.screen_loc : ui_rhand
 		else
-			hud.screen_loc = ui_lhand
+			hud.screen_loc = assailant.hud_used && assailant.hud_used.l_hand_hud_object ? assailant.hud_used.l_hand_hud_object.screen_loc : ui_lhand
 
 /obj/item/grab/process()
 	if(QDELETED(src)) // GC is trying to delete us, we'll kill our processing so we can cleanly GC

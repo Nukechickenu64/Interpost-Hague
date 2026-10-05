@@ -76,7 +76,8 @@
 		data["SM_integrity"] = active.get_integrity()
 		data["SM_power"] = active.power
 		data["SM_ambienttemp"] = air.temperature
-		data["SM_ambientpressure"] = air.return_pressure()
+		data["SM_ambientmoles"] = round(air.get_tile_moles(), 0.1)
+		data["SM_ambientstate"] = air.get_tile_moles() > PRESSURE_TO_MOLES(10000) ? "bad" : air.get_tile_moles() > PRESSURE_TO_MOLES(5000) ? "average" : "good"
 		data["SM_EPR"] = active.get_epr()
 		if(air.total_moles)
 			data["SM_gas_O2"] = round(100*air.gas["oxygen"]/air.total_moles,0.01)

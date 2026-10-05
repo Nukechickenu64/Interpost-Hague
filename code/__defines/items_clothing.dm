@@ -20,6 +20,8 @@
 #define SLOT_TIE        (1<<14)
 #define SLOT_HOLSTER	(1<<15) //16th bit - higher than this will overflow
 #define SLOT_DENYPOCKET (1<<16)
+#define SLOT_WRIST_L   (1<<17)
+#define SLOT_WRIST_R   (1<<18)
 
 #define ACCESSORY_SLOT_UTILITY  "Utility"
 #define ACCESSORY_SLOT_HOLSTER  "Holster"
@@ -78,7 +80,9 @@
 #define slot_legs        21
 #define slot_tie         22
 #define slot_wear_amulet 23
-#define slot_last        24
+#define slot_wrist_l     24
+#define slot_wrist_r     25
+#define slot_last        26
 
 // Inventory slot strings.
 // since numbers cannot be used as associative list keys.
@@ -99,6 +103,8 @@
 #define slot_wear_id_str  	"slot_wear_id"
 #define slot_wear_amulet_str "slot_wear_amulet"
 #define slot_gloves_str  	"slot_gloves"
+#define slot_wrist_l_str     "slot_wrist_l"
+#define slot_wrist_r_str     "slot_wrist_r"
 #define slot_glasses_str  	"slot_glasses"
 #define slot_s_store_str	"slot_s_store"
 #define slot_tie_str		"slot_tie"

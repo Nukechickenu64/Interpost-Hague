@@ -138,12 +138,7 @@
 	update_uis()
 
 /obj/item/modular_computer/attack_ghost(var/mob/observer/ghost/user)
-	if(enabled)
-		ui_interact(user)
-	else if(check_rights(R_ADMIN, 0, user))
-		var/response = alert(user, "This computer is turned off. Would you like to turn it on?", "Admin Override", "Yes", "No")
-		if(response == "Yes")
-			turn_on(user)
+	return attack_self(user)
 
 /obj/item/modular_computer/attack_ai(var/mob/user)
 	return attack_self(user)
@@ -153,12 +148,29 @@
 		return attack_self(user)
 	return ..()
 
-// On-click handling. Turns on the computer if it's off and opens the GUI.
 /obj/item/modular_computer/attack_self(var/mob/user)
-	if(enabled && screen_on)
-		ui_interact(user)
-	else if(!enabled && screen_on)
-		turn_on(user)
+	show_space_science_term(user)
+
+/obj/item/modular_computer/proc/show_space_science_term(var/mob/user)
+	var/static/list/space_science_terms = list(
+		"Accretion",
+		"Aphelion",
+		"Apoapsis",
+		"Astrometry",
+		"Blueshift",
+		"Cosmology",
+		"Exoplanet",
+		"Magnetar",
+		"Nebula",
+		"Orbit",
+		"Pulsar",
+		"Quasar",
+		"Redshift",
+		"Supernova",
+		"Synchrotron",
+		"Wormhole"
+	)
+	to_chat(user, pick(space_science_terms))
 
 /obj/item/modular_computer/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
 	if(istype(W, /obj/item/card/id)) // ID Card, try to insert it.

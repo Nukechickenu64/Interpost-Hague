@@ -28,6 +28,8 @@
 /mob/living/carbon/human/death(gibbed,deathmessage="seizes up and falls limp...", show_dead_message = "You have died.")
 
 	if(stat == DEAD) return
+	if(leech_starving)
+		stop_leech_starvation()
 	var/turf/death_turf = get_turf(src)
 	if(!gibbed && getHalLoss() >= 300 && death_turf)
 		for(var/obj/target in death_turf)
@@ -80,6 +82,9 @@
 		wearing_rig.notify_ai("<span class='danger'>Warning: user death event. Mobility control passed to integrated intelligence system.</span>")
 
 	. = ..(gibbed,"no message")
+	if(stat == DEAD && get_medical_bracelet())
+		var/area/death_area = get_area(src)
+		GLOB.global_announcer.autosay("Medical alert! [real_name] has died in [death_area ? death_area.name : "an unknown location"]!", "Medical Bracelet")
 	if(!gibbed)
 		handle_organs()
 		if(species.death_sound)

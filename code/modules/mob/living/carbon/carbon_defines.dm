@@ -44,5 +44,7 @@
 
 	var/list/stasis_sources = list()
 	var/stasis_value
+	var/voluntary_sleeping = FALSE
+	var/waking_up = FALSE
 	var/social_class = null
 	var/in_bed = null

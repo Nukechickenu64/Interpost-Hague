@@ -457,7 +457,7 @@
 	return (source_pressure - sink_pressure)/(R_IDEAL_GAS_EQUATION * (source.temperature/source_volume + sink.temperature/sink_volume))
 
 //Determines if the atmosphere is safe (for humans). Safe atmosphere:
-// - Is between 80 and 120kPa
+// - Has between 79% and 118% of a standard tile's gas amount
 // - Has between 17% and 30% oxygen
 // - Has temperature between -10C and 50C
 // - Has no or only minimal phoron or N2O
@@ -473,10 +473,9 @@
 	if((atmosphere.temperature > (T0C + 50)) || (atmosphere.temperature < (T0C - 10)))
 		status.Add("Temperature too [atmosphere.temperature > (T0C + 50) ? "high" : "low"].")
 
-	// Pressure check
-	var/pressure = atmosphere.return_pressure()
-	if((pressure > 120) || (pressure < 80))
-		status.Add("Pressure too [pressure > 120 ? "high" : "low"].")
+	var/gas_amount = atmosphere.get_tile_moles()
+	if((gas_amount > PRESSURE_TO_MOLES(120)) || (gas_amount < PRESSURE_TO_MOLES(80)))
+		status.Add("Gas amount too [gas_amount > PRESSURE_TO_MOLES(120) ? "high" : "low"].")
 
 	// Gas concentration checks
 	var/oxygen = 0

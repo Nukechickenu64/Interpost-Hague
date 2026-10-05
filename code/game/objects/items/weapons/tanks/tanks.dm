@@ -383,13 +383,7 @@ var/list/global/tank_gauge_cache = list()
 			var/turf/simulated/T = get_turf(src)
 			if(!T)
 				return
-			var/datum/gas_mixture/environment = loc.return_air()
-			var/env_pressure = environment.return_pressure()
-			var/tank_pressure = air_contents.return_pressure()
-
-			var/release_ratio = clamp(0.002, sqrt(max(tank_pressure-env_pressure,0)/tank_pressure),1)
-			var/datum/gas_mixture/leaked_gas = air_contents.remove_ratio(release_ratio)
-			//dynamic air release based on ambient pressure
+			var/datum/gas_mixture/leaked_gas = air_contents.remove_ratio(1)
 
 			T.assume_air(leaked_gas)
 			if(!leaking)
@@ -528,4 +522,3 @@ var/list/global/tank_gauge_cache = list()
 /obj/item/projectile/bullet/pellet/fragment/tank/big
 	name = "large metal fragment"
 	damage = 17
-

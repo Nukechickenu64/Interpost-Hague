@@ -3,6 +3,8 @@
 	breath_pressure = 18
 	failed_breath_oxy_loss_multiplier = 2
 	safe_exhaled_pressure = 5
+	safe_air_moles_min = HUMAN_SAFE_AIR_MOLES_MIN
+	safe_air_moles_max = HUMAN_SAFE_AIR_MOLES_MAX
 	medical_skin_appearance = TRUE
 	name_plural = "Humans"
 	primitive_form = "Monkey"

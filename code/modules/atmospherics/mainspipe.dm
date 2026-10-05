@@ -8,14 +8,10 @@ obj/machinery/atmospherics/pipe/mains_component
 		parent_pipe = loc
 
 	check_pressure(pressure)
-		var/datum/gas_mixture/environment = loc.loc.return_air()
-
-		var/pressure_difference = pressure - environment.return_pressure()
-
-		if(pressure_difference > parent_pipe.maximum_pressure)
+		if(pressure > parent_pipe.maximum_pressure)
 			mains_burst()
 
-		else if(pressure_difference > parent_pipe.fatigue_pressure)
+		else if(pressure > parent_pipe.fatigue_pressure)
 			//TODO: leak to turf, doing pfshhhhh
 			if(prob(5))
 				mains_burst()
@@ -76,14 +72,10 @@ obj/machinery/atmospherics/mains_pipe
 			burst()
 
 	proc/check_pressure(pressure)
-		var/datum/gas_mixture/environment = loc.return_air()
-
-		var/pressure_difference = pressure - environment.return_pressure()
-
-		if(pressure_difference > maximum_pressure)
+		if(pressure > maximum_pressure)
 			burst()
 
-		else if(pressure_difference > fatigue_pressure)
+		else if(pressure > fatigue_pressure)
 			//TODO: leak to turf, doing pfshhhhh
 			if(prob(5))
 				burst()

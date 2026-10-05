@@ -7,22 +7,37 @@
 	w_class = 2
 	unique = 1
 	carved = 2 // Don't carve it
+	var/religion_name = NARSIE_RELIGION
+
+/obj/item/book/tome/fire
+	name = "infernal tome"
+	religion_name = KHARIN_RELIGION
+	color = "#ff6600"
+
+/obj/item/book/tome/death
+	name = "mortuary tome"
+	religion_name = REAPER_RELIGION
+	color = "#800020"
 
 /obj/item/book/tome/attack_self(var/mob/user)
-	if(!iscultist(user))
+	if(!same_cult(user, get_cult_by_religion(religion_name)))
 		to_chat(user, "\The [src] seems full of illegible scribbles. Is this a joke?")
 	else
 		to_chat(user, "Hold \the [src] in your hand while drawing a rune to use it.")
+		var/datum/religion/faith = GLOB.all_religions[religion_name]
+		if(faith)
+			faith.show_rituals(user)
 
 /obj/item/book/tome/examine(var/mob/user)
 	. = ..()
-	if(!iscultist(user))
+	if(!same_cult(user, get_cult_by_religion(religion_name)))
 		to_chat(user, "An old, dusty tome with frayed edges and a sinister looking cover.")
 	else
-		to_chat(user, "The scriptures of Nar-Sie, The One Who Sees, The Geometer of Blood. Contains the details of every ritual his followers could think of. Most of these are useless, though.")
+		var/datum/antagonist/cultist/cult = get_cult(user)
+		to_chat(user, "The scriptures of [cult.entity_name], [cult.entity_title]. Contains the rituals of [religion_name].")
 
 /obj/item/book/tome/afterattack(var/atom/A, var/mob/user, var/proximity)
-	if(!proximity || !iscultist(user))
+	if(!proximity || !same_cult(user, get_cult_by_religion(religion_name)))
 		return
 	if(A.reagents && A.reagents.has_reagent(/datum/reagent/water/holywater))
 		to_chat(user, "<span class='notice'>You unbless \the [A].</span>")
@@ -31,10 +46,14 @@
 		A.reagents.add_reagent(/datum/reagent/water, holy2water)
 
 /mob/proc/make_rune(var/rune, var/cost = 5, var/tome_required = 0)
+	var/datum/antagonist/cultist/cult = get_cult(src)
+	if(!cult)
+		to_chat(src, "<span class='warning'>The forbidden knowledge eludes you.</span>")
+		return FALSE
 	var/has_tome = 0
 	var/has_robes = 0
 	var/cult_ground = 0
-	if(istype(get_active_hand(), /obj/item/book/tome) || istype(get_inactive_hand(), /obj/item/book/tome))
+	if(istype(get_active_hand(), cult.tome_type) || istype(get_inactive_hand(), cult.tome_type))
 		has_tome = 1
 	else if(tome_required && mob_needs_tome())
 		to_chat(src, "<span class='warning'>This rune is too complex to draw by memory, you need to have a tome in your hand to draw it.</span>")
@@ -89,10 +108,10 @@
 			damage = 2
 	visible_message("<span class='warning'>\The [src] slices open a finger and begins to chant and paint symbols on the floor.</span>", "<span class='notice'>[self]</span>", "You hear chanting.")
 	if(do_after(src, timer))
-		pay_for_rune(cost * damage)
-		if(locate(/obj/effect/rune) in T)
+		if(!same_cult(src, cult) || get_turf(src) != T || T.holy || (locate(/obj/effect/rune) in T))
 			return
-		var/obj/effect/rune/R = new rune(T, get_rune_color(), get_blood_name())
+		pay_for_rune(cost * damage)
+		var/obj/effect/rune/R = new rune(T, get_rune_color(), get_blood_name(), cult)
 		var/area/A = get_area(R)
 		log_and_message_admins("created \an [R.cultname] rune at \the [A.name] - [loc.x]-[loc.y]-[loc.z].")
 		R.add_fingerprint(src)
@@ -283,7 +302,8 @@ var/list/Tier4Runes = list(
 	set category = "Cult Magic"
 	set name = "Communicate"
 
-	if(incapacitated())
+	var/datum/antagonist/cultist/cult = get_cult(src)
+	if(!cult || incapacitated())
 		to_chat(src, "<span class='warning'>Not when you are incapacitated.</span>")
 		return
 
@@ -291,14 +311,14 @@ var/list/Tier4Runes = list(
 	pay_for_rune(3)
 
 	var/input = input(src, "Please choose a message to tell to the other acolytes.", "Voice of Blood", "")
-	if(!input)
+	if(!input || !same_cult(src, cult) || incapacitated())
 		return
 
 	whisper("[input]")
 
 	input = sanitize(input)
 	log_and_message_admins("used a communicate verb to say '[input]'")
-	for(var/datum/mind/H in GLOB.cult.current_antagonists)
+	for(var/datum/mind/H in cult.current_antagonists)
 		if(H.current && !H.current.stat)
 			to_chat(H.current, "<span class='cult'>[input]</span>")
 

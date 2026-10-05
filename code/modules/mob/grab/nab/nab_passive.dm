@@ -10,6 +10,6 @@
 
 	grab_slowdown = 0
 
-	icon_state = "reinforce1"
+	icon_state = "gripe"
 
 	break_chance_table = list(50, 80, 100)

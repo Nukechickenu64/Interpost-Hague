@@ -102,7 +102,7 @@
 	return here == goal
 
 /datum/humanized_mover/proc/step_delay()
-	var/delay = owner.m_intent == "walk" ? 7 + config.walk_speed : 1 + config.run_speed
+	var/delay = owner.get_move_intent_delay()
 	if(owner.m_intent == "run" && owner.drowsyness > 0)
 		delay += 6
 	delay += owner.movement_delay()
@@ -110,6 +110,9 @@
 	if(prob(3))
 		delay += rand(1, 3)
 	return max(1, delay)
+
+/datum/humanized_mover/proc/try_tick()
+	return tick() != MOVER_FAILED
 
 /datum/humanized_mover/proc/tick()
 	if(!goal)

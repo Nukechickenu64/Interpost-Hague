@@ -345,9 +345,7 @@
 	if (istype(src, /obj/machinery/atmospherics/tvalve/digital))
 		to_chat(user, "<span class='warning'>You cannot unwrench \the [src], it's too complicated.</span>")
 		return 1
-	var/datum/gas_mixture/int_air = return_air()
-	var/datum/gas_mixture/env_air = loc.return_air()
-	if ((int_air.return_pressure()-env_air.return_pressure()) > 2*ONE_ATMOSPHERE)
+	if(get_networks_max_pressure(list(network_node1, network_node2, network_node3)) > 2*ONE_ATMOSPHERE)
 		to_chat(user, "<span class='warnng'>You cannot unwrench \the [src], it too exerted due to internal pressure.</span>")
 		add_fingerprint(user)
 		return 1

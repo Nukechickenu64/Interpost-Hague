@@ -109,7 +109,9 @@
 	layer = CRIT_LAYER
 
 /obj/screen/fullscreen/blind
-	icon_state = "blackimageoverlay"
+	icon = 'icons/mob/screen1.dmi'
+	icon_state = "black"
+	screen_loc = ui_entire_screen
 	layer = BLIND_LAYER
 
 /obj/screen/fullscreen/dead

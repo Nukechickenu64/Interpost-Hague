@@ -33,7 +33,7 @@ Class Procs:
 		May be called on unsimulated turfs, returning 0.
 
 	merge(zone/A, zone/B)
-		Called when zones have a direct connection and equivalent pressure and temperature.
+		Called when zones have a direct connection and equivalent gas amounts and temperature.
 		Merges the zones to create a single zone.
 
 	connect(turf/simulated/A, turf/B)
@@ -330,7 +330,7 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	var/space = !istype(B)
 
 	if(!space)
-		if(min(A.zone.contents.len, B.zone.contents.len) < ZONE_MIN_SIZE || (direct && (equivalent_pressure(A.zone,B.zone) || times_fired == 0)))
+		if((direct || min(A.zone.contents.len, B.zone.contents.len) < ZONE_MIN_SIZE) && (equivalent_pressure(A.zone,B.zone) || times_fired == 0))
 			merge(A.zone,B.zone)
 			return
 
@@ -395,7 +395,7 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	E.sleeping = 0
 
 /datum/controller/subsystem/air/proc/equivalent_pressure(zone/A, zone/B)
-	return A.air.compare(B.air)
+	return A.air.compare(B.air, compare_pressure = FALSE)
 
 /datum/controller/subsystem/air/proc/get_edge(zone/A, zone/B)
 	if(istype(B))

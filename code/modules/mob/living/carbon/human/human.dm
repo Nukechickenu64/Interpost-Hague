@@ -9,7 +9,17 @@
 	var/list/hud_list[10]
 	var/embedded_flag	  //To check if we've need to roll for damage on movement while an item is imbedded in us.
 	var/obj/item/rig/wearing_rig // This is very not good, but it's much much better than calling get_rig() every update_canmove() call.
+	var/sprinting = FALSE
+	var/obj/screen/sprint_icon
 	var/combat_music = 'sound/music/bloodlust.ogg'
+
+/mob/living/carbon/human/proc/update_movement_hud()
+	if(sprinting && (m_intent != "run" || !canmove || resting))
+		sprinting = FALSE
+	if(hud_used && hud_used.move_intent)
+		hud_used.move_intent.icon_state = m_intent == "walk" ? "walking" : "running"
+	if(sprint_icon)
+		sprint_icon.icon_state = sprinting ? "sprint1" : "sprint0"
 
 /mob/living/carbon/human/New(var/new_loc, var/new_species = null)
 
@@ -64,6 +74,11 @@
 	make_blood()
 
 /mob/living/carbon/human/Destroy()
+	if(pony_flight_timer)
+		deltimer(pony_flight_timer)
+		pony_flight_timer = null
+	stop_leech_starvation()
+	clear_blind_tiles()
 	GLOB.human_mob_list -= src
 	worn_underwear = null
 	for(var/organ in organs)
@@ -284,8 +299,9 @@
 		dat += "<BR><b>Right pocket:</b> [right_pocket_text]"
 		dat += " <A href='?src=\ref[src];item=pocket_right'>Open</A>"
 		dat += "<BR><A href='?src=\ref[src];item=pockets'>Empty or Place Item</A>"
-		if(suit.has_sensor == 1)
-			dat += "<BR><A href='?src=\ref[src];item=sensors'>Set sensors</A>"
+	var/obj/item/device/medical_bracelet/bracelet = get_medical_bracelet()
+	if(bracelet && bracelet.has_sensor == SUIT_HAS_SENSORS)
+		dat += "<BR><A href='?src=\ref[src];item=sensors'>Set medical bracelet sensors</A>"
 	if(handcuffed)
 		dat += "<BR><A href='?src=\ref[src];item=[slot_handcuffed]'>Handcuffed</A>"
 
@@ -1196,6 +1212,7 @@ var/list/rank_prefix = list(\
 
 		if(species.name && species.name == new_species)
 			return
+		update_species_stats(FALSE)
 		if(species.language)
 			remove_language(species.language)
 		if(species.default_language)
@@ -1243,6 +1260,7 @@ var/list/rank_prefix = list(\
 
 	species.create_organs(src)
 	species.handle_post_spawn(src)
+	update_species_stats()
 	maxHealth = species.total_health
 
 	default_pixel_x = initial(pixel_x) + species.pixel_offset_x

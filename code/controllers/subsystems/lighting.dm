@@ -93,11 +93,15 @@ SUBSYSTEM_DEF(lighting)
 			if(!L.destroyed)
 				L.apply_lum()
 
-		else if(L.vis_update)	//We smartly update only tiles that became (in) visible to use.
-			L.smart_vis_update()
+		else
+			if(L.vis_update)	//We smartly update only tiles that became (in) visible to use.
+				L.smart_vis_update()
+			if(L.cone_update)
+				L.update_cone_lum()
 
 		L.vis_update   = FALSE
 		L.force_update = FALSE
+		L.cone_update  = FALSE
 		L.needs_update = FALSE
 
 		processed_lights += 1

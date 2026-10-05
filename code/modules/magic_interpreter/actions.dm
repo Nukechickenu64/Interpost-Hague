@@ -3,7 +3,7 @@
 
 /decl/magic_word/magic_action/creare
 	name = "create"
-	words = list("creare")
+	words = list("creare", "facere")
 	aliases = list("create", "spawn", "make")
 	accepts_turf = TRUE
 
@@ -59,7 +59,7 @@
 
 /decl/magic_word/magic_action/ignire
 	name = "ignite"
-	words = list("ignire")
+	words = list("ignire", "incendere")
 	aliases = list("ignite", "burn_up", "kindle")
 	base_cost = 30
 
@@ -86,7 +86,7 @@
 
 /decl/magic_word/magic_action/explodere
 	name = "explode"
-	words = list("explodere")
+	words = list("explodere", "rumpere")
 	aliases = list("explode", "detonate")
 	accepts_turf = TRUE
 	base_cost = 40
@@ -116,7 +116,7 @@
 
 /decl/magic_word/magic_action/sanare
 	name = "heal"
-	words = list("sanare")
+	words = list("sanare", "curare", "mederi")
 	aliases = list("heal", "rejuvenate", "mend")
 	cosmetic = TRUE
 	base_cost = 80
@@ -130,7 +130,7 @@
 
 /decl/magic_word/magic_action/delere
 	name = "delete"
-	words = list("delere")
+	words = list("delere", "abolere")
 	aliases = list("delete", "destroy", "erase")
 	base_cost = 20
 
@@ -144,7 +144,7 @@
 
 /decl/magic_word/magic_action/locus
 	name = "relocate"
-	words = list("locus")
+	words = list("locus", "transferre")
 	aliases = list("teleport", "move")
 	base_cost = 40
 

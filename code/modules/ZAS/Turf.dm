@@ -247,11 +247,6 @@
 	if(initial_gas)
 		GM.gas = initial_gas.Copy()
 	GM.temperature = temperature
-	var/turf/default_turf = /turf
-	if(temperature == initial(default_turf.temperature) && length(initial_gas) == 2 && initial_gas[GAS_OXYGEN] == MOLES_O2STANDARD && initial_gas[GAS_NITROGEN] == MOLES_N2STANDARD)
-		var/temperature_ratio = T20C / temperature
-		GM.gas[GAS_OXYGEN] *= temperature_ratio
-		GM.gas[GAS_NITROGEN] *= temperature_ratio
 	GM.update_values()
 
 	return GM

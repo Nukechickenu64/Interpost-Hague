@@ -1,6 +1,6 @@
 /datum/computer_file/program/suit_sensors
 	filename = "sensormonitor"
-	filedesc = "Suit Sensors Monitoring"
+	filedesc = "Medical Bracelet Monitoring"
 	nanomodule_path = /datum/nano_module/crew_monitor
 	program_icon_state = "crew"
 	program_key_state = "med_key"

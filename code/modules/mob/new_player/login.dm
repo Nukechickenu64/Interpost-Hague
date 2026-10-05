@@ -7,17 +7,8 @@
 	mouse_opacity = 0
 
 /obj/effect/lobby_image/Initialize()
-	icon = GLOB.using_map.lobby_icon
-	var/known_icon_states = icon_states(icon)
-	for(var/lobby_screen in GLOB.using_map.lobby_screens)
-		if(!(lobby_screen in known_icon_states))
-			error("Lobby screen '[lobby_screen]' did not exist in the icon set [icon].")
-			GLOB.using_map.lobby_screens -= lobby_screen
-
-	if(GLOB.using_map.lobby_screens.len)
-		icon_state = pick(GLOB.using_map.lobby_screens)
-	else
-		icon_state = known_icon_states[1]
+	icon = 'icons/misc/fullscreen_lobby.dmi'
+	icon_state = "orbital"
 
 	. = ..()
 
@@ -37,7 +28,15 @@
 		mind.current = src
 
 	loc = null
-	client.screen += lobby_image
+	var/obj/effect/lobby_image/lobby = new
+	var/view_w = update_client_view()
+	if(view_w > 15)
+		// Uniform "cover" scaling: keeps the aspect ratio, fills the widened view, and crops the overflow top and bottom.
+		var/matrix/M = matrix()
+		M.Scale(view_w / 15, view_w / 15)
+		M.Translate((view_w - 15) * 16, 0)
+		lobby.transform = M
+	client.screen += lobby
 	my_client = client
 	set_sight(sight|SEE_TURFS|SEE_OBJS)
 	GLOB.player_list |= src

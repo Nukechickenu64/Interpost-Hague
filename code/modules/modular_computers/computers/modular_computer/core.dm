@@ -145,12 +145,9 @@
 		ui_interact(user) // Re-open the UI on this computer. It should show the main screen now.
 	update_icon()
 
-// Returns 0 for No Signal, 1 for Low Signal and 2 for Good Signal. 3 is for wired connection (always-on)
+// Modular computers no longer provide NTNet access.
 /obj/item/modular_computer/proc/get_ntnet_status(var/specific_action = 0)
-	if(network_card)
-		return network_card.get_signal(specific_action)
-	else
-		return 0
+	return 0
 
 /obj/item/modular_computer/proc/add_log(var/text)
 	if(!get_ntnet_status())
@@ -187,12 +184,6 @@
 
 	update_icon()
 
-	// Autorun feature
-	if(!updates)
-		var/datum/computer_file/data/autorun = hard_drive ? hard_drive.find_file_by_name("autorun") : null
-		if(istype(autorun))
-			run_program(autorun.stored_data)
-
 	if(user)
 		ui_interact(user)
 
@@ -210,41 +201,8 @@
 
 
 /obj/item/modular_computer/proc/run_program(prog)
-	var/datum/computer_file/program/P = null
-	var/mob/user = usr
-	if(hard_drive)
-		P = hard_drive.find_file_by_name(prog)
-
-	if(!P || !istype(P)) // Program not found or it's not executable program.
-		to_chat(user, "<span class='danger'>\The [src]'s screen shows \"I/O ERROR - Unable to run [prog]\" warning.</span>")
-		return
-
-	P.computer = src
-
-	if(!P.is_supported_by_hardware(hardware_flag, 1, user))
-		return
-	if(P in idle_threads)
-		P.program_state = PROGRAM_STATE_ACTIVE
-		active_program = P
-		idle_threads.Remove(P)
-		update_icon()
-		return
-
-	if(idle_threads.len >= processor_unit.max_idle_programs+1)
-		to_chat(user, "<span class='notice'>\The [src] displays a \"Maximal CPU load reached. Unable to run another program.\" error</span>")
-		return
-
-	if(P.requires_ntnet && !get_ntnet_status(P.requires_ntnet_feature)) // The program requires NTNet connection, but we are not connected to NTNet.
-		to_chat(user, "<span class='danger'>\The [src]'s screen shows \"NETWORK ERROR - Unable to connect to NTNet. Please retry. If problem persists contact your system administrator.\" warning.</span>")
-		return
-
-	if(active_program)
-		minimize_program(user)
-
-	if(P.run_program(user))
-		active_program = P
-		update_icon()
-	return 1
+	// Keep stored programs inert so they cannot open their own interfaces.
+	return 0
 
 /obj/item/modular_computer/proc/update_uis()
 	if(active_program) //Should we update program ui or computer ui?

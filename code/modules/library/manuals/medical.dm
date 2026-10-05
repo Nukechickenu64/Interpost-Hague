@@ -49,7 +49,7 @@
 
 				<a name='4'><h3>Step 4: Scan body</h3>
 				Go onto the computer and scan the body by pressing 'Scan - &lt;Subject Name Here&gt;.' If you're successful, they will be added to the records (note that this can be done at any time, even with living people,
-				so that they can be cloned without a body in the event that they are lying dead on port solars and didn't turn on their suit sensors)!
+				so that they can be cloned without a body in the event that they are lying dead on port solars and aren't wearing an active medical bracelet)!
 				If not, and it says "Error: Mental interface failure.", then they have left their bodily confines and are one with the spirits. If this happens, just shout at them to get back in their body,
 				click 'Refresh' and try scanning them again. If there's no success, threaten them with gibbing.
 				Still no success? Skip over to Step 7 and don't continue after it, as you have an unresponsive body and it cannot be cloned.

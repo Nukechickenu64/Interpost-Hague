@@ -32,16 +32,10 @@
 				{{/if}}
 			</div>		
 			<div class="itemLabel">
-				Pressure:
+				Gas Amount:
 			</div>
 			<div class="itemContent">
-				{{if data.SM_ambientpressure > 10000}}
-					<span class='bad'>{{:data.SM_ambientpressure}} kPa</span>
-				{{else data.SM_ambientpressure > 5000}}
-					<span class='average'>{{:data.SM_ambientpressure}} kPa</span>
-				{{else}}
-					<span class='good'>{{:data.SM_ambientpressure}} kPa</span>
-				{{/if}}
+				<span class='{{:data.SM_ambientstate}}'>{{:data.SM_ambientmoles}} mol/tile</span>
 			</div>
 			<div class="itemLabel">
 				Chamber EPR:

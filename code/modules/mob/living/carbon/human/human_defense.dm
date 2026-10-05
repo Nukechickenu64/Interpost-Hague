@@ -15,6 +15,99 @@ meteor_act
 	else
 		return "hits"
 
+/mob/living/carbon/human/proc/prepare_guard()
+	if(stat || incapacitated() || !canmove)
+		return FALSE
+	adjustStaminaLoss(5)
+	guard_stance_charges = 1
+	guard_stance_until = world.time + 6
+	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	visible_message("<span class='combat'>[src] braces for an incoming attack.</span>")
+	return TRUE
+
+/mob/living/carbon/human/proc/consume_feint_bonus(mob/living/carbon/human/target)
+	if(feint_target != target || world.time > feint_expires)
+		if(world.time > feint_expires)
+			feint_target = null
+			feint_margin = 0
+			feint_expires = 0
+		return 0
+	var/penalty = feint_margin
+	feint_target = null
+	feint_margin = 0
+	feint_expires = 0
+	return penalty
+
+/mob/living/carbon/human/proc/try_guard_block(mob/living/attacker)
+	if(!guard_stance_charges)
+		return FALSE
+	if(world.time > guard_stance_until || incapacitated() || !canmove)
+		guard_stance_charges = 0
+		guard_stance_until = 0
+		return FALSE
+	if(!attacker || !(get_dir(src, attacker) & dir))
+		return FALSE
+	var/block_chance = 50
+	var/feint_penalty = 0
+	if(ishuman(attacker))
+		var/mob/living/carbon/human/human_attacker = attacker
+		feint_penalty = human_attacker.consume_feint_bonus(src)
+	if(prob(max(block_chance - feint_penalty, 0)))
+		guard_stance_charges = 0
+		guard_stance_until = 0
+		visible_message("<span class='combat'>[src] blocks [attacker]'s attack!</span>")
+		playsound(src, 'sound/weapons/thudswoosh.ogg', 50, 1)
+		return TRUE
+	return FALSE
+
+/mob/living/carbon/human/proc/perform_combat_feint(mob/living/carbon/human/target)
+	if(!target || target == src || !Adjacent(target) || stat || incapacitated() || !canmove)
+		return FALSE
+	var/attacker_margin = skillcheck_margin(skills["melee"], "melee")
+	var/defender_margin = target.skillcheck_margin(target.skills["melee"], "melee")
+	var/contest_margin = attacker_margin - defender_margin
+	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	if(contest_margin <= 0)
+		visible_message("<span class='combat'>[src] attempts to feint [target], but [target] reads the movement.</span>")
+		return FALSE
+	feint_target = target
+	feint_margin = contest_margin
+	feint_expires = world.time + 6
+	visible_message("<span class='combat'>[src] feints against [target].</span>")
+	return TRUE
+
+/mob/living/carbon/human/proc/perform_dual_attack(mob/living/carbon/human/target)
+	if(!target || target == src || !Adjacent(target) || stat || incapacitated() || !canmove || !combat_mode)
+		return FALSE
+	if(world.time < next_move)
+		return FALSE
+	var/obj/item/offhand_item = get_inactive_hand()
+	if(offhand_item)
+		offhand_item.attack(target, src, zone_sel.selecting)
+	else
+		var/old_hand = hand
+		var/old_intent = a_intent
+		swap_hand()
+		a_intent = I_HURT
+		target.attack_hand(src)
+		if(hand != old_hand)
+			swap_hand()
+		a_intent = old_intent
+	adjustStaminaLoss(4)
+	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	return TRUE
+
+/mob/living/carbon/human/attack_hand_right(mob/user)
+	if(ishuman(user))
+		var/mob/living/carbon/human/H = user
+		if(H.c_intent == I_GUARD)
+			return H.prepare_guard()
+		if(H.c_intent == I_DUAL)
+			return H.perform_dual_attack(src)
+		if(H.c_intent == I_FEINT)
+			return H.perform_combat_feint(src)
+	return ..()
+
 /mob/living/carbon/human/bullet_act(var/obj/item/projectile/P, var/def_zone)
 
 	def_zone = check_zone(def_zone)
@@ -175,14 +268,17 @@ meteor_act
 	if(user == src) // Attacking yourself can't miss
 		return target_zone
 
-	if(attempt_dodge())//Trying to dodge it before they even have the chance to miss us.
+	var/attack_margin = user.skillcheck_margin(user.skills[SKILL_MELEE], SKILL_MELEE)
+	user.attack_quality = null
+
+	if(try_guard_block(user) || attempt_dodge(user))//Trying to dodge or block before they even have the chance to miss us.
 		return null
 
 	var/hit_modifier = user.c_intent == I_AIM ? -40 : 0 //If they are in aim mode, miss less
 	var/hit_zone = get_zone_with_miss_chance(target_zone, src, hit_modifier)
 
 	if(!hit_zone)
-		visible_message("<span class='danger'>\The [user] misses [src] with \the [I]!</span>")
+		visible_message("<span class='danger'>\The [user] misses [src] [user.attack_quality_from_margin(attack_margin, FALSE)] with \the [I]!</span>")
 		return null
 
 	if(user.skillcheck(user.skills["melee"], 60, null, "melee") == CRIT_FAILURE)
@@ -214,6 +310,7 @@ meteor_act
 			to_chat(user, "<span class='notice'><b>I can't reach their [affecting.name]!</span></b>")
 			return null
 
+	user.attack_quality = user.attack_quality_from_margin(attack_margin, TRUE)
 	return hit_zone
 
 /mob/living/carbon/human/hit_with_weapon(obj/item/I, mob/living/user, var/effective_force, var/hit_zone)
@@ -235,14 +332,14 @@ meteor_act
 	var/blocked = run_armor_check(hit_zone, "melee", I.armor_penetration, "Your armor has protected your [affecting.name].", "Your armor has softened the blow to your [affecting.name].")
 
 
-	if(hit_zone != aim_zone && (aim_zone != BP_MOUTH) &&  (aim_zone != BP_THROAT) && (aim_zone != BP_EYES))//This is ugly but it works.
-		visible_message("<span class='combat'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
+	if(hit_zone != aim_zone && !(aim_zone in list(BP_MOUTH, BP_THROAT, BP_EYES, BP_FACE, BP_VITALS, BP_BELLY)))//This is ugly but it works.
+		visible_message("<span class='combat'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] [user.attack_quality ? user.attack_quality : ""] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
 
 	else if(blocked < 20 && blocked > 1)//This is ugly and it doesn't work.
-		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]! Slight damage was done.</span>")
+		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] [user.attack_quality ? user.attack_quality : ""] with the [I.name]! Slight damage was done.</span>")
 
 	else
-		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] with the [I.name]!</span>")
+		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] [user.attack_quality ? user.attack_quality : ""] with the [I.name]!</span>")
 
 	receive_damage()
 
@@ -258,8 +355,8 @@ meteor_act
 	if(!affecting)
 		return 0
 
-	if(user.stats[STAT_ST])//If they have strength then add it.
-		effective_force += strToDamageModifier(user.stats[STAT_ST])
+	if(user.combat_strength())//If they have strength then add it.
+		effective_force += strToDamageModifier(user.combat_strength())
 
 	// Handle striking to cripple.
 	if(user.a_intent == I_DISARM)
@@ -296,8 +393,8 @@ meteor_act
 
 	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
 	else if(I.sharp && I.edge)
-		if(I.sharpness >= 1 && user.statcheck(user.stats[STAT_ST], 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
-			if(prob(I.sharpness * strToDamageModifier(user.stats[STAT_ST])))
+		if(I.sharpness >= 1 && user.statcheck(user.combat_strength(), 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
+			if(prob(I.sharpness * strToDamageModifier(user.combat_strength())))
 				affecting.droplimb(0, DROPLIMB_EDGE)
 
 	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in src.organs
@@ -641,13 +738,15 @@ meteor_act
 		return
 
 	var/armour = run_armor_check(hit_zone, "melee")
+	if(try_guard_block(user) || attempt_dodge(user))
+		return
 	switch(hit_zone)
 		if(BP_CHEST)//If we aim for the chest we kick them in the direction we're facing.
 			if(lying || prob(10))
 				var/turf/target = get_turf(src.loc)
 				var/range = src.throw_range
 				var/throw_dir = get_dir(user, src)
-				var/throwdis = 1 + 3 + user.stats[STAT_ST] - 7
+				var/throwdis = 1 + 3 + user.combat_strength() - 7
 				for(var/i = 1; i < range; i++)
 					var/turf/new_turf = get_step(target, throw_dir)
 					target = new_turf
@@ -673,7 +772,7 @@ meteor_act
 				return
 
 	//STR makes you hit harder, DEX makes it less tiring
-	var/kickdam = rand(5,20) + stat_to_modifier(user.stats[STAT_ST])
+	var/kickdam = rand(5,20) + stat_to_modifier(user.combat_strength())
 	user.adjustStaminaLoss(rand(30,45) - stat_to_modifier(user.stats[STAT_DX]))//Kicking someone is a big deal.
 	if(kickdam)
 		playsound(user.loc, 'sound/weapons/kick.ogg', 50, 0)
@@ -683,6 +782,108 @@ meteor_act
 	else
 		user.visible_message("<span class= 'combat'>[user] tried to kick [src] in the [affecting.name], but missed!</span>")
 		playsound(loc, 'sound/weapons/punchmiss.ogg', 50, 1)
+
+/mob/living/carbon/human/bite_act(mob/living/carbon/human/user)
+	if(!user || user.middle_click_intent != "bite")
+		return
+	return user.try_bite_target(src)
+
+/mob/living/carbon/human/proc/try_bite_target(mob/living/carbon/human/victim)
+	if(!victim || victim == src || incapacitated() || !Adjacent(victim))
+		return FALSE
+	if(victim.stat == DEAD && !is_leech())
+		return FALSE
+	var/obj/item/grab/mouth/existing_bite = wear_mask
+	if(istype(existing_bite) && existing_bite.affecting == victim)
+		return existing_bite.bite_down()
+	if(!tilectx_can_bite(victim))
+		return FALSE
+	var/obj/item/grab/mouth/bite_grab = new(src, victim)
+	if(!bite_grab.pre_check() || !bite_grab.can_grab() || !bite_grab.bite_down(TRUE))
+		qdel(bite_grab)
+		return FALSE
+	bite_grab.init()
+	return !QDELETED(bite_grab)
+
+/mob/living/carbon/human/steal_act(mob/living/carbon/human/user)
+	if(!user || user == src || user.stat || user.incapacitated() || !Adjacent(user))
+		return
+	if(user.middle_click_intent != "steal")
+		return
+	if(user.get_active_hand())
+		to_chat(user, "<span class='warning'>Your active hand must be empty to steal.</span>")
+		return
+	if(combat_mode)
+		to_chat(user, "<span class='warning'>They are alert and notice your attempt.</span>")
+		return
+
+	var/hit_zone = user.zone_sel.selecting
+	var/obj/item/organ/external/target_organ = get_organ(ran_zone(hit_zone))
+	if(!target_organ || target_organ.is_stump())
+		to_chat(user, "<span class='warning'>There is nothing to steal from that area.</span>")
+		return
+
+	var/obj/item/stolen_item
+	var/slot
+	switch(hit_zone)
+		if(BP_CHEST)
+			stolen_item = get_equipped_item(slot_r_store)
+			if(stolen_item)
+				slot = slot_r_store
+			else
+				stolen_item = get_equipped_item(slot_l_store)
+				if(stolen_item)
+					slot = slot_l_store
+		if(BP_GROIN)
+			if(belt)
+				stolen_item = belt
+				slot = slot_belt
+			else if(s_store)
+				stolen_item = s_store
+				slot = slot_s_store
+		if(BP_L_HAND, BP_R_HAND)
+			if(gloves)
+				to_chat(user, "<span class='warning'>Their gloves conceal the ID card.</span>")
+				return
+			stolen_item = wear_id
+			if(stolen_item)
+				slot = slot_wear_id
+		else
+			to_chat(user, "<span class='warning'>You cannot reach anything to steal there.</span>")
+			return
+
+	if(!stolen_item || !slot)
+		to_chat(user, "<span class='warning'>There is nothing to steal from that area.</span>")
+		return
+	if(!stolen_item.mob_can_unequip(src, slot, disable_warning = 1))
+		to_chat(user, "<span class='warning'>You cannot remove that item.</span>")
+		return
+	if(!user.statcheck(user.stats[STAT_DX], 12, "You fail to steal the item.", STAT_DX))
+		visible_message("<span class='warning'>[user] tries to steal from [src], but fails.</span>")
+		return
+
+	var/obj/item/stolen/decoy = new(src)
+	decoy.icon = stolen_item.icon
+	decoy.icon_state = stolen_item.icon_state
+	decoy.name = stolen_item.name
+	decoy.desc = stolen_item.desc
+	decoy.w_class = stolen_item.w_class
+	decoy.slot_flags = stolen_item.slot_flags
+	if(!unEquip(stolen_item))
+		qdel(decoy)
+		return
+	if(!user.put_in_active_hand(stolen_item))
+		equip_to_slot(stolen_item, slot)
+		qdel(decoy)
+		return
+	equip_to_slot(decoy, slot)
+	visible_message("<span class='warning'>[user] discreetly steals [stolen_item] from [src].</span>")
+	to_chat(user, "<span class='notice'>You steal [stolen_item].</span>")
+
+/obj/item/stolen/attack_hand(mob/user)
+	to_chat(user, "<span class='warning'>The item is no longer there; it was stolen.</span>")
+	qdel(src)
+	return 1
 
 
 //We crit failed, let's see what happens to us.

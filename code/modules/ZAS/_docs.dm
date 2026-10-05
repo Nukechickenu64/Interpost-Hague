@@ -5,6 +5,12 @@ Zone Air System:
 This air system divides the station into impermeable areas called zones.
 When something happens, i.e. a door opening or a wall being taken down,
 zones equalize and eventually merge. Making an airtight area closes the connection again.
+Tile atmospheres track gas amounts and temperature. Open edges equalize gas in
+one air tick, weighted by zone size, and breaches equalize with the outside air.
+Before equalization, the mole-density gradient drives airflow within seven
+passable tiles of each opening, calibrated to atmospheric pressure at 20 C.
+Airflow respects anchoring, buckles, no-slip footwear, and movement thresholds.
+Breathing and fire use gas amounts; pipes and tanks retain internal pressure.
 
 Control Flow:
 Every air tick:

@@ -5,7 +5,7 @@
 
 	shift = -10
 
-	icon_state = "kill1"
+	icon_state = "gripe2"
 
 	downgrade_on_action = 1
 	downgrade_on_move = 1

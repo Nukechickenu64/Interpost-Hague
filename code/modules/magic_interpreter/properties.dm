@@ -20,7 +20,7 @@
 
 /decl/magic_word/magic_property/sanguis
 	name = "blood volume"
-	words = list("sanguis")
+	words = list("sanguis", "cruor")
 	aliases = list("blood", "blood_volume", "bloodloss")
 	base_cost = 15
 	cost_per_unit = 0.5
@@ -76,28 +76,31 @@
 
 /decl/magic_word/magic_property/damage/aeris
 	name = "toxin damage"
-	words = list("aeris")
+	words = list("aeris", "venenum")
 	aliases = list("toxloss", "tox", "toxin")
 	damage_kind = "tox"
 
 /decl/magic_word/magic_property/damage/brute
 	name = "brute damage"
+	words = list("vulnus")
 	aliases = list("bruteloss", "brute")
 	damage_kind = "brute"
 
 /decl/magic_word/magic_property/damage/burn
 	name = "burn damage"
+	words = list("adustio")
 	aliases = list("fireloss", "burnloss", "burn")
 	damage_kind = "burn"
 
 /decl/magic_word/magic_property/damage/oxy
 	name = "oxygen damage"
+	words = list("suffocatio")
 	aliases = list("oxyloss", "oxy", "suffocation")
 	damage_kind = "oxy"
 
 /decl/magic_word/magic_property/calor
 	name = "body temperature"
-	words = list("calor")
+	words = list("calor", "temperies")
 	aliases = list("bodytemperature", "temperature", "temp")
 	max_value = 1000
 	cost_per_unit = 0.1
@@ -113,7 +116,7 @@
 
 /decl/magic_word/magic_property/color
 	name = "color"
-	words = list("color")
+	words = list("color", "tinctura")
 	aliases = list("colour", "tint")
 	value_kind = "color"
 	cosmetic = TRUE
@@ -124,7 +127,7 @@
 
 /decl/magic_word/magic_property/alpha
 	name = "opacity"
-	words = list("alpha")
+	words = list("alpha", "perspicuitas")
 	aliases = list("opacity", "transparency")
 	max_value = 255
 	cosmetic = TRUE
@@ -139,7 +142,7 @@
 
 /decl/magic_word/magic_property/nomen
 	name = "name"
-	words = list("nomen")
+	words = list("nomen", "titulus")
 	aliases = list("name")
 	value_kind = "text"
 	cosmetic = TRUE
@@ -160,13 +163,13 @@
 		H.SetName(H.get_visible_name())
 
 /decl/magic_word/magic_property/aer
-	name = "air pressure"
-	words = list("aer")
-	aliases = list("pressure", "air")
-	max_value = 1000
+	name = "air amount (mol/tile)"
+	words = list("aer", "aura")
+	aliases = list("moles", "air")
+	max_value = PRESSURE_TO_MOLES(1000)
 	accepts_turf = TRUE
 	base_cost = 30
-	cost_per_unit = 0.1
+	cost_per_unit = 0.1 * ONE_ATMOSPHERE / MOLES_CELLSTANDARD
 
 /decl/magic_word/magic_property/aer/accepts(atom/target)
 	return istype(get_turf(target), /turf/simulated)
@@ -174,7 +177,7 @@
 /decl/magic_word/magic_property/aer/get_value(atom/target)
 	var/turf/T = get_turf(target)
 	var/datum/gas_mixture/air = T.return_air()
-	return air ? air.return_pressure() : 0
+	return air ? air.get_tile_moles() : 0
 
 /decl/magic_word/magic_property/aer/set_value(atom/target, value)
 	var/turf/T = get_turf(target)
@@ -187,13 +190,13 @@
 		if(air.temperature < TCMB)
 			air.temperature = T20C
 		air.adjust_multi(GAS_OXYGEN, MOLES_O2STANDARD * air.group_multiplier, GAS_NITROGEN, MOLES_N2STANDARD * air.group_multiplier)
-	var/current = air.return_pressure()
+	var/current = air.get_tile_moles()
 	if(current > 0)
 		air.multiply(value / current)
 
 /decl/magic_word/magic_property/descriptio
 	name = "description"
-	words = list("descriptio")
+	words = list("descriptio", "narratio")
 	aliases = list("desc", "description")
 	value_kind = "text"
 	max_length = MAX_MESSAGE_LEN

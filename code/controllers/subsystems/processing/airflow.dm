@@ -4,6 +4,8 @@
 	TARGET.airflow_speed = 0;               \
 	TARGET.airflow_time = 0;                \
 	TARGET.airflow_skip_speedcheck = FALSE; \
+	TARGET.airflow_path = null;             \
+	TARGET.airborne_acceleration = 0;       \
 	if (TARGET.airflow_od) {                \
 		TARGET.density = 0;                 \
 	}
@@ -24,6 +26,12 @@ PROCESSING_SUBSYSTEM_DEF(airflow)
 	while (curr.len)
 		var/atom/movable/target = curr[curr.len]
 		curr.len--
+
+		if (QDELETED(target))
+			processing -= target
+			if (MC_TICK_CHECK)
+				return
+			continue
 
 		if (target.airflow_speed <= 0)
 			CLEAR_OBJECT(target)
@@ -66,6 +74,19 @@ PROCESSING_SUBSYSTEM_DEF(airflow)
 		if (target.airflow_od)
 			target.density = 1
 
+		if (target.anchored || !target.AirflowCanMove(target.airflow_speed))
+			CLEAR_OBJECT(target)
+			if (MC_TICK_CHECK)
+				return
+			continue
+
+		if (target.airflow_path && target.airflow_path.len)
+			while (target.airflow_path.len && target.loc == target.airflow_path[1])
+				target.airflow_path.Cut(1, 2)
+			if (target.airflow_path.len)
+				target.airflow_dest = target.airflow_path[1]
+				target.airflow_xo = target.airflow_dest.x - target.x
+				target.airflow_yo = target.airflow_dest.y - target.y
 		if (!target.airflow_dest || target.loc == target.airflow_dest)
 			target.airflow_dest = locate(min(max(target.x + target.airflow_xo, 1), world.maxx), min(max(target.y + target.airflow_yo, 1), world.maxy), target.z)
 
@@ -81,7 +102,16 @@ PROCESSING_SUBSYSTEM_DEF(airflow)
 				return
 			continue
 
-		step_towards(target, target.airflow_dest)
+		if (!step_towards(target, target.airflow_dest))
+			var/turf/blocked_turf = get_step(target, get_dir(target, target.airflow_dest))
+			var/atom/obstacle = blocked_turf
+			if (blocked_turf && !blocked_turf.density)
+				for (var/atom/blocker in blocked_turf)
+					if (blocker.density)
+						obstacle = blocker
+						break
+			target.airflow_hit(obstacle)
+			CLEAR_OBJECT(target)
 		if (ismob(target) && target:client)
 			target:setMoveCooldown(vsc.airflow_mob_slowdown)
 
@@ -96,9 +126,10 @@ PROCESSING_SUBSYSTEM_DEF(airflow)
 	var/airflow_od
 	var/airflow_process_delay
 	var/airflow_skip_speedcheck
+	var/list/airflow_path
 
 /atom/movable/proc/prepare_airflow(n)
-	if (!airflow_dest || airflow_speed < 0 || last_airflow > world.time - vsc.airflow_delay)
+	if (!airflow_dest || airflow_speed < 0 || (last_airflow && last_airflow > world.time - vsc.airflow_delay))
 		return FALSE
 	if (airflow_speed)
 		airflow_speed = n / max(get_dist(src, airflow_dest), 1)
@@ -120,7 +151,10 @@ PROCESSING_SUBSYSTEM_DEF(airflow)
 		airflow_dest = null
 		return FALSE
 
-	airflow_speed = min(max(n * (9 / airflow_falloff), 1), 9)
+	airflow_speed = clamp(n * airflow_falloff / 9, 1, 15)
+	airflow_time = 0
+	airflow_process_delay = 0
+	airflow_skip_speedcheck = FALSE
 
 	airflow_od = 0
 

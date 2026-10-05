@@ -40,6 +40,12 @@
 	affect_ingest(M, alien, removed)
 
 /datum/reagent/nutriment/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
+	if(ishuman(M))
+		var/mob/living/carbon/human/H = M
+		var/datum/species/pony/P = H.species
+		if(istype(P) && !P.handle_nutriment(H, src, removed))
+			adjust_nutrition(M, alien, removed)
+			return
 	M.heal_organ_damage(0.5 * removed, 0) //what
 
 	adjust_nutrition(M, alien, removed)

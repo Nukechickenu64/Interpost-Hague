@@ -46,8 +46,7 @@ How they spawn stuff is decided by behaviour vars, which are explained below
 			if(istype(get_turf(user),/turf/simulated/shuttle) || istype(spawn_place, /turf/simulated/shuttle))
 				to_chat(user, "<span class='warning'>You can't build things on shuttles!</span>")
 				continue
-			spawn_place.ChangeTurf(summoned_object_type)
-			summoned_object = spawn_place
+			summoned_object = spawn_place.ChangeTurf(summoned_object_type)
 		else
 			summoned_object = new summoned_object_type(spawn_place)
 		var/atom/movable/overlay/animation = new /atom/movable/overlay(spawn_place)
@@ -63,6 +62,7 @@ How they spawn stuff is decided by behaviour vars, which are explained below
 		for(var/varName in newVars)
 			if(varName in summoned_object.vars)
 				summoned_object.vars[varName] = newVars[varName]
+		bind_cult_summon(summoned_object, get_cult(user))
 
 		if(duration)
 			spawn(duration)

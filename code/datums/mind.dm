@@ -52,7 +52,7 @@
 
 	var/has_been_rev = 0//Tracks if this mind has been a rev or not
 
-	var/datum/faction/faction 			//associated faction
+	var/primary_allegiance = "nanotrasen" // Political alignment; independent from roles and combat factions.
 	var/datum/changeling/changeling		//changeling holder
 
 	var/rev_cooldown = 0
@@ -73,6 +73,8 @@
 
 	var/prayer
 	var/religion
+	var/religion_before_cult
+	var/faction_before_cult
 	var/list/initial_email_login = list("login" = "", "password" = "")
 
 /datum/mind/proc/add_active_antagonist(var/datum/antagonist/antag)
@@ -99,6 +101,8 @@
 	. = ..()
 
 /datum/mind/proc/transfer_to(mob/living/new_character)
+	var/mob/living/old_character = current
+	var/datum/antagonist/cultist/cult = get_cult(current)
 	if(!istype(new_character))
 		world.log << "## DEBUG: transfer_to(): Some idiot has tried to transfer_to() a non mob/living mob. Please inform Carn"
 	if(current)					//remove ourself from our old body's mind variable
@@ -119,6 +123,9 @@
 
 	if(changeling)
 		new_character.make_changeling()
+
+	if(cult)
+		cult.transfer_cult_body(old_character, new_character)
 
 	if(active)
 		new_character.key = key		//now transfer the key to link the client to our new body

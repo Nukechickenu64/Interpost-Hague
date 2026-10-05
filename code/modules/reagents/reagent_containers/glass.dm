@@ -92,6 +92,15 @@
 /obj/item/reagent_containers/glass/afterattack(var/obj/target, var/mob/user, var/proximity)
 	if(!is_open_container() || !proximity) //Is the container open & are they next to whatever they're clicking?
 		return 1 //If not, do nothing.
+	if(isturf(target) && user.a_intent == I_HELP)
+		var/turf/floor = target
+		if(floor.liquids)
+			if(reagents.get_free_space() < 1)
+				to_chat(user, SPAN_WARNING("\The [src] is full."))
+				return 1
+			var/collected = floor.liquids.take_reagents(reagents, amount_per_transfer_from_this)
+			to_chat(user, SPAN_NOTICE("You scoop [round(collected, 0.1)] units into \the [src]."))
+			return 1
 	for(var/type in can_be_placed_into) //Is it something it can be placed into?
 		if(istype(target, type))
 			return 1

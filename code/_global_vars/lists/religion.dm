@@ -1,3 +1,4 @@
 GLOBAL_LIST_EMPTY(all_religions)
 GLOBAL_LIST_EMPTY(religion_controlled_machines)
 GLOBAL_LIST_EMPTY(all_spells)
+GLOBAL_LIST_EMPTY(old_god_shrines)

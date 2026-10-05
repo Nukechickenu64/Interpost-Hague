@@ -49,18 +49,58 @@
 
 //Lower right, persistant menu
 #define ui_swaphand1 "-1,7"
-#define ui_dropbutton "0,3"
-#define ui_drop_throw "0,2" //Intents, actually. Hate Baycode.
-#define ui_pull "-2,1"//12"
-#define ui_atk "0,4"//Dodge intents
+#define ui_dropbutton "0.375,5"
+#define ui_drop_throw "-0.625,6" //Intents, actually. Hate Baycode.
+#define ui_pull "-0.625,2"//12"
+#define ui_atk "0.375,6"//Dodge intents
 #define ui_wield "-1,3"//Dodge intents
-#define ui_atk_intents "-2, 2" //atk_intents
-#define ui_skills_family "-1,2"
-#define ui_resist "-2,3"
+#define ui_atk_intents "-0.625,1" //atk_intents
+#define ui_skills_family "EAST+1,NORTH-7"
+#define ui_resist "EAST+1,SOUTH"
 #define ui_acti "-2,0"//"SOUTH-1,8"
-#define ui_combat "-1,1"//COMBAT MODE!
-#define ui_combat_intent "-2,4"
-#define ui_movi "0,1"
+#define ui_combat "1,SOUTH"//COMBAT MODE!
+#define ui_combat_intent "2,SOUTH"
+#define ui_sprint "3,SOUTH"
+#define ui_movi "EAST+1,SOUTH+7"
+#define ui_os13_combat "-1.625,SOUTH"
+#define ui_os13_combat_popup "-1.625,2" // Menu artwork starts in the second icon column, above ui_atk_intents.
+#define ui_os13_defense "-1.625,SOUTH+4"
+#define ui_os13_moreactions "-1.625,6"
+#define ui_os13_sprint "0.375,SOUTH"
+#define ui_os13_back "WEST-0.625,NORTH-3"
+#define ui_os13_r_ear "WEST-2.625,NORTH-2"
+#define ui_os13_head "WEST-1.625,NORTH-1"
+#define ui_os13_l_ear "WEST-0.625,NORTH-1"
+#define ui_os13_mask "WEST-1.625,NORTH-2"
+#define ui_os13_amulet "WEST-1.625,NORTH-3"
+#define ui_os13_glasses "WEST-0.625,NORTH-2"
+#define ui_os13_rhand "WEST-2.625,NORTH-4"
+#define ui_os13_iclothing "WEST-1.625,NORTH-7"
+#define ui_os13_lhand "WEST-0.625,NORTH-4"
+#define ui_os13_storage1 "WEST-2.625,NORTH-7"
+#define ui_os13_swaphand "WEST-1.625,NORTH-5"
+#define ui_os13_storage2 "WEST-0.625,NORTH-7"
+#define ui_os13_sstore "WEST-2.625,NORTH-3"
+#define ui_os13_id "WEST-0.625,NORTH-8"
+#define ui_os13_belt "WEST-1.625,NORTH-8"
+#define ui_os13_gloves "WEST-1.625,NORTH-6"
+#define ui_os13_wrist_l "WEST-0.625,NORTH-6"
+#define ui_os13_wrist_r "WEST-2.625,NORTH-6"
+#define ui_os13_oclothing "WEST-1.625,NORTH-4"
+#define ui_os13_shoes "WEST-2.625,NORTH-8"
+#define ui_os13_move "EAST+1,SOUTH+6"
+#define ui_os13_zonesel "EAST+1,NORTH-1"
+#define ui_os13_internal "EAST+1,NORTH-2"
+#define ui_os13_temp "EAST+1,NORTH-10"
+#define ui_os13_rest "EAST+1,NORTH-9"
+#define ui_os13_awake "EAST+1,NORTH-13"
+#define ui_os13_nutrition "EAST+1,NORTH-5"
+#define ui_os13_surrender "EAST+1,NORTH-4"
+#define ui_os13_readycd "EAST+1,NORTH-6"
+#define ui_os13_fixeye "EAST-15.625,NORTH-10"
+#define ui_os13_stamina "EAST+1,NORTH-12"
+#define ui_os13_health "EAST+1,NORTH-11"
+#define ui_os13_happiness "EAST+1,NORTH-3"
 #define ui_zonesel "EAST+1, NORTH-2"
 #define ui_acti_alt "SOUTH-1,8" //alternative intent switcher for when the interface is hidden (F12)
 #define ui_gun4 "EAST-3:24,SOUTH+2:7"
@@ -89,10 +129,10 @@
 #define ui_gun_select "10, SOUTH-1"
 
 //Upper-middle right (damage indicators)
-#define ui_toxin "EAST+1, NORTH-7"//6
-#define ui_fire "EAST+1, NORTH-8"//8
-#define ui_oxygen "EAST+1, NORTH-4"//NORTH-3"
-#define ui_pressure "EAST+1, NORTH-5"//7
+#define ui_toxin "EAST+1, NORTH-6"
+#define ui_fire "EAST+1, NORTH-7"
+#define ui_oxygen "EAST+1, NORTH-3"
+#define ui_pressure "EAST+1, NORTH-4"
 #define ui_surrender "EAST+1, NORTH-10"
 #define ui_fixeye "EAST+1, NORTH-11"
 
@@ -102,12 +142,12 @@
 
 //Middle right (status indicators)
 #define ui_stamina "EAST+1, NORTH-12"
-#define ui_temp "EAST+1, NORTH-6"
+#define ui_temp "EAST+1, NORTH-5"
 #define ui_health "EAST+1, NORTH-13"
 #define ui_happiness "EAST+1, NORTH-14"
 #define ui_nutrition "EAST+1, NORTH-9"
-#define ui_hydration "EAST+1, NORTH-9"
-#define ui_internal "EAST+1, NORTH-3"
+#define ui_hydration "EAST+1, NORTH-15"
+#define ui_internal "EAST+1, NORTH-2"
 									//borgs
 #define ui_borg_health "EAST-1:28,CENTER-1:13" //borgs have the health display where humans have the pressure damage indicator.
 #define ui_alien_health "EAST-1:28,CENTER-1:13" //aliens have the health display where humans have the pressure damage indicator.

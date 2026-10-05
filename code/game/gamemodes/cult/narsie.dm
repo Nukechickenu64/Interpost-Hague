@@ -14,10 +14,13 @@ var/global/list/narsie_list = list()
 	dissipate = 0 // Do we lose energy over time?
 	grav_pull = 10 //How many tiles out do we pull?
 	consume_range = 3 //How many tiles out do we eat
+	var/religion_name = NARSIE_RELIGION
+	var/datum/antagonist/cultist/cult
 
 
 /obj/singularity/narsie/Initialize()
 	. = ..()
+	cult = get_cult_by_religion(religion_name)
 	narsie_list.Add(src)
 
 /obj/singularity/narsie/Destroy()
@@ -39,6 +42,18 @@ var/global/list/narsie_list = list()
 	consume_range = 6 // How many tiles out do we eat.
 	var/announce=1
 	var/cause_hell = 1
+
+/obj/singularity/narsie/large/fire
+	name = "Kha'Rin"
+	religion_name = KHARIN_RELIGION
+	color = "#ff6600"
+	light_color = "#ff6600"
+
+/obj/singularity/narsie/large/death
+	name = "The Reaper"
+	religion_name = REAPER_RELIGION
+	color = "#800020"
+	light_color = "#800020"
 
 /obj/singularity/narsie/large/New()
 	..()
@@ -78,7 +93,7 @@ var/global/list/narsie_list = list()
 		if(M.stat == CONSCIOUS)
 			if(M.status_flags & GODMODE)
 				continue
-			if(!iscultist(M))
+			if(!same_cult(M, cult))
 				to_chat(M, "<span class='danger'> You feel your sanity crumble away in an instant as you gaze upon [src.name]...</span>")
 				M.apply_effect(3, STUN)
 
@@ -173,7 +188,10 @@ var/global/list/narsie_list = list()
 		if(M.status_flags & GODMODE)
 			return 0
 
-		M.cultify()
+		if(isliving(M) && iscultist(M) && !same_cult(M, cult))
+			M.dust()
+		else
+			M.cultify()
 
 //TURF PROCESSING
 	else if (isturf(A))
@@ -188,7 +206,7 @@ var/global/list/narsie_list = list()
 			var/turf/T = A
 			if(T.holy)
 				T.holy = 0 //Nar-Sie doesn't give a shit about sacred grounds.
-			T.cultify()
+			T.cultify_for_cult(cult)
 
 /obj/singularity/narsie/proc/old_narsie(const/atom/A)
 	if(!(A.singuloCanEat()))
@@ -269,7 +287,7 @@ var/global/list/narsie_list = list()
 
 /obj/singularity/narsie/proc/pickcultist() //Narsie rewards his cultists with being devoured first, then picks a ghost to follow. --NEO
 	var/list/cultists = list()
-	for(var/datum/mind/cult_nh_mind in GLOB.cult.current_antagonists)
+	for(var/datum/mind/cult_nh_mind in cult.current_antagonists)
 		if(!cult_nh_mind.current)
 			continue
 		if(cult_nh_mind.current.stat)

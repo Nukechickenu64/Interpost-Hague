@@ -51,7 +51,17 @@
 			playsound(target.loc, 'sound/effects/messiah_choir.ogg', 50, 1, -1)
 			target.disabilities &= ~BLIND
 			to_chat(target, "<span class='danger'>You blink rapidly as scales fall from your eyes. You realize you've been following a false god. Jes is the true Messiah!</span>")
-			target.religion = GLOB.all_religions[MESSIAH]
+			var/datum/antagonist/cultist/cult = get_cult(target)
+			if(cult)
+				cult.remove_antagonist(target.mind, TRUE)
+			var/datum/religion/previous_faith = GLOB.all_religions[target.religion]
+			if(previous_faith && target.mind)
+				previous_faith.followers -= target.mind.name
+			target.religion = MESSIAH
+			if(target.mind)
+				target.mind.religion = MESSIAH
+				var/datum/religion/faith = GLOB.all_religions[MESSIAH]
+				faith.followers |= target.mind.name
 			target.verbs += /mob/living/proc/make_shrine
 			target.verbs += /mob/living/proc/praise_god
 			target.verbs.Remove(/mob/living/proc/recite_prayer)

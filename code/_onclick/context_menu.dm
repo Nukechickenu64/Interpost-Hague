@@ -504,12 +504,7 @@
 					return TRUE
 				var/mob/living/carbon/human/attacker = src
 				var/mob/living/carbon/human/victim = target
-				var/obj/item/grab/mouth/bite_grab = new(attacker, victim)
-				if(bite_grab.can_grab()) {
-					bite_grab.init()
-				} else {
-					qdel(bite_grab)
-				}
+				attacker.try_bite_target(victim)
 			} else {
 				// Validate that the requested proc is an actual verb on the target before calling it
 				var/allowed = FALSE

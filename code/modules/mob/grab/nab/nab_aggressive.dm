@@ -6,7 +6,7 @@
 
 	shift = -10
 
-	icon_state = "kill"
+	icon_state = "gripe1"
 
 	break_chance_table = list(3, 18, 45, 100)
 

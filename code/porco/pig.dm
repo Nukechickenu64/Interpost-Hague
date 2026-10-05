@@ -109,7 +109,7 @@
 				if(!tab_actions.len)
 					continue
 				roleButtonHTML += "<a href=\"#\" class=\"role-button\" title=\"[tab_name]\"><div style=\"background-image: url('[tab_icon]');\" id=\"[tab_id]\" class=\"button\"></div></a>"
-		if(H.religion && H.religion != LEGAL_RELIGION)
+		if(/mob/living/proc/praise_god in H.verbs)
 			roleButtonHTML += "<a href=\"#\" class=\"role-button\" title=\"Religion\"><div style=\"background-image: url('Thanati.png');\" id=\"Religion\" class=\"button\"></div></a>"
 		if(H.stat == DEAD)
 			buttonHTML += "<a href=\"#\" style=\"display:inline-block;width:32px;height:32px;position:absolute;margin-left:46px;\"><div style=\"background-image: url('Dead.png'); width:32px;height:32px;background-size:cover;display:block;position:relative;top:-88px;\" id=\"Dead\" class=\"button\"></div></a>"
@@ -156,7 +156,7 @@
 	var/list/religion_actions = list()
 	if(ishuman(src))
 		var/mob/living/carbon/human/religion_user = src
-		if(religion_user.religion && religion_user.religion != LEGAL_RELIGION)
+		if(/mob/living/proc/praise_god in religion_user.verbs)
 			if(/mob/living/proc/praise_god in religion_user.verbs)
 				religion_actions += list(list("PraiseyourGod", "Praise Your God"))
 			if(/mob/living/proc/make_shrine in religion_user.verbs)

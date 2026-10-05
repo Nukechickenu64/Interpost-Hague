@@ -3,7 +3,6 @@
 	processor_unit = new/obj/item/computer_hardware/processor_unit(src)
 	tesla_link = new/obj/item/computer_hardware/tesla_link(src)
 	hard_drive = new/obj/item/computer_hardware/hard_drive/super(src)
-	network_card = new/obj/item/computer_hardware/network_card/wired(src)
 
 // Engineering
 /obj/item/modular_computer/console/preset/engineering/install_default_programs()
@@ -32,7 +31,6 @@
 
 /obj/item/modular_computer/console/preset/research/install_default_programs()
 	..()
-	hard_drive.store_file(new/datum/computer_file/program/ntnetmonitor())
 	hard_drive.store_file(new/datum/computer_file/program/nttransfer())
 	hard_drive.store_file(new/datum/computer_file/program/chatclient())
 	hard_drive.store_file(new/datum/computer_file/program/camera_monitor())
@@ -47,7 +45,6 @@
 
 /obj/item/modular_computer/console/preset/sysadmin/install_default_programs()
 	..()
-	hard_drive.store_file(new/datum/computer_file/program/ntnetmonitor())
 	hard_drive.store_file(new/datum/computer_file/program/nttransfer())
 	hard_drive.store_file(new/datum/computer_file/program/chatclient())
 	hard_drive.store_file(new/datum/computer_file/program/camera_monitor())
