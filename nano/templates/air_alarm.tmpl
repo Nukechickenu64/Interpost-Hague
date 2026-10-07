@@ -142,10 +142,10 @@ Used In File(s): \code\game\machinery\alarm.dm
 			</div>
 			<div class="item">
 				<div class="itemLabel">
-					External Gas Bound (mol/tile):
+					External Pressure Bound (kPa):
 				</div>
 				<div class="itemContent">
-					{{:helper.link(helper.fixed(value.external,2) + ' mol/tile', null, { 'id_tag' : value.id_tag, 'command' : 'set_external_pressure'})}}
+					{{:helper.link(helper.fixed(value.external,2) + ' kPa', null, { 'id_tag' : value.id_tag, 'command' : 'set_external_pressure'})}}
 					{{:helper.link('Reset', null, { 'id_tag' : value.id_tag, 'command' : 'reset_external_pressure'})}}
 				</div>
 			</div>			
@@ -203,7 +203,7 @@ Used In File(s): \code\game\machinery\alarm.dm
 		{{/for}}
     {{else data.screen == 5}}
 		<H3>Alarm Threshold</H3>
-		Gas amounts in mol/tile; temperature in Kelvin.
+		Pressures in kPa; temperature in Kelvin.
 		<table class='fixed'>
 		<tr>
 			<td></td><td><span class='bad'>min2</span></td><td><span class='average'>min1</span></td><td><span class='average'>max1</span></td><td><span class='bad'>max2</span></td>

@@ -331,6 +331,12 @@
 			return 1
 	return 0
 
+/obj/machinery/alarm/proc/tile_moles_to_kpa(var/tile_moles, var/gas_temperature = T20C)
+	return tile_moles * R_IDEAL_GAS_EQUATION * gas_temperature / CELL_VOLUME
+
+/obj/machinery/alarm/proc/kpa_to_tile_moles(var/pressure_kpa, var/gas_temperature = T20C)
+	return pressure_kpa * CELL_VOLUME / (R_IDEAL_GAS_EQUATION * gas_temperature)
+
 /obj/machinery/alarm/proc/get_danger_level(var/current_value, var/list/danger_levels)
 	if((current_value > danger_levels[4] && danger_levels[4] > 0) || current_value < danger_levels[1])
 		return 2
@@ -533,13 +539,15 @@
 	var/turf/alarm_turf = get_turf(src)
 	var/datum/gas_mixture/room_air = alarm_turf ? alarm_turf.return_air() : null
 	var/room_moles = room_air ? room_air.get_tile_moles() : 0
+	var/room_pressure = room_air ? tile_moles_to_kpa(room_moles, room_air.temperature) : 0
 	var/list/gas_limits = TLV["pressure"]
 	var/list/room_status = list("safe", "<font color='orange'>harmful</font>", "<font color='red'>DANGER</font>")
-	text += "Room air: [round(room_moles, 0.1)] mol/tile, [room_status[get_danger_level(room_moles, gas_limits) + 1]] (safe [gas_limits[2]]-[gas_limits[3]])<br>"
-	text += "Gas target: [round(PRESSURE_TO_MOLES(output_pressure), 0.1)] mol/tile <a href='?src=\ref[src];modcon=pressure'>SET</a><br>"
+	text += "Room air: [round(room_pressure, 0.1)] kPa, [room_status[get_danger_level(room_moles, gas_limits) + 1]]<br>"
+	text += "Pressure target: [round(output_pressure, 0.1)] kPa <a href='?src=\ref[src];modcon=pressure'>SET</a><br>"
 	text += "Chemical scrubber: [cartridge ? "[round(cartridge.integrity / cartridge.max_integrity * 100, 0.1)]%" : "missing"]<hr>"
 	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in alarm_area)
 		var/datum/gas_mixture/vent_air = vent.loc.return_air()
+		var/vent_pressure = vent_air ? tile_moles_to_kpa(vent_air.get_tile_moles(), vent_air.temperature) : 0
 		var/obj/machinery/station_gas_tank/vent_tank = get_station_gas_tank(vent)
 		var/obj/machinery/alarm/controller = vent.initial_loc ? vent.initial_loc.master_air_alarm : null
 		var/vent_status = vent.get_supply_status(vent_tank)
@@ -550,16 +558,16 @@
 				vent_status = "waiting for shared tank allowance"
 			else
 				vent_status = "awaiting vent cycle"
-		text += "[vent.name]: target [controller ? "[round(PRESSURE_TO_MOLES(controller.output_pressure), 0.1)] mol/tile" : "offline"], actual [vent_air ? "[round(vent_air.get_tile_moles(), 0.1)] mol/tile" : "offline"], output [round(vent.last_flow_rate, 0.1)] mol/cycle ([vent_status])<br>"
+		text += "[vent.name]: target [controller ? "[round(controller.output_pressure, 0.1)] kPa" : "offline"], actual [vent_air ? "[round(vent_pressure, 0.1)] kPa" : "offline"], output [round(vent.last_flow_rate, 0.1)] mol/cycle ([vent_status])<br>"
 	to_chat(user, "[text]</div></div>")
 
 /obj/machinery/alarm/Topic(href, href_list)
 	if(href_list["modcon"] == "pressure")
 		if(locked || (stat & (NOPOWER|BROKEN)) || get_dist(usr, src) > 1 || !allowed(usr))
 			return
-		var/new_amount = input(usr, "Area vent gas target (mol/tile)", "Modcon", PRESSURE_TO_MOLES(output_pressure)) as null|num
-		if(isnum_safe(new_amount) && !locked && get_dist(usr, src) <= 1 && allowed(usr))
-			output_pressure = between(0, new_amount * ONE_ATMOSPHERE / MOLES_CELLSTANDARD, MAX_PUMP_PRESSURE)
+		var/new_pressure = input(usr, "Area vent pressure target (kPa)", "Modcon", output_pressure) as null|num
+		if(isnum_safe(new_pressure) && !locked && get_dist(usr, src) <= 1 && allowed(usr))
+			output_pressure = between(0, new_pressure, MAX_PUMP_PRESSURE)
 			interact(usr)
 		return
 	return ..()
@@ -639,7 +647,7 @@
 	var/list/environment_data = new
 	data["has_environment"] = total
 	if(total)
-		environment_data[++environment_data.len] = list("name" = "Gas amount", "value" = environment.get_tile_moles(), "unit" = "mol/tile", "danger_level" = pressure_dangerlevel)
+		environment_data[++environment_data.len] = list("name" = "Pressure", "value" = tile_moles_to_kpa(environment.get_tile_moles(), environment.temperature), "unit" = "kPa", "danger_level" = pressure_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Oxygen", "value" = environment.gas["oxygen"] / total * 100, "unit" = "%", "danger_level" = oxygen_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Carbon dioxide", "value" = environment.gas["carbon_dioxide"] / total * 100, "unit" = "%", "danger_level" = co2_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Toxins", "value" = environment.gas["phoron"] / total * 100, "unit" = "%", "danger_level" = phoron_dangerlevel)
@@ -667,7 +675,7 @@
 						"power"		= info["power"],
 						"checks"	= info["checks"],
 						"direction"	= info["direction"],
-						"external"	= PRESSURE_TO_MOLES(info["external"])
+						"external"	= info["external"]
 					)
 			data["vents"] = vents
 		if(AALARM_SCREEN_SCRUB)
@@ -715,12 +723,12 @@
 				thresholds[++thresholds.len] = list("name" = gas_names[g], "settings" = list())
 				selected = TLV[g]
 				for(var/i = 1, i <= 4, i++)
-					thresholds[thresholds.len]["settings"] += list(list("env" = g, "val" = i, "selected" = selected[i]))
+					thresholds[thresholds.len]["settings"] += list(list("env" = g, "val" = i, "selected" = selected[i] < 0 ? -1 : tile_moles_to_kpa(selected[i])))
 
 			selected = TLV["pressure"]
-			thresholds[++thresholds.len] = list("name" = "Gas amount", "settings" = list())
+			thresholds[++thresholds.len] = list("name" = "Pressure", "settings" = list())
 			for(var/i = 1, i <= 4, i++)
-				thresholds[thresholds.len]["settings"] += list(list("env" = "pressure", "val" = i, "selected" = selected[i]))
+				thresholds[thresholds.len]["settings"] += list(list("env" = "pressure", "val" = i, "selected" = selected[i] < 0 ? -1 : tile_moles_to_kpa(selected[i])))
 
 			selected = TLV["temperature"]
 			thresholds[++thresholds.len] = list("name" = "Temperature", "settings" = list())
@@ -783,9 +791,10 @@
 			var/device_id = href_list["id_tag"]
 			switch(href_list["command"])
 				if("set_external_pressure")
-					var/input_amount = input(user, "Gas amount to maintain (mol/tile)", "Gas Controls") as num|null
-					if(isnum_safe(input_amount) && CanUseTopic(user, state))
-						send_signal(device_id, list(href_list["command"] = input_amount * ONE_ATMOSPHERE / MOLES_CELLSTANDARD))
+					var/list/vent_info = alarm_area.air_vent_info[device_id]
+					var/input_pressure = input(user, "External pressure bound (kPa)", "Gas Controls", vent_info ? vent_info["external"] : ONE_ATMOSPHERE) as num|null
+					if(isnum_safe(input_pressure) && CanUseTopic(user, state))
+						send_signal(device_id, list(href_list["command"] = input_pressure))
 					return TOPIC_REFRESH
 
 				if("reset_external_pressure")
@@ -793,7 +802,7 @@
 					return TOPIC_REFRESH
 
 				if("adjust_external_pressure")
-					send_signal(device_id, list(href_list["command"] = text2num(href_list["val"]) * ONE_ATMOSPHERE / MOLES_CELLSTANDARD))
+					send_signal(device_id, list(href_list["command"] = text2num(href_list["val"])))
 					return TOPIC_REFRESH
 
 				if( "power",
@@ -814,18 +823,21 @@
 					var/threshold = text2num(href_list["var"])
 					var/list/selected = TLV[env]
 					var/list/thresholds = list("lower bound", "low warning", "high warning", "upper bound")
-					var/newval = input(user, "Enter [thresholds[threshold]] for [env]", "Alarm triggers", selected[threshold]) as null|num
+					var/current_value = env == "temperature" || selected[threshold] < 0 ? selected[threshold] : tile_moles_to_kpa(selected[threshold])
+					var/newval = input(user, "Enter [thresholds[threshold]] for [env][env == "temperature" ? " (K)" : " (kPa)"]", "Alarm triggers", current_value) as null|num
 					if (isnull(newval) || !CanUseTopic(user, state))
 						return TOPIC_HANDLED
 					if (newval<0)
 						selected[threshold] = -1.0
 					else if (env=="temperature" && newval>5000)
 						selected[threshold] = 5000
-					else if (env=="pressure" && newval>50*MOLES_CELLSTANDARD)
-						selected[threshold] = 50*MOLES_CELLSTANDARD
-					else if (env!="temperature" && env!="pressure" && newval>PRESSURE_TO_MOLES(200))
-						selected[threshold] = PRESSURE_TO_MOLES(200)
 					else
+						if (env != "temperature")
+							newval = kpa_to_tile_moles(newval)
+						if (env=="pressure" && newval>50*MOLES_CELLSTANDARD)
+							newval = 50*MOLES_CELLSTANDARD
+						else if (env!="temperature" && env!="pressure" && newval>PRESSURE_TO_MOLES(200))
+							newval = PRESSURE_TO_MOLES(200)
 						newval = round(newval,0.01)
 						selected[threshold] = newval
 					if(threshold == 1)

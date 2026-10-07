@@ -106,6 +106,11 @@
 	return
 
 /obj/vehicle/bike/attackby(obj/item/W as obj, mob/user as mob)
+	if(istype(W, /obj/item/stack/material/phoron))
+		if(engine)
+			return engine.attackby(W, user)
+		to_chat(user, SPAN_WARNING("Install an engine before fueling [src]."))
+		return TRUE
 	if(open)
 		if(istype(W, /obj/item/weapon/engine))
 			if(engine)

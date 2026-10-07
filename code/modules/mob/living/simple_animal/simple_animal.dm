@@ -50,6 +50,8 @@
 	//LETTING SIMPLE ANIMALS ATTACK? WHAT COULD GO WRONG. Defaults to zero so Ian can still be cuddly
 	var/melee_damage_lower = 0
 	var/melee_damage_upper = 0
+	var/gurps_melee_skill = 50
+	var/gurps_ranged_skill = 50
 	var/attacktext = "attacked"
 	var/attack_sound = null
 	var/friendly = "nuzzles"
@@ -68,6 +70,8 @@
 
 /mob/living/simple_animal/Initialize()
 	. = ..()
+	skills[SKILL_MELEE] = gurps_melee_skill
+	skills[SKILL_RANGE] = gurps_ranged_skill
 
 /mob/living/simple_animal/Life()
 	..()
@@ -211,6 +215,9 @@
 			//TODO: Push the mob away or something
 
 		if(I_HURT)
+			if(!M.gurps_melee_attack_check(src))
+				M.do_attack_animation(src)
+				return
 			adjustBruteLoss(harm_intent_damage)
 			M.visible_message("<span class='warning'>[M] [response_harm] \the [src]</span>")
 			M.do_attack_animation(src)
@@ -240,6 +247,11 @@
 			visible_message("<span class='notice'>[user] gently taps [src] with \the [O].</span>")
 		else
 			O.attack(src, user, user.zone_sel?.selecting || ran_zone())
+
+/mob/living/simple_animal/resolve_item_attack(obj/item/I, mob/living/user, var/target_zone)
+	if(user != src && !user.gurps_melee_attack_check(src))
+		return null
+	return target_zone
 
 /mob/living/simple_animal/hit_with_weapon(obj/item/O, mob/living/user, var/effective_force, var/hit_zone)
 

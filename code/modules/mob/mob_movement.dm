@@ -320,6 +320,10 @@
 				direct = turn(direct, pick(90, -90))
 			return mob.buckled.relaymove(mob,direct)
 
+		if(istype(mob.buckled, /obj/structure/bed/chair/civ13/driver))
+			move_delay = world.time
+			return mob.buckled.relaymove(mob, direct)
+
 		if(istype(mob.machine, /obj/machinery))
 			if(mob.machine.relaymove(mob,direct))
 				return

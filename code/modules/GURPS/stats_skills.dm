@@ -342,6 +342,26 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 	var/effective_skill = clamp(round((skill + mood_stat()) / 5), 1, 20)
 	return effective_skill - (rand(1, 6) + rand(1, 6) + rand(1, 6))
 
+/mob/living/proc/gurps_melee_attack_check(mob/living/target)
+	if(!target)
+		return FALSE
+
+	var/attack_margin = skillcheck_margin(skills[SKILL_MELEE], SKILL_MELEE)
+	if(attack_margin < 0)
+		visible_message("<span class='danger'>\The [src] misses [target] with a melee attack!</span>")
+		return FALSE
+
+	if(target.gurps_melee_defense_check(src, attack_margin))
+		visible_message("<span class='notice'>[target] evades [src]'s melee attack!</span>")
+		return FALSE
+	return TRUE
+
+/mob/living/proc/gurps_melee_defense_check(mob/living/attacker, var/attack_margin)
+	if(!canmove || lying || buckled || incapacitated())
+		return FALSE
+	var/defense_margin = skillcheck_margin(skills[SKILL_MELEE], SKILL_MELEE)
+	return defense_margin > attack_margin
+
 /mob/proc/attack_quality_from_margin(var/margin, var/hit)
 	if(hit)
 		if(margin >= 10)

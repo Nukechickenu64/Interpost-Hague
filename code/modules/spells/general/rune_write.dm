@@ -69,6 +69,7 @@
 		"Revive" = /obj/effect/rune/revive,
 		"Blood Boil" = /obj/effect/rune/blood_boil,
 		"Tear Reality" = /obj/effect/rune/tearreality,
+		"Hell Ascension" = /obj/effect/rune/ascension,
 		"Weapon" = /obj/effect/rune/weapon,
 		"Shell" = /obj/effect/rune/shell,
 		"Imbue" = /obj/effect/rune/imbue/emp
@@ -96,10 +97,15 @@
 	var/turf/T = get_turf(user)
 	if(!T)
 		return
+	if(choice == "Hell Ascension" && !is_hell_turf(T))
+		to_chat(user, "<span class='warning'>This rite can only be inscribed in Hell.</span>")
+		return
 
 	// Writing takes time; longer for larger or more complex runes
 	var/delay = 30
 	if(choice == "Tear Reality")
+		delay = 80
+	else if(choice == "Hell Ascension")
 		delay = 80
 	else if(choice == "Teleport" || choice == "Revive")
 		delay = 50
@@ -149,6 +155,8 @@
 	else if(choice == "Revive")
 		blood_cost = 25
 	else if(choice == "Tear Reality")
+		blood_cost = 50
+	else if(choice == "Hell Ascension")
 		blood_cost = 50
 	else if(choice == "Imbue")
 		blood_cost = 3

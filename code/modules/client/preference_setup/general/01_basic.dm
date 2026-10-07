@@ -108,7 +108,7 @@ datum/preferences
 		return TOPIC_REFRESH
 	else if(href_list["religion"])
 		var/list/religion_options = GLOB.using_map.religion_choices + list("None", "Other")
-		var/choice = input(user, "Choose your character's religious affiliation. All faiths are roleplay-only except the Cult of Nar-Sie, which has an independent 1-in-20 chance per round to grant the Cultist antagonist role.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in religion_options
+		var/choice = input(user, "Choose your character's religious affiliation. Each cult faith grants its Cultist role on a 1-in-15 roll per character per round; Forbidden Knowledge grants Heretic on a 1-in-20 roll. Jes, Judas, and Hasard retain their Old God magic.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in religion_options
 		if(!choice || !CanUseTopic(user))
 			return TOPIC_NOACTION
 		if(choice == "Other")

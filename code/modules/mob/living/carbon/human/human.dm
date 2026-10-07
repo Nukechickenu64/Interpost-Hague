@@ -1226,6 +1226,7 @@ var/list/rank_prefix = list(\
 	species = all_species[new_species]
 	species.handle_pre_spawn(src)
 
+	species_language = null
 	if(species.language)
 		add_language(species.language)
 		species_language = all_languages[species.language]

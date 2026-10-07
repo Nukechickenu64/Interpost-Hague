@@ -87,16 +87,8 @@
 /obj/machinery/gateway/centerstation/attack_ghost(mob/user as mob)
 	if(get_dist(user, src) > 1)
 		return
-	if(awaygate)
-		user.forceMove(awaygate.loc)
-	else
-		to_chat(user, "[src] has no destination.")
-
-/obj/machinery/gateway/centeraway/attack_ghost(mob/user as mob)
-	if(get_dist(user, src) > 1)
-		return
-	if(stationgate)
-		user.forceMove(stationgate.loc)
+	if(active && hell_arrival_turf)
+		user.forceMove(hell_arrival_turf)
 	else
 		to_chat(user, "[src] has no destination.")
 

@@ -271,7 +271,7 @@
 
 /obj/machinery/light/proc/refresh_light_emission(var/trigger = 0)
 	var/cryo_pulse = GLOB.cryo_startup_effect.affects(src)
-	if(on && get_status() == LIGHT_OK)
+	if(on && lightbulb && get_status() == LIGHT_OK)
 		var/emission_range = lightbulb.brightness_range
 		var/emission_power = lightbulb.brightness_power
 		var/emission_color = lightbulb.brightness_color
@@ -343,7 +343,7 @@
 
 /obj/machinery/light/proc/set_emergency_lighting(var/enable)
 	if(enable)
-		if(LIGHTMODE_EMERGENCY in lightbulb.lighting_modes)
+		if(lightbulb && (LIGHTMODE_EMERGENCY in lightbulb.lighting_modes))
 			set_mode(LIGHTMODE_EMERGENCY)
 			update_power_channel(ENVIRON)
 	else

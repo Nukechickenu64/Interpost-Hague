@@ -24,6 +24,21 @@
 /obj/item/weapon/engine/proc/putter(var/atom/movable/M)
 	return
 
+/proc/refuel_vehicle_cell(obj/item/cell/power_cell, obj/item/stack/material/phoron/sheets, mob/user, atom/vehicle)
+	if(!user || !vehicle.Adjacent(user) || user.incapacitated() || sheets.loc != user)
+		return TRUE
+	if(!power_cell || power_cell.maxcharge <= 0)
+		to_chat(user, SPAN_WARNING("[vehicle] needs an installed power cell before accepting phoron sheets."))
+		return TRUE
+	var/charge_per_sheet = min(1000, power_cell.maxcharge)
+	if(power_cell.maxcharge - power_cell.charge < charge_per_sheet)
+		to_chat(user, SPAN_WARNING("The cell needs room for [charge_per_sheet] charge units to accept a phoron sheet."))
+		return TRUE
+	if(sheets.use(1))
+		power_cell.give(charge_per_sheet)
+		to_chat(user, SPAN_NOTICE("You fuel [vehicle] with a phoron sheet, adding [charge_per_sheet] charge units."))
+	return TRUE
+
 /obj/item/weapon/engine/electric
 	name = "electric engine"
 	desc = "A battery-powered engine used to power a small vehicle."
@@ -33,6 +48,9 @@
 	var/obj/item/cell/cell
 
 /obj/item/weapon/engine/electric/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/stack/material/phoron))
+		var/atom/refueling_target = istype(loc, /obj/vehicle/bike) ? loc : src
+		return refuel_vehicle_cell(cell, I, user, refueling_target)
 	if(istype(I,/obj/item/cell))
 		if(cell)
 			to_chat(user, "<span class='warning'>There is already a cell in \the [src].</span>")
@@ -89,6 +107,17 @@
 	temp_reagents_holder.atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 
 /obj/item/weapon/engine/thermal/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/stack/material/phoron))
+		var/atom/refueling_target = istype(loc, /obj/vehicle/bike) ? loc : src
+		if(!refueling_target.Adjacent(user) || user.incapacitated() || I.loc != user)
+			return TRUE
+		if(reagents.get_free_space() < 20)
+			to_chat(user, SPAN_WARNING("The engine needs room for 20 fuel units to accept a phoron sheet."))
+			return TRUE
+		var/obj/item/stack/material/phoron/sheets = I
+		if(sheets.use(1) && reagents.add_reagent(/datum/reagent/fuel, 20))
+			to_chat(user, SPAN_NOTICE("You fuel [src] with a phoron sheet, adding 20 units of fuel."))
+		return TRUE
 	if(istype(I,/obj/item/reagent_containers) && I.is_open_container())
 		if(istype(I,/obj/item/reagent_containers/food/snacks) || istype(I,/obj/item/reagent_containers/pill))
 			return 0

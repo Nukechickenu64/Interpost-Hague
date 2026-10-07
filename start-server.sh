@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Linux one-shot launcher: update the repo, start the MariaDB container, compile, run DreamDaemon.
+# Linux one-shot launcher: update the repo, start MariaDB and TTS, compile, run DreamDaemon.
 
 if [ -z "${BASH_VERSION:-}" ]; then
 	command -v bash >/dev/null 2>&1 || {
@@ -30,11 +30,11 @@ usage() {
 	cat <<'EOF'
 Usage: ./start-server.sh [--yes] [--port N] [--branch NAME] [--skip-update] [--skip-compile] [--stop-db-on-exit]
 
-Updates the repository (git fetch + hard reset), starts the MariaDB docker
-container, compiles Interpost-Hague.dme, then runs DreamDaemon in the foreground.
+Updates the repository (git fetch + hard reset), starts MariaDB and local TTS
+containers, compiles Interpost-Hague.dme, then runs DreamDaemon in the foreground.
 
 Environment overrides: PORT, REMOTE, BRANCH, SKIP_UPDATE, SKIP_COMPILE,
-STOP_DB_ON_EXIT, FORCE_RESET, PUBLIC_HOST, BYOND_HOME.
+STOP_DB_ON_EXIT, FORCE_RESET, PUBLIC_HOST, BYOND_HOME, TTS_HTTP_URL, TTS_HTTP_TOKEN.
 EOF
 }
 
@@ -123,6 +123,16 @@ fi
 log "MariaDB is ready. Verifying the schema..."
 docker compose exec -T db mariadb -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "SHOW TABLES;" \
 	|| die "Database connection or schema verification failed."
+
+# --- Text to speech ----------------------------------------------------------
+
+if [[ -z "${TTS_HTTP_URL:-}" || "${TTS_HTTP_URL:-}" == "http://127.0.0.1:5000" ]]; then
+	log "Building and starting the local Linux TTS service..."
+	docker compose up -d --build --wait --wait-timeout 120 tts \
+		|| die "TTS did not become ready. See 'docker compose logs tts'."
+else
+	log "Using the configured external TTS service."
+fi
 
 # --- Compile -----------------------------------------------------------------
 

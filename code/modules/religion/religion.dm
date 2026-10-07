@@ -53,6 +53,13 @@
 		return same_cult(user, get_cult_by_religion(name))
 	return name != LEGAL_RELIGION
 
+/datum/religion/heretic
+	name = HERETIC_RELIGION
+	whisper_lines = list("The Mansus lies beyond the veil.", "Every door has a key.", "Knowledge demands a price.")
+
+/datum/religion/heretic/can_use_magic(mob/living/user)
+	return FALSE
+
 /datum/religion/proc/show_rituals(mob/living/user)
 	if(!can_use_magic(user))
 		to_chat(user, "<span class='warning'>The rituals of this faith are closed to you.</span>")
@@ -100,7 +107,7 @@
 
 //Stupidly simplistic? Probably. But I'm too tired to write something more complex.
 /mob/living/proc/religion_is_legal()
-	return !is_cult_religion(religion)
+	return !is_cult_religion(religion) && religion != HERETIC_RELIGION
 
 //Reveals self as a heretic
 /mob/living/proc/reveal_self()

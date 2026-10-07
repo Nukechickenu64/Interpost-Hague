@@ -69,6 +69,7 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/toggledsay,		//toggles dsay on/off for everyone,
 	/datum/admins/proc/toggle_smsafemode,	//toggles inter-round persistent supermatter safemode,
 	/datum/admins/proc/toggle_role_debug_mode,	//toggles inter-round persistent captain requirement bypass,
+	/datum/admins/proc/toggle_tts,
 	/client/proc/game_panel,			//game panel, allows to change game-mode etc,
 	/client/proc/cmd_admin_say,			//admin-only ooc chat,
 	/datum/admins/proc/togglehubvisibility, //toggles visibility on the BYOND Hub,
@@ -146,6 +147,7 @@ var/list/admin_verbs_spawn = list(
 	/datum/admins/proc/spawn_plant,
 	/datum/admins/proc/spawn_fluid_verb,
 	/datum/admins/proc/spawn_atom,		// allows us to spawn instances,
+	/client/proc/vehicle_menu,
 	/client/proc/respawn_character,
 	/client/proc/virus2_editor,
 	/client/proc/spawn_chemdisp_cartridge
@@ -367,6 +369,7 @@ var/list/admin_verbs_mentor = list(
 		if(holder.rights & R_MENTOR)		verbs += admin_verbs_mentor
 
 /client/proc/remove_admin_verbs()
+	clear_vehicle_placement()
 	verbs.Remove(
 		admin_verbs_default,
 		/client/proc/togglebuildmodeself,

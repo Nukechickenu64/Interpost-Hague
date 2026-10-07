@@ -348,6 +348,10 @@
 
 	if(!damage || !istype(user))
 		return
+	if(istype(user, /mob/living/simple_animal))
+		var/mob/living/simple_animal/animal_attacker = user
+		if(!animal_attacker.gurps_melee_attack_check(src))
+			return 0
 	admin_attack_log(user, src, "Attacked their victim", "Was attacked", "has [attack_message]")
 	src.visible_message("<span class='danger'>[user] has [attack_message] [src]!</span>")
 	user.do_attack_animation(src)

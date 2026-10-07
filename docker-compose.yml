@@ -1,4 +1,21 @@
 services:
+  tts:
+    build: ./tools/tts
+    image: interpost-tts:latest
+    restart: unless-stopped
+    init: true
+    networks:
+      - internal
+    ports:
+      - "127.0.0.1:5000:5000"
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
   db:
     build: ./sql
     image: marrow-db:latest
@@ -14,6 +31,11 @@ services:
     build: .
     image: marrow:latest
     restart: unless-stopped
+    environment:
+      TTS_HTTP_URL: http://tts:5000
+    depends_on:
+      tts:
+        condition: service_healthy
     networks:
       - internal
     ports:

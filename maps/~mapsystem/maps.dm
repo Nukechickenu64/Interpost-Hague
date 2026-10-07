@@ -156,6 +156,7 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 		"Cult of Nar-Sie",
 		"Cult of Kha'Rin",
 		"Cult of Mortality",
+		HERETIC_RELIGION,
 		"Jes, the Messiah",
 		"Judas",
 		"Hasard, the God of Chaos"

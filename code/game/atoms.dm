@@ -698,6 +698,8 @@ this doesn't work anymore lol
 */
 
 /atom/MouseMove(location, control, params)
+	if(usr && usr.client)
+		usr.client.vehicle_placement_hover(src, control, params)
 	..()
 
 

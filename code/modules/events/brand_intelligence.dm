@@ -50,6 +50,11 @@
 								 "You don't want to buy anything? Yeah, well I didn't want to buy your mom either."))
 
 /datum/event/brand_intelligence/end()
+	if(originMachine && !QDELETED(originMachine))
+		originMachine.shut_up = 1
+		originMachine.shoot_inventory = 0
 	for(var/obj/machinery/vending/infectedMachine in infectedVendingMachines)
+		if(QDELETED(infectedMachine))
+			continue
 		infectedMachine.shut_up = 1
 		infectedMachine.shoot_inventory = 0

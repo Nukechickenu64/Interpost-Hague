@@ -115,7 +115,7 @@
 		return TOPIC_REFRESH
 
 	else if(href_list["religion"])
-		var/choice = input(user, "Choose your character's religious affiliation. The blood, fire, and mortality cults each have an independent 1-in-20 chance per round to grant their competing Cultist role. Jes, Judas, and Hasard retain their Old God magic.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in GLOB.using_map.religion_choices + list("None","Other")
+		var/choice = input(user, "Choose your character's religious affiliation. Each cult faith grants its Cultist role on a 1-in-15 roll per character per round; Forbidden Knowledge grants Heretic on a 1-in-20 roll. Jes, Judas, and Hasard retain their Old God magic.", CHARACTER_PREFERENCE_INPUT_TITLE, pref.religion) as null|anything in GLOB.using_map.religion_choices + list("None","Other")
 		if(!choice || !CanUseTopic(user))
 			return TOPIC_NOACTION
 		if(choice == "Other")

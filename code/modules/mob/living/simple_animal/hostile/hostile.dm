@@ -101,7 +101,7 @@
 		return
 	if(isliving(target_mob))
 		var/mob/living/L = target_mob
-		L.attack_generic(src,rand(melee_damage_lower,melee_damage_upper),attacktext,damtype,defense)
+		L.attack_generic(src, rand(melee_damage_lower, melee_damage_upper), attacktext, environment_smash, damtype, defense)
 		return L
 	if(istype(target_mob,/obj/mecha))
 		var/obj/mecha/M = target_mob
@@ -212,6 +212,9 @@
 
 /mob/living/simple_animal/hostile/proc/Shoot(var/target, var/start, var/user, var/bullet = 0)
 	if(target == start)
+		return
+	if(skillcheck_margin(skills[SKILL_RANGE], SKILL_RANGE) < 0)
+		visible_message("<span class='danger'>\The [src] misses [target] with a ranged attack!</span>")
 		return
 
 	var/obj/item/projectile/A = new projectiletype(user:loc)

@@ -331,7 +331,10 @@ var/global/icon/solid_white_icon
 
 /obj/screen/plane_master/cryo
 	plane = DEFAULT_PLANE
-	filters = list(filter(type = "blur", size = 1), filter(type = "ripple", size = 1), filter(type = "bloom", size = 1))
+	filters = list(filter(type = "blur", size = 3), filter(type = "ripple", size = 1), filter(type = "bloom", size = 1))
+
+/obj/screen/plane_master/cryo/double_sight
+	filters = filter(type = "motion_blur", x = 4, y = -3)
 
 /obj/screen/plane_master/skewium
 	plane = DEFAULT_PLANE

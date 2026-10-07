@@ -10,7 +10,7 @@
 	set name = "Pull"
 	set category = "Object"
 
-	if(AM.Adjacent(src))
+	if(AM && AM.Adjacent(src))
 		src.start_pulling(AM)
 
 		return

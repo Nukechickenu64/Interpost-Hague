@@ -43,8 +43,9 @@ client
 	set category = "OOC"
 	verbs -= /client/proc/ClearCredits
 	QDEL_NULL_LIST(credits)
-	mob.clear_fullscreen("fishbed")
-	mob.clear_fullscreen("fadeout")
+	if(mob)
+		mob.clear_fullscreen("fishbed")
+		mob.clear_fullscreen("fadeout")
 	//sound_to(mob, sound(null, channel = 1)) Let the music play
 
 /obj/screen/credit

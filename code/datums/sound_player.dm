@@ -215,9 +215,19 @@ datum/sound_token/proc/PrivAddListener(var/atom/listener)
 	var/turf/source_turf = get_turf(source)
 	var/turf/listener_turf = get_turf(listener)
 
+	// Movement and deletion callbacks can race with the sound update. A sound
+	// without a real source or listener position cannot be spatialized.
+	if(!source_turf || !listener_turf)
+		if(prefer_mute)
+			listener_status[listener] |= SOUND_MUTE
+			PrivUpdateListener(listener)
+		else
+			PrivRemoveListener(listener)
+		return
+
 	var/distance = get_dist(source_turf, listener_turf)
 
-	if(!listener_turf || (distance > range) || (!(listener_turf in can_be_heard_from) && !ignore_vis) )
+	if((distance > range) || (!(listener_turf in can_be_heard_from) && !ignore_vis) )
 		if(prefer_mute)
 			listener_status[listener] |= SOUND_MUTE
 			PrivUpdateListener(listener)

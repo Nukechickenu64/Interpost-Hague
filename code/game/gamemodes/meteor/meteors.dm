@@ -197,7 +197,8 @@
 	//then, ram the turf if it still exists
 	if(T && !T.CanPass(src, src.loc, 0.5, 0))
 		T.ex_act(hitpwr)
-		floor_jolt(T, heavy ? 5 : 3, heavy ? 6 : 3)
+		var/jolt_radius = isStationLevel(T.z) ? max(world.maxx, world.maxy) * 2 : (heavy ? 5 : 3)
+		floor_jolt(T, jolt_radius, heavy ? 6 : 3, affect_items = TRUE)
 
 //process getting 'hit' by colliding with a dense object
 //or randomly when ramming turfs
@@ -224,6 +225,9 @@
 
 /obj/effect/meteor/proc/meteor_effect()
 	if(heavy)
+		var/turf/impact_turf = get_turf(src)
+		if(impact_turf && isStationLevel(impact_turf.z))
+			floor_jolt(impact_turf, max(world.maxx, world.maxy) * 2, 6, affect_items = TRUE)
 		for(var/mob/M in GLOB.player_list)
 			var/turf/T = get_turf(M)
 			if(!T || T.z != src.z)

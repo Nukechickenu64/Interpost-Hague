@@ -4,6 +4,7 @@
 #define MINING_SATELLITE_LANDMARK "nav_mining_satellite"
 
 var/datum/mining_expedition_controller/mining_expedition
+var/list/civ13_mining_expeditions = list()
 
 /proc/get_mining_expedition()
 	if(!mining_expedition)
@@ -43,9 +44,11 @@ var/datum/mining_expedition_controller/mining_expedition
 	return ext
 
 // Rectangle list(minx, miny, maxx, maxy, z) that generation must leave empty around the ruins dock.
-/proc/get_mining_dock_exclusion(var/margin = 3)
-	var/obj/effect/shuttle_landmark/dock = SSshuttle.get_landmark(MINING_RUINS_LANDMARK)
-	var/datum/shuttle/S = SSshuttle.shuttles[MINING_SHUTTLE_TAG]
+/proc/get_mining_dock_exclusion(var/margin = 3, var/datum/shuttle/S = null, var/obj/effect/shuttle_landmark/dock = null)
+	if(!dock)
+		dock = SSshuttle.get_landmark(MINING_RUINS_LANDMARK)
+	if(!S)
+		S = SSshuttle.shuttles[MINING_SHUTTLE_TAG]
 	if(!istype(dock) || !S)
 		return null
 	var/turf/D = get_turf(dock)
@@ -237,15 +240,27 @@ var/datum/mining_expedition_controller/mining_expedition
 /datum/mining_expedition_controller/proc/shuttle_is_idle(var/datum/shuttle/autodock/S)
 	return S && S.current_location && S.moving_status == SHUTTLE_IDLE && S.process_state == IDLE_STATE && !S.in_use
 
+/datum/mining_expedition_controller/proc/is_home_landmark(var/obj/effect/shuttle_landmark/L)
+	return L && L.landmark_tag == MINING_STATION_LANDMARK
+
+/datum/mining_expedition_controller/proc/is_home_dock(var/datum/shuttle/autodock/S)
+	return S && is_home_landmark(S.current_location)
+
+/datum/mining_expedition_controller/proc/get_home_landmark()
+	return SSshuttle.get_landmark(MINING_STATION_LANDMARK)
+
+/datum/mining_expedition_controller/proc/has_transit_navigation(var/datum/shuttle/autodock/S)
+	return S && S.landmark_transition && S.landmark_transition.is_valid(S)
+
 /datum/mining_expedition_controller/proc/is_expedition_landmark(var/obj/effect/shuttle_landmark/L)
 	return istype(L) && (L.landmark_tag == MINING_RUINS_LANDMARK || L.landmark_tag == MINING_SATELLITE_LANDMARK)
 
 /datum/mining_expedition_controller/proc/location_label(var/obj/effect/shuttle_landmark/L)
 	if(!L)
 		return "UNKNOWN"
+	if(is_home_landmark(L))
+		return "STATION"
 	switch(L.landmark_tag)
-		if(MINING_STATION_LANDMARK)
-			return "STATION"
 		if(MINING_RUINS_LANDMARK)
 			return "DEBRIS FIELD"
 		if(MINING_SATELLITE_LANDMARK)
@@ -270,7 +285,7 @@ var/datum/mining_expedition_controller/mining_expedition
 
 /datum/mining_expedition_controller/proc/is_away()
 	var/datum/shuttle/autodock/S = get_shuttle()
-	return S && S.current_location && S.current_location.landmark_tag != MINING_STATION_LANDMARK
+	return S && S.current_location && !is_home_landmark(S.current_location)
 
 /datum/mining_expedition_controller/proc/is_at_ruins()
 	var/datum/shuttle/autodock/S = get_shuttle()
@@ -295,12 +310,25 @@ var/datum/mining_expedition_controller/mining_expedition
 			return fail(user, "MISSION DENIED: THE SHUTTLE IS STILL AT THE DEBRIS FIELD.")
 		if(S.next_location && S.next_location.z == rz)
 			return fail(user, "MISSION DENIED: THE SHUTTLE IS EN ROUTE TO THE DEBRIS FIELD.")
+	// A Prospector uses its own controller, so it must also respect the mapped
+	// Mining shuttle before replacing the shared debris field.
+	var/datum/mining_expedition_controller/main_expedition = get_mining_expedition()
+	if(main_expedition && main_expedition != src)
+		var/datum/shuttle/autodock/main_shuttle = main_expedition.get_shuttle()
+		if(main_shuttle && ((main_shuttle.current_location && main_shuttle.current_location.z == rz) || (main_shuttle.next_location && main_shuttle.next_location.z == rz)))
+			return fail(user, "MISSION DENIED: THE MINING SHUTTLE IS USING THE DEBRIS FIELD.")
 	for(var/mob/living/L in world)
 		if(!L.ckey)
 			continue
 		var/turf/T = get_turf(L)
 		if(T && T.z == rz)
 			return fail(user, "MISSION DENIED: PERSONNEL DETECTED IN THE DEBRIS FIELD.")
+	for(var/datum/mining_expedition_controller/civ13/other_expedition in civ13_mining_expeditions)
+		if(other_expedition == src)
+			continue
+		var/datum/shuttle/autodock/other_shuttle = other_expedition.get_shuttle()
+		if(other_shuttle && ((other_shuttle.current_location && other_shuttle.current_location.z == rz) || (other_shuttle.next_location && other_shuttle.next_location.z == rz)))
+			return fail(user, "MISSION DENIED: ANOTHER PROSPECTOR IS USING THE DEBRIS FIELD.")
 	return TRUE
 
 /datum/mining_expedition_controller/proc/dispatch(var/obj/effect/shuttle_landmark/destination, var/mob/user, var/travel_time)
@@ -345,7 +373,7 @@ var/datum/mining_expedition_controller/mining_expedition
 		return fail(user, "THE SHUTTLE IS BUSY.")
 	if(get_space_ruins_z() && !can_regenerate_ruins(user))
 		return FALSE
-	if(!S.landmark_transition || !S.landmark_transition.is_valid(S))
+	if(!has_transit_navigation(S))
 		return fail(user, "TRANSIT NAVIGATION IS NOT READY.")
 	var/eta = rand(10, 120)
 	mission_pending = TRUE
@@ -374,7 +402,7 @@ var/datum/mining_expedition_controller/mining_expedition
 			return
 		if(!ruins_gen_job)
 			ruins_gen_job = new
-		if(!ruins_gen_job.start(null, mission_salvage, TRUE, fresh_level))
+		if(!ruins_gen_job.start(null, mission_salvage, TRUE, fresh_level, src))
 			mission_error = ruins_gen_job.last_error || "DEBRIS FIELD SURVEY COULD NOT START."
 			finish_mission()
 			return
@@ -391,7 +419,7 @@ var/datum/mining_expedition_controller/mining_expedition
 			finish_mission()
 			return
 		var/datum/shuttle/autodock/S = get_shuttle()
-		if(!shuttle_is_idle(S) || !S.current_location || S.current_location.landmark_tag != MINING_STATION_LANDMARK)
+		if(!shuttle_is_idle(S) || !is_home_dock(S))
 			mission_error = "MINING SHUTTLE LEFT THE STATION BEFORE SURVEY COMPLETED."
 			finish_mission()
 			return
@@ -443,7 +471,7 @@ var/datum/mining_expedition_controller/mining_expedition
 	return dispatch(get_ruins_dock(), user)
 
 /datum/mining_expedition_controller/proc/return_station(var/mob/user)
-	return dispatch(SSshuttle.get_landmark(MINING_STATION_LANDMARK), user)
+	return dispatch(get_home_landmark(), user)
 
 /datum/mining_expedition_controller/proc/travel_satellite(var/mob/user)
 	var/datum/shuttle/autodock/S = get_shuttle()
@@ -506,6 +534,54 @@ var/datum/mining_expedition_controller/mining_expedition
 
 /datum/mining_expedition_controller/proc/render_menu(var/atom/holder, var/list/links)
 	return "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>CHOOSE YOUR DESTINATION - [status_text()]</span>\n<hr>[jointext(links, "\n")]</div></div>"
+
+/datum/mining_expedition_controller/proc/show_local_menu(mob/user, atom/holder)
+	var/list/links = list()
+	links += mining_menu_link(holder, "mining", "LOCAL MINING MISSION")
+	links += mining_menu_link(holder, "salvage", "SALVAGE MISSION")
+	links += mining_menu_link(holder, "remote", remote_forbidden ? "ALLOW REMOTE CONTROL" : "FORBID REMOTE CONTROL")
+	links += mining_menu_link(holder, "satellite", "TRAVEL TO THE SATELLITE")
+	if(has_last_location && !is_at_ruins())
+		links += mining_menu_link(holder, "revisit", "REVISIT LAST LOCATION")
+	if(is_away())
+		links += mining_menu_link(holder, "station", "RETURN TO STATION")
+	links += mining_menu_link(holder, "cancel", "(CANCEL)")
+	to_chat(user, render_menu(holder, links))
+
+/datum/mining_expedition_controller/proc/show_remote_menu(mob/user, atom/holder)
+	var/list/links = list()
+	links += mining_menu_link(holder, "mining", "LOCAL MINING MISSION")
+	links += mining_menu_link(holder, "salvage", "SALVAGE MISSION")
+	links += mining_menu_link(holder, "satellite", "TRAVEL TO THE SATELLITE")
+	links += mining_menu_link(holder, "cancel", "(CANCEL)")
+	to_chat(user, render_menu(holder, links))
+
+/datum/mining_expedition_controller/proc/handle_menu_action(mob/user, list/href_list, remote = FALSE)
+	var/action = href_list["action"]
+	switch(action)
+		if("mining")
+			start_mission(user, FALSE)
+		if("salvage")
+			start_mission(user, TRUE)
+		if("remote")
+			if(remote)
+				return FALSE
+			toggle_remote(user)
+		if("satellite")
+			travel_satellite(user)
+		if("revisit")
+			if(remote)
+				return FALSE
+			revisit(user)
+		if("station")
+			if(remote)
+				return FALSE
+			return_station(user)
+		if("cancel")
+			cancel_mission(user)
+		else
+			return FALSE
+	return TRUE
 
 /obj/machinery/computer/shuttle_control/mining/expedition
 	name = "mining shuttle console"

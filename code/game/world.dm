@@ -532,6 +532,22 @@ var/world_topic_spam_protect_time = world.timeofday
 	fdel(F)
 	F << "[the_value]"
 
+/hook/startup/proc/loadTTSMode()
+	world.load_tts_enabled()
+	return 1
+
+/world/proc/load_tts_enabled()
+	if(!fexists("data/tts_enabled.txt"))
+		return
+	var/list/lines = file2list("data/tts_enabled.txt")
+	if(lines.len)
+		GLOB.tts_enabled = text2num(lines[1]) == 1
+
+/world/proc/save_tts_enabled()
+	var/save_file = file("data/tts_enabled.txt")
+	fdel(save_file)
+	save_file << "[GLOB.tts_enabled]"
+
 /hook/startup/proc/loadMOTD()
 	world.load_motd()
 	return 1

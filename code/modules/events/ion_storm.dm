@@ -124,7 +124,7 @@
 			species += initial(specimen.name_plural)
 
 	if(species.len)
-		return pick(species.len)
+		return pick(species)
 	return default_if_none
 
 /datum/event/ionstorm/proc/get_random_language(var/mob/living/silicon/S)

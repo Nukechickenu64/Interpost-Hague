@@ -275,13 +275,18 @@
 		return
 
 	var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, job.title)
-	if(!spawnpoint || !spawnpoint.turfs || !spawnpoint.turfs.len)
-		to_chat(src, "<span class='warning'>No valid spawnpoint is available for this job.</span>")
-		return 0
-	var/turf/spawn_turf = pick(spawnpoint.turfs)
+	var/turf/spawn_turf
 	if(job.latejoin_at_spawnpoints)
 		var/obj/S = job_master.get_roundstart_spawnpoint(job.title)
 		spawn_turf = get_turf(S)
+		if(!spawn_turf)
+			to_chat(src, "<span class='warning'>No valid spawnpoint is available for this job.</span>")
+			return 0
+	else
+		if(!spawnpoint || !spawnpoint.turfs || !spawnpoint.turfs.len)
+			to_chat(src, "<span class='warning'>No valid spawnpoint is available for this job.</span>")
+			return 0
+		spawn_turf = pick(spawnpoint.turfs)
 		// Just in case someone stole our position while we were waiting for input from alert() proc
 		if(!IsJobAvailable(job))
 			to_chat(src, alert("[job.title] is not available. Please try another."))
@@ -320,15 +325,16 @@
 
 	SSticker.mode.handle_latejoin(character)
 	GLOB.universe.OnPlayerLatejoin(character)
-	spawnpoint.after_join(character)
+	if(spawnpoint)
+		spawnpoint.after_join(character)
 	if(job_master.ShouldCreateRecords(job.title))
 		if(character.mind.assigned_role != "Cyborg")
 			CreateModularRecord(character)
 			file_crew_id(character)
 			SSticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
-			AnnounceArrival(character, job, spawnpoint.msg)
+			AnnounceArrival(character, job, spawnpoint?.msg)
 		else
-			AnnounceCyborg(character, job, spawnpoint.msg)
+			AnnounceCyborg(character, job, spawnpoint?.msg)
 		matchmaker.do_matchmaking()
 	log_and_message_admins("has joined the round as [character.mind.assigned_role].", character)
 	qdel(src)

@@ -8,6 +8,9 @@
 	for(var/obj/effect/landmark/C in landmarks_list)
 		if(C.name == "carpspawn")
 			possible_spawns.Add(C)
+	if(!possible_spawns.len)
+		log_warning("Rogue drone event could not find a carpspawn landmark on [station_name()].")
+		return
 
 	//25% chance for this to be a false alarm
 	var/num

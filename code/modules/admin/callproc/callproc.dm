@@ -201,7 +201,9 @@
 		holder.callproc.waiting_for_click = 0
 		holder.callproc.do_args()
 
-/client/Click(atom/A)
+/client/Click(atom/A, location, control, params)
+	if(vehicle_placement_click(A, control, params))
+		return
 	if(holder && holder.callproc && holder.callproc.waiting_for_click)
 		if(alert("Do you want to select \the [A] as the [holder.callproc.arguments.len+1]\th argument?",, "Yes", "No") == "Yes")
 			holder.callproc.arguments += A

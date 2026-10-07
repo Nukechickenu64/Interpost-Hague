@@ -657,6 +657,7 @@ var/global/floorIsLava = 0
 
 /datum/admins/proc/Secrets(var/datum/admin_secret_category/active_category = null)
 	if(!check_rights(0))	return
+	admin_secrets.populate_random_events()
 
 	// Print the header with category selection buttons.
 	var/dat = "<B>The first rule of adminbuse is: you don't talk about the adminbuse.</B><HR>"
@@ -812,6 +813,22 @@ var/global/floorIsLava = 0
 	world.save_role_debug_mode(GLOB.role_debug_mode)
 	log_and_message_admins("toggled role debug mode ([GLOB.role_debug_mode ? "on" : "off"]).")
 	SSstatistics.add_field_details("admin_verb","TROLEDEBUG")
+
+/datum/admins/proc/toggle_tts()
+	set category = "Server"
+	set name = "Toggle Text To Speech"
+	set desc = "Enable or disable chat TTS across rounds and server restarts."
+
+	if(!check_rights(R_ADMIN))
+		return
+	GLOB.tts_enabled = !GLOB.tts_enabled
+	world.save_tts_enabled()
+	if(!GLOB.tts_enabled)
+		SStts.clear_queue()
+	else if(!SStts.backend_url())
+		to_chat(usr, "<span class='warning'>TTS is enabled, but no backend is configured. Start the bundled TTS service and set tts_http_url in config/config.txt.</span>")
+	log_and_message_admins("toggled text to speech ([GLOB.tts_enabled ? "on" : "off"]).")
+	SSstatistics.add_field_details("admin_verb", "TCHATTS")
 
 /datum/admins/proc/toggleoocdead()
 	set category = "Server"

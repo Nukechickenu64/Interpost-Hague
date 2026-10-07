@@ -14,7 +14,7 @@
 
 /obj/machinery/computer/bbs_terminal
 	name = "BBS research terminal"
-	desc = "A dial-up terminal for trawling scientific bulletin boards. Feed it a fabricator data disk to pull research files off the line."
+	desc = "A dial-up terminal containing the first research milestones needed to investigate Hell. Feed it a fabricator data disk to pull prerequisite research files off the line."
 	icon_keyboard = "rd_key"
 	icon_screen = "rdcomp"
 	light_color = "#a97faa"
@@ -31,7 +31,14 @@
 	var/line_time
 	var/list/guess_log
 	var/status_msg
-	var/max_level = 8
+	// The archive is an on-ramp for the infernal research program, not a source
+	// of general-purpose R&D levels. These caps exactly cover its appliances.
+	var/list/hell_research_board_caps = list(
+		TECH_DATA = 3,
+		TECH_BIO = 2,
+		TECH_MAGNET = 3,
+		TECH_BLUESPACE = 2
+	)
 	var/board_cooldown = 3 MINUTES
 	var/list/board_cooldowns = list()
 	// Session flavor, rolled on each successful dial-in.
@@ -114,13 +121,9 @@
  '-=-=-=-=-=-=-=-=-=-=-=-='</pre>"}
 			dat += "SysOp: d1gital_monk | You are caller #[caller_number]<br>"
 			dat += "<i>MOTD: [motd]</i><br>"
-			dat += "Users online: [english_list(online_handles)]<br><br>FILE AREAS:<br>"
-			for(var/T in subtypesof(/datum/tech))
-				var/datum/tech/tech_type = T
-				var/id = initial(tech_type.id)
-				if(id == TECH_ARCANE || (id == TECH_ILLEGAL && !emagged))
-					continue
-				var/area_name = id == TECH_ILLEGAL ? "Warez Underground" : initial(tech_type.name)
+			dat += "Users online: [english_list(online_handles)]<br><br>HELL RESEARCH PREREQUISITES:<br>"
+			for(var/id in hell_research_board_caps)
+				var/area_name = CallTechName(id)
 				var/wait = board_cooldowns[id] ? board_cooldowns[id] - world.time : 0
 				if(wait > 0)
 					dat += "&nbsp;- [area_name] <i>(SYSOP: area busy, [round(wait / 10)]s)</i><br>"
@@ -266,7 +269,9 @@
 	guess_log = null
 
 /obj/machinery/computer/bbs_terminal/proc/open_board(var/id)
-	if(id == TECH_ARCANE || (id == TECH_ILLEGAL && !emagged))
+	var/board_cap = hell_research_board_caps[id]
+	if(!board_cap)
+		status_msg = "ACCESS DENIED: THIS NODE ONLY ARCHIVES HELL RESEARCH PREREQUISITES."
 		return
 	if(board_cooldowns[id] && board_cooldowns[id] > world.time)
 		status_msg = "SYSOP: AREA BUSY. TRY AGAIN LATER."
@@ -280,8 +285,8 @@
 	if(!board_type)
 		return
 	var/level = get_network_level(board_type)
-	if(level >= max_level)
-		status_msg = "NO NEWER FILES IN THIS AREA."
+	if(level >= board_cap)
+		status_msg = "PREREQUISITE MILESTONE COMPLETE. NO LATER REVISIONS ARE HOSTED ON THIS NODE."
 		return
 	board_id = id
 	target_level = level + 1

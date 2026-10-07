@@ -13,5 +13,4 @@
 		icon_state = icon_opened
 
 /obj/structure/closet/coffin/Destroy()
-	qdel(src)
-	. = ..()
+	return ..()

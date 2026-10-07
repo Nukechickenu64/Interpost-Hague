@@ -105,7 +105,25 @@
 
 /mob/living/carbon/human/Weaken(amount)
 	if(HULK in mutations)	return
+	var/was_lying = lying
 	..()
+	if(was_lying || !lying)
+		return
+	var/turf/knockdown_turf = get_turf(src)
+	if(!knockdown_turf)
+		return
+	var/list/impact_items = list()
+	for(var/obj/item/item in knockdown_turf)
+		if(item.loc == knockdown_turf && !item.anchored && item.w_class > ITEM_SIZE_TINY)
+			impact_items += item
+	if(!impact_items.len || !prob(20))
+		return
+	var/obj/item/impact_item = pick(impact_items)
+	var/hit_zone = pick(BP_HEAD, BP_CHEST, BP_GROIN, BP_L_ARM, BP_R_ARM, BP_L_LEG, BP_R_LEG)
+	var/impact_damage = max(0, rand(1, 6) - 2) // GURPS ST 10 thrust damage: 1d-2.
+	if(impact_damage)
+		visible_message("<span class='danger'>[src] falls awkwardly onto \the [impact_item]!</span>", "<span class='danger'>You fall awkwardly onto \the [impact_item], taking a painful hit!</span>")
+		apply_damage(impact_damage, BRUTE, hit_zone, run_armor_check(hit_zone, "melee"))
 
 /mob/living/carbon/human/Paralyse(amount)
 	if(HULK in mutations)	return

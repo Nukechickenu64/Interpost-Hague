@@ -16,11 +16,17 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 /datum/event/dust/tick()
 	if(world.time > last_wave + min_delay && prob(10))
 		dust_swarm(severity)
+		last_wave = world.time
 
 /datum/event/dust/end()
 	command_announcement.Announce("The [station_name()] has now passed through the belt of space dust.", "[station_name()] Sensor Array")
 
 /proc/dust_swarm(var/strength = EVENT_LEVEL_MUNDANE)
+	if(!GLOB.using_map || !GLOB.using_map.station_levels || !GLOB.using_map.station_levels.len)
+		return
+	if(world.maxx <= TRANSITIONEDGE * 4 || world.maxy <= TRANSITIONEDGE * 4)
+		return
+
 	var/numbers = rand(strength * 10, strength * 15)
 
 	var/start_dir = pick(GLOB.cardinal)
@@ -28,7 +34,7 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 	var/turf/targloc
 	var/randomz = pick(GLOB.using_map.station_levels)
 	var/randomx = rand(1+TRANSITIONEDGE*2, world.maxx-TRANSITIONEDGE*2)
-	var/randomy = rand(1+TRANSITIONEDGE*2, world.maxx-TRANSITIONEDGE*2)
+	var/randomy = rand(1+TRANSITIONEDGE*2, world.maxy-TRANSITIONEDGE*2)
 	switch(start_dir)
 		if(NORTH)
 			startloc = locate(randomx, world.maxy - TRANSITIONEDGE, randomz)
@@ -42,8 +48,12 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 		if(WEST)
 			startloc = locate(1 + TRANSITIONEDGE, randomy, randomz)
 			targloc = locate(world.maxx - TRANSITIONEDGE, world.maxy - randomy, randomz)
+	if(!startloc || !targloc)
+		return
 	var/list/starters = getcircle(startloc, 3)
 	starters += startloc
+	if(!starters.len)
+		return
 
 	var/rocks_per_tile = round(numbers/starters.len)
 	for(var/turf/T in starters)

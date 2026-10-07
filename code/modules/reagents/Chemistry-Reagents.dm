@@ -80,7 +80,7 @@
 			overdose(M, alien)
 	if(prob(reagent_addiction_strength) && !is_type_in_list(src, M.reagents.addiction_list))
 		to_chat(M, "<span class='danger'>I like that feeling. I hope I get more later.</span>")
-		var/datum/reagent/new_reagent = new type()
+		var/datum/reagent/new_reagent = new type(M.reagents)
 		new_reagent.last_addiction_dose = world.timeofday
 		M.reagents.addiction_list.Add(new_reagent)
 	else if(is_type_in_list(src, M.reagents.addiction_list))

@@ -49,7 +49,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	return 1
 
 //Called after mob is created, moved to a turf and equipped.
-/datum/spawnpoint/proc/after_join(mob/victim)
+/datum/spawnpoint/proc/after_join(mob/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	return
 
 #ifdef UNIT_TEST
@@ -87,7 +87,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryo
 
-/datum/spawnpoint/cryo/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryo/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -98,12 +98,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), rand(23,32) SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -117,7 +117,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryocaptain
 
-/datum/spawnpoint/cryocaptain/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryocaptain/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -125,12 +125,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_captain_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), 24 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -144,7 +144,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryoengineering
 
-/datum/spawnpoint/cryoengineering/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryoengineering/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -155,12 +155,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), rand(23,32) SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -174,7 +174,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryoscience
 
-/datum/spawnpoint/cryoscience/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryoscience/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -185,12 +185,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), rand(23,32) SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -204,7 +204,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryosecurity
 
-/datum/spawnpoint/cryosecurity/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryosecurity/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -215,12 +215,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), rand(23,32) SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -234,7 +234,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryomedical
 
-/datum/spawnpoint/cryomedical/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryomedical/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -245,12 +245,12 @@ GLOBAL_VAR(spawntypes_by_path)
 		if(!C.occupant)
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), rand(23,32) SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)
@@ -264,7 +264,7 @@ GLOBAL_VAR(spawntypes_by_path)
 	..()
 	turfs = GLOB.latejoin_cryohop
 
-/datum/spawnpoint/cryohop/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer)
+/datum/spawnpoint/cryohop/after_join(mob/living/carbon/human/victim, obj/machinery/computer/cryopod/control_computer = null, roundstart = FALSE)
 	if(!istype(victim))
 		return
 	var/area/A = get_area(victim)
@@ -276,12 +276,12 @@ GLOBAL_VAR(spawntypes_by_path)
 			//TODO fix sleep start
 			C.set_occupant(victim, 1, joining = TRUE)
 			victim.resting = 0
+			if(roundstart)
+				victim.start_cryo_filter_effect()
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_advice), 25 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			addtimer(CALLBACK(victim, /mob/living/carbon/human/proc/give_cryo_effect), 30 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			victim.add_event("cryo", /datum/happiness_event/cryo)
 			addtimer(CALLBACK(C, /obj/machinery/cryopod/proc/go_out_forced), 26 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
-			//victim.add_cryo_filter_effect()
-			//addtimer(CALLBACK(victim, /mob/living/proc/remove_cryo_filter_effect), 40 SECONDS, TIMER_UNIQUE|TIMER_NO_HASH_WAIT)
 			return
 	for(var/obj/machinery/light/L in A)
 		L.flicker(10)

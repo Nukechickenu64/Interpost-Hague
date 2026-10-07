@@ -74,6 +74,8 @@
 		return 0
 
 /obj/vehicle/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if(istype(W, /obj/item/stack/material/phoron))
+		return refuel_vehicle_cell(cell, W, user, src)
 	if(istype(W, /obj/item/hand_labeler))
 		return
 	if(isScrewdriver(W))

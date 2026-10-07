@@ -241,6 +241,7 @@
 	//DISCONNECT//
 	//////////////
 /client/Del()
+	clear_vehicle_placement()
 	ticket_panels -= src
 	if(holder)
 		holder.owner = null

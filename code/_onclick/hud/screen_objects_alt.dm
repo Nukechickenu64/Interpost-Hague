@@ -376,6 +376,11 @@
 		usr.ClickOn(src, params, usr, usr.client)
 		return 1
 	}
+	if(name == "internal" && modifiers["right"] && iscarbon(usr))
+		var/mob/living/carbon/C = usr
+		C.holding_breath = !C.holding_breath
+		to_chat(C, "<span class='notice'>You [C.holding_breath ? "hold your breath" : "start breathing again"].</span>")
+		return 1
 	var/clicksound = list('sound/misc/UISwitch1.ogg', 'sound/misc/UISwitch2.ogg', 'sound/misc/PopupMenu.ogg')
 	switch(name)
 		if("toggle")

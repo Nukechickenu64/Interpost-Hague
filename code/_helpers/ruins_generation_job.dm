@@ -14,11 +14,14 @@ var/datum/ruins_generation_job/ruins_gen_job
 	var/sleep_ticks = 2 // deciseconds between areas (~1.2s) to further reduce load
 	var/salvage = FALSE
 	var/skip_wipe = FALSE
+	var/datum/mining_expedition_controller/mission_controller
+	var/datum/shuttle/mission_shuttle
+	var/obj/effect/shuttle_landmark/mission_dock
 
-/datum/ruins_generation_job/proc/start(var/profile_path, var/salvage_mission = FALSE, var/owned_mission = FALSE, var/fresh_level = FALSE)
+/datum/ruins_generation_job/proc/start(var/profile_path, var/salvage_mission = FALSE, var/owned_mission = FALSE, var/fresh_level = FALSE, var/datum/mining_expedition_controller/controller = null)
 	if(active)
 		return FALSE
-	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	var/datum/mining_expedition_controller/expedition = controller || get_mining_expedition()
 	if(expedition.mission_pending && !owned_mission)
 		return FALSE
 	cancelled = FALSE
@@ -31,7 +34,7 @@ var/datum/ruins_generation_job/ruins_gen_job
 		return FALSE
 	var/datum/shuttle/autodock/shuttle = owned_mission ? expedition.get_shuttle() : null
 	if(owned_mission)
-		if(!expedition.mission_pending || !shuttle || shuttle.moving_status != SHUTTLE_IDLE || !shuttle.current_location || shuttle.current_location.landmark_tag != "nav_mining_start")
+		if(!expedition.mission_pending || !shuttle || shuttle.moving_status != SHUTTLE_IDLE || !expedition.is_home_dock(shuttle))
 			last_error = "The expedition shuttle is not holding at the station for preflight."
 			return FALSE
 	if(!expedition.can_regenerate_ruins(null, owned_mission))
@@ -50,6 +53,9 @@ var/datum/ruins_generation_job/ruins_gen_job
 	signal_emit("ruins_generation:started", total)
 	active = TRUE
 	expedition.ruins_fresh = FALSE
+	mission_controller = expedition
+	mission_shuttle = shuttle
+	mission_dock = expedition.mission_dock
 	// Kick off background processing
 	spawn(1)
 		processing_loop()
@@ -119,7 +125,7 @@ var/datum/ruins_generation_job/ruins_gen_job
 
 /datum/ruins_generation_job/proc/processing_loop()
 	// Process one area per tick to spread cost. If an area throws, store error and continue.
-	var/list/exclusion = get_mining_dock_exclusion()
+	var/list/exclusion = get_mining_dock_exclusion(3, mission_shuttle, mission_dock)
 	while(active && !cancelled && done < total)
 		var/area/space/ruins/A = areas[done+1]
 		if(A)
@@ -152,6 +158,9 @@ var/datum/ruins_generation_job/ruins_gen_job
 		last_error = "Survey cancelled."
 	active = FALSE
 	cancelled = FALSE
+	mission_controller = null
+	mission_shuttle = null
+	mission_dock = null
 	// Finalize
 	signal_emit("ruins_generation:complete", list(total = total, done = done, error = last_error))
 

@@ -218,6 +218,9 @@ var/global/const/NO_EMAG_ACT = -50
 /obj/item/card/id/cryo_temporary/proc/dissolve()
 	access = list()
 	visible_message("<span class='notice'>\The [src] finishes dissolving in the air and disappears.</span>")
+	if(ismob(loc))
+		var/mob/holder = loc
+		holder.drop_from_inventory(src)
 	qdel(src)
 
 /obj/item/card/id/verb/read()

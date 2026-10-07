@@ -79,7 +79,7 @@
 // Separate from the keypad airlock above: this is a wall control for an existing airlock.
 /obj/machinery/airlock_keypad
 	name = "airlock keypad"
-	desc = "A wall-mounted keypad linked to an airlock."
+	desc = "A wall-mounted keypad that unlocks the single airlock within one tile."
 	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "doorctrlid"
 	anchored = 1.0
@@ -117,6 +117,15 @@
 		return
 	granted_minds += mind
 	mind.store_memory("Airlock keypad [airlock_id] combination: [code]")
+
+/obj/machinery/airlock_keypad/proc/user_knows_code(mob/user)
+	return user && user.mind && length(user.mind.memory) && findtext(user.mind.memory, code)
+
+/obj/machinery/airlock_keypad/proc/find_nearby_airlocks()
+	var/list/nearby_airlocks = list()
+	for(var/obj/machinery/door/airlock/door in range(1, src))
+		nearby_airlocks += door
+	return nearby_airlocks
 
 /obj/machinery/airlock_keypad/proc/start_attempt(mob/user)
 	clear_attempt(user)
@@ -157,6 +166,8 @@
 /obj/machinery/airlock_keypad/examine(mob/user)
 	. = ..()
 	if(user && !user.stat && !user.restrained() && get_dist(user, src) <= 1 && !(stat & (NOPOWER|BROKEN)))
+		if(user_knows_code(user))
+			to_chat(user, "<span class='notice'>You recall this keypad's combination: <b>[code]</b>.</span>")
 		start_attempt(user)
 
 /obj/machinery/airlock_keypad/attack_hand(mob/user)
@@ -183,18 +194,109 @@
 		clear_attempt(user)
 		return
 
-	var/obj/machinery/door/airlock/target = null
-	var/target_count = 0
-	if(length(airlock_id))
-		for(var/obj/machinery/door/airlock/door in world)
-			if(door.id_tag == airlock_id)
-				target = door
-				target_count++
+	var/list/nearby_airlocks = find_nearby_airlocks()
+	var/obj/machinery/door/airlock/target = nearby_airlocks.len == 1 ? nearby_airlocks[1] : null
 
-	if(target_count != 1)
-		to_chat(user, "<span class='warning'>The keypad cannot identify a unique airlock.</span>")
+	if(!target)
+		to_chat(user, "<span class='warning'>The keypad cannot identify a unique airlock within one tile.</span>")
 	else if(target.unlock())
 		to_chat(user, "<span class='notice'>The airlock bolts rise.</span>")
 	else
 		to_chat(user, "<span class='warning'>The airlock bolts do not respond.</span>")
 	clear_attempt(user)
+
+// Role presets grant their randomly generated code only to the matching job title.
+// These use job titles rather than departments so mappers can restrict a keypad precisely.
+/obj/machinery/airlock_keypad/role
+
+/obj/machinery/airlock_keypad/role/assistant
+	name = "assistant airlock keypad"
+	owner_roles = list("Assistant")
+
+/obj/machinery/airlock_keypad/role/greyhound
+	name = "greyhound airlock keypad"
+	owner_roles = list("Greyhound")
+
+/obj/machinery/airlock_keypad/role/captain
+	name = "captain airlock keypad"
+	owner_roles = list("Captain")
+
+/obj/machinery/airlock_keypad/role/executive_officer
+	name = "executive officer airlock keypad"
+	owner_roles = list("Executive Officer")
+
+/obj/machinery/airlock_keypad/role/head_scientist
+	name = "head scientist airlock keypad"
+	owner_roles = list("Head Scientist")
+
+/obj/machinery/airlock_keypad/role/general_researcher
+	name = "general researcher airlock keypad"
+	owner_roles = list("General Researcher")
+
+/obj/machinery/airlock_keypad/role/medical_officer
+	name = "medical officer airlock keypad"
+	owner_roles = list("Medical Officer")
+
+/obj/machinery/airlock_keypad/role/cmo
+	name = "CMO airlock keypad"
+	owner_roles = list("CMO")
+
+/obj/machinery/airlock_keypad/role/major
+	name = "major airlock keypad"
+	owner_roles = list("Major")
+
+/obj/machinery/airlock_keypad/role/enforcer
+	name = "enforcer airlock keypad"
+	owner_roles = list("Enforcer")
+
+/obj/machinery/airlock_keypad/role/detective
+	name = "detective airlock keypad"
+	owner_roles = list("Detective")
+
+/obj/machinery/airlock_keypad/role/vessel_overseer
+	name = "vessel overseer airlock keypad"
+	owner_roles = list("Vessel Overseer")
+
+/obj/machinery/airlock_keypad/role/maintainer
+	name = "maintainer airlock keypad"
+	owner_roles = list("Maintainer")
+
+/obj/machinery/airlock_keypad/role/excavator
+	name = "excavator airlock keypad"
+	owner_roles = list("Excavator")
+
+/obj/machinery/airlock_keypad/role/cargo_technician
+	name = "cargo technician airlock keypad"
+	owner_roles = list("Cargo Technician")
+
+/obj/machinery/airlock_keypad/role/machinist
+	name = "machinist airlock keypad"
+	owner_roles = list("Machinist")
+
+/obj/machinery/airlock_keypad/role/cargo_assistant
+	name = "cargo assistant airlock keypad"
+	owner_roles = list("Cargo Assistant")
+
+/obj/machinery/airlock_keypad/role/nutritionist
+	name = "nutritionist airlock keypad"
+	owner_roles = list("Nutritionist")
+
+/obj/machinery/airlock_keypad/role/barkeeper
+	name = "barkeeper airlock keypad"
+	owner_roles = list("Barkeeper")
+
+/obj/machinery/airlock_keypad/role/priest
+	name = "priest airlock keypad"
+	owner_roles = list("Priest")
+
+/obj/machinery/airlock_keypad/role/sanitation_technician
+	name = "sanitation technician airlock keypad"
+	owner_roles = list("Sanitation Technician")
+
+/obj/machinery/airlock_keypad/role/botanic
+	name = "botanic airlock keypad"
+	owner_roles = list("Botanic")
+
+/obj/machinery/airlock_keypad/role/medical_assistant
+	name = "medical assistant airlock keypad"
+	owner_roles = list("Medical Assistant")

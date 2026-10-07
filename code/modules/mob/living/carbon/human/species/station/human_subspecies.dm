@@ -1,6 +1,7 @@
 /datum/species/human/gravworlder
 	name = "Grav-Adapted Human"
 	name_plural = "Grav-Adapted Humans"
+	spawn_flags = SPECIES_IS_RESTRICTED
 	blurb = "Heavier and stronger than a baseline human, gravity-adapted people have \
 	thick radiation-resistant skin with a high lead content, denser bones, and recessed \
 	eyes beneath a prominent brow in order to shield them from the glare of a dangerously \
@@ -20,6 +21,7 @@
 /datum/species/human/spacer
 	name = "Space-Adapted Human"
 	name_plural = "Space-Adapted Humans"
+	spawn_flags = SPECIES_IS_RESTRICTED
 	blurb = "Lithe and frail, these sickly folk were engineered for work in environments that \
 	lack both light and atmosphere. As such, they're quite resistant to asphyxiation as well as \
 	toxins, but they suffer from weakened bone structure and a marked vulnerability to bright lights."
@@ -37,6 +39,7 @@
 /datum/species/human/vatgrown
 	name = "Vat-Grown Human"
 	name_plural = "Vat-Grown Humans"
+	spawn_flags = SPECIES_IS_RESTRICTED
 	blurb = "With cloning on the forefront of human scientific advancement, cheap mass production \
 	of bodies is a very real and rather ethically grey industry. Vat-grown humans tend to be paler than \
 	baseline, with no appendix and fewer inherited genetic disabilities, but a weakened metabolism."

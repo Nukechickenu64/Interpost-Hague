@@ -897,6 +897,18 @@ window "mapwindow"
 		is-visible = false
 		is-disabled = true
 		saved-params = ""
+	elem "shock3d"
+		type = BROWSER
+		// Reserve the HUD columns while allowing the 3D view two additional map
+		// tiles (64 px) into the otherwise unused strip at the right.
+		pos = 256,0
+		size = 192x480
+		anchor1 = 0,0
+		anchor2 = 100,100
+		background-color = #000000
+		is-visible = false
+		is-disabled = true
+		saved-params = ""
 
 window "outputwindow"
 	elem "outputwindow"

@@ -492,7 +492,7 @@ var/global/datum/controller/occupations/job_master
 				var/datum/spawnpoint/spawnpoint = H.client ? get_spawnpoint_for(H.client, rank) : null
 				if(spawnpoint && spawnpoint.turfs && spawnpoint.turfs.len)
 					H.forceMove(pick(spawnpoint.turfs))
-					spawnpoint.after_join(H)
+					spawnpoint.after_join(H, roundstart = TRUE)
 				else
 					WARNING("Could not find an appropriate spawnpoint for job [rank].")
 
@@ -629,7 +629,26 @@ var/global/datum/controller/occupations/job_master
 
 		if(H.religion)//In case they somehow don't have one.
 			H.mind.religion = H.religion
-			if(H.religion_is_legal())
+			if(is_cult_religion(H.religion))
+				var/datum/religion/faith = GLOB.all_religions[H.religion]
+				if(faith)
+					faith.followers |= H.mind.name
+				if(!H.mind.religion_antagonist_rolled)
+					H.mind.religion_antagonist_rolled = TRUE
+					var/datum/antagonist/cultist/cult = get_cult_by_religion(H.religion)
+					if(rand(1, 15) == 1 && !player_is_antag(H.mind) && cult.can_become_antag(H.mind))
+						cult.add_antagonist(H.mind, 0, 0, 0)
+				H.update_religion_magic()
+			else if(H.religion == HERETIC_RELIGION)
+				var/datum/religion/faith = GLOB.all_religions[H.religion]
+				if(faith)
+					faith.followers |= H.mind.name
+				if(!H.mind.religion_antagonist_rolled)
+					H.mind.religion_antagonist_rolled = TRUE
+					if(rand(1, 20) == 1 && !player_is_antag(H.mind) && GLOB.heretics.can_become_antag(H.mind))
+						GLOB.heretics.add_antagonist(H.mind, 0, 0, 0)
+				H.update_religion_magic()
+			else if(H.religion_is_legal())
 				var/datum/religion/LR = GLOB.all_religions[LEGAL_RELIGION]
 				if(istype(LR))
 					LR.followers += H.name // I don't think I want to save copies of the entire entity.
@@ -643,7 +662,7 @@ var/global/datum/controller/occupations/job_master
 				//Pick an old god other then the template
 				//to_world("RELIGION TESTING FIX THIS")
 				//H.religion = "Your god here"
-				H.religion = pick(GLOB.all_religions - NARSIE_RELIGION - KHARIN_RELIGION - REAPER_RELIGION - LEGAL_RELIGION)
+				H.religion = pick(GLOB.all_religions - NARSIE_RELIGION - KHARIN_RELIGION - REAPER_RELIGION - HERETIC_RELIGION - LEGAL_RELIGION)
 				H.verbs += /mob/living/proc/make_shrine
 				H.verbs += /mob/living/proc/praise_god
 				var/datum/religion/HR = GLOB.all_religions[H.religion]
@@ -667,8 +686,11 @@ var/global/datum/controller/occupations/job_master
 					var/datum/old_god_spell/OGS = GLOB.all_spells[S]
 					if(istype(OGS) && OGS.old_god == H.religion)
 						pickable_spells += OGS
-				var/datum/old_god_spell/new_spell = pick(pickable_spells)
-				H.mind.store_memory("[new_spell.name] Incantation: \"[new_spell.phrase]\"")
+				if(pickable_spells.len)
+					var/datum/old_god_spell/new_spell = pick(pickable_spells)
+					H.mind.store_memory("[new_spell.name] Incantation: \"[new_spell.phrase]\"")
+				else
+					log_warning("No old-god spell was configured for [H.religion] while equipping [H].")
 
 		BITSET(H.hud_updateflag, ID_HUD)
 		BITSET(H.hud_updateflag, IMPLOYAL_HUD)

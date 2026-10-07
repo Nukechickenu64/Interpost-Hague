@@ -359,8 +359,9 @@ var/last_message_id = 0
 		to_chat(user, "An evacuation cannot be called at this time. Please try again later.")
 		return
 
-	if(SSevac.evacuation_controller.is_on_cooldown()) // Ten minute grace period to let the game get going without lolmetagaming. -- TLE
+	if(SSevac.evacuation_controller.is_on_cooldown())
 		to_chat(user, SSevac.evacuation_controller.get_cooldown_message())
+		return
 
 	if(SSevac.evacuation_controller.is_evacuating())
 		to_chat(user, "An evacuation is already underway.")

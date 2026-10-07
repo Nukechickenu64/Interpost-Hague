@@ -129,6 +129,7 @@
 
 #define LEGAL_RELIGION 			"Atheism"
 #define NARSIE_RELIGION			"Cult of Nar-Sie"
+#define HERETIC_RELIGION			"Forbidden Knowledge"
 #define KHARIN_RELIGION			"Cult of Kha'Rin"
 #define REAPER_RELIGION			"Cult of Mortality"
 

@@ -15,7 +15,7 @@
 /datum/shuttle/autodock/ferry/emergency/arrived()
 	. = ..()
 
-	if(!emergency_controller.has_evacuated())
+	if(current_location == waypoint_station && !emergency_controller.has_evacuated())
 		emergency_controller.finish_preparing_evac()
 
 	if (istype(in_use, /obj/machinery/computer/shuttle_control/emergency))
@@ -25,8 +25,13 @@
 /datum/shuttle/autodock/ferry/emergency/long_jump(var/destination, var/interim, var/travel_time, var/direction)
 	..(destination, interim, emergency_controller.get_long_jump_time(), direction)
 
+/datum/shuttle/autodock/ferry/emergency/get_transit_destination(var/obj/effect/shuttle_landmark/destination)
+	if(emergency_controller.is_on_cooldown())
+		return waypoint_offsite
+	return ..()
+
 /datum/shuttle/autodock/ferry/emergency/shuttle_moved()
-	if(next_location != waypoint_station)
+	if(next_location != waypoint_station && !emergency_controller.is_on_cooldown())
 		emergency_controller.shuttle_leaving()
 		priority_announcement.Announce(replacetext(replacetext((emergency_controller.emergency_evacuation ? GLOB.using_map.emergency_shuttle_leaving_dock : GLOB.using_map.shuttle_leaving_dock), "%dock_name%", "[GLOB.using_map.dock_name]"),  "%ETA%", "[round(emergency_controller.get_eta()/60,1)] minute\s"))
 	..()
@@ -89,7 +94,7 @@
 
 	if (!can_cancel(user)) return
 
-	if(!emergency_controller.shuttle_preparing())
+	if(!emergency_controller.is_on_cooldown())
 
 		if (istype(user, /obj/machinery/computer/shuttle_control/emergency))	//if we were given a command by an emergency shuttle console
 			if (emergency_controller.autopilot)

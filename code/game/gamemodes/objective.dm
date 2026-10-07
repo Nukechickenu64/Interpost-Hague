@@ -818,11 +818,11 @@ var/global/list/all_objectives = list()
 	return acolytes_survived >= target_amount
 
 /datum/objective/cult/eldergod
-	explanation_text = "Summon Nar-Sie via the use of the appropriate rune (Hell join self). It will only work if nine cultists stand on and around it. The convert rune is join blood self."
+	explanation_text = "Summon your deity with a Tear Reality rune after completing both sacrifice objectives. Nine conscious members of your cult, including constructs, must remain within one tile of the rune for 45 seconds."
 
 /datum/objective/cult/eldergod/New()
 	..()
-	explanation_text = "Summon [cult.entity_name] with a Tear Reality rune and members of [cult.religion_name]. Rival cultists do not count toward the ritual."
+	explanation_text = "Summon [cult.entity_name] with a Tear Reality rune after completing both sacrifice objectives. Nine conscious members of [cult.religion_name], including constructs, must remain within one tile of the rune for 45 seconds. Rival cultists do not count."
 
 /datum/objective/cult/eldergod/check_completion()
 	for(var/obj/singularity/narsie/large/deity in narsie_list)
@@ -835,13 +835,12 @@ var/global/list/all_objectives = list()
 
 /datum/objective/cult/sacrifice/find_target()
 	var/list/possible_targets = list()
-	if(!possible_targets.len)
-		for(var/mob/living/carbon/human/player in GLOB.player_list)
-			if(player.mind && !(player.mind in cult.current_antagonists))
-				possible_targets += player.mind
+	for(var/mob/living/carbon/human/player in GLOB.player_list)
+		if(player.mind && !(player.mind in cult.current_antagonists) && !(player.mind in cult.sacrifice_targets))
+			possible_targets += player.mind
 	if(possible_targets.len > 0)
 		target = pick(possible_targets)
-	if(target) explanation_text = "Sacrifice [target.name], the [target.assigned_role]. You will need the sacrifice rune (Hell blood join) and three acolytes to do so."
+	if(target) explanation_text = "Sacrifice [target.name], the [target.assigned_role], on an Offering rune. Three conscious members of your cult must remain at the rune until the target dies."
 
 /datum/objective/cult/sacrifice/check_completion()
 	return target && cult && (target in cult.sacrificed)

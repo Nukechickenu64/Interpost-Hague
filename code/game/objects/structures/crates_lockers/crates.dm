@@ -17,8 +17,7 @@ obj/structure/closet/crate
 	pull_sound = "pull_box"
 
 /obj/structure/closet/crate/Destroy()
-	qdel(src)
-	. = ..()
+	return ..()
 
 /obj/structure/closet/crate/open()
 	if((atom_flags & ATOM_FLAG_OPEN_CONTAINER) && !opened && can_open())

@@ -3,6 +3,10 @@
 var/list/gamemode_cache = list()
 
 /datum/configuration
+	var/tts_http_url = null
+	var/tts_http_token = null
+	var/tts_max_concurrent_requests = 4
+	var/list/tts_voice_blacklist = list()
 	var/server_name = null				// server name (for world name / status)
 	var/server_suffix = 0				// generate numeric suffix based on server port
 
@@ -277,6 +281,14 @@ var/list/gamemode_cache = list()
 
 		if(type == "config")
 			switch (name)
+				if ("tts_http_url")
+					config.tts_http_url = trim(value)
+				if ("tts_http_token")
+					config.tts_http_token = value
+				if ("tts_max_concurrent_requests")
+					config.tts_max_concurrent_requests = clamp(text2num(value), 1, 16)
+				if ("tts_voice_blacklist")
+					config.tts_voice_blacklist = splittext(value, ",")
 				if ("resource_urls")
 					config.resource_urls = splittext(value, " ")
 

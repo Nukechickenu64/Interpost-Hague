@@ -35,7 +35,7 @@
 	if(!islist(shuttle_area))
 		shuttle_area = list(shuttle_area)
 	for(var/T in shuttle_area)
-		var/area/A = locate(T)
+		var/area/A = istype(T, /area) ? T : locate(T)
 		if(!istype(A))
 			CRASH("Shuttle \"[name]\" couldn't locate area [T].")
 		areas += A
@@ -112,10 +112,12 @@
 		if(attempt_move(interim))
 			var/fwooshed = 0
 			while (world.time < arrive_time)
+				destination = get_transit_destination(destination)
 				if(!fwooshed && (arrive_time - world.time) < 100)
 					fwooshed = 1
 					playsound(destination, sound_landing, 100, 0, 7)
 				sleep(5)
+			destination = get_transit_destination(destination)
 			if(!attempt_move(destination))
 				attempt_move(start_location) //try to go back to where we started. If that fails, I guess we're stuck in the interim location
 				message_admins("Shuttle [src.name] failed to arrive at its destination and could not return to its origin.")
@@ -123,6 +125,9 @@
 			attempt_move(destination)
 
 		moving_status = SHUTTLE_IDLE
+
+/datum/shuttle/proc/get_transit_destination(var/obj/effect/shuttle_landmark/destination)
+	return destination
 
 /datum/shuttle/proc/fuel_check()
 	return 1 //fuel check should always pass in non-overmap shuttles (they have magic engines)

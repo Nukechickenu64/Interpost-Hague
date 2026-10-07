@@ -6,7 +6,7 @@
 	var/jolt_impact = 0 //strength of the jolt currently flinging us, used for wall slam damage
 
 // Jolts the floor around epicenter; strength (1-10) falls off with distance. Direction defaults to away from the epicenter.
-/proc/floor_jolt(turf/epicenter, radius, strength, dir_override)
+/proc/floor_jolt(turf/epicenter, radius, strength, dir_override, affect_items = FALSE)
 	epicenter = get_turf(epicenter)
 	if(!epicenter || radius <= 0 || strength <= 0)
 		return
@@ -21,6 +21,21 @@
 		if(local_strength < 1)
 			continue
 		L.floor_jolt_act(dir_override ? dir_override : get_dir(epicenter, L), local_strength)
+	if(affect_items)
+		for(var/obj/item/item in range(radius, epicenter))
+			var/turf/item_turf = get_turf(item)
+			if(!item_turf || item.loc != item_turf || item.anchored || item.throwing || !item_turf.is_floor() || !has_gravity(item, item_turf))
+				continue
+			var/local_strength = round(strength * (1 - get_dist(item, epicenter) / (radius + 1)), 1)
+			if(local_strength < 1)
+				continue
+			var/direction = dir_override ? dir_override : get_dir(epicenter, item)
+			if(!direction)
+				direction = pick(GLOB.cardinal)
+			var/throw_range = clamp(round(local_strength / 2), 1, 5)
+			spawn(0)
+				if(!QDELETED(item) && !item.anchored && !item.throwing && item.loc == item_turf)
+					item.throw_at(get_edge_target_turf(item, direction), throw_range, throw_range)
 
 /mob/living/proc/floor_jolt_act(direction, strength)
 	if(stat == DEAD || buckled || anchored || issilicon(src))

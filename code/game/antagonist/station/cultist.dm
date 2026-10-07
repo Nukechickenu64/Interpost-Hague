@@ -75,7 +75,7 @@ GLOBAL_DATUM_INIT(cult_death, /datum/antagonist/cultist/death, new)
 	blacklisted_jobs = list(/datum/job/ai, /datum/job/chaplain, /datum/job/psychiatrist)
 	feedback_tag = "cult_objective"
 	antag_indicator = "hudcultist"
-	welcome_text = "You have a tome in your possession; one that will help you start the cult. Use it well and remember - there are others."
+	welcome_text = "Keep your faith hidden while you find your fellow cultists. Use Communicate to whisper to your allies. Your tome contains your cult's rituals; hold it while drawing runes. Sacrifice both named targets on Offering runes, then summon your deity with a Tear Reality rune. The final ritual needs nine conscious members of your own cult, including constructs, within one tile of the rune for 45 seconds."
 	victory_text = "The cult wins! It has succeeded in serving its dark masters!"
 	loss_text = "The staff managed to stop the cult!"
 	victory_feedback_tag = "win - cult win"
@@ -98,7 +98,7 @@ GLOBAL_DATUM_INIT(cult_death, /datum/antagonist/cultist/death, new)
 	var/obj/item/book/tome/tome_type = /obj/item/book/tome
 	var/obj/singularity/narsie/large/deity_type = /obj/singularity/narsie/large
 	var/powerless = 0
-	var/datum/mind/sacrifice_target
+	var/list/sacrifice_targets = list()
 	var/list/obj/effect/rune/teleport/teleport_runes = list()
 	var/list/rune_strokes = list()
 	var/list/sacrificed = list()
@@ -158,15 +158,23 @@ GLOBAL_DATUM_INIT(cult_death, /datum/antagonist/cultist/death, new)
 		return
 
 	global_objectives = list()
-	if(prob(50))
-		global_objectives |= new /datum/objective/cult/survive(null, src)
-	else
-		global_objectives |= new /datum/objective/cult/eldergod(null, src)
+	sacrificed = list()
+	sacrifice_targets = list()
+	global_objectives |= new /datum/objective/cult/eldergod(null, src)
+	for(var/i = 1, i <= 2, i++)
+		var/datum/objective/cult/sacrifice/sacrifice = new(null, src)
+		sacrifice.find_target()
+		if(sacrifice.target)
+			sacrifice_targets |= sacrifice.target
+		global_objectives |= sacrifice
 
-	var/datum/objective/cult/sacrifice/sacrifice = new(null, src)
-	sacrifice.find_target()
-	sacrifice_target = sacrifice.target
-	global_objectives |= sacrifice
+/datum/antagonist/cultist/proc/sacrifice_objectives_complete()
+	if(!sacrifice_targets.len)
+		return FALSE
+	for(var/datum/mind/target in sacrifice_targets)
+		if(!(target in sacrificed))
+			return FALSE
+	return TRUE
 
 /datum/antagonist/cultist/equip(var/mob/living/carbon/human/player)
 
@@ -237,6 +245,11 @@ GLOBAL_DATUM_INIT(cult_death, /datum/antagonist/cultist/death, new)
 		player.faction_before_cult = null
 
 /datum/antagonist/cultist/remove_antagonist(var/datum/mind/player, var/show_message, var/implanted)
+	// An ascendant is still a member of this original cult. Remove its added
+	// TG-style powers before the normal deconversion restores their old faith.
+	var/datum/antagonist/cultist/ascendant/ascended = get_cult_ascendant(player)
+	if(ascended)
+		ascended.remove_antagonist(player, 0, implanted)
 	. = ..()
 	if(!.)
 		return 0
@@ -302,6 +315,9 @@ GLOBAL_DATUM_INIT(cult_death, /datum/antagonist/cultist/death, new)
 	new_body.add_language(LANGUAGE_CULT)
 	add_cult_magic(new_body)
 	new_body.update_religion_magic()
+	var/datum/antagonist/cultist/ascendant/ascended = get_cult_ascendant(new_body.mind)
+	if(ascended)
+		ascended.apply_ascendant_magic(new_body)
 	update_icons_added(new_body.mind)
 
 /datum/antagonist/cultist/proc/add_cultiness(var/amount)

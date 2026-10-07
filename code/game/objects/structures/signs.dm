@@ -1,5 +1,6 @@
 /obj/structure/sign
 	icon = 'icons/obj/decals.dmi'
+	icon_state = "nanotrasen"
 	anchored = 1
 	opacity = 0
 	density = 0
@@ -551,7 +552,8 @@
 /obj/structure/sign/nanotrasen
 	name = "Nanotrasen"
 	desc = "You serve them!"
-	icon_state = "nanotrasen"
+	icon = 'icons/obj/contraband.dmi'
+	icon_state = "nanotrasen_logo"
 
 /obj/structure/sign/nanotrasenbig
 	name = "Nanotrasen"

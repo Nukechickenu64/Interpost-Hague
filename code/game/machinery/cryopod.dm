@@ -906,10 +906,13 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 		occupant.client.perspective = MOB_PERSPECTIVE
 
 	occupant.forceMove(get_turf(src))
+	occupant.resting = TRUE
+	occupant.update_canmove()
 	occupant.fatigue = occupant.max_fatigue
 	if(isliving(occupant))
 		var/mob/living/released_occupant = occupant
 		released_occupant.update_stamina_hud()
+		released_occupant.fade_cryo_filter_effect()
 	if(issue_joiner_access_card && ishuman(occupant))
 		dispense_joiner_access_card(occupant)
 	set_occupant(null)

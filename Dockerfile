@@ -27,11 +27,11 @@ make here >/dev/null; \
 source bin/byondsetup; \
 cd ../Marrow; \
 ln -sf /usr/lib/i386-linux-gnu/libmariadb.so.3 libmariadb.so || true; \
-if [ -f secret/__secret.dme ]; then DreamMaker -DSECRETS_ENABLED Marrow.dme; else DreamMaker Marrow.dme; fi; \
+if [ -f secret/__secret.dme ]; then DreamMaker -DSECRETS_ENABLED Interpost-Hague.dme; else DreamMaker Interpost-Hague.dme; fi; \
 '
 
 # Default port (override with -p in docker run / compose)
 EXPOSE 8000
 
 # Run DreamDaemon
-ENTRYPOINT bash -lc ". /marrow/byond/bin/byondsetup && cd /marrow/Marrow && DreamDaemon Marrow.dmb 8000 -invisible -trusted -logself"
+ENTRYPOINT bash -lc ". /marrow/byond/bin/byondsetup && cd /marrow/Marrow && DreamDaemon Interpost-Hague.dmb 8000 -invisible -trusted -logself"

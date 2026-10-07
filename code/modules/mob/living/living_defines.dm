@@ -81,3 +81,7 @@
 	var/obj/screen/plane_master/pain/pain_effect = new
 
 	var/obj/screen/plane_master/pain_extreme/pain_effect_extreme = new
+
+	// A per-mob plane master, applied only while waking from a round-start cryopod.
+	var/obj/screen/plane_master/cryo/cryo_filter_effect
+	var/obj/screen/plane_master/cryo/double_sight/cryo_double_sight_effect

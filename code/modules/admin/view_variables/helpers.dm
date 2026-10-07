@@ -137,6 +137,9 @@
 /datum/configuration/VV_secluded()
 	return vars
 
+/datum/configuration/VV_hidden()
+	return ..() + list("tts_http_token")
+
 // The following vars cannot be edited by anyone
 /datum/proc/VV_static()
 	return list("parent_type")

@@ -454,7 +454,7 @@
 			to_chat(M, "<span class='warning'>[cult.entity_name] accepts this offering.</span>")
 		visible_message("<span class='notice'>\The [F] appears over \the [src].</span>")
 		cult.sacrificed |= victim.mind
-		if(victim.mind == cult.sacrifice_target)
+		if(cult.sacrifice_objectives_complete())
 			for(var/datum/mind/H in cult.current_antagonists)
 				if(H.current)
 					to_chat(H.current, "<span class='cult'>Your objective is now complete.</span>")
@@ -755,36 +755,44 @@
 /obj/effect/rune/tearreality
 	cultname = "tear reality"
 	var/the_end_comes = 0
-	var/the_time_has_come = 300
+	var/the_time_has_come = 45
+	var/summoning = FALSE
 	var/obj/singularity/narsie/large/HECOMES = null
 	strokes = 9
 
 /obj/effect/rune/tearreality/cast(var/mob/living/user)
 	if(!cult.allow_narsie)
 		return
-	if(the_end_comes)
+	if(summoning)
 		to_chat(user, "<span class='cult'>You are already summoning! Be patient!</span>")
 		return
+	if(!cult.sacrifice_objectives_complete())
+		to_chat(user, "<span class='warning'>Your two chosen sacrifices must be offered before you can summon [cult.entity_name].</span>")
+		return
 	var/list/mob/living/cultists = get_cultists()
-	if(cultists.len < 5)
+	if(cultists.len < 9)
+		to_chat(user, "<span class='warning'>Nine conscious members of your cult must gather within one tile of this rune.</span>")
 		return fizzle()
+	summoning = TRUE
+	the_end_comes = 0
 	for(var/mob/living/M in cultists)
 		M.say("Tok-lyr rqa'nap g[pick("'","`")]lt-ulotf!")
-		to_chat(M, "<span class='cult'>You are staring to tear the reality to bring Him back... stay around the rune!</span>")
+		to_chat(M, "<span class='cult'>You begin tearing reality to bring [cult.entity_name] back. Keep nine members of your cult around the rune for 45 seconds!</span>")
 	log_and_message_admins_many(cultists, "started summoning [cult.entity_name].")
 
 	var/area/A = get_area(src)
 	command_announcement.Announce("High levels of bluespace interference detected at \the [A]. Suspected wormhole forming. Investigate it immediately.")
-	while(cultists.len > 4 || the_end_comes)
+	while(summoning && the_end_comes < the_time_has_come)
+		sleep(10)
+		if(QDELETED(src))
+			return
 		cultists = get_cultists()
-		if(cultists.len > 8)
-			++the_end_comes
-		if(cultists.len > 4)
-			++the_end_comes
-		else
-			--the_end_comes
-		if(the_end_comes >= the_time_has_come)
-			break
+		if(cultists.len < 9)
+			summoning = FALSE
+			command_announcement.Announce("Bluespace anomaly has ceased.")
+			qdel(src)
+			return
+		++the_end_comes
 		for(var/mob/living/M in cultists)
 			if(prob(5))
 				M.say(pick("Hakkrutju gopoenjim.", "Nherasai pivroiashan.", "Firjji prhiv mazenhor.", "Tanah eh wakantahe.", "Obliyae na oraie.", "Miyf hon vnor'c.", "Wakabai hij fen juswix."))
@@ -795,10 +803,8 @@
 		sleep(10)
 
 	if(the_end_comes >= the_time_has_come)
+		summoning = FALSE
 		HECOMES = new cult.deity_type(get_turf(src))
-	else
-		command_announcement.Announce("Bluespace anomaly has ceased.")
-		qdel(src)
 
 /obj/effect/rune/tearreality/attack_hand(var/mob/living/user)
 	..()

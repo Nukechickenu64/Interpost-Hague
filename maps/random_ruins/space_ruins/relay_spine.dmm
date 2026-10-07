@@ -2,6 +2,9 @@
 "a" = (
 /turf/space,
 /area/space)
+"." = (
+/turf/simulated/floor/airless,
+/area/space)
 "f" = (
 /obj/structure/window/reinforced,
 /turf/space,

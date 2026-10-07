@@ -75,6 +75,7 @@
 	var/religion
 	var/religion_before_cult
 	var/faction_before_cult
+	var/religion_antagonist_rolled = FALSE
 	var/list/initial_email_login = list("login" = "", "password" = "")
 
 /datum/mind/proc/add_active_antagonist(var/datum/antagonist/antag)
@@ -103,6 +104,9 @@
 /datum/mind/proc/transfer_to(mob/living/new_character)
 	var/mob/living/old_character = current
 	var/datum/antagonist/cultist/cult = get_cult(current)
+	var/datum/heretic_devotee/heretic = get_heretic(current)
+	if(heretic)
+		heretic.unbind_body(old_character)
 	if(!istype(new_character))
 		world.log << "## DEBUG: transfer_to(): Some idiot has tried to transfer_to() a non mob/living mob. Please inform Carn"
 	if(current)					//remove ourself from our old body's mind variable
@@ -126,6 +130,11 @@
 
 	if(cult)
 		cult.transfer_cult_body(old_character, new_character)
+	if(heretic)
+		heretic.bind_body(new_character)
+		old_character.religion = heretic.previous_religion
+		old_character.faction = heretic.previous_faction
+		old_character.update_religion_magic()
 
 	if(active)
 		new_character.key = key		//now transfer the key to link the client to our new body

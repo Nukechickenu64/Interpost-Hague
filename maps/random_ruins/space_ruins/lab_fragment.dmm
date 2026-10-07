@@ -2,6 +2,9 @@
 "a" = (
 /turf/space,
 /area/space)
+"." = (
+/turf/simulated/floor/tiled/techfloor/grid,
+/area/space)
 "u" = (
 /turf/simulated/floor/tiled/techfloor/grid,
 /area/space)

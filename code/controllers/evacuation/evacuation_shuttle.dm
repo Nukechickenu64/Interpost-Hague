@@ -61,13 +61,20 @@
 	return 0
 
 /datum/evacuation_controller/shuttle/cancel_evacuation()
-	if(..() && shuttle.moving_status != SHUTTLE_INTRANSIT)
+	if(..())
 		shuttle_launch_time = null
-		shuttle.cancel_launch(src)
+		if(shuttle.moving_status == SHUTTLE_INTRANSIT)
+			shuttle.next_location = shuttle.waypoint_offsite
+			shuttle.direction = 1
+			shuttle.arrive_time = evac_cooldown_time
+		else if(shuttle.is_launching())
+			shuttle.cancel_launch(src)
 		return 1
 	return 0
 
 /datum/evacuation_controller/shuttle/get_eta()
+	if(is_on_cooldown())
+		return max(0, (evac_cooldown_time - world.time)/10)
 	if (shuttle && shuttle.has_arrive_time())
 		return (shuttle.arrive_time-world.time)/10
 	return ..()
@@ -79,6 +86,8 @@
 
 // This is largely handled by the emergency shuttle datum.
 /datum/evacuation_controller/shuttle/process()
+	if(is_on_cooldown() && (shuttle.moving_status != SHUTTLE_IDLE || shuttle.process_state != IDLE_STATE))
+		return
 	if(state == EVAC_PREPPING)
 		if(!isnull(shuttle_launch_time) && world.time > shuttle_launch_time && shuttle.moving_status == SHUTTLE_IDLE)
 			shuttle.launch()
@@ -89,7 +98,7 @@
 	return ..()
 
 /datum/evacuation_controller/shuttle/can_cancel()
-	return (shuttle.moving_status == SHUTTLE_IDLE && shuttle.location && ..())
+	return (!isnull(evac_called_at) && state == EVAC_PREPPING && shuttle && shuttle.current_location != shuttle.waypoint_station)
 
 /datum/evacuation_controller/shuttle/proc/shuttle_leaving()
 	state = EVAC_IN_TRANSIT
@@ -107,12 +116,13 @@
 		return round(evac_transit_delay/10)
 
 /datum/evacuation_controller/shuttle/available_evac_options()
-	if (!shuttle.location)
+	if (!shuttle || is_on_cooldown())
 		return list()
-	if (is_idle())
+	if (is_idle() && shuttle.current_location == shuttle.waypoint_offsite)
 		return list(evacuation_options[EVAC_OPT_CALL_SHUTTLE])
-	else
+	else if(can_cancel())
 		return list(evacuation_options[EVAC_OPT_RECALL_SHUTTLE])
+	return list()
 
 /datum/evacuation_option/call_shuttle
 	option_text = "Call emergency shuttle"

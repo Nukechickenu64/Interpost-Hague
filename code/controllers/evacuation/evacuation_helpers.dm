@@ -27,6 +27,9 @@
 
 /datum/evacuation_controller/proc/can_evacuate(var/mob/user, var/forced)
 
+	if(is_on_cooldown())
+		return 0
+
 	if(!isnull(evac_called_at))
 		return 0
 

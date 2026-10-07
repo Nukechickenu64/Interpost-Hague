@@ -186,6 +186,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		spawn(50)
 			screen = 1.2
 			files.AddTech2Known(t_disk.stored)
+			files.RefreshResearch() // Newly uploaded technology may unlock additional fabrication designs.
 			updateUsrDialog()
 			griefProtection() //Update centcomm too
 

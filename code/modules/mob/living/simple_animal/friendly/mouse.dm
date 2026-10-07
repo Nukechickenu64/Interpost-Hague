@@ -100,6 +100,8 @@
 		if(hiding)
 			to_chat(src, "<span class='warning'>You can't bite while you are hiding!</span>")
 			return
+		if(!gurps_melee_attack_check(H))
+			return
 
 		var/available_limbs = H.lying ? BP_ALL_LIMBS : BP_BELOW_GROIN
 		var/obj/item/organ/external/limb

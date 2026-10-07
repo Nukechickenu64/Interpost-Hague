@@ -79,6 +79,7 @@
 		else
 			on_hear_say("<span class='game say'><span class='name'>[speaker_name]</span>[alt_name] [track][verb], <span class='message'><span class='body'>\"[message]\"</span></span></span>")
 		runechat_to(src, speaker, message, italics ? (RUNECHAT_ITALIC|RUNECHAT_SMALL) : 0)
+		SStts.queue_speech(speaker, src, message, language, italics)
 		if (speech_sound && (get_dist(speaker, src) <= world.view && src.z == speaker.z))
 			var/turf/source = speaker? get_turf(speaker) : get_turf(src)
 			src.playsound_local(source, speech_sound, sound_vol, 1)

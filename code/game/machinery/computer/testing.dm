@@ -86,7 +86,7 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 	if(!href_list || !href_list["action"])
 		return FALSE
 	var/action = href_list["action"]
-	return (action in list("wake_station", "printstatus", "checkstationintegrity", "announce"))
+	return (action in list("wake_station", "printstatus", "checkstationintegrity", "announce", "call_shuttle", "cancel_shuttle"))
 
 /obj/machinery/computer/bridge/Topic(href, href_list, hsrc)
 	if(..())
@@ -96,6 +96,34 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 	if(get_dist(src, usr) > 1)
 		return
 	switch(href_list["action"])
+		if("cancel_shuttle")
+			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
+			if(!SSevac.evacuation_controller || !SSevac.evacuation_controller.can_cancel())
+				to_chat(usr, "<span class='warning'>The escape shuttle is not inbound and cannot be cancelled.</span>")
+				return
+			if(alert(usr, "Are you sure you want to cancel the escape shuttle?", name, "No", "Yes") != "Yes")
+				return
+			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !usr.GetAccess(ACCESS_REGION_COMMAND))
+				return
+			cancel_call_proc(usr)
+			show_menu(usr)
+		if("call_shuttle")
+			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
+				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
+				return
+			if(round_duration_in_ticks < 30 MINUTES)
+				to_chat(usr, "<span class='warning'>Escape shuttle requests unlock 30 minutes after shift start.</span>")
+				return
+			if(alert(usr, "Are you sure you want to call the escape shuttle?", name, "No", "Yes") != "Yes")
+				return
+			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !usr.GetAccess(ACCESS_REGION_COMMAND))
+				return
+			call_shuttle_proc(usr)
+			show_menu(usr)
 		if("wake_station")
 			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
@@ -204,6 +232,20 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 	menu += "<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity'>STATION STATUS</a></span>\n"
 	if(!GLOB.station_wake_sequence.started)
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=wake_station'>WAKE STATION</a></span>\n"
+	var/datum/evacuation_controller/evacuation = SSevac.evacuation_controller
+	if(!evacuation)
+		menu += "<span class='graytext'>ESCAPE SHUTTLE UNAVAILABLE</span>\n"
+	else if(evacuation.is_on_cooldown())
+		menu += "<span class='graytext'>ESCAPE SHUTTLE [evacuation.get_status_panel_eta()] - CALL LOCKED</span>\n"
+	else if(evacuation.can_cancel())
+		menu += "<span class='graytext'>ESCAPE SHUTTLE [evacuation.get_status_panel_eta()]</span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=cancel_shuttle'>CANCEL ESCAPE SHUTTLE</a></span>\n"
+	else if(!evacuation.is_idle())
+		menu += "<span class='graytext'>ESCAPE SHUTTLE [evacuation.get_status_panel_eta()]</span>\n"
+	else if(round_duration_in_ticks >= 30 MINUTES)
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=call_shuttle'>CALL ESCAPE SHUTTLE</a></span>\n"
+	else
+		menu += "<span class='graytext'>ESCAPE SHUTTLE LOCKED UNTIL 30 MINUTES AFTER ROUND START</span>\n"
 	menu += "<span class='feedback'><a href='?src=\ref[src];action=announce'>PRIORITY ANNOUNCEMENT</a></span></div></div>"
 	to_chat(user, menu)
 

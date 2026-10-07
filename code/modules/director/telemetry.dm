@@ -97,16 +97,18 @@
 	var/safe_areas = 0
 	var/danger_areas = 0
 	for(var/area/A in world)
-		if(!A || !isStationLevel(A.z))
+		if(!A || !isStationLevel(A.z) || istype(A, /area/space))
 			continue
 		var/dangerous = FALSE
 		for(var/turf/simulated/T in A.contents)
-			if(!T)
+			if(T.blocks_air)
 				continue
-			var/datum/gas_mixture/air = T.return_air()
+			// Read air directly; return_air() would queue zone updates as a side effect.
+			var/datum/gas_mixture/air = T.zone ? T.zone.air : T.air
 			if(!air)
 				continue
-			if(air.temperature > T0C + 80 || air.temperature < T0C - 10)
+			// Station baseline is cold (turf default 253.5K); match air alarm danger thresholds.
+			if(air.temperature > T0C + 66 || air.temperature < T0C - 26)
 				dangerous = TRUE
 				break
 			var/oxygen = air.total_moles ? (air.gas["oxygen"] / air.total_moles) * 100 : 0
@@ -173,6 +175,7 @@
 		samples[TELEMETRY_LOYALTY] = round(total_loyalty / count)
 
 /datum/telemetry/proc/sample_structural_integrity()
+	set background = TRUE
 	// Check for damaged walls/floors on station
 	var/intact = 0
 	var/damaged = 0

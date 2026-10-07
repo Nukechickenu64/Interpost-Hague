@@ -88,6 +88,28 @@ var/list/_client_preferences_by_type
 	description ="Play admin midis"
 	key = "SOUND_MIDI"
 
+/datum/client_preference/tts_mode
+	description = "Text to speech"
+	key = "TTS_MODE"
+	options = list("Enabled", "Blips Only", "Disabled")
+
+/datum/client_preference/tts_volume
+	description = "Text to speech volume"
+	key = "TTS_VOLUME"
+	options = list("0", "25", "50", "75", "100")
+	default_value = "75"
+
+/datum/client_preference/tts_voice
+	description = "Text to speech voice"
+	key = "TTS_VOICE"
+	options = list("Automatic")
+
+/datum/client_preference/tts_pitch
+	description = "Text to speech pitch"
+	key = "TTS_PITCH"
+	options = list("-4", "-2", "0", "2", "4")
+	default_value = "0"
+
 /datum/client_preference/play_lobby_music
 	description ="Play lobby music"
 	key = "SOUND_LOBBY"

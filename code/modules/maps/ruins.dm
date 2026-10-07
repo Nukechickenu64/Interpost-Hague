@@ -39,7 +39,7 @@ GLOBAL_LIST_EMPTY(banned_ruin_ids)
 			var/width_border = TRANSITIONEDGE + RUIN_MAP_EDGE_PAD + round(ruin.width / 2)
 			var/height_border = TRANSITIONEDGE + RUIN_MAP_EDGE_PAD + round(ruin.height / 2)
 			var/z_level = pick(z_levels)
-			if(width_border > maxx - width_border || height_border > maxx - height_border) // Too big and will never fit.
+			if(width_border > maxx - width_border || height_border > maxy - height_border) // Too big and will never fit.
 				ruins -= ruin //So let's not even try anymore with this one.
 				break
 

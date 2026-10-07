@@ -1,0 +1,36 @@
+{
+  "revision": "0d38999d5f9f987a944493f11c456537f39ac2f6",
+  "frames": 513,
+  "chassis": 74,
+  "wheels": 44,
+  "presets": 54,
+  "assets": [
+    "icons/obj/ammo.dmi",
+    "icons/obj/cannon_ball.dmi",
+    "icons/obj/engines32.dmi",
+    "icons/obj/guns/mgs.dmi",
+    "icons/obj/structures.dmi",
+    "icons/obj/vehicles/apcparts.dmi",
+    "icons/obj/vehicles/apcparts96x96.dmi",
+    "icons/obj/vehicles/apcparts96x96_damaged.dmi",
+    "icons/obj/vehicles/tankparts.dmi",
+    "icons/obj/vehicles/tankparts96x96.dmi",
+    "icons/obj/vehicles/tankparts96x96_damaged.dmi",
+    "icons/obj/vehicles/vehicleparts.dmi",
+    "icons/obj/vehicles/vehicleparts_damaged.dmi",
+    "icons/obj/vehicles/vehicles256x256.dmi"
+  ],
+  "omittedProps": [
+    "/obj/item/weapon/reagent_containers/food/drinks/teapot/filled",
+    "/obj/item/weapon/reagent_containers/glass/barrel/jerrycan/gasoline",
+    "/obj/item/weapon/storage/toolbox/emergency",
+    "/obj/item/weapon/trafficcone",
+    "/obj/structure/emergency_lights",
+    "/obj/structure/emergency_lights/police2",
+    "/obj/structure/radio/transmitter_receiver/nopower/tank/faction1",
+    "/obj/structure/radio/transmitter_receiver/nopower/tank/faction2",
+    "/obj/structure/supply_crate/faction1",
+    "/obj/structure/supply_crate/faction2",
+    "/obj/structure/table/carboot"
+  ]
+}

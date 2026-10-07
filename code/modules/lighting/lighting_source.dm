@@ -151,6 +151,9 @@
 	else if(top_atom.loc != source_turf)
 		source_turf = top_atom.loc
 		. = 1
+	if(!source_turf)
+		destroy()
+		return 1
 
 	if(source_atom.light_power != light_power)
 		light_power = source_atom.light_power
@@ -301,6 +304,8 @@
 
 	FOR_DVIEW(var/turf/T, light_range, source_turf, INVISIBILITY_LIGHTING)
 		check_t:
+		if(!T)
+			continue
 		if(!T.lighting_corners_initialised)
 			T.generate_missing_corners()
 

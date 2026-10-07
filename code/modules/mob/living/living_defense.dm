@@ -290,6 +290,10 @@
 
 	if(!damage || !istype(user))
 		return
+	if(istype(user, /mob/living/simple_animal))
+		var/mob/living/simple_animal/animal_attacker = user
+		if(!animal_attacker.gurps_melee_attack_check(src))
+			return 0
 
 	adjustBruteLoss(damage)
 	admin_attack_log(user, src, "Attacked", "Was attacked", "attacked")

@@ -23,6 +23,8 @@ GLOBAL_VAR_INIT(smsafemode, FALSE)
 // Inter-round persistent admin toggle: when on, the round may start without a Captain.
 GLOBAL_VAR_INIT(role_debug_mode, FALSE)
 
+GLOBAL_VAR_INIT(tts_enabled, FALSE)
+
 // Database connections. A connection is established on world creation.
 // Ideally, the connection dies when the server restarts (After feedback logging.).
 var/DBConnection/dbcon     = new() // Feedback    database (New database)

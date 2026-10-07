@@ -45,7 +45,7 @@
 		A.reagents.del_reagent(/datum/reagent/water/holywater)
 		A.reagents.add_reagent(/datum/reagent/water, holy2water)
 
-/mob/proc/make_rune(var/rune, var/cost = 5, var/tome_required = 0)
+/mob/proc/make_rune(var/rune, var/cost = 5, var/tome_required = 0, var/hell_required = 0)
 	var/datum/antagonist/cultist/cult = get_cult(src)
 	if(!cult)
 		to_chat(src, "<span class='warning'>The forbidden knowledge eludes you.</span>")
@@ -61,6 +61,9 @@
 	if(istype(get_equipped_item(slot_head), /obj/item/clothing/head/culthood) && istype(get_equipped_item(slot_wear_suit), /obj/item/clothing/suit/cultrobes) && istype(get_equipped_item(slot_shoes), /obj/item/clothing/shoes/cult))
 		has_robes = 1
 	var/turf/T = get_turf(src)
+	if(hell_required && !is_hell_turf(T))
+		to_chat(src, "<span class='warning'>This rite can only be drawn in Hell.</span>")
+		return
 	if(T.holy)
 		to_chat(src, "<span class='warning'>This place is blessed, you may not draw runes on it - defile it first.</span>")
 		return
@@ -118,7 +121,7 @@
 		return 1
 	return 0
 
-/mob/living/carbon/human/make_rune(var/rune, var/cost, var/tome_required)
+/mob/living/carbon/human/make_rune(var/rune, var/cost, var/tome_required, var/hell_required)
 	if(should_have_organ(BP_HEART) && vessel && !vessel.has_reagent(/datum/reagent/blood, species.blood_volume * 0.7))
 		to_chat(src, "<span class='danger'>You are too weak to draw runes.</span>")
 		return
@@ -185,7 +188,8 @@ var/list/Tier3Runes = list(
 )
 
 var/list/Tier4Runes = list(
-	/mob/proc/tearreality_rune
+	/mob/proc/tearreality_rune,
+	/mob/proc/ascension_rune
 	)
 
 /mob/proc/convert_rune()
@@ -291,6 +295,12 @@ var/list/Tier4Runes = list(
 	set name = "Rune: Tear Reality"
 
 	make_rune(/obj/effect/rune/tearreality, cost = 50, tome_required = 1)
+
+/mob/proc/ascension_rune()
+	set category = "Cult Magic"
+	set name = "Rune: Hell Ascension"
+
+	make_rune(/obj/effect/rune/ascension, cost = 50, tome_required = 1, hell_required = 1)
 
 /mob/proc/emp_imbue()
 	set category = "Cult Magic"

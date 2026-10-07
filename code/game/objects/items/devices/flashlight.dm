@@ -17,7 +17,7 @@
 	var/flashlight_power //luminosity of light when on, can be negative
 	var/cone_angle = 30 // half-width in degrees; 0 keeps an all-around glow and disables aiming
 	var/cone_range = 6
-	var/glow_range = 2
+	var/glow_range = 1
 	var/aim_angle
 	var/aim_target_x
 	var/aim_target_y

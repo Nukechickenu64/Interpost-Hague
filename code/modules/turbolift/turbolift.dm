@@ -56,7 +56,8 @@
 				next_process = world.time + move_delay
 		if(LIFT_WAITING_A)
 			var/area/turbolift/origin = locate(current_floor.area_ref)
-			control_panel_interior.visible_message("<b>The elevator</b> announces, \"[origin.lift_announce_str]\"")
+			if(control_panel_interior && origin)
+				control_panel_interior.visible_message("<b>The elevator</b> announces, \"[origin.lift_announce_str]\"")
 			next_process = world.time + floor_wait_delay
 			busy_state = LIFT_WAITING_B
 		if(LIFT_WAITING_B)
@@ -91,8 +92,9 @@
 		else // We failed to close the doors - probably, someone is blocking them; stop trying to move
 			doors_closing = 0
 			open_doors()
-			control_panel_interior.audible_message("\The [current_floor.ext_panel] buzzes loudly.")
-			playsound(control_panel_interior.loc, "sound/machines/buzz-two.ogg", 50, 1)
+			if(control_panel_interior)
+				control_panel_interior.audible_message("\The [current_floor.ext_panel] buzzes loudly.")
+				playsound(control_panel_interior.loc, "sound/machines/buzz-two.ogg", 50, 1)
 			return 0
 
 	doors_closing = 0 // The doors weren't open, so they are done closing
@@ -101,7 +103,8 @@
 
 	if(target_floor == current_floor)
 
-		playsound(control_panel_interior.loc, origin.arrival_sound, 50, 1)
+		if(control_panel_interior && origin)
+			playsound(control_panel_interior.loc, origin.arrival_sound, 50, 1)
 		target_floor.arrived(src)
 		target_floor = null
 
@@ -135,7 +138,8 @@
 		SSmachines.makepowernets()
 
 	current_floor = next_floor
-	control_panel_interior.visible_message("The elevator [moving_upwards ? "rises" : "descends"] smoothly.")
+	if(control_panel_interior)
+		control_panel_interior.visible_message("The elevator [moving_upwards ? "rises" : "descends"] smoothly.")
 
 	return 1
 
@@ -149,7 +153,8 @@
 		else
 			message_admins("... because the floor was already queued")
 		return
-	control_panel_interior.visible_message("The elevator chimes softly.")
+	if(control_panel_interior)
+		control_panel_interior.visible_message("The elevator chimes softly.")
 	floor.pending_move(src)
 	queued_floors |= floor
 	busy_state = LIFT_MOVING
