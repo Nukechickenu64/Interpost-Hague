@@ -32,6 +32,8 @@ GLOBAL_VAR_INIT (waterchip_installed,0)
 		GLOB.waterchip_installed = 1
 		update_icon()
 		playsound(loc, 'sound/items/Ratchet.ogg', 75, 1)
+		GLOB.bridge_crew_objectives.check_progress()
+		return
 	if(GLOB.waterchip_installed)
 		to_chat("There's already a water chip here.")
 		return

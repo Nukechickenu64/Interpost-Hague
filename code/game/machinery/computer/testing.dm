@@ -1,4 +1,74 @@
 GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
+GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
+
+// Shared recovery objectives issued by the bridge report. Each objective is
+// tied to a station state that the game can verify rather than a paper-only task.
+/datum/bridge_crew_objectives
+	var/issued = FALSE
+	var/list/completed = list()
+	var/power_stable_since = 0
+
+/datum/bridge_crew_objectives/proc/reset()
+	issued = FALSE
+	completed.Cut()
+	power_stable_since = 0
+
+/datum/bridge_crew_objectives/proc/issue()
+	issued = TRUE
+	check_progress()
+
+/datum/bridge_crew_objectives/proc/check_progress()
+	if(!issued)
+		return
+	if(!completed["wake_station"] && GLOB.station_wake_sequence.started && !GLOB.station_wake_sequence.active)
+		complete_objective("wake_station", "Station wake-up", 5)
+	if(!completed["water_service"] && GLOB.waterchip_installed)
+		complete_objective("water_service", "Water service restoration", 5)
+	if(!completed["power_grid"])
+		check_power_grid()
+
+/datum/bridge_crew_objectives/proc/check_power_grid()
+	var/powered = 0
+	var/total = 0
+	for(var/obj/machinery/power/area_smes/controller in SSmachines.machinery)
+		if(!is_station_turf(get_turf(controller)))
+			continue
+		total++
+		if(controller.operating)
+			powered++
+	if(!total || powered * 100 < total * 90)
+		power_stable_since = 0
+		return
+	if(!power_stable_since)
+		power_stable_since = world.time
+		return
+	if(world.time - power_stable_since >= 30 SECONDS)
+		complete_objective("power_grid", "Power-grid stabilization", 10)
+
+/datum/bridge_crew_objectives/proc/complete_objective(var/id, var/objective_name, var/reward)
+	if(completed[id])
+		return
+	completed[id] = TRUE
+	var/recipients = 0
+	for(var/mob/living/carbon/human/crew_member in GLOB.player_list)
+		if(!crew_member.client || !crew_member.mind || crew_member.stat == DEAD || !is_station_turf(get_turf(crew_member)) || player_is_antag(crew_member.mind))
+			continue
+		var/datum/preferences/prefs = crew_member.client.prefs
+		if(!prefs)
+			continue
+		prefs.meta_currency += reward
+		prefs.save_preferences()
+		recipients++
+		to_chat(crew_member, "<span class='notice'><b>Bridge recovery objective complete:</b> [objective_name]. +[reward] Leverage (total: [prefs.meta_currency]).</span>")
+	command_announcement.Announce("[objective_name] is complete. [recipients] eligible crew member[recipients == 1 ? "" : "s"] received [reward] Leverage.", "Bridge Operations")
+
+/datum/bridge_crew_objectives/proc/get_status_report()
+	if(!issued)
+		return "<p><b>Bridge recovery contract:</b> no report has been printed this shift.</p>"
+	var/wake_status = completed["wake_station"] ? "Complete" : "Pending"
+	var/water_status = completed["water_service"] ? "Complete" : "Pending"
+	var/power_status = completed["power_grid"] ? "Complete" : "Pending"
+	return "<h3>Bridge Recovery Contract</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th><th>Crew reward</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td><td>5 Leverage</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td><td>5 Leverage</td></tr><tr><td>Keep at least 90% of station power controllers online for 30 seconds</td><td>[power_status]</td><td>10 Leverage</td></tr></table><p>Rewards go to living, non-antagonist crew aboard when each objective clears.</p>"
 
 /datum/station_wake_sequence
 	var/active = FALSE
@@ -69,6 +139,7 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 	if(!QDELETED(operator))
 		to_chat(operator, "<span class='notice'>Wake station command complete: [lights_started] lights started and [thermostats_reset] air alarms set to 20°C.</span>")
 	operator = null
+	GLOB.bridge_crew_objectives.check_progress()
 
 /obj/machinery/computer/bridge
 	name = "bridge computer"
@@ -142,23 +213,11 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 				src.audible_message("The computer makes a few noises as it dispenses a piece of paper.")
 				playsound(src, 'sound/machines/dotprinter.ogg', 10, 1)
 				var/obj/item/paper/R = new(src.loc)
-				var/log_text = "<b>LOG 22-10-2167</b>\n\nREPORT\n\nTHE MUSSR HAS FALLEN DOT\n\nRETURN TO DAILY ACTIVITY DOT\n\n<b>LOG 12-12-2188</b>\n\nCRYOGENIC STORAGE ACCESS DENIED DOT\n\nACTIVATING CONSERVATION MODE DOT\n\n<b>LOG 18-07-2258</b>\n\nISHIM REPUBLIC IN FULL ALERT STATE DOT\n\nREQUESTING HELP DOT\n\n<b>LOG 19-10-2263</b>\n\nTHE DOT STATION DOT IS DOT UNDER DOT NANOTRASEN DOT COMMAND DOT\n\nACTIVATE DOT CRYOGENIC DOT AWAKENING DOT"
-				// Primary objective: exit reserve mode and restore nominal operations
 				var/sname = station_name()
-				var/primary_text = "<b>PRIMARY OBJECTIVE: EXIT RESERVE MODE</b>\n\n[sname] is operating under Reserve Mode protocols. Restore nominal station function in the following sequence:" \
-					+ "\n<ol>" \
-					+ "<li>Bring the engine online and stabilize output.</li>" \
-					+ "<li>Set all air alarm thermostats to 20°C across habitable zones.</li>" \
-					+ "<li>Install the portable water control chip and verify flow.</li>" \
-					+ "<li>Initiate food production (hydroponics or galley autosupply).</li>" \
-					+ "<li>Conduct compartment sweep: examine and certify all sections.</li>" \
-					+ "</ol>" \
-					+ "Report completion to Bridge Ops to lift Reserve Mode locks."
-				// Secondary tasking: dynamically assigned mission
-				var/mission_text = generate_random_mission()
-				var/full_text = "[log_text]\n\n<hr>\n[primary_text]\n\n<hr>\n<b>FOLLOW-ON TASKING</b>\n\n[mission_text]"
+				var/full_text = "<b>BRIDGE COMMUNICATIONS REPORT</b>\n\n<b>From:</b> Emergency Operations Relay\n<b>To:</b> [sname] Bridge Operations\n<b>Subject:</b> Reserve-mode service restoration\n\nThe station is running on reserve-mode protocols. External traffic is intermittent; no off-station assignment or rescue operation has been authorized. Restore the services below so local operations can resume.\n\n<b>CREW RECOVERY CONTRACT</b>\n\n<ol><li><b>Wake the station.</b> Use WAKE STATION at this console. The sequence restores bridge-controlled lighting and resets station air-alarm thermostats to 20°C. <b>Reward: 5 Leverage for each eligible crew member.</b></li><li><b>Restore water service.</b> Install the portable water control chip in its holder. <b>Reward: 5 Leverage for each eligible crew member.</b></li><li><b>Stabilize the power grid.</b> Keep at least 90% of station power controllers online for 30 seconds. <b>Reward: 10 Leverage for each eligible crew member.</b></li></ol>\n\nCompletion is verified automatically. Rewards are deposited immediately to living, non-antagonist crew aboard the station when each objective clears. Review STATION STATUS at this console for live contract progress."
+				GLOB.bridge_crew_objectives.issue()
 				R.set_content(full_text)
-				R.name = "Mission Briefing"
+				R.name = "Bridge Recovery Report"
 				var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
 				stampoverlay.icon_state = "paper_stamp-hos"
 				R.stamped += /obj/item/stamp
@@ -178,7 +237,7 @@ GLOBAL_DATUM_INIT(station_wake_sequence, /datum/station_wake_sequence, new)
 				to_chat(usr, "<span class='warning'>Station telemetry unavailable: AI Director is not initialized.</span>")
 				return
 			var/datum/browser/popup = new(usr, "bridge_station_status", "Station Status", 650, 500)
-			popup.set_content(SSdirector.station_status_report())
+			popup.set_content("[GLOB.bridge_crew_objectives.get_status_report()]<hr>[SSdirector.station_status_report()]")
 			popup.open()
 		if("announce")
 			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))

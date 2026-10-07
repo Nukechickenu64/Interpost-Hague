@@ -106,6 +106,7 @@ SUBSYSTEM_DEF(director)
 	if(world.time - last_telemetry_sample >= TELEMETRY_SAMPLE_INTERVAL)
 		telemetry.sample()
 		last_telemetry_sample = world.time
+	GLOB.bridge_crew_objectives.check_progress()
 
 	// Evaluate at regular intervals
 	if(world.time - last_evaluation >= DIRECTOR_EVAL_INTERVAL)
@@ -157,6 +158,7 @@ SUBSYSTEM_DEF(director)
 	for(var/datum/catalyst_event/C in catalysts)
 		C.reset()
 	profiles.Cut()
+	GLOB.bridge_crew_objectives.reset()
 	assign_corporate_profiles()
 	if(istype(SSticker.mode, /datum/game_mode/dynamic))
 		starter_required = TRUE

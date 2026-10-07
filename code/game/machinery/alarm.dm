@@ -178,7 +178,7 @@
 	TLV["carbon dioxide"] = list(-1.0, -1.0, PRESSURE_TO_MOLES(5), PRESSURE_TO_MOLES(10))
 	TLV["phoron"] =			list(-1.0, -1.0, PRESSURE_TO_MOLES(0.2), PRESSURE_TO_MOLES(0.5))
 	TLV["other"] =			list(-1.0, -1.0, PRESSURE_TO_MOLES(0.5), PRESSURE_TO_MOLES(1.0))
-	TLV["pressure"] =		list(HUMAN_DANGER_AIR_MOLES_MIN, HUMAN_SAFE_AIR_MOLES_MIN, HUMAN_SAFE_AIR_MOLES_MAX, HUMAN_DANGER_AIR_MOLES_MAX)
+	TLV["pressure"] =		list(HUMAN_DANGER_AIR_MOLES_MIN, HUMAN_SAFE_AIR_MOLES_MIN, -1.0, -1.0)
 	TLV["temperature"] =	list(T0C-26, T0C-20, T0C+40, T0C+66) // K
 
 	set_frequency(frequency)
@@ -281,7 +281,7 @@
 	for(var/g in trace_gas)
 		other_moles += environment.gas[g]
 
-	pressure_dangerlevel = get_danger_level(environment.get_tile_moles(), TLV["pressure"])
+	pressure_dangerlevel = get_low_moles_danger_level(environment.get_tile_moles(), TLV["pressure"])
 	oxygen_dangerlevel = get_danger_level(environment.gas["oxygen"]*tile_multiplier, TLV["oxygen"])
 	co2_dangerlevel = get_danger_level(environment.gas["carbon_dioxide"]*tile_multiplier, TLV["carbon dioxide"])
 	phoron_dangerlevel = get_danger_level(environment.gas["phoron"]*tile_multiplier, TLV["phoron"])
@@ -311,7 +311,7 @@
 	var/gas_amount = environment.get_tile_moles()
 	var/pressure_levels = TLV["pressure"]
 
-	if (gas_amount <= pressure_levels[1] && gas_amount <= pressure_levels[3])
+	if (get_low_moles_danger_level(gas_amount, pressure_levels) == 2)
 		if (mode == AALARM_MODE_PANIC || mode == AALARM_MODE_CYCLE)
 			playsound(src.loc, 'sound/machines/airalarm.ogg', 45, 0, 4)
 			return 1
@@ -341,6 +341,13 @@
 	if((current_value > danger_levels[4] && danger_levels[4] > 0) || current_value < danger_levels[1])
 		return 2
 	if((current_value > danger_levels[3] && danger_levels[3] > 0) || current_value < danger_levels[2])
+		return 1
+	return 0
+
+/obj/machinery/alarm/proc/get_low_moles_danger_level(var/current_moles, var/list/danger_levels)
+	if(danger_levels[1] >= 0 && current_moles < danger_levels[1])
+		return 2
+	if(danger_levels[2] >= 0 && current_moles < danger_levels[2])
 		return 1
 	return 0
 
@@ -539,10 +546,9 @@
 	var/turf/alarm_turf = get_turf(src)
 	var/datum/gas_mixture/room_air = alarm_turf ? alarm_turf.return_air() : null
 	var/room_moles = room_air ? room_air.get_tile_moles() : 0
-	var/room_pressure = room_air ? tile_moles_to_kpa(room_moles, room_air.temperature) : 0
 	var/list/gas_limits = TLV["pressure"]
 	var/list/room_status = list("safe", "<font color='orange'>harmful</font>", "<font color='red'>DANGER</font>")
-	text += "Room air: [round(room_pressure, 0.1)] kPa, [room_status[get_danger_level(room_moles, gas_limits) + 1]]<br>"
+	text += "Room air: [round(room_moles, 0.1)] mol/tile, [room_status[get_low_moles_danger_level(room_moles, gas_limits) + 1]]<br>"
 	text += "Pressure target: [round(output_pressure, 0.1)] kPa <a href='?src=\ref[src];modcon=pressure'>SET</a><br>"
 	text += "Chemical scrubber: [cartridge ? "[round(cartridge.integrity / cartridge.max_integrity * 100, 0.1)]%" : "missing"]<hr>"
 	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in alarm_area)
@@ -647,7 +653,7 @@
 	var/list/environment_data = new
 	data["has_environment"] = total
 	if(total)
-		environment_data[++environment_data.len] = list("name" = "Pressure", "value" = tile_moles_to_kpa(environment.get_tile_moles(), environment.temperature), "unit" = "kPa", "danger_level" = pressure_dangerlevel)
+		environment_data[++environment_data.len] = list("name" = "Total air", "value" = environment.get_tile_moles(), "unit" = "mol/tile", "danger_level" = pressure_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Oxygen", "value" = environment.gas["oxygen"] / total * 100, "unit" = "%", "danger_level" = oxygen_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Carbon dioxide", "value" = environment.gas["carbon_dioxide"] / total * 100, "unit" = "%", "danger_level" = co2_dangerlevel)
 		environment_data[++environment_data.len] = list("name" = "Toxins", "value" = environment.gas["phoron"] / total * 100, "unit" = "%", "danger_level" = phoron_dangerlevel)
@@ -726,9 +732,9 @@
 					thresholds[thresholds.len]["settings"] += list(list("env" = g, "val" = i, "selected" = selected[i] < 0 ? -1 : tile_moles_to_kpa(selected[i])))
 
 			selected = TLV["pressure"]
-			thresholds[++thresholds.len] = list("name" = "Pressure", "settings" = list())
-			for(var/i = 1, i <= 4, i++)
-				thresholds[thresholds.len]["settings"] += list(list("env" = "pressure", "val" = i, "selected" = selected[i] < 0 ? -1 : tile_moles_to_kpa(selected[i])))
+			thresholds[++thresholds.len] = list("name" = "Total air (mol/tile)", "settings" = list(), "low_only" = TRUE)
+			for(var/i = 1, i <= 2, i++)
+				thresholds[thresholds.len]["settings"] += list(list("env" = "pressure", "val" = i, "selected" = selected[i]))
 
 			selected = TLV["temperature"]
 			thresholds[++thresholds.len] = list("name" = "Temperature", "settings" = list())
@@ -821,10 +827,13 @@
 				if("set_threshold")
 					var/env = href_list["env"]
 					var/threshold = text2num(href_list["var"])
+					if(env == "pressure" && (threshold < 1 || threshold > 2))
+						return TOPIC_HANDLED
 					var/list/selected = TLV[env]
 					var/list/thresholds = list("lower bound", "low warning", "high warning", "upper bound")
-					var/current_value = env == "temperature" || selected[threshold] < 0 ? selected[threshold] : tile_moles_to_kpa(selected[threshold])
-					var/newval = input(user, "Enter [thresholds[threshold]] for [env][env == "temperature" ? " (K)" : " (kPa)"]", "Alarm triggers", current_value) as null|num
+					var/current_value = env == "temperature" || env == "pressure" || selected[threshold] < 0 ? selected[threshold] : tile_moles_to_kpa(selected[threshold])
+					var/threshold_units = env == "temperature" ? "K" : env == "pressure" ? "mol/tile" : "kPa"
+					var/newval = input(user, "Enter [thresholds[threshold]] for [env] ([threshold_units])", "Alarm triggers", current_value) as null|num
 					if (isnull(newval) || !CanUseTopic(user, state))
 						return TOPIC_HANDLED
 					if (newval<0)
@@ -832,7 +841,7 @@
 					else if (env=="temperature" && newval>5000)
 						selected[threshold] = 5000
 					else
-						if (env != "temperature")
+						if (env != "temperature" && env != "pressure")
 							newval = kpa_to_tile_moles(newval)
 						if (env=="pressure" && newval>50*MOLES_CELLSTANDARD)
 							newval = 50*MOLES_CELLSTANDARD
@@ -840,28 +849,32 @@
 							newval = PRESSURE_TO_MOLES(200)
 						newval = round(newval,0.01)
 						selected[threshold] = newval
-					if(threshold == 1)
+					if(env == "pressure" && threshold == 1 && selected[1] > selected[2])
+						selected[2] = selected[1]
+					if(env == "pressure" && threshold == 2 && selected[2] < selected[1])
+						selected[1] = selected[2]
+					if(env != "pressure" && threshold == 1)
 						if(selected[1] > selected[2])
 							selected[2] = selected[1]
 						if(selected[1] > selected[3])
 							selected[3] = selected[1]
 						if(selected[1] > selected[4])
 							selected[4] = selected[1]
-					if(threshold == 2)
+					if(env != "pressure" && threshold == 2)
 						if(selected[1] > selected[2])
 							selected[1] = selected[2]
 						if(selected[2] > selected[3])
 							selected[3] = selected[2]
 						if(selected[2] > selected[4])
 							selected[4] = selected[2]
-					if(threshold == 3)
+					if(env != "pressure" && threshold == 3)
 						if(selected[1] > selected[3])
 							selected[1] = selected[3]
 						if(selected[2] > selected[3])
 							selected[2] = selected[3]
 						if(selected[3] > selected[4])
 							selected[4] = selected[3]
-					if(threshold == 4)
+					if(env != "pressure" && threshold == 4)
 						if(selected[1] > selected[4])
 							selected[1] = selected[4]
 						if(selected[2] > selected[4])
