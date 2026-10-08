@@ -39,7 +39,17 @@
 	icon = 'icons/turf/flooring/newmaintenance.dmi'
 	icon_state = "hh"
 	// Keep the crawlspace sprite instead of replacing it with the turf below.
-	z_flags = ZM_MIMIC_DEFAULTS | ZM_MIMIC_NO_AO | ZM_ALLOW_ATMOS
+	z_flags = ZM_MIMIC_DEFAULTS | ZM_MIMIC_NO_AO
+
+/turf/simulated/open/crawlspace/CanZPass(atom/A, direction)
+	if(z == A.z)
+		return direction == UP
+	if(direction == DOWN)
+		return !density
+	return FALSE
+
+/turf/simulated/open/crawlspace/is_open()
+	return FALSE
 
 /turf/simulated/open/crawlspace/maintenance
 	name = "wired crawlspace"
