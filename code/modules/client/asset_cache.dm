@@ -327,23 +327,46 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	send_asset_list(client, common, TRUE)
 
 /datum/asset/pig
-	var/list/common = list()
-	var/list/common_dirs = list(
-		"code/porco/html/"
+	parent_type = /datum/asset/simple
+	verify = TRUE
+	assets = list(
+		"button_chrome.png" = 'code/porco/html/button_chrome.png',
+		"button_note.png" = 'code/porco/html/button_note.png',
+		"button_options.png" = 'code/porco/html/button_options.png',
+		"button_pig.png" = 'code/porco/html/button_pig.png',
+		"cond.ttf" = 'code/porco/html/cond.ttf',
+		"controls.js" = 'code/porco/html/controls.js',
+		"Craft.png" = 'code/porco/html/Craft.png',
+		"Crown.png" = 'code/porco/html/Crown.png',
+		"Dead.png" = 'code/porco/html/Dead.png',
+		"effects.js" = 'code/porco/html/effects.js',
+		"Emotes.png" = 'code/porco/html/Emotes.png',
+		"Epsilon.png" = 'code/porco/html/Epsilon.png',
+		"Fangs.png" = 'code/porco/html/Fangs.png',
+		"GPC.png" = 'code/porco/html/GPC.png',
+		"Heart.png" = 'code/porco/html/Heart.png',
+		"ingamepusher.html" = 'code/porco/html/ingamepusher.html',
+		"livepipe.js" = 'code/porco/html/livepipe.js',
+		"Panel.png" = 'code/porco/html/Panel.png',
+		"pig.html" = 'code/porco/html/pig.html',
+		"pig.js" = 'code/porco/html/pig.js',
+		"Plot.png" = 'code/porco/html/Plot.png',
+		"prototype.js" = 'code/porco/html/prototype.js',
+		"PTSANS.ttf" = 'code/porco/html/PTSANS.ttf',
+		"scriptaculous.js" = 'code/porco/html/scriptaculous.js',
+		"scrollbar.js" = 'code/porco/html/scrollbar.js',
+		"shock3d.css" = 'code/porco/html/shock3d.css',
+		"shock3d.html" = 'code/porco/html/shock3d.html',
+		"shock3d.js" = 'code/porco/html/shock3d.js',
+		"slider.js" = 'code/porco/html/slider.js',
+		"stats.png" = 'code/porco/html/stats.png',
+		"style.css" = 'code/porco/html/style.css',
+		"style_antigo.css" = 'code/porco/html/style_antigo.css',
+		"Thanati.png" = 'code/porco/html/Thanati.png',
+		"uibutton.ogg" = 'code/porco/html/uibutton.ogg',
+		"Verbs.png" = 'code/porco/html/Verbs.png',
+		"Villain.png" = 'code/porco/html/Villain.png'
 	)
-
-/datum/asset/pig/register()
-	// Crawl the directories to find files.
-	for (var/path in common_dirs)
-		var/list/filenames = flist(path)
-		for(var/filename in filenames)
-			if(copytext(filename, length(filename)) != "/") // Ignore directories.
-				if(fexists(path + filename))
-					common[filename] = fcopy_rsc(path + filename)
-					register_asset(filename, common[filename])
-
-/datum/asset/pig/send(client)
-	send_asset_list(client, common, TRUE)
 
 /datum/asset/group/goonchat
 	children = list(

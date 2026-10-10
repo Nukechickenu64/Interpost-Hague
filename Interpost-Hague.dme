@@ -2436,7 +2436,6 @@
 #include "code\modules\research\rdconsole.dm"
 #include "code\modules\research\rdmachines.dm"
 #include "code\modules\research\research.dm"
-#include "code\modules\research\infernal_research.dm"
 #include "code\modules\research\server.dm"
 #include "code\modules\research\stock_parts.dm"
 #include "code\modules\runechat\runechat.dm"
