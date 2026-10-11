@@ -56,7 +56,7 @@
 		to_chat(src, "<span class='warning'>Please wait for server initialization to complete...</span>")
 		return
 
-	if(!config.respawn_delay || client.holder || alert(src,"Are you sure you wish to observe? You will have to wait [config.respawn_delay] minute\s before being able to respawn!","Player Setup","Yes","No") == "Yes")
+	if(SSticker.mode?.unrestricted_respawn || !config.respawn_delay || client.holder || alert(src,"Are you sure you wish to observe? You will have to wait [config.respawn_delay] minute\s before being able to respawn!","Player Setup","Yes","No") == "Yes")
 		if(!client)	return 1
 		var/mob/observer/ghost/observer = new()
 
@@ -66,7 +66,10 @@
 
 		observer.started_as_observer = TRUE
 		var/obj/O = locate("landmark*Observer-Start")
-		if(istype(O))
+		if(istype(SSticker.mode, /datum/game_mode/space_wars))
+			var/datum/game_mode/space_wars/space_wars = SSticker.mode
+			observer.forceMove(locate(100, 100, space_wars.arena_z))
+		else if(istype(O))
 			to_chat(src, "<span class='notice'>Now teleporting.</span>")
 			observer.forceMove(O.loc)
 		else
@@ -96,6 +99,8 @@
 	if(GAME_STATE != RUNLEVEL_GAME)
 		to_chat(usr, "<span class='warning'>The round is either not ready, or has already finished...</span>")
 		return
+	if(SSticker.mode && !SSticker.mode.uses_station_jobs)
+		return SSticker.mode.spawn_player(src)
 	LateChoices() //show the latejoin job selection menu
 
 /mob/new_player/proc/setupcharacter(href, href_list)
@@ -115,6 +120,8 @@
 		return TOPIC_NOACTION
 
 	if(href_list["SelectedJob"])
+		if(SSticker.mode && !SSticker.mode.uses_station_jobs)
+			return SSticker.mode.spawn_player(src)
 		var/datum/job/job = job_master.GetJob(href_list["SelectedJob"])
 
 		if(!job)
@@ -259,6 +266,8 @@
 /mob/new_player/proc/AttemptLateSpawn(var/datum/job/job, var/spawning_at)
 	if(src != usr)
 		return 0
+	if(SSticker.mode && !SSticker.mode.uses_station_jobs)
+		return SSticker.mode.spawn_player(src)
 	if(!job || !client)
 		return 0
 	if(GAME_STATE != RUNLEVEL_GAME)

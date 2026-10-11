@@ -147,8 +147,8 @@ Click an empty vehicle seat to sit down. Click your driver's seat again to open
 actions. The driver controls the installed engine even when it is several tiles
 away. The individual `Toggle Vehicle Engine`, `Shift Vehicle Gear`, and
 `Toggle Vehicle Throttle` verbs remain available. Directional movement drives
-forward/reverse or rotates the chassis. Unbuckling stops movement. Click a frame
-to operate its doors. Roofs, body covers, and turret exterior images hide for
+forward/reverse or rotates the chassis. Unbuckling stops ground vehicles. Click
+a frame to operate its doors. Roofs, body covers, and turret exterior images hide for
 onboard players and remain visible to observers outside.
 
 Sit in a gunner station and click the seat again or click its interior weapon
@@ -181,21 +181,32 @@ cardinal and Mouse placement controls on clear space or floor footprints:
 Their helpers are `/obj/effect/civ13_vehicle/spacecraft/scout`, `/shuttle`,
 `/freighter`, `/patrol`, and `/mining` under that same spacecraft path. All spacecraft parts
 are available from the vehicle workbench: hulls, cockpit viewports, boarding
-hatches, nacelles, chassis variants, engines, thrusters, tanks, seats, mass driver
-and cargo lockers. Constructed tanks are empty; preset tanks start fueled.
+hatches, nacelles, chassis variants, engines, thrusters, tanks, seats, mass driver,
+life support units and cargo lockers. Constructed tanks are empty; preset tanks
+start fueled.
 
 Spacecraft require at least two undamaged thrusters instead of wheels or tracks.
+The engine, propellant tank and thrusters must remain installed on intact deck
+mounts. The pilot controls report missing or damaged propulsion parts, insufficient
+propellant and engine shutdown. Restoring propulsion does not restart the throttle.
 Ground chassis reject thrusters; spacecraft chassis reject wheels and tracks.
-Use the pilot couch's existing vehicle controls for engine, thrust setting
-(gear), powered cruise, and braking. Spacecraft use controlled tile movement,
-not orbital physics or the overmap ship engine. Tanks accept standard `fuel`
-and liquid phoron.
+Start the engine through the pilot couch's controls. W/Up raises throttle by 10%;
+S/Down lowers it by 10%, through zero into reverse. A/Left and D/Right adjust
+heading by 15 degrees, independently of the hull's cardinal facing. Gears change
+automatically. Throttle persists when the pilot leaves the seat; use Brake or
+zero throttle to stop. Spacecraft use controlled tile movement, not orbital physics
+or the overmap ship engine. Tanks accept standard `fuel` and liquid phoron.
 Drag items into cargo lockers by using the held item on them; click to retrieve.
 
-Hull sections are not airtight and do not create pressurized floors. Crew need
-spacesuits and internals in vacuum, even behind closed boarding hatches. Ships
-stay on their current Z level and cannot spawn, move or turn into space map-edge
-transition zones, which would otherwise teleport individual vehicle pieces.
+All five presets include self-powered life support. An enabled, intact unit on an
+intact mount supplies breathable air, pressure, temperature control and radiation
+shielding to occupants on intact deck sections, including standing passengers.
+It works with the propulsion engine off. Click to toggle, weld to repair, or use
+a wrench to remove it. Protection follows the deck without pressurizing the turf.
+Crew need spacesuits and internals outside the deck or when support fails. Ships
+using local thrust stay on their current Z level and cannot spawn, move or turn
+into space map-edge transition zones, which would otherwise teleport individual
+vehicle pieces.
 
 The Prospector pilot couch opens the mining shuttle controls for local mining
 and salvage missions, satellite travel, returning home, revisiting the last
@@ -263,14 +274,20 @@ normal game before deployment:
    facing. Check Mouse mode on floors and over large sprites, with ordinary and
    widescreen views; confirm left-click, right-click cancellation, blocked-placement
    retry, and deadmin/disconnect cleanup.
-10. Spawn all four spacecraft in clear space in each facing, wearing a spacesuit
-   with internals. Board through a hatch, start the engine, drive, reverse, turn
-   and brake. Verify crew, loose items and loaded cargo lockers move together.
+10. Spawn all four thruster-driven spacecraft in clear space in each facing.
+   Board through a hatch, start the engine, adjust throttle through zero into
+   reverse, steer and brake. Verify crew, loose items and loaded cargo lockers
+   move together, including after the pilot leaves the seat.
 11. Check spacecraft floor/space transitions, obstruction rejection and map-edge
    stopping. Confirm ordinary ground vehicles still cannot spawn or drive in space.
 12. Break/remove thrusters and exhaust fuel to check movement stopping; repair and
    refuel to resume. Confirm removed thrusters no longer glow. Build a spacecraft
    from workbench parts and operate the patrol craft's weapon from its station.
+   Break the engine, tank or thruster deck mount and confirm flight stops and the
+   pilot controls explain the fault. Repair the mount and explicitly reapply
+   throttle. Displace a mounted component and verify it cannot power the ship.
+   Disable, damage and remove life support; verify vacuum exposure returns.
+   Restore it and check protection on intact decks with the propulsion engine off.
 13. Use phoron sheets on a partly empty car, tank, motorcycle and spacecraft fuel
    tank; confirm one sheet adds 20 units and movement resumes after refueling.
    Check full/nearly full tanks, empty sheet stacks and out-of-reach interactions

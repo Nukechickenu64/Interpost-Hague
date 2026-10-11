@@ -15,6 +15,7 @@
 	var/list/eat_sound = 'sound/items/eatfood.ogg'
 	center_of_mass = "x=16;y=16"
 	w_class = ITEM_SIZE_SMALL
+	slot_flags = SLOT_MASK
 
 /obj/item/reagent_containers/food/snacks/New()
 	..()
@@ -25,14 +26,15 @@
 /obj/item/reagent_containers/food/snacks/proc/On_Consume(var/mob/M)
 	if(!reagents.total_volume)
 		M.visible_message("<span class='notice'>[M] finishes eating \the [src].</span>","<span class='notice'>You finish eating \the [src].</span>")
-		M.drop_item()
+		var/mob/holder = ismob(loc) ? loc : M
+		holder.drop_from_inventory(src)
 		M.update_personal_goal(/datum/goal/achievement/specific_object/food, type)
 		if(trash)
 			if(ispath(trash,/obj/item))
-				var/obj/item/TrashItem = new trash(get_turf(M))
-				M.put_in_hands(TrashItem)
+				var/obj/item/TrashItem = new trash(get_turf(holder))
+				holder.put_in_hands(TrashItem)
 			else if(istype(trash,/obj/item))
-				M.put_in_hands(trash)
+				holder.put_in_hands(trash)
 		qdel(src)
 	return
 

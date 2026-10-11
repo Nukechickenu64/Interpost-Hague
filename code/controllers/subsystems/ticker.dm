@@ -141,7 +141,7 @@ SUBSYSTEM_DEF(ticker)
 			return
 
 	// This means we succeeded in picking a game mode.
-	var/skip_captain_check = GLOB.role_debug_mode || bypass_captain_check
+	var/skip_captain_check = GLOB.role_debug_mode || bypass_captain_check || !mode.uses_station_jobs
 	bypass_captain_check = 0
 	if(!skip_captain_check && !captain_assigned())
 		mode.fail_setup()
@@ -159,7 +159,7 @@ SUBSYSTEM_DEF(ticker)
 	//matchmaker.do_family_matchmaking()  //Do this before equipping
 	var/captainless = equip_characters()
 	round_started_without_captain = captainless
-	if (config.roundstart_events)
+	if (config.roundstart_events && mode.uses_station_jobs)
 		eof = captainless ? new /datum/round_event/captainless : pick_round_event()
 
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
@@ -293,7 +293,8 @@ Helpers
 /datum/controller/subsystem/ticker/proc/choose_gamemode()
 	. = (revotes_allowed && !bypass_gamemode_vote) ? CHOOSE_GAMEMODE_REVOTE : CHOOSE_GAMEMODE_RETRY
 
-	var/mode_to_try = "dynamic" //This is the config tag
+	// Station rounds remain Dynamic; Space Wars is selected explicitly by admins.
+	var/mode_to_try = master_mode == "space_wars" ? "space_wars" : "dynamic"
 	var/datum/game_mode/mode_datum
 
 	if(!mode_to_try)
@@ -328,7 +329,8 @@ Helpers
 	job_master.ResetOccupations()
 	mode_datum.create_antagonists()
 	mode_datum.pre_setup()
-	job_master.DivideOccupations(mode_datum) // Apparently important for new antagonist system to register specific job antags properly.
+	if(mode_datum.uses_station_jobs)
+		job_master.DivideOccupations(mode_datum) // Registers specific job antags properly.
 
 	if(!mode_datum.isStartRequirementsSatisfied(totalPlayers))
 		mode_datum.fail_setup()
@@ -359,6 +361,9 @@ Helpers
 /datum/controller/subsystem/ticker/proc/create_characters()
 	for(var/mob/new_player/player in GLOB.player_list)
 		if(player && player.ready && player.mind)
+			if(!mode.uses_station_jobs)
+				mode.spawn_player(player)
+				continue
 			if(player.mind.assigned_role=="AI")
 				player.AIize()
 			else if(!player.mind.assigned_role)
@@ -370,9 +375,11 @@ Helpers
 /datum/controller/subsystem/ticker/proc/collect_minds()
 	for(var/mob/living/player in GLOB.player_list)
 		if(player.mind)
-			minds += player.mind
+			minds |= player.mind
 
 /datum/controller/subsystem/ticker/proc/equip_characters(var/captainless=1)
+	if(!mode.uses_station_jobs)
+		return FALSE
 	for(var/mob/living/carbon/human/player in GLOB.player_list)
 		if(player && player.mind && player.mind.assigned_role)
 			if(istype(player.mind.assigned_job, /datum/job/captain) || player.mind.assigned_role == "Captain")

@@ -58,6 +58,9 @@
 	return null
 
 /mob/living/carbon/proc/get_breath_from_environment(var/volume_needed=BREATH_VOLUME)
+	var/obj/structure/vehicleparts/life_support/unit = get_spacecraft_life_support()
+	if(unit)
+		return unit.make_air(volume_needed)
 	var/datum/gas_mixture/breath = null
 
 	var/datum/gas_mixture/environment
@@ -96,4 +99,7 @@
 
 /mob/living/carbon/proc/handle_post_breath(datum/gas_mixture/breath)
 	if(breath)
+		if(get_spacecraft_life_support())
+			qdel(breath) // The cabin scrubber recycles exhaled gas without venting into the turf.
+			return
 		loc.assume_air(breath) //by default, exhale

@@ -462,6 +462,7 @@
 		"Spacecraft weapons station" = /obj/structure/bed/chair/civ13/passenger/gunner/spacecraft,
 		"Spacecraft mass driver" = /obj/structure/vehicleparts/weapon/spacecraft,
 		"Spacecraft cargo locker" = /obj/structure/vehicleparts/cargo_hold,
+		"Life support unit" = /obj/structure/vehicleparts/life_support,
 		"Spacecraft searchlight" = /obj/structure/vehicleparts/headlamp/spacecraft,
 	)
 
@@ -490,7 +491,7 @@
 		"1,1" = list(/obj/structure/vehicleparts/frame/spacecraft/nose/left, /obj/structure/bed/chair/civ13/driver/spacecraft, /obj/structure/vehicleparts/headlamp/spacecraft),
 		"2,1" = list(/obj/structure/vehicleparts/frame/spacecraft/nose/right, /obj/structure/bed/chair/civ13/passenger/spacecraft),
 		"1,2" = list(/obj/structure/vehicleparts/frame/spacecraft/hatch, /obj/structure/vehicleparts/fueltank/spacecraft/full),
-		"2,2" = list(/obj/structure/vehicleparts/frame/spacecraft/right, /obj/structure/vehicleparts/cargo_hold),
+		"2,2" = list(/obj/structure/vehicleparts/frame/spacecraft/right, /obj/structure/vehicleparts/cargo_hold, /obj/structure/vehicleparts/life_support),
 		"1,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/left, /obj/structure/vehicleparts/movement/thruster/ion, /obj/structure/vehicleparts/engine/spacecraft/ion),
 		"2,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/right, /obj/structure/vehicleparts/movement/thruster/ion),
 	)
@@ -505,7 +506,7 @@
 		"2,2" = list(/obj/structure/vehicleparts/frame/spacecraft, /obj/structure/bed/chair/civ13/passenger/spacecraft, /obj/structure/vehicleparts/fueltank/spacecraft/full),
 		"3,2" = list(/obj/structure/vehicleparts/frame/spacecraft/hatch/right, /obj/structure/bed/chair/civ13/passenger/spacecraft),
 		"1,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/left, /obj/structure/vehicleparts/movement/thruster),
-		"2,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft, /obj/structure/vehicleparts/cargo_hold),
+		"2,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft, /obj/structure/vehicleparts/cargo_hold, /obj/structure/vehicleparts/life_support),
 		"3,3" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/right, /obj/structure/vehicleparts/movement/thruster),
 	)
 
@@ -527,7 +528,7 @@
 		"2,4" = list(/obj/structure/vehicleparts/frame/spacecraft, /obj/structure/vehicleparts/fueltank/spacecraft/large/full),
 		"3,4" = list(/obj/structure/vehicleparts/frame/spacecraft/right),
 		"1,5" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/left, /obj/structure/vehicleparts/movement/thruster/heavy),
-		"2,5" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft/heavy),
+		"2,5" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft/heavy, /obj/structure/vehicleparts/life_support),
 		"3,5" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/right, /obj/structure/vehicleparts/movement/thruster/heavy),
 	)
 
@@ -545,7 +546,7 @@
 		"2,3" = list(/obj/structure/vehicleparts/frame/spacecraft/armored, /obj/structure/vehicleparts/fueltank/spacecraft/large/full),
 		"3,3" = list(/obj/structure/vehicleparts/frame/spacecraft/right, /obj/structure/vehicleparts/cargo_hold),
 		"1,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/left, /obj/structure/vehicleparts/movement/thruster/heavy),
-		"2,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft/heavy),
+		"2,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/engine/spacecraft/heavy, /obj/structure/vehicleparts/life_support),
 		"3,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/right, /obj/structure/vehicleparts/movement/thruster/heavy),
 	)
 
@@ -564,6 +565,6 @@
 		"2,3" = list(/obj/structure/vehicleparts/frame/spacecraft, /obj/structure/vehicleparts/cargo_hold),
 		"3,3" = list(/obj/structure/vehicleparts/frame/spacecraft/right, /obj/structure/vehicleparts/cargo_hold),
 		"1,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/left),
-		"2,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern),
+		"2,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern, /obj/structure/vehicleparts/life_support),
 		"3,4" = list(/obj/structure/vehicleparts/frame/spacecraft/stern/right),
 	)

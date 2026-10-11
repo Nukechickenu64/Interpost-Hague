@@ -280,9 +280,14 @@
 	var/obj/structure/vehicleparts/axis/chassis = vehicle_axis
 	var/fuel_amount = chassis.engine && chassis.engine.fueltank ? round(chassis.engine.fueltank.get_fuel_amount(chassis.engine.fuel_type), 0.1) : 0
 	var/list/actions = list("Toggle Engine", "Shift Gear", "Toggle Throttle", "Brake", "Leave Seat")
+	var/control_status = "Gear: [chassis.currentspeed]."
+	if(istype(chassis, /obj/structure/vehicleparts/axis/spacecraft))
+		var/obj/structure/vehicleparts/axis/spacecraft/ship = chassis
+		actions = list("Toggle Engine", "Increase Throttle (W)", "Decrease Throttle (S)", "Turn Left (A)", "Turn Right (D)", "Brake", "Leave Seat")
+		control_status = "[ship.flight_status()] Life support: [user.get_spacecraft_life_support() ? "Operational" : "Offline"]. W/S adjust throttle through zero into reverse; A/D adjust heading. Throttle persists after leaving the seat."
 	if(chassis.get_controlled_weapons(src).len)
 		actions += "Weapon Controls"
-	var/action = input(user, "Engine: [chassis.engine && chassis.engine.on ? "On" : "Off"]. Fuel: [fuel_amount]. Gear: [chassis.currentspeed].", "Vehicle Controls") as null|anything in actions
+	var/action = input(user, "Engine: [chassis.engine && chassis.engine.on ? "On" : "Off"]. Fuel: [fuel_amount]. [control_status]", "Vehicle Controls") as null|anything in actions
 	if(!action || buckled_mob != user || vehicle_axis != chassis || user.incapacitated())
 		return
 	switch(action)
@@ -293,6 +298,14 @@
 			shift_gear()
 		if("Toggle Throttle")
 			toggle_throttle()
+		if("Increase Throttle (W)")
+			chassis.relaymove(user, NORTH)
+		if("Decrease Throttle (S)")
+			chassis.relaymove(user, SOUTH)
+		if("Turn Left (A)")
+			chassis.relaymove(user, WEST)
+		if("Turn Right (D)")
+			chassis.relaymove(user, EAST)
 		if("Brake")
 			chassis.stopmovementloop()
 		if("Leave Seat")
@@ -310,7 +323,7 @@
 	. = ..()
 	if(vehicle_axis)
 		vehicle_axis.driver = buckled_mob
-		if(!buckled_mob)
+		if(!buckled_mob && !vehicle_axis.space_capable)
 			vehicle_axis.stopmovementloop()
 
 /obj/structure/bed/chair/civ13/driver/relaymove(mob/user, direction)
@@ -323,6 +336,9 @@
 	set category = "Object"
 	set src in view(1)
 	if(usr != buckled_mob || !vehicle_axis || !vehicle_axis.can_drive(usr))
+		return
+	if(vehicle_axis.space_capable)
+		to_chat(usr, SPAN_NOTICE("Spacecraft gearing is automatic. Use W/S to adjust throttle."))
 		return
 	var/gear = input(usr, "Gear", name, max(1, vehicle_axis.currentspeed)) as null|num
 	if(isnull(gear) || usr != buckled_mob || !vehicle_axis || !vehicle_axis.can_drive(usr))
@@ -351,7 +367,8 @@
 /obj/structure/bed/chair/civ13/driver/Destroy()
 	if(vehicle_axis && vehicle_axis.driver == buckled_mob)
 		vehicle_axis.driver = null
-		vehicle_axis.stopmovementloop()
+		if(!vehicle_axis.space_capable)
+			vehicle_axis.stopmovementloop()
 	return ..()
 
 /obj/structure/vehicleparts/engine/motorcycle
@@ -410,7 +427,7 @@
 
 /obj/structure/bed/chair/civ13/driver/spacecraft
 	name = "pilot's control couch"
-	desc = "Spacecraft flight controls: engine, thrust settings, powered cruise and braking."
+	desc = "Spacecraft flight controls: W increases throttle, S decreases it through zero into reverse. D increases heading by 15 degrees clockwise; A decreases it. Gearing is automatic and throttle stays set when you leave the seat. Click for engine controls and the brake."
 	icon_state = "driver_tank"
 
 /obj/structure/bed/chair/civ13/passenger/spacecraft

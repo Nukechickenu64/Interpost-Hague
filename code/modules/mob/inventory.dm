@@ -255,12 +255,12 @@ var/list/slot_equipment_priority = list( \
 	if(!O) // Nothing to remove, so we succeed.
 		return 1
 	src.u_equip(O)
-	if(QDELETED(O))
-		return 1
 	if (src.client)
 		src.client.screen -= O
-	O.reset_plane_and_layer()
 	O.screen_loc = null
+	if(QDELETED(O))
+		return 1
+	O.reset_plane_and_layer()
 	if(istype(O, /obj/item))
 		var/obj/item/I = O
 		if(target)

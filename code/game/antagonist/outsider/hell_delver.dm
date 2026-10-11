@@ -24,8 +24,26 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	if(istype(M)) M.age = rand(25,45)
 
 /datum/antagonist/delver/place_mob(var/mob/living/mob)
-	get_starting_locations()
-	..()
+	var/list/hell_spawn_locations = list()
+	for(var/obj/effect/landmark/L in world)
+		if(L.name != landmark_id)
+			continue
+		var/turf/T = get_turf(L)
+		if(istype(T, /turf/simulated/floor/helldirt) || istype(T, /turf/simulated/floor/hellslate))
+			hell_spawn_locations += T
+
+	if(!hell_spawn_locations.len)
+		for(var/turf/simulated/floor/helldirt/T in world)
+			if(!T.density && !turf_contains_dense_objects(T))
+				hell_spawn_locations += T
+		for(var/turf/simulated/floor/hellslate/T in world)
+			if(!T.density && !turf_contains_dense_objects(T))
+				hell_spawn_locations += T
+
+	if(!hell_spawn_locations.len)
+		message_admins("Unable to place Hell Delver: no Hell spawn turf found.")
+		return
+	mob.forceMove(pick_mobless_turf_if_exists(hell_spawn_locations))
 
 /datum/antagonist/delver/Initialize()
 	..()

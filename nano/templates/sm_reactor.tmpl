@@ -54,6 +54,8 @@
 	<div class="itemContent">
 		{{if data.window_open}}
 			<span class="good">OPEN - {{:data.window_left}}s</span>
+		{{else data.state == 1}}
+			<span class="average">CLOSED - next window in {{:data.next_window_left}}s</span>
 		{{else}}
 			<span class="average">CLOSED</span>
 		{{/if}}

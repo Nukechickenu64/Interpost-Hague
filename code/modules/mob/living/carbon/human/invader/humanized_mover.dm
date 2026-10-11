@@ -14,6 +14,7 @@
 
 /datum/humanized_mover
 	var/mob/living/carbon/human/owner
+	var/speed_multiplier = 0.7 // Lower is faster step cadence.
 	var/turf/goal
 	var/goal_dist = 0
 	var/list/route
@@ -109,7 +110,7 @@
 	delay += gaussian(0.2, 0.5)
 	if(prob(3))
 		delay += rand(1, 3)
-	return max(1, delay)
+	return max(1, round(delay * speed_multiplier))
 
 /datum/humanized_mover/proc/try_tick()
 	return tick() != MOVER_FAILED

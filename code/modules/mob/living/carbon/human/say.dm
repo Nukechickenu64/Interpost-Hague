@@ -24,8 +24,11 @@
 	var/obj/item/organ/internal/voicebox/vox = locate() in internal_organs
 	var/snowflake_speak = (speaking && (speaking.flags & NONVERBAL|SIGNLANG)) || (vox && vox.is_usable() && (speaking in vox.assists_languages))
 	if(!(speaking && (speaking.flags & (NONVERBAL|SIGNLANG))))
-		if(mouth_item)
-			to_chat(src, "<span class='warning'>You can't speak with \the [mouth_item] in your mouth!</span>")
+		var/obj/item/held_in_mouth = mouth_item
+		if(istype(wear_mask, /obj/item/reagent_containers/food/snacks))
+			held_in_mouth = wear_mask
+		if(held_in_mouth)
+			to_chat(src, "<span class='warning'>You can't speak with \the [held_in_mouth] in your mouth!</span>")
 			return
 		var/obj/item/grab/mouth_cover/mouth_grab = get_mouth_cover_grab()
 		if(mouth_grab)

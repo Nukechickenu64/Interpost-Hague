@@ -49,6 +49,7 @@
 		data["integrity"] = round(R.integrity)
 		data["window_open"] = R.window_open()
 		data["window_left"] = R.window_open() ? round((R.pulse_window_until - world.time) / 10) : 0
+		data["next_window_left"] = R.state == SMR_STATE_RUNNING ? max(0, round((R.next_window_at - world.time) / 10)) : 0
 		data["anomalies"] = anomaly_data
 		data["coolant_charges"] = R.coolant_charges
 		data["max_coolant_charges"] = R.max_coolant_charges

@@ -138,6 +138,9 @@ var/civ13_mining_shuttle_serial = 0
 /obj/structure/vehicleparts/axis/spacecraft/mining/can_drive(mob/user)
 	return FALSE
 
+/obj/structure/vehicleparts/axis/spacecraft/mining/can_move_vehicle()
+	return FALSE
+
 /obj/structure/vehicleparts/axis/spacecraft/mining/proc/find_comms_turf()
 	for(var/obj/structure/vehicleparts/frame/frame in components)
 		for(var/direction in GLOB.cardinal)

@@ -712,6 +712,8 @@ var/global/list/damage_icon_parts = list()
 /mob/living/carbon/human/update_inv_wear_mask(var/update_icons=1)
 	if(mouth_item)
 		overlays_standing[MOUTH_ITEM_LAYER] = mouth_item.get_mob_overlay(src, slot_wear_mask_str)
+	else if(istype(wear_mask, /obj/item/reagent_containers/food/snacks))
+		overlays_standing[MOUTH_ITEM_LAYER] = wear_mask.get_mob_overlay(src, slot_wear_mask_str)
 	else
 		overlays_standing[MOUTH_ITEM_LAYER] = null
 

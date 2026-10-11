@@ -270,7 +270,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 				if(!src.client)
 					return
 				src.client.admin_ghost()
-		else if(config.respawn_delay)
+		else if(config.respawn_delay && !SSticker.mode?.unrestricted_respawn)
 			response = alert(src, "Are you -sure- you want to ghost?\n(You are alive. If you ghost, you won't be able to play this round for another [config.respawn_delay] minute\s! You can't change your mind so choose wisely!)", "Are you sure you want to ghost?", "Ghost", "Stay in body")
 		else
 			response = alert(src, "Are you -sure- you want to ghost?\n(You are alive. If you ghost, you won't be able to return to this body! You can't change your mind so choose wisely!)", "Are you sure you want to ghost?", "Ghost", "Stay in body")
@@ -664,6 +664,10 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/respawn()
 	set name = "Respawn"
 	set category = "OOC"
+
+	if(istype(SSticker.mode, /datum/game_mode/space_wars))
+		var/datum/game_mode/space_wars/space_wars = SSticker.mode
+		return space_wars.respawn_player(src)
 
 	if (!(config.abandon_allowed))
 		to_chat(usr, "<span class='notice'>Respawn is disabled.</span>")

@@ -15,6 +15,8 @@ var/global/list/additional_antag_types = list()
 	var/end_on_antag_death = 0               // Round will end when all antagonists are dead.
 	var/ert_disabled = 0                     // ERT cannot be called.
 	var/deny_respawn = 0	                 // Disable respawn during this round.
+	var/uses_station_jobs = TRUE            // Modes with their own spawning bypass station jobs and events.
+	var/unrestricted_respawn = FALSE
 
 	var/list/disabled_jobs = list()           // Mostly used for Malf.  This check is performed in job_controller so it doesn't spawn a regular AI.
 
@@ -205,6 +207,10 @@ var/global/list/additional_antag_types = list()
 		//antag roles that replace jobs need to be assigned before the job controller hands out jobs.
 		if(antag.flags & ANTAG_OVERRIDE_JOB)
 			antag.attempt_spawn() //select antags to be spawned
+
+// Used by modes which supply their own characters, equipment, and spawn locations.
+/datum/game_mode/proc/spawn_player(mob/new_player/player)
+	return FALSE
 
 ///post_setup()
 /datum/game_mode/proc/post_setup()

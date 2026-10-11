@@ -1,5 +1,39 @@
 # Marrow
 
+## Spacecraft cabins and flight controls
+
+Spacecraft presets include a **life support unit**. While an installed unit is
+enabled and intact, occupants on intact deck sections have breathable air,
+normal cabin pressure and temperature, and environmental radiation shielding.
+This protects seated passengers and people walking around the ship. The unit
+has its own power and works with the propulsion engine off. Click it to toggle
+it, weld it to repair damage, or build a replacement at the vehicle workbench.
+Leaving the deck, disabling or removing the unit, or destroying it removes
+protection; a broken deck or unit mount is also unprotected.
+
+Start the engine from the pilot couch's controls, then use movement keys:
+
+- **W / Up:** increase throttle by 10%, up to 100%.
+- **S / Down:** decrease throttle by 10%, down to -100%. Crossing zero switches
+  between forward and reverse automatically.
+- **D / Right:** increase heading clockwise by 15 degrees.
+- **A / Left:** decrease heading by 15 degrees.
+
+Gears change automatically with throttle. Travel follows the selected heading;
+the modular hull and its sprites rotate in quarter turns. Throttle persists
+when the pilot leaves the seat, and standing occupants and cargo travel with
+the ship. Select **Brake** or set throttle to zero to stop. Obstacles, engine
+shutdown, insufficient working thrusters, and exhausted fuel also stop flight.
+The Prospector retains its mining mission controls. Ground vehicle controls
+are unchanged.
+
+Spacecraft regression tests cover cabin protection and failure, signed throttle,
+automatic gears, steering, reverse travel, unattended flight, fuel loss, and
+collision checks. In-game checks: leave the couch while underway and walk
+around without a suit; return to the couch, steer, cross zero into reverse, and
+brake. Disable life support and verify the cabin warnings return; repair or
+reenable it and verify protection resumes.
+
 [This project is NOT dead.]
 ---
 ![Coverage](https://img.shields.io/badge/coverage---9999999%25-red.svg)
@@ -494,3 +528,28 @@ unit tests or the Dream Maker IDE. Manual in-game checks for this stage:
 - Cancel rune selection, attempt without a blade/tome, and interrupt carving;
   verify immediate retry is possible. Complete a rune and verify recharge
   begins only then. Attempt a second activation while the first menu is open.
+
+## Space Wars
+
+Before a round starts, select **Space Wars** under **Game Panel > Change Game
+Mode**. Its saved mode tag is `space_wars`; select Dynamic to return to station
+rounds. Space Wars needs no station Captain or job selection.
+
+Players start in their own Mule freighter on a separate, empty 200x200 space
+arena. Late joining and respawning each provide a new freighter at a random
+unoccupied location, with the player in its pilot seat and equipped with EVA
+gear. Station events are disabled and the arena's edges do not lead to the
+station. Existing ships and wrecks remain in the arena.
+
+The Porco/pig menu's ghost tab now includes **Respawn**. In Space Wars it returns
+directly to a fresh freighter without a cooldown, character-name restriction,
+antag-HUD restriction, or respawn-count limit. Other modes retain their normal
+respawn rules. Administrative entry locks and species eligibility still apply.
+
+Validation: compile `Interpost-Hague.dme` normally. The standalone
+`space_wars_test.dme` smoke test checks arena generation, round start without a
+Captain, multiple freighters, collision checks, life support, pilot seats, edge
+isolation, and failed-spawn cleanup; run its DMB with DreamDaemon. For client
+verification, ready two players, late join a third, then ghost and repeatedly
+use Respawn. Confirm every spawn gets a separate ship and that the same
+character can return immediately, including with ordinary respawning disabled.

@@ -84,6 +84,7 @@
 		verbs |= /mob/living/proc/praise_god
 		verbs |= /mob/living/proc/make_shrine
 		verbs |= /mob/living/proc/getBrothers
+	updatePig()
 
 /datum/religion/New()
 	selectable_requests =  subtypesof(/datum/request)

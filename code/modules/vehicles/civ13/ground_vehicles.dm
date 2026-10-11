@@ -601,9 +601,14 @@
 		frame.update_icon()
 
 /obj/structure/vehicleparts/axis/proc/can_drive(mob/user)
-	if(user != driver || !user || user.incapacitated() || !components.len || !engine || !engine.on)
+	if(user != driver || !user || user.incapacitated())
 		return FALSE
-	if(!istype(user.buckled, /obj/structure/bed/chair/civ13/driver) || user.buckled:vehicle_axis != src || user.buckled:buckled_mob != user || !has_frame(get_turf(user)) || engine.health <= 0)
+	if(!istype(user.buckled, /obj/structure/bed/chair/civ13/driver) || user.buckled:vehicle_axis != src || user.buckled:buckled_mob != user || !has_frame(get_turf(user)))
+		return FALSE
+	return can_move_vehicle()
+
+/obj/structure/vehicleparts/axis/proc/can_move_vehicle()
+	if(!components.len || !engine || !engine.on || engine.health <= 0)
 		return FALSE
 	if(space_capable)
 		var/thruster_count = 0
@@ -649,17 +654,37 @@
 	if(direction != dir && direction != turn(dir, 180))
 		return turn_vehicle(direction)
 	reverse = direction != dir
+	return move_vehicle(direction)
+
+// Move the entire footprint, including unbuckled occupants and loose cargo.
+/obj/structure/vehicleparts/axis/proc/move_vehicle(direction)
+	if(!can_move_vehicle() || world.time < last_vehicle_move + vehicle_m_delay)
+		return FALSE
 	var/list/destinations = list()
 	var/list/transporting = get_transporting()
 	vehicle_m_delay = speedlist.len ? speedlist[min(max(1, currentspeed), speedlist.len)] : 4
 	for(var/obj/structure/vehicleparts/frame/frame in components)
 		var/turf/destination = get_step(frame, direction)
 		if(!destination)
+			stopmovementloop()
 			return FALSE
 		destinations += destination
 	if(!footprint_clear(destinations, transporting))
 		stopmovementloop()
 		return FALSE
+	// A diagonal step must also clear both adjacent footprints, preventing corner clipping.
+	if((direction & (NORTH|SOUTH)) && (direction & (EAST|WEST)))
+		for(var/axis_direction in list(direction & (NORTH|SOUTH), direction & (EAST|WEST)))
+			var/list/intermediate = list()
+			for(var/obj/structure/vehicleparts/frame/frame in components)
+				var/turf/tile = get_step(frame, axis_direction)
+				if(!tile)
+					stopmovementloop()
+					return FALSE
+				intermediate += tile
+			if(!footprint_clear(intermediate, transporting))
+				stopmovementloop()
+				return FALSE
 	if(!engine.consume_fuel())
 		stopmovementloop()
 		return FALSE
@@ -807,7 +832,7 @@
 
 /obj/structure/vehicleparts/frame/spacecraft
 	name = "spacecraft deck section"
-	desc = "A spacecraft hull section. It provides structural protection, but is not an airtight compartment; use a spacesuit and internals in vacuum."
+	desc = "A spacecraft hull section. A functional onboard life support unit provides breathable air, pressure, temperature control and radiation shielding."
 	icon_state = "frame_steel"
 	override_roof_icon = "roof_steel1"
 	resistance = 200

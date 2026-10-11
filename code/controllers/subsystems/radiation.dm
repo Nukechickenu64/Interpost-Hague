@@ -66,6 +66,8 @@ SUBSYSTEM_DEF(radiation)
 	. = 0
 	if(!istype(T))
 		return
+	if(T.get_spacecraft_life_support())
+		return // Active spacecraft cabin shielding blocks environmental radiation.
 
 	for(var/value in sources)
 		var/datum/radiation_source/source = value

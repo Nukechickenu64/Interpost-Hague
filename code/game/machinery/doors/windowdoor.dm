@@ -27,8 +27,10 @@
 /obj/machinery/door/window/update_icon()
 	if(density)
 		icon_state = base_state
+		layer = closed_layer
 	else
 		icon_state = "[base_state]open"
+		layer = open_layer
 
 /obj/machinery/door/window/proc/shatter(var/display_message = 1)
 	new /obj/item/weapon/material/shard(src.loc)

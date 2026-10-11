@@ -91,6 +91,7 @@
 	if(affecting)
 		reset_position()
 		affecting.grabbed_by -= src
+		affecting.update_canmove()
 		affecting.reset_plane_and_layer()
 		affecting = null
 	if(assailant)

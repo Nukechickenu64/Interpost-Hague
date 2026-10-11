@@ -1,0 +1,4 @@
+// Standalone smoke test; avoids compiling unrelated legacy unit tests.
+// Kept at the repository root so BYOND finds the native libraries and runtime data.
+#include "Interpost-Hague.dme"
+#include "test/space_wars.dm"

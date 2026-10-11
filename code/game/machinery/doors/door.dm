@@ -40,6 +40,18 @@
 
 	atmos_canpass = CANPASS_PROC
 
+/obj/machinery/door/sync_los_cull_exemption()
+	if(los_never_cull && isturf(loc))
+		var/turf/T = loc
+		if(density)
+			T.vis_contents |= src
+		else
+			T.vis_contents -= src
+
+/obj/machinery/door/set_density(var/new_density)
+	. = ..()
+	sync_los_cull_exemption()
+
 /obj/machinery/door/attack_generic(var/mob/user, var/damage)
 	if(damage >= 10)
 		visible_message("<span class='danger'>\The [user] smashes into \the [src]!</span>")

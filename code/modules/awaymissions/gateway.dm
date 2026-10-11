@@ -21,6 +21,12 @@
 	icon_state = "off"
 
 
+/obj/machinery/gateway/attack_hand(mob/user as mob)
+	for(var/obj/machinery/gateway/centerstation/center in range(1, src))
+		return center.attack_hand(user)
+	to_chat(user, "<span class='warning'>The gateway frame is missing its center.</span>")
+
+
 // The station gateway is assembled from this centre and the eight surrounding frame pieces.
 /obj/machinery/gateway/centerstation
 	density = 1
@@ -36,9 +42,11 @@
 	update_icon()
 	wait = world.time + config.gateway_delay
 	. = ..()
+	// The entrance frame is passable, but the center must be bumped to teleport.
+	set_density(1)
 
 /obj/machinery/gateway/centerstation/Destroy()
-	clear_hell_portal()
+	toggleoff()
 	return ..()
 
 /obj/machinery/gateway/centerstation/update_icon()
@@ -59,18 +67,19 @@ obj/machinery/gateway/centerstation/Process()
 
 
 /obj/machinery/gateway/centerstation/proc/detect()
+	// Clear the previous frame's state before replacing the links.
+	toggleoff()
 	linked = list()
+	ready = 0
 	var/turf/T = loc
 
 	for(var/i in GLOB.alldirs)
 		T = get_step(loc, i)
 		var/obj/machinery/gateway/G = locate(/obj/machinery/gateway) in T
-		if(G)
+		if(G && !istype(G, /obj/machinery/gateway/centerstation))
 			linked.Add(G)
 			continue
 
-		ready = 0
-		toggleoff()
 		break
 
 	if(linked.len == 8)
@@ -78,9 +87,13 @@ obj/machinery/gateway/centerstation/Process()
 
 
 /obj/machinery/gateway/centerstation/proc/toggleon(mob/user as mob)
-	if(!ready)			return
-	if(linked.len != 8)	return
-	if(!powered())		return
+	detect()
+	if(!ready)
+		to_chat(user, "<span class='warning'>The gateway needs all eight frame pieces around its center to activate.</span>")
+		return
+	if(!powered())
+		to_chat(user, "<span class='warning'>The gateway has no power.</span>")
+		return
 	if(world.time < wait)
 		to_chat(user, "<span class='notice'>Error: Warpspace triangulation in progress. Estimated time to completion: [round(((wait - world.time) / 10) / 60)] minutes.</span>")
 		return
@@ -161,9 +174,6 @@ obj/machinery/gateway/centerstation/Process()
 
 
 /obj/machinery/gateway/centerstation/attack_hand(mob/user as mob)
-	if(!ready)
-		detect()
-		return
 	if(!active)
 		toggleon(user)
 		return

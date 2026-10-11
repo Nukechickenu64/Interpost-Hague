@@ -352,6 +352,8 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	var/releasing = FALSE // Lid is opening; the occupant is let out once the animation ends.
 	var/last_occupant_appearance
 	var/last_visual_dir
+	var/mutable_appearance/fake_occupant_appearance
+	var/has_fake_occupant = TRUE
 	var/on_store_message = "has entered long-term storage."
 	var/on_store_name = "Cryogenic Oversight"
 	var/on_enter_occupant_message = "You feel cool air surround you. You go numb as your senses turn inward."
@@ -470,8 +472,9 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	. = ..()
 	find_control_computer()
 	if(layered_visuals)
+		fake_occupant_appearance = mutable_appearance('icons/mob/human.dmi', pick("body_m_s", "body_f_s"))
 		setup_layered_visuals()
-	update_icon()
+	update_icon(TRUE)
 
 /atom/movable/cryopod_visual
 	name = ""
@@ -514,13 +517,13 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 
 /obj/machinery/cryopod/update_icon(var/instant = FALSE)
 	if(!layered_visuals || !lid_visual)
-		icon_state = occupant ? occupied_icon_state : base_icon_state
+		icon_state = (occupant || has_fake_occupant) ? occupied_icon_state : base_icon_state
 		return
 
 	icon_state = base_icon_state
 	refresh_occupant_visual()
 
-	var/should_close = (occupant && !releasing) ? TRUE : FALSE
+	var/should_close = ((occupant || has_fake_occupant) && !releasing) ? TRUE : FALSE
 	if(should_close == lid_closed)
 		return
 	lid_closed = should_close
@@ -532,14 +535,15 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 /obj/machinery/cryopod/proc/refresh_occupant_visual(var/force = FALSE)
 	if(!occupant_visual)
 		return
-	if(!occupant || occupant.invisibility)
+	var/visible_appearance = occupant ? occupant.appearance : (has_fake_occupant ? fake_occupant_appearance : null)
+	if(!visible_appearance || (occupant && occupant.invisibility))
 		if(last_occupant_appearance)
 			occupant_visual.overlays.Cut()
 			last_occupant_appearance = null
 		return
-	if(!force && occupant.appearance == last_occupant_appearance && dir == last_visual_dir)
+	if(!force && visible_appearance == last_occupant_appearance && dir == last_visual_dir)
 		return
-	last_occupant_appearance = occupant.appearance
+	last_occupant_appearance = visible_appearance
 	last_visual_dir = dir
 
 	// The SOUTH/WEST sprites put the headrest at the upper left; NORTH/EAST mirror it.
@@ -549,7 +553,7 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 	M.Turn(mirrored ? 45 : -45)
 	M.Translate(mirrored ? -2 : 2, 0)
 
-	var/mutable_appearance/MA = new(occupant)
+	var/mutable_appearance/MA = new(visible_appearance)
 	MA.name = ""
 	MA.plane = FLOAT_PLANE
 	MA.layer = FLOAT_LAYER
@@ -939,6 +943,9 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 // instant: show the pod already closed instead of animating the lid (e.g. latejoiners spawning inside).
 /obj/machinery/cryopod/proc/set_occupant(var/mob/living/carbon/occupant, var/instant = FALSE, var/joining = FALSE)
 	src.occupant = occupant
+	if(occupant)
+		has_fake_occupant = FALSE
+		fake_occupant_appearance = null
 	issue_joiner_access_card = occupant && joining
 	if(!occupant)
 		SetName(initial(name))

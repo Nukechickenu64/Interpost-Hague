@@ -21,6 +21,7 @@
 
 	var/turns_per_move = 1
 	var/turns_since_move = 0
+	var/ai_speed_multiplier = 0.6 // Lower is faster. Applied once on Initialize for client-less AI pacing.
 	universal_speak = 0		//No, just no.
 	var/meat_amount = 0
 	var/meat_type
@@ -72,6 +73,15 @@
 	. = ..()
 	skills[SKILL_MELEE] = gurps_melee_skill
 	skills[SKILL_RANGE] = gurps_ranged_skill
+	if(!client)
+		apply_ai_speedup()
+
+/mob/living/simple_animal/proc/apply_ai_speedup()
+	turns_per_move = max(1, round(turns_per_move * ai_speed_multiplier))
+	if(istype(src, /mob/living/simple_animal/hostile))
+		var/mob/living/simple_animal/hostile/H = src
+		H.move_to_delay = max(0, round(H.move_to_delay * ai_speed_multiplier))
+		H.attack_delay = max(5, round(H.attack_delay * ai_speed_multiplier))
 
 /mob/living/simple_animal/Life()
 	..()
@@ -145,7 +155,7 @@
 	if(!loc)
 		return
 
-	var/datum/gas_mixture/environment = loc.return_air()
+	var/datum/gas_mixture/environment = get_environment_air()
 	if(environment)
 
 		if(abs(environment.temperature - bodytemperature) > 40 )

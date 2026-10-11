@@ -13,6 +13,7 @@
 /datum/invader_ai
 	var/mob/living/carbon/human/invader/owner
 	var/datum/humanized_mover/mover
+	var/speed_multiplier = 0.6 // Lower is faster for think/reaction timings.
 	var/state = INVADER_STATE_SEARCH
 	// world.time until which an async action owns the mob; expires on its own if that action runtimes.
 	var/busy = 0
@@ -79,7 +80,7 @@
 		struggle()
 		return
 	if(world.time >= next_scan)
-		next_scan = world.time + rand(1, 2)
+		next_scan = world.time + max(1, round(rand(1, 2) * speed_multiplier))
 		scan()
 	mover.in_combat = (state == INVADER_STATE_ENGAGE || state == INVADER_STATE_HUNT)
 	// Combat mode blocks stamina regen, so only hold it while actually fighting.
@@ -156,17 +157,17 @@
 	mover.clear()
 	switch(state)
 		if(INVADER_STATE_SEARCH)
-			linger_until = world.time + rand(3, 10)
+			linger_until = world.time + max(1, round(rand(3, 10) * speed_multiplier))
 		if(INVADER_STATE_INVESTIGATE, INVADER_STATE_HUNT)
 			investigate_turf = null
 			state = INVADER_STATE_SEARCH
-			linger_until = world.time + rand(3, 10)
+			linger_until = world.time + max(1, round(rand(3, 10) * speed_multiplier))
 
 /datum/invader_ai/proc/wait_dock()
 	if(!release_at)
 		var/datum/shuttle/autodock/ferry/supply/S = SSsupply.shuttle
 		if(!S || (S.at_station() && S.moving_status == SHUTTLE_IDLE))
-			release_at = world.time + rand(2, 10)
+			release_at = world.time + max(1, round(rand(2, 10) * speed_multiplier))
 	if(release_at && world.time >= release_at)
 		release_at = 0
 		state = INVADER_STATE_SEARCH
@@ -180,7 +181,7 @@
 	if(!mover.goal)
 		var/turf/T = pick_search_goal()
 		if(!T)
-			linger_until = world.time + 20
+			linger_until = world.time + max(5, round(20 * speed_multiplier))
 			return
 		mover.set_goal(T)
 	handle_move_result(mover.tick())
@@ -317,13 +318,13 @@
 /datum/invader_ai/proc/fire_at(var/atom/aim)
 	set waitfor = FALSE
 	owner.zone_sel.selecting = prob(80) ? BP_CHEST : pick(BP_HEAD, BP_GROIN, BP_L_LEG, BP_R_LEG)
-	reaction_at = world.time + clamp(gaussian(1, 0.5), 0, 3)
+	reaction_at = world.time + clamp(round(gaussian(1, 0.5) * speed_multiplier), 0, 2)
 	owner.ClickOn(aim, "")
 
 /datum/invader_ai/proc/melee_attack()
 	set waitfor = FALSE
 	owner.zone_sel.selecting = prob(70) ? BP_CHEST : pick(BP_HEAD, BP_GROIN, BP_L_ARM, BP_R_ARM)
-	reaction_at = world.time + clamp(gaussian(0.5, 0.5), 0, 2)
+	reaction_at = world.time + clamp(round(gaussian(0.5, 0.5) * speed_multiplier), 0, 1)
 	owner.ClickOn(target, "")
 
 /datum/invader_ai/proc/get_gun()
@@ -371,13 +372,13 @@
 		P.unjam(owner)
 	if(M && P.ammo_magazine)
 		P.unload_ammo(owner, 0)
-	sleep(rand(8, 15))
+	sleep(max(2, round(rand(8, 15) * speed_multiplier)))
 	if(M && !QDELETED(owner) && owner.stat == CONSCIOUS && !QDELETED(M) && !QDELETED(P) && P.loc == owner)
 		if(istype(M.loc, /obj/item/storage))
 			var/obj/item/storage/S = M.loc
 			S.remove_from_storage(M, owner)
 		P.load_ammo(M, owner)
-	sleep(rand(3, 8))
+	sleep(max(1, round(rand(3, 8) * speed_multiplier)))
 	reloading_until = 0
 
 /datum/invader_ai/proc/get_melee_weapon(var/min_force = 10)

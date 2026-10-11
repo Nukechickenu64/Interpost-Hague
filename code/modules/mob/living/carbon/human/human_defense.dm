@@ -240,6 +240,8 @@ meteor_act
 
 //Used to check if they can be fed food/drinks/pills
 /mob/living/carbon/human/check_mouth_coverage()
+	if(istype(wear_mask, /obj/item/reagent_containers/food/snacks))
+		return wear_mask
 	var/list/protective_gear = list(head, wear_mask, wear_suit, w_uniform)
 	for(var/obj/item/gear in protective_gear)
 		if(istype(gear) && (gear.body_parts_covered & FACE) && !(gear.item_flags & ITEM_FLAG_FLEXIBLEMATERIAL))
