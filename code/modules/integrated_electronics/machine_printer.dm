@@ -68,7 +68,7 @@ var/list/integrated_circuit_blacklist = list(/obj/item/integrated_circuit, /obj/
 		var/obj/O = type
 		dat += "<A href='?src=\ref[src];build=[type]'>[initial(O.name)]</A>: [initial(O.desc)]<br>"
 
-	ui_browse_styled(user, "Integrated Circuit Printer", dat, "window=integrated;size=600x500;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, "Integrated Circuit Printer", dat, "window=integrated;size=600x500;can_close=0;can_resize=0;border=0;titlebar=0", src)
 
 /obj/machinery/integrated_circuit_printer/Topic(href, href_list)
 	if(..())

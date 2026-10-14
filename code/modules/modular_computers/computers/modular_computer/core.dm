@@ -87,6 +87,24 @@
 		return 1
 
 /obj/item/modular_computer/update_icon()
+	// Complete OS13 sprites already contain their screen, casing, and keyboard.
+	if(icon == 'icons/obj/modular_console.dmi' || icon == 'icons/obj/modular_laptop.dmi')
+		var/screen_state = (active_program && active_program.program_icon_state) ? active_program.program_icon_state : icon_state_menu
+		var/full_state = "os13_[screen_state]"
+		if(full_state in icon_states(icon))
+			overlays.Cut()
+			set_light(enabled ? light_strength : 0)
+			if(damage > broken_damage)
+				icon_state = "[full_state]_broken"
+				set_light(0)
+			else if(!enabled)
+				icon_state = "[full_state]_off"
+			else if(bsod || updating)
+				icon_state = "os13_bsod"
+			else
+				icon_state = full_state
+			return
+
 	icon_state = icon_state_unpowered
 
 	overlays.Cut()

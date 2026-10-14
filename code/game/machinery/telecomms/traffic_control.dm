@@ -112,7 +112,7 @@
 
 
 		var/page = ui_build_styled_html("Traffic Control", dat)
-		user << browse(page, "window=traffic_control;size=575x400")
+		device_ui_browse(user, page, "window=traffic_control;size=575x400", src)
 		onclose(user, "server_control")
 
 		temp = ""

@@ -126,6 +126,7 @@
 	dat += "<hr></body></html>"
 
 	var/datum/browser/popup = new(user, "turbolift_panel", "Lift Panel", 230, 260)
+	popup.device_source = src
 	popup.set_content(jointext(dat, null))
 	popup.open()
 	return

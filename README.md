@@ -1,5 +1,14 @@
 # Marrow
 
+## Cyberdeck research
+
+Research now advances through cyberspace dives recorded onto technology disks.
+Insert a blank disk, link a seated technician wearing a cyberdeck helmet, and boot
+an archive from the research console. Decrypt its relays and download the data
+core, then import the disk at R&D. Higher technology levels generate larger maps.
+BBS and infernal research remain alternative disk sources.
+See [cyberdeck controls and verification](code/modules/cyberresearch/README.md).
+
 ## Spacecraft cabins and flight controls
 
 Spacecraft presets include a **life support unit**. While an installed unit is
@@ -16,11 +25,23 @@ Start the engine from the pilot couch's controls, then use movement keys:
 - **W / Up:** increase throttle by 10%, up to 100%.
 - **S / Down:** decrease throttle by 10%, down to -100%. Crossing zero switches
   between forward and reverse automatically.
-- **D / Right:** increase heading clockwise by 15 degrees.
-- **A / Left:** decrease heading by 15 degrees.
+- **D / Right:** increase heading clockwise by 5 degrees.
+- **A / Left:** decrease heading by 5 degrees.
+- **Set Heading** in the pilot controls: enter any heading, including fractions.
 
-Gears change automatically with throttle. Travel follows the selected heading;
-the modular hull and its sprites rotate in quarter turns. Throttle persists
+Gears change automatically with throttle. The hull moves in continuous world
+coordinates and rotates about its center at the exact selected heading. Braking
+preserves its position between tiles. Hull sections, seats, standing occupants
+and cargo follow the same rotation and translation. Crew face and rotate with
+the hull, and the camera follows the player's exact position between tiles.
+While walking, movement keys choose the closest visible deck direction, with
+normal walking speed and no zero-gravity drift. Adjacent steps stay on adjacent
+deck sections even when the ship is angled; walls and closed hatches block them.
+Walking and pulled cargo glide between deck sections at the movement cooldown,
+including while parked; the camera follows the same intermediate positions.
+Exterior roofs and turret images inherit their mounting frame's transform once.
+The camera stays north-up so lighting, visibility and screen controls remain aligned.
+Collision checks cover the rotated hull throughout a move or turn. Throttle persists
 when the pilot leaves the seat, and standing occupants and cargo travel with
 the ship. Select **Brake** or set throttle to zero to stop. Obstacles, engine
 shutdown, insufficient working thrusters, and exhausted fuel also stop flight.

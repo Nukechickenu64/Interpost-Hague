@@ -257,7 +257,7 @@
 			dat+= text("<HR><A href='?src=\ref[];mach_close=suit_storage_unit'>Close control panel</A>", user)
 
 	var/page = ui_build_styled_html("Suit Storage Unit", dat)
-	user << browse(page, "window=suit_storage_unit;size=400x500")
+	device_ui_browse(user, page, "window=suit_storage_unit;size=400x500", src)
 	onclose(user, "suit_storage_unit")
 	return 1
 
@@ -924,7 +924,7 @@
 	if(panel_open)
 		wires.Interact(user)
 
-	user << browse(dat, "window=suit_cycler")
+	device_ui_browse(user, dat, "window=suit_cycler", src)
 	onclose(user, "suit_cycler")
 	return
 

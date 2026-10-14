@@ -70,6 +70,7 @@
 		<A href='?src=\ref[src];close=1'>Close</A><BR>"}
 
 	var/datum/browser/popup = new(user, "fuel_control", "Fusion Fuel Control Console", 800, 400, src)
+	popup.device_source = src
 	popup.set_content(dat)
 	popup.open()
 	user.set_machine(src)

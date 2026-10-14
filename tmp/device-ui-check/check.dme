@@ -1,0 +1,226 @@
+#define FILE_DIR "C:/Users/nukec/Documents/GitHub/Interpost-Hague"
+
+#define TRUE 1
+#define FALSE 0
+#define CYBERDECK_IDLE 0
+#define CYBERDECK_BOOTING 1
+#define CYBERDECK_RUNNING 2
+/obj/item
+/obj/machinery/computer
+    var/icon_screen
+/obj/item/modular_computer
+    var/datum/program/active_program
+    var/icon_state_menu
+/obj/item/modular_computer/console
+/obj/item/modular_computer/laptop
+/obj/item/modular_computer/telescreen
+/datum/program
+    var/program_icon_state
+/datum/asset
+    var/list/assets
+/datum/asset/proc/send(user)
+/proc/get_asset_datum(path)
+    return new path
+/proc/strip_improper(text)
+    return text
+/client/proc/windowclose(atomref)
+/mob
+    var/atom/machine
+/mob/proc/unset_machine()
+    machine = null
+/datum/proc/nano_host()
+    return src
+/datum/program_host
+    var/atom/host
+/datum/program_host/nano_host()
+    return host
+/var/failures = 0
+/proc/verify(condition, message)
+    if(!condition)
+        failures++
+        world.log << "FAIL: [message]"
+/world/New()
+    ..()
+    var/datum/plain = new
+    var/options = "window=preferences;size=600x400;titlebar=1"
+    verify(!device_ui_host(plain), "Nonphysical menus must not acquire a device host")
+    verify(device_ui_options(options, plain) == options, "Nonphysical window options must be unchanged")
+    verify(device_ui_html(null, "<p>Untouched</p>", "preferences", plain) == "<p>Untouched</p>", "Nonphysical HTML must be unchanged")
+    var/list/fixtures = list(
+        list('icons/obj/computer.dmi', "os13_generic", "Station terminal"),
+        list('icons/obj/computer.dmi', "os13_medcomp", "Medical records"),
+        list('icons/obj/computer.dmi', "os13_security", "Security records"),
+        list('icons/obj/computer.dmi', "os13_rdcomp", "Research console"),
+        list('icons/obj/computer.dmi', "os13_power", "Power monitor"),
+        list('icons/obj/computer.dmi', "os13_supply", "Supply terminal"),
+        list('icons/obj/modular_laptop.dmi', "os13_menu", "Laptop computer"),
+        list('icons/obj/monitorsos13.dmi', "ealarm0", "Air alarm"),
+        list('icons/obj/device.dmi', "eftpos", "Payment terminal")
+    )
+    var/list/results = list()
+    var/index = 0
+    for(var/list/fixture in fixtures)
+        index++
+        var/atom/host = index == 9 ? new /obj/item/device : new /obj/machinery
+        host.icon = fixture[1]
+        host.icon_state = fixture[2]
+        host.name = fixture[3]
+        verify(host.icon_state in icon_states(host.icon), "Fixture sprite exists: [host.icon_state]")
+        var/list/profile = device_ui_profile(host)
+        verify(profile == device_ui_profile(host), "Appearance profiles should be cached")
+        verify(profile["ratio"] >= 0.65 && profile["ratio"] <= 2, "Display ratio must be usable")
+        var/list/ink = ReadRGB(profile["ink"])
+        var/list/bg = ReadRGB(profile["screen"])
+        verify(min(ink[1], ink[2], ink[3]) > max(bg[1], bg[2], bg[3]) + 100, "Theme must retain legible text contrast")
+        var/list/params = params2list(device_ui_options("window=fixture;size=600x400;titlebar=1;can_close=0", host))
+        verify(params["titlebar"] == "0" && params["border"] == "0" && params["can_close"] == "1", "Device windows must be borderless and closable")
+        var/datum/program_host/program = new
+        program.host = host
+        verify(device_ui_host(program) == host, "Software must use its physical host")
+        var/body = {"<!DOCTYPE html><html><head><title>Device preview</title></head><body><h2>System overview</h2><p>Network connection established.</p><div class='statusDisplay'><p>Power supply <b style='float:right'>ONLINE</b></p><p>Equipment status <b style='float:right'>NOMINAL</b></p></div><h3>Controls</h3><p><a href='#records'>Records</a> &nbsp; <a href='#settings'>Settings</a> &nbsp; <a href='#logs'>Activity log</a></p><form><label>Search <input name='search' placeholder='Enter a name'></label></form><table width='100%'><tr><th align='left'>Subsystem</th><th align='right'>Status</th></tr><tr><td>Primary connection</td><td align='right'>Ready</td></tr><tr><td>Local storage</td><td align='right'>84%</td></tr><tr><td>Backup power</td><td align='right'>96%</td></tr></table><p id='live-status'>Live update 0</p><script>setInterval(function(){var el=document.getElementById('live-status');el.textContent='Live update '+Date.now();},3000);</script></body></html>"}
+        var/html = device_ui_html(null, body, null, host)
+        verify(findtext(html, "name='device-screen'") && findtext(html, "name='search'"), "Shell must preserve existing forms")
+        fdel("fixture-[index].html")
+        text2file(html, "fixture-[index].html")
+        profile = profile.Copy()
+        profile["name"] = host.name
+        profile["sprite"] = "[host.icon]"
+        profile["state"] = host.icon_state
+        results += list(profile)
+        if(index == 1)
+            host.name = "</script><script>alert('x')</script>"
+            html = device_ui_html(null, "<html><HEAD></HEAD><body>Safe</body></html>", "fixture", host)
+            verify(!findtext(html, host.name), "Device names must be encoded in metadata")
+            verify(findtext(html, "device-ui.css") < findtext(html, "</HEAD>"), "Case-insensitive head injection")
+        del(host)
+    fdel("profiles.json")
+    text2file(json_encode(results), "profiles.json")
+    cyberdeck_fixtures()
+    world.log << "DEVICE UI REGRESSION: [failures ? "FAIL" : "PASS"]"
+    shutdown()
+
+/proc/cyberdeck_fixtures()
+    var/obj/machinery/host = new
+    host.icon = 'icons/obj/computer.dmi'
+    host.icon_state = "os13_rdcomp"
+    host.name = "Cyberdeck research console"
+    var/list/data = list("phase" = CYBERDECK_IDLE, "message" = "Blank disk loaded. Select an occupied chair and a research field.", "disk_name" = "technology disk", "media" = "blank", "can_boot" = TRUE, "link_hint" = "Neural link selected.")
+    data["chairs"] = list(list("name" = "Roche Hendson", "ref" = "chair1", "selected" = TRUE))
+    var/list/archives = list()
+    var/index = 0
+    for(var/name in list("Materials", "Engineering", "Phoron Technology", "Power Manipulation Technology", "'Blue-space' Technology", "Biological Technology", "Combat Systems", "Electromagnetic Spectrum Technology", "Data Theory"))
+        index++
+        archives += list(list("name" = name, "id" = "field[index]", "known" = 1, "level" = 2, "size" = 17, "complete" = FALSE))
+    data["archives"] = archives
+    for(var/fixture in list("ready", "standby", "booting", "active", "recorded"))
+        if(fixture == "standby")
+            data["can_boot"] = FALSE
+            data["media"] = "missing"
+            data["disk_name"] = "No disk inserted"
+            data["chairs"] = list()
+            data["message"] = "Insert a blank technology disk to begin."
+            data["link_hint"] = "Wear a cyberdeck helmet and buckle into a free chair within three tiles."
+        if(fixture == "booting" || fixture == "active")
+            data["phase"] = fixture == "booting" ? CYBERDECK_BOOTING : CYBERDECK_RUNNING
+            data["operator"] = "Roche Hendson"
+            data["research"] = "Engineering"
+            data["level"] = 2
+            data["size"] = 17
+            data["required"] = 2
+            data["decrypted"] = 1
+            data["seconds"] = 497
+            data["media"] = "blank"
+            data["disk_name"] = "technology disk"
+            data["message"] = fixture == "booting" ? "Building the research archive. The disk drive and neural link are reserved." : "Dive active. Decrypt the relays and download the data core."
+        if(fixture == "recorded")
+            data["phase"] = CYBERDECK_IDLE
+            data["media"] = "recorded"
+            data["disk_name"] = "Engineering technology disk (level 2)"
+            data["message"] = "Download complete. Eject the technology disk and import it at R&D."
+        var/html = cyberdeck_ui_html(data, "byond://?src=test-console")
+        verify(findtext(html, "action=boot") == 0 || fixture == "ready", "Only a ready idle console offers Boot actions")
+        verify((findtext(html, "action=abort") != 0) == (data["phase"] != CYBERDECK_IDLE), "Recall is available only during a session")
+        verify((findtext(html, "action=eject") != 0) == (fixture == "ready" || fixture == "recorded"), "Drive stays locked throughout boot and a dive")
+        if(fixture == "active")
+            verify(findtext(html, "8:17") && findtext(html, "width:50%"), "Session countdown and relay progress use the snapshot")
+        html = device_ui_html(null, html, null, host)
+        fdel("cyberdeck-[fixture].html")
+        text2file(html, "cyberdeck-[fixture].html")
+    data["message"] = "<script>alert('status')</script>"
+    data["disk_name"] = "<img src=x onerror=alert('disk')>"
+    data["chairs"] = list(list("name" = "<script>alert('name')</script>", "ref" = "chair1", "selected" = TRUE))
+    var/html = cyberdeck_ui_html(data, "byond://?src=test-console")
+    verify(!findtext(html, "<script>") && !findtext(html, "<img"), "Status, disk and operator names must be HTML-encoded")
+    del(host)
+
+proc/ReadRGB(rgb)
+	if(!rgb) return
+
+	// interpret the HSV or HSVA value
+	var/i=1,start=1
+	if(text2ascii(rgb) == 35) ++start // skip opening #
+	var/ch,which=0,r=0,g=0,b=0,alpha=0,usealpha
+	var/digits=0
+	for(i=start, i<=length(rgb), ++i)
+		ch = text2ascii(rgb, i)
+		if(ch < 48 || (ch > 57 && ch < 65) || (ch > 70 && ch < 97) || ch > 102) break
+		++digits
+		if(digits == 8) break
+
+	var/single = digits < 6
+	if(digits != 3 && digits != 4 && digits != 6 && digits != 8) return
+	if(digits == 4 || digits == 8) usealpha = 1
+	for(i=start, digits>0, ++i)
+		ch = text2ascii(rgb, i)
+		if(ch >= 48 && ch <= 57) ch -= 48
+		else if(ch >= 65 && ch <= 70) ch -= 55
+		else if(ch >= 97 && ch <= 102) ch -= 87
+		else break
+		--digits
+		switch(which)
+			if(0)
+				r = (r << 4) | ch
+				if(single)
+					r |= r << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(1)
+				g = (g << 4) | ch
+				if(single)
+					g |= g << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(2)
+				b = (b << 4) | ch
+				if(single)
+					b |= b << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(3)
+				alpha = (alpha << 4) | ch
+				if(single) alpha |= alpha << 4
+
+	. = list(r, g, b)
+	if(usealpha) . += alpha
+
+
+proc/BlendRGB(rgb1, rgb2, amount)
+	var/list/RGB1 = ReadRGB(rgb1)
+	var/list/RGB2 = ReadRGB(rgb2)
+
+	// add missing alpha if needed
+	if(RGB1.len < RGB2.len) RGB1 += 255
+	else if(RGB2.len < RGB1.len) RGB2 += 255
+	var/usealpha = RGB1.len > 3
+
+	var/r = round(RGB1[1] + (RGB2[1] - RGB1[1]) * amount, 1)
+	var/g = round(RGB1[2] + (RGB2[2] - RGB1[2]) * amount, 1)
+	var/b = round(RGB1[3] + (RGB2[3] - RGB1[3]) * amount, 1)
+	var/alpha = usealpha ? round(RGB1[4] + (RGB2[4] - RGB1[4]) * amount, 1) : null
+
+	return isnull(alpha) ? rgb(r, g, b) : rgb(r, g, b, alpha)
+
+
+#include "C:/Users/nukec/Documents/GitHub/Interpost-Hague/code/_helpers/device_ui.dm"
+
+#include "C:/Users/nukec/Documents/GitHub/Interpost-Hague/code/modules/cyberresearch/cyberdeck_ui.dm"

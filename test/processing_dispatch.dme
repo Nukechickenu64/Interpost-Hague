@@ -1,0 +1,176 @@
+// Standalone regression: compile this file, then run its DMB with DreamDaemon.
+// Includes the production dispatchers without starting the game or loading a map.
+#define SUBSYSTEM_DEF(X) /datum/controller/subsystem/##X
+#define PROCESSING_SUBSYSTEM_DEF(X) /datum/controller/subsystem/processing/##X
+#define SS_BACKGROUND 4
+#define SS_POST_FIRE_TIMING 64
+#define SS_KEEP_TIMING 32
+#define SS_NO_INIT 1
+#define SS_PRIORITY_PROCESSING 95
+#define SS_PRIORITY_MOB 95
+#define SS_PRIORITY_MISC 95
+#define RUNLEVEL_LOBBY 1
+#define RUNLEVEL_GAME 2
+#define RUNLEVEL_POSTGAME 4
+#define SECOND * 10
+#define SECONDS * 10
+#define SS_RUNNING 2
+#define PROCESS_KILL -1
+#define QDELETED(D) (isnull(D) || D.gc_destroyed)
+#define MC_TICK_CHECK (src.state != SS_RUNNING)
+#define STOP_PROCESSING(SS, D) SS.processing -= D
+#define R_DEBUG 1
+
+/datum
+	var/is_processing = TRUE
+	var/gc_destroyed = FALSE
+
+/datum/proc/Process()
+
+/datum/proc/Initialize()
+
+/datum/proc/VV_static()
+	return list()
+
+/datum/controller/subsystem
+	var/name
+	var/priority
+	var/flags
+	var/wait
+	var/runlevels
+	var/times_fired = 3
+	var/state = SS_RUNNING
+
+/datum/controller/subsystem/proc/stat_entry(message)
+
+/datum/controller/subsystem/proc/fire(resumed)
+
+/datum/controller/subsystem/proc/PreInit()
+
+/datum/controller/master
+	var/current_ticklimit = 100
+
+/var/datum/controller/master/Master = new
+/var/datum/controller/subsystem/processing/mobs/SSmobs
+
+/proc/check_rights(rights)
+	return TRUE
+
+/proc/to_chat(target, message)
+
+/proc/log_info_line(datum/thing)
+	return "[thing.type]"
+
+/proc/crash_with(message)
+	throw EXCEPTION(message)
+
+/proc/message_admins(message)
+
+/mob/proc/Life()
+
+// Kept as a fixture to catch duplicate calls from the former lift workaround.
+/datum/turbolift
+	var/processing = TRUE
+	var/calls = 0
+
+/datum/turbolift/Process()
+	calls++
+
+#include "../code/controllers/subsystems/processing/processing.dm"
+#include "../code/controllers/subsystems/processing/mobs.dm"
+#include "../code/controllers/subsystems/processing/miscdat.dm"
+
+/datum/dispatch_probe
+	var/calls = 0
+	var/received_wait
+	var/received_count
+	var/datum/controller/subsystem/processing/received_subsystem
+	var/stop = FALSE
+	var/pause_after = FALSE
+
+/datum/dispatch_probe/Process(wait, count, datum/controller/subsystem/processing/processor)
+	calls++
+	received_wait = wait
+	received_count = count
+	received_subsystem = processor
+	if(pause_after)
+		processor.state = 0
+	if(stop)
+		return PROCESS_KILL
+
+/mob/dispatch_probe
+	var/calls = 0
+	var/pause_after = FALSE
+
+/mob/dispatch_probe/Life(wait, count, datum/controller/subsystem/processing/processor)
+	calls++
+	if(pause_after)
+		processor.state = 0
+
+/var/failures = 0
+
+/proc/verify(condition, message)
+	if(!condition)
+		failures++
+		world.log << "FAIL: [message]"
+
+/proc/check_dispatch(datum/controller/subsystem/processing/processor)
+	var/datum/dispatch_probe/probe = new
+	processor.processing = list(probe)
+	processor.fire()
+	processor.fire()
+	verify(probe.calls == 2, "[processor.type] must call subtype Process once per fire")
+	verify(probe.received_wait == processor.wait && probe.received_count == processor.times_fired && probe.received_subsystem == processor, "Processing arguments must reach the override")
+	processor.toggle_debug()
+	processor.fire()
+	verify(probe.calls == 3, "Debug processing must reach the same override exactly once")
+	processor.toggle_debug()
+	probe.stop = TRUE
+	processor.fire()
+	processor.fire()
+	verify(probe.calls == 4 && !probe.is_processing && !processor.processing.len, "PROCESS_KILL must unregister the datum")
+
+	var/datum/dispatch_probe/removed = new
+	removed.gc_destroyed = TRUE
+	processor.processing = list(removed, null)
+	processor.fire()
+	verify(!removed.calls && !removed.is_processing && !processor.processing.len, "Deleted entries must be removed without invoking Process")
+
+	var/datum/dispatch_probe/first = new
+	var/datum/dispatch_probe/second = new
+	first.pause_after = TRUE
+	processor.processing = list(second, first)
+	processor.fire()
+	verify(first.calls == 1 && second.calls == 0, "Paused fire must leave the remaining entries untouched")
+	processor.state = SS_RUNNING
+	processor.fire(TRUE)
+	verify(first.calls == 1 && second.calls == 1, "Resumed fire must process each remaining entry once")
+
+/world/New()
+	var/datum/controller/subsystem/processing/processor = new
+	check_dispatch(processor)
+	var/datum/controller/subsystem/processing/miscproc/misc = new
+	check_dispatch(misc)
+
+	var/datum/turbolift/lift = new
+	processor.processing = list(lift)
+	processor.fire()
+	verify(lift.calls == 1, "Turbolifts must not receive an extra Process call")
+
+	var/datum/controller/subsystem/processing/mobs/mobs = new
+	var/mob/dispatch_probe/first = new
+	var/mob/dispatch_probe/second = new
+	mobs.processing = list(second, first)
+	mobs.PreInit()
+	first.pause_after = TRUE
+	mobs.fire()
+	verify(first.calls == 1 && second.calls == 0, "Mob Life must honor the dispatcher tick budget")
+	mobs.state = SS_RUNNING
+	mobs.fire(TRUE)
+	verify(first.calls == 1 && second.calls == 1, "Mob Life must run once across pause/resume")
+	first.pause_after = FALSE
+	mobs.toggle_debug()
+	mobs.fire()
+	verify(first.calls == 2 && second.calls == 2, "Debug mode must preserve Life override dispatch")
+	world.log << "PROCESSING DISPATCH: [failures ? "FAIL ([failures])" : "PASS"]"
+	shutdown()

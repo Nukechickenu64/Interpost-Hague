@@ -95,7 +95,7 @@
 	else
 		dat += "<span class='note'>No media inserted.</span>"
 	dat += " | <a href='byond://?src=\ref[src];close=1'>Close</a>"
-	user << browse(ui_build_styled_html("BBS Terminal", dat), "window=bbs_terminal;size=520x560")
+	device_ui_browse(user, ui_build_styled_html("BBS Terminal", dat), "window=bbs_terminal;size=520x560", src)
 	onclose(user, "bbs_terminal")
 
 /obj/machinery/computer/bbs_terminal/proc/bbs_link(var/text, var/href)

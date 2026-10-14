@@ -127,7 +127,7 @@
 	dat += "</b></center>"
 
 	var/page = ui_build_styled_html("Arcade", dat)
-	user << browse(page, "window=arcade")
+	device_ui_browse(user, page, "window=arcade", src)
 	onclose(user, "arcade")
 	return
 

@@ -372,7 +372,7 @@
 	var/tempstr = "Temperature: [temperature]&deg;C<br>"
 	dat += (overheating)? "<span class='danger'>[tempstr]</span>" : tempstr
 	dat += "<br><A href='?src=\ref[src];action=close'>Close</A>"
-	user << browse("[dat]", "window=port_gen")
+	device_ui_browse(user, "[dat]", "window=port_gen", src)
 	onclose(user, "port_gen")
 */
 

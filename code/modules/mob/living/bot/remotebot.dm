@@ -115,7 +115,7 @@
 	dat += "<a href='byond://?src=\ref[src];look=[is_looking];'>[is_looking ? "Stop" : "Start"] Looking</a><br>"
 	dat += "<a href='byond://?src=\ref[src];drop=1;'>Drop Item</a><br></center>"
 
-	user << browse(dat, "window=bot_controller")
+	device_ui_browse(user, dat, "window=bot_controller", src)
 	onclose(user, "botcontroller")
 
 /obj/item/device/bot_controller/check_eye()

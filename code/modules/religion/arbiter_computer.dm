@@ -63,7 +63,7 @@
 		if(visible_locations.len > 0)
 			dat += text("verina has detected shrines in the following locations: <strong>[visible_locations.Join(", ")]<strong> <HR>")
 		dat += text("<A href='?src=\ref[];choice=Log Out'>{Log Out}</A>",src)
-	user << browse(text("<HEAD><TITLE>Arbiter Records</TITLE></HEAD><TT>[]</TT>", dat), "window=arbiter_rec;size=600x400")
+	device_ui_browse(user, text("<HEAD><TITLE>Arbiter Records</TITLE></HEAD><TT>[]</TT>", dat), "window=arbiter_rec;size=600x400", src)
 	onclose(user, "arbiter_rec")
 	*/
 

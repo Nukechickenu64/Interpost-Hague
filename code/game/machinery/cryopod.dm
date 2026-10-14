@@ -242,7 +242,7 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 		dat += "<a href='?src=\ref[src];allitems=1'>Recover all objects</a>.<br>"
 
 	var/page = ui_build_styled_html(storage_name, dat)
-	user << browse(page, "window=cryopod_console")
+	device_ui_browse(user, page, "window=cryopod_console", src)
 	onclose(user, "cryopod_console")
 
 /obj/machinery/computer/cryopod/OnTopic(user, href_list, state)
@@ -251,7 +251,7 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 		for(var/person in frozen_crew)
 			dat += "[person]<br/>"
 		dat += "<hr/>"
-		show_browser(user, dat, "window=cryolog")
+		device_ui_browse(user, dat, "window=cryolog", src)
 		. = TOPIC_REFRESH
 
 	else if(href_list["view"])

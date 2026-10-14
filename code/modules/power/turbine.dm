@@ -168,7 +168,7 @@
 	t += "</PRE><HR><A href='?src=\ref[src];close=1'>Close</A>"
 
 	t += "</TT>"
-	user << browse(t, "window=turbine")
+	device_ui_browse(user, t, "window=turbine", src)
 	onclose(user, "turbine")
 
 	return
@@ -230,7 +230,7 @@
 	else
 		dat += "<span class='danger'>No compatible attached compressor found.</span>"
 
-	user << browse(dat, "window=computer;size=400x500")
+	device_ui_browse(user, dat, "window=computer;size=400x500", src)
 	onclose(user, "computer")
 	return
 

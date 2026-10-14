@@ -85,7 +85,7 @@
 		</BODY></HTML>
 		"}
 
-		show_browser(user, output, "window=Warrant for the arrest of [active.fields["namewarrant"]]")
+		device_ui_browse(user, output, "window=Warrant for the arrest of [active.fields["namewarrant"]]", src)
 	if(active.fields["arrestsearch"] ==  "search")
 		var/output= {"
 		<HTML><HEAD><TITLE>Search Warrant: [active.fields["namewarrant"]]</TITLE></HEAD>
@@ -112,4 +112,4 @@
 		Vessel or habitat: _<u>[GLOB.using_map.station_name]</u>____</br>
 		</BODY></HTML>
 		"}
-		show_browser(user, output, "window=Search warrant for [active.fields["namewarrant"]]")
+		device_ui_browse(user, output, "window=Search warrant for [active.fields["namewarrant"]]", src)

@@ -128,6 +128,7 @@
 			dat += "<span style='color: red'>No electromagnetic field generators connected.</span>"
 
 	var/datum/browser/popup = new(user, "fusion_control", name, 500, 400, src)
+	popup.device_source = src
 	popup.set_content(dat)
 	popup.open()
 	user.set_machine(src)

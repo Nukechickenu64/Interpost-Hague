@@ -7,6 +7,12 @@
 		/area/shuttle/specops/centcom,
 	)
 
+// Cyberspace "Thunderfield" zone, loaded on demand by the cyberdeck console.
+/area/cyberspace
+	name = "Cyberspace"
+	requires_power = 0
+	dynamic_lighting = 0
+
 /area/maintenance/radiation_bunker
 	name = "Radiation Bunker"
 	area_flags = AREA_FLAG_RAD_SHIELDED

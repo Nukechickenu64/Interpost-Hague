@@ -96,7 +96,7 @@
 
 		dat += "</table><hr>"
 
-	user << browse(dat, "window=metal_lathe")
+	device_ui_browse(user, dat, "window=metal_lathe", src)
 	onclose(user, "metal_lathe")
 
 //THE OBJECT BEING ADDED IS THE LETTER "O" NOT A 0(ZERO)

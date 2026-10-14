@@ -253,6 +253,6 @@
 		dat += "Particle Strength: [src.strength] "
 		dat += "<A href='?src=\ref[src];strengthdown=1'>--</A>|<A href='?src=\ref[src];strengthup=1'>++</A><BR><BR>"
 
-	user << browse(dat, "window=pacontrol;size=420x500")
+	device_ui_browse(user, dat, "window=pacontrol;size=420x500", src)
 	onclose(user, "pacontrol")
 	return

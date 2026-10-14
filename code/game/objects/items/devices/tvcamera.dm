@@ -43,6 +43,7 @@
 	dat += "Microphone is: <a href='?src=\ref[src];sound=1'>[radio.broadcasting ? "Online" : "Offline"]</a><br>"
 	dat += "Sound is being broadcasted on frequency: [format_frequency(radio.frequency)] ([get_frequency_name(radio.frequency)])<br>"
 	var/datum/browser/popup = new(user, "Press Camera Drone", "EyeBuddy", 300, 390, src)
+	popup.device_source = src
 	popup.set_content(jointext(dat,null))
 	popup.open()
 

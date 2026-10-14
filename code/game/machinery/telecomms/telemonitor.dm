@@ -59,7 +59,7 @@
 
 
 		var/page = ui_build_styled_html("Communications Monitor", dat)
-		user << browse(page, "window=comm_monitor;size=575x400")
+		device_ui_browse(user, page, "window=comm_monitor;size=575x400", src)
 		onclose(user, "server_control")
 
 		temp = ""

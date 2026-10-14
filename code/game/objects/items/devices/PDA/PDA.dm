@@ -3,6 +3,12 @@
 
 var/global/list/obj/item/device/pda/PDAs = list()
 
+// PICO-8: default virtual console cartridges installed on every PDA.
+var/global/list/pico8_cart_library = list(
+	"spessman" = list("title" = "Spessman Delivery"),
+	"breakout"  = list("title" = "Breakout-8")
+)
+
 /obj/item/device/pda
 	name = "\improper PDA"
 	desc = "A portable microcomputer by Nanotrasen Personal Devices. Functionality determined by a preprogrammed ROM cartridge."
@@ -16,7 +22,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/owner = null
 	var/default_cartridge = 0 // Access level defined by cartridge
 	var/obj/item/cartridge/cartridge = null //current cartridge
-	var/mode = 0 //Controls what menu the PDA will display. 0 is hub; the rest are either built in or based on cartridge.
+	var/mode = 0 // 0 is the home screen, 4 is utilities; other pages are built in or cartridge-based.
 
 	var/lastmode = 0
 	var/ui_tick = 0
@@ -54,14 +60,20 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/list/feed_info = list()	// The data and contents of each feed as we last knew them
 
 	var/list/cartmodes = list(40, 42, 43, 433, 44, 441, 45, 451, 46, 48, 47, 49) // If you add more cartridge modes add them to this list as well.
-	var/list/no_auto_update = list(1, 40, 43, 44, 441, 45, 451)		     // These modes we turn off autoupdate
+	var/list/no_auto_update = list(1, 8, 40, 43, 44, 441, 45, 451)		     // These modes we turn off autoupdate
 	var/list/update_every_five = list(3, 41, 433, 46, 47, 48, 49)			     // These we update every 5 ticks
 
 	var/obj/item/card/id/id = null //Making it possible to slot an ID card into the PDA so it can function as both.
 	var/ownjob = null //related to above - this is assignment (potentially alt title)
 	var/ownrank = null // this one is rank, never alt title
+	var/datum/money_account/authenticated_account = null // Bank session opened from the ID in the slot.
 
 	var/obj/item/device/paicard/pai = null	// A slot for a personal AI device
+
+	// PICO-8 virtual console (mode 8).
+	var/pico8_cart = null             // Cartridge currently loaded (id from pico8_cart_library), null on the menu.
+	var/pico8_epoch = 0               // Bump this to make the client-side emulator reboot the cart.
+	var/list/pico8_highscores = list() // High scores keyed by cartridge id.
 
 /obj/item/device/pda/examine(mob/user)
 	. = ..(user, 1)
@@ -294,7 +306,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		else
 			HTML += addtext("<i><b>&larr; From <a href='byond://?src=\ref[src];choice=Message;notap=1;target=",index["target"],"'>", index["owner"],"</a>:</b></i><br>", index["message"], "<br>")
 	HTML +="</body></html>"
-	usr << browse(HTML, "window=log;size=400x444;border=1;can_resize=1;can_close=1;can_minimize=0")
+	device_ui_browse(usr, HTML, "window=log;size=400x444;border=1;can_resize=1;can_close=1;can_minimize=0", src)
 
 
 /obj/item/device/pda/ai/can_use()
@@ -377,6 +389,10 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/title = "Personal Data Assistant"
 
 	var/data[0]  // This is the data that will be sent to the PDA
+	var/datum/asset/simple/pda/assets = get_asset_datum(/datum/asset/simple/pda)
+	// Missing/virtual icon states use the base device rather than an empty screen.
+	var/list/ui_profile = assets.ui_profiles[icon_state] || assets.ui_profiles["pda"]
+	data["device"] = ui_profile
 
 	data["owner"] = owner					// Who is your daddy...
 	data["ownjob"] = ownjob					// ...and what does he do?
@@ -393,7 +409,16 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 
 	data["idInserted"] = (id ? 1 : 0)
-	data["idLink"] = (id ? text("[id.registered_name], [id.assignment]") : "--------")
+	data["idLink"] = id ? "[id.registered_name || "Unnamed ID"][id.assignment ? ", [id.assignment]" : ""]" : "Insert ID"
+	data["balance"] = null
+	data["balanceStatus"] = id ? "Unavailable" : "No ID"
+	if(id && id.associated_account_number)
+		// Respect accounts that require a PIN; this readout is not a bank login.
+		var/datum/money_account/account = attempt_account_access(id.associated_account_number, null, 0)
+		if(account && !account.suspended)
+			data["balance"] = account.money
+		else
+			data["balanceStatus"] = "Locked"
 
 	data["cart_loaded"] = cartridge ? 1:0
 	if(cartridge)
@@ -417,7 +442,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		if(mode in cartmodes)
 			data["records"] = cartridge.create_NanoUI_values()
 
-		if(mode == 0)
+		if(mode == 0 || mode == 4)
 			cartdata["name"] = cartridge.name
 			if(isnull(cartridge.radio))
 				cartdata["radio"] = 0
@@ -430,6 +455,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		if(mode == 2)
 			cartdata["charges"] = cartridge.charges ? cartridge.charges : 0
 		data["cartridge"] = cartdata
+
+	data["bank"] = get_bank_ui_data(id)
 
 	data["stationTime"] = stationtime2text()
 	data["new_Message"] = new_message
@@ -544,6 +571,24 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 		data["feed"] = feed
 
+	if(mode == 8)
+		var/list/p8data[0]
+		var/list/p8carts[0]
+		for(var/cart_id in pico8_cart_library)
+			var/list/cart_meta = pico8_cart_library[cart_id]
+			p8carts[++p8carts.len] = list(
+				"id" = cart_id,
+				"title" = cart_meta["title"],
+				"best" = pico8_highscores[cart_id] ? pico8_highscores[cart_id] : 0
+			)
+		p8data["carts"] = p8carts
+		p8data["running"] = (pico8_cart in pico8_cart_library) ? pico8_cart : null
+		if(p8data["running"])
+			p8data["title"] = pico8_cart_library[pico8_cart]["title"]
+			p8data["source"] = file2text("nano/pico8/carts/[pico8_cart].p8")
+		p8data["epoch"] = "[pico8_epoch]"
+		data["pico8"] = p8data
+
 	data["manifest"] = nano_crew_manifest()
 
 	nanoUI = data
@@ -554,7 +599,14 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	if (!ui)
 		// the ui does not exist, so we'll create a new() one
 	        // for a list of parameters and their descriptions see the code docs in \code\modules\nano\nanoui.dm
-		ui = new(user, src, ui_key, "pda.tmpl", title, 520, 400, state = GLOB.inventory_state)
+		assets.send(user)
+		ui = new(user, src, ui_key, "pda.tmpl", title, ui_profile["screenWidth"] * 30 + 68, ui_profile["screenHeight"] * 30 + 68, state = GLOB.inventory_state)
+		ui.set_window_options("focus=0;border=0;titlebar=0;can_close=1;can_resize=0;can_minimize=0;can_maximize=0;")
+		ui.set_layout_key("pda")
+		ui.add_script("pda.js")
+		ui.add_script("pico8_fengari.js")
+		ui.add_script("pico8.js")
+		ui.add_script("pico8_pda.js")
 		// when the ui is first opened this is the data it will use
 
 		ui.set_initial_data(data)
@@ -565,9 +617,6 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 //NOTE: graphic resources are loaded on client login
 /obj/item/device/pda/attack_self(mob/user as mob)
-	var/datum/asset/assets = get_asset_datum(/datum/asset/simple/pda)
-	assets.send(user)
-
 	user.set_machine(src)
 
 	if(active_uplink_check(user))
@@ -611,21 +660,27 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			return 0
 		if("Refresh")//Refresh, goes to the end of the proc.
 		if("Return")//Return
+			if(mode == 8)
+				pico8_cart = null
 			if(mode<=9)
 				mode = 0
 			else
 				mode = round(mode/10)
 				if(mode==2)
 					active_conversation = null
-				if(mode==4)//Fix for cartridges. Redirects to hub.
-					mode = 0
-				else if(mode >= 40 && mode <= 49)//Fix for cartridges. Redirects to refresh the menu.
+				if(mode >= 40 && mode <= 49)//Refresh nested cartridge menus; cartridge roots return to utilities (4).
 					cartridge.mode = mode
 		if ("Authenticate")//Checks for ID
 			id_check(U, 1)
 		if("UpdateInfo")
 			if(id)
 				set_rank_job(id.rank, id.assignment)
+		if("BankLogin")
+			bank_login_topic(U)
+		if("BankLogout")
+			if(authenticated_account)
+				to_chat(U, "<span class='notice'>\The [src] logs you out of account #[authenticated_account.account_number].</span>")
+				authenticated_account = null
 		if("Eject")//Ejects the cart, only done from hub.
 			verb_remove_cartridge()
 
@@ -644,8 +699,33 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			mode = 3
 */
 
-		if("4")//Redirects to hub
-			mode = 0
+		if("4")//Utilities
+			mode = 4
+		if("8")//PICO-8
+			mode = 8
+			pico8_cart = null
+		if("p8_cart")//PICO-8 cartridge select
+			var/selected_cart = href_list["cart"]
+			if(selected_cart in pico8_cart_library)
+				pico8_cart = selected_cart
+				mode = 8
+		if("p8_restart")//PICO-8 reboot running cart
+			if(pico8_cart in pico8_cart_library)
+				pico8_epoch++
+		if("p8_menu")//PICO-8 back to cartridge menu
+			pico8_cart = null
+		if("40")//Signaler
+			if(cartridge && istype(cartridge.radio, /obj/item/radio/integrated/signal))
+				mode = 40
+				cartridge.mode = mode
+		if("47", "48")//Supply records and delivery bots
+			if(cartridge && cartridge.access_quartermaster)
+				mode = text2num(href_list["choice"])
+				cartridge.mode = mode
+		if("49")//Custodial locator
+			if(cartridge && cartridge.access_janitor)
+				mode = 49
+				cartridge.mode = mode
 
 /*
 		if("chatroom") // chatroom hub
@@ -659,6 +739,10 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 		if("Light")
 			toggle_light()
+		if("Honk")
+			if(cartridge && cartridge.access_clown && !(last_honk && world.time < last_honk + 20))
+				playsound(loc, 'sound/items/bikehorn.ogg', 50, 1)
+				last_honk = world.time
 /*
 		if("Medical Scan")
 			if(scanmode == 1)
@@ -700,6 +784,12 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				ui.close()
 		if("Toggle Messenger")
 			toff = !toff
+		if("p8_score")//PICO-8 score report
+			if(pico8_cart && (pico8_cart in pico8_cart_library))
+				var/p8score = max(0, round(text2num(href_list["score"])))
+				if(p8score > 0 && (!pico8_highscores[pico8_cart] || p8score > pico8_highscores[pico8_cart]))
+					pico8_highscores[pico8_cart] = p8score
+					to_chat(U, "<span class='notice'>New PICO-8 high score: [p8score]!</span>")
 		if("Toggle Ringer")//If viewing texts then erase them, if not then toggle silent status
 			message_silent = !message_silent
 		if("Toggle News")
@@ -976,6 +1066,9 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		else
 			id.loc = get_turf(src)
 		id = null
+		if(authenticated_account)
+			authenticated_account = null
+		SSnano.update_uis(src)
 
 /obj/item/device/pda/AltClick()
 	if(Adjacent(usr))
@@ -1197,27 +1290,122 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	else
 		to_chat(usr, "<span class='notice'>You cannot do this while restrained.</span>")
 
-/obj/item/device/pda/proc/id_check(mob/user as mob, choice as num)//To check for IDs; 1 for in-pda use, 2 for out of pda use.
-	if(choice == 1)
-		if (id)
-			remove_id()
-			return 1
-		else
-			var/obj/item/I = user.get_active_hand()
-			if (istype(I, /obj/item/card/id) && user.unEquip(I))
-				I.loc = src
-				id = I
-			return 1
-	else
-		var/obj/item/card/I = user.get_active_hand()
-		if (istype(I, /obj/item/card/id) && I:registered_name && user.unEquip(I))
-			var/obj/old_id = id
-			I.loc = src
-			id = I
-			if(old_id)
-				user.put_in_hands(old_id)
-			return 1
-	return 0
+/obj/item/device/pda/proc/get_bank_ui_data(var/obj/item/card/id/id_card)
+	var/list/bank = list("canBankUse" = 0, "status" = "", "balance" = null, "loggedIn" = 0, "accountName" = null)
+	if(!istype(id_card))
+		bank["status"] = "No ID"
+		return bank
+	if(!id_card.associated_account_number)
+		bank["status"] = "No account"
+		return bank
+	// The PDA can open a session on minimum (0) and moderate (1) security accounts;
+	// moderate security demands a PIN at login time, handled in bank_login_topic().
+	var/datum/money_account/account = get_account(id_card.associated_account_number)
+	if(!account || account.suspended || account.security_level > 1)
+		bank["status"] = account ? "Locked" : "No account"
+		return bank // A locked terminal cannot start a session.
+	bank["canBankUse"] = 1
+	bank["status"] = "Ready"
+	if(authenticated_account)
+		var/datum/money_account/d = authenticated_account
+		bank["loggedIn"] = 1
+		bank["accountName"] = "[d.owner_name] #[d.account_number]"
+		bank["balance"] = d.money
+	return bank
+
+// Try to reach the bank from a PDA with an ID in the slot. Requires the ID's linked
+// account and, for accounts that need a PIN to transfer, also the account's PIN.
+/obj/item/device/pda/proc/bank_login_topic(var/mob/user)
+	if(!istype(user))
+		return
+	if(!istype(id))
+		to_chat(user, "<span class='warning'>Insert an ID card linked to a bank account first.</span>")
+		return
+	if(!id.associated_account_number)
+		to_chat(user, "<span class='warning'>\The [id] is not linked to a bank account.</span>")
+		return
+	var/datum/money_account/registered = get_account(id.associated_account_number)
+	if(!registered)
+		to_chat(user, "<span class='warning'>There is no bank account associated with \the [id].</span>")
+		return
+	if(registered.suspended)
+		to_chat(user, "<span class='warning'>Access to this account has been suspended, and the funds within frozen.</span>")
+		return
+	if(registered.security_level > 1)
+		to_chat(user, "<span class='warning'>This account may only be accessed from a physical banking terminal.</span>")
+		return
+
+	// The ID readout only needs the account number; an account needing a PIN demands it here.
+	var/tried_pin = null
+	if(registered.security_level == 1)
+		tried_pin = input(user, "Enter account PIN", "PDA banking") as null|num
+		if(isnull(tried_pin))
+			return
+	var/datum/money_account/attempt = attempt_account_access(id.associated_account_number, tried_pin, 2)
+	if(!attempt)
+		to_chat(user, "<span class='warning'>\The [src] flashes: Incorrect credentials.</span>")
+		playsound(loc, 'sound/machines/buzz-sigh.ogg', 50, 1)
+		return
+	if(attempt.suspended)
+		to_chat(user, "<span class='warning'>Access to this account has been suspended, and the funds within frozen.</span>")
+		return
+
+	authenticated_account = attempt
+	to_chat(user, "<span class='notice'>\The [src] connects you to account #[attempt.account_number] ([attempt.owner_name]).</span>")
+	playsound(loc, 'sound/machines/twobeep.ogg', 50, 1)
+	// Let the bank know it was access, not a transfer of funds.
+	var/datum/transaction/T = new(attempt.owner_name, "Remote terminal access", 0, "[owner] PDA")
+	attempt.do_transaction(T)
+
+/obj/item/device/pda/proc/prompt_registration_name(mob/user, suggested_name)
+	return input(user, "What name should this PDA register as?", "PDA registration", suggested_name) as null|text
+
+/obj/item/device/pda/proc/id_check(mob/user, choice, obj/item/card/id/card = null)
+	if(!user || user.incapacitated())
+		return FALSE
+	if(choice == 1 && id) // The screen's ID button ejects an occupied slot.
+		remove_id()
+		return TRUE
+	if(!card)
+		card = user.get_active_hand()
+		if(!istype(card))
+			card = user.get_inactive_hand()
+	if(!istype(card))
+		to_chat(user, "<span class='notice'>Hold an ID card to insert it.</span>")
+		return FALSE
+	// Only move a card carried by this user into a PDA they can physically reach.
+	if(card.loc != user || (loc != user && (!isturf(loc) || !in_range(src, user))))
+		return FALSE
+	if(!user.canUnEquip(card))
+		return FALSE
+	var/obj/item/card/id/old_id = id
+	var/suggested_name = owner || card.registered_name || ""
+	if(suggested_name == "Unknown")
+		suggested_name = ""
+	var/registration_name = prompt_registration_name(user, suggested_name)
+	if(QDELETED(src) || QDELETED(user) || QDELETED(card) || isnull(registration_name))
+		return FALSE
+	registration_name = sanitizeName(registration_name, allow_numbers = TRUE, force_first_letter_uppercase = FALSE)
+	if(!registration_name)
+		to_chat(user, "<span class='notice'>Enter a valid name between 2 and [MAX_NAME_LEN] characters.</span>")
+		return FALSE
+	// The input dialog yields. Neither the card, the PDA, nor its slot may be assumed unchanged.
+	if(user.incapacitated() || card.loc != user || id != old_id || (loc != user && (!isturf(loc) || !in_range(src, user))))
+		return FALSE
+	if(!user.unEquip(card, FALSE, src))
+		return FALSE
+	id = card
+	if(old_id)
+		user.put_in_hands(old_id)
+	// A new card means a new (empty) bank session, if any.
+	if(authenticated_account)
+		authenticated_account = null
+	// Registration changes the PDA's display identity, never the card's identity or access.
+	set_owner_rank_job(registration_name, card.rank, card.assignment)
+	to_chat(user, "<span class='notice'>You put the ID into \the [src]'s slot.</span>")
+	playsound(loc, 'sound/machines/id_swipe.ogg', 100, 1)
+	SSnano.update_uis(src)
+	return TRUE
 
 // access to status display signals
 /obj/item/device/pda/attackby(obj/item/C as obj, mob/user as mob)
@@ -1232,23 +1420,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 			cartridge.radio.hostpda = src
 
 	else if(istype(C, /obj/item/card/id))
-		var/obj/item/card/id/idcard = C
-		if(!idcard.registered_name)
-			to_chat(user, "<span class='notice'>\The [src] rejects the ID.</span>")
-			return
-		if(!owner)
-			set_owner_rank_job(idcard.registered_name, idcard.rank, idcard.assignment)
-			SetName("PDA-[owner] ([ownjob])")
-			to_chat(user, "<span class='notice'>Card scanned.</span>")
-		else
-			//Basic safety check. If either both objects are held by user or PDA is on ground and card is in hand.
-			if(((src in user.contents) && (C in user.contents)) || (istype(loc, /turf) && in_range(src, user) && (C in user.contents)) )
-				if(id_check(user, 2))
-					to_chat(user, "<span class='notice'>You put the ID into \the [src]'s slot.</span>")
-					playsound(loc, 'sound/machines/id_swipe.ogg', 100, 1)
-					updateSelfDialog()//Update self dialog on success.
-			return	//Return in case of failed check or when successful.
-		updateSelfDialog()//For the non-input related code.
+		id_check(user, 2, C)
 	else if(istype(C, /obj/item/device/paicard) && !src.pai)
 		user.drop_item()
 		C.loc = src
@@ -1458,7 +1630,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	src.owner = owner
 	update_label()
 
-/obj/item/device/pda/proc/set_rank_job(var/owner, var/rank, var/job)
+/obj/item/device/pda/proc/set_rank_job(var/rank, var/job)
 	ownrank = rank
 	ownjob = job ? job : rank
 	update_label()

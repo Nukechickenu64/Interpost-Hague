@@ -1,0 +1,80 @@
+/* Beveled PDA casing with the sprite's screen proportions and casing palette. */
+@font-face { font-family: PDAPixel; src: url('pda-pixel.ttf') format('truetype'); }
+html, body, #uiLayout { width: 100%; height: 100%; overflow: hidden; }
+body { padding: 0; margin: 0; background: #161719; font-family: PDAPixel, Fixedsys, monospace; font-size: 9px; line-height: 1.7; }
+.pda-case { position: absolute; top: 2px; left: 2px; border-radius: 14px; background: linear-gradient(135deg, #504640 0%, #302925 28%, #25201e 72%, #3e3531 100%); box-shadow: 0 0 0 2px #111110, 0 3px 9px #080909, inset 0 2px 1px #82796a, inset 2px 0 1px #645d50, inset -2px -3px 1px #171513; }
+.pda-case:before { content: ''; position: absolute; top: 5px; right: 5px; bottom: 5px; left: 5px; border: 2px solid; border-color: #777968 #33362e #242620 #666b5c; border-radius: 10px; box-shadow: 0 0 0 1px #181918, inset 0 0 0 1px #191a17; pointer-events: none; }
+.pda-contacts { position: absolute; top: 7px; left: 50%; width: 102px; height: 10px; margin-left: -51px; border: 2px solid; border-color: #171715 #696b5b #696b5b #171715; background: repeating-linear-gradient(90deg, #7d897c 0, #7d897c 7px, #474a40 7px, #474a40 9px, #1c1917 9px, #1c1917 17px); box-shadow: inset 0 2px 3px #272923; }
+.pda-grip { position: absolute; top: 34px; bottom: 34px; width: 8px; border: 1px solid #171916; background: repeating-linear-gradient(0deg, #4d5246 0, #606455 2px, #35392f 24px, #1b1d19 25px, #1b1d19 29px, #777a68 30px); box-shadow: inset 1px 0 #828572, inset -1px 0 #22251e; }
+.pda-grip-left { left: 7px; }
+.pda-grip-right { right: 7px; }
+.pda-corner { position: absolute; width: 18px; height: 18px; z-index: 1; border: 1px solid; border-color: #8a8b76 #282b24 #20231e #696d5c; border-radius: 5px 2px; background: linear-gradient(135deg, #737764, #484c3e 55%, #34392f); box-shadow: 0 0 0 2px #1c1d18; }
+.pda-corner:before { content: ''; position: absolute; top: 5px; left: 5px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid #272a23; background: linear-gradient(135deg, #969787 40%, #242820 43%, #242820 56%, #737665 59%); box-shadow: 0 1px 0 #828672; }
+.pda-corner-tl { top: 5px; left: 5px; }
+.pda-drag-handle { position: absolute; z-index: 4; top: 2px; left: 2px; right: 32px; height: 26px; cursor: move; cursor: grab; -ms-user-select: none; user-select: none; }
+.pda-drag-handle.pda-dragging { cursor: move; cursor: grabbing; }
+.pda-close { position: absolute; z-index: 4; top: 5px; right: 5px; }
+.pda-close .link { display: block; float: none; position: relative; box-sizing: border-box; width: 20px; height: 20px; margin: 0; padding: 0; border: 1px solid; border-color: #8a8b76 #282b24 #20231e #696d5c; border-radius: 3px; background: linear-gradient(135deg, #737764, #484c3e 55%, #34392f); box-shadow: 0 0 0 2px #1c1d18; }
+.pda-close .link:hover { background: #817d61; }
+.pda-close-mark:before, .pda-close-mark:after { content: ''; position: absolute; left: 4px; top: 8px; width: 10px; height: 2px; background: #c6cbb9; transform: rotate(45deg); }
+.pda-close-mark:after { transform: rotate(-45deg); }
+.pda-corner-bl { bottom: 5px; left: 5px; }
+.pda-corner-br { bottom: 5px; right: 5px; }
+.pda-screen { position: absolute; box-sizing: border-box; overflow: hidden; border: 5px solid; border-radius: 7px; text-shadow: 0 0 2px currentColor; box-shadow: 0 0 0 2px #141613, 0 0 0 4px #858a77, 0 0 0 7px #4d5345, 0 0 0 9px #2b3027, 0 0 0 11px #171b16, 0 1px 0 12px #656956; }
+.pda-hardware { position: absolute; bottom: 5px; left: 50%; width: 36px; height: 18px; margin-left: -18px; }
+.pda-hardware .link { display: block; float: none; box-sizing: border-box; width: 36px; height: 18px; min-height: 0; margin: 0; padding: 3px 8px; border: 2px solid; border-color: #959986 #30362d #252c24 #6c7765; border-radius: 4px; background: linear-gradient(#5d6859, #343e33); box-shadow: 0 0 0 2px #171b16; }
+.pda-hardware .link:hover { background: #687b67; }
+.pda-home-mark { display: block; height: 6px; border: 1px solid #b0c3ac; box-shadow: 0 0 3px #8ca088; }
+.pda-screen:before, .pda-screen:after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
+.pda-screen:before { z-index: 2; background: linear-gradient(125deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .045) 39%, transparent 40%, transparent 67%, rgba(255, 255, 255, .035) 68%, transparent 100%); box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25), inset 0 0 13px rgba(0, 0, 0, .45), inset 0 -2px 3px rgba(0, 0, 0, .3); }
+.pda-screen:after { z-index: 3; opacity: .25; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, .18) 2px, rgba(0, 0, 0, .18) 3px); }
+#uiContent { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+#uiLoadingNotice { padding: 15px 10px; }
+.pda-nav { position: absolute; top: 3px; left: 6px; right: 6px; height: 29px; }
+.pda-nav-slot { float: left; width: 20%; text-align: center; }
+.pda-nav .link { display: inline-block; float: none; width: 32px; height: 27px; padding: 0; margin: 0; border: 1px solid transparent; background: transparent; color: inherit; }
+.pda-nav .link:hover, .pda-nav .selected { background: rgba(127, 127, 127, .16); border-bottom-color: currentColor; }
+.pda-nav .pda-unread { border-color: currentColor; background: rgba(127, 127, 127, .25); }
+.pda-nav-icon { display: block; width: 20px; height: 20px; margin: 3px auto; fill: none; stroke: currentColor; stroke-width: 2; shape-rendering: crispEdges; }
+.pda-nav .disabled { opacity: .4; }
+.pda-nav .linkPending { opacity: .5; }
+.pda-page { position: absolute; top: 38px; left: 8px; right: 8px; bottom: 7px; overflow-x: hidden; overflow-y: auto; word-wrap: break-word; scrollbar-color: #7d897c transparent; scrollbar-width: thin; }
+.pda-page::-webkit-scrollbar { width: 6px; }
+.pda-page::-webkit-scrollbar-track { background: rgba(0, 0, 0, .12); }
+.pda-page::-webkit-scrollbar-thumb { background: #7d897c; }
+.pda-case .link:focus { outline: 1px solid; outline-offset: 1px; }
+.pda-owner, .pda-clock { font-size: 14px; line-height: 1.4; font-weight: normal; margin-bottom: 3px; }
+.pda-readout { line-height: 1.7; }
+.pda-readout .pda-job { margin-bottom: 3px; }
+.pda-message-alert { margin-top: 9px; }
+.pda-page h1, .pda-page h2, .pda-page h3 { color: inherit; line-height: 1.6; font-size: 10px; padding: 5px 0; }
+.pda-page h3 { font-size: 9px; }
+.pda-page .item { margin-top: 6px; overflow: hidden; }
+.pda-page .itemLabel, .pda-page .itemLabelNarrow, .pda-page .itemLabelWide, .pda-page .itemLabelWider, .pda-page .itemLabelWidest,
+.pda-page .itemContent, .pda-page .itemContentWide, .pda-page .itemContentNarrow { float: none; width: auto; color: inherit; }
+.pda-page .itemLabel, .pda-page .itemLabelNarrow { margin-bottom: 4px; }
+.pda-page .link { float: none; display: inline-block; vertical-align: top; box-sizing: border-box; max-width: 100%; width: auto; height: auto; min-height: 25px; white-space: normal; text-align: left; padding: 4px 6px; margin: 0 2px 4px 0; font-size: 9px; line-height: 1.8; color: inherit; background: rgba(0, 0, 0, .08); border: 1px solid; }
+.pda-page .link.hasIcon { position: relative; padding-left: 28px; }
+.pda-page .uiIcon16, .pda-page .uiLinkPendingIcon {
+    /* Align the sprite artwork with the pixel font's raised visual baseline. */
+    position: absolute; float: none; left: 6px; top: 50%; margin: -10px 0 0;
+}
+.pda-page .linkActive:hover { background: rgba(127, 127, 127, .25); }
+.pda-page .disabled, .pda-page .inactive { opacity: .5; color: inherit; background: transparent; border-color: currentColor; }
+.pda-page .statusDisplay, .pda-page .statusDisplayRecords { color: inherit; background: rgba(0, 0, 0, .1); border: 1px solid; padding: 6px; }
+.pda-page .average, .pda-page .white, .pda-page .good { color: inherit; font-weight: normal; }
+.pda-page .bad { color: inherit; font-weight: bold; }
+ .pda-page .pda-back { margin-bottom: 4px; }
+ .pda-empty { padding-top: 5px; }
+ .pda-empty p { margin: 12px 0; }
+ .p8-screen { position: relative; width: 100%; max-width: 392px; margin: 2px auto 6px; background: #000; border: 2px solid; border-radius: 4px; box-shadow: inset 0 0 8px rgba(0,0,0,.7); }
+ .p8-screen::before { content: ''; display: block; padding-top: 100%; }
+ .p8-screen-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; }
+ .p8-error { margin: 4px 0; color: #ff004d; }
+ .p8-pad { overflow: hidden; margin: 8px 0 4px; }
+ .p8-pad-row { overflow: hidden; margin-top: 4px; }
+ .p8-pad-btn { float: left; box-sizing: border-box; width: 72px; height: 34px; margin: 0 4px 4px 0; padding-top: 7px; text-align: center; border: 2px solid; border-radius: 6px; background: rgba(0,0,0,.18); cursor: pointer; -ms-user-select: none; user-select: none; font-size: 12px; }
+ .p8-pad-btn:active { background: rgba(127,127,127,.35); }
+ .p8-pad .p8-pad-btn { min-height: 0; line-height: 1.5; }
+ .p8-action { margin-top: 8px; }
+ .p8-action .p8-pad-btn { border-radius: 50%; width: 46px; height: 46px; padding-top: 12px; }

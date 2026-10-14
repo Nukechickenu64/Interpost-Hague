@@ -353,7 +353,11 @@
 		//We are now going to move
 		moving = 1
 		//Something with pulling things
-		if(locate(/obj/item/grab, mob))
+		if(mob.has_spacecraft_deck())
+			if(mob.confused && prob(mob.m_intent == "run" ? 70 : 35))
+				direct = turn(direct, pick(90, -90))
+			. = mob.SelfMove(n, direct)
+		else if(locate(/obj/item/grab, mob))
 			for (var/obj/item/grab/G in mob)
 				move_delay = max(move_delay, world.time + G.grab_slowdown())
 				var/list/L = mob.ret_grab()
@@ -416,6 +420,8 @@
 	return
 
 /mob/proc/SelfMove(turf/n, direct)
+	if(has_spacecraft_deck())
+		return spacecraft_carrier.walk_on_deck(src, direct)
 	if(client && updating_glide_size)
 		set_glide_size(DELAY_TO_GLIDE_SIZE(client.move_delay - world.time))
 	return Move(n, direct)
@@ -504,6 +510,10 @@
 ///For moving in space
 ///Return 1 for movement 0 for none
 /mob/proc/Process_Spacemove(var/check_drift = 0)
+	if(has_spacecraft_deck())
+		inertia_dir = 0
+		update_floating()
+		return 1
 	if(!Check_Dense_Object()) //Nothing to push off of so end here
 		update_floating()
 		return 0
@@ -515,6 +525,9 @@
 	return 1
 
 /mob/proc/check_solid_ground()
+	if(has_spacecraft_deck())
+		inertia_dir = 0
+		return 1
 	if(istype(loc, /turf/space))
 		return 0
 

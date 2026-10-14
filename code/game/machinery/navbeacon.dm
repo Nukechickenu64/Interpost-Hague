@@ -107,7 +107,7 @@ Transponder Codes:<UL>"}
 		t+= "<UL></TT>"
 
 	var/page = ui_build_styled_html("Navigation Beacon", t)
-	user << browse(page, "window=navbeacon")
+	device_ui_browse(user, page, "window=navbeacon", src)
 	onclose(user, "navbeacon")
 	return
 

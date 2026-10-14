@@ -47,6 +47,7 @@
 	dat += "</tr></table>"
 
 	var/datum/browser/popup = new(user, "gyrotron_controller_[id_tag]", "Gyrotron Remote Control Console", 500, 400, src)
+	popup.device_source = src
 	popup.set_content(dat)
 	popup.open()
 	add_fingerprint(user)

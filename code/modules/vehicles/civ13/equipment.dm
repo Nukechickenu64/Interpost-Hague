@@ -246,6 +246,16 @@
 
 /obj/structure/bed/chair/civ13/post_buckle_mob(mob/living/occupant)
 	. = ..()
+	if(istype(vehicle_axis, /obj/structure/vehicleparts/axis/spacecraft))
+		var/obj/structure/vehicleparts/axis/spacecraft/ship = vehicle_axis
+		ship.refresh_pose()
+		var/datum/spacecraft_attachment/seat_pose = ship.flight_attachments[src]
+		var/datum/spacecraft_attachment/occupant_pose = ship.flight_attachments[buckled_mob]
+		if(seat_pose && occupant_pose)
+			ship.stop_deck_animation(buckled_mob)
+			occupant_pose.local_x = seat_pose.local_x
+			occupant_pose.local_y = seat_pose.local_y
+			ship.render_flight_atom(buckled_mob, occupant_pose)
 	if(!buckled_mob)
 		var/obj/structure/vehicleparts/weapon/weapon = station_control ? station_control : mounted_weapon
 		if(weapon && occupant)
@@ -283,7 +293,7 @@
 	var/control_status = "Gear: [chassis.currentspeed]."
 	if(istype(chassis, /obj/structure/vehicleparts/axis/spacecraft))
 		var/obj/structure/vehicleparts/axis/spacecraft/ship = chassis
-		actions = list("Toggle Engine", "Increase Throttle (W)", "Decrease Throttle (S)", "Turn Left (A)", "Turn Right (D)", "Brake", "Leave Seat")
+		actions = list("Toggle Engine", "Increase Throttle (W)", "Decrease Throttle (S)", "Turn Left (A)", "Turn Right (D)", "Set Heading", "Brake", "Leave Seat")
 		control_status = "[ship.flight_status()] Life support: [user.get_spacecraft_life_support() ? "Operational" : "Offline"]. W/S adjust throttle through zero into reverse; A/D adjust heading. Throttle persists after leaving the seat."
 	if(chassis.get_controlled_weapons(src).len)
 		actions += "Weapon Controls"
@@ -306,6 +316,13 @@
 			chassis.relaymove(user, WEST)
 		if("Turn Right (D)")
 			chassis.relaymove(user, EAST)
+		if("Set Heading")
+			if(istype(chassis, /obj/structure/vehicleparts/axis/spacecraft))
+				var/obj/structure/vehicleparts/axis/spacecraft/ship = chassis
+				var/course = input(user, "Heading in degrees clockwise from north (0=N, 90=E).", "Spacecraft Heading", ship.get_heading()) as null|num
+				if(!isnull(course) && buckled_mob == user && vehicle_axis == ship && ship.can_drive(user))
+					if(!ship.set_heading(course))
+						to_chat(user, SPAN_WARNING("Unable to turn: check hull clearance and propellant."))
 		if("Brake")
 			chassis.stopmovementloop()
 		if("Leave Seat")
@@ -427,7 +444,7 @@
 
 /obj/structure/bed/chair/civ13/driver/spacecraft
 	name = "pilot's control couch"
-	desc = "Spacecraft flight controls: W increases throttle, S decreases it through zero into reverse. D increases heading by 15 degrees clockwise; A decreases it. Gearing is automatic and throttle stays set when you leave the seat. Click for engine controls and the brake."
+	desc = "Spacecraft flight controls: W increases throttle, S decreases it through zero into reverse. D increases heading by 5 degrees clockwise; A decreases it. Gearing is automatic and throttle stays set when you leave the seat. Click for engine controls, an exact heading, and the brake."
 	icon_state = "driver_tank"
 
 /obj/structure/bed/chair/civ13/passenger/spacecraft

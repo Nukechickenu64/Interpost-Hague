@@ -78,7 +78,7 @@
 		user.visible_message("<span class='notice'>[user] [panel_open ? "opens" : "closes"] the hatch on the [src].</span>", "<span class='notice'>You [panel_open ? "open" : "close"] the hatch on the [src].</span>")
 		update_icon(1)
 		if(!panel_open && user.machine == src)
-			show_browser(user, null, "window=spaceheater")
+			device_ui_browse(user, null, "window=spaceheater", src)
 			user.unset_machine()
 	else
 		..()
@@ -109,6 +109,7 @@
 		dat += "<A href='?src=\ref[src];op=temp;val=5'>+</A><BR>"
 
 		var/datum/browser/popup = new(usr, "spaceheater", "Space Heater Control Panel")
+		popup.device_source = src
 		popup.set_content(jointext(dat, null))
 		popup.set_title_image(usr.browse_rsc_icon(src.icon, "sheater-standby"))
 		popup.open()
@@ -121,7 +122,7 @@
 
 /obj/machinery/space_heater/Topic(href, href_list, state = GLOB.physical_state)
 	if (..())
-		show_browser(usr, null, "window=spaceheater")
+		device_ui_browse(usr, null, "window=spaceheater", src)
 		usr.unset_machine()
 		return 1
 

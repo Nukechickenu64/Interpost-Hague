@@ -39,5 +39,5 @@
 
 /obj/machinery/computer/rcon/update_icon()
 	..()
-	if(is_operable())
+	if(is_operable() && icon_state != "os13_ai-fixer")
 		overlays += image('icons/obj/computer.dmi', "ai-fixer-empty", overlay_layer)

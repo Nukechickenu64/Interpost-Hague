@@ -56,7 +56,7 @@
 <B>No Patient Detected</B>
 "}
 	var/page = ui_build_styled_html("Operating Computer", dat)
-	user << browse(page, "window=op")
+	device_ui_browse(user, page, "window=op", src)
 	onclose(user, "op")
 
 /obj/machinery/computer/operating/Process()

@@ -590,6 +590,7 @@ var/global/shadowcast_generation = 0
 	update_cull_mask(TRUE)
 
 /client/proc/update_cull_mask(force = FALSE)
+	update_spacecraft_camera()
 	if(!los_cull_image)
 		return
 	var/looking_far = look_far_active()

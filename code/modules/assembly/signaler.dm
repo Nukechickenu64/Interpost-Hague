@@ -64,7 +64,7 @@
 		<A href='byond://?src=\ref[src];code=5'>+</A><BR>
 		[t1]
 		</TT>"}
-	user << browse(dat, "window=radio")
+	device_ui_browse(user, dat, "window=radio", src)
 	onclose(user, "radio")
 	return
 

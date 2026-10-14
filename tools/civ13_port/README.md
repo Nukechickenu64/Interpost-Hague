@@ -192,10 +192,25 @@ propellant and engine shutdown. Restoring propulsion does not restart the thrott
 Ground chassis reject thrusters; spacecraft chassis reject wheels and tracks.
 Start the engine through the pilot couch's controls. W/Up raises throttle by 10%;
 S/Down lowers it by 10%, through zero into reverse. A/Left and D/Right adjust
-heading by 15 degrees, independently of the hull's cardinal facing. Gears change
+heading by 5 degrees; `Set Heading` accepts any angle, including fractions. Gears change
 automatically. Throttle persists when the pilot leaves the seat; use Brake or
-zero throttle to stop. Spacecraft use controlled tile movement, not orbital physics
-or the overmap ship engine. Tanks accept standard `fuel` and liquid phoron.
+zero throttle to stop. Spacecraft retain a continuous center and heading, move
+between tiles, and rotate every deck section, seat and cargo position about that
+center. Collision checks follow the actual rotated deck footprint throughout
+translation and steering. Crew rotate with the hull and their camera follows
+their exact displayed position. Walking uses adjacent local deck cells and
+checks both sides of each shared wall/hatch. Movement keys select the deck axis
+closest to the requested screen direction; occupants have firm footing and
+normal movement penalties. Walking and pulled cargo interpolate between deck
+cells in the moving hull's coordinates, with camera offsets following the same
+intermediate pose; this also animates with the engine off. Roofs and exterior
+turret images inherit their owner's pose exactly once to remain aligned.
+The camera remains north-up; arbitrary map rotation
+would also require rotating the lighting and visibility rendering pipeline.
+BYOND turfs still back world interactions, but do not determine deck adjacency
+or the ship's pose. Flight stays
+on the current Z level and does not use orbital physics or the overmap engine.
+Tanks accept standard `fuel` and liquid phoron.
 Drag items into cargo lockers by using the held item on them; click to retrieve.
 
 All five presets include self-powered life support. An enabled, intact unit on an
@@ -278,8 +293,24 @@ normal game before deployment:
    Board through a hatch, start the engine, adjust throttle through zero into
    reverse, steer and brake. Verify crew, loose items and loaded cargo lockers
    move together, including after the pilot leaves the seat.
-11. Check spacecraft floor/space transitions, obstruction rejection and map-edge
+11. While moving and turning at full throttle, leave the couch and walk in each
+   direction. Check that the camera stays centered, the crew turn with the hull,
+   and each key follows the nearest visible deck axis. Repeat at 37.5, 45, 90 and
+   225 degrees, check closed/open hatches, buckle and unbuckle, pull cargo, and
+   step off the deck. Verify normal camera offsets return outside, on logout and
+   when using a remote camera or looking into the distance.
+   Check smooth walking and pulled cargo between cells with the engine off and
+   during translation/turns, including two cells sharing a backing turf. From
+   outside, verify roofs and turret exteriors align with the hull after steering
+   and after opening/closing hatches or rebuilding their icons.
+   Check spacecraft floor/space transitions, obstruction rejection and map-edge
    stopping. Confirm ordinary ground vehicles still cannot spawn or drive in space.
+   Brake between tiles on cardinal and angled courses. Turn through 45/90-degree
+   boundaries and a full circle; verify the hull center stays fixed, crew and
+   cargo stay on their decks, and roofs match the hull for outside observers.
+   Try fractional moves and turns beside walls and other angled ships. Leave a
+   parked, rotated deck and pick up/drop cargo to check pose cleanup. Set a
+   fractional heading from the pilot controls and verify that exact course.
 12. Break/remove thrusters and exhaust fuel to check movement stopping; repair and
    refuel to resume. Confirm removed thrusters no longer glow. Build a spacecraft
    from workbench parts and operate the patrol craft's weapon from its station.

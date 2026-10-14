@@ -39,7 +39,7 @@ Frequency:
 <A href='byond://?src=\ref[src];freq=10'>+</A><BR>
 
 <A href='?src=\ref[src];refresh=1'>Refresh</A>"}
-	user << browse(dat, "window=radio")
+	device_ui_browse(user, dat, "window=radio", src)
 	onclose(user, "radio")
 	return
 

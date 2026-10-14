@@ -170,6 +170,7 @@
 	dat += "<br>\[<A href='?src=\ref[src];refresh=1'>Refresh</A>\]"
 
 	var/datum/browser/popup = new(user, "dartgun", "[src] mixing control")
+	popup.device_source = src
 	popup.set_content(jointext(dat,null))
 	popup.open()
 

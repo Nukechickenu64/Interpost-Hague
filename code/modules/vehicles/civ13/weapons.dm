@@ -211,7 +211,7 @@
 	html += "<p>Target: [aim_target ? "[aim_target.x], [aim_target.y]" : "None"]</p>"
 	html += "<p>[gun.loading ? "Reloading" : (world.time < next_rotation ? "Rotating" : "Ready")] | [gun.loaded ? gun.loaded.rounds : 0] rounds</p>"
 	html += "<a href='?src=\ref[src];aim=1'>Aim</a> | <a href='?src=\ref[src];left=1'>Rotate Left</a> | <a href='?src=\ref[src];right=1'>Rotate Right</a> | <a href='?src=\ref[src];fire=1'>Fire</a></body></html>"
-	user << browse(html, "window=civ13_weapon;size=360x200")
+	device_ui_browse(user, html, "window=civ13_weapon;size=360x200", src)
 
 /obj/structure/vehicleparts/weapon/Topic(href, href_list)
 	if(!can_operate(usr))

@@ -265,7 +265,7 @@
 			dat += "</tr>"
 		dat += "</table>"
 
-	user << browse(dat, "window=seedstorage")
+	device_ui_browse(user, dat, "window=seedstorage", src)
 	onclose(user, "seedstorage")
 
 /obj/machinery/seed_storage/Topic(var/href, var/list/href_list)

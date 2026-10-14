@@ -109,7 +109,12 @@
 		window_size = "size=[width]x[height];"
 
 	var/debugable = check_rights(R_DEBUG, 0, user)
-	user << browse(get_html(debugable), "window=[window_id];[window_size][list2params(window_options)]") // Open the window.
+	var/html = get_html(debugable)
+	var/options = "window=[window_id];[window_size][list2params(window_options)]"
+	if(!custom_browser_id)
+		html = device_ui_html(user, html, window_id, src_object.ui_host(), "uiclose \ref[src]")
+		options = device_ui_options(options, src_object.ui_host())
+	user << browse(html, options)
 	if (!custom_browser_id)
 		spawn(2)
 			winset(user, window_id, "on-close=\"uiclose \ref[src]\"") // Instruct the client to signal UI when the window is closed.
@@ -243,7 +248,7 @@
 				"name" = "[src_object]",
 				"ref"  = "\ref[src_object]"
 			),
-			"titlebar" = titlebar
+			"titlebar" = titlebar && (custom_browser_id || !device_ui_host(src_object.ui_host()))
 		)
 	return config_data
 

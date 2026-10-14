@@ -96,7 +96,7 @@
 			if(event == ORION_TRAIL_START) //new game? New game.
 				dat = "<center><h1>Orion Trail[emagged ? ": Realism Edition" : ""]</h1><br>Learn how our ancestors got to Orion, and have fun in the process!</center><br><P ALIGN=Right><a href='?src=\ref[src];continue=1'>Start New Game</a></P>"
 				var/page = ui_build_styled_html("Orion Trail", dat)
-				user << browse(page, "window=arcade")
+				device_ui_browse(user, page, "window=arcade", src)
 				return
 			else
 				event_title = event
@@ -175,7 +175,7 @@
 	dat += "[view==ORION_VIEW_SUPPLIES ? "" : "<a href='?src=\ref[src];supplies=1'>"]Supplies[view==ORION_VIEW_SUPPLIES ? "" : "</a>"]<BR>"
 	dat += "[view==ORION_VIEW_CREW ? "" : "<a href='?src=\ref[src];crew=1'>"]Crew[view==ORION_VIEW_CREW ? "" : "</a>"]</P>"
 	var/page2 = ui_build_styled_html("Orion Trail", dat)
-	user << browse(page2, "window=arcade")
+	device_ui_browse(user, page2, "window=arcade", src)
 
 /obj/machinery/computer/arcade/orion_trail/OnTopic(user, href_list)
 	if(href_list["continue"])

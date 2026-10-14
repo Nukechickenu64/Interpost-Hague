@@ -14,11 +14,13 @@
 	var/light_range_on = 2
 	var/light_power_on = 1
 	var/overlay_layer
+	var/base_icon_state
 	atom_flags = ATOM_FLAG_CLIMBABLE
 	clicksound = "truekeyboard"
 
 /obj/machinery/computer/New()
 	overlay_layer = layer
+	base_icon_state = icon_state
 	..()
 
 /obj/machinery/computer/Initialize()
@@ -56,9 +58,34 @@
 
 /obj/machinery/computer/update_icon()
 	overlays.Cut()
+	icon_state = base_icon_state
+	// OS13 states include the casing and keyboard, so do not add legacy overlays.
+	if(icon == 'icons/obj/computer.dmi')
+		var/full_state
+		switch(base_icon_state)
+			if("computer", "retrosmall")
+				full_state = "os13_[icon_screen]"
+			if("oldcomp")
+				full_state = "os13_retro"
+			if("laptop")
+				full_state = "os13_laptop"
+			if("guest")
+				full_state = "os13_pass"
+			if("tcstation")
+				full_state = "os13_syndie"
+		if(full_state && (full_state in icon_states(icon)))
+			if(stat & NOPOWER)
+				icon_state = "[full_state]_off"
+				set_light(0)
+			else
+				icon_state = (stat & BROKEN) ? "[full_state]_broken" : full_state
+				set_light(light_range_on, light_power_on)
+			return
+
 	if(stat & NOPOWER)
 		set_light(0)
-		icon_state = "[icon_state]_off"
+		if("[base_icon_state]_off" in icon_states(icon))
+			icon_state = "[base_icon_state]_off"
 		if(icon_keyboard)
 			overlays += image(icon,"[icon_keyboard]_off", overlay_layer)
 		return

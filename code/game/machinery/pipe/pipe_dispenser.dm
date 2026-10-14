@@ -81,7 +81,7 @@
 	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
-	ui_browse_styled(user, name, body, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, name, body, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "pipedispenser")
 	return
 
@@ -211,7 +211,7 @@ Nah
 	body2 += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body2 += "</div>"
 	body2 += dat
-	ui_browse_styled(user, name, body2, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, name, body2, "window=pipedispenser;size=420x560;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	return
 
 // 0=straight, 1=bent, 2=junction-j1, 3=junction-j2, 4=junction-y, 5=trunk

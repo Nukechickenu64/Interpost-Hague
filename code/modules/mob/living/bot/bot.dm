@@ -142,6 +142,7 @@
 		dat += curText
 
 	var/datum/browser/popup = new(user, "botpanel", "[src] controls")
+	popup.device_source = src
 	popup.set_content(dat)
 	popup.open()
 

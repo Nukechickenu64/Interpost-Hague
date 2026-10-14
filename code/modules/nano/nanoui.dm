@@ -187,6 +187,7 @@ nanoui is used to open and update nano browser uis
 	name = sanitize(name)
 	var/list/config_data = list(
 			"title" = title,
+			"window" = window_id,
 			"srcObject" = list("name" = name),
 			"stateKey" = state_key,
 			"status" = status,
@@ -372,18 +373,30 @@ nanoui is used to open and update nano browser uis
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<head>
 		<script type='text/javascript'>
+			// Updates can arrive before the external scripts or initial data are ready.
+			var nanoUpdateQueue = new Array();
 			function receiveUpdateData(jsonString)
 			{
-				// We need both jQuery and NanoStateManager to be able to recieve data
-				// At the moment any data received before those libraries are loaded will be lost
-				if (typeof NanoStateManager != 'undefined' && typeof jQuery != 'undefined')
+				if (nanoUpdateQueue !== null)
 				{
-					NanoStateManager.receiveUpdateData(jsonString);
+					nanoUpdateQueue.push(jsonString);
 				}
 				else
 				{
-					alert('browser.recieveUpdateData failed due to jQuery or NanoStateManager being unavailiable.');
+					NanoStateManager.receiveUpdateData(jsonString);
 				}
+			}
+			function flushNanoUpdateQueue()
+			{
+				if (nanoUpdateQueue === null)
+				{
+					return;
+				}
+				while (nanoUpdateQueue.length)
+				{
+					NanoStateManager.receiveUpdateData(nanoUpdateQueue.shift());
+				}
+				nanoUpdateQueue = null;
 			}
 		</script>
 		[head_content]
@@ -428,7 +441,12 @@ nanoui is used to open and update nano browser uis
 	var/datum/asset/assets = get_asset_datum(/datum/asset/nanoui)
 	assets.send(user, templates_to_send)
 
-	user << browse(html, "window=[window_id];[window_size][window_options]")
+	var/options = "window=[window_id];[window_size][window_options]"
+	// The PDA already has its own sprite-specific physical layout.
+	if(layout_key != "pda")
+		html = device_ui_html(user, html, window_id, src_object, "nanoclose \ref[src]")
+		options = device_ui_options(options, src_object)
+	user << browse(html, options)
 	winset(user, "mapwindow.map", "focus=true") // return keyboard focus to map
 	on_close_winset()
 	//onclose(user, window_id)

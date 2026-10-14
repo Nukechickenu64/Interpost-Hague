@@ -78,8 +78,8 @@
 // - title: header text
 // - body_html: the content
 // - window_args: optional browse() args (e.g., "window=name;size=500x600")
-/proc/ui_browse_styled(var/mob/user, var/title, var/body_html, var/window_args)
+/proc/ui_browse_styled(var/mob/user, var/title, var/body_html, var/window_args, var/datum/device_source = null)
     if(!user)
         return
     var/page = ui_build_styled_html(title, body_html)
-    user << browse(page, window_args)
+    device_ui_browse(user, page, window_args, device_source)

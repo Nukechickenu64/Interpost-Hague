@@ -209,7 +209,7 @@
 							</body>
 							</html>
 						  "}
-		occupant << browse(window, "window=sam;size=800x600;")
+		device_ui_browse(occupant, window, "window=sam;size=800x600;", src)
 		onclose(occupant, "sam", src)
 	return
 */

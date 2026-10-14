@@ -237,6 +237,7 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				to_chat(usr, "<span class='warning'>Station telemetry unavailable: AI Director is not initialized.</span>")
 				return
 			var/datum/browser/popup = new(usr, "bridge_station_status", "Station Status", 650, 500)
+			popup.device_source = src
 			popup.set_content("[GLOB.bridge_crew_objectives.get_status_report()]<hr>[SSdirector.station_status_report()]")
 			popup.open()
 		if("announce")

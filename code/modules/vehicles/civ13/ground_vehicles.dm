@@ -79,6 +79,12 @@
 	return null
 
 /obj/structure/vehicleparts/frame/proc/wall_blocks(direction)
+	if(istype(axis, /obj/structure/vehicleparts/axis/spacecraft))
+		var/obj/structure/vehicleparts/axis/spacecraft/ship = axis
+		if(!isnull(ship.assembly_heading))
+			var/datum/spacecraft_attachment/attachment = ship.flight_attachments[src]
+			var/local_heading = attachment ? attachment.rotation_origin : ship.assembly_heading
+			direction = angle2dir((dir2angle(direction) - ship.get_heading() + local_heading + 360) % 360)
 	for(var/cardinal in GLOB.cardinal)
 		if(!(direction & cardinal))
 			continue
@@ -230,15 +236,22 @@
 
 /obj/structure/vehicleparts/frame/Crossed(atom/movable/mover)
 	. = ..()
-	if(axis && ismob(mover))
-		axis.refresh_roof_visibility()
+	if(istype(axis, /obj/structure/vehicleparts/axis/spacecraft) && axis:applying_pose)
+		return
+	if(axis && (ismob(mover) || istype(axis, /obj/structure/vehicleparts/axis/spacecraft)))
+		axis.refresh_pose()
+		if(ismob(mover))
+			axis.refresh_roof_visibility()
 
 /obj/structure/vehicleparts/frame/Uncrossed(atom/movable/mover)
 	. = ..()
-	if(axis && ismob(mover))
+	if(istype(axis, /obj/structure/vehicleparts/axis/spacecraft) && axis:applying_pose)
+		return
+	if(axis && (ismob(mover) || istype(axis, /obj/structure/vehicleparts/axis/spacecraft)))
 		var/obj/structure/vehicleparts/axis/chassis = axis
 		spawn(0)
 			if(chassis)
+				chassis.refresh_pose()
 				chassis.refresh_roof_visibility()
 
 /obj/structure/vehicleparts/frame/attackby(obj/item/tool, mob/user)
@@ -299,7 +312,11 @@
 			chassis.components -= src
 			axis = null
 			anchored = FALSE
+			transform = null
+			if(roof)
+				roof.transform = null
 			update_icon()
+			chassis.refresh_pose()
 		return
 	return ..()
 
@@ -313,11 +330,16 @@
 	axis = target.axis
 	axis.components += src
 	anchored = TRUE
+	transform = null
+	if(roof)
+		roof.transform = null
 	set_dir(axis.dir)
 	axis.refresh_component_icons()
+	axis.refresh_pose()
 
 /obj/structure/vehicleparts/frame/Destroy()
 	if(axis)
+		var/obj/structure/vehicleparts/axis/chassis = axis
 		for(var/obj/structure/bed/chair/civ13/seat in get_turf(src))
 			if(seat.vehicle_axis == axis)
 				seat.unbind_from_vehicle()
@@ -326,10 +348,14 @@
 		for(var/obj/structure/vehicleparts/part in axis.modules.Copy())
 			if(part.mount == src)
 				axis.remove_component(part)
-		axis.stopmovementloop()
-		axis.components -= src
-		axis.refresh_component_icons()
+		chassis.stopmovementloop()
+		chassis.components -= src
+		chassis.refresh_component_icons()
 		axis = null
+		transform = null
+		if(roof)
+			roof.transform = null
+		chassis.refresh_pose()
 	return ..()
 
 /obj/structure/vehicleparts/movement
@@ -437,6 +463,9 @@
 			exterior_images += weapon.exterior_image
 	return exterior_images
 
+/obj/structure/vehicleparts/axis/proc/refresh_pose()
+	return
+
 /obj/structure/vehicleparts/axis/proc/refresh_roof_visibility()
 	var/list/current_viewers = list()
 	var/list/exterior_images = get_exterior_images()
@@ -500,6 +529,7 @@
 			weapon.try_autoload()
 	assign_weapon_controls()
 	frame.update_icon()
+	refresh_pose()
 	return TRUE
 
 /obj/structure/vehicleparts/axis/proc/refresh_component_icons()
@@ -577,9 +607,11 @@
 	part.mount = null
 	part.axis = null
 	part.anchored = FALSE
+	part.transform = null
 	assign_weapon_controls()
 	refresh_component_icons()
 	refresh_roof_visibility()
+	refresh_pose()
 	if(istype(part, /obj/structure/vehicleparts/movement/thruster))
 		part.update_icon()
 
@@ -592,6 +624,7 @@
 	forceMove(get_turf(target))
 	target.set_dir(dir)
 	refresh_component_icons()
+	refresh_pose()
 
 /obj/structure/vehicleparts/axis/proc/stopmovementloop()
 	cruise = FALSE
@@ -767,6 +800,9 @@
 				seat.unbind_from_vehicle()
 		frame.axis = null
 		frame.anchored = FALSE
+		frame.transform = null
+		if(frame.roof)
+			frame.roof.transform = null
 	for(var/obj/structure/vehicleparts/movement/wheel in wheels)
 		wheel.axis = null
 	driver = null

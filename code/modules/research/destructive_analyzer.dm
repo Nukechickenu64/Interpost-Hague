@@ -1,7 +1,7 @@
 /*
 Destructive Analyzer
 
-It is used to destroy hand-held objects and advance technological research. Controls are in the linked R&D console.
+It salvages materials and integrated circuit designs. Technology levels are imported from disks. Controls are in the linked R&D console.
 
 Note: Must be placed within 3 tiles of the R&D Console
 */

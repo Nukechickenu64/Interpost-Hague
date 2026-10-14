@@ -229,7 +229,7 @@
 	HTML += "<br><font color='0000FF'>[extended_desc]</font>"
 
 	HTML += "</body></html>"
-	user << browse(jointext(HTML, null), "window=circuit-\ref[src];size=600x350;border=1;can_resize=1;can_close=1;can_minimize=1")
+	device_ui_browse(user, jointext(HTML, null), "window=circuit-\ref[src];size=600x350;border=1;can_resize=1;can_close=1;can_minimize=1", src)
 
 	onclose(user, "circuit-\ref[src]")
 

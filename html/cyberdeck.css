@@ -1,0 +1,64 @@
+/* Palette, glass and outer hardware come from the console's live sprite. */
+.cyberdeck { font: 12px/1.45 Verdana, Arial, sans-serif; padding: 3px 5px; }
+.cyberdeck * { box-sizing: border-box; }
+.cyberdeck h1, .cyberdeck h2, .cyberdeck h3, .cyberdeck p { margin: 0; }
+.cyber-header, .cyber-section-heading, .cyber-panel-footer, .cyber-recall { display: flex; align-items: center; justify-content: space-between; }
+.cyber-header { padding: 2px 0 12px; }
+.cyberdeck h1 { font: bold 25px/1.15 'Courier New', monospace; letter-spacing: .12em; }
+.cyber-eyebrow, .cyber-badge, .cyberdeck h2, .cyber-link-label, .cyber-archive-table th, .cyber-footer { font: 10px/1.5 'Courier New', monospace; text-transform: uppercase; letter-spacing: .08em; }
+.cyber-eyebrow { display: block; margin-bottom: 4px; }
+.cyber-badge { border: 1px solid currentColor; padding: 5px 9px; margin-left: 12px; text-align: center; }
+.cyber-badge:before { content: ''; display: inline-block; width: 5px; height: 5px; margin-right: 7px; vertical-align: 1px; background: currentColor; box-shadow: 0 0 5px currentColor; }
+.cyber-status { padding: 9px 11px; margin-bottom: 12px; border-left: 2px solid currentColor; background: rgba(255,255,255,.06); }
+.cyber-connections { display: flex; margin: 0 -5px; }
+.cyber-panel { border: 1px solid rgba(255,255,255,.19); background: rgba(0,0,0,.14); padding: 11px; margin-bottom: 12px; min-width: 0; }
+.cyber-connections > .cyber-panel { flex: 1 1 0%; margin-left: 5px; margin-right: 5px; }
+.cyberdeck h2 { font-weight: bold; margin-bottom: 8px; }
+.cyber-value { font-weight: bold; overflow-wrap: break-word; word-wrap: break-word; }
+.cyber-muted { opacity: .78; }
+.cyber-panel p { margin-top: 7px; }
+.cyber-panel-footer { flex-wrap: wrap; margin-top: 8px; }
+.cyber-panel-footer > span { margin: 0 8px 4px 0; }
+.cyberdeck .cyber-button { display: inline-block; padding: 4px 9px; border: 1px solid rgba(255,255,255,.3); text-decoration: none; white-space: nowrap; font-size: 11px; line-height: 1.4; text-align: center; }
+.cyberdeck a:focus { outline: 1px solid currentColor; outline-offset: 2px; }
+.cyberdeck .cyber-chair { display: flex; align-items: center; justify-content: space-between; text-decoration: none; padding: 5px 7px; margin-top: 5px; border: 1px solid rgba(255,255,255,.22); }
+.cyber-chair > span:first-child { min-width: 0; overflow-wrap: break-word; word-wrap: break-word; }
+.cyber-chair .cyber-link-label { flex-shrink: 0; margin-left: 8px; }
+.cyberdeck a.selected { background: rgba(255,255,255,.13); border-color: currentColor; }
+.cyber-section-heading h2 { margin: 0 8px 0 0; }
+.cyber-archive-table { border-collapse: collapse; width: 100%; margin-top: 12px; text-align: left; }
+.cyber-archive-table th { padding: 0 7px 6px; opacity: .7; }
+.cyber-archive-table td { padding: 6px 7px; border-top: 1px solid rgba(255,255,255,.12); }
+.cyber-archive-table tbody tr:nth-child(odd) { background: rgba(255,255,255,.025); }
+.cyber-archive-table td:first-child { font-weight: bold; }
+.cyber-archive-table td:nth-child(2), .cyber-archive-table td:nth-child(3) { font: 12px 'Courier New', monospace; white-space: nowrap; }
+.cyber-archive-table td:last-child, .cyber-archive-table th:last-child { text-align: right; }
+.cyber-disabled { opacity: .4; cursor: default; }
+.cyber-prerequisite { padding: 7px 9px; border: 1px dashed rgba(255,255,255,.25); }
+.cyber-session h3 { font: bold 21px/1.4 'Courier New', monospace; margin: 18px 0; }
+.cyber-metrics { display: flex; margin: 0 0 16px; }
+.cyber-metrics > div { flex: 1 1 0%; border-left: 1px solid rgba(255,255,255,.18); padding: 0 12px; }
+.cyber-metrics > div:first-child { padding-left: 0; border: 0; }
+.cyber-metrics strong { display: block; font: 25px/1.4 'Courier New', monospace; }
+.cyber-progress { border: 1px solid rgba(255,255,255,.2); padding: 3px; height: 15px; }
+.cyber-progress span { display: block; height: 7px; background: currentColor; opacity: .75; }
+.cyber-recall { border-top: 1px solid rgba(255,255,255,.18); margin-top: 22px; padding-top: 12px; }
+.cyber-recall > span { margin-right: 12px; }
+body.device-ui .cyberdeck a.danger { color: #ffbeb5 !important; background: rgba(139,40,36,.3); border-color: #ba7269; }
+body.device-ui .cyberdeck a.danger:hover { background: rgba(139,40,36,.6); }
+.cyber-loading { height: 15px; margin-top: 20px; border: 1px solid rgba(255,255,255,.3); background: repeating-linear-gradient(120deg, transparent, transparent 7px, rgba(255,255,255,.15) 7px, rgba(255,255,255,.15) 14px); }
+.cyber-footer { opacity: .65; padding: 0 0 5px; text-align: center; }
+@media (max-width: 560px) {
+  .cyberdeck { padding: 2px 0; }
+  .cyber-connections { display: block; }
+  .cyber-header { align-items: flex-start; }
+  .cyberdeck h1 { font-size: 21px; }
+  .cyber-badge { font-size: 9px; padding: 4px; }
+  .cyber-badge:before { display: none; }
+  .cyber-archive-table th, .cyber-archive-table td { padding-left: 3px; padding-right: 3px; }
+  .cyber-archive-table th:nth-child(3), .cyber-archive-table td:nth-child(3) { display: none; }
+  .cyber-metrics { flex-wrap: wrap; }
+  .cyber-metrics strong { font-size: 20px; }
+  .cyber-recall { display: block; }
+  .cyber-recall .cyber-button { margin-top: 10px; }
+}

@@ -12,6 +12,7 @@ SUBSYSTEM_DEF(mapping)
 /datum/controller/subsystem/mapping/Initialize(timeofday)
 	preloadTemplates()
 	GLOB.using_map.build_away_sites()
+	initialize_cyberdeck_instances()
 	..()
 
 /datum/controller/subsystem/mapping/Recover()

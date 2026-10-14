@@ -3,118 +3,89 @@
 Title: PDA UI
 Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
  -->
+<div class="pda-nav">
+    <div class="pda-nav-slot" title="Home">{{:helper.link('<svg class="pda-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11h3V8h3V5h6v3h3v3h3M6 11v10h5v-6h3v6h4V11"/></svg>', null, {'choice': '0'}, data.mode == 0 ? 'selected' : null)}}</div>
+    <div class="pda-nav-slot" title="Messages">{{:helper.link('<svg class="pda-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v13H4zM4 7l8 7 8-7M4 18l5-5m6 0 5 5"/></svg>', null, {'choice': '2'}, !data.owner ? 'disabled' : data.mode == 2 || data.mode == 21 ? 'selected' : null, data.new_Message ? 'pda-unread' : null)}}</div>
+    <div class="pda-nav-slot" title="Notes">{{:helper.link('<svg class="pda-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v17H5zM8 8h8m-8 4h8m-8 4h6M3 7h4m-4 6h4m-4 6h4"/></svg>', null, {'choice': '1'}, !data.owner ? 'disabled' : data.mode == 1 ? 'selected' : null)}}</div>
+    <div class="pda-nav-slot" title="{{:data.fon ? 'Turn flashlight off' : 'Turn flashlight on'}}">{{:helper.link('<svg class="pda-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v2h3v8h-3v4H9v-4H6V5h3zM9 20h6M12 10v7"/></svg>', null, {'choice': 'Light'}, null, data.fon ? 'selected' : null)}}</div>
+    <div class="pda-nav-slot" title="Utilities">{{:helper.link('<svg class="pda-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4h4v4h3v4h-4v4h-4v3h-4v-4H7v-4H4v-4h4V6h1zM10 10h5v5h-5z"/></svg>', null, {'choice': '4'}, !data.owner ? 'disabled' : data.mode == 4 ? 'selected' : null)}}</div>
+</div>
+<div class="pda-page">
 {{if data.owner}}
-	<div class="item">
-		<div class="itemLabelNarrow">
-			 <b>Functions</b>:
+    {{if data.mode != 0 && data.mode != 4}}
+        <div class="pda-back">{{:helper.link('Back', 'arrowreturn-1-w', {'choice': 'Return'})}}</div>
+    {{/if}}
+    {{if data.mode == 0}}
+        <div class="pda-owner">{{>data.owner}}</div>
+        <div class="pda-clock">{{>data.stationTime}}</div>
+        <div class="pda-readout">
+            {{if data.ownjob}}<div class="pda-job">{{>data.ownjob}}</div>{{/if}}
+            <div>Link: {{:data.toff ? 'Disabled' : data.reception ? 'Online' : 'No signal'}}</div>
+            <div>Balance: {{if data.balance != null}}{{:data.balance}} cr{{else}}{{>data.balanceStatus}}{{/if}}</div>
         </div>
-        <div class="itemContent">
-			<!--{{:helper.link('Refresh', 'refresh', {'choice' : "Refresh"}, null, 'fixedLeft')}}-->
-			{{:helper.link('Close', 'gear', {'choice' : "Close"}, null, 'fixedLeft')}}
-			{{if data.idInserted}} {{:helper.link('Update PDA Info', 'eject', {'choice' : "UpdateInfo"}, null, 'fixedLeftWide')}} {{/if}}
-			{{if data.mode != 0}} {{:helper.link('Return', 'arrowreturn-1-w', {'choice' : "Return"}, null, 'fixedLeft')}} {{/if}}
-		</div>
-	</div>
-	<br>
-	<div class="item">
-		<div class="itemLabelNarrow">
-			<b>Local Time</b>:
-		</div>
-		<div class="itemContent">
-			<span class="average">{{:data.stationTime}}</span>
-		</div>
-	</div>
-	<br>
-
-
-	{{if data.mode == 0}} <!-- Main Menu -->
+        {{if data.new_Message}}
+            <div class="pda-message-alert">{{:helper.link('New message', 'mail-closed', {'choice': '2'})}}</div>
+        {{/if}}
+    {{else data.mode == 4}}
+        <h2>Device utilities</h2>
         <div class="item">
-            <div class="itemLabelNarrow">
-                Owner:
-            </div>
+            <div class="itemLabel">Identity card</div>
             <div class="itemContent">
-                <span class="average">{{:data.owner}}, {{:data.ownjob}}</span>
+                {{:helper.link(data.idInserted ? data.idLink : 'Insert ID', data.idInserted ? 'eject' : 'plus', {'choice': 'Authenticate'})}}
+                {{if data.idInserted}}{{:helper.link('Update PDA info', 'refresh', {'choice': 'UpdateInfo'})}}{{/if}}
             </div>
         </div>
-        <br>
         <div class="item">
-            <div class="itemLabelNarrow">
-                ID:
-            </div>
+            <div class="itemLabel">Bank</div>
             <div class="itemContent">
-                {{:helper.link(data.idLink, 'eject', {'choice' : "Authenticate"}, data.idInserted ? null : 'disabled', data.idInserted ? 'floatright' : 'fixedLeft')}}
-            </div>
-        </div>
-        <br>
-        <div class="item">
-            <div class="itemLabelNarrow">
-                    <b>Cartridge</b>:
-            </div>
-            <div class="itemContent">
-                {{if data.cart_loaded==1}}
-                    {{:helper.link(data.cartridge.name, 'eject', {'choice' : "Eject"},null,null)}}
+                {{if data.idInserted }}
+                    {{if data.bank.loggedIn}}
+                        <div>{{:data.bank.accountName}} &mdash; {{:data.bank.balance}} cr</div>
+                        {{:helper.link('Log out', 'locked', {'choice': 'BankLogout'})}}
+                    {{else}}
+                        <div>Status: {{:data.bank.status}}</div>
+                        {{:helper.link('Login', 'unlocked', {'choice': 'BankLogin'}, data.bank.canBankUse ? null : 'disabled')}}
+                    {{/if}}
                 {{else}}
-                    {{:helper.link('None', 'eject', {'choice' : "Eject"},'disabled',null)}}
+                    <div>Insert an ID card to login.</div>
                 {{/if}}
             </div>
         </div>
         <div class="item">
-            <H2>Functions</H2>
-        </div>
-        <div class="item">
-            <div class="itemLabelNarrow">
-                <b>General</b>:
-            </div>
-            <div class="itemContent">
-                {{:helper.link('Notekeeper', 'note', {'choice' : "1"}, null, 'fixedLeftWide')}}
-                {{:helper.link('Messenger', data.new_Message ? 'mail-closed' : 'mail-open', {'choice' : "2"}, null, 'fixedLeftWide')}}
-            </div>
-        </div>
-        <br>
-        {{if data.cartridge}}
-            {{if data.cartridge.access.access_clown == 1}}
-                <div class="item">
-                    <div class="itemLabelNarrow">
-                        <b>Clown</b>:
-                    </div>
-                    <div class="itemContent">
-                        {{:helper.link('Honk Synthesizer', 'gear', {'choice' : "Honk"}, null, 'fixedLeftWide')}}
-                    </div>
-                </div>
-                <br>
+            <div class="itemLabel">Cartridge</div>
+            {{if data.cart_loaded}}
+                {{:helper.link(data.cartridge.name, 'eject', {'choice': 'Eject'})}}
+            {{else}}
+                <div>No cartridge installed</div>
             {{/if}}
-            {{if data.cartridge.access.access_quartermaster == 1}}
+        </div>
+        {{if data.cartridge}}
+            {{if data.cartridge.access.access_clown}}
+                <div class="item">{{:helper.link('Honk synthesizer', 'gear', {'choice': 'Honk'})}}</div>
+            {{/if}}
+            {{if data.cartridge.access.access_quartermaster}}
                 <div class="item">
-                    <div class="itemLabelNarrow">
-                        <b>Quartermaster</b>:
-                    </div>
-                    <div class="itemContent">
-                        {{:helper.link('Supply Records', 'gear', {'choice' : "47"}, null, 'fixedLeftWide')}}
-                        {{:helper.link('Delivery Bot Control', 'gear', {'choice' : "48"}, null, 'fixedLeftWide')}}
-                         <br>
-                    </div>
+                    {{:helper.link('Supply records', 'gear', {'choice': '47'})}}
+                    {{:helper.link('Delivery bot control', 'gear', {'choice': '48'})}}
                 </div>
-                <br>
+            {{/if}}
+            {{if data.cartridge.access.access_janitor}}
+                <div class="item">{{:helper.link('Custodial locator', 'gear', {'choice': '49'})}}</div>
+            {{/if}}
+            {{if data.cartridge.radio == 2}}
+                <div class="item">{{:helper.link('Signaler system', 'gear', {'choice': '40'})}}</div>
             {{/if}}
         {{/if}}
-        <br>
         <div class="item">
-            <div class = "itemLabelNarrow">
-                <b>Utilities</b>:
-            </div>
-            <div class = "itemContent">
-                {{if data.cartridge}}
-                    {{if data.cartridge.access.access_janitor==1}}
-                        {{:helper.link('Custodial Locator', 'gear', {'choice' : "49"}, null, 'fixedLeftWide')}}
-                    {{/if}}
-                    {{if data.cartridge.radio == 2}}
-                        {{:helper.link('Signaler System', 'gear', {'choice' : "40"}, null, 'fixedLeftWide')}}
-                    {{/if}}
-                {{/if}}
-                {{:helper.link(data.fon==1 ? 'Disable Flashlight' : 'Enable Flashlight', 'lightbulb', {'choice' : "Light"}, null,'fixedLeftWide')}}
+            <div class="itemLabel">Entertainment</div>
+            <div class="itemContent">
+                {{:helper.link('PICO-8 virtual console', 'gear', {'choice': '8'})}}
             </div>
         </div>
-
+        <div class="item">
+            {{:helper.link(data.fon ? 'Flashlight: On' : 'Flashlight: Off', 'lightbulb', {'choice': 'Light'})}}
+            {{:helper.link('Close PDA', 'close', {'choice': 'Close'})}}
+        </div>
 
 	{{else data.mode == 1}} <!-- Notekeeper -->
         <div class="item">
@@ -634,14 +605,10 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
 				<div class="item">
 					<div class="itemLabel">Status:</div>
 					<div class="itemContent">
-						{{if value.mode == 0}}
-							Idle
-						{{else value.mode == 1}}
-							Moving
-						{{else value.mode == 2}}
-							Unloading
+						{{if value.paused}}
+							Paused
 						{{else}}
-							Calculating path
+							Active
 						{{/if}}
 					</div>
 				</div>
@@ -704,6 +671,39 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
                         <span class="average">({{:value.x}} / {{:value.y}}) - {{:value.dir}} - Status: {{:value.status}}</span><br>
                     {{/if}}
                 {{/for}}
+            </div>
+
+	{{else data.mode == 8}} <!-- PICO-8 virtual console -->
+        <H2>PICO-8</H2>
+        {{if data.pico8.running}}
+            <div class="p8-screen"></div>
+            <div class="p8-error" style="display:none;"></div>
+            <div class="item">
+                {{:helper.link('Restart', 'refresh', {'choice': 'p8_restart'})}}
+                {{:helper.link('Cart list', 'arrowreturn-1-w', {'choice': 'p8_menu'})}}
+            </div>
+            <div class="p8-pad">
+                <div class="p8-pad-btn" data-btn="2">^</div>
+                <div class="p8-pad-row">
+                    <div class="p8-pad-btn" data-btn="0">L</div>
+                    <div class="p8-pad-btn" data-btn="3">v</div>
+                    <div class="p8-pad-btn" data-btn="1">R</div>
+                </div>
+            </div>
+            <div class="p8-pad p8-action">
+                <div class="p8-pad-btn" data-btn="4">O</div>
+                <div class="p8-pad-btn" data-btn="5">X</div>
+            </div>
+            <div class="item">Keys: arrows / WASD + Z, X. Touch the pad below.</div>
+        {{else}}
+            <div class="item">Select a cartridge:</div>
+            {{for data.pico8.carts}}
+                <div class="item">
+                    {{:helper.link(value.title, 'gear', {'choice': 'p8_cart', 'cart': value.id})}}
+                    <span class="average">Best: {{:value.best}}</span>
+                </div>
+            {{/for}}
+        {{/if}}
 
     {{else data.mode == 6}}
         <H2><span class="white">InstaNews ED 2.0.9</span></H2>
@@ -775,7 +775,12 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
 
     {{/if}}
 {{else}}
-    <div class="wholeScreen">
-        <br><br><br><br><br><br><br>No Owner information found, please swipe ID
+    <div class="pda-empty">
+        <div class="pda-clock">{{>data.stationTime}}</div>
+        <h2>Unregistered</h2>
+        <p>Insert an ID card to register this PDA.</p>
+        {{:helper.link('Insert ID', 'plus', {'choice': 'Authenticate'})}}
+        {{:helper.link('Close PDA', 'close', {'choice': 'Close'})}}
     </div>
 {{/if}}
+</div>

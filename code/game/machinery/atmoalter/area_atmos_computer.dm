@@ -89,7 +89,7 @@
 				<i>[zone]</i>
 			</body>
 		</html>"}
-		user << browse("[dat]", "window=miningshuttle;size=400x400")
+		device_ui_browse(user, "[dat]", "window=miningshuttle;size=400x400", src)
 		status = ""
 
 	Topic(href, href_list)

@@ -106,6 +106,7 @@
 		dat += "<h2>Psionic Control Violations <a href='?src=\ref[src];show_violations=1'>+</a></h2><hr>"
 
 	var/datum/browser/popup = new(user, "psi_monitor_\ref[src]", "Psi-Monitor")
+	popup.device_source = src
 	popup.set_content(jointext(dat,null))
 	popup.open()
 

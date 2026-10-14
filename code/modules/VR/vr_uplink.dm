@@ -23,7 +23,7 @@
 	dat += "<HR>"
 	dat += "<A href='byond://?src=\ref[src];lock=1'>Lock</a>"
 	dat += "</font></body>"
-	user << browse(dat, "window=hidden")
+	device_ui_browse(user, dat, "window=hidden", src)
 	onclose(user, "hidden")
 	return
 

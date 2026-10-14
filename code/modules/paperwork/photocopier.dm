@@ -37,7 +37,7 @@
 	if(!toner)
 		dat +="<BR>Please insert a new toner cartridge!"
 	dat += "</html>"
-	user << browse(dat, "window=copier")
+	device_ui_browse(user, dat, "window=copier", src)
 	onclose(user, "copier")
 	return
 

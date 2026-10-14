@@ -220,6 +220,7 @@
 
 
 		var/datum/browser/popup = new(user, "ATM", machine_id)
+		popup.device_source = src
 		popup.set_content(jointext(t,null))
 		popup.open()
 	else

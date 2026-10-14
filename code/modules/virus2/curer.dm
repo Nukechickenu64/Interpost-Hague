@@ -62,7 +62,7 @@
 	else
 		dat = "Please insert a container."
 
-	user << browse(dat, "window=computer;size=400x500")
+	device_ui_browse(user, dat, "window=computer;size=400x500", src)
 	onclose(user, "computer")
 	return
 

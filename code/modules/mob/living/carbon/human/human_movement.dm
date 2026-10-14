@@ -6,7 +6,7 @@
 
 	tally += species.handle_movement_delay_special(src)
 
-	if (istype(loc, /turf/space)) return -1 // It's hard to be slowed down in space by... anything
+	if (istype(loc, /turf/space) && !has_spacecraft_deck()) return -1 // It's hard to be slowed down in space by... anything
 	if(isturf(loc) && !is_floating && !buckled)
 		var/turf/floor = loc
 		if(floor.liquids && floor.liquids.liquid_state > 1)
@@ -120,6 +120,8 @@
 	return null
 
 /mob/living/carbon/human/Process_Spacemove(var/check_drift = 0)
+	if(has_spacecraft_deck())
+		return ..()
 	//Can we act?
 	if(restrained())	return 0
 	if(pony_can_fly())

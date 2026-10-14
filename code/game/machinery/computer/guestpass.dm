@@ -109,7 +109,7 @@
 	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
-	ui_browse_styled(user, "Guest Pass Terminal", body, "window=guestpass;size=500x520;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, "Guest Pass Terminal", body, "window=guestpass;size=500x520;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "guestpass")
 
 

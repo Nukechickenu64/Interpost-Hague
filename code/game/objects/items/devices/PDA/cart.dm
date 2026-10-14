@@ -341,8 +341,8 @@
 		var/supplyOrderData[0]
 		for(var/S in SSsupply.shoppinglist)
 			var/datum/supply_order/SO = S
-
-			supplyOrderData[++supplyOrderData.len] = list("Number" = SO.ordernum, "Name" = html_encode(SO.object.name), "ApprovedBy" = SO.orderedby, "Comment" = rhtml_encode(SO.comment))
+			supplyOrderCount++
+			supplyOrderData[++supplyOrderData.len] = list("Number" = SO.ordernum, "Name" = html_encode(SO.object.name), "OrderedBy" = SO.orderedby, "Comment" = rhtml_encode(SO.comment))
 		if(!supplyOrderData.len)
 			supplyOrderData[++supplyOrderData.len] = list("Number" = null, "Name" = null, "OrderedBy"=null)
 

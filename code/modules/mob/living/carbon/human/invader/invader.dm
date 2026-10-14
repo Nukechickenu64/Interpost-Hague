@@ -60,6 +60,11 @@ GLOBAL_LIST_INIT(invader_allied_antag_ids, list(MODE_TRAITOR, MODE_MERCENARY, MO
 /mob/living/carbon/human/invader/ssd_check()
 	return FALSE
 
+// Client-less, so route the client.move_delay penalty (e.g. firing a gun) to the mover instead.
+/mob/living/carbon/human/invader/setMoveCooldown(var/timeout)
+	if(mover)
+		mover.move_cooldown_until = max(mover.move_cooldown_until, world.time + timeout)
+
 // Squadmates swap places like two players on help intent instead of body-blocking each other.
 /mob/living/carbon/human/invader/can_swap_with(var/mob/living/tmob)
 	if(!istype(tmob, /mob/living/carbon/human/invader))
@@ -127,10 +132,18 @@ GLOBAL_LIST_INIT(invader_allied_antag_ids, list(MODE_TRAITOR, MODE_MERCENARY, MO
 	G.safety = 0
 	equip_to_slot_or_del(G, slot_r_hand)
 	equip_to_slot_or_del(new_invader_item(melee_pool), slot_l_hand)
+	equip_spare_ammo(G, rand(2, 3))
+
+/mob/living/carbon/human/invader/proc/equip_spare_ammo(var/obj/item/weapon/gun/G, var/reloads)
 	var/obj/item/weapon/gun/projectile/P = G
-	if(istype(P) && P.magazine_type)
-		for(var/i in 1 to rand(2, 3))
+	if(!istype(P))
+		return
+	if(P.magazine_type)
+		for(var/i in 1 to reloads)
 			equip_to_storage_or_drop(new P.magazine_type(src))
+	else if(P.ammo_type)
+		for(var/i in 1 to reloads * 2)
+			equip_to_storage_or_drop(new P.ammo_type(src))
 
 /mob/living/carbon/human/invader/proc/new_invader_item(var/list/pool)
 	var/path = pick(pool)

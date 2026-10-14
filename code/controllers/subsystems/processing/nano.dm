@@ -1,6 +1,8 @@
 PROCESSING_SUBSYSTEM_DEF(nano)
 	name = "NanoUI"
 	priority = SS_PRIORITY_NANO
+	// Open interfaces need regular updates even when background work is busy.
+	flags = SS_POST_FIRE_TIMING|SS_NO_INIT
 	wait = 1 SECONDS
 
 	// a list of current open /nanoui UIs, grouped by src_object and ui_key

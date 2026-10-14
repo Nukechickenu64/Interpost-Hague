@@ -279,7 +279,7 @@
 		dat += "- <A href='?src=\ref[src];strengthdown=1'>--</A>|<A href='?src=\ref[src];strengthup=1'>++</A><BR><BR>"
 
 
-	user << browse(dat, "window=AMcontrol;size=420x500")
+	device_ui_browse(user, dat, "window=AMcontrol;size=420x500", src)
 	onclose(user, "AMcontrol")
 	return
 

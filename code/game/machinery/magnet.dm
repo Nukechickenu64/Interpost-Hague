@@ -272,7 +272,7 @@
 
 
 		var/page = ui_build_styled_html("Magnetic Control Console", dat)
-		user << browse(page, "window=magnet;size=400x500")
+		device_ui_browse(user, page, "window=magnet;size=400x500", src)
 		onclose(user, "magnet")
 
 	Topic(href, href_list)

@@ -82,7 +82,7 @@
 	else
 		body += "No local gravity generator detected!"
 
-	ui_browse_styled(user, "Gravity Generator Control", body, "window=gravgen;size=400x500;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, "Gravity Generator Control", body, "window=gravgen;size=400x500;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	// Keep legacy onclose in case other code relies on it, though window itself is borderless
 	onclose(user, "gravgen")
 

@@ -5,6 +5,7 @@
 	var/width = 0
 	var/height = 0
 	var/atom/ref = null
+	var/datum/device_source = null
 	var/window_options = "focus=0;can_close=1;can_minimize=1;can_maximize=0;can_resize=1;titlebar=1;" // window option is set using window_id
 	var/stylesheets[0]
 	var/scripts[0]
@@ -16,7 +17,7 @@
 	var/title_buttons = ""
 
 
-/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, var/atom/nref = null)
+/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, var/atom/nref = null, var/datum/ndevice_source = null)
 
 	user = nuser
 	window_id = nwindow_id
@@ -28,6 +29,7 @@
 		height = nheight
 	if (nref)
 		ref = nref
+	device_source = ndevice_source ? ndevice_source : nref
 	// If a client exists, but they have disabled fancy windowing, disable it!
 	if(user && user.client && user.client.get_preference_value(/datum/client_preference/browser_style) == GLOB.PREF_PLAIN)
 		return
@@ -98,17 +100,18 @@
 </html>"}
 
 /datum/browser/proc/get_content()
-	return {"
+	var/html = {"
 	[get_header()]
 	[content]
 	[get_footer()]
 	"}
+	return device_ui_html(user, html, window_id, device_source, ".deviceclose [url_encode(window_id)] [ref ? "\ref[ref]" : "null"]")
 
 /datum/browser/proc/open(var/use_onclose = 1)
 	var/window_size = ""
 	if (width && height)
 		window_size = "size=[width]x[height];"
-	user << browse(get_content(), "window=[window_id];[window_size][window_options]")
+	user << browse(get_content(), device_ui_options("window=[window_id];[window_size][window_options]", device_source))
 	if (use_onclose)
 		onclose(user, window_id, ref)
 

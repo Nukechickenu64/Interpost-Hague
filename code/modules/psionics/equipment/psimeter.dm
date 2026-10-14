@@ -39,6 +39,7 @@
 		dat += "<table>"
 
 	var/datum/browser/popup = new(user, "psi_assay_\ref[src]", "Psi-Assay")
+	popup.device_source = src
 	popup.set_content(jointext(dat,null))
 	popup.open()
 

@@ -8,6 +8,8 @@
 	uses_station_jobs = FALSE
 	unrestricted_respawn = TRUE
 	ert_disabled = TRUE
+	votable = 1
+	probability = 1
 	addantag_allowed = 0
 	var/arena_z
 	var/freighter_serial = 0

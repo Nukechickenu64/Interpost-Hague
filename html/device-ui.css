@@ -1,0 +1,43 @@
+/* A physical bezel around existing UI content. Palette comes from its live sprite. */
+html.device-root { height: 100%; overflow: hidden; }
+body.device-ui { margin: 0 !important; padding: 0 !important; width: 100%; height: 100%; overflow: hidden !important; background-image: none !important; box-shadow: none; font-family: Verdana, Arial, sans-serif; font-size: 12px; }
+#device-frame { position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; box-sizing: border-box; border: 3px solid; border-radius: 12px 12px 7px 7px; background-image: linear-gradient(135deg, rgba(255,255,255,.13), transparent 32%, rgba(0,0,0,.22) 80%); box-shadow: 0 0 0 2px #080a09, inset 0 1px 1px rgba(255,255,255,.4), inset -3px -4px 2px rgba(0,0,0,.5); }
+#device-frame:before { content: ''; position: absolute; inset: 5px; top: 5px; right: 5px; bottom: 5px; left: 5px; border: 1px solid rgba(0,0,0,.6); border-radius: 7px; box-shadow: 0 1px 0 rgba(255,255,255,.2); pointer-events: none; }
+#device-drag { position: absolute; top: 1px; left: 12px; right: 39px; height: 28px; line-height: 28px; cursor: move; cursor: grab; -ms-user-select: none; user-select: none; overflow: hidden; }
+#device-name { display: inline-block; max-width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font: bold 10px/28px Verdana, sans-serif; letter-spacing: .1em; text-transform: uppercase; opacity: .8; text-shadow: 0 1px 1px #000; }
+.device-vents { position: absolute; top: 9px; right: 0; width: 48px; height: 8px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.55) 0, rgba(0,0,0,.55) 3px, transparent 3px, transparent 6px); border-bottom: 1px solid rgba(255,255,255,.18); }
+#device-frame button.device-hardware { box-sizing: border-box; min-width: 0; min-height: 0; margin: 0; padding: 0; cursor: pointer; font: 19px/20px Arial, sans-serif; color: inherit; border: 1px solid rgba(0,0,0,.65); border-radius: 3px; background: linear-gradient(rgba(255,255,255,.16), rgba(0,0,0,.2)); box-shadow: inset 0 1px rgba(255,255,255,.3), 0 1px 2px rgba(0,0,0,.5); }
+#device-frame button.device-hardware:hover { background-color: rgba(255,255,255,.15); }
+#device-frame button.device-hardware:focus { outline: 1px solid currentColor; outline-offset: 2px; }
+#device-close { position: absolute; top: 4px; right: 7px; width: 23px; height: 22px; }
+#device-glass { position: absolute; top: 33px; left: 18px; right: 18px; bottom: 32px; border: 4px solid; border-radius: 7px; overflow: hidden; box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 0 4px rgba(255,255,255,.18), 0 0 0 7px rgba(0,0,0,.25), 0 2px 0 8px rgba(255,255,255,.14); }
+#device-content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #778780 rgba(0,0,0,.2); }
+#device-reflection { position: absolute; z-index: 10000; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; border-radius: 3px; background: linear-gradient(125deg, rgba(255,255,255,.15), rgba(255,255,255,.035) 36%, transparent 36.3%, transparent 72%, rgba(255,255,255,.025) 72.3%, transparent), repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.045) 2px, rgba(0,0,0,.045) 3px); box-shadow: inset 0 1px 1px rgba(255,255,255,.3), inset 0 0 15px rgba(0,0,0,.4), inset 0 -2px 3px rgba(0,0,0,.35); }
+.device-bottom { position: absolute; left: 30px; right: 38px; bottom: 9px; height: 12px; }
+#device-indicator { display: inline-block; width: 5px; height: 5px; margin: 4px 8px 0 0; border-radius: 50%; border: 1px solid rgba(0,0,0,.6); }
+.device-grille { display: inline-block; height: 7px; width: 60px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.5), rgba(0,0,0,.5) 2px, transparent 2px, transparent 5px); }
+.device-screw { position: absolute; bottom: 9px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.7); background: linear-gradient(135deg, rgba(255,255,255,.3) 40%, rgba(0,0,0,.7) 43%, rgba(0,0,0,.7) 55%, rgba(255,255,255,.12) 58%); box-shadow: 0 1px rgba(255,255,255,.2); }
+.device-screw-left { left: 9px; } .device-screw-right { right: 29px; }
+#device-frame #device-resize { position: absolute; bottom: 4px; right: 5px; width: 18px; height: 18px; border: 0; box-shadow: none; background: none; cursor: nwse-resize; font-size: 15px; opacity: .65; }
+.device-handheld #device-frame { border-radius: 17px; }
+.device-handheld #device-glass { left: 22px; right: 22px; border-radius: 9px; }
+.device-handheld .device-grille { width: 34px; }
+/* Remove earlier window chrome, retaining status icons and program controls. */
+body.device-ui .wrap, body.device-ui .uiWrapper, body.device-ui #uiWrapper { min-width: 0; max-width: none; width: auto; height: auto; padding: 0; border: 0; box-shadow: none; background: transparent; }
+body.device-ui #uiLayout { position: relative; height: auto; min-height: 100%; }
+body.device-ui #uiContent, body.device-ui .uiContent { background: transparent; }
+body.device-ui #uiTitleFluff { display: none; }
+body.device-ui .hdr, body.device-ui .uiTitleWrapper, body.device-ui #uiTitleWrapper { background: transparent; border-color: rgba(255,255,255,.2); }
+body.device-ui .statusDisplay, body.device-ui .statusDisplayRecords, body.device-ui .display, body.device-ui .panel { background: rgba(0,0,0,.18); box-shadow: none; }
+body.device-ui .link:not(.disabled):not(.danger):not(.selected):not(.redButton):not(.yellowButton), body.device-ui a:not(.danger):not(.selected):not(.redButton):not(.yellowButton) { background-color: rgba(0,0,0,.16); border-color: rgba(255,255,255,.24); }
+body.device-ui a:hover, body.device-ui .linkActive:hover { background-color: rgba(255,255,255,.13); }
+body.device-ui input, body.device-ui select, body.device-ui textarea { max-width: 100%; }
+body.device-ui table { max-width: 100%; }
+body.device-ui th, body.device-ui td { border-color: rgba(255,255,255,.18); }
+body.device-ui header.titlebar { position: relative; height: 32px; background: transparent; box-shadow: none; }
+body.device-ui header.titlebar .close, body.device-ui header.titlebar .minimize, body.device-ui div.resize { display: none; }
+body.device-ui main { padding-top: 0; margin-top: 0; }
+body.device-ui font[color='black'], body.device-ui font[color='#000000'] { color: inherit; }
+body.device-ui font[color='blue'] { color: #8cbff0; }
+body.device-ui #device-frame button.device-hardware { color: inherit !important; border-color: rgba(0,0,0,.65) !important; background: linear-gradient(rgba(255,255,255,.16), rgba(0,0,0,.2)) !important; }
+@media (max-width: 400px) { #device-content { padding: 7px; } #device-glass { left: 13px; right: 13px; } .device-vents { display: none; } }

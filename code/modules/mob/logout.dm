@@ -1,4 +1,6 @@
 /mob/Logout()
+	if(client)
+		client.clear_spacecraft_camera()
 	SSnano.user_logout(src) // this is used to clean up (remove) this user's Nano UIs
 	SStgui && SStgui.on_logout(src)
 	GLOB.player_list -= src

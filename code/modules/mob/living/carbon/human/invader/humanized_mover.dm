@@ -14,7 +14,6 @@
 
 /datum/humanized_mover
 	var/mob/living/carbon/human/owner
-	var/speed_multiplier = 0.7 // Lower is faster step cadence.
 	var/turf/goal
 	var/goal_dist = 0
 	var/list/route
@@ -22,6 +21,8 @@
 	var/turf/waypoint
 	var/list/segment
 	var/next_step_time = 0
+	// Mirrors client.move_delay penalties such as setMoveCooldown() from firing a gun.
+	var/move_cooldown_until = 0
 	var/pause_until = 0
 	var/failed_steps = 0
 	var/repaths = 0
@@ -92,7 +93,7 @@
 	pause(clamp(round(gaussian(4, 1)), 2, 6))
 
 /datum/humanized_mover/proc/ready()
-	return world.time >= pause_until && world.time >= next_step_time
+	return world.time >= pause_until && world.time >= next_step_time && world.time >= move_cooldown_until
 
 /datum/humanized_mover/proc/arrived()
 	var/turf/here = get_turf(owner)
@@ -107,10 +108,11 @@
 	if(owner.m_intent == "run" && owner.drowsyness > 0)
 		delay += 6
 	delay += owner.movement_delay()
-	delay += gaussian(0.2, 0.5)
+	// Jitter only ever adds delay: never step faster than client/Move allows a player to.
+	delay += max(0, gaussian(0.2, 0.5))
 	if(prob(3))
 		delay += rand(1, 3)
-	return max(1, round(delay * speed_multiplier))
+	return max(1, delay)
 
 /datum/humanized_mover/proc/try_tick()
 	return tick() != MOVER_FAILED
@@ -174,6 +176,9 @@
 		owner.update_canmove()
 		pause(rand(2, 4))
 		return MOVER_WAITING
+	// Players crawl by clicking, so the click cooldown applies.
+	if(!owner.canClick())
+		return MOVER_WAITING
 	owner.scramble(next)
 	if(get_turf(owner) == here)
 		return on_step_failed()
@@ -224,7 +229,26 @@
 			return TRUE
 	return FALSE
 
+/// Same gating client/Move() applies to a player's keypress.
+/datum/humanized_mover/proc/can_self_move()
+	if(!isturf(owner.loc) || owner.transforming || !owner.canmove || owner.buckled)
+		return FALSE
+	if(owner.pinned.len)
+		return FALSE
+	if(owner.restrained())
+		for(var/mob/M in range(owner, 1))
+			if(M.pulling == owner && !M.restrained() && M.stat == CONSCIOUS && M.canmove && owner.Adjacent(M))
+				return FALSE
+	if((istype(owner.loc, /turf/space) || !owner.mob_has_gravity()) && !owner.Process_Spacemove(0))
+		return FALSE
+	return TRUE
+
 /datum/humanized_mover/proc/do_step(var/turf/T, var/dir)
+	if(!can_self_move())
+		return FALSE
+	if(owner.confused && prob(owner.m_intent == "run" ? 70 : 35))
+		dir = turn(dir, pick(90, -90))
+		T = get_step(owner, dir)
 	var/turf/start = get_turf(owner)
 	owner.SelfMove(T, dir)
 	return get_turf(owner) != start
@@ -354,7 +378,7 @@
 
 /datum/humanized_mover/proc/click_door(var/obj/machinery/door/D)
 	set waitfor = FALSE
-	if(owner && D && owner.Adjacent(D))
+	if(owner && D && owner.Adjacent(D) && owner.canClick())
 		D.attack_hand(owner)
 
 /datum/humanized_mover/proc/is_junction(var/turf/T)

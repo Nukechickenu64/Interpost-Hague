@@ -81,7 +81,7 @@ GLOBAL_LIST_EMPTY(adminfaxes)	//cache for faxes that have been sent to admins
 
 	dat += "</html>"
 
-	user << browse(dat, "window=copier")
+	device_ui_browse(user, dat, "window=copier", src)
 	onclose(user, "copier")
 	return
 

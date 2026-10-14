@@ -488,12 +488,12 @@ var/world_topic_spam_protect_time = world.timeofday
 	var/list/Lines = file2list("data/mode.txt")
 	if(Lines.len)
 		if(Lines[1])
-			SSticker.master_mode = Lines[1] == "space_wars" ? "space_wars" : "dynamic"
+			SSticker.master_mode = Lines[1]
 
 /world/proc/save_mode(var/the_mode)
 	var/F = file("data/mode.txt")
 	fdel(F)
-	F << (the_mode == "space_wars" ? "space_wars" : "dynamic")
+	F << the_mode
 
 /hook/startup/proc/loadSMSafeMode()
 	world.load_smsafemode()

@@ -841,7 +841,7 @@
 	var/output = {"<b>Assume direct control over [src]?</b>
 						<a href='?src=\ref[src];ai_take_control=\ref[user];duration=3000'>Yes</a><br>
 						"}
-	user << browse(output, "window=mecha_attack_ai")
+	device_ui_browse(user, output, "window=mecha_attack_ai", src)
 	return
 */
 
@@ -1072,7 +1072,7 @@
 	if(usr!=src.occupant)
 		return
 	//pr_update_stats.start()
-	src.occupant << browse(src.get_stats_html(), "window=exosuit")
+	device_ui_browse(src.occupant, src.get_stats_html(), "window=exosuit", src)
 	return
 
 /*
@@ -1352,7 +1352,7 @@
 		output += "[a_name] - <a href='?src=\ref[src];add_req_access=[a];user=\ref[user];id_card=\ref[id_card]'>Add</a><br>"
 	output += "<hr><a href='?src=\ref[src];finish_req_access=1;user=\ref[user]'>Finish</a> <font color='red'>(Warning! The ID upload panel will be locked. It can be unlocked only through Exosuit Interface.)</font>"
 	output += "</body></html>"
-	user << browse(output, "window=exosuit_add_access")
+	device_ui_browse(user, output, "window=exosuit_add_access", src)
 	onclose(user, "exosuit_add_access")
 	return
 
@@ -1376,7 +1376,7 @@
 						[(state>0) ? maint_options : ""]
 						</body>
 						</html>"}
-	user << browse(output, "window=exosuit_maint_console")
+	device_ui_browse(user, output, "window=exosuit_maint_console", src)
 	onclose(user, "exosuit_maint_console")
 	return
 
@@ -1466,7 +1466,7 @@
 		return
 	if (href_list["view_log"])
 		if(usr != src.occupant)	return
-		src.occupant << browse(src.get_log_html(), "window=exosuit_log")
+		device_ui_browse(src.occupant, src.get_log_html(), "window=exosuit_log", src)
 		onclose(occupant, "exosuit_log")
 		return
 	if (href_list["change_name"])

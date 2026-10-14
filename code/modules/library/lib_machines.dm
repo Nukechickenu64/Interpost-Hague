@@ -33,7 +33,7 @@
 		dat += "       <A href='?src=\ref[src];clear=1'>\[Clear Memory\]</A><BR><BR><A href='?src=\ref[src];eject=1'>\[Remove Book\]</A>"
 	else
 		dat += "<BR>"
-	user << browse(dat, "window=scanner")
+	device_ui_browse(user, dat, "window=scanner", src)
 	onclose(user, "scanner")
 
 /obj/machinery/libraryscanner/Topic(href, href_list)

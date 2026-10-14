@@ -148,10 +148,16 @@ mob/verb/test()
 
 	if (hclient.client.hi_last_pos)
 		params["pos"] = "[hclient.client.hi_last_pos]"
+	if(device_ui_host(ref))
+		params["titlebar"] = FALSE
+		params["border"] = "none"
+		params["can-resize"] = TRUE
+		var/list/device_options = params2list(device_ui_options("size=[width]x[height]", ref))
+		params["size"] = device_options["size"]
 
 	winset(hclient.client, "browser_\ref[src]", list2params(params))
 
-	winset(hclient.client, "browser_\ref[src].browser", list2params(list("parent" = "browser_\ref[src]", "type" = "browser", "pos" = "0,0", "size" = "[width]x[height]", "anchor1" = "0,0", "anchor2" = "100,100", "use-title" = "true", "auto-format" = "false")))
+	winset(hclient.client, "browser_\ref[src].browser", list2params(list("parent" = "browser_\ref[src]", "type" = "browser", "pos" = "0,0", "size" = params["size"], "anchor1" = "0,0", "anchor2" = "100,100", "use-title" = "true", "auto-format" = "false")))
 
 	sendAssets(hclient.client)
 	
@@ -242,7 +248,9 @@ mob/verb/test()
 		else
 			src.createWindow(hclient)
 			hclient.is_loaded = FALSE
-			hclient.client << output(replacetextEx(replacetextEx(file2text(default_html_file), "\[hsrc\]", "\ref[src]"), "</head>", "[head]</head>"), "browser_\ref[src].browser")
+			var/html = replacetextEx(replacetextEx(file2text(default_html_file), "\[hsrc\]", "\ref[src]"), "</head>", "[head]</head>")
+			html = device_ui_html(hclient.client.mob, html, "browser_\ref[src]", ref, close_href = "byond://?src=\ref[src]&html_interface_action=onclose")
+			hclient.client << output(html, "browser_\ref[src].browser")
 			winshow(hclient.client, "browser_\ref[src]", TRUE)
 
 		while (hclient.client && hclient.active && !hclient.is_loaded) sleep(2)

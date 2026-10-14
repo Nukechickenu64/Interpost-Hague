@@ -102,7 +102,7 @@
 			else
 				dat += "<TITLE>Condimaster 3000</TITLE>Condiment infos:<BR><BR>Name:<BR>[href_list["name"]]<BR><BR>Description:<BR>[href_list["desc"]]<BR><BR><BR><A href='?src=\ref[src];main=1'>(Back)</A>"
 			var/body_an = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>" + (condi ? "CondiMaster 3000" : "ChemMaster 3000") + "</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>" + dat
-			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_an, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_an, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0", src)
 			return
 
 		else if (href_list["add"])
@@ -203,7 +203,7 @@
 				dat += "<tr><td><a href=\"?src=\ref[src]&pill_sprite=[i]\"><img src=\"pill[i].png\" /></a></td></tr>"
 			dat += "</table>"
 			var/body_ps = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>Pill Appearance</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div>" + dat
-			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_ps, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_ps, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0", src)
 			return
 		else if(href_list["change_bottle"])
 			var/dat = "<table>"
@@ -211,7 +211,7 @@
 				dat += "<tr><td><a href=\"?src=\ref[src]&bottle_sprite=[sprite]\"><img src=\"[sprite].png\" /></a></td></tr>"
 			dat += "</table>"
 			var/body_bs = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>Bottle Appearance</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div>" + dat
-			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_bs, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
+			ui_browse_styled(usr, (condi ? "CondiMaster 3000" : "ChemMaster 3000"), body_bs, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0", src)
 			return
 		else if(href_list["pill_sprite"])
 			pillsprite = href_list["pill_sprite"]
@@ -307,10 +307,10 @@
 			dat += "<A href='?src=\ref[src];createbottle=1'>Create bottle (50 units max)</A>"
 	if(!condi)
 		var/body_main_c = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>ChemMaster 3000</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>Chemmaster menu:<BR><BR>" + dat
-		ui_browse_styled(user, "ChemMaster 3000", body_main_c, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
+		ui_browse_styled(user, "ChemMaster 3000", body_main_c, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	else
 		var/body_main_cm = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>CondiMaster 3000</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr>Condimaster menu:<BR><BR>" + dat
-		ui_browse_styled(user, "CondiMaster 3000", body_main_cm, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0")
+		ui_browse_styled(user, "CondiMaster 3000", body_main_cm, "window=chem_master;size=575x400;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "chem_master")
 	return
 
@@ -467,7 +467,7 @@
 	else
 		dat += "Please wait..."
 	var/body = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;'><div><b>All-In-One Grinder</b></div><div><a href='?src=\ref[src];close=1'>Close</a></div></div><hr><TT>" + dat + "</TT>"
-	ui_browse_styled(user, "All-In-One Grinder", body, "window=reagentgrinder;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, "All-In-One Grinder", body, "window=reagentgrinder;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "reagentgrinder")
 	return
 

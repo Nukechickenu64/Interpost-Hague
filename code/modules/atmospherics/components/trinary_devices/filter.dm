@@ -188,7 +188,7 @@
 			<B>Flow rate: </B>[round(last_flow_rate, 0.1)]L/s
 			"}
 
-	user << browse("<HEAD><TITLE>[src.name] control</TITLE></HEAD><TT>[dat]</TT>", "window=atmo_filter")
+	device_ui_browse(user, "<HEAD><TITLE>[src.name] control</TITLE></HEAD><TT>[dat]</TT>", "window=atmo_filter", src)
 	onclose(user, "atmo_filter")
 	return
 

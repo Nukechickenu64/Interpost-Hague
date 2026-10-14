@@ -399,7 +399,8 @@
 	else
 		pressure_alert = -2
 		if(!(status_flags & GODMODE))
-			take_overall_damage(brute=LOW_PRESSURE_DAMAGE, used_weapon = "Low Pressure")
+			var/pressure_damage = LOW_PRESSURE_DAMAGE * clamp(1 - adjusted_pressure / species.hazard_low_pressure, 0, 1)
+			take_overall_damage(brute=pressure_damage, used_weapon = "Low Pressure")
 
 	//Check for contaminants before anything else because we don't want to skip it.
 	for(var/g in environment.gas)

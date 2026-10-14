@@ -293,8 +293,7 @@ Helpers
 /datum/controller/subsystem/ticker/proc/choose_gamemode()
 	. = (revotes_allowed && !bypass_gamemode_vote) ? CHOOSE_GAMEMODE_REVOTE : CHOOSE_GAMEMODE_RETRY
 
-	// Station rounds remain Dynamic; Space Wars is selected explicitly by admins.
-	var/mode_to_try = master_mode == "space_wars" ? "space_wars" : "dynamic"
+	var/mode_to_try = master_mode
 	var/datum/game_mode/mode_datum
 
 	if(!mode_to_try)

@@ -127,6 +127,7 @@ var/civ13_mining_shuttle_serial = 0
 	return ..()
 
 /obj/structure/vehicleparts/axis/spacecraft/mining
+	free_flight = FALSE
 	name = "Prospector mining shuttle chassis"
 	desc = "A shuttle-integrated spacecraft chassis. Its pilot couch controls mining missions rather than local thrust."
 	var/area/shuttle/civ13_mining/shuttle_area

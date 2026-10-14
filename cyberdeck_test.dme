@@ -1,0 +1,11 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	queue = list(new /datum/unit_test/cyberdeck_layout, new /datum/unit_test/cyberdeck_session, new /datum/unit_test/cyberdeck_preallocation)
+	if(world.params["cyberdeck_client"])
+		// Round-start character creation must not replace the test client's body.
+		SSticker.can_fire = FALSE
+		queue = list(new /datum/unit_test/cyberdeck_client)
+	log_unit_test("Running focused cyberdeck research regressions.")

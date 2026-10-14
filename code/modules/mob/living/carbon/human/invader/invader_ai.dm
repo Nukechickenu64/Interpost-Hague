@@ -9,11 +9,12 @@
 #define INVADER_SEARCH_RADIUS  60
 #define INVADER_HUNT_TIMEOUT   (30 SECONDS)
 #define INVADER_BREACH_TIMEOUT (60 SECONDS)
+#define INVADER_DARK_LUM       0.05
 
 /datum/invader_ai
 	var/mob/living/carbon/human/invader/owner
 	var/datum/humanized_mover/mover
-	var/speed_multiplier = 0.6 // Lower is faster for think/reaction timings.
+	var/speed_multiplier = 1 // Lower is faster for think/reaction timings; below 1 is quicker than a player.
 	var/state = INVADER_STATE_SEARCH
 	// world.time until which an async action owns the mob; expires on its own if that action runtimes.
 	var/busy = 0
@@ -31,6 +32,8 @@
 	var/breach_started = 0
 	var/resume_state = INVADER_STATE_SEARCH
 	var/list/recent_areas = list()
+	// Areas where crew were actually seen or heard; invaders have no other way of knowing where people are.
+	var/list/contact_areas = list()
 
 /datum/invader_ai/New(var/mob/living/carbon/human/invader/new_owner, var/datum/humanized_mover/new_mover)
 	..()
@@ -45,6 +48,7 @@
 	investigate_turf = null
 	breach_door = null
 	recent_areas = null
+	contact_areas = null
 	return ..()
 
 /// Hold position (with idle fidgeting) until the supply shuttle has docked at the station.
@@ -106,15 +110,16 @@
 	var/mob/living/carbon/human/best
 	var/best_score
 	for(var/mob/living/carbon/human/H in view(INVADER_SIGHT, owner))
-		if(!is_valid_target(H))
+		if(!is_valid_target(H) || !can_perceive(H))
 			continue
 		var/score = get_dist(owner, H) + (H.stat ? 5 : 0) + (H == target ? -2 : 0)
 		if(!best || score < best_score)
 			best = H
 			best_score = score
 	if(best)
+		note_contact(best)
 		if(best != target || (state != INVADER_STATE_ENGAGE && state != INVADER_STATE_HUNT))
-			reaction_at = world.time
+			reaction_at = world.time + human_reaction_time()
 			mover.clear()
 			mover.pause_until = 0
 		target = best
@@ -127,8 +132,36 @@
 		state = INVADER_STATE_HUNT
 		mover.set_goal(last_seen_turf)
 
+/// What a player could make out on screen: nothing behind their vision cone, nothing in pitch darkness, nothing while blind.
+/datum/invader_ai/proc/can_perceive(var/mob/living/carbon/human/H)
+	if(get_dist(owner, H) <= 1)
+		return TRUE
+	if(owner.eye_blind || owner.blinded)
+		return FALSE
+	if(owner.usefov && !owner.lying && !owner.resting && H.InCone(owner, turn(owner.dir, 180)))
+		return FALSE
+	var/turf/T = get_turf(H)
+	if(!T || T.get_lumcount() <= INVADER_DARK_LUM)
+		return FALSE
+	return TRUE
+
+/datum/invader_ai/proc/human_reaction_time()
+	return max(2, round(gaussian(3, 1) * speed_multiplier))
+
+/datum/invader_ai/proc/note_contact(var/mob/M)
+	var/area/A = get_area(M)
+	if(!A)
+		return
+	contact_areas -= A
+	contact_areas += A
+	if(contact_areas.len > 5)
+		contact_areas.Cut(1, 2)
+
 /datum/invader_ai/proc/on_heard(var/mob/speaker)
-	if(!is_valid_target(speaker) || state == INVADER_STATE_ENGAGE || state == INVADER_STATE_WAIT_DOCK)
+	if(!is_valid_target(speaker))
+		return
+	note_contact(speaker)
+	if(state == INVADER_STATE_ENGAGE || state == INVADER_STATE_WAIT_DOCK)
 		return
 	mover.look_target = speaker
 	if(state == INVADER_STATE_SEARCH || state == INVADER_STATE_INVESTIGATE)
@@ -141,7 +174,7 @@
 	target = attacker
 	last_seen_turf = get_turf(attacker)
 	last_seen_time = world.time
-	reaction_at = world.time
+	reaction_at = world.time + human_reaction_time()
 	breach_door = null
 	state = INVADER_STATE_HUNT
 	mover.set_goal(last_seen_turf)
@@ -209,14 +242,9 @@
 	var/turf/here = get_turf(owner)
 	if(!length(areas) || !here)
 		return
-	// Usually head for where people are, like following the noise of an occupied room.
-	if(prob(60))
-		var/list/occupied = list()
-		for(var/mob/living/carbon/human/H in GLOB.human_mob_list)
-			if(is_valid_target(H) && get_dist(H, here) <= INVADER_SEARCH_RADIUS)
-				occupied |= get_area(H)
-		if(occupied.len)
-			areas = occupied
+	// Usually head back to where crew were last seen or heard.
+	if(contact_areas.len && prob(60))
+		areas = contact_areas
 	for(var/attempt in 1 to 6)
 		var/area/A = pick(areas)
 		if(A in recent_areas)
@@ -243,6 +271,11 @@
 	var/dist = get_dist(owner, target)
 	var/obj/item/weapon/gun/G = get_gun()
 	if(G && world.time < reloading_until)
+		combat_move(dist, 3, 5)
+		return
+	if(G && needs_pump(G))
+		if(world.time >= reaction_at)
+			pump(G)
 		combat_move(dist, 3, 5)
 		return
 	if(G && !gun_has_ammo(G))
@@ -301,7 +334,12 @@
 	return FALSE
 
 /datum/invader_ai/proc/melee_engage(var/dist)
-	var/obj/item/W = get_melee_weapon()
+	var/obj/item/W = get_melee_weapon(5)
+	if(!W && world.time >= reaction_at && (!owner.r_hand || !owner.l_hand))
+		var/obj/item/stowed = find_stowed_melee()
+		if(stowed)
+			draw_item(stowed)
+			return
 	if(W)
 		select_hand(W)
 	else if(!owner.r_hand)
@@ -336,23 +374,40 @@
 /datum/invader_ai/proc/gun_has_ammo(var/obj/item/weapon/gun/G)
 	if(istype(G, /obj/item/weapon/gun/projectile))
 		var/obj/item/weapon/gun/projectile/P = G
-		return P.getAmmo() > 0 && !P.is_jammed
+		if(P.is_jammed)
+			return FALSE
+		// A spent casing held in the chamber is not a round.
+		var/rounds = P.loaded.len + (P.chambered && P.chambered.BB ? 1 : 0)
+		if(P.ammo_magazine)
+			rounds += P.ammo_magazine.stored_ammo.len
+		return rounds > 0
 	if(istype(G, /obj/item/weapon/gun/energy))
 		var/obj/item/weapon/gun/energy/E = G
 		return E.power_supply && E.power_supply.charge >= E.charge_cost
 	return TRUE
 
+/datum/invader_ai/proc/needs_pump(var/obj/item/weapon/gun/G)
+	var/obj/item/weapon/gun/projectile/shotgun/pump/S = G
+	return istype(S) && !S.is_jammed && (!S.chambered || !S.chambered.BB) && S.loaded.len
+
+/// Racking the slide is the player's Z keypress on the held gun.
+/datum/invader_ai/proc/pump(var/obj/item/weapon/gun/projectile/shotgun/pump/S)
+	set waitfor = FALSE
+	select_hand(S)
+	reaction_at = world.time + human_reaction_time()
+	S.attack_self(owner)
+
 /datum/invader_ai/proc/try_reload(var/obj/item/weapon/gun/G)
 	var/obj/item/weapon/gun/projectile/P = G
 	if(!istype(P))
 		return FALSE
-	var/obj/item/ammo_magazine/M = find_spare_magazine(P)
-	if(!M && !P.is_jammed)
+	var/obj/item/ammo = find_spare_ammo(P)
+	if(!ammo && !P.is_jammed)
 		return FALSE
-	reload(P, M)
+	reload(P, ammo)
 	return TRUE
 
-/datum/invader_ai/proc/find_spare_magazine(var/obj/item/weapon/gun/projectile/P)
+/datum/invader_ai/proc/find_spare_ammo(var/obj/item/weapon/gun/projectile/P)
 	var/list/queue = owner.contents.Copy()
 	while(queue.len)
 		var/atom/A = queue[queue.len]
@@ -361,25 +416,115 @@
 			var/obj/item/ammo_magazine/M = A
 			if(M.caliber == P.caliber && M.stored_ammo.len && (M.mag_type & P.load_method))
 				return M
+		else if(istype(A, /obj/item/ammo_casing))
+			var/obj/item/ammo_casing/C = A
+			// Guns without a magazine type are fed loose rounds.
+			if(C.BB && C.caliber == P.caliber && !P.magazine_type)
+				return C
 		else if(istype(A, /obj/item/storage))
 			queue += A.contents
 
-/datum/invader_ai/proc/reload(var/obj/item/weapon/gun/projectile/P, var/obj/item/ammo_magazine/M)
+/datum/invader_ai/proc/still_able(var/obj/item/weapon/gun/projectile/P)
+	return !QDELETED(owner) && owner.stat == CONSCIOUS && !owner.incapacitated() && !QDELETED(P) && (P == owner.r_hand || P == owner.l_hand)
+
+/// Same steps a player takes: free a hand, pull the old mag, dig out ammo, insert it.
+/datum/invader_ai/proc/reload(var/obj/item/weapon/gun/projectile/P, var/obj/item/ammo)
 	set waitfor = FALSE
-	reloading_until = world.time + 3 SECONDS
+	reloading_until = world.time + 20 SECONDS
 	select_hand(P)
 	if(P.is_jammed)
 		P.unjam(owner)
-	if(M && P.ammo_magazine)
+	if(!ammo || !still_able(P))
+		reloading_until = 0
+		return
+	if(!free_off_hand(P))
+		reloading_until = 0
+		return
+	sleep(human_action_time(4, 8))
+	if(istype(ammo, /obj/item/ammo_magazine) && P.ammo_magazine && still_able(P))
 		P.unload_ammo(owner, 0)
-	sleep(max(2, round(rand(8, 15) * speed_multiplier)))
-	if(M && !QDELETED(owner) && owner.stat == CONSCIOUS && !QDELETED(M) && !QDELETED(P) && P.loc == owner)
-		if(istype(M.loc, /obj/item/storage))
-			var/obj/item/storage/S = M.loc
-			S.remove_from_storage(M, owner)
-		P.load_ammo(M, owner)
-	sleep(max(1, round(rand(3, 8) * speed_multiplier)))
+		var/obj/item/ammo_magazine/old = (owner.r_hand == P) ? owner.l_hand : owner.r_hand
+		if(istype(old))
+			if(old.stored_ammo.len)
+				stow_item(old)
+			else
+				owner.drop_from_inventory(old)
+		sleep(human_action_time(3, 6))
+	var/loads = istype(ammo, /obj/item/ammo_casing) ? P.max_shells : 1
+	while(loads-- > 0 && ammo && still_able(P))
+		sleep(human_action_time(6, 10))
+		if(QDELETED(ammo) || !still_able(P) || !take_into_hand(ammo))
+			break
+		select_hand(P)
+		sleep(human_action_time(3, 6))
+		if(!still_able(P) || (ammo != owner.r_hand && ammo != owner.l_hand))
+			break
+		P.load_ammo(ammo, owner)
+		if(loads > 0)
+			if(P.loaded.len >= P.max_shells)
+				break
+			ammo = find_spare_ammo(P)
 	reloading_until = 0
+
+/datum/invader_ai/proc/human_action_time(var/low, var/high)
+	return max(1, round(rand(low, high) * speed_multiplier))
+
+/// Empties the hand not holding keep, stowing the item if it fits or dropping it otherwise.
+/datum/invader_ai/proc/free_off_hand(var/obj/item/keep)
+	var/obj/item/off = (owner.r_hand == keep) ? owner.l_hand : owner.r_hand
+	if(off)
+		stow_item(off)
+	return !((owner.r_hand == keep) ? owner.l_hand : owner.r_hand)
+
+/datum/invader_ai/proc/stow_item(var/obj/item/I)
+	for(var/obj/item/storage/S in owner.contents)
+		if(S != I && S.can_be_inserted(I, owner, stop_messages = 1))
+			S.handle_item_insertion(I, prevent_warning = TRUE)
+			return
+	owner.drop_from_inventory(I)
+
+/// Picks an item out of a pocket or bag with an empty hand, as a player clicking it would.
+/datum/invader_ai/proc/take_into_hand(var/obj/item/I)
+	if(I == owner.r_hand || I == owner.l_hand)
+		return TRUE
+	var/old_hand = owner.hand
+	if(!owner.r_hand)
+		owner.hand = 0
+	else if(!owner.l_hand)
+		owner.hand = 1
+	else
+		return FALSE
+	I.attack_hand(owner)
+	if(I != owner.r_hand && I != owner.l_hand)
+		owner.hand = old_hand
+		return FALSE
+	return TRUE
+
+/datum/invader_ai/proc/find_stowed_melee()
+	var/list/queue = list()
+	for(var/obj/item/storage/S in owner.contents)
+		queue += S.contents
+	var/obj/item/best
+	while(queue.len)
+		var/atom/A = queue[queue.len]
+		queue.len--
+		if(istype(A, /obj/item/storage))
+			queue += A.contents
+			continue
+		var/obj/item/weapon/W = A
+		if(!istype(W) || istype(W, /obj/item/weapon/gun) || W.force < 5)
+			continue
+		if(!best || W.force > best.force)
+			best = W
+	return best
+
+/datum/invader_ai/proc/draw_item(var/obj/item/I)
+	set waitfor = FALSE
+	busy = world.time + 10 SECONDS
+	sleep(human_action_time(4, 8))
+	if(!QDELETED(owner) && owner.stat == CONSCIOUS && !QDELETED(I))
+		take_into_hand(I)
+	busy = 0
 
 /datum/invader_ai/proc/get_melee_weapon(var/min_force = 10)
 	var/obj/item/best
@@ -459,8 +604,17 @@
 /datum/invader_ai/proc/pry(var/obj/machinery/door/airlock/A, var/obj/item/crowbar/C)
 	set waitfor = FALSE
 	busy = world.time + 10 SECONDS
-	owner.face_atom(A)
-	A.attackby(C, owner)
+	// The crowbar has to come out of the pocket into a free hand first.
+	if(C != owner.r_hand && C != owner.l_hand)
+		if(owner.r_hand && owner.l_hand)
+			stow_item(owner.hand ? owner.r_hand : owner.l_hand)
+		sleep(human_action_time(4, 8))
+		if(QDELETED(owner) || owner.stat != CONSCIOUS || QDELETED(C) || !take_into_hand(C))
+			busy = 0
+			return
+	select_hand(C)
+	if(!QDELETED(A) && owner.Adjacent(A) && owner.canClick())
+		owner.ClickOn(A, "")
 	busy = 0
 
 // === Misc ===
@@ -487,3 +641,4 @@
 #undef INVADER_SEARCH_RADIUS
 #undef INVADER_HUNT_TIMEOUT
 #undef INVADER_BREACH_TIMEOUT
+#undef INVADER_DARK_LUM

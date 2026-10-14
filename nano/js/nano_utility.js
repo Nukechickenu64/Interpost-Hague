@@ -60,6 +60,10 @@ if (typeof doT == 'undefined') {
 $(document).ready(function () {
 	NanoUtility.init();
 	NanoStateManager.init();
+	// Apply queued updates after initial data is read, before templates render it.
+	if (typeof flushNanoUpdateQueue === 'function') {
+		flushNanoUpdateQueue();
+	}
 	NanoTemplate.init();
 });
 

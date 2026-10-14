@@ -180,6 +180,7 @@
 	dat += "</table>"
 
 	var/datum/browser/popup = new(user, "\ref[src]-reagent_temperature_window", "[capitalize(name)]")
+	popup.device_source = src
 	popup.set_content(jointext(dat, null))
 	popup.open()
 

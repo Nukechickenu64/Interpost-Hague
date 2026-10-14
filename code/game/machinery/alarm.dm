@@ -1216,7 +1216,7 @@ FIRE ALARM
 		var/minute = (round(src.time) - second) / 60
 		var/dat = "<TT><B>Fire alarm</B> [d1]\n<HR>The current alert level is <b>[security_state.current_security_level.name]</b><br><br>\nTimer System: [d2]<BR>\nTime Left: [(minute ? "[minute]:" : null)][second] <A href='?src=\ref[src];tp=-30'>-</A> <A href='?src=\ref[src];tp=-1'>-</A> <A href='?src=\ref[src];tp=1'>+</A> <A href='?src=\ref[src];tp=30'>+</A>\n</TT>"
 		var/page = ui_build_styled_html("Fire Alarm", dat)
-		user << browse(page, "window=firealarm")
+		device_ui_browse(user, page, "window=firealarm", src)
 		onclose(user, "firealarm")
 	else
 		A = A.loc
@@ -1232,7 +1232,7 @@ FIRE ALARM
 		var/minute = (round(src.time) - second) / 60
 		var/dat = "<TT><B>[stars("Fire alarm")]</B> [d1]\n<HR>The current security level is <b>[security_state.current_security_level.name]</b><br><br>\nTimer System: [d2]<BR>\nTime Left: [(minute ? text("[]:", minute) : null)][second] <A href='?src=\ref[src];tp=-30'>-</A> <A href='?src=\ref[src];tp=-1'>-</A> <A href='?src=\ref[src];tp=1'>+</A> <A href='?src=\ref[src];tp=30'>+</A>\n</TT>"
 		var/page2 = ui_build_styled_html("Fire Alarm", dat)
-		user << browse(page2, "window=firealarm")
+		device_ui_browse(user, page2, "window=firealarm", src)
 		onclose(user, "firealarm")
 	return
 
@@ -1352,7 +1352,7 @@ Just a object used in constructing fire alarms
 		var/minute = (time - second) / 60
 		var/dat = text("<TT><B>Party Button</B> []\n<HR>\nTimer System: []<BR>\nTime Left: [][] <A href='?src=\ref[];tp=-30'>-</A> <A href='?src=\ref[];tp=-1'>-</A> <A href='?src=\ref[];tp=1'>+</A> <A href='?src=\ref[];tp=30'>+</A>\n</TT>", d1, d2, (minute ? text("[]:", minute) : null), second, src, src, src, src)
 		var/page3 = ui_build_styled_html("Party Button", dat)
-		user << browse(page3, "window=partyalarm")
+		device_ui_browse(user, page3, "window=partyalarm", src)
 		onclose(user, "partyalarm")
 	else
 		if (A.fire)
@@ -1367,7 +1367,7 @@ Just a object used in constructing fire alarms
 		var/minute = (time - second) / 60
 		var/dat = text("<TT><B>[]</B> []\n<HR>\nTimer System: []<BR>\nTime Left: [][] <A href='?src=\ref[];tp=-30'>-</A> <A href='?src=\ref[];tp=-1'>-</A> <A href='?src=\ref[];tp=1'>+</A> <A href='?src=\ref[];tp=30'>+</A>\n</TT>", stars("Party Button"), d1, d2, (minute ? text("[]:", minute) : null), second, src, src, src, src)
 		var/page4 = ui_build_styled_html("Party Button", dat)
-		user << browse(page4, "window=partyalarm")
+		device_ui_browse(user, page4, "window=partyalarm", src)
 		onclose(user, "partyalarm")
 	return
 

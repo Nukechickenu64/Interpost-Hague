@@ -181,11 +181,20 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 
 	else if(href_list["updt_tech"]) //Update the research holder with information from the technology disk.
+		if(!t_disk || !t_disk.stored)
+			return TOPIC_REFRESH
+		var/obj/item/disk/tech_disk/upload_disk = t_disk
+		var/datum/tech/upload_tech = t_disk.stored
 		screen = 0.0
 		. = TOPIC_REFRESH
 		spawn(50)
+			if(QDELETED(src) || QDELETED(upload_disk) || t_disk != upload_disk || upload_disk.loc != src || upload_disk.stored != upload_tech || (stat & (BROKEN|NOPOWER)))
+				if(!QDELETED(src))
+					screen = 1.0
+					updateUsrDialog()
+				return
 			screen = 1.2
-			files.AddTech2Known(t_disk.stored)
+			files.AddTech2Known(upload_tech)
 			files.RefreshResearch() // Newly uploaded technology may unlock additional fabrication designs.
 			updateUsrDialog()
 			griefProtection() //Update centcomm too
@@ -266,9 +275,8 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 							return
 						if(istype(linked_destroy.loaded_item, /obj/item/device/electronic_assembly))
 							add_ic_design(linked_destroy.loaded_item)
-						else
-							for(var/T in linked_destroy.loaded_item.origin_tech)
-								files.UpdateTech(T, linked_destroy.loaded_item.origin_tech[T])
+						// Technology levels now come from imported research disks.
+						// The analyzer still recovers materials and integrated circuit designs.
 						if(linked_lathe && linked_destroy.loaded_item.matter) // Also sends salvaged materials to a linked protolathe, if any.
 							for(var/t in linked_destroy.loaded_item.matter)
 								if(t in linked_lathe.materials)
@@ -662,7 +670,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				dat += "Assembly Detected. Prepared for blueprint download."
 				dat += "Warning: Assemblies manafactured this way will not have removable circuits."
 			else
-				dat += "Origin Tech:"
+				dat += "Salvage only. New technology levels must be imported from research disks.<BR>Item composition:"
 				dat += "<UL>"
 				for(var/T in linked_destroy.loaded_item.origin_tech)
 					dat += "<LI>[CallTechName(T)] [linked_destroy.loaded_item.origin_tech[T]]"
@@ -836,7 +844,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
 	body += "</div>"
 	body += dat
-	ui_browse_styled(user, "Fabrication Control Console", body, "window=rdconsole;size=850x620;can_close=0;can_resize=0;border=0;titlebar=0")
+	ui_browse_styled(user, "Fabrication Control Console", body, "window=rdconsole;size=850x620;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "rdconsole")
 
 /obj/machinery/computer/rdconsole/robotics

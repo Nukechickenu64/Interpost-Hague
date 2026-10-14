@@ -69,6 +69,7 @@
 
 /obj/item/implant/interact(user)
 	var/datum/browser/popup = new(user, capitalize(name), capitalize(name), 300, 700, src)
+	popup.device_source = src
 	var/dat = get_data()
 	if(malfunction)
 		popup.title = "??? implant"

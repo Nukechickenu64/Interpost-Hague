@@ -204,7 +204,9 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 //DEFINITIONS FOR ASSET DATUMS START HERE.
 
 /datum/asset/simple/pda
+	var/list/ui_profiles = list()
 	assets = list(
+		"pda-pixel.ttf"          = 'fonts/PressStart2P.ttf',
 		"pda_atmos.png"			= 'icons/pda_icons/pda_atmos.png',
 		"pda_back.png"			= 'icons/pda_icons/pda_back.png',
 		"pda_bell.png"			= 'icons/pda_icons/pda_bell.png',
@@ -229,8 +231,31 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 		"pda_refresh.png"		= 'icons/pda_icons/pda_refresh.png',
 		"pda_scanner.png"		= 'icons/pda_icons/pda_scanner.png',
 		"pda_signaler.png"		= 'icons/pda_icons/pda_signaler.png',
-		"pda_status.png"		= 'icons/pda_icons/pda_status.png'
+		"pda_status.png"		= 'icons/pda_icons/pda_status.png',
+		"pico8_fengari.js"		= 'nano/pico8/fengari.js'
 	)
+
+/datum/asset/simple/pda/register()
+	// Both designs coexist in pda.dmi. Screen coordinates are measured in sprite pixels.
+	var/list/landscape_states = list("pda", "pda-c", "pda-cargo", "pda-det", "pda-e", "pda-h", "pda-m", "pda-paramedic", "pda-q", "pda-s", "pda-warden", "pda-syn", "pda-chef")
+	for(var/sprite_state in icon_states('icons/obj/pda.dmi'))
+		if((sprite_state != "pda" && copytext(sprite_state, 1, 5) != "pda-") || sprite_state == "pda-r")
+			continue
+		var/icon/sprite = icon('icons/obj/pda.dmi', sprite_state, SOUTH, 1)
+		var/landscape = (sprite_state in landscape_states)
+		// GetPixel uses bottom-left coordinates; the browser uses top-left coordinates.
+		var/background = landscape ? sprite.GetPixel(12, 20) : sprite.GetPixel(14, 17)
+		var/edge = landscape ? sprite.GetPixel(11, 21) : sprite.GetPixel(11, 22)
+		var/ink = landscape ? sprite.GetPixel(14, 17) : edge
+		var/list/channels = ReadRGB(background)
+		var/light_screen = (channels[1] + channels[2] + channels[3]) / 3 > 140
+		var/foreground = light_screen ? ink : BlendRGB(ink, "#ffffff", 0.65)
+		ui_profiles[sprite_state] = list(
+			"state" = sprite_state,
+			"screenWidth" = landscape ? 14 : 13, "screenHeight" = landscape ? 8 : 15,
+			"background" = background, "edge" = edge, "foreground" = foreground
+		)
+	..()
 
 /datum/asset/simple/tgui
 	assets = list(

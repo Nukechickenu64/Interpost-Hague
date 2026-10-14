@@ -8,7 +8,8 @@ SUBSYSTEM_DEF(processing)
 
 	var/list/processing = list()
 	var/list/current_run = list()
-	var/process_proc = /datum/proc/Process
+	// A proc path calls that exact implementation, bypassing subtype overrides.
+	var/process_proc = "Process"
 
 	var/debug_last_thing
 	var/debug_original_process_proc // initial() does not work with procs
@@ -27,13 +28,10 @@ SUBSYSTEM_DEF(processing)
 	while(current_run.len)
 		var/datum/thing = current_run[current_run.len]
 		current_run.len--
-		var/debug_last_thing = call(thing, process_proc)(wait, times_fired, src)
-		if(istype(thing, /datum/turbolift))
-			var/datum/turbolift/lift = thing
-			thing.Process()
-			if(!lift.processing)
-				processing -= thing
-		if((QDELETED(thing) || debug_last_thing == PROCESS_KILL))
+		var/process_result
+		if(!QDELETED(thing))
+			process_result = call(thing, process_proc)(wait, times_fired, src)
+		if(QDELETED(thing) || process_result == PROCESS_KILL)
 			if(thing)
 				thing.is_processing = null
 			processing -= thing
@@ -48,7 +46,7 @@ SUBSYSTEM_DEF(processing)
 		debug_original_process_proc = null
 	else
 		debug_original_process_proc	= process_proc
-		process_proc = /datum/proc/DebugSubsystemProcess
+		process_proc = "DebugSubsystemProcess"
 
 	to_chat(usr, "[name] - Debug mode [debug_original_process_proc ? "en" : "dis"]abled")
 

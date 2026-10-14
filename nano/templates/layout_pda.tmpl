@@ -1,0 +1,14 @@
+<div class="pda-case" style="width: {{:data.device.screenWidth * 30 + 64}}px; height: {{:data.device.screenHeight * 30 + 64}}px; color: {{:data.device.foreground}};">
+    <div class="pda-contacts" aria-hidden="true"></div>
+    <div class="pda-grip pda-grip-left" aria-hidden="true"></div>
+    <div class="pda-grip pda-grip-right" aria-hidden="true"></div>
+    <div class="pda-corner pda-corner-tl" aria-hidden="true"></div>
+    <div class="pda-drag-handle" title="Drag PDA"></div>
+    <div class="pda-close" title="Close PDA">{{:helper.link('<span class="pda-close-mark" aria-hidden="true"></span>', null, {'choice': 'Close'})}}</div>
+    <div class="pda-corner pda-corner-bl" aria-hidden="true"></div>
+    <div class="pda-corner pda-corner-br" aria-hidden="true"></div>
+    <div class="pda-screen" style="left: 32px; top: 32px; width: {{:data.device.screenWidth * 30}}px; height: {{:data.device.screenHeight * 30}}px; background: {{:data.device.background}}; border-color: {{:data.device.edge}};">
+        <div id="uiContent"><div id="uiLoadingNotice">Starting PDA...</div></div>
+    </div>
+    <div class="pda-hardware" title="Home">{{:helper.link('<span class="pda-home-mark"></span>', null, {'choice': '0'})}}</div>
+</div>
