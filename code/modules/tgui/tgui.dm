@@ -116,6 +116,7 @@
 		options = device_ui_options(options, src_object.ui_host())
 	user << browse(html, options)
 	if (!custom_browser_id)
+		device_ui_configure(user, window_id, src_object.ui_host())
 		spawn(2)
 			winset(user, window_id, "on-close=\"uiclose \ref[src]\"") // Instruct the client to signal UI when the window is closed.
 	SStgui.on_open(src)

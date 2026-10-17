@@ -74,6 +74,7 @@
         verify(min(ink[1], ink[2], ink[3]) > max(bg[1], bg[2], bg[3]) + 100, "Theme must retain legible text contrast")
         var/list/params = params2list(device_ui_options("window=fixture;size=600x400;titlebar=1;can_close=0", host))
         verify(params["titlebar"] == "0" && params["border"] == "0" && params["can_close"] == "1", "Device windows must be borderless and closable")
+        verify(params["can_resize"] == "0", "Native resize borders must stay disabled; the bezel owns resizing")
         var/datum/program_host/program = new
         program.host = host
         verify(device_ui_host(program) == host, "Software must use its physical host")
@@ -96,6 +97,9 @@
     fdel("profiles.json")
     text2file(json_encode(results), "profiles.json")
     cyberdeck_fixtures()
+    var/close_command = device_ui_close_command("console window", "test-ref")
+    var/list/close_params = params2list(url_decode(copytext(close_command, length(".deviceclose ") + 1)))
+    verify(close_params["window"] == "console window" && close_params["ref"] == "test-ref", "Close command must round-trip both values through one text argument")
     world.log << "DEVICE UI REGRESSION: [failures ? "FAIL" : "PASS"]"
     shutdown()
 

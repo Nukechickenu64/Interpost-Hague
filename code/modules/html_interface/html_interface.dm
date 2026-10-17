@@ -151,13 +151,14 @@ mob/verb/test()
 	if(device_ui_host(ref))
 		params["titlebar"] = FALSE
 		params["border"] = "none"
-		params["can-resize"] = TRUE
+		params["can-resize"] = FALSE
 		var/list/device_options = params2list(device_ui_options("size=[width]x[height]", ref))
 		params["size"] = device_options["size"]
 
 	winset(hclient.client, "browser_\ref[src]", list2params(params))
 
 	winset(hclient.client, "browser_\ref[src].browser", list2params(list("parent" = "browser_\ref[src]", "type" = "browser", "pos" = "0,0", "size" = params["size"], "anchor1" = "0,0", "anchor2" = "100,100", "use-title" = "true", "auto-format" = "false")))
+	device_ui_configure(hclient.client.mob, "browser_\ref[src]", ref)
 
 	sendAssets(hclient.client)
 	

@@ -3,7 +3,7 @@
 #endif
 
 /obj/item/circuitboard/rdconsole
-	name = T_BOARD("R&D control console")
+	name = T_BOARD("replicator console")
 	build_path = /obj/machinery/computer/rdconsole/core
 
 /obj/item/circuitboard/rdconsole/attackby(obj/item/I as obj, mob/user as mob)
@@ -14,7 +14,7 @@
 			src.build_path = /obj/machinery/computer/rdconsole/robotics
 			to_chat(user, "<span class='notice'>Access protocols set to robotics.</span>")
 		else
-			src.SetName(T_BOARD("RD Console"))
+			src.SetName(T_BOARD("replicator console"))
 			src.build_path = /obj/machinery/computer/rdconsole/core
 			to_chat(user, "<span class='notice'>Access protocols set to default.</span>")
 	return

@@ -21957,7 +21957,7 @@ component.exports = {
     };
 
     this.observe('config.fancy', function (newkey, oldkey, keypath) {
-      (0, _byond.winset)(_this.get('config.window'), 'can-resize', !newkey);
+      (0, _byond.winset)(_this.get('config.window'), 'can-resize', !newkey && !window.DeviceUI);
 
       if (newkey) {
         document.addEventListener('mousemove', onresize);
@@ -21974,7 +21974,7 @@ component.exports = {
   }
 };
 })(component);
-component.exports.template = {"v":3,"t":[" ",{"t":4,"f":[{"p":[28,3,766],"t":7,"e":"div","a":{"class":"resize"},"v":{"mousedown":"resize"}}],"n":50,"r":"config.fancy","p":[27,1,742]}]};
+component.exports.template = {"v":3,"t":[" ",{"t":4,"f":[{"p":[28,3,786],"t":7,"e":"div","a":{"class":"resize"},"v":{"mousedown":"resize"}}],"n":50,"r":"config.fancy","p":[27,1,762]}]};
 module.exports = Ractive.extend(component.exports);
 
 },{"ractive":205,"util/byond":228,"util/dragresize":230}],213:[function(require,module,exports){

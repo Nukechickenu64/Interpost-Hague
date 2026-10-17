@@ -1,0 +1,217 @@
+#define FILE_DIR "C:/Users/nukec/Documents/GitHub/Interpost-Hague"
+
+#define TRUE 1
+#define FALSE 0
+#define CYBERDECK_IDLE 0
+#define CYBERDECK_BOOTING 1
+#define CYBERDECK_RUNNING 2
+/obj/item
+/obj/machinery/computer
+    var/icon_screen
+/obj/item/modular_computer
+    var/datum/program/active_program
+    var/icon_state_menu
+/obj/item/modular_computer/console
+/obj/item/modular_computer/laptop
+/obj/item/modular_computer/telescreen
+/datum/program
+    var/program_icon_state
+/datum/asset
+    var/list/assets
+/datum/asset/proc/send(mob/user)
+    for(var/name in assets)
+        user << browse_rsc(assets[name], name)
+/proc/get_asset_datum(path)
+    return new path
+/proc/strip_improper(text)
+    return text
+/client/proc/windowclose(atomref)
+    callback_received = TRUE
+    verify(atomref == "\ref[test_host]", "Close callback must receive the original host reference")
+    // Simulate a legacy Topic handler that renders again while being closed.
+    mob.machine = test_host
+    src << browse("Legacy callback reopened", "window=device_test")
+/mob
+    var/atom/machine
+/mob/proc/unset_machine()
+    machine = null
+/datum/proc/nano_host()
+    return src
+/datum/program_host
+    var/atom/host
+/datum/program_host/nano_host()
+    return host
+/var/failures = 0
+/proc/verify(condition, message)
+    if(!condition)
+        failures++
+        world.log << "FAIL: [message]"
+/proc/cyberdeck_fixtures()
+    var/obj/machinery/host = new
+    host.icon = 'icons/obj/computer.dmi'
+    host.icon_state = "os13_rdcomp"
+    host.name = "Cyberdeck research console"
+    var/list/data = list("phase" = CYBERDECK_IDLE, "message" = "Blank disk loaded. Select an occupied chair and a research field.", "disk_name" = "technology disk", "media" = "blank", "can_boot" = TRUE, "link_hint" = "Neural link selected.")
+    data["chairs"] = list(list("name" = "Roche Hendson", "ref" = "chair1", "selected" = TRUE))
+    var/list/archives = list()
+    var/index = 0
+    for(var/name in list("Materials", "Engineering", "Phoron Technology", "Power Manipulation Technology", "'Blue-space' Technology", "Biological Technology", "Combat Systems", "Electromagnetic Spectrum Technology", "Data Theory"))
+        index++
+        archives += list(list("name" = name, "id" = "field[index]", "known" = 1, "level" = 2, "size" = 17, "complete" = FALSE))
+    data["archives"] = archives
+    for(var/fixture in list("ready", "standby", "booting", "active", "recorded"))
+        if(fixture == "standby")
+            data["can_boot"] = FALSE
+            data["media"] = "missing"
+            data["disk_name"] = "No disk inserted"
+            data["chairs"] = list()
+            data["message"] = "Insert a blank technology disk to begin."
+            data["link_hint"] = "Wear a cyberdeck helmet and buckle into a free chair within three tiles."
+        if(fixture == "booting" || fixture == "active")
+            data["phase"] = fixture == "booting" ? CYBERDECK_BOOTING : CYBERDECK_RUNNING
+            data["operator"] = "Roche Hendson"
+            data["research"] = "Engineering"
+            data["level"] = 2
+            data["size"] = 17
+            data["required"] = 2
+            data["decrypted"] = 1
+            data["seconds"] = 497
+            data["media"] = "blank"
+            data["disk_name"] = "technology disk"
+            data["message"] = fixture == "booting" ? "Building the research archive. The disk drive and neural link are reserved." : "Dive active. Decrypt the relays and download the data core."
+        if(fixture == "recorded")
+            data["phase"] = CYBERDECK_IDLE
+            data["media"] = "recorded"
+            data["disk_name"] = "Engineering technology disk (level 2)"
+            data["message"] = "Download complete. Eject the technology disk and import it at R&D."
+        var/html = cyberdeck_ui_html(data, "byond://?src=test-console")
+        verify(findtext(html, "action=boot") == 0 || fixture == "ready", "Only a ready idle console offers Boot actions")
+        verify((findtext(html, "action=abort") != 0) == (data["phase"] != CYBERDECK_IDLE), "Recall is available only during a session")
+        verify((findtext(html, "action=eject") != 0) == (fixture == "ready" || fixture == "recorded"), "Drive stays locked throughout boot and a dive")
+        if(fixture == "active")
+            verify(findtext(html, "8:17") && findtext(html, "width:50%"), "Session countdown and relay progress use the snapshot")
+        html = device_ui_html(null, html, null, host)
+        fdel("cyberdeck-[fixture].html")
+        text2file(html, "cyberdeck-[fixture].html")
+    data["message"] = "<script>alert('status')</script>"
+    data["disk_name"] = "<img src=x onerror=alert('disk')>"
+    data["chairs"] = list(list("name" = "<script>alert('name')</script>", "ref" = "chair1", "selected" = TRUE))
+    var/html = cyberdeck_ui_html(data, "byond://?src=test-console")
+    verify(!findtext(html, "<script>") && !findtext(html, "<img"), "Status, disk and operator names must be HTML-encoded")
+    del(host)
+
+proc/ReadRGB(rgb)
+	if(!rgb) return
+
+	// interpret the HSV or HSVA value
+	var/i=1,start=1
+	if(text2ascii(rgb) == 35) ++start // skip opening #
+	var/ch,which=0,r=0,g=0,b=0,alpha=0,usealpha
+	var/digits=0
+	for(i=start, i<=length(rgb), ++i)
+		ch = text2ascii(rgb, i)
+		if(ch < 48 || (ch > 57 && ch < 65) || (ch > 70 && ch < 97) || ch > 102) break
+		++digits
+		if(digits == 8) break
+
+	var/single = digits < 6
+	if(digits != 3 && digits != 4 && digits != 6 && digits != 8) return
+	if(digits == 4 || digits == 8) usealpha = 1
+	for(i=start, digits>0, ++i)
+		ch = text2ascii(rgb, i)
+		if(ch >= 48 && ch <= 57) ch -= 48
+		else if(ch >= 65 && ch <= 70) ch -= 55
+		else if(ch >= 97 && ch <= 102) ch -= 87
+		else break
+		--digits
+		switch(which)
+			if(0)
+				r = (r << 4) | ch
+				if(single)
+					r |= r << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(1)
+				g = (g << 4) | ch
+				if(single)
+					g |= g << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(2)
+				b = (b << 4) | ch
+				if(single)
+					b |= b << 4
+					++which
+				else if(!(digits & 1)) ++which
+			if(3)
+				alpha = (alpha << 4) | ch
+				if(single) alpha |= alpha << 4
+
+	. = list(r, g, b)
+	if(usealpha) . += alpha
+
+
+proc/BlendRGB(rgb1, rgb2, amount)
+	var/list/RGB1 = ReadRGB(rgb1)
+	var/list/RGB2 = ReadRGB(rgb2)
+
+	// add missing alpha if needed
+	if(RGB1.len < RGB2.len) RGB1 += 255
+	else if(RGB2.len < RGB1.len) RGB2 += 255
+	var/usealpha = RGB1.len > 3
+
+	var/r = round(RGB1[1] + (RGB2[1] - RGB1[1]) * amount, 1)
+	var/g = round(RGB1[2] + (RGB2[2] - RGB1[2]) * amount, 1)
+	var/b = round(RGB1[3] + (RGB2[3] - RGB1[3]) * amount, 1)
+	var/alpha = usealpha ? round(RGB1[4] + (RGB2[4] - RGB1[4]) * amount, 1) : null
+
+	return isnull(alpha) ? rgb(r, g, b) : rgb(r, g, b, alpha)
+
+
+#include "C:/Users/nukec/Documents/GitHub/Interpost-Hague/code/_helpers/device_ui.dm"
+
+#include "C:/Users/nukec/Documents/GitHub/Interpost-Hague/code/modules/cyberresearch/cyberdeck_ui.dm"
+
+/world/New()
+    ..()
+    world.log << "NATIVE DEVICE UI: waiting for test client"
+    spawn(300)
+        world.log << "NATIVE DEVICE UI: FAIL (client timed out)"
+        shutdown()
+
+/client
+    var/obj/machinery/test_host
+    var/callback_received = FALSE
+
+/client/New()
+    . = ..()
+    spawn(5)
+        test_host = new
+        test_host.icon = 'icons/obj/computer.dmi'
+        test_host.icon_state = "os13_rdcomp"
+        test_host.name = "Native device test"
+        mob.machine = test_host
+        src << browse("Old bordered window", "window=device_test;size=600x400;can_resize=1;titlebar=1")
+        sleep(2)
+        var/html = {"<!DOCTYPE html><html><head><title>Native device test</title></head><body><p>Native close and border regression</p><script>function testClose(){document.getElementById('device-close').click();}setTimeout(function(){window.location.href='byond://?device_ready=1';},750);</script></body></html>"}
+        device_ui_browse(mob, html, "window=device_test;size=600x400", test_host)
+
+/client/Topic(href, list/href_list)
+    if(!href_list["device_ready"])
+        return ..()
+    verify(winget(src, "device_test", "titlebar") == "false", "Existing window titlebar must be removed")
+    verify(winget(src, "device_test", "can-resize") == "false", "Native resize frame must be removed")
+    verify(winget(src, "device_test.browser", "border") == "none", "Embedded browser must have no sunken border")
+    var/inner_size = winget(src, "device_test", "size")
+    var/outer_size = winget(src, "device_test", "outer-size")
+    world.log << "Native size [inner_size], outer size [outer_size]"
+    verify(inner_size == outer_size, "The native window must have zero non-client border")
+    winset(src, "device_test", "size=640x440")
+    verify(winget(src, "device_test", "size") == "640x440", "Programmatic bezel resizing must still work")
+    src << output(null, "device_test.browser:testClose")
+    spawn(15)
+        verify(callback_received, "Clicking the real X must invoke the close verb without a prompt")
+        verify(!mob.machine, "Close must stop dialog refresh subscriptions")
+        verify(winget(src, "device_test", "is-visible") != "true", "Close callback must not leave the native window open")
+        world.log << "NATIVE DEVICE UI: [failures ? "FAIL" : "PASS"]"
+        shutdown()

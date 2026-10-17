@@ -1796,7 +1796,7 @@ CIRCUITS BELOW
 	sort_string = "HAAAC"
 
 /datum/design/circuit/rdconsole
-	name = "R&D control console"
+	name = "replicator console"
 	id = "rdconsole"
 	req_tech = list(TECH_DATA = 4)
 	build_path = /obj/item/circuitboard/rdconsole
@@ -1859,7 +1859,7 @@ CIRCUITS BELOW
 	sort_string = "HABAA"
 
 /datum/design/circuit/protolathe
-	name = "protolathe"
+	name = "replicator"
 	id = "protolathe"
 	req_tech = list(TECH_DATA = 2, TECH_ENGINEERING = 2)
 	build_path = /obj/item/circuitboard/protolathe

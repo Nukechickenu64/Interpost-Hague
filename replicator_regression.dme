@@ -1,0 +1,7 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	queue = list(new /datum/unit_test/replicator_radiation, new /datum/unit_test/replicator_operations, new /datum/unit_test/replicator_connections)
+	log_unit_test("Running focused replicator regression tests.")

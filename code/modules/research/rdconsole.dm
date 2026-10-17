@@ -1,13 +1,12 @@
 /*
 Research and Development (R&D) Console
 
-This is the main work horse of the R&D system. It contains the menus/controls for the Destructive Analyzer, Protolathe, and Circuit
+This is the main work horse of the R&D system. It contains the menus/controls for the Destructive Analyzer, Replicator, and Circuit
 imprinter. It also contains the /datum/research holder with all the known/possible technology paths and device designs.
 
-Basic use: When it first is created, it will attempt to link up to related devices within 3 squares. It'll only link up if they
-aren't already linked to another console. Any consoles it cannot link up with (either because all of a certain type are already
-linked or there aren't any in range), you'll just not have access to that menu. In the settings menu, there are menu options that
-allow a player to attempt to re-sync with nearby consoles. You can also force it to disconnect from a specific console.
+Basic use: It links to the closest available replicator anywhere on the map, and to other fabrication devices within 4 squares.
+Devices must have their maintenance panels closed and cannot already belong to another console. The settings menu lets a player
+re-sync devices or disconnect a specific device. Re-syncing also switches to a closer available replicator if one exists.
 
 The imprinting and construction menus do NOT require toxins access to access but all the other menus do. However, if you leave it
 on a menu, nothing is to stop the person from using the options on that menu (although they won't be able to change to a different
@@ -28,7 +27,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 */
 
 /obj/machinery/computer/rdconsole
-	name = "fabrication control console"
+	name = "replicator console"
 	desc = "Console controlling the various fabrication devices. Uses self-learning matrix to hold and optimize blueprints. Prone to corrupting said matrix, so back up often."
 	icon_keyboard = "rd_key"
 	icon_screen = "rdcomp"
@@ -39,7 +38,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	var/obj/item/disk/design_disk/d_disk = null	//Stores the design disk.
 
 	var/obj/machinery/r_n_d/destructive_analyzer/linked_destroy = null	//Linked Destructive Analyzer
-	var/obj/machinery/r_n_d/protolathe/linked_lathe = null				//Linked Protolathe
+	var/obj/machinery/r_n_d/protolathe/linked_lathe = null				//Linked Replicator
 	var/obj/machinery/r_n_d/circuit_imprinter/linked_imprinter = null	//Linked Circuit Imprinter
 
 	var/screen = 1.0	//Which screen is currently showing.
@@ -72,16 +71,35 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	return ispath(reagent_type, /datum/reagent) ? initial(R.name) : "Unknown"
 
 /obj/machinery/computer/rdconsole/proc/SyncRDevices() //Makes sure it is properly sync'ed up with the devices attached to it (if any).
+	var/turf/console_turf = get_turf(src)
+	if(!console_turf)
+		return
+	var/obj/machinery/r_n_d/protolathe/closest_replicator
+	var/closest_distance = INFINITY
+	for(var/obj/machinery/r_n_d/protolathe/R in SSmachines.machinery)
+		if(QDELETED(R) || R.panel_open || (R.linked_console && R.linked_console != src))
+			continue
+		var/turf/replicator_turf = get_turf(R)
+		if(!replicator_turf)
+			continue
+		// Tile distance across all map levels; get_dist() returns -1 between different z levels.
+		var/distance = max(abs(console_turf.x - replicator_turf.x), abs(console_turf.y - replicator_turf.y), abs(console_turf.z - replicator_turf.z))
+		if(distance < closest_distance || (distance == closest_distance && R == linked_lathe))
+			closest_distance = distance
+			closest_replicator = R
+	if(linked_lathe != closest_replicator)
+		if(linked_lathe && linked_lathe.linked_console == src)
+			linked_lathe.linked_console = null
+		linked_lathe = closest_replicator
+	if(linked_lathe)
+		linked_lathe.linked_console = src
+
 	for(var/obj/machinery/r_n_d/D in range(4, src))
 		if(D.linked_console != null || D.panel_open)
 			continue
 		if(istype(D, /obj/machinery/r_n_d/destructive_analyzer))
 			if(linked_destroy == null)
 				linked_destroy = D
-				D.linked_console = src
-		else if(istype(D, /obj/machinery/r_n_d/protolathe))
-			if(linked_lathe == null)
-				linked_lathe = D
 				D.linked_console = src
 		else if(istype(D, /obj/machinery/r_n_d/circuit_imprinter))
 			if(linked_imprinter == null)
@@ -109,8 +127,21 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			break
 
 /obj/machinery/computer/rdconsole/Initialize()
-	SyncRDevices()
 	. = ..()
+	// All map machines must be registered before choosing the nearest replicator.
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/machinery/computer/rdconsole/LateInitialize()
+	SyncRDevices()
+
+/obj/machinery/computer/rdconsole/Destroy()
+	for(var/obj/machinery/r_n_d/D in list(linked_destroy, linked_lathe, linked_imprinter))
+		if(D.linked_console == src)
+			D.linked_console = null
+	linked_destroy = null
+	linked_lathe = null
+	linked_imprinter = null
+	return ..()
 
 /obj/machinery/computer/rdconsole/attackby(var/obj/item/weapon/D as obj, var/mob/user as mob)
 	//Loading a disk into it.
@@ -162,7 +193,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	var/list/restricted_actions = list(
 		"updt_tech", "clear_tech", "eject_tech", "copy_tech",
 		"updt_design", "clear_design", "eject_design", "copy_design",
-		"eject_item", "deconstruct", "lock", "sync", "togglesync",
+		"eject_item", "deconstruct", "reclaim", "lock", "sync", "togglesync",
 		"find_device", "disconnect", "reset"
 	)
 	for(var/action in restricted_actions)
@@ -171,7 +202,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	return FALSE
 
 /obj/machinery/computer/rdconsole/OnTopic(user, href_list)
-	if(href_list["ui_close"]) {
+	if(href_list["ui_close"] || href_list["close"]) {
 		usr << browse(null, "window=rdconsole")
 		usr.unset_machine()
 		return TOPIC_HANDLED
@@ -345,7 +376,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		sync = !sync
 		. = TOPIC_REFRESH
 
-	else if(href_list["build"]) //Causes the Protolathe to build something.
+	else if(href_list["reclaim"] && linked_lathe)
+		var/obj/item/target = locate(href_list["reclaim"]) in get_turf(linked_lathe)
+		if(!linked_lathe.reclaim(target))
+			to_chat(user, "<span class='notice'>The replicator cannot reclaim that item right now. Check that it is on the platform and the machine has power and storage available.</span>")
+		. = TOPIC_REFRESH
+
+	else if(href_list["build"]) //Causes the Replicator to build something.
 		if(linked_lathe)
 			var/datum/design/being_built = null
 			for(var/datum/design/D in files.known_designs)
@@ -406,7 +443,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		linked_imprinter.eject(href_list["imprinter_ejectsheet"], text2num(href_list["amount"]))
 		. = TOPIC_REFRESH
 
-	else if(href_list["find_device"]) //The R&D console looks for devices nearby to link up with.
+	else if(href_list["find_device"]) //Refresh device links, including the closest available replicator.
 		screen = 0.0
 		. = TOPIC_HANDLED
 		spawn(10)
@@ -546,8 +583,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				dat += "<LI>Disk Operations"
 			if(linked_destroy)
 				dat += "<LI><A href='?src=\ref[src];menu=2.2'>Destructive Analyzer Menu</A>"
-			if(linked_lathe)
-				dat += "<LI><A href='?src=\ref[src];menu=3.1'>Protolathe Construction Menu</A>"
+			dat += "<LI><A href='?src=\ref[src];menu=3.1'>Produce</A>"
 			if(linked_imprinter)
 				dat += "<LI><A href='?src=\ref[src];menu=4.1'>Circuit Construction Menu</A>"
 			dat += "<LI><A href='?src=\ref[src];menu=1.6'>Settings</A>"
@@ -597,7 +633,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				dat += "Name: [d_disk.blueprint.name]<BR>"
 				switch(d_disk.blueprint.build_type)
 					if(IMPRINTER) dat += "Lathe Type: Circuit Imprinter<BR>"
-					if(PROTOLATHE) dat += "Lathe Type: Proto-lathe<BR>"
+					if(PROTOLATHE) dat += "Fabricator Type: Replicator<BR>"
 				dat += "Required Materials:<BR>"
 				for(var/M in d_disk.blueprint.materials)
 					if(copytext(M, 1, 2) == "$") dat += "* [copytext(M, 2)] x [d_disk.blueprint.materials[M]]<BR>"
@@ -636,7 +672,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=1.6'>Settings Menu</A><HR>"
 			dat += "R&D Console Device Linkage Menu:<BR><BR>"
-			dat += "<A href='?src=\ref[src];find_device=1'>Re-sync with Nearby Devices</A><HR>"
+			dat += "<A href='?src=\ref[src];find_device=1'>Re-sync Devices</A><HR>"
 			dat += "Linked Devices:"
 			dat += "<UL>"
 			if(linked_destroy)
@@ -644,9 +680,9 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			else
 				dat += "<LI>(No Destructive Analyzer Linked)"
 			if(linked_lathe)
-				dat += "<LI>Protolathe <A href='?src=\ref[src];disconnect=lathe'>(Disconnect)</A>"
+				dat += "<LI>Replicator <A href='?src=\ref[src];disconnect=lathe'>(Disconnect)</A>"
 			else
-				dat += "<LI>(No Protolathe Linked)"
+				dat += "<LI>(No Replicator Linked)"
 			if(linked_imprinter)
 				dat += "<LI>Circuit Imprinter <A href='?src=\ref[src];disconnect=imprinter'>(Disconnect)</A>"
 			else
@@ -685,14 +721,22 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		/////////////////////PROTOLATHE SCREENS/////////////////////////
 		if(3.0)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
-			dat += "NO PROTOLATHE LINKED TO CONSOLE<BR><BR>"
+			dat += "NO REPLICATOR LINKED TO CONSOLE<BR><BR>"
 
 		if(3.1)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.4'>View Queue</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.2'>Material Storage</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.3'>Chemical Storage</A><HR>"
-			dat += "Protolathe Menu:<BR><BR>"
+			dat += "Produce:<BR><BR>"
+			dat += "<B>Radiation hazard:</B> Every conversion leaves a lethal radiation field within three tiles, with weaker radiation beyond. It fades over one minute. Use shielding and remote controls.<BR>"
+			dat += "<B>Reclamation:</B> Place an item or material sheets on the platform, then select it below. <A href='?src=\ref[src];menu=3.1'>Refresh</A><BR>"
+			if(linked_lathe.converting)
+				dat += "Reclamation in progress.<BR>"
+			else
+				for(var/obj/item/item in get_turf(linked_lathe))
+					if(linked_lathe.can_reclaim(item))
+						dat += "<A href='?src=\ref[src];reclaim=\ref[item]'>Reclaim [html_encode(item.name)] (destroys item)</A><BR>"
 			dat += "<B>Material Amount:</B> [linked_lathe.TotalMaterials()] cm<sup>3</sup> (MAX: [linked_lathe.max_material_storage])<BR>"
 			dat += "<B>Chemical Volume:</B> [linked_lathe.reagents.total_volume] (MAX: [linked_lathe.reagents.maximum_volume])<HR>"
 			dat += "<UL>"
@@ -712,9 +756,9 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 					dat += "<LI><B>[D.name]</B>[temp_dat]"
 			dat += "</UL>"
 
-		if(3.2) //Protolathe Material Storage Sub-menu
+		if(3.2) //Replicator Material Storage Sub-menu
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
-			dat += "<A href='?src=\ref[src];menu=3.1'>Protolathe Menu</A><HR>"
+			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Material Storage<BR><HR>"
 			dat += "<UL>"
 			for(var/M in linked_lathe.materials)
@@ -731,18 +775,18 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				dat += ""
 			dat += "</UL>"
 
-		if(3.3) //Protolathe Chemical Storage Submenu
+		if(3.3) //Replicator Chemical Storage Submenu
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
-			dat += "<A href='?src=\ref[src];menu=3.1'>Protolathe Menu</A><HR>"
+			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Chemical Storage<BR><HR>"
 			for(var/datum/reagent/R in linked_lathe.reagents.reagent_list)
 				dat += "Name: [R.name] | Units: [R.volume] "
 				dat += "<A href='?src=\ref[src];disposeP=\ref[R]'>(Purge)</A><BR>"
 				dat += "<A href='?src=\ref[src];disposeallP=1'><U>Disposal All Chemicals in Storage</U></A><BR>"
 
-		if(3.4) // Protolathe queue
+		if(3.4) // Replicator queue
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
-			dat += "<A href='?src=\ref[src];menu=3.1'>Protolathe Menu</A><HR>"
+			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Queue<BR><HR>"
 			if(!linked_lathe.queue.len)
 				dat += "Empty"
@@ -838,13 +882,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "List of Available Designs:"
 			dat += GetResearchListInfo()
 
-	// Build diegetic styled body with a Close link
-	var/body = ""
-	body += "<div style='display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;'>"
-	body += "<a href='?src=\ref[src];ui_close=1'>Close</a>"
-	body += "</div>"
-	body += dat
-	ui_browse_styled(user, "Fabrication Control Console", body, "window=rdconsole;size=850x620;can_close=0;can_resize=0;border=0;titlebar=0", src)
+	ui_browse_styled(user, "Replicator Console", dat, "window=rdconsole;size=850x620;can_close=0;can_resize=0;border=0;titlebar=0", src)
 	onclose(user, "rdconsole")
 
 /obj/machinery/computer/rdconsole/robotics
@@ -853,5 +891,4 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	req_access = list(access_robotics)
 
 /obj/machinery/computer/rdconsole/core
-	name = "?ore fabricator console"
 	id = 1

@@ -165,7 +165,7 @@
 	var/list/profile = device_ui_profile(host)
 	var/list/config = list("window" = window_id, "name" = strip_improper(host.name), "kind" = profile["kind"], "closeCommand" = close_command, "closeHref" = close_href)
 	if(!close_command && !close_href)
-		config["closeCommand"] = ".deviceclose [url_encode(window_id)] \ref[host]"
+		config["closeCommand"] = device_ui_close_command(window_id, "\ref[host]")
 	var/head = "<meta name='device-screen' content='[html_encode(json_encode(config))]'><link rel='stylesheet' href='device-ui.css'><style>"
 	head += "body.device-ui{color:[profile["ink"]] !important;background:[profile["shadow"]] !important;}#device-frame{background-color:[profile["casing"]];border-color:[profile["rim"]] [profile["shadow"]] [profile["shadow"]] [profile["rim"]];}#device-glass{background-color:[profile["screen"]];border-color:[profile["shadow"]];color:[profile["ink"]];}#device-frame .device-hardware{color:[profile["ink"]];}body.device-ui a,body.device-ui #uiTitleText,body.device-ui .uiTitle,body.device-ui h1,body.device-ui h2,body.device-ui h3{color:[profile["accent"]] !important;}#device-indicator{background:[profile["accent"]];box-shadow:0 0 5px [profile["accent"]];}"
 	head += "</style><script src='device-ui.js'></script>"
@@ -188,7 +188,9 @@
 	params["border"] = 0
 	params["titlebar"] = 0
 	params["can_close"] = 1
-	params["can_resize"] = 1
+	// Native resizing adds the Windows frame even with titlebar=0. The bezel's
+	// resize handle changes the size through winset instead.
+	params["can_resize"] = 0
 	params["can_minimize"] = 0
 	params["can_maximize"] = 0
 	// Preserve the content area, but start with the physical display's orientation.
@@ -201,21 +203,40 @@
 	params["size"] = "[w + 48]x[h + 76]"
 	return list2params(params)
 
+/proc/device_ui_configure(var/mob/user, var/window_id, var/datum/source)
+	if(!user || !user.client || !window_id || !device_ui_host(source))
+		return
+	// browse options only apply when a popup is first created. Also repair an
+	// existing window, and remove the embedded browser control's sunken border.
+	winset(user, window_id, "titlebar=false;can-resize=false;can-minimize=false;can-maximize=false")
+	winset(user, "[window_id].browser", "border=none")
+
+/proc/device_ui_close_command(var/window_id, var/atomref = "null")
+	// A single encoded argument avoids BYOND prompting for a second text input.
+	return ".deviceclose [url_encode(list2params(list("window" = window_id, "ref" = atomref)))]"
+
 /proc/device_ui_browse(var/mob/user, var/html, var/options, var/datum/source)
 	if(!html || !device_ui_host(source))
 		user << browse(html, options)
 		return
 	var/list/params = params2list(options)
 	user << browse(device_ui_html(user, html, params["window"], source), device_ui_options(options, source))
+	device_ui_configure(user, params["window"], source)
 
-/client/verb/deviceclose(var/window_id as text, var/atomref as text)
+/client/verb/deviceclose(var/payload as text)
 	set hidden = TRUE
 	set name = ".deviceclose"
-	window_id = url_decode(window_id)
-	src << browse(null, "window=[window_id]")
-	windowclose(atomref)
-	// Legacy Topic handlers often only implement their own ui_close link. Stop
-	// dialog refreshes as well, so the next machinery tick cannot reopen the page.
+	var/list/params = params2list(url_decode(payload))
+	var/window_id = params["window"]
+	if(!istext(window_id) || !length(window_id))
+		return
+	var/atomref = params["ref"] ? params["ref"] : "null"
 	var/atom/host = locate(atomref)
 	if(mob && mob.machine == host)
 		mob.unset_machine()
+	windowclose(atomref)
+	// Some legacy close callbacks render once more. Close after cleanup and
+	// unsubscribe again so processing ticks cannot reopen the screen.
+	if(mob && mob.machine == host)
+		mob.unset_machine()
+	src << browse(null, "window=[window_id]")

@@ -89,7 +89,8 @@
         });
         frame.querySelector('#device-close').addEventListener('click', function () {
             stop();
-            if (config.closeHref) { window.location.href = config.closeHref; }
+            if (!config.window) { frame.style.display = 'none'; }
+            else if (config.closeHref) { window.location.href = config.closeHref; }
             else if (config.closeCommand) { window.location.href = 'byond://winset?command=' + encodeURIComponent(config.closeCommand); }
         });
         document.addEventListener('keydown', function (e) { if (e.keyCode === 27) { stop(); } });

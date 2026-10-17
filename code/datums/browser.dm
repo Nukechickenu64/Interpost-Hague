@@ -105,13 +105,14 @@
 	[content]
 	[get_footer()]
 	"}
-	return device_ui_html(user, html, window_id, device_source, ".deviceclose [url_encode(window_id)] [ref ? "\ref[ref]" : "null"]")
+	return device_ui_html(user, html, window_id, device_source, device_ui_close_command(window_id, ref ? "\ref[ref]" : "null"))
 
 /datum/browser/proc/open(var/use_onclose = 1)
 	var/window_size = ""
 	if (width && height)
 		window_size = "size=[width]x[height];"
 	user << browse(get_content(), device_ui_options("window=[window_id];[window_size][window_options]", device_source))
+	device_ui_configure(user, window_id, device_source)
 	if (use_onclose)
 		onclose(user, window_id, ref)
 

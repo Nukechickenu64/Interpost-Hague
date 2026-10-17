@@ -447,6 +447,8 @@ nanoui is used to open and update nano browser uis
 		html = device_ui_html(user, html, window_id, src_object, "nanoclose \ref[src]")
 		options = device_ui_options(options, src_object)
 	user << browse(html, options)
+	if(layout_key != "pda")
+		device_ui_configure(user, window_id, src_object)
 	winset(user, "mapwindow.map", "focus=true") // return keyboard focus to map
 	on_close_winset()
 	//onclose(user, window_id)

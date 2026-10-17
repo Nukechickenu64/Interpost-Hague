@@ -32,7 +32,7 @@ obj/item/circuitboard/rdserver
 							/obj/item/stock_parts/console_screen = 1)
 
 /obj/item/circuitboard/protolathe
-	name = T_BOARD("protolathe")
+	name = T_BOARD("replicator")
 	build_path = /obj/machinery/r_n_d/protolathe
 	board_type = "machine"
 	origin_tech = list(TECH_ENGINEERING = 2, TECH_DATA = 2)

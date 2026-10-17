@@ -24,8 +24,8 @@ SUBSYSTEM_DEF(radiation)
 
 		if(QDELETED(S))
 			sources -= S
-		else if(S.decay)
-			S.update_rad_power(S.rad_power - config.radiation_decay_rate)
+		else
+			S.process_radiation()
 		if (MC_TICK_CHECK)
 			return
 
@@ -62,14 +62,16 @@ SUBSYSTEM_DEF(radiation)
 	..("S:[sources.len], RC:[resistance_cache.len]")
 
 // Ray trace from all active radiation sources to T and return the strongest effect.
-/datum/controller/subsystem/radiation/proc/get_rads_at_turf(var/turf/T)
+/datum/controller/subsystem/radiation/proc/get_rads_at_turf(var/turf/T, datum/radiation_source/pulse = null)
 	. = 0
 	if(!istype(T))
 		return
 	if(T.get_spacecraft_life_support())
 		return // Active spacecraft cabin shielding blocks environmental radiation.
 
-	for(var/value in sources)
+	// Sample a specific source without including unrelated ambient radiation.
+	var/list/sampled_sources = pulse ? list(pulse) : sources
+	for(var/value in sampled_sources)
 		var/datum/radiation_source/source = value
 		if(source.rad_power < .)
 			continue // Already being affected by a stronger source
@@ -89,7 +91,7 @@ SUBSYSTEM_DEF(radiation)
 
 		// Okay, now ray trace to find resistence!
 		var/turf/origin = source.source_turf
-		var/working = source.rad_power
+		var/working = source.get_power_at_distance(dist)
 		while(origin != T)
 			origin = get_step_towards(origin, T) //Raytracing
 			if(!resistance_cache[origin]) //Only get the resistance if we don't already know it.
@@ -103,7 +105,7 @@ SUBSYSTEM_DEF(radiation)
 			. = 0
 
 	// Add cosmic background radiation in open space, with per-ruin Gaussian variation
-	if(istype(T, /turf/space))
+	if(!pulse && istype(T, /turf/space))
 		var/cosmic = COSMIC_RADS_BASE
 		var/area/A = T.loc
 		if(istype(A, /area/space/ruins))

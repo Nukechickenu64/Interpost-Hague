@@ -9,3 +9,12 @@
 		SSticker.can_fire = FALSE
 		queue = list(new /datum/unit_test/cyberdeck_client)
 	log_unit_test("Running focused cyberdeck research regressions.")
+// BEGIN_INTERNALS
+// END_INTERNALS
+// BEGIN_FILE_DIR
+#define FILE_DIR .
+// END_FILE_DIR
+// BEGIN_PREFERENCES
+// END_PREFERENCES
+// BEGIN_INCLUDE
+// END_INCLUDE
