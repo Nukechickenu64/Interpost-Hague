@@ -541,6 +541,7 @@
 
 /client/proc/lobbyPig()
 	src << browse('code/porco/html/pig.html', "window=outputwindow.browser; size=541x315;")
+	winset(src, "outputwindow.browser", "border=none")
 
 /client/proc/init_pig()
 	loadDataPig()

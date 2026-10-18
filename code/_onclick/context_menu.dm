@@ -140,39 +140,18 @@
 	var/max_h = 720
 	var/dyn_h = clamp(base_h + (items_count * row_h), min_h, max_h)
 
-	// Compose HTML menu with a diegetic style
+	// Compose the compact contextual list.
 	// DOCTYPE is required: without it the embedded browser renders in quirks mode, where
 	// document.body.scrollHeight reports the viewport height instead of the actual content
 	// height, so the auto-fit below silently fails and the background never shrinks to the border.
-	var/html = "<!DOCTYPE html><html><head><title>Local Context</title>"
-	html += "<style>"
-	html += "html,body{background:#050b09;color:#6fe8c0;font-family:'Consolas','Courier New',monospace;font-size:9pt;margin:0;padding:0;}"
-	html += ".wrap{display:inline-block;position:relative;padding:10px 12px;min-width:220px;max-width:360px;border:1px solid #4fe0ab;background:rgba(10,30,24,0.92);box-shadow:0 0 10px rgba(79,224,171,0.2) inset;}"
-	html += ".list{max-height:520px;overflow-y:auto;overflow-x:hidden;padding-right:3px;}"
-	html += ".corner{position:absolute;width:7px;height:7px;border-color:#8ffcd2;}"
-	html += ".corner.tl{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid;}"
-	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
-	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
-	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
-	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);cursor:move;user-select:none;}"
-	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
-	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;} .loc{color:#8ffcd2;}"
-	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
-	html += ".item:hover{background:rgba(111,232,192,0.15);border-color:#8ffcd2;}"
-	html += ".item.plain{padding:3px 6px;text-align:center;color:#4fa88a;}"
-	html += ".item.two{display:table;width:100%;table-layout:fixed;}"
-	html += ".item a{color:#8ffcd2;text-decoration:none;display:block;padding:3px 6px;text-align:center;}"
-	html += ".item a:hover{color:#c8fff0;}"
-	html += ".item.two a.main{display:table-cell;vertical-align:middle;width:100%;}"
-	html += ".item.two a.expand{display:table-cell;vertical-align:middle;width:26px;border-left:1px solid rgba(111,232,192,0.35);}"
-	html += "</style>"
+	var/html = "<!DOCTYPE html><html><head><meta charset='utf-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><title>Local Context</title>"
+	html += tilectx_styles()
 	// Auto-fit the browser window to the bordered .wrap element itself, not the viewport.
 	// The header moves the borderless window while dragging and reports the final position to BYOND.
 	html += "<script type='text/javascript'>var __tilectx_drag=false,__tilectx_dx=0,__tilectx_dy=0;function __tilectx_move(e){if(!__tilectx_drag)return;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;try{window.moveTo(x,y)}catch(err){}}function __tilectx_stop(e){if(!__tilectx_drag)return;__tilectx_drag=false;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;window.location='?src=\ref[src];tilectx_move=1;x='+x+';y='+y;document.removeEventListener('mousemove',__tilectx_move);document.removeEventListener('mouseup',__tilectx_stop);}function __tilectx_start(e){if(e.button!==0)return;__tilectx_drag=true;__tilectx_dx=e.screenX-window.screenX;__tilectx_dy=e.screenY-window.screenY;document.addEventListener('mousemove',__tilectx_move);document.addEventListener('mouseup',__tilectx_stop);e.preventDefault();}function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){document.querySelector('.hdr').addEventListener('mousedown',__tilectx_start);setTimeout(__tilectx_fit,10)};</script>"
 	html += "</head><body><div id='wrap' class='wrap'>"
-	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
 	html += "<div class='hdr'>Local Context</div>"
-	html += "<div class='note' style='text-align:center;margin-bottom:6px;'>Select an object to interact.</div>"
+	html += "<div class='note'>Select an object to interact.</div>"
 	html += "<div class='list'>"
 
 	if(!atoms_on_tile.len)
@@ -191,11 +170,12 @@
 				html += "<div class='item plain'>[label]</div>"
 			else
 				// Split into two cells (label + expand) so each is independently clickable across its full area
-				var/clicked_suffix = (A == clicked) ? " (CLICKED)" : ""
-				html += "<div class='item two'><a class='main' href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label][clicked_suffix]</a><a class='expand' href=\"?src=\ref[src];tilectx_obj=\ref[A]\">...</a></div>"
+				var/clicked_suffix = (A == clicked) ? "<span class='selected-tag'>Selected</span>" : ""
+				var/selected_class = (A == clicked) ? " selected" : ""
+				html += "<div class='item two[selected_class]'><a class='main' href=\"?src=\ref[src];tilectx_invoke=\ref[A];proc=pickup\">[label][clicked_suffix]</a><a class='expand' title='Object actions' aria-label='Object actions' href=\"?src=\ref[src];tilectx_obj=\ref[A]\">&#8250;</a></div>"
 
 	// Close row and HTML wrapper (always include)
-	html += "</div><div class='accent'></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "</div><div class='controls'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	// Open the menu window: borderless, non-resizable, placed at mouse cursor if possible
@@ -328,30 +308,12 @@
 	// DOCTYPE is required: without it the embedded browser renders in quirks mode, where
 	// document.body.scrollHeight reports the viewport height instead of the actual content
 	// height, so the auto-fit below silently fails and the background never shrinks to the border.
-	var/html = "<!DOCTYPE html><html><head><title>Object Actions</title>"
-	html += "<style>"
-	html += "html,body{background:#050b09;color:#6fe8c0;font-family:'Consolas','Courier New',monospace;font-size:9pt;margin:0;padding:0;}"
-	html += ".wrap{display:inline-block;position:relative;padding:10px 12px;min-width:240px;max-width:400px;border:1px solid #4fe0ab;background:rgba(10,30,24,0.92);box-shadow:0 0 10px rgba(79,224,171,0.2) inset;}"
-	html += ".corner{position:absolute;width:7px;height:7px;border-color:#8ffcd2;}"
-	html += ".corner.tl{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid;}"
-	html += ".corner.tr{top:-1px;right:-1px;border-top:2px solid;border-right:2px solid;}"
-	html += ".corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid;border-left:2px solid;}"
-	html += ".corner.br{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid;}"
-	html += ".hdr{font-size:10pt;color:#8ffcd2;letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid rgba(111,232,192,0.4);cursor:move;user-select:none;}"
-	html += ".accent{height:1px;background:linear-gradient(90deg,transparent,#4fe0ab,transparent);margin:6px 0 8px 0;}"
-	html += ".note{color:#4fa88a;opacity:0.9;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;text-align:center;} .loc{color:#8ffcd2;}"
-	html += ".item{margin:3px 0;padding:0;border:1px solid rgba(111,232,192,0.35);background:rgba(111,232,192,0.04);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;}"
-	html += ".section{margin:8px 0 3px;color:#4fa88a;font-size:8pt;text-align:left;letter-spacing:0.08em;text-transform:uppercase;}"
-	html += ".item:hover{background:rgba(111,232,192,0.15);border-color:#8ffcd2;}"
-	html += ".item a{color:#8ffcd2;text-decoration:none;display:block;padding:3px 6px;text-align:center;}"
-	html += ".item a:hover{color:#c8fff0;}"
-	html += ".iconwrap{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;} .iconwrap img{image-rendering:pixelated;border:1px solid #4fe0ab;background:#091018;}"
-	html += "</style>"
+	var/html = "<!DOCTYPE html><html><head><meta charset='utf-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><title>Object Actions</title>"
+	html += tilectx_styles()
 	// Auto-fit this object actions window to the bordered .wrap element itself, not the viewport.
 	// The header moves the borderless window while dragging and reports the final position to BYOND.
 	html += "<script type='text/javascript'>var __tilectx_drag=false,__tilectx_dx=0,__tilectx_dy=0;function __tilectx_move(e){if(!__tilectx_drag)return;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;try{window.moveTo(x,y)}catch(err){}}function __tilectx_stop(e){if(!__tilectx_drag)return;__tilectx_drag=false;var x=e.screenX-__tilectx_dx;var y=e.screenY-__tilectx_dy;window.location='?src=\ref[src];tilectx_move=1;x='+x+';y='+y;document.removeEventListener('mousemove',__tilectx_move);document.removeEventListener('mouseup',__tilectx_stop);}function __tilectx_start(e){if(e.button!==0)return;__tilectx_drag=true;__tilectx_dx=e.screenX-window.screenX;__tilectx_dy=e.screenY-window.screenY;document.addEventListener('mousemove',__tilectx_move);document.addEventListener('mouseup',__tilectx_stop);e.preventDefault();}function __tilectx_fit(){try{var el=document.getElementById('wrap');var w=Math.ceil(el.offsetWidth);var h=Math.ceil(el.offsetHeight);window.location='?src=\ref[src];tilectx_fit=1;w='+w+';h='+h;}catch(e){}};window.onload=function(){document.querySelector('.hdr').addEventListener('mousedown',__tilectx_start);setTimeout(__tilectx_fit,10)};</script>"
-	html += "</head><body><div id='wrap' class='wrap'>"
-	html += "<span class='corner tl'></span><span class='corner tr'></span><span class='corner bl'></span><span class='corner br'></span>"
+	html += "</head><body><div id='wrap' class='wrap object-menu'>"
 	var/title = sanitizeSafe(target.name, 64, 1, 1, 1)
 	html += "<div class='hdr'>[title]</div>"
 	if(I)
@@ -394,7 +356,7 @@
 	html += "</div>"
 
 	// Controls
-	html += "<div class='accent'></div><div class='item'><a href=\"?src=\ref[src];tilectx_back=1\">Back</a></div><div class='item'><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
+	html += "<div class='controls'><a href=\"?src=\ref[src];tilectx_back=1\">&#8249; Back</a><a href=\"?src=\ref[src];mach_close=tilectx\">Close</a></div>"
 	html += "</div></body></html>"
 
 	var/browse_args = "window=tilectx;border=0;titlebar=0;can_resize=0;can_minimize=0;can_close=1;size=300x[dyn_h]"
@@ -550,3 +512,7 @@
 		if(findtext(base, "SOUTH+"))
 			return (text2num(copytext(base, 7)) || 0) + 1
 	return view + 1
+// Keep the tile list and object actions visually consistent without device chrome.
+/proc/tilectx_styles()
+	var/static/css = file2text('html/context-menu.css')
+	return "<style>[css]</style>"

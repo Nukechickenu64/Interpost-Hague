@@ -25,6 +25,7 @@
 		/obj/item/device/flashlight/lantern,
 		/obj/item/shovel,
 		/obj/item/pickaxe,
+		/obj/item/pickaxe/gravcutter,
 		/obj/item/clothing/glasses/meson
 	)
 

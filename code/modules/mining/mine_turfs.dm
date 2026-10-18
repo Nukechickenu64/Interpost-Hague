@@ -219,9 +219,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 
 /turf/simulated/mineral/proc/UpdateMineral()
 	clear_ore_effects()
-	ore_overlay = image('icons/obj/mining.dmi', "rock_[mineral.icon_tag]")
-	ore_overlay.appearance_flags = RESET_COLOR
-	ore_overlay.layer = DECAL_LAYER
+	ore_overlay = null
 	update_icon()
 
 //Not even going to touch this pile of spaghetti
@@ -253,6 +251,14 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 			return
 
 		var/obj/item/pickaxe/P = W
+
+		// The grav cutter mines instantly, skipping archaeology and debris.
+		if(P.digspeed == 0 && P.excavation_amount >= 200)
+			to_chat(user, "<span class='notice'>You shear \the [src] apart with \the [P].</span>")
+			playsound(user, P.drill_sound, 20, 1)
+			GetDrilled(1)
+			return
+
 		if(last_act + P.get_digspeed(user) > world.time)//prevents message spam
 			return
 		last_act = world.time
@@ -469,7 +475,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 
 /turf/simulated/mineral/random
 	name = "Mineral deposit"
-	var/mineralSpawnChanceList = list("Uranium" = 5, "Platinum" = 5, "Iron" = 35, "Carbon" = 35, "Diamond" = 1, "Gold" = 5, "Silver" = 5, "Phoron" = 10)
+	var/mineralSpawnChanceList = list("Iron" = 70, "Zbrite" = 23, "Elerium" = 7)
 	var/mineralChance = 100 //10 //means 10% chance of this plot changing to a mineral deposit
 
 /turf/simulated/mineral/random/New()
@@ -484,7 +490,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 
 /turf/simulated/mineral/random/high_chance
 	mineralChance = 100 //25
-	mineralSpawnChanceList = list("Uranium" = 10, "Platinum" = 10, "Iron" = 20, "Carbon" = 20, "Diamond" = 2, "Gold" = 10, "Silver" = 10, "Phoron" = 20)
+	mineralSpawnChanceList = list("Iron" = 60, "Zbrite" = 27, "Elerium" = 13)
 
 
 /**********************Asteroid**************************/

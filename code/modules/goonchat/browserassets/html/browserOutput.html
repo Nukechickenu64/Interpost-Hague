@@ -12,24 +12,6 @@
 	<script type="text/javascript" src="json2.min.js"></script>
 	<script type="text/javascript" src="jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="jquery.jscrollpane.min.js"></script>
-	<style>
-		.scroll-pane-split {
-			position: relative;
-			z-index: 0;
-		}
-		.topimg {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: calc(100% - 16px);
-			height: 50px;
-			z-index: 1;
-			pointer-events: none;
-		}
-		#loading, #userBar, #ping, #newMessages, .popup {
-			z-index: 2;
-		}
-	</style>
 </head>
 <body>
 	<div id="loading">
@@ -41,14 +23,15 @@
 		</div>
 	</div>
 	<div class="scroll-pane-split">
-		<span id="messages">
+		<div id="messages">
 			
-		</span>
+		</div>
 	</div>
-	<img src="tchatshadow.png" class="topimg" alt="" aria-hidden="true" />
+	<div class="topimg" aria-hidden="true"></div>
 <script>
 	var settings = {
 		showArrows: true,
+		verticalDragMinHeight: 24,
 		stickToBottom: true,
 		maintainPosition: true
 	};

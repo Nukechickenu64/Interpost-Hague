@@ -3,5 +3,8 @@
 
 /datum/controller/subsystem/unit_tests/Initialize(timeofday)
 	. = ..()
-	queue = list(new /datum/unit_test/replicator_radiation, new /datum/unit_test/replicator_operations, new /datum/unit_test/replicator_connections)
+	// Keep the empty test server in setup once the test subsystem starts it.
+	// Normal round setup returns to the lobby without players, suspending radiation.
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/replicator_radiation, new /datum/unit_test/replicator_operations, new /datum/unit_test/replicator_connections, new /datum/unit_test/replicator_storage)
 	log_unit_test("Running focused replicator regression tests.")

@@ -219,6 +219,13 @@
 
 //Let's unlock this early I guess.  Might be too early, needs tweaking.
 /obj/machinery/clonepod/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if(istype(W, /obj/item/hydroponics_supply/biomass))
+		if(!user || user.incapacitated() || !Adjacent(user) || !user.unEquip(W, target = src))
+			return
+		biomass += 50
+		to_chat(user, "The pod accepts the biomass brick. Feedstock: [biomass] units.")
+		qdel(W)
+		return
 	if(isnull(occupant))
 		if(default_deconstruction_screwdriver(user, W))
 			return

@@ -919,6 +919,7 @@ $(function() {
 
 	//Mildly hacky fix for scroll issues on mob change (interface gets resized sometimes, messing up snap-scroll)
 	$(window).on('resize', function(e) {
+		api.reinitialise();
 		if ($(this).height() !== opts.priorChatHeight) {
 			$('body,html').scrollTop($messages.outerHeight());
 			opts.priorChatHeight = $(this).height();

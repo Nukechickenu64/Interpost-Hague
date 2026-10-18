@@ -193,12 +193,29 @@ proc/BlendRGB(rgb1, rgb2, amount)
         mob.machine = test_host
         src << browse("Old bordered window", "window=device_test;size=600x400;can_resize=1;titlebar=1")
         sleep(2)
-        var/html = {"<!DOCTYPE html><html><head><title>Native device test</title></head><body><p>Native close and border regression</p><script>function testClose(){document.getElementById('device-close').click();}setTimeout(function(){window.location.href='byond://?device_ready=1';},750);</script></body></html>"}
+        src << browse_rsc('html/browser/common.css', "common.css")
+        var/html = file2text('tools/device_ui/browser_fixture.html')
+        var/test_script = {"<script>
+            function closeIsExposed(){var c=document.getElementById('device-close'),r=c.getBoundingClientRect();return document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)===c;}
+            function testClose(){document.getElementById('device-close').click();}
+            setTimeout(function(){
+                var titleHidden=window.getComputedStyle(document.querySelector('.uiTitle')).display==='none';
+                var controls=document.querySelector('.uiTitleButtons');
+                var controlsVisible=controls.getBoundingClientRect().height>0 && window.getComputedStyle(controls).position==='static';
+                var exposed=closeIsExposed();
+                document.getElementById('device-content').scrollTop=150;
+                window.location.href='byond://?device_ready=1&title_hidden='+Number(titleHidden)+'&controls_visible='+Number(controlsVisible)+'&exposed='+Number(exposed)+'&scrolled_exposed='+Number(closeIsExposed());
+            },750);
+        </script></body>"}
+        html = replacetext(html, "</body>", test_script)
         device_ui_browse(mob, html, "window=device_test;size=600x400", test_host)
 
 /client/Topic(href, list/href_list)
     if(!href_list["device_ready"])
         return ..()
+    verify(href_list["title_hidden"] == "1", "Legacy title bar must be hidden on a physical screen")
+    verify(href_list["controls_visible"] == "1", "Legacy title buttons must remain accessible inside the screen")
+    verify(href_list["exposed"] == "1" && href_list["scrolled_exposed"] == "1", "The bezel X must receive pointer hits before and after scrolling")
     verify(winget(src, "device_test", "titlebar") == "false", "Existing window titlebar must be removed")
     verify(winget(src, "device_test", "can-resize") == "false", "Native resize frame must be removed")
     verify(winget(src, "device_test.browser", "border") == "none", "Embedded browser must have no sunken border")

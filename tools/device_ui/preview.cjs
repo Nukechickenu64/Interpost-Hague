@@ -12,6 +12,8 @@ for (const file of ['device-ui.css', 'device-ui.js', 'cyberdeck.css']) fs.copyFi
 const profiles = JSON.parse(fs.readFileSync(path.join(fixtures, 'profiles.json'), 'utf8'));
 const fixture = i => fs.readFileSync(path.join(fixtures, 'fixture-' + i + '.html'), 'utf8');
 const themeHead = i => fixture(i).match(/<meta name='device-screen'[\s\S]*?<\/head>/)[0].replace(/<\/head>$/, '');
+fs.copyFileSync(path.join(root, 'html/browser/common.css'), path.join(out, 'common.css'));
+fs.writeFileSync(path.join(out, 'device-browser.html'), read('tools/device_ui/browser_fixture.html').replace('</head>', themeHead(5).replace(/Power monitor/g, 'Lift Panel') + '</head>'));
 for (let i = 1; i <= profiles.length; i++) fs.writeFileSync(path.join(out, 'device-' + i + '.html'), fixture(i));
 
 // These states are rendered by the production DM cyberdeck renderer.
@@ -54,6 +56,6 @@ const liveLayout = JSON.stringify('<h2>Research diagnostics</h2><p>Live layout r
 fs.writeFileSync(path.join(out, 'device-html.html'), '<!doctype html><html><head><script src="jquery.min.js"></script><script>var hSrc="preview";</script><script src="html_interface.js"></script>' + themeHead(4) + '</head><body><script>setInterval(function(){updateLayout(' + liveLayout + ');},3000);</script></body></html>');
 
 const cards = profiles.map((p, i) => '<article><div class="caption">' + p.name + '</div><iframe title="' + p.name + '" src="device-' + (i + 1) + '.html" style="height:' + Math.round(330 / p.ratio + 76) + 'px"></iframe></article>').join('');
-const extras = [['NanoUI air alarm', 'device-nano.html'], ['TGUI cell timer', 'device-tgui.html'], ['HTML interface live refresh', 'device-html.html']].map(([name, url]) => '<article><div class="caption">' + name + '</div><iframe title="' + name + '" src="' + url + '" style="height:560px"></iframe></article>').join('');
+const extras = [['Legacy lift panel', 'device-browser.html'], ['NanoUI air alarm', 'device-nano.html'], ['TGUI cell timer', 'device-tgui.html'], ['HTML interface live refresh', 'device-html.html']].map(([name, url]) => '<article><div class="caption">' + name + '</div><iframe title="' + name + '" src="' + url + '" style="height:560px"></iframe></article>').join('');
 fs.writeFileSync(path.join(out, 'device-preview.html'), '<!doctype html><html><head><meta charset="utf-8"><title>Device screen preview</title><style>body{background:#171b1d;color:#d3dcd7;font:13px Verdana;margin:28px}h1{font-size:22px;margin-bottom:8px}p{color:#87958f;margin-bottom:24px}a{color:#b6dced}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;align-items:start}iframe{display:block;width:100%;border:0}.caption{padding:8px 2px;color:#a8b8b0;font-size:11px;text-transform:uppercase;letter-spacing:.08em}h2{font-size:16px;margin-top:32px}</style></head><body><h1>Device screens</h1><p>Sprite-derived casing, display colors and proportions. Sample controls below are a visual preview.</p><p><a href="cyberdeck-preview.html">Open the cyberdeck research screen and its five states</a></p><div class="grid">' + cards + '</div><h2>Existing UI systems</h2><div class="grid">' + extras + '</div></body></html>');
 console.log('Generated nine sprite themes, five cyberdeck states and NanoUI, TGUI and HTML-interface fixtures in ' + out);

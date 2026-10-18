@@ -151,7 +151,7 @@
 		var/obj/item/ore/O = locate() in input.loc
 		if(!O) break
 		if(O.ore && !isnull(ores_stored[O.ore.name]))
-			ores_stored[O.ore.name] -= 1
+			ores_stored[O.ore.name] += 1
 		else
 			world.log << "[src] encountered ore [O] with oretag [O.ore ? O.ore : "(no ore)"] which this machine did not have an entry for!"
 

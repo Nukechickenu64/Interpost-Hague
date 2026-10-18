@@ -34,6 +34,11 @@
 		if(world.time >= spawn_at)
 			spawn_wave()
 		return
+	if(!wave && !next_warning_at)
+		// post_setup() normally schedules the first warning. Heal it if the mode was
+		// started through a path that skipped post_setup (e.g. force-mode).
+		next_warning_at = world.time + WAVE_FIRST_WARNING
+		return
 	if(next_warning_at && (world.time >= next_warning_at || (wave && wave_cleared())))
 		announce_wave()
 
@@ -52,16 +57,28 @@
 	return istype(H) && !istype(H, /mob/living/carbon/human/invader) && H.client && H.stat != DEAD
 
 /datum/game_mode/wave_attack/proc/get_spawn_turfs(var/list/areas, var/needed)
+	var/list/turfs = collect_spawn_turfs(areas, needed)
+	return turfs.len >= needed ? turfs : null
+
+/// Pool free floor turfs from every listed area until `needed` are found; a squad no longer has to fit inside a single area.
+/datum/game_mode/wave_attack/proc/collect_spawn_turfs(var/list/areas, var/needed)
 	var/list/turfs = list()
 	for(var/area/A in areas)
 		for(var/turf/simulated/floor/F in A)
 			if(!F.contains_dense_objects() && !(locate(/mob/living) in F))
 				turfs += F
-	return turfs.len >= needed ? turfs : null
+				if(turfs.len >= needed)
+					return turfs
+	return turfs
 
-/// Arrivals hallway unless crew are standing in it; then a random crew-free area; arrivals again if every area is occupied.
+/// Arrivals hallway unless crew are standing in it; then unoccupied station areas; then any station floor as a last resort.
 /datum/game_mode/wave_attack/proc/pick_spawn_turfs(var/needed)
 	var/list/station_areas = SSinvaders.get_station_areas()
+	if(!length(station_areas))
+		// The station area cache can be empty if it was built before the map finished
+		// loading or the map datum lists no station z-levels. Fall back to all mapped areas.
+		station_areas = get_filtered_areas(GLOB.is_ghost_teleportable_area)
+
 	var/list/occupied = list()
 	for(var/mob/living/carbon/human/H in GLOB.player_list)
 		if(is_active_crew(H))
@@ -71,18 +88,19 @@
 	for(var/area/A in station_areas)
 		if(is_type_in_list(A, arrivals_area_types))
 			arrivals += A
-	var/list/arrival_turfs = get_spawn_turfs(arrivals, needed)
 
-	var/arrivals_occupied = length(arrivals & occupied)
-	if(arrival_turfs && !arrivals_occupied)
-		return arrival_turfs
+	// Preferred: the arrivals hallway, unoccupied and large enough.
+	if(!length(arrivals & occupied))
+		var/list/arrival_turfs = get_spawn_turfs(arrivals, needed)
+		if(arrival_turfs)
+			return arrival_turfs
 
-	var/list/candidates = shuffle(station_areas - occupied - arrivals)
-	for(var/area/A in candidates)
-		var/list/turfs = get_spawn_turfs(list(A), needed)
-		if(turfs)
-			return turfs
-	return arrival_turfs
+	// Crew are at or near arrivals (or it is too small): pack the squad across the
+	// unoccupied station areas first, then anywhere that is clear.
+	var/list/turfs = collect_spawn_turfs(shuffle(station_areas - occupied), needed)
+	if(turfs.len >= needed)
+		return turfs
+	return collect_spawn_turfs(station_areas, needed)
 
 /datum/game_mode/wave_attack/proc/get_squad_size()
 	var/crew = 0
@@ -97,8 +115,9 @@
 	next_warning_at = world.time + WAVE_MAX_DURATION
 	var/size = get_squad_size()
 	var/list/turfs = pick_spawn_turfs(size)
-	if(!length(turfs))
-		log_and_message_admins("Wave Attack: no valid spawn turfs for wave [wave].")
+	if(!length(turfs) || turfs.len < size)
+		log_and_message_admins("Wave Attack: no valid spawn turfs for wave [wave]. Squad [size], station areas [length(SSinvaders.get_station_areas())], free turfs [length(turfs)].")
+		wave--
 		return
 	wave_mobs = list()
 	var/list/spawn_pool = turfs.Copy()
@@ -110,6 +129,8 @@
 			if(!spawn_turf)
 				break
 		var/mob/living/carbon/human/invader/wave/I = new(spawn_turf)
+		if(QDELETED(I))
+			continue
 		I.equip_wave_gear(wave)
 		wave_mobs += I
 	if(length(wave_mobs))

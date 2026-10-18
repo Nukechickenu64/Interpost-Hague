@@ -6,6 +6,8 @@ NanoUI, TGUI and HTML-interface windows resolve their own hosts automatically. T
 
 The frame stays outside framework content roots so live updates preserve dragging, resize handles and close controls. JavaScript is ES5 and uses the existing BYOND winset transport. Native resizing is disabled to remove the Windows frame; the bezel still resizes through `winset`. `device_ui_configure` also corrects already-open windows and removes the embedded browser's sunken border. Closing calls the owning UI framework's cleanup. Legacy windows pass one encoded argument to `.deviceclose` and close after callbacks to prevent accidental reopening.
 
+Legacy browser titles are hidden only inside physical device screens; their title action buttons remain in the scrolling content. The glass has its own stacking context below the hardware controls so fixed-position framework content cannot cover the bezel X. `device-browser.html` previews this with the real `common.css` used by lift panels.
+
 Validation:
 
 1. Compile `Interpost-Hague.dme` normally.
@@ -15,4 +17,4 @@ Validation:
 
 The cyberdeck's dedicated dashboard uses `screen_data()` and `cyberdeck_ui_html()` with `html/cyberdeck.css`; the shared shell still determines its palette, proportions and window controls. Refresh links/status requests a new snapshot. The isolated checks cover action visibility, media locking and escaping; `cyberdeck_test.dme` also exercises real chair/disk prerequisites and close cleanup.
 
-For a native client regression, run `python tools/device_ui/native_check.py` after step 3, compile `tmp/device-ui-check/native.dme`, and run its DMB with DreamDaemon on an unused port. Connect a temporary Dream Seeker. The test replaces an existing bordered window, verifies its outer and inner dimensions match, checks programmatic resizing, and clicks the real X against a callback that attempts to reopen the window. It prints `NATIVE DEVICE UI: PASS` and exits (30-second timeout). Keep this test separate from a running game.
+For a native client regression, run `python tools/device_ui/native_check.py` after step 3, compile `tmp/device-ui-check/native.dme`, and run its DMB with DreamDaemon on an unused port. Connect a temporary Dream Seeker. The test replaces an existing bordered window, verifies its outer and inner dimensions match, checks programmatic resizing, checks pointer access to the X before and after scrolling past a legacy title bar, and clicks the real X against a callback that attempts to reopen the window. It also verifies legacy title action buttons remain visible. It prints `NATIVE DEVICE UI: PASS` and exits (30-second timeout). Keep this test separate from a running game.

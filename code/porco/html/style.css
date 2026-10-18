@@ -1,333 +1,83 @@
-body {
-    background-color:#090a0b;
-    background-attachment:scroll;
-    background-repeat: repeat;
-    background-size: auto;
-    overflow: hidden;
-    word-break: break-word;
-    font-family: "Cond","Verdana",sans-serif;
-    color:#b8b0a0;
-    font-size:14px;
-    margin: 0;
-    text-shadow: 0px 0px 4px rgba(0,0,0, 0.9);
+/* PORCO / FUNCTIONAL. Compact controls inside the shared device bezel. */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#05060a}
+body{color:#a9aab9;font:10px/13px Consolas,'Lucida Console','Courier New',monospace}
+a{color:inherit;text-decoration:none;cursor:pointer}
+#device-frame{background-color:#444b49;border-color:#747b75;color:#d5dacf}
+#device-glass{top:30px;left:13px;right:13px;bottom:20px;background:#080a16;border-color:#262f34}
+#device-reflection{opacity:.6}
+.device-bottom{bottom:3px;height:8px;left:25px;right:25px}
+.device-screw{bottom:2px}
+.device-screw-right{right:9px}
+#statpanel{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;color:#b3b3c0}
+#stats-strip,#action-panel,#tabs-panel{position:absolute;left:5px;right:5px;border:1px solid #464356;
+  background:#10131e;box-shadow:inset 1px 1px #777184,inset -1px -1px #06080f}
+#topbar{position:absolute;top:0;left:12px;right:9px;height:27px;line-height:23px}
+.brand{position:absolute;left:0;top:0;color:#d5dacf;font:bold 11px/25px 'Lucida Console',monospace;letter-spacing:2px;text-shadow:1px 1px #050608}
+#buttonpanel{position:absolute;right:7px;top:3px;height:20px;white-space:nowrap}
+#buttonpanel a{display:inline-block;vertical-align:top;min-width:43px;height:19px;padding:2px 8px 0;margin-left:4px;
+  text-align:center;font:bold 9px/13px Consolas,'Courier New',monospace;color:#b9bbca;
+  background:linear-gradient(rgba(255,255,255,.16),rgba(0,0,0,.2));border:1px solid #252b28;border-radius:3px;
+  box-shadow:inset 0 1px rgba(255,255,255,.3),0 1px 2px rgba(0,0,0,.5)}
+#buttonpanel a:hover,#buttonpanel a.selected{border-color:#71a6bd;color:#d6edeb;background:#243243}
+#connection{position:absolute;right:116px;top:1px;height:22px;font-size:8px;line-height:23px;color:#b3bab9}
+#connection i{display:inline-block;margin-right:5px;width:6px;height:6px;vertical-align:middle;
+  background:#4f4f61;border:1px solid #8b8193}
+#connection.online{color:#9ad1a8}
+#connection.online i{background:#49b96d;border-color:#8ce9a0;box-shadow:0 0 4px #2d8645}
 
-    border: 0;
-    padding: 0;
-}
-.statstable
-{
-    width:80%;
-    border-collapse: collapse;
-     margin-top:8px;
-}
-.trstats
-{
-background: rgba(199, 154, 75, 0.12);
-}
-.trstats:nth-child(2n)
-{ background: rgba(139, 47, 34, 0.16);}
+#stats-strip{top:5px;height:38px;padding:3px 4px;background:#11131d;display:none}
+body.has-stats #stats-strip{display:block}
+.stat-item{float:left;position:relative;width:25%;height:30px;background:#090c15;
+  border:1px solid #3c394e;box-shadow:inset 1px 1px #686179,inset -1px -1px #030509;overflow:hidden}
+.stat-item+.stat-item{border-left:0}
+.stat-label{position:absolute;left:7px;top:3px;color:#c9b4a7;font:bold 9px/12px Consolas,'Courier New',monospace}
+.stat-label small{display:block;margin-top:0;font:7px/9px Consolas,'Courier New',monospace;color:#777789}
+.stat-item strong{position:absolute;right:10px;top:4px;color:#e16660;font:bold 18px/21px Consolas,'Courier New',monospace;text-shadow:0 0 4px #6e272c}
 
-.ST
-{
-    font-weight: bold;
-    font-size:150%;
-    font-family: "Cond",sans-serif;
-    color: #c79a4b;
-    text-shadow: 0px 0px 10px #000;
-}
-.ST.SMALLER
-{
-    font-size:120%;
-}
-.ST.MINOR
-{
-    color: #9ea36d;
-
-}
-.ST.DES
-{
-    color: #d7b46a;
-    text-shadow: 0px 0px 5px #5d241b;
-}
-.smallstat
-{
-    font-size:80%;
-    color: #9ea36d;
-    text-shadow: 0px 0px 3px #000;
-}
-.verb {font-family: "Cond";text-shadow: 0px 0px 3px #bdda57;
-color:#d7b46a; text-decoration:none;outline: none;border: none;font-size:90%;}
-.verb.dim { color:#707070; text-shadow: 0px 0px 3px #707070;}
-.verb.smaller { font-size:80%;}
-.verb.dim:hover{color: #8b2f22; word-break: keep-all; }
-.verb:hover {color:#f0cf84;background:rgba(139,47,34,0.25);outline: none;border: none;font-weight:bold; word-break: keep-all;}
-.verb:focus{outline:none;}
-
-#buttonpanel
-{
-    top: 35px;
-    left:15px;
-    height: 228px;
-    width: 44px;
-    position: absolute;
-    z-index: 1;
-}
-.icon-link
-{
-    display: block;
-    width: 48px;
-    height: 44px;
-    cursor: hand;
-    cursor: pointer;
-    position: relative;
-    z-index: 10;
-    text-decoration: none;
-}
-.icon-link:hover .button,
-.icon-link:focus .button
-{
-    background-color: transparent;
-    outline: none;
-}
-.icon-link:active .button
-{
-    transform: translateY(3px);
-}
-#note-link
-{
-    margin-top:44px;
-}
-.button
-{
-    margin:0 0 2px 2px;
-    width: 44px;
-    height: 42px;
-    max-width: 45px;
-    max-height: 45px;
-    background-repeat:no-repeat;
-    cursor: hand;
-    cursor: pointer;
-}
-.button:hover
-{
-    background-color: transparent;
-    outline: none;
-}
-.button:active {
-    transition: 0.1s;
-        transform: translateY(4px);
-}
-#loading
-{
-    font-size:110%;
-    color: #fd5b5b;
-    text-shadow: 0px 0px 2px rgba(255,0,0, 0.9);
-}
-#note
-{
-background-image:url('button_note.png');
-}
-#pig
-{
-background-image:url('button_pig.png');
-}
-#options
-{
-background-image:url('button_options.png');
-}
-
-#statpanel {
-    position:absolute;
-    background-image:url('stats.png');
-
-    overflow: hidden;
-    background-repeat:no-repeat;
-    top:0;
-    left:0;
-    width: 541px;
-    height: 315px;
-}
-#statcontainer
-{
-    position:absolute;
-    top:29px;
-    left:190px;
-    width: 290px;
-    padding: 5px;
-    height: 137px;
-}
-
-#scrollbar_container {
-    position:absolute; top:42px; left:315px; width: 200px; height: 159px; padding: 5px;
-}
-
-#scrollbar_track {
-    position:absolute; top:18px; right:0px; height:145px; width:16px; background-color:rgba(199,154,75,0.18); cursor:move;
-}
-
-#scrollbar_handle {
-    width:14px;
-    left:1px;
-    overflow:auto;
-    background-color:rgba(215,180,106,0.45);
-    cursor:move;
-}
-
-#scrollbar_content {
-    overflow:hidden;
-    position: relative;
-    width: 330px;
-	right: 144px;
-    height: 137px;
-	top: 10px;
-}
-
-.scrollbart {
-    position:relative;
-    width:14px;
-    height:50%;
-    overflow:auto;
-    background-repeat:no-repeat;
-    cursor:move;
-    border:0;
-    padding:0;
-    margin:0;
-}
-
-.scrollbarb {
-    position:relative;
-    width:14px;
-    height:50%;
-    overflow:auto;
-    background-repeat:no-repeat;
-    background-position:left bottom;
-    cursor:move;
-    border:0;
-    padding:0;
-    margin:0;
-}
-
-#scrollbtnup {
-    width:16px;
-    height:16px;
-    position:absolute;
-    top:1px;
-    right:0px;
-    overflow:auto;
-    background-color:rgba(215,180,106,0.45);
-}
-
-#scrollbtndown {
-    width:16px;
-    height:16px;
-    position:absolute;
-    bottom:1px;
-    right:0px;
-    overflow:hidden;
-    background-color:rgba(215,180,106,0.45);
-}
-
-
-
-
-td
-{
-width:50%;
- vertical-align:top;
-}
-table
-{
-width:90%;
-}
-
-
-.button.dynamic{
-background-color: #5d241b;
-height: 32px;
-width: 32px;
-float: left;
-}
-
-#overpanel
-{
-    background-image:url('panel.png');
-    top: 275px;
-    width: 541px;
-    position: absolute;
-    z-index:1;
-    height:35px;
-    pointer-events:none;
-}
-#dynamicpanel
-{
-    background-image: url("data:image/gif;base64,R0lGODlhAQABAPcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAABAAEAAAgEAP8FBAA7");
-    background-size: cover;
-    top: 210px;
-    left:15px;
-    height: 45px;
-    width: 294px;
-    position: absolute;
-    z-index:1;
-}
-#dynamicpanel2
-{
-    background-image: url("data:image/gif;base64,R0lGODlhAQABAPcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAABAAEAAAgEAP8FBAA7");
-    background-size: cover;
-    top: 214px;
-    left: 130px;
-    height: 44px;
-    width: 388px;
-    position: absolute;
-    z-index:2;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-}
-#dynamicpanel2 .role-button
-{
-    display: inline-block;
-    width: 40px;
-    height: 36px;
-    margin-right: 4px;
-    vertical-align: top;
-}
-#dynamicpanel2 .role-button .button
-{
-    display: block;
-    width: 32px;
-    height: 32px;
-    margin: 2px 0 0 2px;
-    background-size: cover;
-}
-#dynamicpanel a,
-#dynamicpanel2 a
-{
-    display: block;
-    cursor: hand;
-    cursor: pointer;
-}
-#dynamicpanel a:hover,
-#dynamicpanel2 a:hover
-{
-    background-color: transparent;
-    outline: none;
-}
-
-.segment1{
-    width: 90px;
-    max-width: 100px;
-    max-height: 135px;
-    float: left;
-
-    position: absolute;
-    z-index: 0;
-}
-.segment2{
-    position: absolute;
-    width: 90px;
-    max-width: 90px;
-    max-height: 135px;
-    margin-right: 44%;
-    left: 50%;
-    z-index: 0;
-}
+#action-panel{top:5px;bottom:51px;background:#070b14}
+body.has-stats #action-panel{top:47px}
+#action-header{position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1px solid #3b3b52;
+  background:linear-gradient(#242234,#171724);color:#d0c0ae;font:bold 10px/20px Consolas,'Courier New',monospace}
+.tiny-chevron{display:inline-block;margin:0 8px;color:#c28b59;font-size:15px}
+#section-title{vertical-align:top}
+#action-count{position:absolute;right:10px;top:1px;color:#8c909e;font-size:9px;font-weight:normal}
+#scrollbar_container{position:absolute;left:2px;right:3px;top:24px;bottom:3px;background:#070a11}
+#scrollbar_content{width:100%;height:100%;padding:3px 6px;overflow:auto;overflow-x:hidden;
+  scrollbar-color:#565268 #0c101a;scrollbar-width:thin;word-wrap:break-word}
+#scrollbar_content .segment1,#scrollbar_content .segment2{display:block;width:100%;margin:0;padding:0;font-size:0}
+#scrollbar_content .verb{display:inline-block;vertical-align:top;width:48%;min-height:21px;margin:0 1% 2px 0;
+  padding:4px 5px 3px 9px;color:#b4b7c4;font:10px/13px Consolas,'Lucida Console','Courier New',monospace;
+  white-space:normal;border:1px solid #1f2636;border-left:2px solid #40334b;background:#10141e;
+  text-overflow:clip}
+#scrollbar_content .verb:before{content:'›';display:inline-block;margin-right:7px;color:#c58c58;font:bold 13px/10px Consolas,monospace}
+#scrollbar_content .verb.dim{background:#0c1018;color:#9aa0b0}
+#scrollbar_content .verb:hover,#scrollbar_content .verb:focus{background:#243347;color:#e3e5ec;
+  border-left-color:#69abc0;border-top-color:#3d6374;outline:none}
+#scrollbar_content b{color:#d2b6a6}
+#scrollbar_content .ST{color:#9aba93}
+#scrollbar_content span[style*="#0e3b0e"]{color:#9aba93!important}
+.empty-state{padding:14px 11px;color:#8c94a3;font:10px/15px Consolas,'Courier New',monospace}
+/* Compact nav row: generated actions/roles stay real clickable icons */
+#tabs-panel{bottom:5px;height:42px;background:linear-gradient(#151624,#0c0e17);overflow:hidden}
+#tab-label{position:absolute;top:6px;left:7px;color:#b4aaaf;font:bold 9px/12px Consolas,'Courier New',monospace}
+#tab-hint{position:absolute;top:23px;left:7px;width:68px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  color:#8e869b;font:8px/10px Consolas,'Courier New',monospace}
+#dynamicpanel,#dynamicpanel2{position:absolute;top:2px;height:37px;white-space:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none}
+#dynamicpanel{left:78px;right:36%}
+#role-divider{position:absolute;top:6px;right:35%;height:28px;width:1px;background:#655d76;box-shadow:1px 0 #06070d}
+#dynamicpanel2{left:66%;right:4px}
+#dynamicpanel::-webkit-scrollbar,#dynamicpanel2::-webkit-scrollbar{height:0}
+body.no-roles #role-divider,body.no-roles #dynamicpanel2{display:none}
+body.no-roles #dynamicpanel{right:4px}
+#dynamicpanel > a,#dynamicpanel2 > a{display:inline-block!important;vertical-align:top!important;position:relative!important;
+  top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
+  width:37px!important;height:37px!important;margin:0 5px 0 0!important;padding:0!important;text-decoration:none!important;
+  background:linear-gradient(#2d293e,#161725 30%,#171827)!important;border:1px solid #5a566b!important;
+  box-shadow:inset 1px 1px #8c879b,inset -1px -1px #05070c!important;overflow:hidden!important}
+#dynamicpanel > a:hover,#dynamicpanel2 > a:hover,#dynamicpanel > a.selected,#dynamicpanel2 > a.selected{
+  background:linear-gradient(#39445e,#192638)!important;border-color:#7997b0!important;
+  box-shadow:inset 1px 1px #b0b9c9,inset -1px -1px #070a11!important}
+#dynamicpanel .button,#dynamicpanel2 .button{display:block!important;position:relative!important;top:0!important;left:0!important;
+  right:auto!important;bottom:auto!important;width:31px!important;height:31px!important;margin:2px!important;padding:0!important;
+  background-position:center!important;background-repeat:no-repeat!important;background-size:contain!important}

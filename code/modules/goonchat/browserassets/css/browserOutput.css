@@ -16,25 +16,69 @@ html, body {
     height: 100%;
 	position: relative;
 	width: 100%;
-    color: #c8c1b3;
+    color: #b8c4df;
     word-wrap: break-word;
 }
 body {
 	background-image: url("chatbg.png");
-    background-color: #090a0b;
+	background-image: linear-gradient(rgba(7, 8, 10, 0.58), rgba(7, 8, 10, 0.58)), url("chatbg.png");
+    background-color: #07080a;
 	background-size: auto;
 	background-repeat: repeat;
 	background-attachment: scroll;
 	font-family: Bahnschrift, sans-serif;
-	font-size: 19px;
-    color: #b8b0a0;
+	font-size: 16px;
+    color: #b8c4df;
     white-space: normal;
-    height: 102%;
+    height: 100%;
+	box-sizing: border-box;
+	padding: 22px 4px 4px;
 	position: relative;
     margin: 0px;
 	overflow: hidden;
 	line-height: 1.2;
 	word-wrap: break-word;
+}
+
+/* Fixed metal trim stays above the scrolling log without intercepting clicks. */
+body:after {
+	content: "";
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: 3px solid #111216;
+	box-shadow: inset 1px 0 0 #42434a, inset -1px 0 0 #42434a, inset 0 -1px 0 #62616b;
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* Keep the original chat rail, then fade its lower edge into the log. */
+.topimg {
+	position: fixed;
+	top: 3px;
+	left: 4px;
+	right: 4px;
+	height: 12px;
+	background: url("tchatshadow.png") repeat-x left top;
+	background-size: auto 50px;
+	pointer-events: none;
+	z-index: 1;
+}
+.topimg:after {
+	content: "";
+	position: absolute;
+	top: 12px;
+	left: 0;
+	right: 0;
+	height: 24px;
+	background: linear-gradient(to bottom, rgba(78, 90, 133, .7), rgba(78, 90, 133, 0));
+	pointer-events: none;
+}
+
+#loading, #userBar, #ping, #newMessages, .popup, .contextMenu {
+	z-index: 2;
 }
 
 em {
@@ -59,9 +103,9 @@ img.icon {
 	vertical-align: bottom;
 }
 
-a {color: #d7b46a;}
-a.visited {color: #d7b46a;}
-a:visited {color: #d7b46a;}
+a {color: #639ed6;}
+a.visited {color: #929bd4;}
+a:visited {color: #929bd4;}
 a.popt {text-decoration: none;}
 
 /*****************************************
@@ -81,8 +125,8 @@ a.popt {text-decoration: none;}
 #loading i {display: block; padding-bottom: 3px;}
 
 #messages {
-	font-size: 16px;
-	padding: 3px;
+	font-size: 14px;
+	padding: 3px 7px 6px;
 	margin: 0;
 	word-wrap: break-word;
 }
@@ -123,11 +167,9 @@ a.popt {text-decoration: none;}
 	right: 0;
 }
 
-#jspPane {
-    padding: 3px;
+.jspPane {
     position: absolute;
     margin: 0;
-    width: 98%;
     overflow: hidden;
     word-wrap: break-word;
 }
@@ -264,8 +306,9 @@ a.popt {text-decoration: none;}
 /* ADD HERE FOR BOLD */
 .bold, .prefix, .ooc, .looc, .adminooc, .admin, .medal, .yell {font-weight: bold;}
 
-.name {font-weight: 150; font-size: 105%; color: #a99b8d; text-shadow: 0 0 4px #000}
-.emote_speaker {color: #82c7d0;}
+/* Cool speech colors; radio and examination text keep their own emphasis. */
+.name {font-weight: 150; font-size: 105%; color: #719bb6; text-shadow: 0 0 2px rgba(53, 111, 163, 0.4)}
+.emote_speaker {color: #719bb6;}
 .nameradio {font-weight: 100; font-size: 102%}
 
 /* ADD HERE FOR ITALIC */
@@ -317,7 +360,7 @@ em						{font-style: normal;	font-weight: bold;}
 
 /* Radio: Misc */
 .deadsay				{color: #e2c1ff}
-.radio					{color: #759bd9; text-shadow: 0 0 2px #759bd9;}
+.radio					{color: #328bce; text-shadow: 0 0 2px rgba(36, 106, 171, 0.65);}
 .deptradio				{color: #ff00ff;}	/* when all other department colors fail */
 .newscaster				{color: #750000;}
 
@@ -341,65 +384,65 @@ em						{font-style: normal;	font-weight: bold;}
 h1.alert, h2.alert		{color: #2e852e; text-shadow: 0 0 2px #2e852e; font-family: tablichka;}
 h3.announcementalert		{color: #078c00; text-shadow: 0 0 8px #078c00; font-family: tablichka;}
 
-.emote					{font-style: italic; color: #454a52;}
+.emote					{font-style: italic; color: #9385bd;}
 
 /* Game Messages */
 
 .looksat {
-    color: #635fcf;
+    color: #8293b5;
     font-size: 85%;
 }
 
 .looksatbold {
-    color: #635fcf;
+    color: #8c9fc6;
     font-weight: bold;
     font-size: 80%;
-    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    text-shadow: 0 0 2px rgba(74, 102, 173, 0.4);
     margin-left: 3px;
 }
 
 .examinebold {
-    color: #635fcf;
+    color: #9b8dcc;
     font-weight: bold;
     font-size: 100%;
-    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    text-shadow: 0 0 2px rgba(107, 92, 175, 0.4);
     margin-left: 2px;
 }
 
 .passivebold {
-    color: #416777;
+    color: #719bb6;
     font-weight: bold;
-    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    text-shadow: 0 0 2px rgba(53, 111, 163, 0.4);
     margin-left: 2px;
 }
 
 .statustext {
-    color: #6e6e6e;
+    color: #8c98b3;
     text-shadow: 0px 0px 1px #00000f;
 }
 
 .uppertext {
-    color: #685f8a;
+    color: #ad9bd4;
     font-weight: bold;
-    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    text-shadow: 0 0 2px rgba(107, 92, 175, 0.4);
 }
 
 .bname {
-    color: #8a8f99;
+    color: #91a6cd;
     font-weight: bold;
-    text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4);
+    text-shadow: 0 0 2px rgba(74, 102, 173, 0.4);
 }
 
 .graytext {
-    color: #909090;
+    color: #929eb7;
     text-shadow: 1px;
 }
 
 a {
     float: top;
     font-family: cond, sans-serif;
-    text-shadow: 0px 0px 3px #4d661a;
-    color: #85cf17;
+    text-shadow: 0 0 2px rgba(36, 106, 171, 0.5);
+    color: #639ed6;
     font-weight: bold;
     text-decoration: none;
     outline: none;
@@ -408,9 +451,9 @@ a {
 }
 
 a:hover {
-    color: #00994d;
-    text-shadow: 0px 0px 3px #00945b;
-    background: rgba(255, 0, 0, 0.2);
+    color: #8bc4f1;
+    text-shadow: 0 0 3px rgba(64, 134, 202, 0.6);
+    background: rgba(42, 83, 136, 0.2);
     outline: none;
     border: none;
     font-weight: bold;
@@ -418,9 +461,9 @@ a:hover {
 }
 
 a:visited {
-    color: #85cf17;
-    text-shadow: 0px 0px 3px #85cf17;
-    background: rgba(255, 0, 0, 0.2);
+    color: #929bd4;
+    text-shadow: 0 0 2px rgba(107, 92, 175, 0.4);
+    background: rgba(42, 83, 136, 0.2);
     outline: none;
     border: none;
     font-weight: bold;
@@ -433,12 +476,12 @@ a:visited {
 .passive				{color: #660000;}
 
 .danger					{color: #c51e1e; text-shadow: 0 0 7px #c51e1e;}
-.blueglow				{color: #2f785a; text-shadow: 0 0 5px #2f785a;}
+.blueglow				{color: #4899d5; text-shadow: 0 0 3px rgba(36, 106, 171, 0.65);}
 .warning				{color: #c51e1e;	font-style: italic; text-shadow: 0 0 4px #c51e1e;}
 .boldannounce			{color: #c51e1e;	font-weight: bold; text-shadow: 0 0 3px #c51e1e;}
 .rose					{color: #ff5050;}
-.info					{color: #065f35; text-shadow: 0 0 5px #065f35;}
-.notice					{color: #065535; text-shadow: 0 0 3px #065535;}
+.info					{color: #9b8dcc; text-shadow: 0 0 2px rgba(107, 92, 175, 0.4);}
+.notice					{color: #879aca; text-shadow: 0 0 2px rgba(74, 102, 173, 0.4);}
 .alium					{color: #00ff00;}
 .cult					{color: #aa1c1c;}
 .wakeup					{color: #8ebf92; text-shadow: 0 0 2px #8ebf92;}

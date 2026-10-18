@@ -355,6 +355,8 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 	parent_type = /datum/asset/simple
 	verify = TRUE
 	assets = list(
+		"device-ui.css" = 'html/device-ui.css',
+		"Chrome.png" = 'code/porco/html/button_chrome.png',
 		"button_chrome.png" = 'code/porco/html/button_chrome.png',
 		"button_note.png" = 'code/porco/html/button_note.png',
 		"button_options.png" = 'code/porco/html/button_options.png',
@@ -415,8 +417,8 @@ You can set verify to TRUE if you want send() to sleep until the client has the 
 		"json2.min.js"             = 'code/modules/goonchat/browserassets/js/json2.min.js',
 		"browserOutput.js"         = 'code/modules/goonchat/browserassets/js/browserOutput.js',
 		"browserOutput.css"	       = 'code/modules/goonchat/browserassets/css/browserOutput.css',
-		"chatbg.png"			   = 'icons/misc/chatbg.png',
-		"tchatshadow.png"		   = 'icons/misc/tchatshadow.png',
+		"chatbg.png"			   = 'code/modules/goonchat/browserassets/image/chatbg.png',
+		"tchatshadow.png"		   = 'code/modules/goonchat/browserassets/html/tchatshadow.png',
 		"chatscrollbar-bg.png"			   = 'icons/misc/chatscrollbar-bg.png',
 		"chatscrollbar-scrolldown.png"		   = 'icons/misc/chatscrollbar-scrolldown.png',
 		"chatscrollbar-scrollup.png"			   = 'icons/misc/chatscrollbar-scrollup.png',

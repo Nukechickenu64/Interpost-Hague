@@ -60,13 +60,35 @@ var/global/list/ores_by_type = list()
 
 /ore/hematite
 	name = "iron"
-	display_name = "hematite"
+	display_name = "iron"
 	smelts_to = "iron"
 	alloy = 1
-	result_amount = 5
+	result_amount = 1
+	spread = 0
 	spread_chance = 25
-	ore = /obj/item/ore/iron
+	ore = /obj/item/ore/os13/iron
 	scan_icon = "mineral_common"
+
+/ore/zbrite
+	name = "zbrite"
+	display_name = "zbrite"
+	smelts_to = "glass"
+	alloy = 1
+	result_amount = 1
+	spread = 0
+	ore = /obj/item/ore/os13/zbrite
+	scan_icon = "mineral_uncommon"
+
+/ore/elerium
+	name = "elerium"
+	display_name = "elerium"
+	smelts_to = "plasteel"
+	alloy = 1
+	result_amount = 1
+	spread = 0
+	ore = /obj/item/ore/os13/elerium
+	scan_icon = "mineral_rare"
+	origin_tech = list(TECH_MATERIAL = 5)
 
 /ore/coal
 	name = "carbon"

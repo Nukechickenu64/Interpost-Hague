@@ -1,46 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Pig</title>
-
-	<link rel="stylesheet" href="style.css">
-	<style type="text/css">
-		@font-face {font-family: Cond;src: url(cond.ttf);}
-		.goth, .book, .hando, .typewriter, .arabic, .droser {font-family: Cond, Verdana, sans-serif;}
-	</style>
-
-	<script type="text/javascript" src="prototype.js"></script>
-	<script type="text/javascript" src="scriptaculous.js"></script>
-	<script type="text/javascript" src="effects.js"></script>
-	<script type="text/javascript" src="controls.js"></script>
-	<script type="text/javascript" src="slider.js"></script>
-	<script type="text/javascript" src="livepipe.js"></script>
-	<script type="text/javascript" src="scrollbar.js"></script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porco - Interpost</title>
+<link rel="stylesheet" href="device-ui.css">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body onselectstart="return false">
-<div id='statpanel'>
-	<div id='buttonpanel'>
-		<a class='icon-link' href='byond://winset?command=Who' id='pig-link'><div class='button' id='pig'></div></a>
-		<a class='icon-link' href='byond://winset?command=heartpig' id='note-link'><div class='button' id='note'></div></a>
-		<a class='icon-link' href='#' id='options-link'><div class='button' id='options'></div></a>
-	</div>
-
-	<div id="scrollbar_container">
-		<div id="scrollbtnup"></div>
-		<div id="scrollbar_track"><div id="scrollbar_handle"><div class="scrollbart"></div><div class="scrollbarb"></div></div></div>
-		<div id="scrollbar_content"></div>
-		<div id="scrollbtndown"></div>
-	</div>
-
-	<div id='dynamicpanel'></div>
-	<div id='dynamicpanel2'></div>
-	<div id='overpanel'></div>
+<!-- Native 541x315 BYOND outputwindow.browser panel. Only live attributes/actions are shown. -->
+<div id="device-frame">
+  <div id="topbar">
+    <span class="brand">P O R C O</span>
+    <span id="connection" title="Server communication status"><i></i>WAITING</span>
+    <div id="buttonpanel">
+      <a id="pig-link" href="byond://winset?command=Who" title="Show connected players">WHO</a>
+      <a id="options-link" href="#" title="Open OOC and other options">OOC</a>
+    </div>
+  </div>
+  <div id="device-glass">
+  <div id="statpanel">
+  <div id="stats-strip" aria-label="Character attributes">
+    <div class="stat-item"><span class="stat-label">ST <small>STRENGTH</small></span><strong id="st">--</strong></div>
+    <div class="stat-item"><span class="stat-label">HT <small>HEALTH</small></span><strong id="ht">--</strong></div>
+    <div class="stat-item"><span class="stat-label">IN <small>INTELLECT</small></span><strong id="int">--</strong></div>
+    <div class="stat-item"><span class="stat-label">DX <small>DEXTERITY</small></span><strong id="dx">--</strong></div>
+  </div>
+  <div id="action-panel">
+    <div id="action-header">
+      <span class="tiny-chevron">›</span><span id="section-title">ACTIONS</span>
+      <span id="action-count"></span>
+    </div>
+    <div id="scrollbar_container">
+      <div id="scrollbar_content" tabindex="0" aria-label="Available actions">
+        <div class="empty-state">Waiting for game actions…</div>
+      </div>
+    </div>
+  </div>
+  <div id="tabs-panel">
+    <span id="tab-label">TABS</span>
+    <div id="dynamicpanel" aria-label="General action tabs"></div>
+    <div id="role-divider"></div>
+    <div id="dynamicpanel2" aria-label="Role action tabs"></div>
+    <span id="tab-hint"></span>
+  </div>
 </div>
+  <div id="device-reflection" aria-hidden="true"></div>
+  </div>
+  <div class="device-bottom" aria-hidden="true"><span class="device-grille"></span></div>
+  <div class="device-screw device-screw-left" aria-hidden="true"></div>
+  <div class="device-screw device-screw-right" aria-hidden="true"></div>
+</div>
+<script src="pig.js"></script>
 </body>
-	<script type="text/javascript" src="pig.js?v=20260922-5">
-</script>
 </html>

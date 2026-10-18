@@ -50,6 +50,7 @@
 
 /obj/structure/closet/secure_closet/RD/WillContain()
 	return list(
+		/obj/item/device/waterchip,
 		/obj/item/clothing/suit/bio_suit/scientist,
 		/obj/item/clothing/under/rank/headsciformal,
 		/obj/item/clothing/suit/storage/toggle/labcoat/rd,

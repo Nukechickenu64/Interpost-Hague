@@ -1,0 +1,26 @@
+<h2>Water supply</h2>
+{{if data.chip_installed}}
+    <div class="notice">Water Chip installed. Supply available.</div>
+    {{:helper.link('Eject Water Chip', 'eject', {'eject_chip': 1})}}
+{{else}}
+    <div class="notice">Insert a Water Chip from Research to enable the water supply.</div>
+{{/if}}
+{{if data.can_fill}}
+    {{:helper.link('Fill empty vats', 'tint', {'fill': 1})}}
+{{else}}
+    <span class="notice">Filling requires an installed chip and an empty, powered vat.</span>
+{{/if}}
+
+<h2>Connected vats</h2>
+{{for data.vats}}
+    <div class="item">
+        <h3>Vat at {{:value.position}}</h3>
+        <div class="{{if value.needs_stir}}bad{{else value.ready}}good{{/if}}">{{:value.status}}</div>
+        {{if !value.powered}}<div class="bad">Paused: no power or damaged machinery.</div>{{/if}}
+        <div>Yeast: {{if value.yeast}}added{{else}}needed{{/if}} &nbsp; Glig: {{if value.glig}}added{{else}}needed{{/if}}</div>
+        <div>Mixes: {{:value.stirs}} / {{:value.stirs_required}} &nbsp; Goo remaining: {{:value.portions}}</div>
+    </div>
+{{empty}}
+    <div class="notice">No vats are connected in this room on this deck.</div>
+{{/for}}
+<div class="notice">Use a skimmer at the vat: stir when red flashes, scoop when green flashes, then empty the goo into the Biomass Press.</div>

@@ -310,8 +310,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 						// The analyzer still recovers materials and integrated circuit designs.
 						if(linked_lathe && linked_destroy.loaded_item.matter) // Also sends salvaged materials to a linked protolathe, if any.
 							for(var/t in linked_destroy.loaded_item.matter)
-								if(t in linked_lathe.materials)
-									linked_lathe.materials[t] += min(linked_lathe.max_material_storage - linked_lathe.TotalMaterials(), linked_destroy.loaded_item.matter[t] * linked_destroy.decon_mod)
+								linked_lathe.store_material(t, linked_destroy.loaded_item.matter[t] * linked_destroy.decon_mod)
 
 						linked_destroy.loaded_item = null
 						for(var/obj/I in linked_destroy.contents)
@@ -379,7 +378,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	else if(href_list["reclaim"] && linked_lathe)
 		var/obj/item/target = locate(href_list["reclaim"]) in get_turf(linked_lathe)
 		if(!linked_lathe.reclaim(target))
-			to_chat(user, "<span class='notice'>The replicator cannot reclaim that item right now. Check that it is on the platform and the machine has power and storage available.</span>")
+			to_chat(user, "<span class='notice'>The replicator cannot reclaim that item right now. Check that it is on the platform, the machine has power, and a matching storage compartment has room.</span>")
 		. = TOPIC_REFRESH
 
 	else if(href_list["build"]) //Causes the Replicator to build something.
@@ -729,15 +728,17 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=3.2'>Material Storage</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.3'>Chemical Storage</A><HR>"
 			dat += "Produce:<BR><BR>"
+			if(linked_lathe.producing_design)
+				dat += "<B>Producing [html_encode(linked_lathe.producing_design.name)]...</B><BR>"
+			dat += "Production takes three seconds. The flash and radiation begin immediately.<BR>"
 			dat += "<B>Radiation hazard:</B> Every conversion leaves a lethal radiation field within three tiles, with weaker radiation beyond. It fades over one minute. Use shielding and remote controls.<BR>"
 			dat += "<B>Reclamation:</B> Place an item or material sheets on the platform, then select it below. <A href='?src=\ref[src];menu=3.1'>Refresh</A><BR>"
-			if(linked_lathe.converting)
-				dat += "Reclamation in progress.<BR>"
-			else
-				for(var/obj/item/item in get_turf(linked_lathe))
-					if(linked_lathe.can_reclaim(item))
-						dat += "<A href='?src=\ref[src];reclaim=\ref[item]'>Reclaim [html_encode(item.name)] (destroys item)</A><BR>"
-			dat += "<B>Material Amount:</B> [linked_lathe.TotalMaterials()] cm<sup>3</sup> (MAX: [linked_lathe.max_material_storage])<BR>"
+			for(var/obj/item/item in get_turf(linked_lathe))
+				if(linked_lathe.can_reclaim(item))
+					dat += "<A href='?src=\ref[src];reclaim=\ref[item]'>Reclaim [html_encode(item.name)] (destroys item)</A><BR>"
+			dat += "<B>Shared storage:</B> [round(linked_lathe.TotalMaterials() / SHEET_MATERIAL_AMOUNT, 0.01)] sheets. Only unlocked compartments can supply production.<BR>"
+			for(var/material_id in GLOB.replicator_material_names)
+				dat += "[capitalize(linked_lathe.material_name(material_id))]: [round(linked_lathe.material_amount(material_id, TRUE) / SHEET_MATERIAL_AMOUNT, 0.01)] sheets available<BR>"
 			dat += "<B>Chemical Volume:</B> [linked_lathe.reagents.total_volume] (MAX: [linked_lathe.reagents.maximum_volume])<HR>"
 			dat += "<UL>"
 			for(var/datum/design/D in files.known_designs)
@@ -745,9 +746,9 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 					continue
 				var/temp_dat
 				for(var/M in D.materials)
-					temp_dat += ", [D.materials[M]] [CallMaterialName(M)]"
+					temp_dat += ", [D.materials[M] * linked_lathe.mat_efficiency] [capitalize(linked_lathe.material_name(M))]"
 				for(var/T in D.chemicals)
-					temp_dat += ", [D.chemicals[T]*linked_imprinter.mat_efficiency] [CallReagentName(T)]"
+					temp_dat += ", [D.chemicals[T]*linked_lathe.mat_efficiency] [CallReagentName(T)]"
 				if(temp_dat)
 					temp_dat = " \[[copytext(temp_dat, 3)]\]"
 				if(linked_lathe.canBuild(D))
@@ -760,20 +761,21 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Material Storage<BR><HR>"
-			dat += "<UL>"
-			for(var/M in linked_lathe.materials)
-				var/amount = linked_lathe.materials[M]
-				dat += "<LI><B>[capitalize(M)]</B>: [amount] cm<sup>3</sup>"
-				if(amount >= SHEET_MATERIAL_AMOUNT)
-					dat += " || Eject "
-					for (var/C in list(1, 3, 5, 10, 15, 20, 25, 30, 40))
-						if(amount < C * SHEET_MATERIAL_AMOUNT)
-							break
-						dat += "[C > 1 ? ", " : ""]<A href='?src=\ref[src];lathe_ejectsheet=[M];amount=[C]'>[C]</A> "
-
-					dat += " or <A href='?src=\ref[src];lathe_ejectsheet=[M];amount=50'>max</A> sheets"
-				dat += ""
-			dat += "</UL>"
+			dat += "Materials cannot be withdrawn. Science access is required to lock or unlock each compartment at its controls.<BR>"
+			if(!length(GLOB.replicator_storages))
+				dat += "No replicator storage structures found.<BR>"
+			var/storage_number = 0
+			for(var/obj/machinery/replicator_storage/storage in GLOB.replicator_storages)
+				storage_number++
+				var/area/storage_area = get_area(storage)
+				dat += "<B>Storage [storage_number] ([html_encode(storage_area ? storage_area.name : "Unknown location")])</B><UL>"
+				for(var/material_id in GLOB.replicator_material_names)
+					var/obj/machinery/replicator_storage_compartment/C = storage.compartments[material_id]
+					if(QDELETED(C) || !C.connected())
+						dat += "<LI>[capitalize(linked_lathe.material_name(material_id))]: unavailable"
+					else
+						dat += "<LI>[capitalize(C.material_label)]: [round(C.stored_material / SHEET_MATERIAL_AMOUNT, 0.01)] / [C.capacity / SHEET_MATERIAL_AMOUNT] sheets — [C.locked ? "Locked" : "Unlocked"]"
+				dat += "</UL>"
 
 		if(3.3) //Replicator Chemical Storage Submenu
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
@@ -788,6 +790,8 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Queue<BR><HR>"
+			if(linked_lathe.producing_design)
+				dat += "<B>Producing: [html_encode(linked_lathe.producing_design.name)]</B><BR>"
 			if(!linked_lathe.queue.len)
 				dat += "Empty"
 			else

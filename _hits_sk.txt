@@ -1,0 +1,2 @@
+code\modules\mining\mine_items.dm:66: 	return digspeed - user.skills[SKILL_MINE] * 0.1 // -10 is the best you can do
+code\__defines\stats_skills.dm:14: #define SKILL_MINE  "mining"

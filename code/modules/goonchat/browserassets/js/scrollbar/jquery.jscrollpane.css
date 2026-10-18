@@ -9,17 +9,19 @@
 .scroll-pane-split{
 	height: 100%;
 	width: 100%;
+	position: relative;
+	z-index: 0;
 }
 
 .jspContainer
 {
 	overflow: hidden;
-	position: fixed;
+	position: relative;
 }
 
 .jspVerticalBar
 {
-	background: url("chatscrollbar-bg.png");
+	background: #101116;
 	height: 100%;
 	position: absolute;
 	right: 0%;
@@ -40,17 +42,39 @@
 
 .jspTrack
 {
-	background: url("chatscrollbar-bg.png");
+	background: #090b0f;
+	background-image: linear-gradient(to right, #64656e 0, #25272e 2px, #090b0f 3px, #090b0f 12px, #353740 13px, #92929b 14px, #17181d 15px);
 	position: relative;
 }
 
 .jspDrag
 {
-	background: url("chatscroller-m.png");
+	background: url("chatscroller-m.png") repeat-y center top;
 	cursor: pointer;
 	left: 0;
 	position: relative;
 	top: 0;
+}
+
+.jspDragTop,
+.jspDragBottom
+{
+	position: absolute;
+	left: 1px;
+	width: 14px;
+	height: 4px;
+}
+
+.jspDragTop
+{
+	top: 0;
+	background: url("chatscroller-t.png") no-repeat;
+}
+
+.jspDragBottom
+{
+	bottom: 0;
+	background: url("chatscroller-b.png") no-repeat;
 }
 
 .jspHorizontalBar .jspTrack,
@@ -71,11 +95,11 @@
 }
 
 .jspArrow.jspArrowUp{
-	background: url("scrollbar-scrollup.png");
+	background: url("chatscrollbar-scrollup.png") no-repeat center;
 }
 
 .jspArrow.jspArrowDown{
-	background: url("chatscrollbar-scrolldown.png");
+	background: url("chatscrollbar-scrolldown.png") no-repeat center;
 }
 
 .jspVerticalBar .jspArrow

@@ -9,6 +9,9 @@
 
 /obj/structure/closet/secure_closet/hydroponics/WillContain()
 	return list(
+		/obj/item/hydroponics_supply/skimmer,
+		/obj/item/hydroponics_supply/yeast = 4,
+		/obj/item/hydroponics_supply/glig = 4,
 		new /datum/atom_creator/weighted(list(/obj/item/clothing/suit/apron)),
 		/obj/item/storage/plants,
 		/obj/item/clothing/under/rank/hydroponics,

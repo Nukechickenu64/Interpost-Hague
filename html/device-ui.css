@@ -11,6 +11,9 @@ body.device-ui { margin: 0 !important; padding: 0 !important; width: 100%; heigh
 #device-frame button.device-hardware:focus { outline: 1px solid currentColor; outline-offset: 2px; }
 #device-close { position: absolute; top: 4px; right: 7px; width: 23px; height: 22px; }
 #device-glass { position: absolute; top: 33px; left: 18px; right: 18px; bottom: 32px; border: 4px solid; border-radius: 7px; overflow: hidden; box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 0 4px rgba(255,255,255,.18), 0 0 0 7px rgba(0,0,0,.25), 0 2px 0 8px rgba(255,255,255,.14); }
+/* Keep legacy fixed-position content below the physical window controls. */
+#device-glass { z-index: 0; }
+#device-drag, #device-close, #device-resize { z-index: 1; }
 #device-content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: auto; padding: 10px; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #778780 rgba(0,0,0,.2); }
 #device-reflection { position: absolute; z-index: 10000; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; border-radius: 3px; background: linear-gradient(125deg, rgba(255,255,255,.15), rgba(255,255,255,.035) 36%, transparent 36.3%, transparent 72%, rgba(255,255,255,.025) 72.3%, transparent), repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.045) 2px, rgba(0,0,0,.045) 3px); box-shadow: inset 0 1px 1px rgba(255,255,255,.3), inset 0 0 15px rgba(0,0,0,.4), inset 0 -2px 3px rgba(0,0,0,.35); }
 .device-bottom { position: absolute; left: 30px; right: 38px; bottom: 9px; height: 12px; }
@@ -28,6 +31,11 @@ body.device-ui #uiLayout { position: relative; height: auto; min-height: 100%; }
 body.device-ui #uiContent, body.device-ui .uiContent { background: transparent; }
 body.device-ui #uiTitleFluff { display: none; }
 body.device-ui .hdr, body.device-ui .uiTitleWrapper, body.device-ui #uiTitleWrapper { background: transparent; border-color: rgba(255,255,255,.2); }
+/* common.css pins these to the viewport. The bezel already supplies a title;
+   retain any action buttons in the screen's normal scrolling layout. */
+body.device-ui .uiTitleWrapper, body.device-ui .uiTitleButtons { position: static; top: auto; right: auto; left: auto; height: auto; z-index: auto; }
+body.device-ui .uiTitleWrapper > .uiTitle { display: none; }
+body.device-ui .uiTitleButtons { text-align: right; }
 body.device-ui .statusDisplay, body.device-ui .statusDisplayRecords, body.device-ui .display, body.device-ui .panel { background: rgba(0,0,0,.18); box-shadow: none; }
 body.device-ui .link:not(.disabled):not(.danger):not(.selected):not(.redButton):not(.yellowButton), body.device-ui a:not(.danger):not(.selected):not(.redButton):not(.yellowButton) { background-color: rgba(0,0,0,.16); border-color: rgba(255,255,255,.24); }
 body.device-ui a:hover, body.device-ui .linkActive:hover { background-color: rgba(255,255,255,.13); }

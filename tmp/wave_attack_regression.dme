@@ -1,0 +1,67 @@
+#define UNIT_TEST
+#include "../Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	queue = list(new /datum/unit_test/wave_attack/wave_spawn_pipeline)
+	log_unit_test("Running focused wave attack spawn regression test.")
+	. = ..()
+
+/datum/unit_test/wave_attack
+	name = "WAVE ATTACK template"
+
+/datum/unit_test/wave_attack/wave_spawn_pipeline
+	name = "WAVE ATTACK - Spawn pipeline produces invaders"
+
+/datum/unit_test/wave_attack/wave_spawn_pipeline/start_test()
+	var/datum/game_mode/wave_attack/mode = new
+	if(!istype(mode))
+		fail("Could not create wave_attack mode datum.")
+		return
+
+	// Simulate roundstart scheduling.
+	mode.post_setup()
+	if(!mode.next_warning_at)
+		fail("post_setup() did not schedule the first-wave warning timer.")
+		return
+
+	var/list/station_areas = SSinvaders.get_station_areas()
+	log_debug("station_areas cached: [length(station_areas)] areas")
+
+	// Force the warning timer to fire now and run a process tick.
+	mode.next_warning_at = 1
+	mode.process()
+	if(!mode.spawn_at)
+		fail("process() did not schedule a wave after the warning timer fired.")
+		return
+	log_debug("announce_wave scheduled a board in [(mode.spawn_at - world.time) / 10] seconds")
+
+	// Force the spawn timer to fire now and run a process tick.
+	mode.spawn_at = 1
+	mode.process()
+	var/expected = mode.get_squad_size()
+	if(!mode.wave_mobs.len)
+		fail("spawn_wave() left wave_mobs empty (expected [expected] invaders).")
+		return
+	if(mode.wave_mobs.len != expected)
+		fail("wave_mobs=[mode.wave_mobs.len], expected [expected] invaders.")
+		return
+
+	var/bad_types = 0
+	for(var/mob/M in mode.wave_mobs)
+		if(!istype(M, /mob/living/carbon/human/invader/wave))
+			bad_types++
+	var/alive = 0
+	for(var/mob/living/carbon/human/invader/wave/I in mode.wave_mobs)
+		if(!QDELETED(I) && I.stat != DEAD)
+			alive++
+	if(!alive)
+		fail("All [mode.wave_mobs.len] registered wave mobs are dead or deleted.")
+		return
+	if(alive != expected)
+		fail("Only [alive]/[expected] spawned invaders are alive.")
+		return
+	if(bad_types)
+		fail("[bad_types] wave_mobs entries are not /mob/living/carbon/human/invader/wave.")
+		return
+
+	pass("Spawned [alive] invading humans at [get_area(mode.wave_mobs[1])].")
