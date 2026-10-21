@@ -1574,6 +1574,7 @@
 #include "code\modules\goonchat\browserOutput.dm"
 #include "code\modules\goonchat\jsErrorHandler.dm"
 #include "code\modules\GURPS\stats_skills.dm"
+#include "code\modules\GURPS\deathweb.dm"
 #include "code\modules\holodeck\HolodeckControl.dm"
 #include "code\modules\holodeck\HolodeckObjects.dm"
 #include "code\modules\holodeck\HolodeckPrograms.dm"

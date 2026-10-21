@@ -270,30 +270,32 @@ meteor_act
 	if(user == src) // Attacking yourself can't miss
 		return target_zone
 
-	var/attack_margin = user.skillcheck_margin(user.skills[SKILL_MELEE], SKILL_MELEE)
 	user.attack_quality = null
-
-	if(try_guard_block(user) || attempt_dodge(user))//Trying to dodge or block before they even have the chance to miss us.
-		return null
-
-	var/hit_modifier = user.c_intent == I_AIM ? -40 : 0 //If they are in aim mode, miss less
-	var/hit_zone = get_zone_with_miss_chance(target_zone, src, hit_modifier)
+	if(ishuman(user))
+		var/mob/living/carbon/human/human_user = user
+		human_user.deathweb_learn_skill(SKILL_MELEE, -2)
+		if(I.deathweb_weapon_skill)
+			human_user.deathweb_learn_skill(I.deathweb_weapon_skill, -2)
+	var/hit_modifier = user.deathweb_melee_miss_modifier() + I.deathweb_accuracy + I.deathweb_specialty_modifier(user)
+	if(lying)
+		hit_modifier -= 100
+	if(buckled)
+		hit_modifier -= 20
+	if(!combat_mode)
+		hit_modifier -= 5
+	if(FAT in mutations)
+		hit_modifier -= 15
+	if(!user.combat_mode)
+		hit_modifier += 15
+	if(length(user.grabbed_by))
+		hit_modifier += 15
+	var/hit_zone = deathweb_hit_zone(target_zone, hit_modifier)
 
 	if(!hit_zone)
-		visible_message("<span class='danger'>\The [user] misses [src] [user.attack_quality_from_margin(attack_margin, FALSE)] with \the [I]!</span>")
+		visible_message("<span class='danger'>\The [user] misses [src] with \the [I]!</span>")
 		return null
 
-	if(user.skillcheck(user.skills["melee"], 60, null, "melee") == CRIT_FAILURE)
-		user.resolve_critical_miss(I)
-		return null
-
-	if(!user.skillcheck(user.skills["melee"], 30, null, "melee") || !user.combat_mode)
-		if(prob(user.skills["melee"]/3))
-			visible_message("<span class='danger'>[user] botches the attack on [src]!</span>")
-			return null
-
-	//PARRYING HAPPENS HERE
-	if(check_shields(I.force, I, user, target_zone, "the [I.name]"))
+	if(attempt_dodge(user) || deathweb_parry(user, I.force))
 		return null
 
 	var/obj/item/organ/external/affecting = get_organ(hit_zone)
@@ -301,18 +303,12 @@ meteor_act
 		to_chat(user, "<span class='danger'>They are missing that limb!</span>")
 		return null
 
-	var/blocked = run_armor_check(hit_zone, "melee", I.armor_penetration, "Your armor has protected your [affecting.name].", "Your armor has softened the blow to your [affecting.name].")
-
-	if(blocked == 100)
-		visible_message("<span class='danger'>[user] [I.get_attack_name()] [src]'s [affecting.name] with the [I], but it does no damage!")
-		return null
-
 	if(hit_zone == BP_CHEST || hit_zone == BP_MOUTH || hit_zone == BP_THROAT || hit_zone == BP_HEAD)//If we're lying and we're trying to aim high, we won't be able to hit.
 		if(user.lying && !src.lying)
 			to_chat(user, "<span class='notice'><b>I can't reach their [affecting.name]!</span></b>")
 			return null
 
-	user.attack_quality = user.attack_quality_from_margin(attack_margin, TRUE)
+	user.attack_quality = ""
 	return hit_zone
 
 /mob/living/carbon/human/hit_with_weapon(obj/item/I, mob/living/user, var/effective_force, var/hit_zone)
@@ -331,8 +327,12 @@ meteor_act
 	if(aim_zone == BP_THROAT)
 		organ_hit = "throat"
 
-	var/blocked = run_armor_check(hit_zone, "melee", I.armor_penetration, "Your armor has protected your [affecting.name].", "Your armor has softened the blow to your [affecting.name].")
+	var/blocked = deathweb_melee_armor(hit_zone, I)
 
+	if(blocked >= 100)
+		visible_message(SPAN_NOTICE("[src]'s armor stops [user]'s strike with [I]!"))
+		I.deathweb_wear_weapon(TRUE)
+		return blocked
 
 	if(hit_zone != aim_zone && !(aim_zone in list(BP_MOUTH, BP_THROAT, BP_EYES, BP_FACE, BP_VITALS, BP_BELLY)))//This is ugly but it works.
 		visible_message("<span class='combat'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] [user.attack_quality ? user.attack_quality : ""] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
@@ -352,13 +352,21 @@ meteor_act
 	return blocked
 
 /mob/living/carbon/human/standard_weapon_hit_effects(obj/item/I, mob/living/user, var/effective_force, var/blocked, var/hit_zone)
-	hit_zone = user.zone_sel.selecting
 	var/obj/item/organ/external/affecting = get_organ(hit_zone)
 	if(!affecting)
 		return 0
 
-	if(user.combat_strength())//If they have strength then add it.
-		effective_force += strToDamageModifier(user.combat_strength())
+	if(blocked >= 100)
+		I.deathweb_wear_weapon(TRUE)
+		return FALSE
+	effective_force = I.deathweb_weapon_force(effective_force, user.combat_strength())
+	if(blocked == 50)
+		effective_force = max(0, effective_force - getarmor(hit_zone, "melee"))
+	if(I.sharp)
+		effective_force *= I.deathweb_weapon_sharpness / 100
+	if(effective_force <= 0)
+		I.deathweb_wear_weapon()
+		return FALSE
 
 	// Handle striking to cripple.
 	if(user.a_intent == I_DISARM)
@@ -376,54 +384,9 @@ meteor_act
 	if(effective_force > 10 || effective_force >= 5 && prob(33))
 		forcesay(GLOB.hit_appends)	//forcesay checks stat already
 
-	//Ok this block of text handles cutting arteries, tendons, and limbs off.
-	//First we cut an artery, the reason for that, is that arteries are funninly enough, not that lethal, and don't have the biggest impact. They'll still make you bleed out, but they're less immediately lethal.
-	if(I.sharp && prob(I.sharpness * 2) && !(affecting.status & ORGAN_ARTERY_CUT))
-		affecting.sever_artery()
-		if(affecting.artery_name == "cartoid artery")
-			src.visible_message("<span class='danger'>[user] slices [src]'s throat!</span>")
-		else
-			src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.artery_name]!</span>")
+	attack_bloody(I, user, effective_force, hit_zone)
 
-	//Next tendon, which disables the limb, but does not remove it, making it easier to fix, and less lethal, than losing it.
-	else if(I.sharp && (I.sharpness * 2) && !(affecting.status & ORGAN_TENDON_CUT) && affecting.has_tendon)//Yes this is the same exactly probability again. But I'm running it seperate because I don't want the two to be exclusive.
-		affecting.sever_tendon()
-		src.visible_message("<span class='danger'>[user] slices open [src]'s [affecting.tendon_name]!</span>")
-
-	if(I.sharp && affecting.has_finger && prob(rand(10,18)))
-		affecting.ripout_fingers(get_dir(affecting, src), round(rand(28, 38) * ((I.force*1.5)/100)))
-
-	//Finally if we pass all that, we cut the limb off. This should reduce the number of one hit sword kills.
-	else if(I.sharp && I.edge)
-		if(I.sharpness >= 1 && user.statcheck(user.combat_strength(), 13, 0, STAT_ST)) //cant dismember with blunt objects fool, or being a weak fool
-			if(prob(I.sharpness * strToDamageModifier(user.combat_strength())))
-				affecting.droplimb(0, DROPLIMB_EDGE)
-
-	var/obj/item/organ/external/head/O = locate(/obj/item/organ/external/head) in src.organs
-
-	if(I.damtype == BRUTE && !I.edge && prob(I.force * (hit_zone == BP_MOUTH ? 6 : 0)) && O)//Knocking out teeth.
-		if(O.knock_out_teeth(get_dir(user, src), round(rand(28, 38) * ((I.force*1.5)/100))))
-			src.visible_message("<span class='danger'>[src]'s teeth sail off in an arc!</span>", \
-								"<span class='userdanger'>[src]'s teeth sail off in an arc!</span>")
-
-	else if((I.damtype == BRUTE || I.damtype == PAIN) && prob(25 + (effective_force * 2)))//Knocking them out.
-		if(!stat)
-			if(headcheck(hit_zone))
-				//Harder to score a stun but if you do it lasts a bit longer
-				if(prob(effective_force - stat_to_modifier(user.stats[STAT_HT])))
-					visible_message("<span class='danger'>[src] [species.knockout_message]</span>")
-					apply_effect(20, PARALYZE, blocked)
-			else if(hit_zone == (BP_L_LEG || BP_R_LEG || BP_L_FOOT || BP_R_FOOT))
-				//Easier to score a stun but lasts less time
-				if(prob(effective_force + 15 - stat_to_modifier(user.stats[STAT_HT])))
-					visible_message("<span class='danger'>[src] has been knocked down!</span>")
-					apply_effect(6, WEAKEN, blocked)
-		//Apply blood
-		attack_bloody(I, user, effective_force, hit_zone)
-	if(user.skillcheck(user.skills["melee"], 0, null,"melee") == CRIT_SUCCESS)
-		resolve_critical_hit()
-
-	if(user.stats[STAT_HT] >= src.stats[STAT_HT]+4 && !lying)
+	if(user.combat_strength() >= gurps_stat(STAT_HT) + 4 && !lying && !I.sharp && !I.edge && effective_force > 8)
 		Weaken(1)
 		var/turf/target = get_turf(src.loc)
 		var/range = src.throw_range
@@ -435,6 +398,7 @@ meteor_act
 				break
 		src.throw_at(target, rand(2,4), src.throw_speed)
 
+	I.deathweb_wear_weapon()
 	return 1
 
 /mob/living/carbon/human/proc/attack_bloody(obj/item/W, mob/living/attacker, var/effective_force, var/hit_zone)

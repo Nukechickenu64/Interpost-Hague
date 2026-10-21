@@ -699,13 +699,17 @@ var/list/global/slot_flags_enumeration = list(
 		return 0
 	if(isnull(parry_sounds))
 		parry_sounds = list('sound/weapons/blunt_parry1.ogg', 'sound/weapons/blunt_parry2.ogg', 'sound/weapons/blunt_parry3.ogg')
-	if(default_sword_parry(user, damage, attacker, damage_source))
+	if(default_sword_parry(user, damage, damage_source, attacker, def_zone, attack_text))
 		return 1
 	return 0
 
 //The point of this is for weapons that blocks puts significant stress on your hand, making it hard to hold (Sword, crowbar)
 //It's in  a different funtion so we can make it more difficult then the default parry check, which is used for shields, which anoyone can use to parry.
 /obj/item/proc/default_sword_parry(mob/living/user, var/damage, atom/damage_source = null, mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
+	if(ishuman(user))
+		if(user.get_active_hand() != src || istype(damage_source, /obj/item/projectile) || (attacker && get_dist(user, attacker) > 1))
+			return FALSE
+		return user.deathweb_parry(attacker, damage)
 	if(default_parry_check(user, attacker, damage_source) && (user.get_active_hand() == src))//You gotta be holding onto that sheesh bro
 		if(prob((user.skills["melee"]/2) + block_chance)) //a check on block chance
 			user.visible_message("<span class='danger'>\The [user] parries [attack_text] with \the [src]!</span>")

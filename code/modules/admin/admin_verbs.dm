@@ -183,6 +183,7 @@ var/list/admin_verbs_debug = list(
 	/client/proc/cmd_admin_list_open_jobs,
 	/client/proc/Debug2,
 	/client/proc/ZASSettings,
+	/client/proc/visualize_atmos_subareas,
 	/client/proc/cmd_debug_make_powernets,
 	/client/proc/debug_controller,
 	/client/proc/debug_antagonist_template,
@@ -370,6 +371,7 @@ var/list/admin_verbs_mentor = list(
 
 /client/proc/remove_admin_verbs()
 	clear_vehicle_placement()
+	clear_atmos_subarea_visualizer()
 	verbs.Remove(
 		admin_verbs_default,
 		/client/proc/togglebuildmodeself,

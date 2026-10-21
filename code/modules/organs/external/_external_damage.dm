@@ -131,6 +131,9 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 		owner.UpdateDamageIcon()
 		owner.update_bleeding()
 
+	if(owner)
+		owner.react_to_damage_pain(src, brute + burn)
+
 	return created_wound
 
 /obj/item/organ/external/heal_damage(brute, burn, internal = 0, robo_repair = 0)

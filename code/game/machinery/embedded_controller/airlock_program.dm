@@ -121,8 +121,10 @@
 	var/shutdown_pump = 0
 	switch(command)
 		if("cycle_ext")
+			if(!done_cycling())
+				return
 			//If airlock is already cycled in this direction, just toggle the doors.
-			if(!memory["purge"] && IsInRange(memory["external_sensor_pressure"], memory["chamber_sensor_pressure"] - SENSOR_TOLERANCE, memory["chamber_sensor_pressure"] + SENSOR_TOLERANCE))
+			if(!memory["purge"] && check_interior_door_secured() && IsInRange(memory["external_sensor_pressure"], memory["chamber_sensor_pressure"] - SENSOR_TOLERANCE, memory["chamber_sensor_pressure"] + SENSOR_TOLERANCE))
 				toggleDoor(memory["exterior_status"], tag_exterior_door, memory["secure"], "toggle")
 			//only respond to these commands if the airlock isn't already doing something
 			//prevents the controller from getting confused and doing strange things
@@ -130,7 +132,9 @@
 				begin_cycle_out()
 
 		if("cycle_int")
-			if(!memory["purge"] && IsInRange(memory["internal_sensor_pressure"], memory["chamber_sensor_pressure"] - SENSOR_TOLERANCE, memory["chamber_sensor_pressure"] + SENSOR_TOLERANCE))
+			if(!done_cycling())
+				return
+			if(!memory["purge"] && check_exterior_door_secured() && IsInRange(memory["internal_sensor_pressure"], memory["chamber_sensor_pressure"] - SENSOR_TOLERANCE, memory["chamber_sensor_pressure"] + SENSOR_TOLERANCE))
 				toggleDoor(memory["interior_status"], tag_interior_door, memory["secure"], "toggle")
 			else if(state == target_state)
 				begin_cycle_in()
@@ -259,6 +263,10 @@
 						memory["target_pressure"] = (target_state == TARGET_INOPEN ? memory["internal_sensor_pressure"] : memory["external_sensor_pressure"])
 						if (memory["target_pressure"] > SENSOR_TOLERANCE)
 							state = STATE_PREPARE
+						else
+							cycleDoors(target_state)
+							state = STATE_IDLE
+							target_state = TARGET_NONE
 					else
 						cycleDoors(target_state)
 						state = STATE_IDLE
@@ -315,10 +323,10 @@
 	signal.data = list(
 		"tag" = tag,
 		"sigtype" = "command",
-		"power" = power,
-		"direction" = direction,
+		"power" = num2text(power),
+		"direction" = isnull(direction) ? null : num2text(direction),
 		// Vent radio configuration retains legacy units; no ambient pressure is measured.
-		"set_external_pressure" = isnull(target_moles) ? null : target_moles * ONE_ATMOSPHERE / MOLES_CELLSTANDARD
+		"set_external_pressure" = isnull(target_moles) ? null : num2text(target_moles * ONE_ATMOSPHERE / MOLES_CELLSTANDARD)
 	)
 	post_signal(signal)
 

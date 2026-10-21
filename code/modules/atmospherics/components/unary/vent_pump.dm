@@ -27,6 +27,7 @@
 
 	var/hibernate = 0 //Do we even process?
 	var/pump_direction = 1 //0 = siphoning, 1 = releasing
+	var/airlock_controlled = FALSE
 
 	var/external_pressure_bound = EXTERNAL_PRESSURE_BOUND
 	var/internal_pressure_bound = INTERNAL_PRESSURE_BOUND
@@ -155,6 +156,8 @@
 	return 1
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/get_target_pressure()
+	if(airlock_controlled)
+		return min(external_pressure_bound, MAX_PUMP_PRESSURE)
 	var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
 	if(!area_modcon)
 		return 0
@@ -182,9 +185,9 @@
 			return "area modcon disabled or offline"
 		return filter_controller.scrub_efficiency() ? "filtering" : "filter cartridge missing or exhausted"
 	var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
-	if(!area_modcon)
+	if(!airlock_controlled && !area_modcon)
 		return "no area modcon"
-	if(!area_modcon.can_supply_air())
+	if(!airlock_controlled && !area_modcon.can_supply_air())
 		return "area modcon disabled or offline"
 	var/datum/gas_mixture/environment = loc ? loc.return_air() : null
 	if(!environment)
@@ -244,7 +247,7 @@
 	if(pump_direction)
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
 		var/excess_moles = environment.get_tile_moles() - PRESSURE_TO_MOLES(get_target_pressure())
-		if(area_modcon && area_modcon.can_supply_air() && excess_moles > PRESSURE_TO_MOLES(0.5))
+		if(!airlock_controlled && area_modcon && area_modcon.can_supply_air() && excess_moles > PRESSURE_TO_MOLES(0.5))
 			var/recovery_moles = min(tank.max_output_moles, excess_moles * environment.volume * environment.group_multiplier / CELL_VOLUME)
 			last_flow_rate = area_modcon.recover_air(tank, environment, recovery_moles)
 			if(last_flow_rate)
@@ -260,12 +263,39 @@
 		if(transfer_moles < MINIMUM_MOLES_TO_PUMP)
 			return 0
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
-		if(area_modcon)
+		if(airlock_controlled)
+			last_flow_rate = recover_chamber_air(tank, environment, transfer_moles)
+		else if(area_modcon)
 			last_flow_rate = area_modcon.recover_air(tank, environment, transfer_moles)
 	if(last_flow_rate)
 		last_power_draw = min(power_rating, last_flow_rate * 10)
 		use_power_oneoff(last_power_draw)
 	return 1
+
+/obj/machinery/atmospherics/unary/vent_pump/proc/recover_chamber_air(obj/machinery/station_gas_tank/tank, datum/gas_mixture/environment, requested_moles)
+	if(!tank.enabled || (tank.stat & (NOPOWER|BROKEN)) || !tank.air_contents)
+		return 0
+	var/obj/machinery/filter_hub/hub = get_station_filter_hub(src)
+	if(hub && !hub.can_process())
+		return 0
+	var/sample_moles = min(requested_moles, tank.max_output_moles, environment.get_total_moles())
+	if(sample_moles < MINIMUM_MOLES_TO_PUMP)
+		return 0
+	var/datum/gas_mixture/sample = environment.remove(sample_moles)
+	if(!sample)
+		return 0
+	var/discarded_moles = 0
+	for(var/gas in sample.gas.Copy())
+		if(gas != GAS_OXYGEN && gas != GAS_NITROGEN)
+			var/contaminant_moles = sample.get_gas(gas)
+			discarded_moles += contaminant_moles
+			sample.adjust_gas(gas, -contaminant_moles)
+	var/recovered_moles = tank.receive_gas(sample, sample.total_moles)
+	environment.merge(sample)
+	qdel(sample)
+	if(hub)
+		hub.consume_contaminants(discarded_moles)
+	return recovered_moles + discarded_moles
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/get_transfer_moles(datum/gas_mixture/environment)
 	var/transfer_moles = environment.get_total_moles()
@@ -358,6 +388,7 @@
 	. = ..()
 	initial_loc = get_area(loc)
 	area_uid = initial_loc.uid
+	airlock_controlled = frequency != 1439
 	if (!id_tag)
 		assign_uid()
 		id_tag = num2text(uid)

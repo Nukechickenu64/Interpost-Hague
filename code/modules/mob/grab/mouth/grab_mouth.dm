@@ -170,7 +170,7 @@
 		skill_requirement = 55
 	else if(assailant.c_intent == I_STRONG)
 		skill_requirement = 65
-	var/bite_result = assailant.skillcheck(assailant.skills["melee"], skill_requirement, null, "melee")
+	var/bite_result = assailant.skillcheck(assailant.skills["melee"], skill_requirement, null, "melee", TRUE)
 	if(!bite_result || bite_result == CRIT_FAILURE)
 		visible_message("<span class='warning'>[assailant] tries to bite [affecting], but misses.</span>")
 		playsound(affecting.loc, 'sound/weapons/punchmiss.ogg', 50, 1)

@@ -139,7 +139,7 @@
 					to_chat(H, "There is nothing to grab!")
 					return
 				if(M != src)
-					if(try_guard_block(H) || attempt_dodge(H))//Trying to dodge or block before they even have the chance to miss us.
+					if(deathweb_grab_dodge(H))
 						return
 
 				switch(H.zone_sel.selecting)
@@ -183,21 +183,18 @@
 
 
 		if(I_HURT)
-			M.adjustStaminaLoss(rand(12,18))//No more spamming disarm without consequences.
 			if(!istype(H))
 				attack_generic(H,rand(1,3),"punched")
 				return
-			var/rand_damage = rand(1, 5)
-			var/damage_modifier = 0
+			var/rand_damage = rand(0, 4)
 			var/effective_strength = H.combat_strength()
-			if(H.c_intent == I_STRONG) // If H is using STRONG combat mod
-				damage_modifier = (stat_to_modifier(effective_strength) > 0) ?  strToDamageModifier(effective_strength) : 1 //This is to prevent low str from fucking you up
-			rand_damage += strToDamageModifier(effective_strength) + damage_modifier
-			log_debug("Real damage: [rand_damage].  StrMod: [strToDamageModifier(effective_strength)]") //Debugging
-			var/block = 0
-			var/accurate = 0
-			var/feint_block_penalty = 0
-			var/hit_zone = H.zone_sel.selecting
+			rand_damage += deathweb_unarmed_damage(effective_strength, gurps_stat(STAT_HT))
+			var/hit_zone = H == src ? H.zone_sel.selecting : deathweb_hit_zone(H.zone_sel.selecting)
+			if(!hit_zone)
+				M.adjustStaminaLoss(rand(2, 3))
+				M.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+				visible_message(SPAN_DANGER("[H] misses [src] with an unarmed strike!"))
+				return
 			var/obj/item/organ/external/affecting = get_organ(hit_zone)
 
 			// See what attack they use
@@ -215,66 +212,22 @@
 				H.last_attack = world.time + cooldown_modifier
 				H.last_attack_delay = attack.delay
 				H.set_hand_ready_cooldown(H.hand, world.time + cooldown_modifier + attack.delay)
+			M.adjustStaminaLoss(rand(2, 3))
 
 			if(!affecting || affecting.is_stump())
 				to_chat(M, "<span class='danger'>You cannot attack something the enemy doesn't have.</span>")
 				return 1
 
-			var/attack_margin = H.skillcheck_margin(H.skills[SKILL_MELEE], SKILL_MELEE)
+			H.deathweb_learn_skill("unarmed", -2)
+			if(!H.combat_mode || !prob(H.gurps_skill_rank(SKILL_MELEE) + 30))
+				rand_damage /= prob(60) ? 2 : 1.2
 
 			if(M != src)
-				if(try_guard_block(H) || attempt_dodge(H))//Trying to dodge or block before they even have the chance to miss us.
+				if(attempt_dodge(H) || deathweb_parry(H, rand_damage))
 					return
 
-			switch(src.combat_mode)
-				if(0)
-					// We didn't see this coming, so we get the full blow
-					accurate = 1
-				if(1)
-					// We're in a fighting stance, there's a chance we block
-					if(src.canmove && src!=H && !(src.grabbed_by.len || src.buckled) && !(H.species.species_flags & SPECIES_FLAG_NO_BLOCK))
-						feint_block_penalty = H.consume_feint_bonus(src)
-						if(prob(max(20 - (feint_block_penalty * 5), 0)))
-							block = 1
-
-			if(src.grabbed_by.len || src.buckled || !src.canmove || src==H || H.species.species_flags & SPECIES_FLAG_NO_BLOCK)
-				accurate = 1 // certain circumstances make it impossible for us to evade punches
-			// Process evasion and blocking
 			var/miss_type = 0
 			var/attack_message
-			if(!accurate)
-				/* ~Hubblenaut
-					This place is kind of convoluted and will need some explaining.
-					ran_zone() will pick out of 11 zones, thus the chance for hitting
-					our target where we want to hit them is circa 9.1%.
-					Now since we want to statistically hit our target organ a bit more
-					often than other organs, we add a base chance of 20% for hitting it.
-					This leaves us with the following chances:
-					If aiming for chest:
-						27.3% chance you hit your target organ
-						70.5% chance you hit a random other organ
-						 2.2% chance you miss
-					If aiming for something else:
-						23.2% chance you hit your target organ
-						56.8% chance you hit a random other organ
-						15.0% chance you miss
-					Note: We don't use get_zone_with_miss_chance() here since the chances
-						  were made for projectiles.
-					TODO: proc for melee combat miss chances depending on organ?
-				*/
-				if(prob(80))
-					hit_zone = ran_zone(hit_zone)
-				if(prob(20) && hit_zone != BP_CHEST) // Missed!
-					if(!src.lying)
-						if(H.skillcheck(H.skills["melee"], 60, null, "melee") == CRIT_FAILURE)
-							H.resolve_critical_miss_unarmed()
-							attack_message = null
-						else
-							attack_message = "[H] attempted to strike [src], but missed [H.attack_quality_from_margin(attack_margin, FALSE)]!"
-					else
-						attack_message = "[H] missed [src] [H.attack_quality_from_margin(attack_margin, FALSE)] as \he rolled out of the way!"
-						src.set_dir(pick(GLOB.cardinal))
-					miss_type = 1
 
 			var/hitcheck = rand(0, 9)
 			if(istype(affecting, /obj/item/organ/external/head) && prob(hitcheck * (hit_zone == BP_MOUTH ? 5 : 1))) //MUCH higher chance to knock out teeth if you aim for mouth
@@ -283,14 +236,9 @@
 					src.visible_message("<span class='danger'>[src]'s teeth sail off in an arc!</span>", \
 										"<span class='userdanger'>[src]'s teeth sail off in an arc!</span>")
 
-			if(!miss_type && block)
-				attack_message = "[H] went for [src]'s [affecting.name] but was blocked!"
-				miss_type = 2
-
 			//H.do_attack_animation(src)
 			if(!attack_message)
-				if(!miss_type && istype(attack, /datum/unarmed_attack/punch))
-					H.attack_quality = H.attack_quality_from_margin(attack_margin, TRUE)
+				H.attack_quality = null
 				attack.show_attack(H, src, hit_zone, rand_damage)
 				H.attack_quality = null
 			else
@@ -313,7 +261,11 @@
 				real_damage *= 2 // Hulks do twice the damage
 				rand_damage *= 2
 
-			var/armour = run_armor_check(hit_zone, "melee")
+			var/armour = deathweb_melee_armor(hit_zone, null, TRUE, H.gloves && H.gloves.armor["melee"] > 0)
+			if(armour && !H.gloves)
+				var/obj/item/organ/external/hand_organ = H.get_organ(H.hand ? BP_L_HAND : BP_R_HAND)
+				if(hand_organ)
+					hand_organ.take_external_damage(armour >= 100 ? 6 : 2)
 			// Apply additional unarmed effects.
 			attack.apply_effects(H, src, armour, rand_damage, hit_zone)
 

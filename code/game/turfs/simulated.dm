@@ -19,6 +19,8 @@
 /turf/simulated/post_change()
 	..()
 	var/turf/T = GetAbove(src)
+	if(T && !AreAtmosZLevelsConnected(z, T.z))
+		return
 	if(istype(T,/turf/space) || (density && istype(T,/turf/simulated/open)))
 		var/new_turf_type = density ? (istype(T.loc, /area/space) ? /turf/simulated/floor/airless : /turf/simulated/floor/plating) : /turf/simulated/open
 		T.ChangeTurf(new_turf_type)

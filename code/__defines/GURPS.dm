@@ -3,6 +3,15 @@
 #define STAT_IQ "iq"
 #define STAT_HT "ht"
 #define STAT_PER "per"
+#define STAT_WP "wp"
+#define STAT_IM "im"
+#define STAT_SPD "spd"
+
+#define DEATHWEB_ARMOR_CLOTH 10
+#define DEATHWEB_ARMOR_LEATHER 20
+#define DEATHWEB_ARMOR_MAIL 30
+#define DEATHWEB_ARMOR_PLATE 40
+#define DEATHWEB_ARMOR_DAMAGED 50
 
 #define PERCEPTION_STAT_FLOOR 2
 #define PERCEPTION_CHANCE_PER_POINT 15

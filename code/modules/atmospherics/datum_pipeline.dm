@@ -177,13 +177,9 @@
 		else
 			var/delta_temperature = 0
 			var/sharer_heat_capacity = 0
-
-			if(modeled_location.zone)
-				delta_temperature = (air.temperature - modeled_location.zone.air.temperature)
-				sharer_heat_capacity = modeled_location.zone.air.heat_capacity()
-			else
-				delta_temperature = (air.temperature - modeled_location.air.temperature)
-				sharer_heat_capacity = modeled_location.air.heat_capacity()
+			var/datum/gas_mixture/environment = modeled_location.return_air()
+			delta_temperature = air.temperature - environment.temperature
+			sharer_heat_capacity = environment.heat_capacity()
 
 			var/self_temperature_delta = 0
 			var/sharer_temperature_delta = 0
@@ -198,11 +194,7 @@
 				return 1
 
 			air.temperature += self_temperature_delta
-
-			if(modeled_location.zone)
-				modeled_location.zone.air.temperature += sharer_temperature_delta/modeled_location.zone.air.group_multiplier
-			else
-				modeled_location.air.temperature += sharer_temperature_delta
+			environment.temperature += sharer_temperature_delta/environment.group_multiplier
 
 
 	else

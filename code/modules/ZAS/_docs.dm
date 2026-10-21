@@ -2,10 +2,39 @@
 
 Zone Air System:
 
-This air system divides the station into impermeable areas called zones.
-When something happens, i.e. a door opening or a wall being taken down,
-zones equalize and eventually merge. Making an airtight area closes the connection again.
-Tile atmospheres track gas amounts and temperature. Open edges equalize gas in
+Before round start, each non-space /area is flood-filled into atmos-only subareas.
+Walls, airtight barriers, and door boundaries separate these gas zones, even
+inside the same mapped area. Each subarea shares gas and temperature internally.
+Open boundaries exchange gas between subareas without merging them.
+Closed doorways retain isolated one-tile gas zones. Normal door cycles refresh
+local connections without rebuilding rooms or recreating doorway gas. Door
+construction, removal, and movement rebuild affected room boundaries; firedoors
+that close across a shared zone still split it when necessary.
+Full-room airlock auto-linking follows the bounded physical chamber, rather than
+collecting devices elsewhere in the same power area. Controllers and markers
+explicitly request late initialization, and each chamber links only once.
+Controller IDs stay stable for mapped access buttons; local device tags are
+namespaced by that ID to avoid controlling remote doors with duplicate tags.
+Multiple vents sharing the configured pump tag operate as one pump group.
+The linked chamber sensor immediately sends a fresh reading and targets the
+controller when used as a cycle button. Equal-pressure cycle
+shortcuts require the opposite door to be secured and the controller to be idle.
+Vents exchange gas with their local subarea while power and modcon ownership
+remain on the mapped area. Airlock-controlled vents honor radio targets without
+requiring a modcon, and recover clean gas through the shared reserve/filter hub.
+Active boundary transfers show small cosmetic smoke wisps on both connected
+tiles, moving toward the lower gas density. Each edge emits at most one pair per
+second; sealed boundaries and settled gas do not emit them.
+The original mapped /area still owns power, machinery, and alarms; turfs are
+not moved into new areas. Geometry changes rebuild affected gas zones as needed.
+Turf replacement preserves local gas, detaches the old tile, and queues room
+rebuilds and boundary refreshes on adjacent tiles and connected decks. Vertical
+flow requires a real opening and a connected z-stack; closed floors seal it.
+Map atmos_isolated_z_levels exclude decks from vertical flow and turf cascades.
+Alpha isolates its CentCom/admin deck (z=4), without changing station power.
+Space areas, including the power-capable /area/external, are vacuum reservoirs,
+even when their turfs are simulated floors. Breaches depressurize exposed subareas.
+Subarea atmospheres track gas amounts and temperature. Open edges equalize gas in
 one air tick, weighted by zone size, and breaches equalize with the outside air.
 Before equalization, the mole-density gradient drives airflow within seven
 passable tiles of each opening, calibrated to atmospheric pressure at 20 C.

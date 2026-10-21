@@ -242,6 +242,7 @@
 	//////////////
 /client/Del()
 	clear_vehicle_placement()
+	clear_atmos_subarea_visualizer()
 	ticket_panels -= src
 	if(holder)
 		holder.owner = null

@@ -1,3 +1,97 @@
+/client/var/list/image/atmos_subarea_markers = list()
+/client/var/list/atmos_subarea_colors = list()
+/client/var/atmos_subarea_visualizer_enabled = FALSE
+/client/var/atmos_subarea_visualizer_generation = 0
+
+/client/proc/visualize_atmos_subareas()
+	set category = "Debug"
+	set name = "Visualize Atmos Subareas"
+	if(!check_rights(R_DEBUG))
+		return
+	atmos_subarea_visualizer_enabled = !atmos_subarea_visualizer_enabled
+	atmos_subarea_visualizer_generation++
+	images -= atmos_subarea_markers
+	atmos_subarea_markers.Cut()
+	atmos_subarea_colors.Cut()
+	if(!atmos_subarea_visualizer_enabled)
+		clear_atmos_subarea_visualizer()
+		to_chat(src, "Atmospheric subarea visualization disabled.")
+		return
+	SSstatistics.add_field_details("admin_verb", "VASUB")
+	to_chat(src, "Atmospheric subarea visualization enabled. Colors identify gas subareas; labels show the mapped power area, tile count, pressure, and temperature. U/D mark open vertical air paths; X marks an isolated deck. Toggle this verb again to disable.")
+	refresh_atmos_subarea_visualizer(atmos_subarea_visualizer_generation)
+
+/client/proc/clear_atmos_subarea_visualizer()
+	atmos_subarea_visualizer_enabled = FALSE
+	atmos_subarea_visualizer_generation++
+	images -= atmos_subarea_markers
+	atmos_subarea_markers.Cut()
+	atmos_subarea_colors.Cut()
+
+/client/proc/refresh_atmos_subarea_visualizer(generation)
+	set waitfor = FALSE
+	var/icon/subarea_fill = icon('icons/misc/debug_group.dmi', "green")
+	subarea_fill.Blend("#ffffff", ICON_ADD)
+	while(src && atmos_subarea_visualizer_enabled && generation == atmos_subarea_visualizer_generation)
+		images -= atmos_subarea_markers
+		atmos_subarea_markers.Cut()
+		if(!holder || !(holder.rights & R_DEBUG))
+			clear_atmos_subarea_visualizer()
+			return
+		var/turf/center = get_turf(eye) || get_turf(mob)
+		if(center && SSair)
+			var/list/labeled_subareas = list()
+			var/list/current_colors = list()
+			var/list/view_dimensions = getviewsize(view)
+			var/half_width = min(16, round(view_dimensions[1] / 2))
+			var/half_height = min(16, round(view_dimensions[2] / 2))
+			var/turf/lower_corner = locate(max(1, center.x - half_width), max(1, center.y - half_height), center.z)
+			var/turf/upper_corner = locate(min(world.maxx, center.x + half_width), min(world.maxy, center.y + half_height), center.z)
+			for(var/turf/simulated/tile in block(lower_corner, upper_corner))
+				if(!TURF_HAS_VALID_ZONE(tile) || SSair.is_space_turf(tile))
+					continue
+				var/zone/subarea = tile.zone
+				var/subarea_color = atmos_subarea_colors[subarea]
+				if(!subarea_color)
+					subarea_color = rgb(rand(96, 255), rand(96, 255), rand(96, 255))
+				current_colors[subarea] = subarea_color
+				var/image/marker = image(subarea_fill, tile)
+				marker.plane = ABOVE_LIGHTING_PLANE
+				marker.layer = HOLOMAP_LAYER
+				marker.mouse_opacity = 0
+				marker.alpha = 100
+				marker.color = subarea_color
+				atmos_subarea_markers += marker
+				var/vertical_paths = ""
+				if(GLOB.using_map && (tile.z in GLOB.using_map.atmos_isolated_z_levels))
+					vertical_paths = "X"
+				else
+					for(var/direction in list(UP, DOWN))
+						var/turf/neighbour = get_zstep(tile, direction)
+						if(neighbour && !(SSair.air_blocked(tile, neighbour) & AIR_BLOCKED))
+							vertical_paths += direction == UP ? "U" : "D"
+				if(length(vertical_paths))
+					var/image/vertical_marker = image(loc = tile)
+					vertical_marker.plane = ABOVE_LIGHTING_PLANE
+					vertical_marker.layer = HOLOMAP_LAYER + 0.1
+					vertical_marker.mouse_opacity = 0
+					vertical_marker.maptext = "<span style='color: white; font-size: 8px; background-color: black;'>[vertical_paths]</span>"
+					atmos_subarea_markers += vertical_marker
+				if(!(subarea in labeled_subareas))
+					labeled_subareas += subarea
+					var/image/label = image(loc = tile)
+					label.plane = ABOVE_LIGHTING_PLANE
+					label.layer = HOLOMAP_LAYER + 0.2
+					label.mouse_opacity = 0
+					label.maptext_width = 224
+					label.maptext_height = 64
+					label.maptext_y = 16
+					label.maptext = "<span style='color: white; font-size: 8px; background-color: black;'>[subarea.name] ([subarea.contents.len] tiles)<br>[html_encode(subarea.owner ? subarea.owner.name : "No power area")]<br>[round(subarea.air.return_pressure(), 0.1)] kPa / [round(subarea.air.temperature, 0.1)] K</span>"
+					atmos_subarea_markers += label
+			atmos_subarea_colors = current_colors
+			images += atmos_subarea_markers
+		sleep(1 SECOND)
+
 /client/proc/atmosscan()
 	set category = "Mapping"
 	set name = "Check Piping"

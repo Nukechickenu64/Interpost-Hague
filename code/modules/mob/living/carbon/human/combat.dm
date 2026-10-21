@@ -39,35 +39,36 @@
 
 //Going here till I find a better place for it.
 /mob/living/proc/handle_combat_mode()//Makes it so that you can't regain stamina in combat mode.
-	if(combat_mode)
-		if(staminaloss < 90)
-			adjustStaminaLoss(1)
+	return
 
 /mob/living/proc/attempt_dodge(mob/living/carbon/human/attacker = null) // Handle parry is an object proc, it's, its own thing.
+	if(attacker == src || !combat_mode || stat || !canmove || incapacitated())
+		return FALSE
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		if(H.toggle_resisting)
 			return 0
-	var/dodge_modifier = c_intent == I_DEFEND ? 4 : 0
+	var/dodge_modifier = c_intent == I_DEFEND ? 3 : 0
 	if(defense_intent != I_DODGE || buckled || resting || lying || zoomed)
 		return 0
 	var/feint_penalty = ishuman(attacker) ? attacker.consume_feint_bonus(src) : 0
-	if(combat_mode)
-		var/dodge_difficulty = 10 + min(round(staminaloss / 10), 8) - dodge_modifier + feint_penalty
-		if(staminaloss < 50 && statcheck(stats[STAT_DX], dodge_difficulty, "We couldn't dodge in time!", "dex"))
-			do_dodge()
-			return 1
-		else if(staminaloss >= 50 && statcheck(stats[STAT_DX], dodge_difficulty + 2, "I'm getting too exhausted to dodge!", "dex"))
-			do_dodge()
-			return 1
-	else if(prob(5) && statcheck(stats[STAT_DX], 12 + feint_penalty, "I can't dodge something I'm not ready for!", "dex"))
+	if(length(grabbed_by))
+		dodge_modifier -= 5
+	if(staminaloss >= 50)
+		dodge_modifier -= 3
+	else if(staminaloss >= 30)
+		dodge_modifier -= 1
+	var/list/result = gurps_roll(min(gurps_stat(STAT_DX), 13) + dodge_modifier - feint_penalty)
+	if(result["success"])
 		do_dodge()
-		return 1
-	return 0
+		return TRUE
+	if(result["critical_failure"])
+		adjustStaminaLoss(rand(5, 10))
+	return FALSE
 
 /mob/living/proc/do_dodge()
 	var/lol = pick(GLOB.cardinal)//get a direction.
-	adjustStaminaLoss(15)//add some stamina loss
+	adjustStaminaLoss(max(0, 6 - (gurps_stat(STAT_DX) - 9)) + (c_intent == I_DEFEND ? 2 : 0))
 	playsound(loc, 'sound/weapons/punchmiss.ogg', 80, 1)//play a sound
 	step(src,lol)//move them
 	visible_message("<b><big>[src.name] dodges out of the way!</big></b>")//send a message

@@ -22,7 +22,7 @@
 	// This makes sure that turfs are not changed to space when one side is part of a zone
 	if(N == /turf/space)
 		var/turf/below = GetBelow(src)
-		if(istype(below) && !istype(below,/turf/space))
+		if(istype(below) && AreAtmosZLevelsConnected(z, below.z) && !istype(below,/turf/space))
 			N = below.density ? /turf/simulated/floor/airless : /turf/simulated/open
 
 	var/obj/fire/old_fire = fire
@@ -33,6 +33,18 @@
 	var/old_corners = corners
 	var/old_ao_neighbors = ao_neighbors
 	var/old_opaque_counter = opaque_counter
+	var/datum/gas_mixture/old_air
+	if(istype(src, /turf/simulated))
+		var/turf/simulated/old_turf = src
+		if(old_turf.zone)
+			old_turf.c_copy_air()
+			var/zone/old_subarea = old_turf.zone
+			if(!old_subarea.invalid)
+				old_subarea.remove(old_turf)
+				old_subarea.rebuild()
+			else
+				old_turf.zone = null
+		old_air = old_turf.air
 
 //	log_debug("Replacing [src.type] with [N]")
 
@@ -53,6 +65,8 @@
 		A.forceMove(null)
 
 	var/turf/simulated/W = new N( locate(src.x, src.y, src.z) )
+	if(istype(W, /turf/simulated) && old_air)
+		W.air = old_air
 	for(var/atom/movable/A in old_contents)
 		A.forceMove(W)
 
@@ -71,12 +85,11 @@
 	if(tell_universe)
 		GLOB.universe.OnTurfChange(W)
 
-	SSair.mark_for_update(src) //handle the addition of the new turf.
-
 	for(var/turf/space/S in range(W,1))
 		S.update_starlight()
 
 	W.post_change()
+	SSair.update_atmos_geometry(W)
 	. = W
 
 	W.ao_neighbors = old_ao_neighbors

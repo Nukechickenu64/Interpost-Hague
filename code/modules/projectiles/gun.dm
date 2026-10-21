@@ -78,6 +78,14 @@
 	var/safety = 1		//Whether or not the safety is on. BLESS YOU MATT
 
 	var/next_fire_time = 0
+	var/firing = FALSE
+	var/last_fired = null
+	var/shots_fired = 0
+	var/scatter = 0
+	var/scatter_increase = 0.2
+	var/scatter_decay = 0.1
+	var/max_scatter = 3
+	var/movement_acc_penalty_mult = 1
 
 	var/sel_mode = 1 //index of the currently selected mode
 	var/list/firemodes = list()
@@ -148,7 +156,10 @@
 		handle_click_empty(user)
 		return 0
 
-	if(!is_jammed && prob(jam_chance))
+	var/list/handling_roll
+	if(ishuman(user) && jam_chance > 0)
+		handling_roll = user.gurps_skill_roll(SKILL_RANGE)
+	if(!is_jammed && handling_roll && !handling_roll["success"] && prob(jam_chance))
 		if(!has_jammed)  //If we just unjammed, don't jam again
 			playsound(src.loc, 'sound/effects/jam.ogg', 50, 1)
 			src.visible_message("<span class='danger'>[user]\'s [src] jams!</span>")
@@ -196,6 +207,7 @@
 /obj/item/weapon/gun/proc/Fire(atom/target, mob/living/user, clickparams, pointblank=0, reflex=0)
 	if(!user || !target) return
 	if(target.z != user.z) return
+	if(firing) return
 
 	add_fingerprint(user)
 
@@ -207,7 +219,14 @@
 			to_chat(user, "<span class='warning'>[src] is not ready to fire again!</span>")
 		return
 
-	var/shoot_time = (burst - 1)* burst_delay
+	firing = TRUE
+	var/burst_amount = burst
+	var/shot_delay = burst_delay
+	var/atom/firing_location = loc
+	var/held_at_start = user.get_active_hand() == src || user.get_inactive_hand() == src
+	if(isnull(last_fired) || world.time - last_fired >= max(10, fire_delay + burst_delay))
+		shots_fired = 0
+	var/shoot_time = (burst_amount - 1)* shot_delay
 	user.setClickCooldown(shoot_time) //no clicking on things while shooting
 	user.setMoveCooldown(shoot_time) //no moving while shooting either
 	next_fire_time = world.time + shoot_time
@@ -216,27 +235,41 @@
 
 	//actually attempt to shoot
 	var/turf/targloc = get_turf(target) //cache this in case target gets deleted during shooting, e.g. if it was a securitron that got destroyed.
-	for(var/i in 1 to burst)
+	for(var/i in 1 to burst_amount)
+		if(QDELETED(src) || QDELETED(user) || user.incapacitated() || loc != firing_location || safety || is_jammed)
+			break
+		if(held_at_start && user.get_active_hand() != src && user.get_inactive_hand() != src)
+			break
+		if(!target || target.z != user.z || (!waterproof && submerged()))
+			break
 		var/obj/projectile = consume_next_projectile(user)
 		if(!projectile)
 			handle_click_empty(user)
 			break
 
-		process_accuracy(projectile, user, target, i, held_twohanded)
+		held_twohanded = wielded
+		process_accuracy(projectile, user, target, automatic ? shots_fired + 1 : i, held_twohanded)
 
 		if(pointblank)
 			process_point_blank(projectile, user, target)
 
 		if(process_projectile(projectile, user, target, user.zone_sel.selecting, clickparams))
+			shots_fired++
+			scatter = clamp(scatter + scatter_increase, 0, max_scatter)
+			last_fired = world.time
 			handle_post_fire(user, target, pointblank, reflex)
 			update_icon()
 
-		if(i < burst)
-			sleep(burst_delay)
+		if(i < burst_amount)
+			sleep(shot_delay)
 
 		if(!(target && target.loc))
 			target = targloc
 			pointblank = 0
+
+	firing = FALSE
+	if(QDELETED(src) || QDELETED(user))
+		return
 
 	//update timing
 	user.setClickCooldown(DEFAULT_QUICK_COOLDOWN)
@@ -311,9 +344,12 @@
 				if(4 to INFINITY)
 					to_chat(user, "<span class='warning'>You struggle to hold \the [src] steady!</span>")
 		*/
-	if(screen_shake)
+	var/total_recoil = screen_shake
+	if(total_recoil && !wielded)
+		total_recoil += one_hand_penalty
+	if(total_recoil)
 		spawn()
-			shake_camera(user, screen_shake+1, screen_shake)
+			shake_camera(user, total_recoil+1, total_recoil)
 
 	if(combustion)
 		var/turf/curloc = get_turf(src)
@@ -343,7 +379,9 @@
 	if(!istype(P))
 		return //default behaviour only applies to true projectiles
 
-	P.attack_margin = user.skillcheck_margin(user.skills[SKILL_RANGE], SKILL_RANGE)
+	P.deathweb_ranged = TRUE
+	P.deathweb_wielded = held_twohanded
+	P.deathweb_heavy = w_class >= ITEM_SIZE_HUGE
 
 	var/acc_mod = burst_accuracy[min(burst, burst_accuracy.len)]
 	var/disp_mod = dispersion[min(burst, dispersion.len)]
@@ -356,8 +394,18 @@
 	//Accuracy modifiers
 	P.accuracy = accuracy + acc_mod
 	P.dispersion = disp_mod
+	if(!isnull(last_fired))
+		scatter = clamp(scatter - max(0, world.time - last_fired - 1) * scatter_decay, 0, max_scatter)
+	else
+		scatter = 0
+	var/handling_penalty = scatter * (held_twohanded ? 1 : 2)
 
-	var/mod = rand(5,20)
+	if(user.l_move_time && world.time - user.l_move_time < 5)
+		handling_penalty += movement_acc_penalty_mult * (held_twohanded ? 1 : 2)
+	if(ishuman(user))
+		P.accuracy -= handling_penalty
+	else
+		P.dispersion += handling_penalty
 
 	if(user.horror_loop)//They're freaking the fuck out, make it hard to aim.
 		P.dispersion += 5
@@ -370,21 +418,6 @@
 		//As opposed to no-delay pew pew
 		P.accuracy += 2
 
-	if(!user.skillcheck(user.skills["ranged"], 55, "How do you even aim this?!", "ranged") || !user.combat_mode)//Being unskilled at guns decreased accuracy.
-		P.accuracy -= 4
-
-	if(user.combat_mode)
-		P.accuracy += 3
-
-	if(!user.combat_mode)
-		P.dispersion += mod
-
-	if(user.staminaloss >= (STAMINA_EXHAUST/2))
-		P.dispersion += mod
-
-	if(user.chem_effects[CE_PAINKILLER] > 100)
-		P.dispersion += 10
-		P.accuracy -= 3
 
 //does the actual launching of the projectile
 /obj/item/weapon/gun/proc/process_projectile(obj/projectile, mob/user, atom/target, var/target_zone, var/params=null)
@@ -515,6 +548,8 @@
 
 
 /obj/item/weapon/gun/proc/switch_firemodes()
+	if(firing)
+		return null
 	if(firemodes.len <= 1)
 		return null
 
@@ -542,6 +577,8 @@
 		safety = !safety
 		playsound(user, 'sound/weapons/guns/interact/selector.ogg', 50, 1)
 		to_chat(user, "<span class='notice'>You toggle the safety [safety ? "on":"off"].</span>")
+		if(!user.client)
+			return
 		if(!safety)
 			user.client.mouse_pointer_icon = file("icons/misc/pointer.dmi")
 		else
@@ -550,11 +587,13 @@
 //Gun pointer
 /obj/item/weapon/gun/pickup(mob/user)
 	..()
-	if(!safety)
+	if(user.client && !safety)
 		user.client.mouse_pointer_icon = file("icons/misc/pointer.dmi")
 
 /obj/item/weapon/gun/equipped(mob/user, var/slot)
 	..()
+	if(!user.client)
+		return
 	if(!safety && (slot == slot_l_hand || slot == slot_r_hand))
 		user.client.mouse_pointer_icon = file("icons/misc/pointer.dmi")
 	else
@@ -562,7 +601,7 @@
 
 /obj/item/weapon/gun/dropped(mob/user)
 	..()
-	if(user.get_active_hand() != src)
+	if(user.client && user.get_active_hand() != src)
 		user.client.mouse_pointer_icon = initial(user.client.mouse_pointer_icon)
 
 var/dispersion_modifyer = 0 //while(automatic) dispersion_mod++; dispersion = 0.1 + dispersion_mod;

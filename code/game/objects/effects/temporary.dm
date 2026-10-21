@@ -13,6 +13,28 @@
 	. = ..()
 	qdel(src, duration)
 
+/obj/effect/temp_visual/air_transfer
+	name = "airflow"
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "smoke"
+	alpha = 72
+	color = "#d4e4e8"
+	duration = 8
+
+/obj/effect/temp_visual/air_transfer/Initialize(mapload, turf/source, turf/destination)
+	. = ..(mapload)
+	if(!source || !destination)
+		return
+	var/flow_x = destination.x - source.x
+	var/flow_y = destination.y - source.y
+	if(destination.z != source.z)
+		flow_y = destination.z > source.z ? 1 : -1
+	var/offset = loc == source ? 6 : -6
+	pixel_x = flow_x * offset + rand(-2, 2)
+	pixel_y = flow_y * offset + rand(-2, 2)
+	transform = matrix() * 0.3
+	animate(src, pixel_x = pixel_x + flow_x * 12, pixel_y = pixel_y + flow_y * 12, alpha = 0, transform = matrix() * 0.55, time = duration)
+
 /obj/effect/temp_visual/bloodsplatter
 	icon = 'icons/effects/bloodspatter.dmi'
 	duration = 5

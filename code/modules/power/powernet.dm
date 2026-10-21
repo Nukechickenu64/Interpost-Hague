@@ -83,6 +83,9 @@ var/global/datum/powernet/power_net = new
 /datum/powernet/proc/station_areas()
 	if(!length(cached_station_areas))
 		cached_station_areas = get_filtered_areas(GLOB.is_station_but_not_space_or_shuttle_area)
+		for(var/area/external/external_area)
+			if(isStationLevel(external_area.z))
+				cached_station_areas |= external_area
 	return cached_station_areas
 
 // --- Consumption / state ---------------------------------------------------

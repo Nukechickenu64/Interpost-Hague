@@ -105,7 +105,8 @@
 
 /obj/machinery/door/Destroy()
 	set_density(0)
-	update_nearby_tiles()
+	block_air_zones = FALSE
+	update_nearby_tiles(need_rebuild = TRUE)
 	. = ..()
 
 /obj/machinery/door/proc/can_open()
@@ -476,10 +477,23 @@
 	return ..(M)
 
 /obj/machinery/door/update_nearby_tiles(need_rebuild)
-	. = ..()
 	for(var/turf/simulated/turf in locs)
 		update_heat_protection(turf)
-		SSair.mark_for_update(turf)
+		if(need_rebuild)
+			SSair.update_atmos_geometry(turf)
+		else
+			SSair.mark_for_update(turf)
+			if(turf.connections)
+				turf.connections.update_all()
+			#ifdef MULTIZAS
+			var/list/directions = GLOB.cardinalz
+			#else
+			var/list/directions = GLOB.cardinal
+			#endif
+			for(var/direction in directions)
+				var/turf/neighbour = get_zstep(turf, direction)
+				if(neighbour)
+					SSair.mark_for_update(neighbour)
 	return 1
 
 /obj/machinery/door/proc/update_heat_protection(var/turf/simulated/source)
@@ -490,7 +504,7 @@
 			source.thermal_conductivity = initial(source.thermal_conductivity)
 
 /obj/machinery/door/Move(new_loc, new_dir)
-	update_nearby_tiles()
+	update_nearby_tiles(need_rebuild = TRUE)
 
 	. = ..()
 	if(width > 1)
@@ -506,6 +520,7 @@
 			filler = (get_step(src,NORTH)) //Find new turf
 
 	if(.)
+		update_nearby_tiles(need_rebuild = TRUE)
 		deconstruct(null, TRUE)
 
 

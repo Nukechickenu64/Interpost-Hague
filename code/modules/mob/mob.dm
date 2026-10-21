@@ -761,7 +761,7 @@
 		reset_plane_and_layer()
 
 /mob/proc/facedir(var/ndir)
-	if(!canface() || client.moving || world.time < client.move_delay)
+	if(!client || !canface() || client.moving || world.time < client.move_delay)
 		return 0
 	set_dir(ndir)
 	if(buckled && buckled.buckle_movable)

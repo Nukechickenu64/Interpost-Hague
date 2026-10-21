@@ -41,6 +41,7 @@ Class Procs:
 
 
 /zone/var/name
+/zone/var/area/owner
 /zone/var/invalid = 0
 /zone/var/list/contents = list()
 /zone/var/list/fire_tiles = list()
@@ -56,7 +57,10 @@ Class Procs:
 /zone/var/list/graphic_add = list()
 /zone/var/list/graphic_remove = list()
 
-/zone/New()
+/zone/New(area/owner)
+	src.owner = owner
+	if(owner)
+		owner.atmos_subareas += src
 	SSair.add_zone(src)
 	air.temperature = TCMB
 	air.group_multiplier = 1
@@ -69,7 +73,10 @@ Class Procs:
 	ASSERT(!SSair.has_valid_zone(T))
 #endif
 
-	var/datum/gas_mixture/turf_air = T.return_air()
+	if(T.zone && T.zone.invalid)
+		T.c_copy_air()
+		T.zone = null
+	var/datum/gas_mixture/turf_air = T.air ? T.air : T.create_initial_air()
 	add_tile_air(turf_air)
 	T.zone = src
 	contents.Add(T)
@@ -123,6 +130,8 @@ Class Procs:
 
 /zone/proc/c_invalidate()
 	invalid = 1
+	if(owner)
+		owner.atmos_subareas -= src
 	if(zone_edges)
 		for(var/zone/neighbour in zone_edges)
 			if(neighbour.zone_edges && neighbour.zone_edges[src] == zone_edges[neighbour])

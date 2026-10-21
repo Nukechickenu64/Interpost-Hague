@@ -54,12 +54,18 @@
 
 	health += maxhealth - old_maxhealth
 
-/obj/structure/table/proc/take_damage(obj/item/I as obj, mob/user as mob)
-	var/obj/item/weapon/W = I
-	var/amount = W.force
+/obj/structure/table/proc/take_damage(damage, mob/user as mob)
+	var/obj/item/weapon/W
+	var/amount = damage
+	if(istype(damage, /obj/item))
+		W = damage
+		amount = W.force
+	if(!isnum(amount))
+		return
 	//attack stuff Should this be in it's own function?
-	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-	user.do_attack_animation(src)
+	if(W && user)
+		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+		user.do_attack_animation(src)
 	// If the table is made of a brittle material, and is *not* reinforced with a non-brittle material, damage is multiplied by TABLE_BRITTLE_MATERIAL_MULTIPLIER
 	if(material && material.is_brittle())
 		if(reinforced)
@@ -67,11 +73,12 @@
 				amount *= TABLE_BRITTLE_MATERIAL_MULTIPLIER
 		else
 			amount *= TABLE_BRITTLE_MATERIAL_MULTIPLIER
-	if(amount < 0)
-		user.visible_message("<span class='danger'>\The [user] hits \the [src] with \the [W] with no visible effect.</span>")
-	else
-		user.visible_message("<span class='danger'>\The [user] forcefully strikes \the [src] with \the [W]!</span>")
-		playsound(src.loc, hitsound, 100, 1)
+	if(W && user)
+		if(amount < 0)
+			user.visible_message("<span class='danger'>\The [user] hits \the [src] with \the [W] with no visible effect.</span>")
+		else
+			user.visible_message("<span class='danger'>\The [user] forcefully strikes \the [src] with \the [W]!</span>")
+			playsound(src.loc, hitsound, 100, 1)
 	health -= amount
 	if(health <= 0)
 		visible_message("<span class='warning'>\The [src] breaks down!</span>")

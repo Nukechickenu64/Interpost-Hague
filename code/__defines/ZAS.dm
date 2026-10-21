@@ -33,12 +33,7 @@ var/list/gzn_check = list(NORTH, SOUTH, EAST, WEST, UP, DOWN)
 		ret = BLOCKED; \
 	} \
 	else if (B.z != A.z) { \
-		if (B.z < A.z) { \
-			ret = (A.z_flags & ZM_ALLOW_ATMOS) ? ZONE_BLOCKED : BLOCKED; \
-		} \
-		else { \
-			ret = (B.z_flags & ZM_ALLOW_ATMOS) ? ZONE_BLOCKED : BLOCKED; \
-		} \
+		ret = A.c_airblock(B); \
 	} \
 	else if (A.blocks_air & ZONE_BLOCKED || B.blocks_air & ZONE_BLOCKED) { \
 		ret = (A.z == B.z) ? ZONE_BLOCKED : AIR_BLOCKED; \

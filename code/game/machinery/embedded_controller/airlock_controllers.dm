@@ -39,6 +39,11 @@
 /obj/machinery/embedded_controller/radio/airlock/airlock_controller
 	name = "Airlock Controller"
 	tag_secure = 1
+	var/airlock_autolinked = FALSE
+
+/obj/machinery/embedded_controller/radio/airlock/airlock_controller/Initialize()
+	. = ..()
+	return INITIALIZE_HINT_LATELOAD
 
 /obj/machinery/embedded_controller/radio/airlock/ui_interact()
 	return
@@ -87,36 +92,69 @@
 
 /obj/machinery/embedded_controller/radio/airlock/airlock_controller/LateInitialize()
 	. = ..()
+	if(airlock_autolinked)
+		return
+	var/list/chamber = get_airlock_chamber_turfs(get_turf(src), 4)
 	for(var/obj/effect/landmark/airlock_link/link_marker in range(4, src))
-		if(get_area(link_marker) == get_area(src))
+		if(chamber[get_turf(link_marker)])
 			return
-	var/obj/effect/landmark/airlock_link/generated_marker = new(get_turf(src))
-	generated_marker.dir = dir
-	generated_marker.link_airlock_components()
+	new /obj/effect/landmark/airlock_link(get_turf(src), dir)
 
 /obj/effect/landmark/airlock_link
 	name = "airlock link marker"
 	desc = "Automatically links a nearby full-room airlock. Face this marker toward the exterior door."
 	var/search_radius = 4
+	var/linked = FALSE
 
-/obj/effect/landmark/airlock_link/Initialize()
+/obj/effect/landmark/airlock_link/Initialize(mapload, initial_direction)
 	. = ..()
+	if(initial_direction)
+		set_dir(initial_direction)
 	icon_state = "x2"
 	invisibility = 101
+	return INITIALIZE_HINT_LATELOAD
 
 /obj/effect/landmark/airlock_link/LateInitialize()
 	. = ..()
 	link_airlock_components()
 
+/proc/get_airlock_chamber_turfs(turf/seed, radius)
+	var/list/chamber = list()
+	if(!seed || isspace(get_area(seed)) || (seed.c_airblock(seed) & (AIR_BLOCKED | ZONE_BLOCKED)))
+		return chamber
+	var/area/chamber_area = get_area(seed)
+	var/list/pending = list(seed)
+	chamber[seed] = TRUE
+	while(pending.len)
+		var/turf/current = pending[pending.len]
+		pending.len--
+		for(var/direction in GLOB.cardinal)
+			var/turf/simulated/neighbour = get_step(current, direction)
+			if(!istype(neighbour) || chamber[neighbour] || get_dist(seed, neighbour) > radius || get_area(neighbour) != chamber_area)
+				continue
+			if(neighbour.c_airblock(neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
+				continue
+			if(SSair.air_blocked(current, neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
+				continue
+			chamber[neighbour] = TRUE
+			pending += neighbour
+	return chamber
+
 /obj/effect/landmark/airlock_link/proc/link_airlock_components()
+	if(linked)
+		return
+	var/list/chamber = get_airlock_chamber_turfs(get_turf(src), search_radius)
+	if(!chamber.len)
+		log_error("Airlock link marker at [x],[y],[z] is not inside an atmospheric chamber.")
+		return
 	var/obj/machinery/embedded_controller/radio/airlock/airlock_controller/controller
 	var/obj/machinery/airlock_sensor/chamber_sensor
-	var/obj/machinery/atmospherics/air_pump
+	var/list/air_pumps = list()
 	var/obj/machinery/door/airlock/exterior_door
 	var/obj/machinery/door/airlock/interior_door
 	var/list/nearby_doors = list()
 	for(var/obj/machinery/embedded_controller/radio/airlock/airlock_controller/C in range(search_radius, src))
-		if(C.z == z && get_area(C) == get_area(src))
+		if(chamber[get_turf(C)])
 			if(controller)
 				log_error("Airlock link marker at [x],[y],[z] found multiple full-room controllers.")
 				return
@@ -124,26 +162,36 @@
 	if(!controller)
 		log_error("Airlock link marker at [x],[y],[z] has no full-room controller nearby.")
 		return
+	if(controller.airlock_autolinked)
+		linked = TRUE
+		return
 	for(var/obj/machinery/airlock_sensor/S in range(search_radius, src))
-		if(S.z == z && get_area(S) == get_area(src))
+		if(chamber[get_turf(S)])
 			if(chamber_sensor)
 				log_error("Airlock link marker at [x],[y],[z] found multiple chamber sensors.")
 				return
 			chamber_sensor = S
 	for(var/obj/machinery/atmospherics/P in range(search_radius, src))
-		if((istype(P, /obj/machinery/atmospherics/binary/pump) || istype(P, /obj/machinery/atmospherics/unary/vent_pump)) && P.z == z && get_area(P) == get_area(src))
+		if((istype(P, /obj/machinery/atmospherics/binary/pump) || istype(P, /obj/machinery/atmospherics/unary/vent_pump)) && chamber[get_turf(P)])
 			var/pump_matches_legacy_tag = (istype(P, /obj/machinery/atmospherics/binary/pump) && P:id == controller.tag_airpump) || (istype(P, /obj/machinery/atmospherics/unary/vent_pump) && P:id_tag == controller.tag_airpump)
 			if(controller && controller.tag_airpump && !pump_matches_legacy_tag)
 				continue
-			if(air_pump)
+			if(air_pumps.len && !controller.tag_airpump)
 				log_error("Airlock link marker at [x],[y],[z] found multiple air pumps.")
 				return
-			air_pump = P
+			air_pumps += P
 	for(var/obj/machinery/door/airlock/D in range(search_radius, src))
-		if(D.z == z && get_area(D) == get_area(src))
+		if(D.z != z)
+			continue
+		var/borders_chamber = FALSE
+		for(var/turf/door_tile in D.locs)
+			for(var/direction in GLOB.cardinal)
+				if(chamber[get_step(door_tile, direction)])
+					borders_chamber = TRUE
+		if(borders_chamber)
 			nearby_doors += D
-	if(!chamber_sensor || !air_pump || nearby_doors.len != 2)
-		log_error("Airlock link marker at [x],[y],[z] requires one controller, one chamber sensor, one air pump, and exactly two airlocks.")
+	if(!chamber_sensor || !air_pumps.len || nearby_doors.len != 2)
+		log_error("Airlock link marker at [x],[y],[z] requires one controller, one chamber sensor, a tagged pump group, and exactly two airlocks.")
 		return
 
 	for(var/obj/machinery/door/airlock/D in nearby_doors)
@@ -160,15 +208,13 @@
 		log_error("Airlock link marker at [x],[y],[z] must face one of its two airlock doors.")
 		return
 
-	var/link_id = "AIRLOCK_[sequential_id(/obj/effect/landmark/airlock_link)]"
+	var/link_id = controller.id_tag ? controller.id_tag : "AIRLOCK_[sequential_id(/obj/effect/landmark/airlock_link)]"
 	var/airlock_frequency = controller.frequency
 	controller.id_tag = link_id
 	controller.tag_exterior_door = "[link_id]_outer"
 	controller.tag_interior_door = "[link_id]_inner"
 	controller.tag_airpump = "[link_id]_pump"
 	controller.tag_chamber_sensor = "[link_id]_sensor"
-	controller.tag_exterior_sensor = null
-	controller.tag_interior_sensor = null
 	var/datum/computer/file/embedded_program/airlock/airlock_program = controller.program
 	if(!airlock_program)
 		log_error("Airlock link marker at [x],[y],[z] found a controller without an airlock program.")
@@ -178,8 +224,8 @@
 	airlock_program.tag_interior_door = controller.tag_interior_door
 	airlock_program.tag_airpump = controller.tag_airpump
 	airlock_program.tag_chamber_sensor = controller.tag_chamber_sensor
-	airlock_program.tag_exterior_sensor = null
-	airlock_program.tag_interior_sensor = null
+	airlock_program.tag_exterior_sensor = controller.tag_exterior_sensor
+	airlock_program.tag_interior_sensor = controller.tag_interior_sensor
 	if(controller.frequency != airlock_frequency)
 		controller.set_frequency(airlock_frequency)
 
@@ -188,23 +234,30 @@
 	interior_door.id_tag = controller.tag_interior_door
 	interior_door.set_frequency(airlock_frequency)
 	chamber_sensor.id_tag = controller.tag_chamber_sensor
+	chamber_sensor.master_tag = link_id
+	chamber_sensor.previousMoles = null
 	chamber_sensor.set_frequency(airlock_frequency, RADIO_AIRLOCK)
-	if(istype(air_pump, /obj/machinery/atmospherics/binary/pump))
-		var/obj/machinery/atmospherics/binary/pump/binary_pump = air_pump
-		binary_pump.id = controller.tag_airpump
-		binary_pump.set_frequency(airlock_frequency, RADIO_AIRLOCK)
-		binary_pump.broadcast_status()
-	else
-		var/obj/machinery/atmospherics/unary/vent_pump/vent = air_pump
-		unregister_radio(vent, vent.frequency)
-		vent.id_tag = controller.tag_airpump
-		vent.frequency = airlock_frequency
-		vent.radio_filter_in = null
-		vent.radio_filter_out = null
-		vent.radio_connection = register_radio(vent, airlock_frequency, airlock_frequency)
-		vent.broadcast_status()
+	for(var/obj/machinery/atmospherics/air_pump in air_pumps)
+		if(istype(air_pump, /obj/machinery/atmospherics/binary/pump))
+			var/obj/machinery/atmospherics/binary/pump/binary_pump = air_pump
+			binary_pump.id = controller.tag_airpump
+			binary_pump.set_frequency(airlock_frequency, RADIO_AIRLOCK)
+			binary_pump.broadcast_status()
+		else
+			var/obj/machinery/atmospherics/unary/vent_pump/vent = air_pump
+			vent.airlock_controlled = TRUE
+			unregister_radio(vent, vent.frequency)
+			vent.id_tag = controller.tag_airpump
+			vent.frequency = airlock_frequency
+			vent.radio_filter_in = null
+			vent.radio_filter_out = null
+			vent.radio_connection = register_radio(vent, airlock_frequency, airlock_frequency)
+			vent.broadcast_status()
 	exterior_door.send_status()
 	interior_door.send_status()
+	chamber_sensor.Process()
+	controller.airlock_autolinked = TRUE
+	linked = TRUE
 	controller.update_icon()
 
 

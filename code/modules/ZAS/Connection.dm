@@ -66,7 +66,7 @@ Class Procs:
 	src.A = A
 	src.B = B
 	zoneA = A.zone
-	if(!istype(B))
+	if(SSair.is_space_turf(B))
 		mark_space()
 		edge = SSair.get_edge(A.zone,B)
 		edge.add_connection(src)
@@ -118,7 +118,7 @@ Class Procs:
 	else
 		mark_direct()
 
-	var/b_is_space = !istype(B,/turf/simulated)
+	var/b_is_space = SSair.is_space_turf(B)
 
 	if(state & CONNECTION_SPACE)
 		if(!b_is_space)

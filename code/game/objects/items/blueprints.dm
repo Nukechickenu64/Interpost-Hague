@@ -156,6 +156,8 @@ move an amendment</a> to the drawing, or <a href='?src=\ref[src];action=delete_a
 
 /obj/item/blueprints/proc/move_turfs_to_area(var/list/turf/turfs, var/area/A)
 	A.contents.Add(turfs)
+	for(var/turf/T in turfs)
+		A.refresh_turf_atmosphere(T)
 		//oldarea.contents.Remove(usr.loc) // not needed
 		//T.loc = A //error: cannot change constant value
 

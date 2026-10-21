@@ -50,6 +50,19 @@ var/list/z_levels = list()// Each bit re... haha just kidding this is a list of 
 /proc/AreConnectedZLevels(var/zA, var/zB)
 	return zA == zB || (zB in GetConnectedZlevels(zA))
 
+/proc/AreAtmosZLevelsConnected(first_z, second_z)
+	if(abs(first_z - second_z) != 1)
+		return FALSE
+	if(GLOB.using_map && ((first_z in GLOB.using_map.atmos_isolated_z_levels) || (second_z in GLOB.using_map.atmos_isolated_z_levels)))
+		return FALSE
+	return HasBelow(max(first_z, second_z))
+
+/proc/CanAtmosZConnect(turf/first, turf/second)
+	if(!first || !second || !AreAtmosZLevelsConnected(first.z, second.z))
+		return FALSE
+	var/turf/upper = first.z > second.z ? first : second
+	return istype(upper, /turf/space) || (upper.z_flags & ZM_ALLOW_ATMOS) != 0
+
 /proc/get_zstep(ref, dir)
 	if(dir == UP)
 		. = GetAbove(ref)

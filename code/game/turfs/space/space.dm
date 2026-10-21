@@ -22,6 +22,8 @@
 	if(!HasBelow(z))
 		return
 	var/turf/below = GetBelow(src)
+	if(!below || !AreAtmosZLevelsConnected(z, below.z))
+		return
 
 	if(istype(below, /turf/space))
 		return

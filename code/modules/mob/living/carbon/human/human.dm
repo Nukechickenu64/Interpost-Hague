@@ -22,6 +22,8 @@
 		sprint_icon.icon_state = sprinting ? "sprint1" : "sprint0"
 
 /mob/living/carbon/human/New(var/new_loc, var/new_species = null)
+	for(var/stat_type in list(STAT_ST, STAT_DX, STAT_IQ, STAT_HT))
+		stats[stat_type] = rand(9, 10)
 
 	if(!dna)
 		dna = new /datum/dna(null)
@@ -52,6 +54,7 @@
 
 	GLOB.human_mob_list |= src
 	..()
+	initialize_deathweb_skills()
 
 	add_teeth()
 	add_tongue()

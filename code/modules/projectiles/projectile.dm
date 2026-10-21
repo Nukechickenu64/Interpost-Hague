@@ -52,6 +52,9 @@
 	var/penetration_modifier = 0.2 //How much internal damage this projectile can deal, as a multiplier.
 	var/hitchance_mod = 0
 	var/attack_margin = null
+	var/deathweb_ranged = FALSE
+	var/deathweb_wielded = FALSE
+	var/deathweb_heavy = FALSE
 
 	var/hitscan = 0		// whether the projectile should be hitscan
 	var/step_delay = 0.7	// the delay between iterations if not a hitscan projectile
@@ -215,7 +218,25 @@
 	miss_modifier = 15*(distance-2) - round(15*accuracy) + miss_modifier
 	if(target_mob == src.original)
 		miss_modifier -= 60
-	var/hit_zone = get_zone_with_miss_chance(def_zone, target_mob, miss_modifier, ranged_attack=(distance > 1 || original != target_mob)) //if the projectile hits a target we weren't originally aiming at then retain the chance to miss
+	var/hit_zone
+	if(deathweb_ranged && ishuman(firer))
+		var/roll_modifier = accuracy + (ismob(original) ? 0 : 1)
+		if(!deathweb_wielded)
+			roll_modifier -= pick(0, 0.5, 1)
+			if(deathweb_heavy)
+				roll_modifier -= rand(6, 8)
+		if(distance > 3)
+			roll_modifier -= distance * 2
+		else
+			roll_modifier += 2
+			if(distance == 1)
+				roll_modifier += 3
+		var/list/attack_roll = firer.gurps_skill_roll(SKILL_RANGE, roll_modifier)
+		attack_margin = attack_roll["margin"]
+		if(attack_roll["success"])
+			hit_zone = def_zone
+	else
+		hit_zone = get_zone_with_miss_chance(def_zone, target_mob, miss_modifier, ranged_attack=(distance > 1 || original != target_mob))
 
 	var/result = PROJECTILE_FORCE_MISS
 	if(hit_zone)

@@ -7,6 +7,7 @@
 	var/global/global_uid = 0
 	var/uid
 	var/area_flags
+	var/list/atmos_subareas = list()
 
 /area/New()
 	icon_state = ""
@@ -33,6 +34,8 @@
 	power_change()		// all machines set to current power level, also updates lighting icon
 
 /area/Destroy()
+	for(var/zone/subarea in atmos_subareas.Copy())
+		subarea.c_invalidate()
 	..()
 	return QDEL_HINT_HARDDEL
 
@@ -200,6 +203,9 @@
 var/list/mob/living/forced_ambiance_list = new
 
 /area/Entered(A)
+	if(isturf(A))
+		refresh_turf_atmosphere(A)
+		return
 	if(!istype(A,/mob/living))	return
 
 	var/mob/living/L = A
@@ -216,6 +222,20 @@ var/list/mob/living/forced_ambiance_list = new
 
 	play_ambience(L)
 	L.lastarea = newarea
+
+/area/proc/refresh_turf_atmosphere(turf/T)
+	if(!SSair)
+		return
+	SSair.mark_for_update(T)
+	#ifdef MULTIZAS
+	var/list/directions = GLOB.cardinalz
+	#else
+	var/list/directions = GLOB.cardinal
+	#endif
+	for(var/direction in directions)
+		var/turf/neighbour = get_zstep(T, direction)
+		if(neighbour)
+			SSair.mark_for_update(neighbour)
 
 /area/proc/play_ambience(var/mob/living/L)
 	// Ambience goes down here -- make sure to list each area seperately for ease of adding things in later, thanks! Note: areas adjacent to each other should have the same sounds to prevent cutoff when possible.- LastyScratch

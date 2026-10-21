@@ -8,6 +8,7 @@
 
 	station_levels = list(1,2,3)
 	admin_levels = list(4)
+	atmos_isolated_z_levels = list(4)
 	contact_levels = list(1,2,3)
 	player_levels = list(1,2,3,5)
 	accessible_z_levels = list("1"=1,"2"=1,"3"=1,"5"=90) //Percentage of chance to get on this or that Z level as you drift through space.

@@ -130,6 +130,11 @@ SUBSYSTEM_DEF(air)
 /datum/controller/subsystem/air/Initialize(timeofday, simulate = TRUE)
 
 	var/starttime = REALTIMEOFDAY
+	message_admins("Building atmospheric subareas...")
+	for(var/turf/simulated/seed)
+		build_atmos_subarea(seed, initializing = TRUE)
+		CHECK_TICK
+
 	message_admins("Processing Geometry...")
 
 	var/simulated_turf_count = 0
@@ -299,6 +304,8 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	return ablock | .
 
 /datum/controller/subsystem/air/proc/merge(zone/A, zone/B)
+	if(A.owner != B.owner)
+		return
 	#ifdef ZASDBG
 	ASSERT(istype(A))
 	ASSERT(istype(B))
@@ -312,6 +319,44 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	else
 		B.c_merge(A)
 		mark_zone_update(A)
+
+/datum/controller/subsystem/air/proc/build_atmos_subarea(turf/simulated/seed, initializing = FALSE)
+	if(TURF_HAS_VALID_ZONE(seed) || is_space_turf(seed))
+		return
+	var/seed_block = seed.c_airblock(seed)
+	if((seed_block & AIR_BLOCKED) && ((seed.blocks_air & AIR_BLOCKED) || !(locate(/obj/machinery/door) in seed)))
+		return
+	var/area/owner = get_area(seed)
+	var/zone/subarea = new /zone(owner)
+	subarea.add(seed)
+	if(seed_block & AIR_BLOCKED)
+		return subarea
+	var/list/pending = list(seed)
+	#ifdef MULTIZAS
+	var/list/directions = GLOB.cardinalz
+	#else
+	var/list/directions = GLOB.cardinal
+	#endif
+	while(pending.len)
+		var/turf/simulated/current = pending[pending.len]
+		pending.len--
+		if(!(current.c_airblock(current) & ZONE_BLOCKED))
+			for(var/direction in directions)
+				var/turf/simulated/neighbour = get_zstep(current, direction)
+				if(!istype(neighbour) || get_area(neighbour) != owner || TURF_HAS_VALID_ZONE(neighbour))
+					continue
+				if(neighbour.c_airblock(neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
+					continue
+				if(air_blocked(current, neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
+					continue
+				subarea.add(neighbour)
+				pending += neighbour
+		if(initializing)
+			CHECK_TICK
+	return subarea
+
+/datum/controller/subsystem/air/proc/is_space_turf(turf/T)
+	return !istype(T, /turf/simulated) || isspace(get_area(T))
 
 /datum/controller/subsystem/air/proc/connect(turf/simulated/A, turf/simulated/B)
 	#ifdef ZASDBG
@@ -327,11 +372,10 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	if(block & AIR_BLOCKED) return
 
 	var/direct = !(block & ZONE_BLOCKED)
-	var/space = !istype(B)
+	var/space = is_space_turf(B)
 
 	if(!space)
-		if((direct || min(A.zone.contents.len, B.zone.contents.len) < ZONE_MIN_SIZE) && (equivalent_pressure(A.zone,B.zone) || times_fired == 0))
-			merge(A.zone,B.zone)
+		if(!TURF_HAS_VALID_ZONE(B) || A.zone == B.zone)
 			return
 
 	var/a_to_b = get_dir(A,B)
@@ -354,6 +398,28 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	B.connections.place(c, b_to_a)
 
 	if(direct) c.mark_direct()
+
+/datum/controller/subsystem/air/proc/update_atmos_geometry(turf/changed)
+	var/list/affected = list(changed)
+	#ifdef MULTIZAS
+	var/list/directions = GLOB.cardinalz
+	#else
+	var/list/directions = GLOB.cardinal
+	#endif
+	for(var/direction in directions)
+		var/turf/neighbour = get_zstep(changed, direction)
+		if(!neighbour)
+			continue
+		if(neighbour.z != changed.z && !AreAtmosZLevelsConnected(changed.z, neighbour.z))
+			continue
+		affected += neighbour
+	for(var/turf/simulated/simulated_turf in affected)
+		if(TURF_HAS_VALID_ZONE(simulated_turf))
+			simulated_turf.zone.rebuild()
+	for(var/turf/affected_turf in affected)
+		if(affected_turf.connections)
+			affected_turf.connections.erase_all()
+		mark_for_update(affected_turf)
 
 /datum/controller/subsystem/air/proc/mark_for_update(turf/T)
 	#ifdef ZASDBG

@@ -679,21 +679,19 @@ default behaviour is:
 
 	if(staminaloss && !combat_mode)//If we're not doing anything, we're not in combat mode, and we've lost stamina we can wait to gain it back.
 		if(lying)
-			adjustStaminaLoss(-5)
+			adjustStaminaLoss(-3)
 		else
-			adjustStaminaLoss(-1)
+			adjustStaminaLoss(-2)
 
 	var/is_sprinting = FALSE
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		is_sprinting = H.sprinting
 
-	if(!is_sprinting && m_intent == "run" && staminaloss < 50)
-		adjustStaminaLoss(1, TRUE)
-	else if(!is_sprinting)
-		adjustStaminaLoss(-2)
+	if(is_sprinting)
+		adjustStaminaLoss(2)
 
-	if(staminaloss >= STAMINA_EXHAUST && !stat)//Oh shit we've lost too much stamina and now we're tired!
+	if(staminaloss >= (ishuman(src) ? 120 : STAMINA_EXHAUST) && !stat)//Oh shit we've lost too much stamina and now we're tired!
 		Exhaust()
 		return
 
@@ -707,9 +705,8 @@ default behaviour is:
 
 	if(gaspsound)
 		playsound(src, gaspsound, 25, 0, 1)
-	if(!statcheck(stats[STAT_HT],15,"I'm too tired to keep going.","con"))
-		Weaken(5)
-	setStaminaLoss(185)  //Give them a bit of stamina back to avoid calling this multiple times
+	Weaken(10)
+	setStaminaLoss(ishuman(src) ? 100 : 185)
 
 
 /mob/living/verb/resist()

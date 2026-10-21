@@ -78,6 +78,14 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 /area/space/update_icon()
 	return
 
+/area/external
+	parent_type = /area/space
+	name = "External"
+	always_unpowered = 0
+	power_light = 1
+	power_equip = 1
+	power_environ = 1
+
 area/space/atmosalert()
 	return
 

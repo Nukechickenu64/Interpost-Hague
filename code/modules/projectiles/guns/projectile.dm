@@ -62,14 +62,6 @@
 	update_icon()
 
 /obj/item/weapon/gun/projectile/consume_next_projectile()
-	if(!is_jammed && prob(jam_chance))
-		if(!has_jammed)  //If we just unjammed, don't jam again
-			if(loaded.len)
-				playsound(src.loc, 'sound/effects/jam.ogg', 50, 1)
-				src.visible_message("<span class='danger'>\The [src] jams!</span>")
-				is_jammed = 1
-				has_jammed = TRUE
-
 	if(is_jammed)  //
 		return null
 

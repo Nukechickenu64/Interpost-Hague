@@ -426,6 +426,7 @@ This function restores all organs.
 			created_wound = organ.take_external_damage(0, damage, damage_flags, used_weapon)
 		if(PAIN)
 			organ.adjust_pain(damage)
+			react_to_damage_pain(organ, damage)
 		if(CLONE)
 			organ.add_genetic_damage(damage)
 
@@ -433,15 +434,10 @@ This function restores all organs.
 	updatehealth()
 	BITSET(hud_updateflag, HEALTH_HUD)
 
-	// Flash pain on significant first-impact hits (brute/burn) if conscious and can feel pain
 	if(!significant_hit)
 		return created_wound
 	if(!(damagetype in list(BRUTE, BURN)))
 		return created_wound
-	if(can_feel_pain() && stat == CONSCIOUS)
-		// Use organ damage + severity to decide flash intensity
-		var/flash_power = round(damage)
-		custom_pain("I reel from the sudden pain!", flash_power, force = TRUE, affecting = organ, flash_pain = flash_power)
 
 	// If the head was struck hard enough AND brain took notable damage, knock out.
 	if(head_trauma && brain_ref)

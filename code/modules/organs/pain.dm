@@ -20,7 +20,7 @@ mob/var/next_pain_time = 0
 // message is the custom message to be displayed
 // power decides how much painkillers will stop the message
 // force means it ignores anti-spam timer
-/mob/living/carbon/proc/custom_pain(var/message, var/power, var/force, var/obj/item/organ/external/affecting, var/nohalloss, var/flash_pain)
+/mob/living/carbon/proc/custom_pain(var/message, var/power, var/force, var/obj/item/organ/external/affecting, var/nohalloss, var/flash_pain, var/feedback_only = FALSE)
 	if(stat || !can_feel_pain() || chem_effects[CE_PAINKILLER] > power)//!message
 		return 0
 
@@ -30,7 +30,8 @@ mob/var/next_pain_time = 0
 	if(!nohalloss && (power || flash_pain))//Flash pain is so that handle_pain actually makes use of this proc to flash pain.
 		var/actual_flash
 		if(affecting)
-			affecting.adjust_pain(ceil(power/2))
+			if(!feedback_only)
+				affecting.adjust_pain(ceil(power/2))
 			if(power > flash_pain)
 				actual_flash = power
 			else
@@ -72,7 +73,7 @@ mob/var/next_pain_time = 0
 					add_event("pain", /datum/happiness_event/pain)
 					remove_all_pain()
 					set_all_pain_extreme()
-		else
+		else if(!feedback_only)
 			adjustHalLoss(ceil(power/2))
 
 	// Anti message spam checks
@@ -83,6 +84,11 @@ mob/var/next_pain_time = 0
 		else
 			to_chat(src, "<b>[message]</b>")
 	next_pain_time = world.time + (100-power)
+
+/mob/living/carbon/human/proc/react_to_damage_pain(var/obj/item/organ/external/affecting, var/damage)
+	if(damage <= 0 || !affecting || !can_feel_pain(affecting))
+		return
+	custom_pain("My [affecting.name] hurts!", damage, affecting = affecting, flash_pain = damage, feedback_only = TRUE)
 
 /mob/living/carbon/human/proc/handle_pain()
 	if(stat)

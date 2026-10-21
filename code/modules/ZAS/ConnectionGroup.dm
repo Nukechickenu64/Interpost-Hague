@@ -61,6 +61,7 @@ Class Procs:
 
 /connection_edge/var/coefficient = 0
 /connection_edge/var/list/airflow_connections = list()
+/connection_edge/var/next_air_transfer_effect = 0
 
 /connection_edge/New()
 	CRASH("Cannot make connection edge without specifications.")
@@ -96,6 +97,19 @@ Class Procs:
 	if(!SSair.times_fired)
 		return
 	var/mole_delta = A.air.get_tile_moles() - other.get_tile_moles()
+	if(abs(mole_delta) >= PRESSURE_TO_MOLES(0.5) && world.time >= next_air_transfer_effect && airflow_connections.len)
+		var/connection/visible_opening = pick(airflow_connections)
+		if(visible_opening.valid() && !(SSair.air_blocked(visible_opening.A, visible_opening.B) & AIR_BLOCKED))
+			var/turf/simulated/our_side = visible_opening.A
+			var/turf/their_side = visible_opening.B
+			if(our_side.zone != A)
+				our_side = visible_opening.B
+				their_side = visible_opening.A
+			var/turf/source = mole_delta > 0 ? our_side : their_side
+			var/turf/destination = mole_delta > 0 ? their_side : our_side
+			new /obj/effect/temp_visual/air_transfer(source, source, destination)
+			new /obj/effect/temp_visual/air_transfer(destination, source, destination)
+			next_air_transfer_effect = world.time + 1 SECOND
 	var/strength = abs(mole_delta) * R_IDEAL_GAS_EQUATION * T20C / CELL_VOLUME / ONE_ATMOSPHERE * 100
 	if(strength < min(vsc.airflow_lightest_pressure, vsc.airflow_stun_pressure))
 		return
@@ -164,12 +178,7 @@ Class Procs:
 	var/equiv = A.air.share_ratio(B.air, coefficient, transfer_ratio = 1)
 
 	if(equiv)
-		if(direct)
-			erase()
-			SSair.merge(A, B)
-			return
-		else
-			SSair.mark_edge_sleeping(src)
+		SSair.mark_edge_sleeping(src)
 
 	SSair.mark_zone_update(A)
 	SSair.mark_zone_update(B)
