@@ -49,14 +49,6 @@
 
 #define GEAR_EVA 15
 
-//Note that you have to specify each subspecies individually. Shouldn't be a big deal.
-/var/list/economic_species_modifier = list(
-												/datum/species/human             = 10,
-												/datum/species/human/gravworlder = 10,
-												/datum/species/human/spacer      = 10,
-												/datum/species/human/vatgrown    = 10 //now lore-friendly,
-											)
-
 //---- The following corporations are friendly with NanoTrasen and loosely enable trade and travel:
 //Corporation NanoTrasen - Generalised / high tech research and phoron exploitation.
 //Corporation Vessel Contracting - Ship and station construction, materials research.
@@ -74,9 +66,3 @@
 //Destroyers are medium sized vessels, often used for escorting larger ships but able to go toe-to-toe with them if need be.
 //Frigates are medium sized vessels, often used for escorting larger ships. They will rapidly find themselves outclassed if forced to face heavy warships head on.
 
-var/global/datum/money_account/vendor_account
-var/global/datum/money_account/station_account
-var/global/list/datum/money_account/department_accounts = list()
-var/global/num_financial_terminals = 1
-var/global/next_account_number = 0
-var/global/list/all_money_accounts = list()

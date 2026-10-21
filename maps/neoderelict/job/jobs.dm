@@ -35,7 +35,6 @@
 	spawn_positions = -1
 	supervisors = "absolutely everyone"
 	selection_color = "#515151"
-	economic_modifier = 1
 	access = list()			//See /datum/job/assistant/get_access()
 	minimal_access = list()	//See /datum/job/assistant/get_access()
 	alt_titles = list("Technical Assistant","Medical Intern","Research Assistant","Visitor")
@@ -92,7 +91,6 @@
 	access = list() 			//See get_access()
 	minimal_access = list() 	//See get_access()
 	minimal_player_age = 14
-	economic_modifier = 20
 	outfit_type = /decl/hierarchy/outfit/job/captain
 
 	equip(var/mob/living/carbon/human/H)
@@ -132,7 +130,6 @@
 	spawn_positions = 1
 	supervisors = "the chief medical officer"
 	selection_color = "#013d3b"
-	economic_modifier = 5
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology, access_genetics)
 	minimal_access = list(access_medical, access_medical_equip, access_chemistry)
 	outfit_type = /decl/hierarchy/outfit/job/medical/chemist
@@ -187,7 +184,6 @@
 	supervisors = "the captain"
 	selection_color = "#7f6e2c"
 	req_admin_notify = 1
-	economic_modifier = 10
 	minimal_access = list(access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels,
 			            access_teleporter, access_external_airlocks, access_atmospherics, access_emergency_storage, access_eva,
 			            access_heads, access_construction, access_sec_doors,
@@ -209,7 +205,6 @@
 	supervisors = "the head of security"
 	selection_color = "#601c1c"
 	alt_titles = list("Forensic Technician" = /decl/hierarchy/outfit/job/security/detective/forensic)
-	economic_modifier = 5
 	minimal_access = list(access_brig, access_security, access_sec_doors, access_forensics_lockers, access_morgue, access_maint_tunnels)
 	outfit_type = /decl/hierarchy/outfit/job/security/detective
 
@@ -227,7 +222,6 @@
 	spawn_positions = 7
 	supervisors = "the chief engineer"
 	selection_color = "#5b4d20"
-	economic_modifier = 5
 	minimal_player_age = 7
 	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage)
 	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage)
@@ -250,7 +244,6 @@
 	selection_color = "#2f2f7f"
 	req_admin_notify = 1
 	minimal_player_age = 14
-	economic_modifier = 10
 	ideal_character_age = 50
 	minimal_access = list(access_security, access_sec_doors, access_brig, access_forensics_lockers,
 			            access_medical, access_engine, access_change_ids, access_ai_upload, access_eva, access_heads,
@@ -276,7 +269,6 @@
 	supervisors = "the captain"
 	selection_color = "#8e2929"
 	req_admin_notify = 1
-	economic_modifier = 10
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory,
 			            access_forensics_lockers, access_morgue, access_maint_tunnels, access_all_personal_lockers,
 			            access_research, access_engine, access_mining, access_medical, access_construction, access_mailsorting,
@@ -335,7 +327,6 @@
 	spawn_positions = 2
 	supervisors = "the chief medical officer"
 	selection_color = "#013d3b"
-	economic_modifier = 7
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology, access_genetics)
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_virology)
 	outfit_type = /decl/hierarchy/outfit/job/medical/doctor
@@ -353,7 +344,6 @@
 	spawn_positions = 1
 	supervisors = "the chief medical officer"
 	selection_color = "#013d3b"
-	economic_modifier = 4
 	minimal_player_age = 7
 	access = list(access_medical, access_medical_equip, access_morgue, access_surgery, access_chemistry, access_virology, access_eva, access_maint_tunnels, access_external_airlocks, access_psychiatrist)
 	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_eva, access_maint_tunnels, access_external_airlocks)
@@ -372,7 +362,6 @@
 	spawn_positions = 1
 	supervisors = "the head of personnel"
 	selection_color = "#515151"
-	economic_modifier = 5
 	access = list(access_maint_tunnels, access_mailsorting, access_cargo, access_cargo_bot, access_qm, access_mining, access_mining_station)
 	minimal_access = list(access_maint_tunnels, access_mailsorting, access_cargo, access_cargo_bot, access_qm, access_mining, access_mining_station)
 	minimal_player_age = 3
@@ -391,7 +380,6 @@
 	spawn_positions = 1
 	supervisors = "research director"
 	selection_color = "#633d63"
-	economic_modifier = 5
 	minimal_access = list(access_robotics, access_tech_storage, access_morgue, access_research)
 	minimal_player_age = 3
 	outfit_type = /decl/hierarchy/outfit/job/science/roboticist
@@ -409,7 +397,6 @@
 	spawn_positions = 4
 	supervisors = "the head of security"
 	selection_color = "#601c1c"
-	economic_modifier = 4
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_morgue, access_external_airlocks)
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_external_airlocks)
 	minimal_player_age = 7
@@ -428,7 +415,6 @@
 	spawn_positions = 3
 	supervisors = "the quartermaster and the head of personnel"
 	selection_color = "#515151"
-	economic_modifier = 5
 	access = list(access_maint_tunnels, access_mailsorting, access_cargo, access_cargo_bot, access_qm, access_mining, access_mining_station)
 	minimal_access = list(access_mining, access_mining_station, access_mailsorting)
 	outfit_type = /decl/hierarchy/outfit/job/cargo/mining
@@ -446,7 +432,6 @@
 	spawn_positions = 2
 	supervisors = "the research director"
 	selection_color = "#633d63"
-	economic_modifier = 7
 	minimal_access = list(access_tox, access_tox_storage, access_research, access_xenoarch)
 	minimal_player_age = 7
 	outfit_type = /decl/hierarchy/outfit/job/science/scientist
@@ -465,7 +450,6 @@
 	spawn_positions = 1
 	supervisors = "the head of security"
 	selection_color = "#601c1c"
-	economic_modifier = 5
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory, access_maint_tunnels, access_morgue, access_external_airlocks)
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory, access_maint_tunnels, access_external_airlocks)
 	minimal_player_age = 7
@@ -485,7 +469,6 @@
 	spawn_positions = 2
 	supervisors = "the research director"
 	selection_color = "#633d63"
-	economic_modifier = 7
 	access = list(access_robotics, access_tox, access_tox_storage, access_research, access_xenobiology, access_hydroponics)
 	minimal_access = list(access_research, access_xenobiology, access_hydroponics)
 	alt_titles = list("Xenobotanist")

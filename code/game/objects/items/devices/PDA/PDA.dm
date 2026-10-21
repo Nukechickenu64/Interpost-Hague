@@ -66,7 +66,6 @@ var/global/list/pico8_cart_library = list(
 	var/obj/item/card/id/id = null //Making it possible to slot an ID card into the PDA so it can function as both.
 	var/ownjob = null //related to above - this is assignment (potentially alt title)
 	var/ownrank = null // this one is rank, never alt title
-	var/datum/money_account/authenticated_account = null // Bank session opened from the ID in the slot.
 
 	var/obj/item/device/paicard/pai = null	// A slot for a personal AI device
 
@@ -410,15 +409,6 @@ var/global/list/pico8_cart_library = list(
 
 	data["idInserted"] = (id ? 1 : 0)
 	data["idLink"] = id ? "[id.registered_name || "Unnamed ID"][id.assignment ? ", [id.assignment]" : ""]" : "Insert ID"
-	data["balance"] = null
-	data["balanceStatus"] = id ? "Unavailable" : "No ID"
-	if(id && id.associated_account_number)
-		// Respect accounts that require a PIN; this readout is not a bank login.
-		var/datum/money_account/account = attempt_account_access(id.associated_account_number, null, 0)
-		if(account && !account.suspended)
-			data["balance"] = account.money
-		else
-			data["balanceStatus"] = "Locked"
 
 	data["cart_loaded"] = cartridge ? 1:0
 	if(cartridge)
@@ -456,7 +446,6 @@ var/global/list/pico8_cart_library = list(
 			cartdata["charges"] = cartridge.charges ? cartridge.charges : 0
 		data["cartridge"] = cartdata
 
-	data["bank"] = get_bank_ui_data(id)
 
 	data["stationTime"] = stationtime2text()
 	data["new_Message"] = new_message
@@ -675,12 +664,6 @@ var/global/list/pico8_cart_library = list(
 		if("UpdateInfo")
 			if(id)
 				set_rank_job(id.rank, id.assignment)
-		if("BankLogin")
-			bank_login_topic(U)
-		if("BankLogout")
-			if(authenticated_account)
-				to_chat(U, "<span class='notice'>\The [src] logs you out of account #[authenticated_account.account_number].</span>")
-				authenticated_account = null
 		if("Eject")//Ejects the cart, only done from hub.
 			verb_remove_cartridge()
 
@@ -1066,8 +1049,6 @@ var/global/list/pico8_cart_library = list(
 		else
 			id.loc = get_turf(src)
 		id = null
-		if(authenticated_account)
-			authenticated_account = null
 		SSnano.update_uis(src)
 
 /obj/item/device/pda/AltClick()
@@ -1290,73 +1271,6 @@ var/global/list/pico8_cart_library = list(
 	else
 		to_chat(usr, "<span class='notice'>You cannot do this while restrained.</span>")
 
-/obj/item/device/pda/proc/get_bank_ui_data(var/obj/item/card/id/id_card)
-	var/list/bank = list("canBankUse" = 0, "status" = "", "balance" = null, "loggedIn" = 0, "accountName" = null)
-	if(!istype(id_card))
-		bank["status"] = "No ID"
-		return bank
-	if(!id_card.associated_account_number)
-		bank["status"] = "No account"
-		return bank
-	// The PDA can open a session on minimum (0) and moderate (1) security accounts;
-	// moderate security demands a PIN at login time, handled in bank_login_topic().
-	var/datum/money_account/account = get_account(id_card.associated_account_number)
-	if(!account || account.suspended || account.security_level > 1)
-		bank["status"] = account ? "Locked" : "No account"
-		return bank // A locked terminal cannot start a session.
-	bank["canBankUse"] = 1
-	bank["status"] = "Ready"
-	if(authenticated_account)
-		var/datum/money_account/d = authenticated_account
-		bank["loggedIn"] = 1
-		bank["accountName"] = "[d.owner_name] #[d.account_number]"
-		bank["balance"] = d.money
-	return bank
-
-// Try to reach the bank from a PDA with an ID in the slot. Requires the ID's linked
-// account and, for accounts that need a PIN to transfer, also the account's PIN.
-/obj/item/device/pda/proc/bank_login_topic(var/mob/user)
-	if(!istype(user))
-		return
-	if(!istype(id))
-		to_chat(user, "<span class='warning'>Insert an ID card linked to a bank account first.</span>")
-		return
-	if(!id.associated_account_number)
-		to_chat(user, "<span class='warning'>\The [id] is not linked to a bank account.</span>")
-		return
-	var/datum/money_account/registered = get_account(id.associated_account_number)
-	if(!registered)
-		to_chat(user, "<span class='warning'>There is no bank account associated with \the [id].</span>")
-		return
-	if(registered.suspended)
-		to_chat(user, "<span class='warning'>Access to this account has been suspended, and the funds within frozen.</span>")
-		return
-	if(registered.security_level > 1)
-		to_chat(user, "<span class='warning'>This account may only be accessed from a physical banking terminal.</span>")
-		return
-
-	// The ID readout only needs the account number; an account needing a PIN demands it here.
-	var/tried_pin = null
-	if(registered.security_level == 1)
-		tried_pin = input(user, "Enter account PIN", "PDA banking") as null|num
-		if(isnull(tried_pin))
-			return
-	var/datum/money_account/attempt = attempt_account_access(id.associated_account_number, tried_pin, 2)
-	if(!attempt)
-		to_chat(user, "<span class='warning'>\The [src] flashes: Incorrect credentials.</span>")
-		playsound(loc, 'sound/machines/buzz-sigh.ogg', 50, 1)
-		return
-	if(attempt.suspended)
-		to_chat(user, "<span class='warning'>Access to this account has been suspended, and the funds within frozen.</span>")
-		return
-
-	authenticated_account = attempt
-	to_chat(user, "<span class='notice'>\The [src] connects you to account #[attempt.account_number] ([attempt.owner_name]).</span>")
-	playsound(loc, 'sound/machines/twobeep.ogg', 50, 1)
-	// Let the bank know it was access, not a transfer of funds.
-	var/datum/transaction/T = new(attempt.owner_name, "Remote terminal access", 0, "[owner] PDA")
-	attempt.do_transaction(T)
-
 /obj/item/device/pda/proc/prompt_registration_name(mob/user, suggested_name)
 	return input(user, "What name should this PDA register as?", "PDA registration", suggested_name) as null|text
 
@@ -1397,9 +1311,6 @@ var/global/list/pico8_cart_library = list(
 	id = card
 	if(old_id)
 		user.put_in_hands(old_id)
-	// A new card means a new (empty) bank session, if any.
-	if(authenticated_account)
-		authenticated_account = null
 	// Registration changes the PDA's display identity, never the card's identity or access.
 	set_owner_rank_job(registration_name, card.rank, card.assignment)
 	to_chat(user, "<span class='notice'>You put the ID into \the [src]'s slot.</span>")

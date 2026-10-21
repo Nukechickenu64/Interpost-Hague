@@ -174,6 +174,7 @@
 	// The 64px art is centered on its solid base tile; leave space above and beside mapped vats.
 	pixel_x = -16
 	layer = STRUCTURE_LAYER
+	appearance_flags = KEEP_TOGETHER|TILE_BOUND|LONG_GLIDE
 	density = TRUE
 	anchored = TRUE
 	obj_flags = OBJ_FLAG_ANCHORABLE
@@ -238,11 +239,12 @@
 		return FALSE
 	water_supply = supply
 	stage = BIOMASS_VAT_FILLING
-	work_left = 10 SECONDS
+	work_left = 1.2 SECONDS
 	last_process = world.time
 	update_use_power(POWER_USE_ACTIVE)
 	update_icon()
 	flick("vat_filling", src)
+	addtimer(CALLBACK(src, /datum/proc/Process), work_left)
 	return TRUE
 
 /obj/machinery/biomass_vat/Process()
@@ -729,24 +731,21 @@
 	icon_state = "nutri"
 	icon_deny = "nutri-deny"
 	icon_vend = "nutri-vend"
-	products = list(/obj/item/hydroponics_supply/yeast = 40, /obj/item/hydroponics_supply/glig = 40, /obj/item/hydroponics_supply/skimmer = 4)
+	products = list(/obj/item/hydroponics_supply/yeast, /obj/item/hydroponics_supply/glig, /obj/item/hydroponics_supply/skimmer)
 
 /decl/hierarchy/supply_pack/hydroponics/vat_supplies
 	name = "Biomass vat cultures and skimmers"
 	contains = list(/obj/item/hydroponics_supply/yeast = 12, /obj/item/hydroponics_supply/glig = 12, /obj/item/hydroponics_supply/skimmer = 2)
-	cost = 15
 	containername = "biomass culture crate"
 
 /decl/hierarchy/supply_pack/hydroponics/vat_equipment
 	name = "Biomass vat equipment"
 	contains = list(/obj/machinery/biomass_vat, /obj/machinery/computer/hydroponics, /obj/machinery/biomass_press)
-	cost = 60
 	containertype = /obj/structure/closet/crate/large/hydroponics
 	containername = "biomass equipment crate"
 
 /decl/hierarchy/supply_pack/hydroponics/food_processor
 	name = "Biomass food processor"
 	contains = list(/obj/machinery/biomass_press/food_processor)
-	cost = 30
 	containertype = /obj/structure/closet/crate/large/hydroponics
 	containername = "food processor crate"

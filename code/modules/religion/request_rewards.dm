@@ -70,18 +70,6 @@
 /datum/reward/proc/do_reward()
 	to_world("You should not be seeing this!")
 
-/datum/reward/money
-	name = "Money" //LOADSA EMONE
-	message="You have been graced with a bonus!"
-
-/datum/reward/money/do_reward(var/mob/living/target)
-	for(var/datum/money_account/acounts in all_money_accounts)
-		if(acounts.owner_name == target.name)
-			var/datum/transaction/T = new("[target.religion]", "Request fufilled", 1000)
-			to_chat(target, message)
-			playsound(target, 'sound/effects/phone_ring.ogg', 25, 1, -1)
-			acounts.do_transaction(T)
-
 /datum/reward/happiness/
 	name = "Happiness"
 	message="You feel a soothing calm settle on your soul."
@@ -110,19 +98,6 @@
 
 datum/punishment/proc/do_punishment()
 	to_world("You should not be seeing this!")
-
-datum/punishment/money
-	name = "Money" //LOADSA EMONE
-	message="Your wages have been garnished..."
-
-datum/punishment/money/do_punishment(var/mob/living/target)
-	for(var/datum/money_account/acounts in all_money_accounts)
-		if(acounts.owner_name == target.name)
-			var/datum/transaction/T = new("[target.religion]", "Request failed", -1000)
-			to_chat(target, message)
-			var/L = target.loc
-			playsound(L, 'sound/effects/phone_ring.ogg', 50, 1, -1)
-			acounts.do_transaction(T)
 
 datum/punishment/happiness/
 	name = "Happiness"

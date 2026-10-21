@@ -28,10 +28,10 @@
 			/obj/item/reagent_containers/glass/bottle/left4zed = 120,
 			/obj/item/reagent_containers/glass/bottle/robustharvest = 120),
 		"Leather" = list(
-			/obj/item/storage/wallet/leather = 100,
+			/obj/item/storage/card_holder/leather = 100,
 			/obj/item/storage/belt/utility = 300,
 			/obj/item/storage/backpack/satchel = 400,
-			/obj/item/storage/bag/cash = 400,
+			/obj/item/storage/bag/tokens = 400,
 			/obj/item/clothing/shoes/workboots = 400,
 			/obj/item/clothing/shoes/leather = 400,
 			/obj/item/clothing/shoes/dress = 400,

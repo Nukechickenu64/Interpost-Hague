@@ -100,7 +100,7 @@ GLOBAL_DATUM_INIT(raiders, /datum/antagonist/raider, new)
 		)
 
 /datum/antagonist/raider/update_access(var/mob/living/player)
-	for(var/obj/item/storage/wallet/W in player.contents)
+	for(var/obj/item/storage/card_holder/W in player.contents)
 		for(var/obj/item/card/id/id in W.contents)
 			id.SetName("[player.real_name]'s Passport")
 			id.registered_name = player.real_name
@@ -221,10 +221,9 @@ GLOBAL_DATUM_INIT(raiders, /datum/antagonist/raider, new)
 	var/obj/item/card/id/id = create_id("Visitor", player, equip = 0)
 	id.SetName("[player.real_name]'s Passport")
 	id.assignment = "Visitor"
-	var/obj/item/storage/wallet/W = new(player)
+	var/obj/item/storage/card_holder/W = new(player)
 	W.handle_item_insertion(id)
 	player.equip_to_slot_or_del(W, slot_wear_id)
-	spawn_money(rand(50,150)*10,W)
 	create_radio(RAID_FREQ, player)
 
 	return 1

@@ -101,9 +101,6 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 	var/away_site_budget = 0
 
 	//Economy stuff
-	var/starting_money = 75000		//Money in station account
-	var/department_money = 5000		//Money in department accounts
-	var/salary_modifier	= 1			//Multiplier to starting character money
 	var/station_departments = list()//Gets filled automatically depending on jobs allowed
 
 	//Factions prefs stuff
@@ -264,7 +261,7 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 	return pick(empty_levels)
 
 
-/datum/map/proc/setup_economy()
+/datum/map/proc/setup_news()
 	news_network.CreateFeedChannel("Nyx Daily", "SolGov Minister of Information", 1, 1)
 	news_network.CreateFeedChannel("The Gibson Gazette", "Editor Mike Hammers", 1, 1)
 
@@ -273,18 +270,10 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 		weighted_randomevent_locations[D] = D.viable_random_events.len
 		weighted_mundaneevent_locations[D] = D.viable_mundane_events.len
 
-	if(!station_account)
-		station_account = create_account("[station_name()] Primary Account", starting_money)
-
 	for(var/job in allowed_jobs)
 		var/datum/job/J = decls_repository.get_decl(job)
 		if(J.department)
 			station_departments |= J.department
-	for(var/department in station_departments)
-		department_accounts[department] = create_account("[department] Account", department_money)
-
-	department_accounts["Vendor"] = create_account("Vendor Account", 0)
-	vendor_account = department_accounts["Vendor"]
 
 /datum/map/proc/map_info(var/client/victim)
 	return

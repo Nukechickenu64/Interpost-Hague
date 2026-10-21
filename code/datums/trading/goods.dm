@@ -2,7 +2,7 @@
 	name = "Toy Shop Employee"
 	name_language = TRADER_DEFAULT_NAME
 	origin = "Toy Shop"
-	trade_flags = TRADER_GOODS|TRADER_MONEY|TRADER_WANTED_ONLY
+	trade_flags = TRADER_GOODS|TRADER_WANTED_ONLY
 	possible_origins = list("Toys R Ours", "LEGS GO", "Kay-Cee Toys", "Build-a-Cat", "Magic Box", "The Positronic's Dungeon and Baseball Card Shop")
 	speech = list("hail_generic"    = "Uhh... hello? Welcome to ORIGIN, I hope you have a, uhh.... good shopping trip.",
 				"hail_deny"         = "Nah, you're not allowed here. At all",
@@ -281,7 +281,7 @@ Sells devices, odds and ends, and medical stuff
 /datum/trader/xeno_shop
 	name = "Xenolife Collector"
 	origin = "CSV Not a Poacher"
-	trade_flags = TRADER_GOODS|TRADER_MONEY|TRADER_WANTED_ONLY|TRADER_WANTED_ALL
+	trade_flags = TRADER_GOODS|TRADER_WANTED_ONLY|TRADER_WANTED_ALL
 	possible_origins = list("XenoHugs","NT Specimen Acquisition","Lonely Pete's Exotic Companionship","Space Wei's Exotic Cuisine")
 	speech = list("hail_generic"    = "Welcome! We are always looking to acquire more exotic life forms.",
 				"hail_deny"         = "We no longer wish to speak to you. Please contact our legal representative if you wish to rectify this.",
@@ -315,7 +315,7 @@ Sells devices, odds and ends, and medical stuff
 /datum/trader/medical
 	name = "Medical Supplier"
 	origin = "Infirmary of CSV Iniquity"
-	trade_flags = TRADER_GOODS|TRADER_MONEY|TRADER_WANTED_ONLY
+	trade_flags = TRADER_GOODS|TRADER_WANTED_ONLY
 	want_multiplier = 1.2
 	margin = 2
 	possible_origins = list("Dr.Krieger's Practice", "Legit Medical Supplies (No Refund)", "Mom's & Pop's Addictive Opoids", "Legitimate Pharmaceutical Firm", "Designer Drugs by Lil Xanny")
@@ -370,7 +370,7 @@ Sells devices, odds and ends, and medical stuff
 /datum/trader/mining
 	name = "Rock'n'Drill Mining Inc"
 	origin = "Automated Smelter AH-532"
-	trade_flags = TRADER_GOODS|TRADER_MONEY|TRADER_WANTED_ONLY|TRADER_WANTED_ALL
+	trade_flags = TRADER_GOODS|TRADER_WANTED_ONLY|TRADER_WANTED_ALL
 	want_multiplier = 1.5
 	margin = 2
 	possible_origins = list("Automated Smelter AH-532", "CMV Locust", "The Galactic Foundry Company", "Crucible LLC")

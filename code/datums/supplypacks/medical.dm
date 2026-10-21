@@ -14,38 +14,32 @@
 					/obj/item/reagent_containers/glass/bottle/stoxin,
 					/obj/item/storage/box/syringes,
 					/obj/item/storage/box/autoinjectors)
-	cost = 10
 	containername = "\improper Medical crate"
 
 /decl/hierarchy/supply_pack/medical/bloodpack
 	name = "Blood pack crate"
 	contains = list(/obj/item/storage/box/bloodpacks = 3)
-	cost = 10
 	containername = "\improper Blood pack crate"
 
 /decl/hierarchy/supply_pack/medical/blood
 	name = "Nanoblood crate"
 	contains = list(/obj/item/reagent_containers/ivbag/nanoblood = 4)
-	cost = 15
 	containername = "\improper Nanoblood crate"
 
 /decl/hierarchy/supply_pack/medical/bodybag
 	name = "Body bag crate"
 	contains = list(/obj/item/storage/box/bodybags = 3)
-	cost = 10
 	containername = "\improper Body bag crate"
 
 /decl/hierarchy/supply_pack/medical/cryobag
 	name = "Stasis bag crate"
 	contains = list(/obj/item/bodybag/cryobag = 3)
-	cost = 50
 	containername = "\improper Stasis bag crate"
 
 /decl/hierarchy/supply_pack/medical/medicalextragear
 	name = "Medical surplus equipment"
 	contains = list(/obj/item/storage/belt/medical = 3,
 					/obj/item/clothing/glasses/hud/health = 3)
-	cost = 15
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Medical surplus equipment"
 	access = access_medical
@@ -67,7 +61,6 @@
 					/obj/item/device/healthanalyzer,
 					/obj/item/device/flashlight/pen,
 					/obj/item/reagent_containers/syringe)
-	cost = 60
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Chief medical officer equipment"
 	access = access_cmo
@@ -88,7 +81,6 @@
 					/obj/item/device/healthanalyzer,
 					/obj/item/device/flashlight/pen,
 					/obj/item/reagent_containers/syringe)
-	cost = 20
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Medical Doctor equipment"
 	access = access_medical_equip
@@ -109,7 +101,6 @@
 					/obj/item/device/healthanalyzer,
 					/obj/item/storage/box/pillbottles,
 					/obj/item/reagent_containers/syringe)
-	cost = 15
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Chemist equipment"
 	access = access_chemistry
@@ -134,7 +125,6 @@
 					/obj/item/device/flashlight/pen,
 					/obj/item/reagent_containers/syringe,
 					/obj/item/clothing/accessory/storage/white_vest)
-	cost = 20
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Paramedic equipment"
 	access = access_medical_equip
@@ -151,7 +141,6 @@
 					/obj/item/folder/white,
 					/obj/item/pen,
 					/obj/item/cartridge/medical)
-	cost = 15
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Psychiatrist equipment"
 	access = access_psychiatrist
@@ -169,7 +158,6 @@
 					/obj/item/clothing/head/surgery/green,
 					/obj/item/storage/box/masks,
 					/obj/item/storage/box/gloves)
-	cost = 15
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Medical scrubs crate"
 	access = access_medical_equip
@@ -184,7 +172,6 @@
 					/obj/item/storage/box/masks,
 					/obj/item/storage/box/gloves,
 					/obj/item/pen)
-	cost = 20
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Autopsy equipment crate"
 	access = access_morgue
@@ -208,7 +195,6 @@
 					/obj/item/clothing/suit/storage/toggle/labcoat/chemist,
 					/obj/item/storage/box/masks,
 					/obj/item/storage/box/gloves)
-	cost = 15
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Medical uniform crate"
 	access = access_medical_equip
@@ -223,7 +209,6 @@
 					/obj/item/tank/oxygen = 5,
 					/obj/item/storage/box/masks,
 					/obj/item/storage/box/gloves)
-	cost = 50
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Medical biohazard equipment"
 	access = access_medical_equip
@@ -231,7 +216,6 @@
 /decl/hierarchy/supply_pack/medical/portablefreezers
 	name = "Portable freezers crate"
 	contains = list(/obj/item/storage/box/freezer = 7)
-	cost = 25
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Portable freezers"
 	access = access_medical_equip
@@ -249,7 +233,6 @@
 					/obj/item/weapon/surgery_tool/retractor,
 					/obj/item/weapon/surgery_tool/bonesetter,
 					/obj/item/weapon/surgery_tool/circular_saw)
-	cost = 25
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Surgery crate"
 	access = access_medical
@@ -261,7 +244,6 @@
 					/obj/item/storage/box/masks,
 					/obj/item/storage/box/gloves,
 					/obj/item/storage/belt/medical = 3)
-	cost = 15
 	containertype = /obj/structure/closet/crate
 	containername = "\improper Sterile equipment crate"
 
@@ -270,7 +252,6 @@
 	contains = list(/obj/item/clothing/suit/space/void/medical/alt,
 					/obj/item/clothing/head/helmet/space/void/medical/alt,
 					/obj/item/clothing/shoes/magboots)
-	cost = 120
 	containername = "\improper Medical voidsuit crate"
 	containertype = /obj/structure/closet/crate/secure/large
 	access = access_medical_equip

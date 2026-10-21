@@ -7,40 +7,33 @@
 /datum/uplink_item/item/services/fake_ion_storm
 	name = "Ion Storm Announcement"
 	desc = "Interferes with ion sensors."
-	item_cost = 8
 	path = /obj/item/device/uplink_service/fake_ion_storm
 
 /datum/uplink_item/item/services/suit_sensor_garble
 	name = "Complete Medical Bracelet Jamming"
 	desc = "Garbles all medical bracelet data for 10 minutes."
-	item_cost = 16
 	path = /obj/item/device/uplink_service/jamming/garble
 
 /datum/uplink_item/item/services/fake_rad_storm
 	name = "Radiation Storm Announcement"
 	desc = "Interferes with radiation sensors."
-	item_cost = 24
 	path = /obj/item/device/uplink_service/fake_rad_storm
 
 /datum/uplink_item/item/services/fake_crew_annoncement
 	name = "Crew Arrival Announcement and Records"
 	desc = "Creates a fake crew arrival announcement as well as fake crew records, using your current appearance (including held items!) and worn id card. Prepare well!"
-	item_cost = 16
 	path = /obj/item/device/uplink_service/fake_crew_announcement
 
 /datum/uplink_item/item/services/suit_sensor_shutdown
 	name = "Complete Medical Bracelet Shutdown"
 	desc = "Completely disables all medical bracelet transmissions for 10 minutes."
-	item_cost = 40
 	path = /obj/item/device/uplink_service/jamming
 
 /datum/uplink_item/item/services/fake_update_annoncement
-	item_cost = 40
 	path = /obj/item/device/uplink_service/fake_update_announcement
 
 /datum/uplink_item/item/services/fake_update_annoncement/New()
 	..()
-	item_cost = round(DEFAULT_TELECRYSTAL_AMOUNT / 2)
 
 	spawn(2)
 		name = "[command_name()] Update Announcement"

@@ -11,7 +11,6 @@ obj/structure/closet/crate
 
 	storage_types = CLOSET_STORAGE_ITEMS
 
-	var/points_per_crate = 5
 	var/rigged = 0
 
 	pull_sound = "pull_box"
@@ -104,7 +103,6 @@ obj/structure/closet/crate
 	icon_state = "plasticcrate"
 	icon_opened = "plasticcrateopen"
 	icon_closed = "plasticcrate"
-	points_per_crate = 1
 
 /obj/structure/closet/crate/internals
 	name = "internals crate"

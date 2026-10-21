@@ -63,8 +63,8 @@
 #define MODE_DELVER "delver"
 #define MODE_LOGOMANCER "logomancer"
 
-#define DEFAULT_TELECRYSTAL_AMOUNT 100
-#define IMPLANT_TELECRYSTAL_AMOUNT(x) (round(x * 0.49)) // If this cost is ever greater than half of DEFAULT_TELECRYSTAL_AMOUNT then it is possible to buy more TC than you spend
+#define DEFAULT_CREATION_CHARGES 10
+#define IMPLANT_CREATION_CHARGES(x) (x)
 
 /////////////////
 ////WIZARD //////

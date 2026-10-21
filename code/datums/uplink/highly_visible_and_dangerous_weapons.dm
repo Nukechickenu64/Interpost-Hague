@@ -6,11 +6,8 @@
 
 /datum/uplink_item/item/visible_weapons/revolver
 	name = "Revolver, .357"
-	item_cost = 60
 	path = /obj/item/storage/backpack/satchel/syndie_kit/revolver
 
 /datum/uplink_item/item/visible_weapons/sword
 	name = "berserk sword"
-	item_cost = 15
-	antag_costs = list(MODE_MERCENARY = 10)
 	path = /obj/item/weapon/material/sword/siegesword

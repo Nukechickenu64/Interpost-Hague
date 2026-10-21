@@ -8,8 +8,6 @@
 	supervisors = "your laws"
 	req_admin_notify = 1
 	minimal_player_age = 14
-	account_allowed = 0
-	economic_modifier = 0
 	outfit_type = /decl/hierarchy/outfit/job/silicon/ai
 	loadout_allowed = FALSE
 	hud_icon = "hudblank"

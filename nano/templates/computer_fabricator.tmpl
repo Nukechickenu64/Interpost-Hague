@@ -1,5 +1,5 @@
 {{:helper.link('Clear Order', 'circle', { "clean_order" : 1 })}}<br><br>
-<i>Your new computer device you always dreamed of is just four steps away...</i><hr>
+<h2>Creation charges: {{:data.charges}}</h2>
 {{if data.state == 0}} <!-- Device type selection -->
 <div class='item'>
 	<h2>Step 1: Select your device type</h2>
@@ -11,8 +11,8 @@
 	<h2>Step 2: Personalise your device</h2>
 	<table>
 		<tr>
-			<td><b>Current Price:</b>
-			<td>{{:data.totalprice}}T
+			<td><b>Creation cost:</b>
+			<td>{{:data.chargecost}} charges
 		<tr>
 			<td><b>Battery:</b>
 			<td>{{:helper.link('Standard', null, { "hw_battery" : 1 }, data.hw_battery == 1 ? 'selected' : null)}}
@@ -52,7 +52,7 @@
 			<td>{{:helper.link('Standard', null, { "hw_aislot" : 1 }, data.hw_aislot == 1 ? 'selected' : null)}}
 		<tr>
 			<td><b>Confirm Order:</b>
-			<td>{{:helper.link('CONFIRM', null, { "confirm_order" : 1 })}}
+			<td>{{:helper.link('Create', 'check', { "confirm_order" : 1 }, data.charges >= data.chargecost ? null : 'disabled')}}
 	</table>
 	<hr>
 	<b>Battery</b> allows your device to operate without external utility power source. Advanced batteries increase battery life.<br>
@@ -64,12 +64,7 @@
 	<b>Card Reader</b> adds a slot that allows you to manipulate RFID cards. Please note that this is not necessary to allow the device to read your identification, it is just necessary to manipulate other cards.<br>
 	<b>Intellicard Slot</b> is a specialised high powered hardware that can hold an intellicard with active AI personality. It is required for some specialised programs to run properly.<br>
 </div>
-{{else data.state == 2}}
-	<h2>Step 3: Payment</h2>
-	<b>Your device is now ready for fabrication..</b><br>
-	<i>Please swipe your identification card to finish purchase.</i><br>
-	<i>Total price: <b>{{:data.totalprice}}T</b></i>
 {{else data.state == 3}}
-	<h2>Step 4: Thank you for your purchase</h2>
+	<h2>Fabrication complete</h2>
 	<b>Should you experience any issues with your new device, contact technical support at support@computerservice.nt</b>
 {{/if}}

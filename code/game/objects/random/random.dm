@@ -3,11 +3,9 @@
 	desc = "This item type is used to spawn random objects at round-start."
 	icon = 'icons/misc/mark.dmi'
 	icon_state = "rup"
-	var/spawn_nothing_percentage = 0 // this variable determines the likelyhood that this random object will not spawn anything
-
+	var/spawn_nothing_percentage = 0
 	var/spawn_method = /obj/random/proc/spawn_item
 
-// creates a new object and deletes itself
 /obj/random/Initialize()
 	..()
 	call(src, spawn_method)()
@@ -212,7 +210,6 @@
 				/obj/item/weapon/material/butterfly/switchblade = 1,
 				/obj/item/weapon/material/hatchet/tacknife = 1,
 				/obj/item/weapon/material/kitchen/utensil/knife/boot = 2,
-				/obj/item/storage/secure/briefcase/money = 1,
 				/obj/item/storage/box/syndie_kit/cigarette = 1,
 				/obj/item/stack/telecrystal = 1,
 				/obj/item/clothing/under/syndicate = 2,
@@ -443,21 +440,6 @@ obj/random/closet/spawn_choices()
 				/obj/structure/closet/wardrobe/mixed,
 				/obj/structure/closet/wardrobe/suit,
 				/obj/structure/closet/wardrobe/orange)
-
-/obj/random/coin
-	name = "random coin"
-	desc = "This is a random coin."
-	icon = 'icons/obj/items.dmi'
-	icon_state = "coin"
-
-/obj/random/coin/spawn_choices()
-	return list(/obj/item/coin/gold = 3,
-				/obj/item/coin/silver = 4,
-				/obj/item/coin/diamond = 2,
-				/obj/item/coin/iron = 4,
-				/obj/item/coin/uranium = 3,
-				/obj/item/coin/platinum = 1,
-				/obj/item/coin/phoron = 1)
 
 /obj/random/toy
 	name = "random toy"
@@ -700,7 +682,7 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/storage/box/gloves = 3,
 				/obj/item/storage/box/large = 2,
 				/obj/item/storage/box/glowsticks = 3,
-				/obj/item/storage/wallet = 1,
+				/obj/item/storage/card_holder = 1,
 				/obj/item/storage/ore = 2,
 				/obj/item/storage/belt/utility/full = 2,
 				/obj/item/storage/belt/medical/emt = 2,
@@ -854,21 +836,6 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/clothing/accessory/kneepads = 3,
 				/obj/item/clothing/accessory/stethoscope = 2)
 
-/obj/random/cash
-	name = "random currency"
-	desc = "LOADSAMONEY!"
-	icon = 'icons/obj/items.dmi'
-	icon_state = "spacecash1"
-
-/obj/random/cash/spawn_choices()
-	return list(/obj/item/spacecash/bundle/c1 = 4,
-				/obj/item/spacecash/bundle/c10 = 3,
-				/obj/item/spacecash/bundle/c20 = 3,
-				/obj/item/spacecash/bundle/c50 = 2,
-				/obj/item/spacecash/bundle/c100 = 2,
-				/obj/item/spacecash/bundle/c1000 = 1)
-
-
 /obj/random/maintenance //Clutter and loot for maintenance and away missions
 	name = "random maintenance item"
 	desc = "This is a random maintenance item."
@@ -901,7 +868,7 @@ something, make sure it's not in one of the other lists.*/
 				/obj/random/action_figure = 2,
 				/obj/random/plushie = 2,
 				/obj/random/material = 40,
-				/obj/random/coin = 5,
+				/obj/item/stack/material/gold = 5,
 				/obj/random/toy = 20,
 				/obj/random/tank = 20,
 				/obj/random/soap = 5,
@@ -919,7 +886,7 @@ something, make sure it's not in one of the other lists.*/
 				/obj/random/suit = 20,
 				/obj/random/clothing = 30,
 				/obj/random/accessory = 20,
-				/obj/random/cash = 10)
+				/obj/item/vending_charge = 10)
 
 /obj/random/loot /*Better loot for away missions and salvage */
 	name = "random loot"

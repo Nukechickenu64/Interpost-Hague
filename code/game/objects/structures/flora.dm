@@ -247,15 +247,25 @@
 	icon_state = "plant-01"
 	layer = ABOVE_HUMAN_LAYER
 
-/obj/structure/flora/verb/collect_purchase()
-	set name = "Collect Purchase"
+/obj/structure/flora/verb/collect_equipment()
+	set name = "Collect Equipment"
 	set category = "Object"
 	set src in oview(1)
-
-	if(!isliving(usr))
+	if(!ishuman(usr))
 		return
-	var/mob/living/shop_user = usr
-	shop_user.collect_meta_shop(src)
+	var/mob/living/carbon/human/operator = usr
+	if(!operator.mind?.traitor_plant_uplink_pending || operator.mind.traitor_plant_uplink_claimed || !GLOB.traitors.is_antagonist(operator.mind))
+		return
+	if(!operator.Adjacent(src) || operator.incapacitated())
+		return
+	var/obj/item/device/radio/uplink/fabricator = new(get_turf(operator), operator.mind, DEFAULT_CREATION_CHARGES)
+	if(!operator.put_in_hands(fabricator))
+		qdel(fabricator)
+		to_chat(operator, SPAN_WARNING("You need a free hand to collect your equipment fabricator."))
+		return
+	operator.mind.traitor_plant_uplink_pending = FALSE
+	operator.mind.traitor_plant_uplink_claimed = TRUE
+	to_chat(operator, SPAN_NOTICE("You collect your equipment fabricator from the plant."))
 
 /obj/structure/flora/pottedplant/large
 	name = "large potted plant"

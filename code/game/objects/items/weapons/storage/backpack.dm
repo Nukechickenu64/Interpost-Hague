@@ -215,7 +215,7 @@
 	name = "grey satchel"
 
 /obj/item/storage/backpack/satchel/grey/withwallet
-	startswith = list(/obj/item/storage/wallet/random)
+	startswith = list(/obj/item/storage/card_holder)
 
 /obj/item/storage/backpack/satchel/leather //brown, master type
 	name = "brown leather satchel"

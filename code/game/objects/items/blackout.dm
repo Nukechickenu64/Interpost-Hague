@@ -3,7 +3,6 @@
 
 /datum/uplink_item/item/tools/blackout
 	name = "High Pulse Electricity Outage Tool"
-	item_cost = 24
 	path = /obj/item/weapon/blackout
 	desc = "A device wich can create power virus in terminal, spread it in power network and temporally creating blackout."
 

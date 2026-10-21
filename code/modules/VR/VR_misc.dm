@@ -115,8 +115,14 @@
 
 /obj/item/clothing/head/cyberdeck
 	name = "Cyberspace Deck"
+	icon = 'icons/os13/objects/objects/clothing/hats.dmi'
 	icon_state = "cyberdeck"
 	item_state = "cyberdeck"
+	item_icons = list(
+		slot_l_hand_str = 'icons/mob/onmob/items/lefthand_hats.dmi',
+		slot_r_hand_str = 'icons/mob/onmob/items/righthand_hats.dmi',
+		slot_head_str = 'icons/os13/mob/mob/clothing/secondary/head.dmi',
+		)
 	desc = "A Cyber-Deck used to filter out garbage data and to enhance the ability of the Cybertechnician to work in a place no man was meant to be."
 	tint = TINT_BLIND
 

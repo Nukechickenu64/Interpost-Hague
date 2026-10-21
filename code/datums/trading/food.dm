@@ -3,7 +3,7 @@
 	name_language = TRADER_DEFAULT_NAME
 	origin = "Pizzeria"
 	possible_origins = list("Papa Joe's", "Pizza Ship", "Dominator Pizza", "Little Kaezars", "Pizza Planet", "Cheese Louise", "Little Taste o' Neo-Italy", "Pizza Gestapo")
-	trade_flags = TRADER_MONEY
+	trade_flags = TRADER_GOODS
 	possible_wanted_items = list() //They are a pizza shop, not a bargainer.
 	possible_trading_items = list(/obj/item/reagent_containers/food/snacks/sliceable/pizza   = TRADER_SUBTYPES_ONLY)
 
@@ -38,7 +38,7 @@
 	name_language = TRADER_DEFAULT_NAME
 	origin = "Captain Panda Bistro"
 	possible_origins = list("888 Shanghai Kitchen", "Mr. Lee's Greater Hong Kong", "The House of the Venerable and Inscrutable Colonel", "Lucky Dragon")
-	trade_flags = TRADER_MONEY
+	trade_flags = TRADER_GOODS
 	possible_wanted_items = list()
 	possible_trading_items = list(/obj/item/reagent_containers/food/snacks/meatkabob    	       = TRADER_THIS_TYPE,
 							/obj/item/reagent_containers/food/snacks/monkeysdelight             = TRADER_THIS_TYPE,
@@ -93,7 +93,7 @@
 	name = "Grocer"
 	name_language = TRADER_DEFAULT_NAME
 	possible_origins = list("HyTee", "Kreugars", "Spaceway", "Privaxs", "FutureValue", "Phyvendyme", "Skreller's Market")
-	trade_flags = TRADER_MONEY
+	trade_flags = TRADER_GOODS
 
 	possible_trading_items = list(/obj/item/reagent_containers/food/snacks                      = TRADER_SUBTYPES_ONLY,
 							/obj/item/reagent_containers/food/drinks/cans                       = TRADER_SUBTYPES_ONLY,

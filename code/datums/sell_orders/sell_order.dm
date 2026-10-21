@@ -1,7 +1,6 @@
 /datum/sell_order
 	var/name = "Wanted Item"
 	var/description = ""
-	var/cost = null
 	var/progress = 0
 	var/max_progress = 1
 	var/list/wanted = list() //list of wanted items
@@ -68,5 +67,6 @@
 	return so_parent.parent_type //get category and return it
 
 /datum/sell_order/proc/reward() //proc for getting rewarded for order
-	SSsupply.add_points_from_source(cost, "request")
+	if(progress < max_progress)
+		return
 	SSsupply.respawn(type) //respawns order

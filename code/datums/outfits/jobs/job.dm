@@ -17,7 +17,4 @@
 	var/obj/item/card/id/C = ..()
 	if(!C)
 		return
-	if(H.mind)
-		if(H.mind.initial_account)
-			C.associated_account_number = H.mind.initial_account.account_number
 	return C

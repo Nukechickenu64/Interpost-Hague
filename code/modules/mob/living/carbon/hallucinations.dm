@@ -213,15 +213,6 @@
 	if(holder.client)
 		holder.client.images -= things
 
-//LOADSEMONEY
-/datum/hallucination/mirage/money
-	min_power = 20
-	max_power = 45
-	number = 2
-
-/datum/hallucination/mirage/money/generate_mirage()
-	return image('icons/obj/items.dmi', "spacecash[pick(1000,500,200,100,50)]", layer = BELOW_TABLE_LAYER)
-
 //Blood and aftermath of firefight
 /datum/hallucination/mirage/carnage
 	min_power = 50

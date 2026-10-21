@@ -10,7 +10,7 @@
 	throw_range = 3
 	force = 15
 	var/list/potentials = list(
-		SPECIES_HUMAN = /obj/item/storage/bag/cash/infinite)
+		SPECIES_HUMAN = /obj/item/storage/toolbox/mechanical)
 
 /obj/item/weapon/magic_rock/attack_self(mob/user)
 	if(!istype(user,/mob/living/carbon/human))
@@ -34,18 +34,6 @@
 	to_chat(user, "\The [src] crumbles in your hands.")
 	qdel(src)
 
-/obj/item/storage/bag/cash/infinite
-	startswith = list(/obj/item/spacecash/bundle/c1000 = 1)
-
-//HUMAN
-/obj/item/storage/bag/cash/infinite/remove_from_storage(obj/item/W as obj, atom/new_location)
-	. = ..()
-	if(.)
-		if(istype(W,/obj/item/spacecash)) //only matters if its spacecash.
-			var/obj/item/I = new /obj/item/spacecash/bundle/c1000()
-			src.handle_item_insertion(I,1)
-
-//IPC
 /spell/camera_connection
 	name = "Camera Connection"
 	desc = "This spell allows the wizard to connect to the local camera network and see what it sees."

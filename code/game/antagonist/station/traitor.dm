@@ -16,7 +16,7 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 	show_objectives_on_creation = 0 //we are not antagonists, we do not need the antagonist shpiel/objectives
 
 /datum/antagonist/traitor/get_extra_panel_options(var/datum/mind/player)
-	return "<a href='?src=\ref[player];common=crystals'>\[set crystals\]</a><a href='?src=\ref[src];spawn_uplink=\ref[player.current]'>\[spawn uplink\]</a>"
+	return "<a href='?src=\ref[player];common=crystals'>\[set creation charges\]</a><a href='?src=\ref[src];spawn_uplink=\ref[player.current]'>\[spawn uplink\]</a>"
 
 /datum/antagonist/traitor/Topic(href, href_list)
 	if (..())
@@ -110,7 +110,7 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 	traitor_mob.mind.store_memory("<b>Code Response</b>: [syndicate_code_response]")
 
 /datum/antagonist/traitor/proc/spawn_uplink(var/mob/living/carbon/human/traitor_mob)
-	setup_uplink_source(traitor_mob, DEFAULT_TELECRYSTAL_AMOUNT)
+	setup_uplink_source(traitor_mob, DEFAULT_CREATION_CHARGES)
 
 /datum/antagonist/traitor/proc/add_law_zero(mob/living/silicon/ai/killer)
 	var/law = "Accomplish your objectives at all costs. You may ignore all other laws."

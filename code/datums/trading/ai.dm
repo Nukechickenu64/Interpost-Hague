@@ -10,7 +10,7 @@ They sell generic supplies and ask for generic supplies.
 	name = "AI"
 	origin = "Trading Beacon"
 	name_language = LANGUAGE_EAL
-	trade_flags = TRADER_MONEY|TRADER_GOODS
+	trade_flags = TRADER_GOODS
 	speech = list("hail_generic"    = "Greetings, I am MERCHANT, Artifical Intelligence onboard ORIGIN, tasked with trading goods in return for thalers and supplies.",
 				"hail_deny"         = "We are sorry, your connection has been blacklisted. Have a nice day.",
 
@@ -36,7 +36,7 @@ They sell generic supplies and ask for generic supplies.
 								/obj/item/device/pda                     = TRADER_BLACKLIST_SUB,
 								/obj/item/device/uplink                  = TRADER_BLACKLIST)
 	possible_trading_items = list(/obj/item/storage/bag                       = TRADER_SUBTYPES_ONLY,
-								/obj/item/storage/bag/cash/infinite           = TRADER_BLACKLIST,
+								/obj/item/storage/bag/tokens/infinite           = TRADER_BLACKLIST,
 								/obj/item/storage/backpack                    = TRADER_ALL,
 								/obj/item/storage/backpack/cultpack           = TRADER_BLACKLIST,
 								/obj/item/storage/backpack/holding            = TRADER_BLACKLIST,
@@ -53,7 +53,7 @@ They sell generic supplies and ask for generic supplies.
 								/obj/item/storage/plants                      = TRADER_THIS_TYPE,
 								/obj/item/storage/ore                         = TRADER_THIS_TYPE,
 								/obj/item/storage/toolbox                     = TRADER_ALL,
-								/obj/item/storage/wallet                      = TRADER_THIS_TYPE,
+								/obj/item/storage/card_holder                      = TRADER_THIS_TYPE,
 								/obj/item/storage/photo_album                 = TRADER_THIS_TYPE,
 								/obj/item/clothing/glasses                           = TRADER_SUBTYPES_ONLY,
 								/obj/item/clothing/glasses/hud                       = TRADER_BLACKLIST_ALL,

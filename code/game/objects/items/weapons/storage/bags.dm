@@ -79,14 +79,15 @@
 	cant_hold = list(/obj/item/disk/nuclear)
 
 // -----------------------------
-//           Cash Bag
+//          Token Bag
 // -----------------------------
 
-/obj/item/storage/bag/cash
-	name = "cash bag"
-	icon = 'icons/obj/storage.dmi'
-	icon_state = "cashbag"
-	desc = "A bag for carrying lots of cash. It's got a big dollar sign printed on the front."
+/obj/item/storage/bag/tokens
+	name = "token bag"
+	icon = 'icons/obj/trash.dmi'
+	icon_state = "plasticbag"
+	item_state = "plasticbag"
+	desc = "A bag for carrying universal creation tokens."
 	storage_slots_w = 4
 	storage_slots_h = 4
-	can_hold = list(/obj/item/coin,/obj/item/spacecash)
+	can_hold = list(/obj/item/vending_charge)

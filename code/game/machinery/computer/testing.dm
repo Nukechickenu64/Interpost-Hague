@@ -53,14 +53,9 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	for(var/mob/living/carbon/human/crew_member in GLOB.player_list)
 		if(!crew_member.client || !crew_member.mind || crew_member.stat == DEAD || !is_station_turf(get_turf(crew_member)) || player_is_antag(crew_member.mind))
 			continue
-		var/datum/preferences/prefs = crew_member.client.prefs
-		if(!prefs)
-			continue
-		prefs.meta_currency += reward
-		prefs.save_preferences()
 		recipients++
-		to_chat(crew_member, "<span class='notice'><b>Bridge recovery objective complete:</b> [objective_name]. +[reward] Leverage (total: [prefs.meta_currency]).</span>")
-	command_announcement.Announce("[objective_name] is complete. [recipients] eligible crew member[recipients == 1 ? "" : "s"] received [reward] Leverage.", "Bridge Operations")
+		to_chat(crew_member, "<span class='notice'><b>Bridge recovery objective complete:</b> [objective_name].</span>")
+	command_announcement.Announce("[objective_name] is complete. [recipients] eligible crew member[recipients == 1 ? "" : "s"] notified.", "Bridge Operations")
 
 /datum/bridge_crew_objectives/proc/get_status_report()
 	if(!issued)
@@ -68,7 +63,7 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	var/wake_status = completed["wake_station"] ? "Complete" : "Pending"
 	var/water_status = completed["water_service"] ? "Complete" : "Pending"
 	var/power_status = completed["power_grid"] ? "Complete" : "Pending"
-	return "<h3>Bridge Recovery Contract</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th><th>Crew reward</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td><td>5 Leverage</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td><td>5 Leverage</td></tr><tr><td>Keep at least 90% of station power controllers online for 30 seconds</td><td>[power_status]</td><td>10 Leverage</td></tr></table><p>Rewards go to living, non-antagonist crew aboard when each objective clears.</p>"
+	return "<h3>Bridge Recovery Objectives</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td></tr><tr><td>Keep at least 90% of station power controllers online for 30 seconds</td><td>[power_status]</td></tr></table>"
 
 /datum/station_wake_sequence
 	var/active = FALSE
@@ -214,7 +209,7 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				playsound(src, 'sound/machines/dotprinter.ogg', 10, 1)
 				var/obj/item/paper/R = new(src.loc)
 				var/sname = station_name()
-				var/full_text = "<b>BRIDGE COMMUNICATIONS REPORT</b>\n\n<b>From:</b> Emergency Operations Relay\n<b>To:</b> [sname] Bridge Operations\n<b>Subject:</b> Reserve-mode service restoration\n\nThe station is running on reserve-mode protocols. External traffic is intermittent; no off-station assignment or rescue operation has been authorized. Restore the services below so local operations can resume.\n\n<b>CREW RECOVERY CONTRACT</b>\n\n<ol><li><b>Wake the station.</b> Use WAKE STATION at this console. The sequence restores bridge-controlled lighting and resets station air-alarm thermostats to 20°C. <b>Reward: 5 Leverage for each eligible crew member.</b></li><li><b>Restore water service.</b> Install the portable water control chip in its holder. <b>Reward: 5 Leverage for each eligible crew member.</b></li><li><b>Stabilize the power grid.</b> Keep at least 90% of station power controllers online for 30 seconds. <b>Reward: 10 Leverage for each eligible crew member.</b></li></ol>\n\nCompletion is verified automatically. Rewards are deposited immediately to living, non-antagonist crew aboard the station when each objective clears. Review STATION STATUS at this console for live contract progress."
+				var/full_text = "<b>BRIDGE COMMUNICATIONS REPORT</b>\n\n<b>From:</b> Emergency Operations Relay\n<b>To:</b> [sname] Bridge Operations\n<b>Subject:</b> Reserve-mode service restoration\n\nThe station is running on reserve-mode protocols. External traffic is intermittent; no off-station assignment or rescue operation has been authorized. Restore the services below so local operations can resume.\n\n<b>CREW RECOVERY OBJECTIVES</b>\n\n<ol><li><b>Wake the station.</b> Use WAKE STATION at this console. The sequence restores bridge-controlled lighting and resets station air-alarm thermostats to 20°C.</li><li><b>Restore water service.</b> Install the portable water control chip in its holder.</li><li><b>Stabilize the power grid.</b> Keep at least 90% of station power controllers online for 30 seconds.</li></ol>\n\nCompletion is verified automatically. Review STATION STATUS at this console for live objective progress."
 				GLOB.bridge_crew_objectives.issue()
 				R.set_content(full_text)
 				R.name = "Bridge Recovery Report"

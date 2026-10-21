@@ -539,7 +539,7 @@
 	if(!is_leech() || gloves || !item || (l_hand != item && r_hand != item))
 		return FALSE
 	var/material/item_material = item.get_material()
-	if(item_material?.name != "silver" && !(item.matter && item.matter["silver"]) && !istype(item, /obj/item/coin/silver))
+	if(item_material?.name != "silver" && !(item.matter && item.matter["silver"]))
 		return FALSE
 	var/hand_zone = l_hand == item ? BP_L_HAND : BP_R_HAND
 	drop_from_inventory(item)

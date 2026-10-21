@@ -129,7 +129,7 @@
 "dj" = (/obj/structure/bed/chair{dir = 4},/obj/effect/decal/cleanable/dirt,/turf/simulated/floor/tiled,/area/icarus/vessel)
 "dk" = (/obj/structure/table/standard,/obj/item/trash/plate,/turf/simulated/floor/tiled,/area/icarus/open)
 "dl" = (/obj/structure/table/standard,/obj/random/powercell,/turf/simulated/floor/tiled,/area/icarus/open)
-"dm" = (/obj/structure/closet,/obj/random/cash,/obj/random/cash,/obj/random/cash,/turf/simulated/floor/tiled,/area/icarus/vessel)
+"dm" = (/obj/structure/closet,/turf/simulated/floor/tiled,/area/icarus/vessel)
 "dn" = (/obj/structure/closet,/obj/random/glasses,/obj/item/clothing/under/blazer,/turf/simulated/floor/tiled,/area/icarus/vessel)
 "do" = (/obj/structure/table/standard,/obj/item/weapon/material/kitchen/utensil/knife,/turf/simulated/floor/tiled,/area/icarus/vessel)
 "dp" = (/obj/effect/decal/cleanable/dirt,/turf/simulated/wall,/area/icarus/vessel)

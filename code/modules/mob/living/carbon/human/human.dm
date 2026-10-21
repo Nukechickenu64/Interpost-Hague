@@ -523,8 +523,6 @@ var/list/rank_prefix = list(\
 	return traced_organs
 
 /mob/living/carbon/human/Topic(href, href_list)
-	if(href_list["meta_shop_category"] || href_list["meta_shop_buy"])
-		return ..()
 	if(href_list["porco_action"])
 		var/action_id = href_list["porco_action"]
 		var/action_allowed = FALSE

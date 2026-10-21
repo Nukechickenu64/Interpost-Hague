@@ -12,6 +12,7 @@ Used In File(s): \code\game\objects\items\devices\uplinks.dm
 	</div>
 	<div class="itemContent">
 		{{:helper.link('Request Items', 'gear', {'menu' : 0}, null, 'fixedLeftWider')}}
+		{{if data.resource_label == 'Creation charges'}}{{:helper.link('Add token', 'plus', {'refill' : 1})}}{{/if}}
 		{{:helper.link('Exploitable Information', 'gear', {'menu' : 2}, null, 'fixedLeftWider')}}
 		{{:helper.link('Return', 'arrowreturn-1-w', {'return' : 1}, null, 'fixedLeft')}}
 		{{:helper.link('Close', 'gear', {'lock' : "1"}, null, 'fixedLeft')}}
@@ -22,23 +23,13 @@ Used In File(s): \code\game\objects\items\devices\uplinks.dm
 {{if data.menu == 0 || data.menu == 1}}
 	<div class="item">
 		<div class="itemLabel">
-			<b>Tele-Crystals</b>:
+			<b>{{:data.resource_label}}</b>:
 		</div>
 		<div class="itemContent">
-			{{:data.crystals}}
+			{{:data.charges}}
 		</div>
 	</div>
 
-	{{if data.discount_amount < 100}}
-		<div class="item">
-			<div class="itemLabel">
-				<b>Currently discounted</b>:
-			</div>
-			<div class="itemContent">
-				{{:data.discount_category}}<br>{{:data.discount_name}}<br>{{:data.discount_amount}}% off. Offer will expire at: {{:data.offer_expiry}}
-			</div>
-		</div>
-	{{/if}}
 {{/if}}
 
 {{if data.menu == 0}}
@@ -50,7 +41,6 @@ Used In File(s): \code\game\objects\items\devices\uplinks.dm
 	{{/for}}
 {{else data.menu == 1}}
     <H2><span class="white">Request items:</span></H2>
-    <span class="white"><i>Each item costs a number of tele-crystals as indicated by the number following their name.</i></span>
 	
 	{{for data.items}}
 		<div class="item">

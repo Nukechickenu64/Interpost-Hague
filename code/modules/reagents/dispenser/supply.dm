@@ -6,7 +6,6 @@
 	contains = list(
 			/obj/machinery/chemical_dispenser{anchored = 0}
 		)
-	cost = 25
 	containertype = /obj/structure/largecrate
 	containername = "reagent dispenser crate"
 
@@ -15,7 +14,6 @@
 	contains = list(
 			/obj/machinery/chemical_dispenser/bar_alc{anchored = 0}
 		)
-	cost = 25
 	containertype = /obj/structure/largecrate
 	containername = "booze dispenser crate"
 
@@ -24,7 +22,6 @@
 	contains = list(
 			/obj/machinery/chemical_dispenser/bar_soft{anchored = 0}
 		)
-	cost = 25
 	containertype = /obj/structure/largecrate
 	containername = "soda dispenser crate"
 
@@ -53,7 +50,6 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/sacid,
 			/obj/item/reagent_containers/chem_disp_cartridge/tungsten
 		)
-	cost = 150
 	containertype = /obj/structure/closet/crate/secure
 	containername = "chemical crate"
 	access = list(access_chemistry)
@@ -74,7 +70,6 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/ale,
 			/obj/item/reagent_containers/chem_disp_cartridge/mead
 		)
-	cost = 50
 	containertype = /obj/structure/closet/crate/secure
 	containername = "alcoholic drinks crate"
 	access = list(access_bar)
@@ -100,7 +95,6 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/lime,
 			/obj/item/reagent_containers/chem_disp_cartridge/watermelon
 		)
-	cost = 50
 	containertype = /obj/structure/closet/crate
 	containername = "soft drinks crate"
 
@@ -116,7 +110,6 @@
 			/obj/item/reagent_containers/chem_disp_cartridge/tea,
 			/obj/item/reagent_containers/chem_disp_cartridge/ice
 		)
-	cost = 50
 	containertype = /obj/structure/closet/crate
 	containername = "coffee drinks crate"
 
@@ -134,7 +127,6 @@
 			/obj/item/reagent_containers/chem_disp_cartridge,
 			/obj/item/reagent_containers/chem_disp_cartridge
 		)
-	cost = 15
 	containertype = /obj/structure/closet/crate
 	containername = "dispenser cartridge crate"
 
@@ -149,7 +141,6 @@
 			containername = _cname ;\
 			containertype = /obj/structure/closet/crate/secure;\
 			access = list( _access );\
-			cost = _cost ;\
 			contains = list( _type , _type );\
 		}\
 	}
@@ -159,7 +150,6 @@
 			name = _name ;\
 			containername = _cname ;\
 			containertype = /obj/structure/closet/crate;\
-			cost = _cost ;\
 			contains = list( _type , _type );\
 		}\
 	}

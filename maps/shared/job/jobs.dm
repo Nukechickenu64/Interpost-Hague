@@ -226,7 +226,6 @@
 	title = "Assistant"
 	supervisors = "everyone"
 	minimal_player_age = 14
-	economic_modifier = 1
 	ideal_character_age = 21
 	alt_titles = null
 	social_class = SOCIAL_CLASS_MIN
@@ -250,7 +249,6 @@
 	supervisors = "the sleepers, and GOD"
 	minimal_player_age = 14
 	selection_color = "#797979"
-	economic_modifier = 15
 	ideal_character_age = 72
 	alt_titles = null
 	social_class = SOCIAL_CLASS_MIN
@@ -272,7 +270,6 @@
 	supervisors = "your own wits and Nanotrasen"
 	job_desc = "Leader of the ship and its crew, responsible for making tough decisions and ensuring the safety of all aboard."
 	minimal_player_age = 41
-	economic_modifier = 10
 	ideal_character_age = 65
 	outfit_type = /decl/hierarchy/outfit/job/dreyfus/magistrate
 	social_class = SOCIAL_CLASS_MAX
@@ -293,7 +290,6 @@
 	job_desc = "Second-in-command on the ship, assisting the Captain in decision-making and management."
 	supervisors = "the Captain"
 	minimal_player_age = 31
-	economic_modifier = 5
 	ideal_character_age = 45
 	total_positions = 1
 	spawn_positions = 1
@@ -316,7 +312,6 @@
 	job_desc = "The lead researcher in charge of the science department, overseeing all research projects and experiments."
 	supervisors = "the Captain"
 	minimal_player_age = 21
-	economic_modifier = 9
 	ideal_character_age = 40
 	total_positions = 1
 	spawn_positions = 1
@@ -352,7 +347,6 @@
 	job_desc = "A scientist conducting various research projects and experiments to advance knowledge and technology."
 	supervisors = "the Head Scientist"
 	minimal_player_age = 19
-	economic_modifier = 2
 	ideal_character_age = 30
 	total_positions = 1
 	spawn_positions = 3
@@ -377,7 +371,6 @@
 	department_flag = MED
 	supervisors = "the Captain and Hippocrates"
 	minimal_player_age = 19
-	economic_modifier = 2
 	ideal_character_age = 30
 	total_positions = 2
 	spawn_positions = 3
@@ -419,7 +412,6 @@
 	total_positions = 1
 	spawn_positions = 1
 	selection_color = "#601c1c"
-	economic_modifier = 5
 	rankprefix  = "Major"
 	sex_lock = MALE
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory,
@@ -450,7 +442,6 @@
 	department_flag = SEC
 	total_positions = 1
 	spawn_positions = 8
-	economic_modifier = 3
 	rankprefix  = "Enforcer"
 	access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_morgue, access_external_airlocks)
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_external_airlocks)
@@ -471,7 +462,6 @@
 	department_flag = SEC
 	total_positions = 1
 	spawn_positions = 1
-	economic_modifier = 3
 	access = list(access_security, access_eva, access_sec_doors, access_maint_tunnels, access_morgue, access_external_airlocks, access_detoffice)
 	minimal_access = list(access_security, access_eva, access_sec_doors, access_maint_tunnels, access_external_airlocks, access_detoffice)
 	minimal_player_age = 0
@@ -491,7 +481,6 @@
 	job_desc = "the Vessel Overseer is responsible for managing the station's supplies, cargo, and overall logistics."
 	supervisors = "the Captain"
 	minimal_player_age = 21
-	economic_modifier = 3
 	ideal_character_age = 30
 	total_positions = 1
 	spawn_positions = 2
@@ -513,7 +502,6 @@
 	job_desc = "Responsible for the upkeep and repair of the ship's systems and infrastructure."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
-	economic_modifier = 3
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 3
@@ -536,7 +524,6 @@
 	job_desc = "Responsible for extracting valuable minerals and resources from asteroids and planetary bodies."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -557,7 +544,6 @@
 	job_desc = "Responsible for managing and organizing the ship's cargo and supplies."
 	supervisors = "the Vessel Overseer"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -588,7 +574,6 @@
 	job_desc = "A young helper in the cargo department, eager to learn the ropes of managing supplies and logistics."
 	supervisors = "the Cargo Overseer"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -609,7 +594,6 @@
 	supervisors = "the Executive Manager"
 	job_desc = "Responsible for overseeing the nutritional needs and meal planning for the crew."
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 1
 	spawn_positions = 2
@@ -642,7 +626,6 @@
 	title = "Priest"
 	supervisors = "the Arbiters and Verina"
 	minimal_player_age = 21
-	economic_modifier = 3
 	ideal_character_age = 30
 	total_positions = 1
 	spawn_positions = 1
@@ -661,7 +644,6 @@
 	job_desc = "Responsible for maintaining cleanliness and hygiene aboard the ship."
 	supervisors = "the Executive Officer"
 	minimal_player_age = 16
-	economic_modifier = 1
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -720,7 +702,6 @@
 	department_flag = CRH
 	total_positions = 1
 	spawn_positions = 1
-	economic_modifier = 5
 	selection_color = "#6161aa"
 	access = list(access_maint_tunnels, access_chapel_office)
 	minimal_access = list(access_maint_tunnels, access_chapel_office)
@@ -742,7 +723,6 @@
 	department_flag = CRH
 	total_positions = 2
 	spawn_positions = 2
-	economic_modifier = 3
 	selection_color = "#6161aa"
 	access = list(access_maint_tunnels, access_chapel_office)
 	minimal_access = list(access_maint_tunnels, access_chapel_office)
@@ -764,7 +744,6 @@
 	job_desc = "A young helper in the medical department, eager to learn the ropes of healing and care."
 	supervisors = "the Undertaker"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -788,7 +767,6 @@
 	title = "Security Cadet"
 	supervisors = "the officers"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -809,7 +787,6 @@
 	title = "Junior Engineer"
 	supervisors = "the engineers"
 	minimal_player_age = 16
-	economic_modifier = 2
 	ideal_character_age = 21
 	total_positions = 2
 	spawn_positions = 2
@@ -836,7 +813,6 @@
 	total_positions = 5
 	spawn_positions = 5
 	create_record = 0
-	account_allowed = 0
 	has_email = 0
 	//no_late_join = 1
 	selection_color = "#6161aa"

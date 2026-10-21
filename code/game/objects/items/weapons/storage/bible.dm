@@ -17,8 +17,6 @@
 
 	startswith = list(
 		/obj/item/reagent_containers/food/drinks/bottle/small/beer,
-		/obj/item/spacecash/bundle/c50,
-		/obj/item/spacecash/bundle/c50,
 		)
 
 /obj/item/storage/bible/afterattack(atom/A, mob/user as mob, proximity)

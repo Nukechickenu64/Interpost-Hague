@@ -3,7 +3,7 @@
 	var/origin = "some place"                                   //The place that they are trading from
 	var/list/possible_origins                                   //Possible names of the trader origin
 	var/disposition = 0                                         //The current disposition of them to us.
-	var/trade_flags = TRADER_MONEY                              //Flags
+	var/trade_flags = TRADER_GOODS
 	var/name_language                                                //If this is set to a language name this will generate a name from the language
 	var/icon/portrait                                           //The icon that shows up in the menu @TODO
 
@@ -124,15 +124,6 @@
 		trading_items[type] = margin*value
 	return trading_items[trading_items[trading_num]]
 
-/datum/trader/proc/offer_money_for_trade(var/trade_num, var/money_amount)
-	if(!(trade_flags & TRADER_MONEY))
-		return TRADER_NO_MONEY
-	var/value = get_item_value(trade_num)
-	if(money_amount < value)
-		return TRADER_NOT_ENOUGH
-
-	return value
-
 /datum/trader/proc/offer_items_for_trade(var/list/offers, var/num, var/turf/location)
 	if(!offers || !offers.len)
 		return TRADER_NOT_ENOUGH
@@ -148,14 +139,10 @@
 		if(blacklisted_trade_items && blacklisted_trade_items.len && is_type_in_list(offer,blacklisted_trade_items))
 			return 0
 
-		if(istype(offer,/obj/item/spacecash))
-			if(!(trade_flags & TRADER_MONEY))
-				return TRADER_NO_MONEY
-		else
-			if(!(trade_flags & TRADER_GOODS))
-				return TRADER_NO_GOODS
-			else if((trade_flags & TRADER_WANTED_ONLY|TRADER_WANTED_ALL) && !is_wanted)
-				return TRADER_FOUND_UNWANTED
+		if(!(trade_flags & TRADER_GOODS))
+			return TRADER_NO_GOODS
+		else if((trade_flags & (TRADER_WANTED_ONLY|TRADER_WANTED_ALL)) && !is_wanted)
+			return TRADER_FOUND_UNWANTED
 
 		offer_worth += get_value(offer) * (is_wanted > 1 ? want_multiplier : 1)
 	if(!offer_worth)
@@ -224,9 +211,7 @@
 
 /datum/trader/proc/how_much_do_you_want(var/num)
 	var/atom/movable/M = trading_items[num]
-	. = get_response("how_much", "Hmm.... how about VALUE thalers?")
-	. = replacetext(.,"VALUE",get_item_value(num))
-	. = replacetext(.,"ITEM", initial(M.name))
+	return "For [initial(M.name)]: [what_do_you_want()]"
 
 /datum/trader/proc/what_do_you_want()
 	if(!(trade_flags & TRADER_GOODS))
@@ -239,26 +224,3 @@
 		want_english += initial(a.name)
 	. += " [english_list(want_english)]"
 
-/datum/trader/proc/sell_items(var/list/offers)
-	if(!(trade_flags & TRADER_GOODS))
-		return TRADER_NO_GOODS
-	if(!offers || !offers.len)
-		return TRADER_NOT_ENOUGH
-
-	var/mult = 1
-	. = 0
-	for(var/offer in offers)
-		if((trade_flags & TRADER_WANTED_ONLY) && is_type_in_list(offer,wanted_items))
-			mult = want_multiplier
-		else if((trade_flags & TRADER_WANTED_ALL) && is_type_in_list(offer,possible_wanted_items))
-			mult = 1
-		else
-			return TRADER_FOUND_UNWANTED
-		. += get_value(offer) * mult
-
-	playsound(get_turf(offers[1]), 'sound/effects/teleport.ogg', 50, 1)
-	for(var/offer in offers)
-		qdel(offer)
-
-/datum/trader/proc/bribe_to_stay_longer(var/amt)
-	return get_response("bribe_refusal", "How about... no?")

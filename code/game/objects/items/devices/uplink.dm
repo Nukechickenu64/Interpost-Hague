@@ -18,7 +18,7 @@
 	var/exploit_id								// Id of the current exploit record we are viewing
 
 	var/welcome = "Welcome, Operative"	// Welcoming menu message
-	var/uses 							// Numbers of crystals
+	var/uses = 10
 	var/list/ItemsCategory				// List of categories with lists of items
 	var/list/ItemsReference				// List of references with an associated item
 	var/list/nanoui_items				// List of items for NanoUI use
@@ -26,16 +26,12 @@
 	var/list/nanoui_data = new 			// Additional data for NanoUI use
 
 	var/datum/mind/uplink_owner = null
-	var/used_TC = 0
-	var/offer_time = 15 MINUTES			//The time increment per discount offered
-	var/next_offer_time					//The time a discount will next be offered
-	var/datum/uplink_item/discount_item	//The item to be discounted
-	var/discount_amount					//The amount as a percent the item will be discounted by
+	var/creation_charges_spent = 0
 
 /obj/item/device/uplink/nano_host()
 	return loc
 
-/obj/item/device/uplink/New(var/atom/location, var/datum/mind/owner, var/telecrystals = DEFAULT_TELECRYSTAL_AMOUNT)
+/obj/item/device/uplink/New(var/atom/location, var/datum/mind/owner, var/initial_charges = DEFAULT_CREATION_CHARGES)
 	if(!istype(location, /atom))
 		CRASH("Invalid spawn location. Expected /atom, was [location ? location.type : "NULL"]")
 
@@ -44,52 +40,13 @@
 	update_nano_data()
 
 	src.uplink_owner = owner
+	uses = istype(location, /mob/living/deity) ? initial_charges : 10
 	world_uplinks += src
-	uses = telecrystals
-	START_PROCESSING(SSobj, src)
 
 /obj/item/device/uplink/Destroy()
 	uplink_owner = null
 	world_uplinks -= src
-	STOP_PROCESSING(SSobj, src)
 	return ..()
-
-/obj/item/device/uplink/Process()
-	if(world.time > next_offer_time)
-		next_offer_time = world.time + offer_time
-		discount_amount = pick(90;0.9, 80;0.8, 70;0.7, 60;0.6, 50;0.5, 40;0.4, 30;0.3, 20;0.2, 10;0.1)
-
-		var/datum/uplink_item/new_discount_item
-		do
-			var/datum/uplink_random_selection/uplink_selection = get_uplink_random_selection_by_type(/datum/uplink_random_selection/blacklist)
-			new_discount_item = uplink_selection.get_random_item(INFINITY, src)
-		// Ensures we only only get items for which we get an actual discount and that this particular uplink can actually view (can buy would risk near-infinite loops).
-		while(is_improper_item(new_discount_item, discount_amount))
-		if(!new_discount_item)
-			return
-
-		discount_item = new_discount_item
-		update_nano_data()
-		SSnano.update_uis(src)
-
-/obj/item/device/uplink/proc/is_improper_item(var/datum/uplink_item/new_discount_item, discount_amount)
-	if(!new_discount_item)
-		return FALSE
-
-	if(istype(new_discount_item, /datum/uplink_item/item/stealthy_weapons/soap))
-		return FALSE
-
-	var/discount_price = round(new_discount_item.cost(uses) * discount_amount)
-	if(!discount_price || new_discount_item.cost(uses) == discount_price)
-		return TRUE
-
-	if(!new_discount_item.can_view(src))
-		return TRUE
-
-	return FALSE
-
-/obj/item/device/uplink/proc/get_item_cost(var/item_type, var/item_cost)
-	return item_type == discount_item ? max(1, round(item_cost*discount_amount)) : item_cost
 
 // Toggles the uplink on and off. Normally this will bypass the item's normal functions and go to the uplink menu, if activated.
 /obj/item/device/uplink/proc/toggle()
@@ -118,12 +75,9 @@
 	var/data[0]
 
 	data["welcome"] = welcome
-	data["crystals"] = uses
+	data["charges"] = uses
+	data["resource_label"] = istype(loc, /mob/living/deity) ? "Power" : "Creation charges"
 	data["menu"] = nanoui_menu
-	data["discount_category"] = discount_item ? discount_item.category.name : ""
-	data["discount_name"] = discount_item ? discount_item.name : ""
-	data["discount_amount"] = (1-discount_amount)*100
-	data["offer_expiry"] = worldtime2stationtime(next_offer_time)
 
 	data += nanoui_data
 
@@ -146,9 +100,20 @@
 
 // The purchasing code.
 /obj/item/device/uplink/OnTopic(user, href_list)
-	if(href_list["buy_item"])
+	if(href_list["refill"] && !istype(loc, /mob/living/deity))
+		var/mob/operator = user
+		var/obj/item/vending_charge/token = operator.get_active_hand()
+		if(!istype(token))
+			token = operator.get_inactive_hand()
+		if(!istype(token) || token.loc != operator || operator.incapacitated() || !operator.unEquip(token, target = src))
+			return TOPIC_HANDLED
+		uses += 10
+		qdel(token)
+		. = TOPIC_REFRESH
+	else if(href_list["buy_item"])
 		var/datum/uplink_item/UI = (locate(href_list["buy_item"]) in uplink.items)
-		UI.buy(src, usr)
+		if(UI)
+			UI.buy(src, user)
 		. = TOPIC_REFRESH
 	else if(href_list["lock"])
 		toggle()
@@ -175,7 +140,7 @@
 			if(category.can_view(src))
 				categories[++categories.len] = list("name" = category.name, "ref" = "\ref[category]")
 		nanoui_data["categories"] = categories
-	else if(nanoui_menu == 1)
+	else if(nanoui_menu == 1 && category)
 		var/items[0]
 		for(var/datum/uplink_item/item in category.items)
 			if(item.can_view(src))

@@ -30,6 +30,3 @@
 
 /obj/item/weapon/material/Value()
 	return material.value * worth_multiplier
-
-/obj/item/spacecash/Value()
-	return worth

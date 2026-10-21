@@ -197,10 +197,6 @@
 	. = ..()
 	make_exact_fit()
 
-/obj/item/storage/secure/briefcase/money
-
-	startswith = list(/obj/item/spacecash/bundle/c1000 = 10)
-
 /obj/item/storage/backpack/satchel/syndie_kit/armor
 	name = "armor satchel"
 	desc = "A satchel for when you don't want to try a diplomatic approach."

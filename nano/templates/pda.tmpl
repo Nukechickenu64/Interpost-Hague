@@ -21,7 +21,6 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
         <div class="pda-readout">
             {{if data.ownjob}}<div class="pda-job">{{>data.ownjob}}</div>{{/if}}
             <div>Link: {{:data.toff ? 'Disabled' : data.reception ? 'Online' : 'No signal'}}</div>
-            <div>Balance: {{if data.balance != null}}{{:data.balance}} cr{{else}}{{>data.balanceStatus}}{{/if}}</div>
         </div>
         {{if data.new_Message}}
             <div class="pda-message-alert">{{:helper.link('New message', 'mail-closed', {'choice': '2'})}}</div>
@@ -33,22 +32,6 @@ Used In File(s): \code\game\objects\items\devices\PDA\PDA.dm
             <div class="itemContent">
                 {{:helper.link(data.idInserted ? data.idLink : 'Insert ID', data.idInserted ? 'eject' : 'plus', {'choice': 'Authenticate'})}}
                 {{if data.idInserted}}{{:helper.link('Update PDA info', 'refresh', {'choice': 'UpdateInfo'})}}{{/if}}
-            </div>
-        </div>
-        <div class="item">
-            <div class="itemLabel">Bank</div>
-            <div class="itemContent">
-                {{if data.idInserted }}
-                    {{if data.bank.loggedIn}}
-                        <div>{{:data.bank.accountName}} &mdash; {{:data.bank.balance}} cr</div>
-                        {{:helper.link('Log out', 'locked', {'choice': 'BankLogout'})}}
-                    {{else}}
-                        <div>Status: {{:data.bank.status}}</div>
-                        {{:helper.link('Login', 'unlocked', {'choice': 'BankLogin'}, data.bank.canBankUse ? null : 'disabled')}}
-                    {{/if}}
-                {{else}}
-                    <div>Insert an ID card to login.</div>
-                {{/if}}
             </div>
         </div>
         <div class="item">

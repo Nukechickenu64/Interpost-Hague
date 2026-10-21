@@ -411,8 +411,6 @@ var/list/ai_verbs_default = list(
 /mob/living/silicon/ai/Topic(href, href_list)
 	if(usr != src)
 		return
-	if(href_list["meta_shop_category"] || href_list["meta_shop_buy"])
-		return ..()
 	if(..())
 		return
 	if (href_list["mach_close"])

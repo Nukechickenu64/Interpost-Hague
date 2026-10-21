@@ -6,8 +6,8 @@
 	var/activation_emote
 
 /obj/item/implant/uplink/New(var/loc, var/amount)
-	amount = amount || IMPLANT_TELECRYSTAL_AMOUNT(DEFAULT_TELECRYSTAL_AMOUNT)
-	hidden_uplink = new(src, telecrystals = amount)
+	amount = amount || IMPLANT_CREATION_CHARGES(DEFAULT_CREATION_CHARGES)
+	hidden_uplink = new(src, initial_charges = amount)
 	..()
 
 /obj/item/implant/uplink/implanted(mob/source)

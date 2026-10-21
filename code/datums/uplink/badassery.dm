@@ -6,11 +6,10 @@
 
 /datum/uplink_item/item/badassery/balloon
 	name = "For showing that You Are The BOSS (Useless Balloon)"
-	item_cost = DEFAULT_TELECRYSTAL_AMOUNT
 	path = /obj/item/toy/balloon
 
 /datum/uplink_item/item/badassery/balloon/NT
-	name = "For showing that you love TC SOO much (Useless Balloon)"
+	name = "Nanotrasen balloon"
 	path = /obj/item/toy/balloon/nanotrasen
 
 /datum/uplink_item/item/badassery/balloon/random
@@ -28,8 +27,7 @@
 **************/
 /datum/uplink_item/item/badassery/random_one
 	name = "Random Item"
-	desc = "Buys you a random item for at least 1TC. Careful: No upper price cap!"
-	item_cost = 1
+	desc = "Creates a random item using the available creation charges."
 
 /datum/uplink_item/item/badassery/random_one/buy(var/obj/item/device/uplink/U, var/mob/user)
 	var/datum/uplink_random_selection/uplink_selection = get_uplink_random_selection_by_type(/datum/uplink_random_selection/default)
@@ -65,14 +63,16 @@
 ****************/
 /datum/uplink_item/item/badassery/surplus
 	name = "\improper Surplus Crate"
-	item_cost = DEFAULT_TELECRYSTAL_AMOUNT * 4
-	var/item_worth = DEFAULT_TELECRYSTAL_AMOUNT * 6
+	var/item_worth = 5
 	var/icon
 
 /datum/uplink_item/item/badassery/surplus/New()
 	..()
 	antag_roles = list(MODE_MERCENARY)
-	desc = "A crate containing [item_worth] telecrystal\s worth of surplus leftovers."
+	desc = "A crate containing a small assortment of surplus equipment."
+
+/datum/uplink_item/item/badassery/surplus/cost(var/charges, obj/item/device/uplink/U)
+	return 5
 
 /datum/uplink_item/item/badassery/surplus/get_goods(var/obj/item/device/uplink/U, var/loc)
 	var/obj/structure/largecrate/C = new(loc)

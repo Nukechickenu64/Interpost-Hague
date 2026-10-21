@@ -64,20 +64,6 @@
 /hook/harvest_podman
 
 /**
- * Payroll revoked hook.
- * Called in Accounts_DB.dm when someone's payroll is stolen at the Accounts terminal.
- * Parameters: var/datum/money_account
- */
-/hook/revoke_payroll
-
-/**
- * Account suspension hook.
- * Called in Accounts_DB.dm when someone's account is suspended or unsuspended at the Accounts terminal.
- * Parameters: var/datum/money_account
- */
-/hook/change_account_status
-
-/**
  * Employee reassignment hook.
  * Called in card.dm when someone's card is reassigned at the HoP's desk.
  * Parameters: var/obj/item/card/id

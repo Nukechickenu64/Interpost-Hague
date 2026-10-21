@@ -61,7 +61,6 @@
 	var/brigged_since = -1
 
 	//put this here for easier tracking ingame
-	var/datum/money_account/initial_account
 
 	//used for optional self-objectives that antagonists can give themselves, which are displayed at the end of the round.
 	var/ambitions
@@ -514,10 +513,10 @@
 						to_chat(usr, "<span class='warning'>Failed to find an uplink.</span>")
 						return
 					var/crystals = suplink.uses
-					crystals = input("Amount of telecrystals for [key]","Operative uplink", crystals) as null|num
+					crystals = input("Creation charges for [key]","Operative uplink", crystals) as null|num
 					if (!isnull(crystals) && !QDELETED(suplink))
-						suplink.uses = crystals
-						log_and_message_admins("set the telecrystals for [key] to [crystals]")
+						suplink.uses = max(0, round(crystals))
+						log_and_message_admins("set the creation charges for [key] to [suplink.uses]")
 
 	else if (href_list["obj_announce"])
 		var/obj_count = 1
@@ -574,7 +573,6 @@
 	assigned_job =    null
 	//faction =       null //Uncommenting this causes a compile error due to 'undefined type', fucked if I know.
 	changeling =      null
-	initial_account = null
 	objectives =      list()
 	special_verbs =   list()
 	has_been_rev =    0

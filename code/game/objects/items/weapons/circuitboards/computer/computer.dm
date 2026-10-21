@@ -152,7 +152,3 @@
 	name = T_BOARD("RCON remote control console")
 	build_path = /obj/machinery/computer/rcon
 	origin_tech = list(TECH_DATA = 4, TECH_ENGINEERING = 3, TECH_POWER = 5)
-
-/obj/item/circuitboard/account_database
-	name = T_BOARD("accounts uplink terminal")
-	build_path = /obj/machinery/computer/account_database

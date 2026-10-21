@@ -18,7 +18,6 @@
 	w_class = ITEM_SIZE_TINY
 	obj_flags = OBJ_FLAG_NO_EMBED
 	slot_flags = SLOT_EARS | SLOT_AMULET
-	var/associated_account_number = 0
 
 	var/list/files = list(  )
 

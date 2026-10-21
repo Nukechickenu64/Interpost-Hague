@@ -127,8 +127,6 @@
 			return global._client_preferences_by_key;
 		if("_client_preferences_by_type")
 			return global._client_preferences_by_type;
-		if("account_hack_attempted")
-			return global.account_hack_attempted;
 		if("additional_antag_types")
 			return global.additional_antag_types;
 		if("admin_datums")
@@ -195,8 +193,6 @@
 			return global.all_grabstates;
 		if("all_languages")
 			return global.all_languages;
-		if("all_money_accounts")
-			return global.all_money_accounts;
 		if("all_objectives")
 			return global.all_objectives;
 		if("all_robolimbs")
@@ -343,8 +339,6 @@
 			return global.defer_powernet_rebuild;
 		if("delta_index")
 			return global.delta_index;
-		if("department_accounts")
-			return global.department_accounts;
 		if("department_radio_keys")
 			return global.department_radio_keys;
 		if("description_icons")
@@ -361,8 +355,6 @@
 			return global.dreams;
 		if("dummy_lighting_corner")
 			return global.dummy_lighting_corner;
-		if("economic_species_modifier")
-			return global.economic_species_modifier;
 		if("empty_playable_ai_cores")
 			return global.empty_playable_ai_cores;
 		if("endgame_exits")
@@ -615,8 +607,6 @@
 			return global.news_network;
 		if("newscaster_standard_feeds")
 			return global.newscaster_standard_feeds;
-		if("next_account_number")
-			return global.next_account_number;
 		if("next_duration_update")
 			return global.next_duration_update;
 		if("next_station_date_change")
@@ -635,8 +625,6 @@
 			return global.nttransfer_uid;
 		if("nuke_disks")
 			return global.nuke_disks;
-		if("num_financial_terminals")
-			return global.num_financial_terminals;
 		if("ore_data")
 			return global.ore_data;
 		if("ores_by_type")
@@ -807,8 +795,6 @@
 			return global.sqlpass;
 		if("sqlport")
 			return global.sqlport;
-		if("station_account")
-			return global.station_account;
 		if("station_date")
 			return global.station_date;
 		if("stool_cache")
@@ -917,8 +903,6 @@
 			return global.uplink_random_selections_;
 		if("valid_bloodtypes")
 			return global.valid_bloodtypes;
-		if("vendor_account")
-			return global.vendor_account;
 		if("ventcrawl_machinery")
 			return global.ventcrawl_machinery;
 		if("view_variables_dont_expand")
@@ -1086,8 +1070,6 @@
 			global._client_preferences_by_key=newval;
 		if("_client_preferences_by_type")
 			global._client_preferences_by_type=newval;
-		if("account_hack_attempted")
-			global.account_hack_attempted=newval;
 		if("additional_antag_types")
 			global.additional_antag_types=newval;
 		if("admin_datums")
@@ -1154,8 +1136,6 @@
 			global.all_grabstates=newval;
 		if("all_languages")
 			global.all_languages=newval;
-		if("all_money_accounts")
-			global.all_money_accounts=newval;
 		if("all_objectives")
 			global.all_objectives=newval;
 		if("all_robolimbs")
@@ -1302,8 +1282,6 @@
 			global.defer_powernet_rebuild=newval;
 		if("delta_index")
 			global.delta_index=newval;
-		if("department_accounts")
-			global.department_accounts=newval;
 		if("department_radio_keys")
 			global.department_radio_keys=newval;
 		if("description_icons")
@@ -1320,8 +1298,6 @@
 			global.dreams=newval;
 		if("dummy_lighting_corner")
 			global.dummy_lighting_corner=newval;
-		if("economic_species_modifier")
-			global.economic_species_modifier=newval;
 		if("empty_playable_ai_cores")
 			global.empty_playable_ai_cores=newval;
 		if("endgame_exits")
@@ -1574,8 +1550,6 @@
 			global.news_network=newval;
 		if("newscaster_standard_feeds")
 			global.newscaster_standard_feeds=newval;
-		if("next_account_number")
-			global.next_account_number=newval;
 		if("next_duration_update")
 			global.next_duration_update=newval;
 		if("next_station_date_change")
@@ -1594,8 +1568,6 @@
 			global.nttransfer_uid=newval;
 		if("nuke_disks")
 			global.nuke_disks=newval;
-		if("num_financial_terminals")
-			global.num_financial_terminals=newval;
 		if("ore_data")
 			global.ore_data=newval;
 		if("ores_by_type")
@@ -1764,8 +1736,6 @@
 			global.sqlpass=newval;
 		if("sqlport")
 			global.sqlport=newval;
-		if("station_account")
-			global.station_account=newval;
 		if("station_date")
 			global.station_date=newval;
 		if("stool_cache")
@@ -1876,8 +1846,6 @@
 			global.uplink_random_selections_=newval;
 		if("valid_bloodtypes")
 			global.valid_bloodtypes=newval;
-		if("vendor_account")
-			global.vendor_account=newval;
 		if("ventcrawl_machinery")
 			global.ventcrawl_machinery=newval;
 		if("view_variables_dont_expand")
@@ -1984,7 +1952,6 @@
 	"_client_preferences",
 	"_client_preferences_by_key",
 	"_client_preferences_by_type",
-	"account_hack_attempted",
 	"additional_antag_types",
 	"admin_datums",
 	"admin_pm_repository",
@@ -2020,7 +1987,6 @@
 	"all_grabobjects",
 	"all_grabstates",
 	"all_languages",
-	"all_money_accounts",
 	"all_objectives",
 	"all_robolimbs",
 	"all_species",
@@ -2097,7 +2063,6 @@
 	"default_pai_software",
 	"defer_powernet_rebuild",
 	"delta_index",
-	"department_accounts",
 	"department_radio_keys",
 	"description_icons",
 	"diary",
@@ -2106,7 +2071,6 @@
 	"doppler_arrays",
 	"dreams",
 	"dummy_lighting_corner",
-	"economic_species_modifier",
 	"empty_playable_ai_cores",
 	"endgame_exits",
 	"endgame_safespawns",
@@ -2242,7 +2206,6 @@
 	"navbeacons",
 	"news_network",
 	"newscaster_standard_feeds",
-	"next_account_number",
 	"next_duration_update",
 	"next_station_date_change",
 	"ninjastart",
@@ -2252,7 +2215,6 @@
 	"ntnrc_uid",
 	"nttransfer_uid",
 	"nuke_disks",
-	"num_financial_terminals",
 	"ore_data",
 	"ores_by_type",
 	"organ_cache",
@@ -2347,7 +2309,6 @@
 	"sqllogin",
 	"sqlpass",
 	"sqlport",
-	"station_account",
 	"station_date",
 	"stool_cache",
 	"stored_shock_by_ref",
@@ -2408,7 +2369,6 @@
 	"uplink_purchase_repository",
 	"uplink_random_selections_",
 	"valid_bloodtypes",
-	"vendor_account",
 	"ventcrawl_machinery",
 	"view_variables_dont_expand",
 	"view_variables_no_assoc",

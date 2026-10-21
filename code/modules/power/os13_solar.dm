@@ -302,12 +302,10 @@ GLOBAL_LIST_EMPTY(solar_bases)
 /decl/hierarchy/supply_pack/engineering/solar_panels
 	name = "Replacement solar panels"
 	contains = list(/obj/item/solar_panel = 6)
-	cost = 20
 	containername = "replacement solar panel crate"
 
 /decl/hierarchy/supply_pack/engineering/solar_service
 	name = "Solar maintenance carts"
 	contains = list(/obj/structure/solar_panel_cart/loaded, /obj/structure/harvester)
-	cost = 35
 	containername = "solar maintenance crate"
 

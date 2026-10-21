@@ -35,7 +35,6 @@
 
 	data["is_admin"] = is_admin
 	data["screen"] = screen
-	data["credits"] = "[SSsupply.points]"
 	switch(screen)
 		if(1)// Main ordering menu
 			data["categories"] = category_names
@@ -43,14 +42,10 @@
 				data["category"] = selected_category
 				data["possible_purchases"] = category_contents[selected_category]
 
-		if(2)// Statistics screen with credit overview
-			var/list/point_breakdown = list()
-			for(var/tag in SSsupply.point_source_descriptions)
-				var/entry = list()
-				entry["desc"] = SSsupply.point_source_descriptions[tag]
-				entry["points"] = SSsupply.point_sources[tag] || 0
-				point_breakdown += list(entry) //Make a list of lists, don't flatten
-			data["point_breakdown"] = point_breakdown
+		if(2)
+			data["pending_count"] = SSsupply.requestlist.len
+			data["shipment_count"] = SSsupply.shoppinglist.len
+			data["completed_count"] = SSsupply.donelist.len
 			data["can_print"] = can_print()
 
 		if(3)// Shuttle monitoring and control
@@ -79,7 +74,6 @@
 
 		if(5)// Selling menu
 			data["categories"] = categories_to_nanoui()
-			data["refresh_cost"] = SSsupply.refresh_cost
 			data["refresh_timer"] = SSsupply.current_refresh_timer
 			data["can_print"] = can_print()
 
@@ -182,12 +176,8 @@
 		for(var/datum/supply_order/SO in SSsupply.requestlist)
 			if(SO.ordernum != id)
 				continue
-			if(SO.object.cost > SSsupply.points)
-				to_chat(usr, "<span class='warning'>Not enough points to purchase \the [SO.object.name]!</span>")
-				return 1
 			SSsupply.requestlist -= SO
 			SSsupply.shoppinglist += SO
-			SSsupply.points -= SO.object.cost
 			break
 		return 1
 
@@ -204,7 +194,6 @@
 		for(var/datum/supply_order/SO in SSsupply.shoppinglist)
 			if(SO.ordernum == id)
 				SSsupply.shoppinglist -= SO
-				SSsupply.points += SO.object.cost
 				break
 		return 1
 
@@ -219,6 +208,8 @@
 	if(href_list["refresh_category"])
 		var/key = href_list["refresh_category"] //getting key of category
 		var/datum/sell_order/category = SSsupply.list_avalable_categories[key]
+		if(!istype(category) || SSsupply.current_refresh_timer > 0)
+			return
 		var/category_type = category.type //and getting its type
 		for(var/so_key in SSsupply.sell_order_list) //searching orders with this category
 			var/datum/sell_order/so = SSsupply.sell_order_list[so_key]
@@ -226,7 +217,6 @@
 			if(so_category == category_type) //respawning them
 				SSsupply.respawn(so.type)
 		SSsupply.current_refresh_timer = SSsupply.refresh_timer //anti rerolling
-		SSsupply.points -= SSsupply.refresh_cost
 
 	if(href_list["complete_order"])
 		var/key = href_list["complete_order"]
@@ -246,7 +236,6 @@
 					continue
 				category.Add(list(list(
 					"name" = spc.name,
-					"cost" = spc.cost,
 					"ref" = "\ref[spc]"
 				)))
 			category_contents[sp.name] = category
@@ -268,7 +257,6 @@
 		"id" = SO.ordernum,
 		"object" = SO.object.name,
 		"orderer" = SO.orderedby,
-		"cost" = SO.object.cost,
 		"reason" = SO.reason
 		))
 
@@ -288,7 +276,6 @@
 					"order_desc" = so.description,
 					"order_progress" = so.progress,
 					"order_max_progress" = so.max_progress,
-					"order_cost" = so.cost,
 					"order_key" = key
 				))
 		categories += list(list( //add category to list
@@ -336,13 +323,13 @@
 				t += "<b>Name:</b> [order.name]<br>"
 				t += "<b>Description:</b> [order.description]<br>"
 				t += "<b>Progress:</b> [order.progress]/[order.max_progress]<br>"
-				t += "<b>Reward:</b> [order.cost] Cr.<br><br>"
 		t += "<hr>"
 	print_text(t, user)
 
 /datum/nano_module/supply/proc/print_summary(var/mob/user)
 	var/t = ""
 	t += "<center><BR><b><large>[GLOB.using_map.station_name]</large></b><BR><i>[station_date]</i><BR><i>Export overview<field></i></center><hr>"
-	for(var/source in SSsupply.point_source_descriptions)
-		t += "[SSsupply.point_source_descriptions[source]]: [SSsupply.point_sources[source] || 0]<br>"
+	t += "Pending requests: [SSsupply.requestlist.len]<br>"
+	t += "Approved shipments: [SSsupply.shoppinglist.len]<br>"
+	t += "Completed shipments: [SSsupply.donelist.len]<br>"
 	print_text(t, user)

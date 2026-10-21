@@ -52,8 +52,6 @@
 	var/obj/item/storage/secure/briefcase/sec_briefcase = new(H)
 	for(var/obj/item/briefcase_item in sec_briefcase)
 		qdel(briefcase_item)
-	for(var/i=3, i>0, i--)
-		sec_briefcase.contents += new /obj/item/spacecash/bundle/c1000
 	sec_briefcase.contents += new /obj/item/weapon/gun/energy/crossbow
 	sec_briefcase.contents += new /obj/item/weapon/gun/projectile/revolver/mateba
 	sec_briefcase.contents += new /obj/item/ammo_magazine/c50

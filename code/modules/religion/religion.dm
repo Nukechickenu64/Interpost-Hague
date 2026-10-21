@@ -95,7 +95,7 @@
 	name = "Atheism"
 	holy_item = /obj/item/weapon/brander
 	whisper_lines = list("Remember: science protects.", "The researcher provides.", "Trust the Internal Affairs agent.")
-	offering_items = list(/obj/item/spacecash/bundle/c10)
+	offering_items = list(/obj/item/stack/material/steel)
 
 /*
 /datum/religion/narsie

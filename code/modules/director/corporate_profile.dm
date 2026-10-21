@@ -8,8 +8,7 @@
 	var/description = "You have a standard corporate profile with no special obligations."
 
 	// Agenda vars
-	var/agenda_text = ""          // What the crewmember is being paid extra to do
-	var/agenda_reward = 0         // Payout in thalers/credits on completion
+	var/agenda_text = ""
 	var/agenda_completed = FALSE
 	var/agenda_target_type = null // Optional: type path of target item/area
 	var/agenda_target_amount = 0  // Optional: amount to hoard/collect
@@ -23,7 +22,6 @@
 	var/debt_contraband_delivered = 0
 	var/debt_threshold = 0        // When debt_paid >= debt_threshold, debt is cleared
 	var/debt_failed = FALSE       // If round ends without paying, consequences
-	var/debt_leverage_granted = FALSE // Guards against granting Leverage more than once
 
 	// Tension contribution
 	var/tension_contribution = 0  // How much this profile adds to the tension meter
@@ -45,54 +43,46 @@
 		var/obj/item/stack/dummy = agenda_target_type
 		agenda_text = "Hoard and stockpile at least [rand(15,30)] units of [initial(dummy.name)] in the cargo bay."
 		agenda_target_amount = rand(15, 30)
-		agenda_reward = rand(800, 1500)
 		tension_contribution = 5
 
 	else if(findtext(role, "Scientist") || findtext(role, "Research"))
 		agenda_text = "Bypass safety protocols on the engine and push experimental research beyond standard parameters."
-		agenda_reward = rand(1000, 2000)
 		tension_contribution = 8
 
 	else if(findtext(role, "Engineer") || findtext(role, "Atmos"))
 		agenda_text = "Divert power from a non-critical department to your preferred section and maintain it for 10 minutes."
-		agenda_reward = rand(600, 1200)
 		tension_contribution = 6
 
 	else if(findtext(role, "Medical") || findtext(role, "Doctor") || findtext(role, "Chemist"))
-		agenda_text = "Stockpile a personal reserve of advanced medicines and withhold distribution until a price is met."
-		agenda_reward = rand(700, 1300)
+		agenda_text = "Stockpile a personal reserve of advanced medicines and withhold distribution from rival departments."
 		tension_contribution = 5
 
 	else if(findtext(role, "Security") || findtext(role, "Officer") || findtext(role, "Detective"))
-		agenda_text = "Maintain a quota of arrests. You receive a bonus for each successful processing."
+		agenda_text = "Maintain a quota of arrests and successfully process each detainee."
 		agenda_target_amount = rand(3, 6)
-		agenda_reward = rand(500, 1000) * agenda_target_amount
 		tension_contribution = 10
 
 	else if(findtext(role, "Bartender") || findtext(role, "Chef") || findtext(role, "Botanist"))
-		agenda_text = "Create and sell premium goods at inflated prices. Hoard the best ingredients."
-		agenda_reward = rand(400, 800)
+		agenda_text = "Create premium goods for your preferred department. Hoard the best ingredients."
 		tension_contribution = 3
 
 	else if(findtext(role, "Captain") || findtext(role, "Head"))
 		agenda_text = "Maximize department efficiency metrics. Cut corners on safety to boost output."
-		agenda_reward = rand(1500, 3000)
 		tension_contribution = 7
 
 	else
 		// Generic agenda for any other role
 		var/list/generic_agendas = list(
-			"Collect and hoard a specific type of item for a private buyer.",
+			"Collect and hoard a specific type of item for a private contact.",
 			"Spread a rumor about a coworker to damage their reputation.",
 			"Sabotage a rival department's equipment subtly.",
 			"Secure a promotion by any means necessary.",
-			"Accumulate more wealth than any other crewmember."
+			"Stockpile more useful equipment than any other crewmember."
 		)
 		agenda_text = pick(generic_agendas)
-		agenda_reward = rand(500, 1000)
 		tension_contribution = 4
 
-	description = "Corporate Agenda: [agenda_text] Complete this for a bonus of T[agenda_reward]."
+	description = "Corporate Agenda: [agenda_text]"
 
 /// Generate a debt for the crewmember
 /datum/corporate_profile/proc/generate_debt()
@@ -105,11 +95,11 @@
 		"the Cybersun Syndicate",
 		"the Donk Corporation",
 		"a shadowy syndicate broker",
-		"an unaffiliated loan shark",
+		"an unaffiliated smuggling contact",
 		"the Waffle Corporation"
 	)
 	debt_creditor = pick(creditors)
-	debt_amount = rand(3000, 8000)
+	debt_amount = rand(3, 5)
 	debt_threshold = debt_amount
 
 	var/list/debt_tasks = list(
@@ -122,8 +112,8 @@
 	)
 	var/task = pick(debt_tasks)
 
-	agenda_text = "You owe [debt_creditor] T[debt_amount]. To pay off your debt, you must [task]."
-	description = "Corporate Debt: You owe [debt_creditor] T[debt_amount]. You must [task] to pay it off. Failure will have consequences."
+	agenda_text = "You are obligated to [debt_creditor]. You must [task]."
+	description = "Corporate Obligation: Complete [debt_amount] deliveries for [debt_creditor]. You must [task]. Failure will have consequences."
 	tension_contribution = 12
 
 /// Show the profile to the player
@@ -181,18 +171,13 @@
 	credit_agenda_progress()
 	return TRUE
 
-/// Mark the agenda complete and pay out the reward
 /datum/corporate_profile/proc/complete_agenda()
 	if(agenda_completed)
 		return
 	agenda_completed = TRUE
 	tension_contribution = max(0, tension_contribution - 5)
-	if(owner && owner.initial_account)
-		var/datum/transaction/T = new("Corporate Agenda", "Agenda bonus", agenda_reward)
-		owner.initial_account.do_transaction(T)
 	if(owner && owner.current)
-		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> Your corporate bonus of T[agenda_reward] has been deposited.</span>")
-	grant_leverage(round(agenda_reward / 25))
+		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> You have fulfilled your corporate assignment.</span>")
 
 /// Mark debt as partially paid
 /datum/corporate_profile/proc/pay_debt(var/amount)
@@ -200,18 +185,15 @@
 		return
 	debt_paid += amount
 	if(debt_paid >= debt_threshold)
-		to_chat(owner.current, "<span class='notice'><b>Debt Cleared:</b> You have paid off your debt to [debt_creditor]. You are free.</span>")
+		to_chat(owner.current, "<span class='notice'><b>Obligation Fulfilled:</b> You have completed your assignment for [debt_creditor].</span>")
 		tension_contribution = max(0, tension_contribution - 10)
-		if(!debt_leverage_granted)
-			debt_leverage_granted = TRUE
-			grant_leverage(round(debt_amount / 25))
 
 /// Mark contraband delivered for debt
 /datum/corporate_profile/proc/deliver_contraband()
 	if(type_name != PROFILE_DEBT)
 		return
 	debt_contraband_delivered++
-	debt_paid += rand(500, 1500)
+	debt_paid++
 	pay_debt(0) // Check threshold
 
 /// Called at round end to evaluate consequences
@@ -220,27 +202,15 @@
 		return
 	if(type_name == PROFILE_DEBT && debt_paid < debt_threshold)
 		debt_failed = TRUE
-		to_chat(owner.current, "<span class='danger'><b>Debt Unpaid:</b> You failed to repay [debt_creditor]. They will remember this...</span>")
+		to_chat(owner.current, "<span class='danger'><b>Obligation Unfulfilled:</b> You failed to complete your assignment for [debt_creditor].</span>")
 	else if(type_name == PROFILE_AGENDA && agenda_completed)
-		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> Your corporate bonus of T[agenda_reward] has been deposited.</span>")
+		to_chat(owner.current, "<span class='notice'><b>Agenda Completed:</b> You have fulfilled your corporate assignment.</span>")
 
-/// Grant persistent Leverage currency to the owner's account, spendable in the Leverage shop.
-/datum/corporate_profile/proc/grant_leverage(var/amount)
-	if(amount <= 0 || !owner || !owner.current || !owner.current.client)
-		return
-	var/datum/preferences/prefs = owner.current.client.prefs
-	if(!prefs)
-		return
-	prefs.meta_currency += amount
-	prefs.save_preferences()
-	to_chat(owner.current, "<span class='notice'><b>Leverage Earned:</b> +[amount] Leverage (total: [prefs.meta_currency]). Spend it in the Leverage Exchange in your OOC menu.</span>")
-
-/// Get a summary for round-end display
 /datum/corporate_profile/proc/get_summary()
 	if(type_name == PROFILE_CLEAN)
 		return null
 	if(type_name == PROFILE_AGENDA)
 		return "Agenda: [agenda_text] - [agenda_completed ? "<font color='green'>Completed</font>" : "<font color='red'>Incomplete</font>"]"
 	if(type_name == PROFILE_DEBT)
-		return "Debt to [debt_creditor]: T[debt_paid]/T[debt_amount] - [debt_paid >= debt_threshold ? "<font color='green'>Paid</font>" : "<font color='red'>Unpaid</font>"]"
+		return "Obligation to [debt_creditor]: [debt_paid]/[debt_amount] deliveries - [debt_paid >= debt_threshold ? "<font color='green'>Completed</font>" : "<font color='red'>Incomplete</font>"]"
 	return null

@@ -90,4 +90,4 @@
 	if(amount)
 		SSnano.update_uis(mob_uplink)
 		mob_uplink.uses -= amount
-		mob_uplink.used_TC += amount
+		mob_uplink.creation_charges_spent += amount

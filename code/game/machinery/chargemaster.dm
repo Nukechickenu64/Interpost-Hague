@@ -128,13 +128,11 @@
 /decl/hierarchy/supply_pack/supply/precursor_charges
 	name = "Precursor charges (12)"
 	contains = list(/obj/item/precursor_charge = 12)
-	cost = 60
 	containername = "precursor charge crate"
 
 /decl/hierarchy/supply_pack/supply/chargemaster
 	name = "ChargeMaster"
 	contains = list(/obj/machinery/chargemaster)
-	cost = 40
 	containertype = /obj/structure/closet/crate/large
 	containername = "ChargeMaster crate"
 

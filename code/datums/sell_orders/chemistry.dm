@@ -7,15 +7,12 @@
 
 /datum/sell_order/chemistry/bicaridine/v240
 	wanted = list(/datum/reagent/bicaridine = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/bicaridine/v120
 	wanted = list(/datum/reagent/bicaridine = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/bicaridine/v60
 	wanted = list(/datum/reagent/bicaridine = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/dermaline
 	name = "Dermaline"
@@ -23,15 +20,12 @@
 
 /datum/sell_order/chemistry/dermaline/v240
 	wanted = list(/datum/reagent/dermaline = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/dermaline/v120
 	wanted = list(/datum/reagent/dermaline = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/dermaline/v60
 	wanted = list(/datum/reagent/dermaline = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/dexalinp
 	name = "Dexaline Plus"
@@ -39,15 +33,12 @@
 
 /datum/sell_order/chemistry/dexalinp/v240
 	wanted = list(/datum/reagent/dexalinp = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/dexalinp/v120
 	wanted = list(/datum/reagent/dexalinp = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/dexalinp/v60
 	wanted = list(/datum/reagent/dexalinp = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/oxycodone
 	name = "Oxycodone"
@@ -55,15 +46,12 @@
 
 /datum/sell_order/chemistry/oxycodone/v240
 	wanted = list(/datum/reagent/tramadol/oxycodone = 240)
-	cost = 100
 
 /datum/sell_order/chemistry/oxycodone/v120
 	wanted = list(/datum/reagent/tramadol/oxycodone = 120)
-	cost = 50
 
 /datum/sell_order/chemistry/oxycodone/v60
 	wanted = list(/datum/reagent/tramadol/oxycodone = 60)
-	cost = 25
 
 /datum/sell_order/chemistry/hyronalin
 	name = "Hyronalin"
@@ -71,15 +59,12 @@
 
 /datum/sell_order/chemistry/hyronalin/v240
 	wanted = list(/datum/reagent/hyronalin = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/hyronalin/v120
 	wanted = list(/datum/reagent/hyronalin = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/hyronalin/v60
 	wanted = list(/datum/reagent/hyronalin = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/arithrazine
 	name = "Arithrazine"
@@ -87,15 +72,12 @@
 
 /datum/sell_order/chemistry/arithrazine/v240
 	wanted = list(/datum/reagent/arithrazine = 240)
-	cost = 100
 
 /datum/sell_order/chemistry/arithrazine/v120
 	wanted = list(/datum/reagent/arithrazine = 120)
-	cost = 50
 
 /datum/sell_order/chemistry/arithrazine/v60
 	wanted = list(/datum/reagent/arithrazine = 60)
-	cost = 25
 
 /datum/sell_order/chemistry/alkysine
 	name = "Alkysine"
@@ -103,15 +85,12 @@
 
 /datum/sell_order/chemistry/alkysine/v240
 	wanted = list(/datum/reagent/alkysine = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/alkysine/v120
 	wanted = list(/datum/reagent/alkysine = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/alkysine/v60
 	wanted = list(/datum/reagent/alkysine = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/peridaxon
 	name = "Peridaxon"
@@ -119,15 +98,12 @@
 
 /datum/sell_order/chemistry/peridaxon/v240
 	wanted = list(/datum/reagent/peridaxon = 240)
-	cost = 400
 
 /datum/sell_order/chemistry/peridaxon/v120
 	wanted = list(/datum/reagent/peridaxon = 120)
-	cost = 200
 
 /datum/sell_order/chemistry/peridaxon/v60
 	wanted = list(/datum/reagent/peridaxon = 60)
-	cost = 100
 
 /datum/sell_order/chemistry/imidazoline
 	name = "Imidazoline"
@@ -135,15 +111,12 @@
 
 /datum/sell_order/chemistry/imidazoline/v240
 	wanted = list(/datum/reagent/imidazoline = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/imidazoline/v120
 	wanted = list(/datum/reagent/imidazoline = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/imidazoline/v60
 	wanted = list(/datum/reagent/imidazoline = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/clonexadone
 	name = "Clonexadone"
@@ -151,30 +124,24 @@
 
 /datum/sell_order/chemistry/clonexadone/v240
 	wanted = list(/datum/reagent/clonexadone = 240)
-	cost = 100
 
 /datum/sell_order/chemistry/clonexadone/v120
 	wanted = list(/datum/reagent/clonexadone = 120)
-	cost = 50
 
 /datum/sell_order/chemistry/clonexadone/v60
 	wanted = list(/datum/reagent/clonexadone = 60)
-	cost = 25
 
 /datum/sell_order/chemistry/noexcutite
 	name = "Noexcutite"
 
 /datum/sell_order/chemistry/noexcutite/v240
 	wanted = list(/datum/reagent/noexcutite = 240)
-	cost = 150
 
 /datum/sell_order/chemistry/noexcutite/v120
 	wanted = list(/datum/reagent/noexcutite = 120)
-	cost = 75
 
 /datum/sell_order/chemistry/noexcutite/v60
 	wanted = list(/datum/reagent/noexcutite = 60)
-	cost = 37.5
 
 /datum/sell_order/chemistry/ryetalyn
 	name = "Ryetalyn"
@@ -182,15 +149,12 @@
 
 /datum/sell_order/chemistry/ryetalyn/v240
 	wanted = list(/datum/reagent/ryetalyn = 240)
-	cost = 200
 
 /datum/sell_order/chemistry/ryetalyn/v120
 	wanted = list(/datum/reagent/ryetalyn = 120)
-	cost = 100
 
 /datum/sell_order/chemistry/ryetalyn/v60
 	wanted = list(/datum/reagent/ryetalyn = 60)
-	cost = 50
 
 /datum/sell_order/chemistry/hyperzine
 	name = "Hyperzine"
@@ -198,15 +162,12 @@
 
 /datum/sell_order/chemistry/hyperzine/v240
 	wanted = list(/datum/reagent/hyperzine = 240)
-	cost = 25
 
 /datum/sell_order/chemistry/hyperzine/v120
 	wanted = list(/datum/reagent/hyperzine = 120)
-	cost = 12.5
 
 /datum/sell_order/chemistry/hyperzine/v60
 	wanted = list(/datum/reagent/hyperzine = 60)
-	cost = 6.25
 
 /datum/sell_order/chemistry/ethylredoxrazine
 	name = "Ethylredoxrazine"
@@ -214,15 +175,12 @@
 
 /datum/sell_order/chemistry/ethylredoxrazine/v240
 	wanted = list(/datum/reagent/ethylredoxrazine = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/ethylredoxrazine/v120
 	wanted = list(/datum/reagent/ethylredoxrazine = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/ethylredoxrazine/v60
 	wanted = list(/datum/reagent/ethylredoxrazine = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/leporazine
 	name = "Leporazine"
@@ -230,15 +188,12 @@
 
 /datum/sell_order/chemistry/leporazine/v240
 	wanted = list(/datum/reagent/leporazine = 240)
-	cost = 50
 
 /datum/sell_order/chemistry/leporazine/v120
 	wanted = list(/datum/reagent/leporazine = 120)
-	cost = 25
 
 /datum/sell_order/chemistry/leporazine/v60
 	wanted = list(/datum/reagent/leporazine = 60)
-	cost = 12.5
 
 /datum/sell_order/chemistry/lube
 	name = "Space Lube"
@@ -246,15 +201,12 @@
 
 /datum/sell_order/chemistry/lube/v240
 	wanted = list(/datum/reagent/lube = 240)
-	cost = 25
 
 /datum/sell_order/chemistry/lube/v120
 	wanted = list(/datum/reagent/lube = 120)
-	cost = 12.5
 
 /datum/sell_order/chemistry/lube/v60
 	wanted = list(/datum/reagent/lube = 60)
-	cost = 6.25
 
 /datum/sell_order/chemistry/lexorin
 	name = "Lexorin"
@@ -262,15 +214,12 @@
 
 /datum/sell_order/chemistry/lexorin/v240
 	wanted = list(/datum/reagent/lexorin = 240)
-	cost = 400
 
 /datum/sell_order/chemistry/lexorin/v120
 	wanted = list(/datum/reagent/lexorin = 120)
-	cost = 200
 
 /datum/sell_order/chemistry/lexorin/v60
 	wanted = list(/datum/reagent/lexorin = 60)
-	cost = 100
 
 /datum/sell_order/chemistry/chloralhydrate
 	name = "Chloral Hydrate"
@@ -278,15 +227,12 @@
 
 /datum/sell_order/chemistry/chloralhydrate/v240
 	wanted = list(/datum/reagent/chloralhydrate = 240)
-	cost = 150
 
 /datum/sell_order/chemistry/chloralhydrate/v120
 	wanted = list(/datum/reagent/chloralhydrate = 120)
-	cost = 75
 
 /datum/sell_order/chemistry/chloralhydrate/v60
 	wanted = list(/datum/reagent/chloralhydrate = 60)
-	cost = 37.5
 
 /datum/sell_order/chemistry/cryptobiolin
 	name = "Cryptobiolin"
@@ -294,15 +240,12 @@
 
 /datum/sell_order/chemistry/cryptobiolin/v240
 	wanted = list(/datum/reagent/cryptobiolin = 240)
-	cost = 25
 
 /datum/sell_order/chemistry/cryptobiolin/v120
 	wanted = list(/datum/reagent/cryptobiolin = 120)
-	cost = 12.5
 
 /datum/sell_order/chemistry/cryptobiolin/v60
 	wanted = list(/datum/reagent/cryptobiolin = 60)
-	cost = 6.25
 
 /datum/sell_order/chemistry/mindbreaker
 	name = "Mindbreaker Toxin"
@@ -310,12 +253,9 @@
 
 /datum/sell_order/chemistry/mindbreaker/v240
 	wanted = list(/datum/reagent/mindbreaker = 240)
-	cost = 75
 
 /datum/sell_order/chemistry/mindbreaker/v120
 	wanted = list(/datum/reagent/mindbreaker = 120)
-	cost = 37.5
 
 /datum/sell_order/chemistry/mindbreaker/v60
 	wanted = list(/datum/reagent/mindbreaker = 60)
-	cost = 18.75

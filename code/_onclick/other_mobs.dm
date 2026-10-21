@@ -45,7 +45,7 @@
 		/obj/structure/closet/verb/verb_toggleopen,
 		/obj/structure/bed/chair/verb/rotate,
 		/obj/structure/ore_box/verb/empty_box,
-		/obj/structure/flora/verb/collect_purchase
+		/obj/structure/flora/verb/collect_equipment
 	)
 	return supported_verbs
 

@@ -1,7 +1,11 @@
 /datum/uplink_item/deity
 	antag_roles = list()
+	var/power_cost = 1
 	var/list/required_feats //is a list of the feat names
 	var/path
+
+/datum/uplink_item/deity/cost(var/power, obj/item/device/uplink/U)
+	return max(1, power_cost)
 
 /datum/uplink_item/deity/can_view(obj/item/device/uplink/U)
 	if(!..() || !U || !U.uplink_owner || !istype(U.uplink_owner.current, /mob/living/deity))

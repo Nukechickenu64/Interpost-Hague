@@ -24,7 +24,7 @@
 		eyeobj = new eye_type(src)
 		eyeobj.possess(src)
 		eyeobj.visualnet.add_source(src)
-	mob_uplink = new(src, telecrystals = 0)
+	mob_uplink = new(src, initial_charges = 0)
 
 /mob/living/deity/Life()
 	. = ..()

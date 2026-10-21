@@ -10,7 +10,6 @@ var/list/weighted_mundaneevent_locations = list()
 	var/list/willing_to_sell = list()
 	var/can_shuttle_here = 0		//one day crew from the exodus will be able to travel to this destination
 	var/list/viable_random_events = list()
-	var/list/temp_price_change[BIOMEDICAL]
 	var/list/viable_mundane_events = list()
 
 /datum/trade_destination/proc/get_custom_eventstring(var/event_type)

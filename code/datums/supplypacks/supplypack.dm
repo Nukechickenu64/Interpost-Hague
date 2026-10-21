@@ -5,7 +5,6 @@ var/decl/hierarchy/supply_pack/cargo_supply_packs	// Non-category supply packs
 	name = "Supply Packs"
 	var/list/contains = list()
 	var/manifest = ""
-	var/cost = null
 	var/containertype = /obj/structure/closet/crate
 	var/containername = null
 	var/access = null

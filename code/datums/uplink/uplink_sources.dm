@@ -1,4 +1,4 @@
-#define NO_GUARANTEE_NO_EXTRA_COST_DESC(X) "Installs an uplink into " + X + " if, and only if, found on your person. Has no TC cost."
+#define NO_GUARANTEE_NO_EXTRA_COST_DESC(X) "Installs an uplink into " + X + " if found on your person."
 
 #define SETUP_FAILED TRUE
 
@@ -55,7 +55,7 @@ GLOBAL_LIST_INIT(default_uplink_source_priority, list(
 
 /decl/uplink_source/implant
 	name = "Implant"
-	desc = "Teleports an uplink implant into your head. Costs at least half the initial TC amount."
+	desc = "Installs an equipment fabricator in your head."
 
 /decl/uplink_source/implant/setup_uplink_source(var/mob/living/carbon/human/H, var/amount)
 	if(!istype(H))
@@ -65,7 +65,7 @@ GLOBAL_LIST_INIT(default_uplink_source_priority, list(
 	if(!head)
 		return SETUP_FAILED
 
-	var/obj/item/implant/uplink/U = new(H, IMPLANT_TELECRYSTAL_AMOUNT(amount))
+	var/obj/item/implant/uplink/U = new(H, IMPLANT_CREATION_CHARGES(amount))
 	U.imp_in = H
 	U.implanted = TRUE
 	U.part = head
@@ -75,15 +75,15 @@ GLOBAL_LIST_INIT(default_uplink_source_priority, list(
 
 /decl/uplink_source/unit
 	name = "Uplink Unit"
-	desc = "Teleports an uplink unit to your location. Costs 10% of the initial TC amount."
+	desc = "Creates a portable equipment fabricator at your location."
 
 /decl/uplink_source/unit/setup_uplink_source(var/mob/M, var/amount)
-	var/obj/item/device/radio/uplink/U = new(M, M.mind, round(amount * 0.9))
+	var/obj/item/device/radio/uplink/U = new(M, M.mind, amount)
 	put_on_mob(M, U, "\A [U]")
 
 /decl/uplink_source/telecrystals
 	name = "Telecrystals"
-	desc = "Get your telecrystals in pure form, without the means to trade them for goods."
+	desc = "Receive physical crystals for short-range teleportation instead of an equipment fabricator."
 
 /decl/uplink_source/telecrystals/setup_uplink_source(var/mob/M, var/amount)
 	var/obj/item/stack/telecrystal/TC = new(M, amount)
@@ -107,7 +107,7 @@ GLOBAL_LIST_INIT(default_uplink_source_priority, list(
 		AM.dropInto(M.loc)
 		to_chat(M, "<span class='notice'>[text] appear at your location.</span>")
 
-/proc/setup_uplink_source(var/mob/M, var/amount = DEFAULT_TELECRYSTAL_AMOUNT)
+/proc/setup_uplink_source(var/mob/M, var/amount = DEFAULT_CREATION_CHARGES)
 	if(!istype(M) || !M.mind)
 		return FALSE
 

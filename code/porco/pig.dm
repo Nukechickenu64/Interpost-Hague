@@ -490,10 +490,6 @@
 	client.changebuttoncontent("#note", noteHTML)
 	client.changebuttoncontent("#Verb", verbUpdate())
 	var/list/ooc_options = list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))
-	if(isliving(src))
-		var/mob/living/shop_user = src
-		if(shop_user.meta_shop_access())
-			ooc_options += list(list("Leverage-Exchange", "Leverage Exchange"))
 	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(ooc_options) + "</span>")
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
