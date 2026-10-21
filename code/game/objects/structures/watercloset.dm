@@ -221,9 +221,11 @@
 	anchored = 1
 	mouse_opacity = 0
 
-/obj/structure/hygiene/shower/attack_hand(mob/M as mob, var/obj/machinery/waterchip_holder)
-	if(!GLOB.waterchip_installed)
-		to_chat(usr, "<span class='info'>The [name] makes a sad gurgle. The water chip is not installed.</span>")
+/obj/structure/hygiene/shower/attack_hand(mob/M as mob)
+	if(!M || M.incapacitated() || !Adjacent(M))
+		return
+	if(!on && !GLOB.waterchip_installed)
+		to_chat(M, "<span class='info'>The [name] makes a sad gurgle. The water chip is not installed.</span>")
 		return
 
 	var/showersound = "sound/machines/shower_mid[rand(1,3)].ogg"
@@ -278,6 +280,8 @@
 
 //Yes, showers are super powerful as far as washing goes.
 /obj/structure/hygiene/shower/proc/wash(var/atom/movable/washing, atom/movable/O as obj|mob)
+	if(!on || !GLOB.waterchip_installed)
+		return
 	if(on)
 		wash_mob(washing)
 		if(isturf(loc))
@@ -288,6 +292,9 @@
 	reagents.splash(washing, 10)
 
 /obj/structure/hygiene/shower/Process()
+	if(on && !GLOB.waterchip_installed)
+		on = FALSE
+		update_icon()
 	if(!on) return
 
 	for(var/thing in loc)
@@ -311,7 +318,7 @@
 		is_washing = 0
 
 /obj/structure/hygiene/shower/proc/process_heat(mob/living/M)
-	if(!on || !istype(M)) return
+	if(!on || !GLOB.waterchip_installed || !istype(M)) return
 
 	var/temperature = temperature_settings[watertemp]
 	var/temp_adj = between(BODYTEMP_COOLING_MAX, temperature - M.bodytemperature, BODYTEMP_HEATING_MAX)
@@ -353,7 +360,9 @@
 	thing.reagents.clear_reagents()
 	thing.update_icon()
 
-/obj/structure/hygiene/sink/attack_hand(mob/user as mob, var/obj/machinery/waterchip_holder)
+/obj/structure/hygiene/sink/attack_hand(mob/user as mob)
+	if(!user || user.incapacitated())
+		return
 	if (ishuman(user))
 		var/mob/living/carbon/human/H = user
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
@@ -393,7 +402,7 @@
 			playsound(loc, 'sound/effects/sink_long.ogg', 75, 1)
 
 	busy = 1
-	if(!do_after(user, 4 SECONDS, src))
+	if(!do_after(user, 4 SECONDS, src) || !GLOB.waterchip_installed)
 		busy = 0
 		return TRUE
 	busy = 0
@@ -412,11 +421,11 @@
 		to_chat(user, "<span class='warning'>Someone's already washing here.</span>")
 		return
 
-/*
-	if(!waterchip_holder.installed)
-		to_chat("<span class='info'>There's no waterchip installed.</span>")
+	if(!user || user.incapacitated() || !Adjacent(user) || O.loc != user)
 		return
-*/
+	if(!GLOB.waterchip_installed)
+		to_chat(user, "The [name] makes a sad gurgle. The water chip is not installed.")
+		return
 
 	var/obj/item/reagent_containers/RG = O
 	if (istype(RG) && RG.is_open_container() && RG.reagents)
@@ -460,6 +469,7 @@
 	sleep(40)
 	busy = 0
 
+	if(!GLOB.waterchip_installed) return
 	if(user.loc != location) return				//User has moved
 	if(!I) return 								//Item's been destroyed while washing
 	if(user.get_active_hand() != I) return		//Person has switched hands or the item in their hands

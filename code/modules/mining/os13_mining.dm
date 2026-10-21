@@ -2,7 +2,7 @@
 // Only iron, zrbite and elerium are mineable. Ore nuggets look like any other
 // rock and can be fed straight into the Replicator platform. Adds the grav
 // cutter instant mining tool and the Harvester, a drag-able mining crate that
-// vacuums up every ore it drives over while powered on.
+// collects loose ore and salvage it drives over while powered on.
 
 /****************************** Ores ******************************/
 
@@ -72,7 +72,7 @@
 
 /obj/structure/harvester
 	name = "harvester"
-	desc = "A heavy mining crate on treads. While powered on, everything it drives over is vacuumed inside. Click it to power it, and use Release Ores in its right-click menu to dump everything collected."
+	desc = "A heavy collection crate on treads. While powered on, it collects loose ore, shards and scrap. Click it to power it, and use Release Contents in its right-click menu to empty it."
 	icon = 'icons/os13/objects/objects/mining.dmi'
 	icon_state = "harvester0"
 	density = 1
@@ -86,7 +86,8 @@
 	add_fingerprint(user)
 	on = !on
 	if(on)
-		to_chat(user, "<span class='notice'>You power on \the [src]. It will now scoop up every ore it drives over.</span>")
+		scoop_turf()
+		to_chat(user, "<span class='notice'>You power on \the [src]. It will collect loose ore, shards and scrap.</span>")
 	else
 		to_chat(user, "<span class='notice'>You power off \the [src].</span>")
 	update_icon()
@@ -97,12 +98,14 @@
 		scoop_turf()
 	return .
 
-// Called on a successful Move(): vacuum up all loose ore on the destination turf.
+// Called on a successful Move(): collect eligible loose salvage on the destination turf.
 /obj/structure/harvester/proc/scoop_turf()
 	var/turf/T = get_turf(src)
 	if(!T)
 		return
-	for(var/obj/item/ore/O in T.contents)
+	for(var/obj/item/O in T.contents)
+		if(O.anchored || !can_collect(O))
+			continue
 		O.forceMove(src)
 		scooped |= O
 	if(scooped.len)
@@ -112,13 +115,35 @@
 	. = ..()
 	if(!Adjacent(user))
 		return
+	scooped &= contents
 	if(!scooped.len)
 		to_chat(user, "It is empty.")
 		return
-	to_chat(user, "It holds [scooped.len] lump\s of ore.")
+	to_chat(user, "It holds [scooped.len] collected item\s.")
+
+/obj/structure/harvester/proc/can_collect(obj/item/O)
+	return istype(O, /obj/item/ore) || istype(O, /obj/item/weapon/material/shard) || istype(O, /obj/item/solar_panel)
+
+/obj/structure/harvester/Destroy()
+	// Salvage must not disappear with a destroyed collection crate.
+	release_contents()
+	return ..()
+
+/obj/structure/harvester/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	scooped -= O
+
+/obj/structure/harvester/proc/release_contents()
+	var/turf/T = get_turf(src)
+	if(!T)
+		return FALSE
+	for(var/obj/item/O in contents)
+		O.forceMove(T)
+	scooped.Cut()
+	return TRUE
 
 /obj/structure/harvester/verb/release_ores()
-	set name = "Release Ores"
+	set name = "Release Contents"
 	set category = "Object"
 	set src in view(1)
 
@@ -132,15 +157,11 @@
 		return
 
 	add_fingerprint(usr)
+	scooped &= contents
 
 	if(!scooped.len)
 		to_chat(usr, "<span class='warning'>The harvester is empty.</span>")
 		return
 
-	var/turf/T = get_turf(src)
-	for(var/obj/item/ore/O in scooped)
-		if(QDELETED(O))
-			continue
-		O.forceMove(T)
-	scooped.Cut()
+	release_contents()
 	to_chat(usr, "<span class='notice'>You release everything the harvester has collected.</span>")

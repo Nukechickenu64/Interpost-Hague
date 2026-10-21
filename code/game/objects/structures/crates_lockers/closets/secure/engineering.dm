@@ -76,6 +76,7 @@
 		/obj/item/clothing/suit/storage/hazardvest,
 		/obj/item/clothing/glasses/meson,
 		/obj/item/clothing/under/rank/eng,
+		/obj/item/device/fixboy,
 		/obj/item/cartridge/engineering,
 		/obj/item/taperoll/engineering
 	)

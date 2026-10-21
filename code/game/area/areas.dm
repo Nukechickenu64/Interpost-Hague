@@ -26,7 +26,7 @@
 
 /area/Initialize()
 	. = ..()
-	if(!requires_power || !area_smes)
+	if(!requires_power)
 		power_light = 0
 		power_equip = 0
 		power_environ = 0
@@ -60,11 +60,7 @@
 			danger_level = max(danger_level, AA.danger_level)
 
 	if(danger_level != atmosalm)
-		if (danger_level < 1 && atmosalm >= 1)
-			//closing the doors on red and opening on green provides a bit of hysteresis that will hopefully prevent fire doors from opening and closing repeatedly due to noise
-			air_doors_open()
-		else if (danger_level >= 2 && atmosalm < 2)
-			air_doors_close()
+		update_atmos_lockdown(danger_level)
 
 		atmosalm = danger_level
 		for (var/obj/machinery/alarm/AA in src)

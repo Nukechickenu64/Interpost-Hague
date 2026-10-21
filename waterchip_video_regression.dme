@@ -1,0 +1,11 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+
+/datum/controller/subsystem/machines
+	runlevels = RUNLEVEL_GAME | RUNLEVEL_POSTGAME | RUNLEVEL_SETUP
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/biomass_workflow, new /datum/unit_test/biomass_consumers, new /datum/unit_test/biomass_processing, new /datum/unit_test/engineer_vending, new /datum/unit_test/waterchip_chargemaster, new /datum/unit_test/waterchip_refills, new /datum/unit_test/waterchip_supply, new /datum/unit_test/waterchip_food, new /datum/unit_test/waterchip_dispatch, new /datum/unit_test/waterchip_meat)
+	log_unit_test("Running focused water-chip video regression tests.")

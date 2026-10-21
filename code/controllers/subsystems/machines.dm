@@ -26,8 +26,8 @@ if(Datum.is_processing) {\
 #define START_PROCESSING_PIPENET(Datum) START_PROCESSING_IN_LIST(Datum, pipenets)
 #define STOP_PROCESSING_PIPENET(Datum) STOP_PROCESSING_IN_LIST(Datum, pipenets)
 
-#define START_PROCESSING_POWERNET(Datum) START_PROCESSING_IN_LIST(Datum, powernets)
-#define STOP_PROCESSING_POWERNET(Datum) STOP_PROCESSING_IN_LIST(Datum, powernets)
+#define START_PROCESSING_POWERNET(Datum)
+#define STOP_PROCESSING_POWERNET(Datum)
 
 #define START_PROCESSING_POWER_OBJECT(Datum) START_PROCESSING_IN_LIST(Datum, power_objects)
 #define STOP_PROCESSING_POWER_OBJECT(Datum) STOP_PROCESSING_IN_LIST(Datum, power_objects)
@@ -48,7 +48,6 @@ SUBSYSTEM_DEF(machines)
 
 	var/list/pipenets      = list()
 	var/list/machinery     = list() // These are all machines.
-	var/list/powernets     = list()
 	var/list/power_objects = list()
 	var/list/bus_consumers = list() // ordinary machinery drawing from a linked bus instead of its area
 
@@ -56,7 +55,6 @@ SUBSYSTEM_DEF(machines)
 	var/list/current_run = list()
 
 /datum/controller/subsystem/machines/Initialize(timeofday)
-	makepowernets()
 	setup_atmos_machinery(machinery)
 	fire()
 	..()
@@ -83,9 +81,9 @@ if(current_step == this_step || (check_resumed && !resumed)) {\
 
 #undef INTERNAL_PROCESS_STEP
 
-// rebuild all power buses from the CCID link graph
+// The grid no longer needs rebuilding; kept for compatibility.
 /datum/controller/subsystem/machines/proc/makepowernets()
-	rebuild_power_grid()
+	return
 
 datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 	set background=1
@@ -101,9 +99,6 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 	for(var/obj/machinery/atmospherics/unary/U in machines)
 		if(istype(U, /obj/machinery/atmospherics/unary/vent_pump))
 			var/obj/machinery/atmospherics/unary/vent_pump/T = U
-			T.broadcast_status()
-		else if(istype(U, /obj/machinery/atmospherics/unary/vent_scrubber))
-			var/obj/machinery/atmospherics/unary/vent_scrubber/T = U
 			T.broadcast_status()
 		CHECK_TICK
 	if(!Master.current_runlevel)//So it only does it at roundstart
@@ -122,7 +117,6 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 	msg += "} "
 	msg += "PI:[pipenets.len]|"
 	msg += "MC:[processing.len]|"
-	msg += "PN:[powernets.len]|"
 	msg += "PO:[power_objects.len]|"
 	msg += "MC/MS:[round((cost ? processing.len/cost : 0),0.1)]"
 	..(jointext(msg, null))
@@ -175,40 +169,12 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 		if(MC_TICK_CHECK)
 			return
 
+// Once all machinery has processed its draw, balance the single global power grid.
 /datum/controller/subsystem/machines/proc/process_powernets(resumed = 0)
-	if (!resumed)
-		if(power_grid_dirty)
-			rebuild_power_grid()
-		process_bus_consumers()
-		src.current_run = powernets.Copy()
-
-	var/list/current_run = src.current_run
-	while(current_run.len)
-		var/datum/powernet/PN = current_run[current_run.len]
-		current_run.len--
-		if(istype(PN) && !QDELETED(PN))
-			PN.reset(wait)
-		else
-			powernets.Remove(PN)
-			PN.is_processing = null
-		if(MC_TICK_CHECK)
-			return
+	power_net.reset()
 
 /datum/controller/subsystem/machines/proc/process_bus_consumers()
-	for(var/obj/machinery/M in bus_consumers)
-		var/datum/power_node/N = M.power_node
-		if(QDELETED(M) || !N || !N.on_bus)
-			bus_consumers -= M
-			continue
-		var/datum/powernet/PN = N.in_net
-		var/need = M.get_power_usage() + N.bus_oneoff
-		N.bus_oneoff = 0
-		var/new_state = FALSE
-		if(PN && PN.avail > 0)
-			new_state = (PN.draw_power(need) >= need)
-		if(new_state != N.bus_powered)
-			N.bus_powered = new_state
-			M.power_change()
+	return
 
 /datum/controller/subsystem/machines/proc/process_power_objects(resumed = 0)
 	if (!resumed)
@@ -231,8 +197,6 @@ datum/controller/subsystem/machines/proc/setup_atmos_machinery(list/machines)
 		machinery = SSmachines.machinery
 	if (istype(SSmachines.processing))
 		processing = SSmachines.processing
-	if (istype(SSmachines.powernets))
-		powernets = SSmachines.powernets
 	if (istype(SSmachines.power_objects))
 		power_objects = SSmachines.power_objects
 	if (istype(SSmachines.bus_consumers))

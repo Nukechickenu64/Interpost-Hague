@@ -39,13 +39,6 @@
 			log_bad("[bad_msg] is not supposed to have an area power marker.")
 			area_good = 0
 
-		if(!A.air_scrub_info.len && !(exemptions & GLOB.using_map.NO_SCRUBBER))
-			log_bad("[bad_msg] lacks an air scrubber.")
-			area_good = 0
-		else if(A.air_scrub_info.len && (exemptions & GLOB.using_map.NO_SCRUBBER))
-			log_bad("[bad_msg] is not supposed to have an air scrubber.")
-			area_good = 0
-
 		if(!A.air_vent_info.len && !(exemptions & GLOB.using_map.NO_VENT))
 			log_bad("[bad_msg] lacks an air vent.[ascii_reset]")
 			area_good = 0
@@ -364,8 +357,6 @@ datum/unit_test/ladder_check/start_test()
 /datum/unit_test/legacy_atmospherics_shall_be_retired/start_test()
 	var/failures = 0
 	for(var/obj/machinery/atmospherics/machine in world)
-		if(istype(machine, /obj/machinery/atmospherics/unary/vent_pump) || istype(machine, /obj/machinery/atmospherics/unary/vent_scrubber))
-			continue
 		log_bad("Legacy atmospheric machinery remains: [log_info_line(machine)]")
 		failures++
 

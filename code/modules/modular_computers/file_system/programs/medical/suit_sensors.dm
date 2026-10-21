@@ -21,6 +21,10 @@
 /datum/nano_module/crew_monitor/Topic(href, href_list)
 	if(..()) return 1
 
+	if(href_list["report"])
+		to_chat(usr, crew_signal_report(get_readings()))
+		return 1
+
 	if(href_list["track"])
 		if(isAI(usr))
 			var/mob/living/silicon/ai/AI = usr
@@ -29,13 +33,45 @@
 				AI.ai_actual_track(H)
 		return 1
 
+// Missing signals are identified from the public manifest, never by scanning
+// hidden/offline mobs. No stale position or health is retained for a lost signal.
+/proc/crew_monitor_rows(list/readings, list/records)
+	var/list/rows = readings.Copy()
+	var/list/responding = list()
+	for(var/list/entry in readings)
+		responding |= entry["name"]
+	for(var/datum/computer_file/crew_record/CR in records)
+		var/crew_name = CR.get_name()
+		if(!crew_name || crew_name in responding)
+			continue
+		responding |= crew_name
+		rows += list(list("name" = crew_name, "assignment" = CR.get_job(), "sensor_type" = 0, "missing" = TRUE, "area" = "", "x" = -1, "y" = -1, "z" = -1))
+	return sortByKey(rows, "name")
+
+/datum/nano_module/crew_monitor/proc/get_readings()
+	var/list/readings = list()
+	for(var/z_level in GLOB.using_map.map_levels)
+		readings += crew_repository.health_data(z_level)
+	return crew_monitor_rows(readings, GLOB.all_crew_records)
+
+/proc/crew_signal_report(list/readings)
+	var/report = "<b>MEDICAL BRACELET SIGNALS</b><br>"
+	for(var/list/entry in readings)
+		var/crew_name = html_encode(entry["name"])
+		if(entry["missing"])
+			report += "<span class='warning'>[crew_name] - NOT RESPONDING.</span><br>"
+		else if(entry["sensor_type"] >= SUIT_SENSOR_VITAL)
+			var/location = entry["sensor_type"] >= SUIT_SENSOR_TRACKING ? html_encode(entry["area"]) : "Location unavailable"
+			report += "[crew_name] ([location]) PLS: [entry["pulse"]][entry["radiation"] ? " RAD: [entry["radiation"]]" : ""]<br>"
+		else
+			report += "[crew_name] - [entry["dead"] ? "No life signs" : "Life signs detected"].<br>"
+	return report
+
 /datum/nano_module/crew_monitor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = host.initial_data()
 
 	data["isAI"] = isAI(user)
-	data["crewmembers"] = list()
-	for(var/z_level in GLOB.using_map.map_levels)
-		data["crewmembers"] += crew_repository.health_data(z_level)
+	data["crewmembers"] = get_readings()
 
 	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if(!ui)

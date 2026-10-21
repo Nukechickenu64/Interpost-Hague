@@ -463,8 +463,8 @@
 	if(abs((room_before_siphon - room.test_air.total_moles) - (tank.air_contents.total_moles - tank_before_siphon) - discarded_contaminants) > ATMOS_PRECISION)
 		fail("Filtered siphoning did not conserve clean gas and account for discarded contaminants.")
 		supply_failed = TRUE
-	if(tank.air_contents.get_gas(GAS_CO2) > 0 || discarded_contaminants <= 0 || modcon.cartridge.integrity >= cartridge_before_siphon)
-		fail("Siphoning did not filter contaminants before reserve storage and wear the cartridge.")
+	if(tank.air_contents.get_gas(GAS_CO2) > 0 || discarded_contaminants <= 0 || modcon.cartridge.integrity != cartridge_before_siphon)
+		fail("Siphoning did not filter contaminants before reserve storage while preserving the modcon cartridge.")
 		supply_failed = TRUE
 	qdel(siphon_command)
 	vent.pump_direction = 1
@@ -645,8 +645,8 @@
 	var/reserve_before = reserve.air_contents.total_moles
 	var/integrity_before = modcon.cartridge.integrity
 	var/flow = modcon.recover_air(reserve, room, 50)
-	if(abs(flow - 50) > 0.01 || abs(reserve.air_contents.total_moles - reserve_before - 45) > 0.01 || reserve.air_contents.get_gas(GAS_CO2) || reserve.air_contents.get_gas(GAS_PHORON) || modcon.cartridge.integrity >= integrity_before)
-		fail("Recovered gas was not filtered, conserved, or charged to the cartridge.")
+	if(abs(flow - 50) > 0.01 || abs(reserve.air_contents.total_moles - reserve_before - 45) > 0.01 || reserve.air_contents.get_gas(GAS_CO2) || reserve.air_contents.get_gas(GAS_PHORON) || modcon.cartridge.integrity != integrity_before)
+		fail("Recovered gas was not filtered, conserved, or the modcon cartridge wore unexpectedly.")
 		failed = TRUE
 	for(var/fault in list(NOPOWER, BROKEN))
 		modcon.stat = fault
@@ -680,7 +680,7 @@
 	qdel(filter)
 	qdel(reserve)
 	if(!failed)
-		pass("Recovery filters contaminants, wears cartridges, and respects filter faults and reserve capacity.")
+		pass("Recovery filters contaminants without wearing the modcon cartridge, and respects filter faults and reserve capacity.")
 	return 1
 
 /datum/unit_test/atmos_machinery/modcon_cold_start

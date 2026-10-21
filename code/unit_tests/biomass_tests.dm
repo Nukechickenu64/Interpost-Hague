@@ -26,7 +26,7 @@
 
 /datum/unit_test/biomass_workflow/start_test()
 	var/failure = ""
-	var/turf/T = get_safe_turf()
+	var/turf/T = engineer_test_turf()
 	var/mob/living/carbon/human/U = new(T)
 	var/obj/machinery/computer/hydroponics/biomass_test/C = new(T)
 	var/obj/machinery/biomass_vat/biomass_test/V = new(T)
@@ -34,7 +34,9 @@
 	var/obj/item/hydroponics_supply/skimmer/S = new(T)
 	var/obj/item/device/waterchip/chip = new(T)
 	var/obj/item/device/waterchip/spare = new(T)
+	var/turf/vat_front = get_step(V, NORTH)
 	C.stat = V.stat = P.stat = 0
+	U.forceMove(vat_front)
 	C.update_icon()
 	if(!istype(C, /obj/machinery/computer) || C.icon_state != "os13_tank")
 		failure += "Hydroponics is not using the powered OS13 computer. "
@@ -144,7 +146,63 @@
 	if(failure)
 		fail(failure)
 	else
-		pass("Physical chip recovery, power pauses, exact recipe, three mandatory mixes, three scoops, pressing and batch reset verified.")
+		pass("Physical chip recovery, power pauses, exact recipe, five mandatory mixes, three scoops, pressing and batch reset verified.")
+	return TRUE
+
+/datum/unit_test/vat_access
+	name = "HYDROPONICS - North-only vat service and blocked upper tile"
+
+/datum/unit_test/vat_access/start_test()
+	var/failure = ""
+	var/turf/T = engineer_test_turf()
+	var/mob/living/carbon/human/U = new(engineer_test_turf())
+	var/obj/machinery/biomass_vat/biomass_test/V = new(T)
+	V.stat = 0
+	var/turf/front = get_step(V, NORTH)
+	var/obj/effect/vat_access/B = V.access_blocker
+	if(V.layer != STRUCTURE_LAYER)
+		failure += "The vat does not render below standing humans. "
+	if(!B || B.loc != front || B.invisibility != INVISIBILITY_MAXIMUM)
+		failure += "The vat did not maintain an invisible access blocker on its north tile. "
+	if(B.CheckExit(U, get_step(front, EAST)) || B.CheckExit(U, get_step(front, WEST)))
+		failure += "The vat's upper tile allows sideways exits. "
+	U.forceMove(get_step(front, NORTH))
+	if(!B.CheckExit(U, front))
+		failure += "The vat's upper tile blocks its only working approach. "
+	if(!B.CanPass(U, U.loc, 1, 0))
+		failure += "The vat's upper tile blocks entry from the north. "
+	U.forceMove(get_step(front, EAST))
+	if(B.CanPass(U, U.loc, 1, 0))
+		failure += "The vat's upper tile permits entry from the side. "
+	V.stage = BIOMASS_VAT_FILLED
+	var/obj/item/hydroponics_supply/yeast/Y = new(front)
+	U.forceMove(front)
+	U.put_in_hands(Y)
+	V.attackby(Y, U)
+	if(!V.has_yeast || !QDELETED(Y))
+		failure += "A worker standing directly north of the vat could not add a culture. "
+	var/obj/item/hydroponics_supply/glig/G = new(T)
+	U.forceMove(get_step(V, SOUTH))
+	U.put_in_hands(G)
+	V.attackby(G, U)
+	if(V.has_glig || QDELETED(G))
+		failure += "A worker outside the north tile added a culture. "
+	var/turf/T2 = get_step(V, NORTH)
+	var/obj/effect/vat_access/old_blocker = B
+	V.forceMove(T2)
+	if(!V.access_blocker || V.access_blocker == old_blocker || !QDELETED(old_blocker) || V.access_blocker.loc != get_step(V, NORTH))
+		failure += "The access blocker did not follow a relocated vat. "
+	var/obj/effect/vat_access/new_blocker = V.access_blocker
+	qdel(V)
+	if(!QDELETED(new_blocker) && new_blocker.loc == get_step(T2, NORTH))
+		failure += "Destroying the vat left its access blocker behind. "
+	for(var/atom/A in list(U, Y, G))
+		if(A && !QDELETED(A))
+			qdel(A)
+	if(failure)
+		fail(failure)
+	else
+		pass("The vat renders under walkers, its upper tile only opens north or south, and only the tile directly north can work it.")
 	return TRUE
 
 /datum/unit_test/biomass_consumers
@@ -152,7 +210,7 @@
 
 /datum/unit_test/biomass_consumers/start_test()
 	var/failure = ""
-	var/turf/T = get_safe_turf()
+	var/turf/T = engineer_test_turf()
 	var/mob/living/carbon/human/U = new(T)
 	var/obj/machinery/biomass_press/food_processor/biomass_test/F = new(T)
 	var/obj/machinery/clonepod/C = new(T)
@@ -162,8 +220,11 @@
 		U.put_in_hands(B)
 		F.output_type = F.food_shapes[shape]
 		F.attackby(B, U)
+		if(F.loaded_input != B || QDELETED(B) || F.work_left)
+			failure += "The food processor did not hold a brick for [shape]. "
+		F.attack_hand(U)
 		if(!QDELETED(B) || !F.work_left)
-			failure += "The food processor did not consume a brick for [shape]. "
+			failure += "The food processor did not activate for [shape]. "
 		F.advance_cycle(5 SECONDS)
 		var/obj/item/reagent_containers/food/snacks/meal = F.take_product()
 		if(!istype(meal) || meal.type != F.food_shapes[shape] || !meal.reagents.total_volume || F.take_product())
@@ -184,7 +245,7 @@
 	if(failure)
 		fail(failure)
 	else
-		pass("All three food shapes produce edible meals; a batch of three bricks supplies 150 cloning biomass.")
+		pass("All food shapes produce edible meals; a batch of three bricks supplies 150 cloning biomass.")
 	return TRUE
 
 /datum/unit_test/biomass_processing
@@ -192,9 +253,9 @@
 
 /datum/unit_test/biomass_processing/start_test()
 	var/failure = ""
-	var/obj/machinery/biomass_press/biomass_test/P = new(get_safe_turf())
+	var/obj/machinery/biomass_press/biomass_test/P = new(engineer_test_turf())
 	P.stat = 0
-	var/obj/item/hydroponics_supply/skimmer/S = new(get_safe_turf())
+	var/obj/item/hydroponics_supply/skimmer/S = new(engineer_test_turf())
 	S.loaded = TRUE
 	P.start_pressing(S)
 	// Exercise actual subsystem dispatch, not just manual time advancement.
@@ -222,7 +283,7 @@
 		if(istype(M, /obj/machinery/vending/hydro_cultures))
 			cultures++
 	if(GLOB.using_map.name == "Alpha" && (vats != 4 || !consoles || !presses || !food_processors || !cultures))
-		failure += "Alpha is missing a step in its mapped biomass supply chain. "
+		failure += "Alpha biomass fixtures: [vats] vats, [consoles] consoles, [presses] presses, [food_processors] food processors, [cultures] culture dispensers. "
 	if(failure)
 		fail(failure)
 	else

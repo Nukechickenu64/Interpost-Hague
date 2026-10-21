@@ -1,0 +1,11 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+
+/datum/controller/subsystem/machines
+	runlevels = RUNLEVEL_GAME | RUNLEVEL_POSTGAME | RUNLEVEL_SETUP
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/engineer_solar_service, new /datum/unit_test/engineer_salvage, new /datum/unit_test/engineer_vending, new /datum/unit_test/engineer_power_sample, new /datum/unit_test/engineer_shield_and_bracelet, new /datum/unit_test/engineer_crew_signals, new /datum/unit_test/engineer_atmos_controls, new /datum/unit_test/engineer_atmos_flow, new /datum/unit_test/engineer_timed_maintenance)
+	log_unit_test("Running focused OS13 engineer video regression tests.")

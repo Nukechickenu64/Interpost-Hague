@@ -8,7 +8,7 @@ GLOBAL_VAR_INIT (waterchip_installed,0)
 	force = 1
 	w_class = 3
 	slot_flags = SLOT_HEAD | SLOT_MASK
-	matter = list("steel" = 5000)
+	matter = list("steel" = 1000, "glass" = 500)
 
 /obj/machinery/waterchip_holder
 	name = "water chip holder"

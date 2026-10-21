@@ -88,8 +88,6 @@ Buildable meters
 			src.pipe_type = PIPE_GAS_FILTER
 		else if(istype(make_from, /obj/machinery/atmospherics/trinary/mixer))
 			src.pipe_type = PIPE_GAS_MIXER
-		else if(istype(make_from, /obj/machinery/atmospherics/unary/vent_scrubber))
-			src.pipe_type = PIPE_SCRUBBER
 		else if(istype(make_from, /obj/machinery/atmospherics/binary/passive_gate))
 			src.pipe_type = PIPE_PASSIVE_GATE
 		else if(istype(make_from, /obj/machinery/atmospherics/unary/heat_exchanger))
@@ -191,7 +189,7 @@ Buildable meters
 		"manual valve", \
 		"digital valve", \
 		"pump", \
-		"scrubber", \
+		"unused", \
 		"unused", \
 		"gas filter", \
 		"gas mixer", \
@@ -250,7 +248,7 @@ Buildable meters
 		"mvalve", \
 		"dvalve", \
 		"pump", \
-		"scrubber", \
+		"unused", \
 		"unused", \
 		"filter", \
 		"mixer", \
@@ -367,7 +365,7 @@ Buildable meters
 			return dir|flip
 		if(PIPE_SIMPLE_BENT, PIPE_HE_BENT, PIPE_SUPPLY_BENT, PIPE_SCRUBBERS_BENT, PIPE_FUEL_BENT)
 			return dir //dir|acw
-		if(PIPE_CONNECTOR,PIPE_UVENT,PIPE_SCRUBBER,PIPE_HEAT_EXCHANGE)
+		if(PIPE_CONNECTOR,PIPE_UVENT,PIPE_HEAT_EXCHANGE)
 			return dir
 		if(PIPE_MANIFOLD4W, PIPE_SUPPLY_MANIFOLD4W, PIPE_SCRUBBERS_MANIFOLD4W, PIPE_OMNI_MIXER, PIPE_OMNI_FILTER, PIPE_FUEL_MANIFOLD4W)
 			return dir|flip|cw|acw
@@ -981,20 +979,6 @@ Buildable meters
 				P.node3.atmos_init()
 				P.node3.build_network()
 
-		if(PIPE_SCRUBBER)		//scrubber
-			var/obj/machinery/atmospherics/unary/vent_scrubber/S = new(src.loc)
-			S.set_dir(dir)
-			S.initialize_directions = pipe_dir
-			if (pipename)
-				S.SetName(pipename)
-			var/turf/T = S.loc
-			S.level = !T.is_plating() ? 2 : 1
-			S.atmos_init()
-			S.build_network()
-			if (S.node)
-				S.node.atmos_init()
-				S.node.build_network()
-
 		if(PIPE_MTVALVE)		//manual t-valve
 			var/obj/machinery/atmospherics/tvalve/V = new(src.loc)
 			V.set_dir(dir)
@@ -1313,7 +1297,6 @@ Buildable meters
 #undef PIPE_DVALVE
 #undef PIPE_SVALVE
 #undef PIPE_PUMP
-#undef PIPE_SCRUBBER
 #undef PIPE_GAS_FILTER
 #undef PIPE_GAS_MIXER
 #undef PIPE_PASSIVE_GATE

@@ -10,8 +10,9 @@
 	name = null
 	icon = 'icons/obj/power.dmi'
 	anchored = 1.0
-	var/datum/powernet/powernet = null
-	var/datum/powernet/input_powernet = null	// only for split nodes (SMES-like)
+	var/datum/powernet/powernet = null			// the single global power net
+	var/datum/powernet/input_powernet = null	// storage units draw from/feed the same global net
+	var/network_connected = 0					// registered with the global net
 	use_power = POWER_USE_OFF
 	idle_power_usage = 0
 	active_power_usage = 0
@@ -25,16 +26,15 @@
 	. = ..()
 
 /obj/machinery/power/is_power_linkable()
-	return TRUE
+	return FALSE
 
 /obj/machinery/power/power_nets_changed(datum/power_node/N)
-	powernet = N.out_net
-	input_powernet = N.split ? N.in_net : null
+	powernet = power_net
+	input_powernet = power_net
 
 ///////////////////////////////
 // General procedures
-//////////////////////////////
-
+///////////////////////////////
 
 /obj/machinery/power/powered()
 	if(use_power)
@@ -73,33 +73,37 @@
 	else
 		return 0
 
-// Enable this machine's node so it joins whatever buses it is linked into.
+// Join the single global grid. Generators feed global production, SMES units
+// join the global storage pool.
 /obj/machinery/power/proc/connect_to_network()
-	var/datum/power_node/N = get_power_node()
-	if(!N)
-		return 0
-	N.set_enabled(TRUE)
+	if(network_connected)
+		return 1
+	network_connected = TRUE
+	powernet = power_net
+	input_powernet = power_net
+	if(istype(src, /obj/machinery/power/smes) && !istype(src, /obj/machinery/power/area_smes))
+		power_net.register_storage(src)
+	else
+		power_net.register_machine(src)
 	return 1
 
-// Keep links but leave every bus until reconnected.
+// Leave the grid. Stored charge stays with the unit.
 /obj/machinery/power/proc/disconnect_from_network()
-	if(!power_node)
+	if(!network_connected)
 		return 0
-	power_node.set_enabled(FALSE)
-	if(powernet)
-		powernet.nodes -= src
-		powernet = null
-	if(input_powernet)
-		input_powernet.input_nodes -= src
-		input_powernet = null
+	network_connected = FALSE
+	power_net.unregister_machine(src)
+	powernet = null
+	input_powernet = null
 	return 1
 
+// Kept for API compatibility; the grid no longer needs rebuilding.
 /proc/request_power_grid_rebuild()
-	power_grid_dirty = TRUE
+	return
 
 //Determines how strong could be shock, deals damage to mob, uses power.
 //M is a mob who touched wire/whatever
-//power_source is a source of electricity, can be powercell, area, area SMES, powernet or null
+//power_source is a source of electricity, can be powercell, area, the global powernet or null
 //source is an object caused electrocuting (airlock, grille, etc)
 //No animations will be performed by this proc.
 /proc/electrocute_mob(mob/living/carbon/M as mob, var/power_source, var/obj/source, var/siemens_coeff = 1.0)
@@ -107,7 +111,7 @@
 	var/area/source_area
 	if(istype(power_source,/area))
 		source_area = power_source
-		power_source = source_area.get_area_smes()
+		power_source = power_net
 
 	var/datum/powernet/PN
 	var/obj/item/cell/cell
@@ -116,10 +120,6 @@
 		PN = power_source
 	else if(istype(power_source,/obj/item/cell))
 		cell = power_source
-	else if(istype(power_source,/obj/machinery/power/area_smes))
-		var/obj/machinery/power/area_smes/smes = power_source
-		cell = smes.cell
-		PN = smes.powernet
 	else if (!power_source)
 		return 0
 	else

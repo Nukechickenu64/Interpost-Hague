@@ -1,0 +1,60 @@
+<h2>Station atmosphere</h2>
+{{if data.tank}}
+<div class="item">
+    Reserve: <b>{{:data.reserve}} kPa</b> &mdash; {{:data.supply_status}}<br>
+    Supply: {{if data.enabled}}ON{{else}}OFF{{/if}} | Limit: {{:data.limit}} mol/cycle<br>
+    Lockdown threshold: <b>{{:data.lockdown_pressure}} kPa at 20 C</b>
+    {{if data.can_control}}
+    <div class="clearBoth"></div>{{:helper.link('Set threshold', null, {'lockdown_pressure': 1})}}<br>
+    {{:helper.link('Toggle supply', null, {'gas_action': 'toggle'})}}
+    {{:helper.link('Set supply limit', null, {'gas_action': 'limit'})}}
+    {{:helper.link('Transfer from canister', null, {'gas_action': 'refill'})}}
+    {{/if}}
+</div>
+{{else}}
+<div class="item">No station gas reserve connected.</div>
+{{/if}}
+<h3>Choose area</h3>
+<div class="item" style="max-height:160px;overflow-y:auto;">
+{{for data.areas}}
+    {{:helper.link(value.name + (value.locked ? ' [LOCKDOWN]' : ''), null, {'choose_area': 1, 'area': value.ref})}}
+{{empty}}
+    No area controllers connected.
+{{/for}}
+</div>
+{{if data.selected}}
+<h3>{{:data.area_name}}</h3>
+<div class="item">
+    Controller: {{if data.controller_online}}online{{else}}OFFLINE{{/if}}<br>
+    Lockdown: {{if data.locked}}ACTIVE{{else}}clear{{/if}} |
+    Manual: {{if data.manual}}ON{{else}}OFF{{/if}} |
+    Automatic: {{if data.automatic}}ON{{else}}OFF{{/if}}
+    {{if data.can_control}}
+    <br>{{:helper.link('Toggle manual lockdown', null, {'area': data.selected, 'lockdown': 1})}}
+    {{:helper.link('Toggle automatic lockdown', null, {'area': data.selected, 'automatic': 1})}}
+    {{/if}}
+</div>
+{{if data.can_control && data.controller_online}}
+<div class="item">
+    <b>All vents</b><div class="clearBoth"></div>
+    {{:helper.link('REFILL', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'REFILL'})}}
+    {{:helper.link('STOP', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'STOP'})}}
+    {{:helper.link('FILTER', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'FILTER'})}}
+</div>
+{{/if}}
+{{for data.vents}}
+<div class="item">
+    <b>{{:value.name}}</b>: {{:value.pressure}} kPa<br>
+    {{:value.mode}} &mdash; {{:value.status}}
+    {{if data.can_control && data.controller_online}}
+    <br>{{:helper.link('REFILL', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'REFILL'})}}
+    {{:helper.link('STOP', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'STOP'})}}
+    {{:helper.link('FILTER', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'FILTER'})}}
+    {{/if}}
+</div>
+{{empty}}
+<div class="item">No vents in this area.</div>
+{{/for}}
+<div class="item">REFILL supplies air. FILTER removes contaminants using the modcon cartridge. STOP disables the selected vents. Vent readings show actual pressure; lockdown settings use gas quantity at 20 C.</div>
+{{/if}}
+{{if !data.can_control}}<div class="item">Engineering or atmospherics access is required to change settings.</div>{{/if}}

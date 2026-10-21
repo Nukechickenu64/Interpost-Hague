@@ -78,6 +78,17 @@
 		return 1
 	return 0
 
+/obj/machinery/power/smes/connect_to_network()
+	if(..())
+		power_net.register_storage(src)
+		return 1
+	return 0
+
+/obj/machinery/power/smes/disconnect_from_network()
+	if(network_connected)
+		power_net.unregister_storage(src)
+	return ..()
+
 /obj/machinery/power/smes/update_icon()
 	overlays.Cut()
 	if(stat & BROKEN)	return
@@ -115,10 +126,9 @@
 		inputting = 1
 	// else inputting = 0, as set in process()
 
-	if(input_powernet)
-		var/inputted = input_powernet.draw_power(to_input)
-		add_charge(inputted)
-		input_available += inputted
+	var/inputted = power_net.draw_power(to_input)
+	add_charge(inputted)
+	input_available += inputted
 
 // Mostly in place due to child types that may store power in other way (PSUs)
 /obj/machinery/power/smes/proc/add_charge(var/amount)
@@ -149,17 +159,17 @@
 	input_available = 0
 	//inputting
 	if(input_attempt && (!input_pulsed && !input_cut))
-		target_load = min((capacity-charge)/CELLRATE, input_level)	// Amount we will request from the powernet.
-		if(input_powernet)
-			input_powernet.smes_demand += target_load
-			input_powernet.inputting.Add(src)
+		target_load = min((capacity-charge)/CELLRATE, input_level)	// Amount we will request from the grid.
+		if(network_connected)
+			power_net.smes_demand += target_load
+			power_net.inputting.Add(src)
 		else
-			target_load = 0 // We won't input any power without an input bus.
+			target_load = 0 // We won't input any power while disconnected.
 		inputting = 0
 
 	output_used = 0
 	//outputting
-	if(output_attempt && (!output_pulsed && !output_cut) && powernet && charge)
+	if(output_attempt && (!output_pulsed && !output_cut) && network_connected && powernet && charge)
 		output_used = min( charge/CELLRATE, output_level)		//limit output to that stored
 		remove_charge(output_used)			// reduce the storage (may be recovered in /restore() if excessive)
 		add_avail(output_used)				// add output to powernet (smes side)
@@ -191,7 +201,7 @@
 	var/clev = chargedisplay()
 
 	add_charge(total_restore)				// restore unused power
-	powernet.netexcess -= total_restore		// remove the excess from the powernet, so later SMESes don't try to use it
+	power_net.netexcess -= total_restore	// remove the excess from the grid, so later SMESes don't try to use it
 
 	output_used -= total_restore
 
@@ -200,8 +210,8 @@
 	return
 
 /obj/machinery/power/smes/draw_power(var/amount)
-	if(input_powernet)
-		return input_powernet.draw_power(amount)
+	if(network_connected)
+		return power_net.draw_power(amount)
 	return 0
 
 

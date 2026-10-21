@@ -1,9 +1,10 @@
 var/global/list/station_gas_tanks = list()
+var/global/list/station_filter_hubs = list()
 
 /proc/retire_legacy_piping(list/machines)
 	var/list/atmos_machinery_to_remove = list()
 	for(var/obj/machinery/atmospherics/machine in machines)
-		if(istype(machine, /obj/machinery/atmospherics/unary/vent_pump) || istype(machine, /obj/machinery/atmospherics/unary/vent_scrubber))
+		if(istype(machine, /obj/machinery/atmospherics/unary/vent_pump))
 			continue
 		atmos_machinery_to_remove += machine
 	for(var/obj/machinery/atmospherics/machine in atmos_machinery_to_remove)
@@ -22,6 +23,21 @@ var/global/list/station_gas_tanks = list()
 	for(var/obj/structure/disposalconstruct/construction in world)
 		if(construction.ptype != 6 && construction.ptype != 8)
 			qdel(construction)
+
+/proc/get_station_filter_hub(atom/source)
+	var/turf/source_turf = get_turf(source)
+	if(!source_turf)
+		return null
+	for(var/obj/machinery/filter_hub/hub in station_filter_hubs)
+		if(QDELETED(hub))
+			continue
+		var/obj/effect/overmap/source_sector = map_sectors["[source_turf.z]"]
+		var/obj/effect/overmap/hub_sector = map_sectors["[hub.z]"]
+		if(source_sector && hub_sector && source_sector != hub_sector)
+			continue
+		if(is_on_same_plane_or_station(source_turf.z, hub.z))
+			return hub
+	return null
 
 /proc/get_station_gas_tank(atom/source)
 	var/turf/source_turf = get_turf(source)
@@ -54,18 +70,23 @@ var/global/list/station_gas_tanks = list()
 			if(get_dist(floor, tank) > 1 && get_area(floor) == get_area(tank) && !locate(/obj/machinery) in floor)
 				new /obj/machinery/computer/station_gas_control(floor)
 				break
+	// Each station reserve gets one central filter hub alongside it.
+	for(var/obj/machinery/station_gas_tank/tank in station_gas_tanks)
+		if(QDELETED(tank) || get_station_filter_hub(tank))
+			continue
+		var/turf/hub_turf = get_step(get_turf(tank), EAST)
+		if(hub_turf && !locate(/obj/machinery/filter_hub) in hub_turf)
+			new /obj/machinery/filter_hub(hub_turf)
 
 /obj/machinery/station_gas_tank
 	name = "station gas tank"
 	desc = "A large reserve of breathable gas for the station's atmosphere controls."
-	icon = 'icons/obj/station_gas_tank.dmi'
-	icon_state = "tank"
+	icon = 'icons/os13/objects/objects/machines/atmos2.dmi'
+	icon_state = "0,1"
 	anchored = TRUE
 	density = FALSE
 	bound_width = 96
-	bound_height = 96
-	bound_x = -32
-	bound_y = -32
+	bound_height = 64
 	power_channel = ENVIRON
 	idle_power_usage = 150
 	var/datum/gas_mixture/air_contents
@@ -83,6 +104,26 @@ var/global/list/station_gas_tanks = list()
 	var/initial_moles = 20 * ONE_ATMOSPHERE * air_contents.volume / (R_IDEAL_GAS_EQUATION * T20C)
 	air_contents.adjust_multi(GAS_OXYGEN, initial_moles * 0.21, GAS_NITROGEN, initial_moles * 0.79)
 	station_gas_tanks |= src
+	update_tile_appearance()
+
+// The reserve renders as a 3x2 arrangement of per-tile sprites from atmos2.dmi.
+// Row y = 0 is the north row, y = 1 is the south row; the object anchors the
+// southwest tile with icon_state "0,1".
+/obj/machinery/station_gas_tank/proc/update_tile_appearance()
+	overlays.Cut()
+	icon_state = "0,1"
+	var/list/tile_offsets = list(
+		list("1,1", 32, 0),
+		list("2,1", 64, 0),
+		list("0,0", 0, 32),
+		list("1,0", 32, 32),
+		list("2,0", 64, 32)
+	)
+	for(var/list/tile in tile_offsets)
+		var/image/piece = image(icon, tile[1])
+		piece.pixel_x = tile[2]
+		piece.pixel_y = tile[3]
+		overlays += piece
 
 /obj/machinery/station_gas_tank/Destroy()
 	station_gas_tanks -= src
@@ -191,26 +232,19 @@ var/global/list/station_gas_tanks = list()
 	to_chat(user, "<span class='notice'>Reserve: [round(air_contents.return_pressure(), 0.1)] kPa; output: [enabled ? "enabled" : "disabled"] ([max_output_moles] mol/cycle).</span>")
 
 /obj/machinery/computer/station_gas_control
-	name = "station gas control computer"
-	desc = "Controls the station's shared breathable gas reserve."
+	name = "Atmospherics Control Console"
+	desc = "Controls area vents, atmospheric lockdowns and the shared breathable gas reserve."
 	req_one_access = list(access_atmospherics, access_engine_equip)
 
 /obj/machinery/computer/station_gas_control/attack_hand(mob/user)
 	if(..())
 		return
-	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(src)
-	if(!tank)
-		to_chat(user, "<span class='warning'>No station gas tank is online.</span>")
-		return
-	var/text = "<div class='firstdivmood'><div class='compbox'><b>STATION GAS CONTROL</b><hr>Reserve: [round(tank.air_contents.return_pressure(), 0.1)] kPa<br>Output: [tank.enabled ? "ON" : "OFF"]<br>Limit: [tank.max_output_moles] mol/cycle<br>"
-	if(allowed(user))
-		text += "<a href='?src=\ref[src];gas_action=toggle'>TOGGLE OUTPUT</a><br><a href='?src=\ref[src];gas_action=limit'>SET LIMIT</a><br><a href='?src=\ref[src];gas_action=refill'>TRANSFER FROM CANISTER</a>"
-	to_chat(user, "[text]</div></div>")
+	ui_interact(user)
 
 /obj/machinery/computer/station_gas_control/Topic(href, href_list)
 	if(!href_list["gas_action"])
 		return ..()
-	if((stat & (NOPOWER|BROKEN)) || !usr || get_dist(src, usr) > 1 || !allowed(usr))
+	if(!usr || CanUseTopic(usr) != STATUS_INTERACTIVE || !allowed(usr))
 		return
 	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(src)
 	if(!tank)
@@ -220,7 +254,7 @@ var/global/list/station_gas_tanks = list()
 			tank.enabled = !tank.enabled
 		if("limit")
 			var/new_limit = input(usr, "Maximum gas output in moles per cycle", "Station gas", tank.max_output_moles) as null|num
-			if(isnum_safe(new_limit) && get_dist(src, usr) <= 1 && allowed(usr))
+			if(isnum_safe(new_limit) && CanUseTopic(usr) == STATUS_INTERACTIVE && allowed(usr) && tank == get_station_gas_tank(src))
 				tank.max_output_moles = between(0, new_limit, 1000)
 		if("refill")
 			var/list/candidates = list()
@@ -228,7 +262,7 @@ var/global/list/station_gas_tanks = list()
 				if(!canister.station_fed && canister.air_contents && canister.air_contents.total_moles && canister.air_contents.gas.len <= 2 && canister.air_contents.get_gas(GAS_OXYGEN) + canister.air_contents.get_gas(GAS_NITROGEN) >= canister.air_contents.total_moles)
 					candidates += canister
 			var/obj/machinery/portable_atmospherics/canister/selected = input(usr, "Transfer breathable gas from which canister?", "Station gas") as null|anything in candidates
-			if(selected && get_dist(src, usr) <= 1 && allowed(usr) && get_dist(selected, tank) <= 1)
+			if(selected && !QDELETED(selected) && CanUseTopic(usr) == STATUS_INTERACTIVE && allowed(usr) && tank == get_station_gas_tank(src) && get_dist(selected, tank) <= 1)
 				var/capacity = max(0, (tank.max_pressure - tank.air_contents.return_pressure()) * tank.air_contents.volume / (R_IDEAL_GAS_EQUATION * T20C))
 				var/datum/gas_mixture/transferred = selected.air_contents.remove(min(capacity, selected.air_contents.total_moles))
 				if(transferred)

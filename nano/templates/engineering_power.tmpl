@@ -1,0 +1,25 @@
+<h2>STATION POWER</h2>
+<div class="statusDisplay">
+	Total demand: <b>{{:data.demand}} kW</b><br>
+	Generated: <b>{{:data.generated}} kW</b><br>
+	Stored energy: <b>{{:data.stored}} / {{:data.capacity}} MJ</b><br>
+	Sample age: {{:data.age}} seconds
+</div>
+<h2>SOLAR ARRAY</h2>
+<div class="statusDisplay">
+	{{:data.working}} / {{:data.panels}} mounts generating {{:data.solar_output}} kW<br>
+	{{:data.retracted}} mounts retracted
+</div>
+{{if data.can_control}}
+	{{:helper.link('Spread array', null, {'deploy': '1'})}}
+	{{:helper.link('Retract array', null, {'deploy': '0'})}}
+{{else}}
+	Engineering access required to deploy or retract the array.
+{{/if}}
+<h2>AREA DEMAND</h2>
+<table style="width:100%">
+	<tr><th>Area</th><th>Demand</th><th>Status</th></tr>
+	{{for data.areas}}
+	<tr><td>{{:value.name}}</td><td>{{:value.load}} kW</td><td>{{if value.offline}}Power cut{{else}}Online{{/if}}</td></tr>
+	{{/for}}
+</table>

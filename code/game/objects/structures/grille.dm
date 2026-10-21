@@ -167,8 +167,11 @@
 		return 0
 	if(!in_range(src, user))//To prevent TK and mech users from getting shocked
 		return 0
-	var/datum/powernet/PN = power_node && power_node.in_net
-	if(PN)
+	var/area/A = get_area(src)
+	if(!A || !A.powered(EQUIP))
+		return 0
+	var/datum/powernet/PN = power_net
+	if(PN && PN.avail > 0)
 		if(electrocute_mob(user, PN, src))
 			PN.trigger_warning()
 			var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread

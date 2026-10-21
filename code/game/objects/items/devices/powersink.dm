@@ -25,7 +25,7 @@
 	var/datum/powernet/PN			// Our input bus
 
 /obj/item/device/powersink/is_power_linkable()
-	return TRUE
+	return FALSE
 
 /obj/item/device/powersink/Destroy()
 	if(mode == 2)
@@ -37,18 +37,13 @@
 		if(mode == 0)
 			if(!isturf(loc))
 				return
-			var/datum/power_node/N = get_power_node()
-			if(!length(N.inputs))
-				var/area/A = get_area(src)
-				var/obj/machinery/power/area_smes/S = A && A.get_area_smes()
-				if(S)
-					link_power_nodes(S.get_power_node(), N)
-			if(!length(N.inputs))
-				to_chat(user, "There is no power feed here to clamp onto.")
+			if(!isStationLevel(z))
+				to_chat(user, "There is no station power feed here to clamp onto.")
 				return
 			anchored = 1
 			mode = 1
-			src.visible_message("<span class='notice'>[user] clamps [src] onto the local power feed!</span>")
+			PN = power_net
+			src.visible_message("<span class='notice'>[user] clamps [src] onto the station power grid!</span>")
 			return
 		else
 			if (mode == 2)
@@ -97,20 +92,18 @@
 
 	set_light(12)
 	PN.trigger_warning()
-	// found a powernet, so drain up to max power from it
+	// found the grid, so drain up to max power from it
 	drained = PN.draw_power(drain_rate)
-	// if tried to drain more than available on powernet
-	// now look for area SMES units on the bus and drain their cells
+	// if tried to drain more than the grid could give, drain the station SMES storage pool instead
 	if(drained < drain_rate)
-		for(var/obj/machinery/power/area_smes/A in PN.nodes)
+		for(var/obj/machinery/power/smes/S in PN.storage)
 			// Enough power drained this tick, no need to torture more units
 			if(drained >= drain_rate)
 				break
-			if(A.operating && A.cell)
-				var/cur_charge = A.cell.charge / CELLRATE
-				var/drain_val = min(apc_drain_rate, cur_charge)
-				A.cell.use(drain_val * CELLRATE)
-				drained += drain_val
+			var/cur_charge = S.charge / CELLRATE
+			var/drain_val = min(apc_drain_rate, cur_charge)
+			S.remove_charge(drain_val)
+			drained += drain_val
 	power_drained += drained
 	return 1
 
@@ -124,7 +117,7 @@
 		explosion(src.loc, 3,6,9,12)
 		qdel(src)
 		return
-	if(anchored && power_node)
-		PN = power_node.in_net
+	if(anchored && isStationLevel(z))
+		PN = power_net
 	else
 		PN = null

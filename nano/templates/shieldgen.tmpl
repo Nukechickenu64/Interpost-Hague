@@ -85,6 +85,12 @@
 			<td>{{:helper.link('Set Input Cap', null, {'set_input_cap' : '1'})}}
 		</table>
 	<h2>FIELD CALIBRATION</h2>
+	<div class="statusDisplay">{{:data.coverage}}</div>
+	{{:helper.link('360 degrees', null, {'direction': '0'})}}
+	{{:helper.link('North', null, {'direction': '1'})}}
+	{{:helper.link('South', null, {'direction': '2'})}}
+	{{:helper.link('East', null, {'direction': '4'})}}
+	{{:helper.link('West', null, {'direction': '8'})}}
 	<hr>
 	{{for data.modes}}
 		<div class="item">

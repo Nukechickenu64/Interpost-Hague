@@ -17,12 +17,15 @@ Used In File(s): \code\game\machinery\computer\crew.dm
 </style>
 
 {{:helper.link('Show Tracker Map', 'pin-s', {'showMap' : 1})}}
+{{:helper.link('Read signals', null, {'report' : 1})}}
 <table class='wideTable'><tbody>
 	{{for data.crewmembers}}
 		<tr class="candystripe">
 			<td>{{:value.name}} ({{:value.assignment}}): </td>
 
-			{{if value.sensor_type == 1}}
+			{{if value.missing}}
+				<td><span class="bad">NOT RESPONDING</span></td>
+			{{else value.sensor_type == 1}}
 				
 				{{if value.pulse}}
 					<td><span class="neutral">Pulse detected</td>
@@ -50,6 +53,9 @@ Used In File(s): \code\game\machinery\computer\crew.dm
 					<td class='tracking'>{{:helper.link('Track', null, {'track' : value.ref})}}</td>
 				{{/if}}
 				
+			{{/if}}
+			{{if value.sensor_type >= 2 && value.radiation}}
+				<td><span class="bad">RAD: {{:value.radiation}}</span></td>
 			{{/if}}
 		</tr>
 	{{/for}}

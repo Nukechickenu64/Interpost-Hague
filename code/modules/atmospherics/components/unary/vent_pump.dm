@@ -41,13 +41,19 @@
 	var/internal_pressure_bound_default = INTERNAL_PRESSURE_BOUND
 	var/pressure_checks_default = PRESSURE_CHECKS
 
-	var/welded = 0 // Added for aliens -- TLE
 
 	var/frequency = 1439
 	var/datum/radio_frequency/radio_connection
 
 	var/radio_filter_out
 	var/radio_filter_in
+
+	//Random breakdown state. While malfunctioning the vent stops working and spews smoke until serviced with a screwdriver.
+	var/malfunction = 0
+	var/malfunction_chance = 0.02 //Chance to break down each process tick.
+	var/malfunction_puffs = 0
+	var/next_malfunction_effect = 0
+	var/obj/effect/gas_particle/malfunction_smoke
 
 /obj/machinery/atmospherics/unary/vent_pump/on
 	use_power = POWER_USE_IDLE
@@ -82,6 +88,7 @@
 
 /obj/machinery/atmospherics/unary/vent_pump/Destroy()
 	unregister_radio(src, frequency)
+	malfunction_smoke = null
 	if(initial_loc)
 		initial_loc.air_vent_info -= id_tag
 		initial_loc.air_vent_names -= id_tag
@@ -143,6 +150,8 @@
 		return 0
 	if(welded)
 		return 0
+	if(malfunction)
+		return 0
 	return 1
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/get_target_pressure()
@@ -155,6 +164,8 @@
 	return target_pressure
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/get_supply_status(obj/machinery/station_gas_tank/tank)
+	if(malfunction)
+		return "vent malfunctioning"
 	if(stat & BROKEN)
 		return "vent broken"
 	if(stat & NOPOWER)
@@ -165,6 +176,11 @@
 		return "vent welded"
 	if(hibernate > world.time)
 		return "vent sleeping"
+	if(engineering_mode == "FILTER")
+		var/obj/machinery/alarm/filter_controller = initial_loc ? initial_loc.master_air_alarm : null
+		if(!filter_controller || !filter_controller.can_supply_air())
+			return "area modcon disabled or offline"
+		return filter_controller.scrub_efficiency() ? "filtering" : "filter cartridge missing or exhausted"
 	var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
 	if(!area_modcon)
 		return "no area modcon"
@@ -185,7 +201,7 @@
 	return tank.get_supply_status()
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/get_supply_demand(obj/machinery/station_gas_tank/tank)
-	if(!pump_direction || get_station_gas_tank(src) != tank || get_supply_status(tank))
+	if(engineering_mode == "FILTER" || !pump_direction || get_station_gas_tank(src) != tank || get_supply_status(tank))
 		return 0
 	var/datum/gas_mixture/environment = loc.return_air()
 	var/target_pressure = get_target_pressure()
@@ -195,17 +211,35 @@
 /obj/machinery/atmospherics/unary/vent_pump/Process()
 	..()
 
+	if(malfunction)
+		last_flow_rate = 0
+		last_power_draw = 0
+		if(world.time >= next_malfunction_effect)
+			next_malfunction_effect = world.time + 5
+			spew_malfunction_smoke()
+		return 1
+
+	if(use_power && prob(malfunction_chance))
+		start_malfunction()
+		return 1
+
 	if (hibernate > world.time)
 		return 1
 
 	if(!can_pump())
+		last_flow_rate = 0
+		last_power_draw = 0
 		return 0
 
 	var/datum/gas_mixture/environment = loc.return_air()
 	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(src)
 	last_flow_rate = 0
 	last_power_draw = 0
-	if(!environment || !tank)
+	if(!environment)
+		return 0
+	if(engineering_mode == "FILTER")
+		return filter_room(environment)
+	if(!tank)
 		return 0
 	if(pump_direction)
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
@@ -242,6 +276,49 @@
 		var/pressure_delta = max(0, internal_pressure_bound - air_contents.return_pressure())
 		transfer_moles = min(transfer_moles, calculate_transfer_moles(environment, air_contents, pressure_delta))
 	return transfer_moles
+
+/obj/machinery/atmospherics/unary/vent_pump/proc/start_malfunction()
+	if(malfunction)
+		return
+	malfunction = 1
+	malfunction_puffs = 0
+	hibernate = 0
+	last_flow_rate = 0
+	last_power_draw = 0
+	visible_message(SPAN_WARNING("\The [src] shudders and starts spewing smoke!"))
+	spew_malfunction_smoke(TRUE)
+	broadcast_status()
+	update_icon()
+
+/obj/machinery/atmospherics/unary/vent_pump/proc/spew_malfunction_smoke(loud = FALSE)
+	if(loud || ++malfunction_puffs >= 30)
+		malfunction_puffs = 0
+		playsound(src.loc, 'sound/machines/loop_vent2.ogg', loud ? 40 : 10, 0, 3)
+	var/obj/effect/gas_particle/O = new(src.loc)
+	malfunction_smoke = O
+	animate(O, pixel_y = rand(50, 98), time = rand(14, 20))
+	spawn(20)
+		if(istype(O) && O.loc)
+			animate(O, alpha = 0, time = 20)
+		spawn(20)
+			if(istype(O) && O.loc)
+				if(malfunction_smoke == O)
+					malfunction_smoke = null
+				qdel(O)
+
+/obj/machinery/atmospherics/unary/vent_pump/proc/fix_malfunction()
+	if(!malfunction)
+		return
+	malfunction = 0
+	malfunction_puffs = 0
+	next_malfunction_effect = 0
+	last_flow_rate = 0
+	last_power_draw = 0
+	if(malfunction_smoke)
+		animate(malfunction_smoke, alpha = 0, time = 10)
+		malfunction_smoke = null
+	broadcast_status()
+	update_icon()
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/broadcast_status()
 	if(!radio_connection)
@@ -294,12 +371,18 @@
 /obj/machinery/atmospherics/unary/vent_pump/receive_signal(datum/signal/signal)
 	if(stat & (NOPOWER|BROKEN))
 		return
+	if(malfunction)
+		return
 
 	hibernate = 0
 
 	//log_admin("DEBUG \[[world.timeofday]\]: /obj/machinery/atmospherics/unary/vent_pump/receive_signal([signal.debug_print()])")
 	if(!signal.data["tag"] || (signal.data["tag"] != id_tag) || (signal.data["sigtype"]!="command"))
 		return 0
+
+	// Explicit local/radio control takes ownership back from the station console.
+	if(signal.data["power"] != null || signal.data["power_toggle"] != null || signal.data["direction"] != null || signal.data["purge"] != null || signal.data["stabalize"] != null)
+		engineering_mode = null
 
 	if(signal.data["purge"] != null)
 		pressure_checks &= ~1
@@ -360,52 +443,33 @@
 	update_icon()
 	return
 
-/obj/machinery/atmospherics/unary/vent_pump/attackby(obj/item/W, mob/user)
-	if(isWelder(W))
-
-		var/obj/item/weldingtool/WT = W
-
-		if(!WT.isOn())
-			to_chat(user, "<span class='notice'>The welding tool needs to be on to start this task.</span>")
-			return 1
-
-		if(!WT.remove_fuel(0,user))
-			to_chat(user, "<span class='warning'>You need more welding fuel to complete this task.</span>")
-			return 1
-
-		to_chat(user, "<span class='notice'>Now welding \the [src].</span>")
-		playsound(src.loc, 'sound/items/Welder2.ogg', 50, 1)
-
-		if(!do_after(user, 20, src))
-			to_chat(user, "<span class='notice'>You must remain close to finish this task.</span>")
-			return 1
-
-		if(!src)
-			return 1
-
-		if(!WT.isOn())
-			to_chat(user, "<span class='notice'>The welding tool needs to be on to finish this task.</span>")
-			return 1
-
-		welded = !welded
-		update_icon()
-		user.visible_message("<span class='notice'>\The [user] [welded ? "welds \the [src] shut" : "unwelds \the [src]"].</span>", \
-			"<span class='notice'>You [welded ? "weld \the [src] shut" : "unweld \the [src]"].</span>", \
-			"You hear welding.")
-		return 1
-
-	else
-		..()
-
 /obj/machinery/atmospherics/unary/vent_pump/examine(mob/user)
 	if(..(user, 1))
-		to_chat(user, "A small gauge in the corner reads [round(last_flow_rate, 0.1)] L/s; [round(last_power_draw)] W")
+		to_chat(user, "A small gauge in the corner reads [round(last_flow_rate, 0.1)] mol/cycle; [round(last_power_draw)] W")
 	else
 		to_chat(user, "You are too far away to read the gauge.")
 	if(welded)
 		to_chat(user, "It seems welded shut.")
+	if(malfunction)
+		to_chat(user, SPAN_WARNING("It's spewing smoke and doesn't seem to be working. A screwdriver could set it right."))
 
-/obj/machinery/atmospherics/unary/vent_pump/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
+/obj/machinery/atmospherics/unary/vent_pump/attackby(obj/item/W, mob/user)
+	if(vent_servicing)
+		return TRUE
+	if(isScrewdriver(W))
+		if(!malfunction)
+			return ..()
+		to_chat(user, SPAN_NOTICE("You begin servicing the malfunctioning valves on \the [src]..."))
+		playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+		if(do_after(user, 4 SECONDS, src) && user.get_active_hand() == W && !QDELETED(W))
+			user.visible_message(SPAN_NOTICE("\The [user] services \the [src] with \the [W], and the smoke subsides."))
+			fix_malfunction()
+		else
+			to_chat(user, SPAN_WARNING("You stop servicing \the [src]."))
+		return TRUE
+	if(isWelder(W))
+		weld_vent(W, user)
+		return TRUE
 	if(!isWrench(W))
 		return ..()
 	if (!(stat & NOPOWER) && use_power)

@@ -1,6 +1,6 @@
 /obj/machinery/computer/crew
 	name = "crew monitoring computer"
-	desc = "Used to monitor active health sensors built into most of the crew's uniforms."
+	desc = "Monitors medical bracelet signals, radiation exposure and missing transmissions from the crew manifest."
 	icon_keyboard = "med_key"
 	icon_screen = "crew"
 	light_color = "#315ab4"

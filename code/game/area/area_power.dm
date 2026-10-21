@@ -4,10 +4,15 @@
 #define ENVIRON 3
 */
 
+/area
+	var/power_cut = 0		// force-depowered by the global grid shortage balancer
+
 /area/proc/powered(var/chan)		// return true if the area has power to given channel
 	if(!requires_power)
 		return 1
 	if(always_unpowered)
+		return 0
+	if(power_cut)
 		return 0
 	switch(chan)
 		if(EQUIP)
@@ -18,6 +23,23 @@
 			return power_environ
 
 	return 0
+
+/area/proc/any_power_channel_on()
+	return power_equip || power_light || power_environ
+
+// Called by the global grid when power runs short: kill this area's channels.
+/area/proc/area_power_cut()
+	power_cut = 1
+	power_change()
+	update_icon()
+
+// Called by the global grid once supply is sufficient again.
+/area/proc/area_power_restore()
+	if(!power_cut)
+		return
+	power_cut = 0
+	power_change()
+	update_icon()
 
 // called when power status changes
 /area/proc/power_change()

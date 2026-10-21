@@ -29,6 +29,12 @@ var/list/solars_list = list()
 /obj/machinery/power/solar/drain_power()
 	return -1
 
+/obj/machinery/power/solar/connect_to_network()
+	if(..())
+		power_net.register_producer(src)
+		return 1
+	return 0
+
 /obj/machinery/power/solar/New(var/turf/loc, var/obj/item/solar_assembly/S)
 	..(loc)
 	Make(S)
@@ -122,15 +128,17 @@ var/list/solars_list = list()
 	if(!GLOB.sun || !control) //if there's no sun or the panel is not linked to a solar control computer, no need to proceed
 		return
 
-	if(powernet)
-		if(powernet == control.powernet)//check if the panel is still connected to the computer
+	if(network_connected)
+		if(control) //panel is still linked to a control computer
 			if(obscured) //get no light from the sun, so don't generate power
 				return
 			var/sgen = solar_gen_rate * sunfrac * efficiency
 			add_avail(sgen)
 			control.gen += sgen
-		else //if we're no longer on the same powernet, remove from control computer
-			unset_control()
+		else //not linked; generate untracked power anyway
+			if(obscured)
+				return
+			add_avail(solar_gen_rate * sunfrac * efficiency)
 
 /obj/machinery/power/solar/set_broken(new_state)
 	. = ..()
@@ -312,7 +320,7 @@ var/list/solars_list = list()
 
 /obj/machinery/power/solar_control/power_nets_changed(datum/power_node/N)
 	..()
-	if(powernet)
+	if(network_connected)
 		solars_list |= src
 	else
 		solars_list -= src
@@ -320,16 +328,16 @@ var/list/solars_list = list()
 
 /obj/machinery/power/solar_control/proc/refresh_connected()
 	for(var/obj/machinery/power/solar/panel in connected_panels.Copy())
-		if(!powernet || panel.powernet != powernet)
+		if(!network_connected || !panel.network_connected)
 			panel.unset_control()
-	if(connected_tracker && (!powernet || connected_tracker.powernet != powernet))
+	if(connected_tracker && (!network_connected || !connected_tracker.network_connected))
 		connected_tracker.unset_control()
 
-//search for unconnected panels and trackers in the computer powernet and connect them
+//search for unconnected panels and trackers near the computer on the global grid and connect them
 /obj/machinery/power/solar_control/proc/search_for_connected()
 	refresh_connected()
-	if(powernet)
-		for(var/obj/machinery/power/M in powernet.nodes)
+	if(network_connected)
+		for(var/obj/machinery/power/M in range(SOLAR_MAX_DIST, src))
 			if(istype(M, /obj/machinery/power/solar))
 				var/obj/machinery/power/solar/S = M
 				if(!S.control) //i.e unconnected
@@ -361,6 +369,7 @@ var/list/solars_list = list()
 /obj/machinery/power/solar_control/Initialize()
 	. = ..()
 	if(!connect_to_network()) return
+	solars_list |= src
 	set_panels(cdir)
 
 /obj/machinery/power/solar_control/update_icon()
@@ -449,7 +458,7 @@ var/list/solars_list = list()
 	if(devices_need_refresh)
 		devices_need_refresh = FALSE
 		refresh_connected()
-		if(auto_discover && powernet)
+		if(auto_discover && network_connected)
 			search_for_connected()
 			if(GLOB.sun)
 				update()
@@ -458,7 +467,7 @@ var/list/solars_list = list()
 		return
 
 	if(connected_tracker) //NOTE : handled here so that we don't add trackers to the processing list
-		if(connected_tracker.powernet != powernet)
+		if(!connected_tracker.network_connected)
 			connected_tracker.unset_control()
 
 	if(track==1 && trackrate) //manual tracking and set a rotation speed

@@ -374,16 +374,15 @@
 		)
 		signal.frequency = connection.frequency // Quick frequency set
 
-	  //#### Sending the signal to all subspace receivers ####//
+	  //#### Send the signal to the bluespace relay, the only machine radios need ####//
 
-		for(var/obj/machinery/telecomms/receiver/R in telecomms_list)
+		for(var/obj/machinery/bluespacerelay/R in bluespace_relays)
 			R.receive_signal(signal)
 
-		// Allinone can act as receivers.
+		// Allinone can act as receivers for legacy outposts without a bluespace relay.
 		for(var/obj/machinery/telecomms/allinone/R in telecomms_list)
 			R.receive_signal(signal)
 
-		// Receiving code can be located in Telecommunications.dm
 		if(position.z in signal.data["level"]) // level membership check
 			return signal.data["done"]
 		return 0
@@ -430,7 +429,11 @@
 	)
 	signal.frequency = connection.frequency // Quick frequency set
 
-	for(var/obj/machinery/telecomms/receiver/R in telecomms_list)
+	for(var/obj/machinery/bluespacerelay/R in bluespace_relays)
+		R.receive_signal(signal)
+
+	// Allinone can act as receivers for legacy outposts without a bluespace relay.
+	for(var/obj/machinery/telecomms/allinone/R in telecomms_list)
 		R.receive_signal(signal)
 
 

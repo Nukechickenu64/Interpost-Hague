@@ -31,9 +31,7 @@
 /area
 	var/obj/machinery/alarm/master_air_alarm
 	var/list/air_vent_names = list()
-	var/list/air_scrub_names = list()
 	var/list/air_vent_info = list()
-	var/list/air_scrub_info = list()
 
 /decl/environment_data
 	var/list/important_gasses = list(
@@ -214,6 +212,9 @@
 	if (mode==AALARM_MODE_CYCLE && environment.get_tile_moles()<MOLES_CELLSTANDARD*0.05)
 		mode=AALARM_MODE_FILL
 		apply_mode()
+
+	if(alarm_area && alarm_area.master_air_alarm == src)
+		alarm_area.update_atmos_lockdown()
 
 	//atmos computer remote controll stuff
 	switch(rcon_setting)
@@ -406,11 +407,9 @@
 		return
 
 	var/dev_type = signal.data["device"]
-	if(!(id_tag in alarm_area.air_scrub_names) && !(id_tag in alarm_area.air_vent_names))
+	if(!(id_tag in alarm_area.air_vent_names))
 		register_env_machine(id_tag, dev_type)
-	if(dev_type == "AScr")
-		alarm_area.air_scrub_info[id_tag] = signal.data
-	else if(dev_type == "AVP")
+	if(dev_type == "AVP")
 		alarm_area.air_vent_info[id_tag] = signal.data
 
 /obj/machinery/alarm/proc/register_env_machine(var/m_id, var/device_type)
@@ -418,9 +417,6 @@
 	if (device_type=="AVP")
 		new_name = "[alarm_area.name] Vent Pump #[alarm_area.air_vent_names.len+1]"
 		alarm_area.air_vent_names[m_id] = new_name
-	else if (device_type=="AScr")
-		new_name = "[alarm_area.name] Air Scrubber #[alarm_area.air_scrub_names.len+1]"
-		alarm_area.air_scrub_names[m_id] = new_name
 	else
 		return
 	spawn (10)
@@ -429,11 +425,6 @@
 /obj/machinery/alarm/proc/refresh_all()
 	for(var/id_tag in alarm_area.air_vent_names)
 		var/list/I = alarm_area.air_vent_info[id_tag]
-		if (I && I["timestamp"]+AALARM_REPORT_TIMEOUT/2 > world.time)
-			continue
-		send_signal(id_tag, list("status") )
-	for(var/id_tag in alarm_area.air_scrub_names)
-		var/list/I = alarm_area.air_scrub_info[id_tag]
 		if (I && I["timestamp"]+AALARM_REPORT_TIMEOUT/2 > world.time)
 			continue
 		send_signal(id_tag, list("status") )
@@ -471,32 +462,22 @@
 
 	switch(new_mode)
 		if(AALARM_MODE_SCRUBBING)
-			for(var/device_id in target_area.air_scrub_names)
-				send_signal(device_id, list("power"= 1, "co2_scrub"= 1, "scrubbing"= 1, "panic_siphon"= 0) )
 			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_PANIC, AALARM_MODE_CYCLE)
-			for(var/device_id in target_area.air_scrub_names)
-				send_signal(device_id, list("power"= 1, "panic_siphon"= 1) )
 			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 0) )
 
 		if(AALARM_MODE_REPLACEMENT)
-			for(var/device_id in target_area.air_scrub_names)
-				send_signal(device_id, list("power"= 1, "panic_siphon"= 1) )
 			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_FILL)
-			for(var/device_id in target_area.air_scrub_names)
-				send_signal(device_id, list("power"= 0) )
 			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 1, "checks"= "default", "set_external_pressure"= "default") )
 
 		if(AALARM_MODE_OFF)
-			for(var/device_id in target_area.air_scrub_names)
-				send_signal(device_id, list("power"= 0) )
 			for(var/device_id in target_area.air_vent_names)
 				send_signal(device_id, list("power"= 0) )
 
@@ -535,10 +516,37 @@
 		return
 	return interact(user)
 
-/obj/machinery/alarm/interact(mob/user)
-	if(locked || (stat & (NOPOWER|BROKEN)))
-		to_chat(user, "<span class='warning'>The modcon controls are locked or offline.</span>")
+// Right-click toggles the control lock. An engineering access card is still
+// required in the ID slot; there is no direct ID swipe anymore.
+/obj/machinery/alarm/attack_hand_right(mob/user)
+	if(user.incapacitated() || !Adjacent(user))
 		return
+	if(buildstage != 2)
+		to_chat(user, SPAN_WARNING("It is not wired."))
+		return
+	if(stat & (NOPOWER|BROKEN))
+		to_chat(user, SPAN_WARNING("It does nothing."))
+		return
+	if(wires.IsIndexCut(AALARM_WIRE_IDSCAN))
+		to_chat(user, SPAN_WARNING("The scanner beeps but nothing happens."))
+		return
+	if(!allowed(user))
+		to_chat(user, SPAN_WARNING("Access denied."))
+		return
+	locked = !locked
+	update_icon()
+	to_chat(user, SPAN_NOTICE("You [ locked ? "lock" : "unlock"] the modcon controls."))
+	if(!locked)
+		interact(user)
+
+/obj/machinery/alarm/interact(mob/user)
+	if(locked || buildstage != 2 || shorted || (stat & (NOPOWER|BROKEN)))
+		to_chat(user, SPAN_WARNING("The modcon controls are locked or offline."))
+		return
+	to_chat(user, modcon_report(user))
+
+/obj/machinery/alarm/proc/modcon_report(mob/user)
+	var/can_control = can_use_modcon(user)
 	var/obj/machinery/station_gas_tank/tank = get_station_gas_tank(src)
 	var/tank_status = tank ? tank.get_supply_status() : "offline"
 	var/text = "<div class='firstdivmood'><div class='compbox'><b>[name]</b><hr>"
@@ -549,8 +557,11 @@
 	var/list/gas_limits = TLV["pressure"]
 	var/list/room_status = list("safe", "<font color='orange'>harmful</font>", "<font color='red'>DANGER</font>")
 	text += "Room air: [round(room_moles, 0.1)] mol/tile, [room_status[get_low_moles_danger_level(room_moles, gas_limits) + 1]]<br>"
-	text += "Pressure target: [round(output_pressure, 0.1)] kPa <a href='?src=\ref[src];modcon=pressure'>SET</a><br>"
-	text += "Chemical scrubber: [cartridge ? "[round(cartridge.integrity / cartridge.max_integrity * 100, 0.1)]%" : "missing"]<hr>"
+	text += "Pressure target: [round(output_pressure, 0.1)] kPa [can_control ? "<a href='?src=\ref[src];modcon=pressure'>SET</a>" : ""]<br>"
+	text += "Chemical scrubber: [cartridge ? "installed" : "missing"]<hr>"
+	text += "Lockdown: [alarm_area.air_doors_activated ? "ACTIVE" : "clear"]; manual [alarm_area.atmos_manual_lockdown ? "ON" : "OFF"]; automatic [alarm_area.atmos_auto_lockdown ? "ON" : "OFF"]<br>"
+	if(can_control)
+		text += "<a href='?src=\ref[src];modcon=lockdown'>Toggle manual lockdown</a> | <a href='?src=\ref[src];modcon=automatic'>Toggle automatic lockdown</a><br>All vents: [vent_control_links("all")]<hr>"
 	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in alarm_area)
 		var/datum/gas_mixture/vent_air = vent.loc.return_air()
 		var/vent_pressure = vent_air ? tile_moles_to_kpa(vent_air.get_tile_moles(), vent_air.temperature) : 0
@@ -564,16 +575,22 @@
 				vent_status = "waiting for shared tank allowance"
 			else
 				vent_status = "awaiting vent cycle"
-		text += "[vent.name]: target [controller ? "[round(controller.output_pressure, 0.1)] kPa" : "offline"], actual [vent_air ? "[round(vent_pressure, 0.1)] kPa" : "offline"], output [round(vent.last_flow_rate, 0.1)] mol/cycle ([vent_status])<br>"
-	to_chat(user, "[text]</div></div>")
+		text += "[html_encode(vent.name)] [vent.engineering_mode_name()]: target [controller ? "[round(controller.output_pressure, 0.1)] kPa" : "offline"], actual [vent_air ? "[round(vent_pressure, 0.1)] kPa" : "offline"], output [round(vent.last_flow_rate, 0.1)] mol/cycle ([vent_status])<br>"
+		if(can_control)
+			text += "[vent_control_links("\ref[vent]")]<br>"
+	return "[text]</div></div>"
 
 /obj/machinery/alarm/Topic(href, href_list)
-	if(href_list["modcon"] == "pressure")
-		if(locked || (stat & (NOPOWER|BROKEN)) || get_dist(usr, src) > 1 || !allowed(usr))
+	if(href_list["modcon"])
+		if(!can_use_modcon(usr))
 			return
-		var/new_pressure = input(usr, "Area vent pressure target (kPa)", "Modcon", output_pressure) as null|num
-		if(isnum_safe(new_pressure) && !locked && get_dist(usr, src) <= 1 && allowed(usr))
-			output_pressure = between(0, new_pressure, MAX_PUMP_PRESSURE)
+		if(href_list["modcon"] == "pressure")
+			var/new_pressure = input(usr, "Area vent pressure target (kPa)", "Modcon", output_pressure) as null|num
+			if(isnum_safe(new_pressure) && can_use_modcon(usr))
+				output_pressure = between(0, new_pressure, MAX_PUMP_PRESSURE)
+		else
+			apply_modcon_action(usr, href_list)
+		if(can_use_modcon(usr))
 			interact(usr)
 		return
 	return ..()
@@ -593,13 +610,17 @@
 		return 0
 	return between(0, cartridge.integrity / cartridge.max_integrity, 1)
 
+// Chemical scrubber wear has been removed from modcon units. The cartridge is
+// still required, but it never degrades.
 /obj/machinery/alarm/proc/wear_scrubber(moles)
-	if(cartridge && moles > 0)
-		cartridge.integrity = max(0, cartridge.integrity - moles / 1000)
+	return
 
 /obj/machinery/alarm/proc/recover_air(obj/machinery/station_gas_tank/tank, datum/gas_mixture/environment, requested_moles)
 	var/efficiency = scrub_efficiency()
 	if(mode == AALARM_MODE_OFF || !efficiency || !tank || !environment || !tank.air_contents || !tank.enabled || (tank.stat & (NOPOWER|BROKEN)) || environment.temperature <= 0 || environment.total_moles <= 0)
+		return 0
+	var/obj/machinery/filter_hub/hub = get_station_filter_hub(src)
+	if(hub && !hub.can_process())
 		return 0
 	var/clean_fraction = (environment.get_gas(GAS_OXYGEN) + environment.get_gas(GAS_NITROGEN)) / environment.total_moles
 	if(clean_fraction <= 0)
@@ -619,7 +640,10 @@
 	var/recovered_moles = tank.receive_gas(sample, sample.total_moles)
 	environment.merge(sample)
 	qdel(sample)
-	wear_scrubber(discarded_moles)
+	// Modcon cartridges no longer wear; a central filter hub absorbs the
+	// contaminants (and wears its media) when one is installed.
+	if(hub)
+		hub.consume_contaminants(discarded_moles)
 	return recovered_moles + discarded_moles
 
 /obj/machinery/alarm/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 0)
@@ -684,27 +708,6 @@
 						"external"	= info["external"]
 					)
 			data["vents"] = vents
-		if(AALARM_SCREEN_SCRUB)
-			var/scrubbers[0]
-			for(var/id_tag in alarm_area.air_scrub_names)
-				var/long_name = alarm_area.air_scrub_names[id_tag]
-				var/list/info = alarm_area.air_scrub_info[id_tag]
-				if(!info)
-					continue
-				scrubbers[++scrubbers.len] = list(
-						"id_tag"	= id_tag,
-						"long_name" = sanitize(long_name),
-						"power"		= info["power"],
-						"scrubbing"	= info["scrubbing"],
-						"panic"		= info["panic"],
-						"filters"	= list()
-					)
-				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Oxygen",			"command" = "o2_scrub",	"val" = info["filter_o2"]))
-				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Nitrogen",		"command" = "n2_scrub",	"val" = info["filter_n2"]))
-				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Carbon Dioxide", "command" = "co2_scrub","val" = info["filter_co2"]))
-				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Toxin"	, 		"command" = "tox_scrub","val" = info["filter_phoron"]))
-				scrubbers[scrubbers.len]["filters"] += list(list("name" = "Nitrous Oxide",	"command" = "n2o_scrub","val" = info["filter_n2o"]))
-			data["scrubbers"] = scrubbers
 		if(AALARM_SCREEN_MODE)
 			data["mode_scope"] = mode_scope
 			var/modes[0]
@@ -812,14 +815,7 @@
 					return TOPIC_REFRESH
 
 				if( "power",
-					"checks",
-					"o2_scrub",
-					"n2_scrub",
-					"co2_scrub",
-					"tox_scrub",
-					"n2o_scrub",
-					"panic_siphon",
-					"scrubbing")
+					"checks")
 
 					send_signal(device_id, list(href_list["command"] = text2num(href_list["val"]) ) )
 					return TOPIC_REFRESH
@@ -892,20 +888,26 @@
 		if(href_list["atmos_unlock"])
 			switch(href_list["atmos_unlock"])
 				if("0")
-					alarm_area.air_doors_close()
+					alarm_area.atmos_manual_lockdown = TRUE
 				if("1")
-					alarm_area.air_doors_open()
+					alarm_area.atmos_manual_lockdown = FALSE
+					alarm_area.atmos_auto_lockdown = FALSE
+			alarm_area.update_atmos_lockdown()
 			return TOPIC_REFRESH
 
 		if(href_list["atmos_alarm"])
+			alarm_area.atmos_manual_lockdown = TRUE
 			if (alarm_area.atmosalert(2, src))
 				apply_danger_level(2)
+			alarm_area.update_atmos_lockdown()
 			update_icon()
 			return TOPIC_REFRESH
 
 		if(href_list["atmos_reset"])
+			alarm_area.atmos_manual_lockdown = FALSE
 			if (alarm_area.atmosalert(0, src))
 				apply_danger_level(0)
+			alarm_area.update_atmos_lockdown()
 			update_icon()
 			return TOPIC_REFRESH
 
@@ -953,18 +955,6 @@
 				update_icon()
 				return
 
-			if (istype(W, /obj/item/card/id) || istype(W, /obj/item/device/pda))// trying to unlock the interface with an ID card
-				if(stat & (NOPOWER|BROKEN))
-					to_chat(user, "It does nothing")
-					return
-				else
-					if(allowed(usr) && !wires.IsIndexCut(AALARM_WIRE_IDSCAN))
-						locked = !locked
-						to_chat(user, "<span class='notice'>You [ locked ? "lock" : "unlock"] the modcon controls.</span>")
-						update_icon()
-					else
-						to_chat(user, "<span class='warning'>Access denied.</span>")
-			return
 
 		if(1)
 			if(isCoil(W))
@@ -1010,6 +1000,8 @@
 		to_chat(user, "It is not wired.")
 	if (buildstage < 1)
 		to_chat(user, "The circuit is missing.")
+	if (buildstage == 2)
+		to_chat(user, "Right-click to [locked ? "unlock" : "lock"] the controls. An engineering ID in the ID slot is required.")
 /*
 AIR ALARM CIRCUIT
 Just a object used in constructing air alarms

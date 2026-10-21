@@ -30,8 +30,8 @@
 	if(istype(target, /obj/machinery/power))
 		var/obj/machinery/power/power_machine = target
 
-		if(!power_machine.powernet && !power_machine.input_powernet)
-			to_chat(user, "<span class='warning'>This power station isn't connected to power net.</span>")
+		if(!power_machine.network_connected)
+			to_chat(user, "<span class='warning'>This power station isn't connected to the station grid.</span>")
 			return
 
 		if(check_to_use())
@@ -68,15 +68,13 @@
 	shots--
 	cooldown = world.time
 
-	var/datum/powernet/powernet = power_machine.input_powernet || power_machine.powernet
-	if(!powernet)
-		return
-	for(var/obj/machinery/power/area_smes/A in powernet.nodes)
-		A.energy_fail(rand(30 * severity, 60 * severity))
-	for(var/obj/machinery/power/smes/buildable/S in powernet.nodes | powernet.input_nodes)
+	// Strike the whole station: knock out SMES storage for a while and cut the global grid.
+	var/datum/powernet/powernet = power_net
+	for(var/obj/machinery/power/smes/S in powernet.storage)
 		S.energy_fail(rand(15 * severity, 30 * severity))
+	powernet.trigger_warning(rand(20 * severity, 40 * severity))
 
-	log_and_message_admins("used \the [src] on \the [power_machine] to shutdown powernet.", user)
+	log_and_message_admins("used \the [src] on \the [power_machine] to shut down the station grid.", user)
 	icon_state = "device_blackout-off"
 
 /obj/item/weapon/blackout/proc/check_to_use()

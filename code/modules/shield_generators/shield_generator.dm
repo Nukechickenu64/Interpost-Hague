@@ -15,6 +15,7 @@
 	var/max_energy = 0					// Maximal stored energy. In joules. Depends on the type of used SMES coil when constructing this generator.
 	var/current_energy = 0				// Current stored energy.
 	var/field_radius = 1				// Current field radius.
+	var/field_direction = 0 // 0 = full coverage; cardinal direction = one 90-degree sector.
 	var/running = SHIELD_OFF			// Whether the generator is enabled or not.
 	var/input_cap = 1 MEGAWATTS			// Currently set input limit. Set to 0 to disable limits altogether. The shield will try to input this value per tick at most
 	var/upkeep_power_usage = 0			// Upkeep power usage last tick.
@@ -99,12 +100,7 @@
 	if(!running)
 		return
 
-	var/list/shielded_turfs
-
-	if(check_flag(MODEFLAG_HULL))
-		shielded_turfs = fieldtype_hull()
-	else
-		shielded_turfs = fieldtype_square()
+	var/list/shielded_turfs = get_shielded_turfs()
 
 	for(var/turf/T in shielded_turfs)
 		var/obj/effect/shield/S = new(T)
@@ -112,6 +108,31 @@
 		S.flags_updated()
 		field_segments |= S
 	update_icon()
+
+
+/obj/machinery/power/shield_generator/proc/covers_direction(turf/T)
+	if(!field_direction)
+		return TRUE
+	var/dx = T.x - x
+	var/dy = T.y - y
+	switch(field_direction)
+		if(NORTH)
+			return dy >= abs(dx)
+		if(SOUTH)
+			return -dy >= abs(dx)
+		if(EAST)
+			return dx >= abs(dy)
+		if(WEST)
+			return -dx >= abs(dy)
+	return FALSE
+
+/obj/machinery/power/shield_generator/proc/get_shielded_turfs()
+	var/list/candidates = check_flag(MODEFLAG_HULL) ? fieldtype_hull() : fieldtype_square()
+	var/list/selected = list()
+	for(var/turf/T in candidates)
+		if(covers_direction(T))
+			selected |= T
+	return selected
 
 
 // Recalculates and updates the upkeep multiplier
@@ -221,6 +242,8 @@
 	data["total_segments"] = field_segments ? field_segments.len : 0
 	data["functional_segments"] = damaged_segments ? data["total_segments"] - damaged_segments.len : data["total_segments"]
 	data["field_radius"] = field_radius
+	data["field_direction"] = field_direction
+	data["coverage"] = field_direction ? "[dir2text(field_direction)] sector (90 degrees)" : "Full coverage (360 degrees)"
 	data["input_cap_kw"] = round(input_cap / 1000)
 	data["upkeep_power_usage"] = round(upkeep_power_usage / 1000, 0.1)
 	data["power_usage"] = round(power_usage / 1000)
@@ -279,6 +302,16 @@
 		return TOPIC_REFRESH
 
 	if(mode_changes_locked)
+		return TOPIC_REFRESH
+
+	if(!isnull(href_list["direction"]))
+		if(!(href_list["direction"] in list("0", "[NORTH]", "[SOUTH]", "[EAST]", "[WEST]")))
+			return TOPIC_HANDLED
+		var/new_direction = text2num(href_list["direction"])
+		if(!(new_direction in list(0, NORTH, SOUTH, EAST, WEST)))
+			return TOPIC_HANDLED
+		field_direction = new_direction
+		regenerate_field()
 		return TOPIC_REFRESH
 
 	if(href_list["set_range"])

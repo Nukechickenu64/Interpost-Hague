@@ -117,11 +117,6 @@
 	description_info = "Outputs the pipe's gas into the atmosphere, similar to an airvent.  It can be controlled by a nearby atmospherics computer. \
 	A green light on it means it is on."
 
-//Scrubbers
-/obj/machinery/atmospherics/unary/vent_scrubber
-	description_info = "This filters the atmosphere of harmful gas.  Filtered gas goes to the pipes connected to it, typically a scrubber pipe. \
-	It can be controlled from an Air Alarm.  It can be configured to drain all air rapidly with a 'panic syphon' from an air alarm."
-
 //Omni filters
 /obj/machinery/atmospherics/omni/filter
 	description_info = "Filters gas from a custom input direction, with up to two filtered outputs and a 'everything else' \

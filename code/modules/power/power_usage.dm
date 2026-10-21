@@ -52,12 +52,7 @@ This is /obj/machinery level code to properly manage power usage from the area.
 /obj/machinery/get_implicit_power_inputs()
 	if(power_node && power_node.on_bus)
 		return list()
-	var/area/A = get_area(src)
-	var/obj/machinery/power/area_smes/S = A && A.get_area_smes()
-	if(S)
-		var/datum/power_node/supply_node = S.get_power_node()
-		return list("Area supply: [S.name] ([supply_node.ccid])")
-	return list("Area supply: none")
+	return list("Station supply: global power grid")
 
 // returns true if the area has power on given channel (or doesn't require power), defaults to power_channel.
 // May also optionally specify an area, otherwise defaults to src.loc.loc

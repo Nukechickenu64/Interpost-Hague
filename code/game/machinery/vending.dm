@@ -150,6 +150,9 @@
 		return 1
 
 /obj/machinery/vending/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if(istype(W, /obj/item/vending_charge))
+		refill_from_charge(W, user)
+		return
 
 	var/obj/item/card/id/I = W.GetIdCard()
 

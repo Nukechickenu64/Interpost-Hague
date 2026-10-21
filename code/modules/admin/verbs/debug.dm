@@ -467,16 +467,15 @@
 	visualpower_remove()
 	powernet_markers = list()
 
-	for(var/datum/powernet/PN in SSmachines.powernets)
-		var/netcolor = rgb(rand(100,255),rand(100,255),rand(100,255))
-		for(var/obj/O in PN.nodes | PN.input_nodes)
-			var/image/I = image('icons/effects/lighting_overlay.dmi', get_turf(O), "transparent")
-			I.plane = DEFAULT_PLANE
-			I.layer = EXPOSED_WIRE_LAYER
-			I.alpha = 127
-			I.color = netcolor
-			I.maptext = "<span style='font-size:6px'>[O.ccid]</span>"
-			powernet_markers += I
+	var/datum/powernet/PN = power_net
+	var/netcolor = rgb(rand(100,255),rand(100,255),rand(100,255))
+	for(var/obj/O in PN.nodes | PN.input_nodes)
+		var/image/I = image('icons/effects/lighting_overlay.dmi', get_turf(O), "transparent")
+		I.plane = DEFAULT_PLANE
+		I.layer = EXPOSED_WIRE_LAYER
+		I.alpha = 127
+		I.color = netcolor
+		powernet_markers += I
 	images += powernet_markers
 
 /client/proc/visualpower_remove()

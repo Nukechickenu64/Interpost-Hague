@@ -757,6 +757,8 @@ GLOBAL_LIST_EMPTY(area_smes_by_id)
 	lastused_equip = total_area_usage(EQUIP)
 	lastused_environ = total_area_usage(ENVIRON)
 	for(var/area/A in served_areas)
+		if(A.requires_power)
+			power_net.record_serviced_area(A)
 		A.clear_usage()
 
 	lastused_total = lastused_light + lastused_equip + lastused_environ
@@ -1045,11 +1047,9 @@ GLOBAL_LIST_EMPTY(area_power_markers)
 	return INITIALIZE_HINT_LATELOAD
 
 /obj/effect/area_power_marker/LateInitialize()
-	var/obj/machinery/power/area_smes/S = GLOB.area_smes_by_id[area_id]
-	if(S)
-		S.add_served_area(get_area(src))
-	else
-		log_error("Area power marker at [x],[y],[z] has no area SMES with area_id '[area_id]'.")
+	// Local area power distribution is removed. The global grid powers every station
+	// area directly; markers no longer link areas to distribution units.
+	return INITIALIZE_HINT_NORMAL
 
 /obj/effect/area_power_marker/Destroy()
 	GLOB.area_power_markers -= src

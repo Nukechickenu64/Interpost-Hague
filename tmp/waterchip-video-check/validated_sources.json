@@ -1,0 +1,15 @@
+{
+  "code/game/machinery/chargemaster.dm": "e4996acf05cbeab4b8f2c14313c2ce6ea392c037c148a55b2faba935efb79aa0",
+  "code/game/machinery/vending_charges.dm": "1be53c42ee150ab0697a60c06c2222f4d465d474eb2d4736b8cebf859aef720c",
+  "code/modules/hydroponics/biomass.dm": "38982afc7430d9ef26c367250ec748245ed9dd74263e29c74b8dd2a477c43485",
+  "code/unit_tests/waterchip_video_tests.dm": "a0bf6540075715cf9a32c6f8f28a402d87635dbceff142d6d10cf5d00e255990",
+  "maps/alpha/alpha.dmm": "3171f99df0b05a1dcb1c3ca432ed491a5574c2939337a1389e4da78c78b0a1e3",
+  "code/modules/reagents/dispenser/dispenser2.dm": "ac5675dc76ef81f5a0d23a39ae3b62da111a911e31ded0189c3185262145b12a",
+  "code/modules/reagents/dispenser/dispenser_presets.dm": "7ff984a6454d5d9c80f27a9ca4fce01191199d2af0c7009488b58361b259da14",
+  "code/game/objects/items/waterchip.dm": "d9051977ae82d07f215d03880e48f89349614c341ec68af23395f33fee2690be",
+  "code/game/objects/structures/watercloset.dm": "96d73a31a882608b203e34239e184730fabb8ca71c1d201f7aeb25f7b7f16b75",
+  "code/unit_tests/biomass_tests.dm": "cba944c07eed4a6dfcd9f23a07fd55c12bc0bb68b0c15ab738c3ee9c97cf2ed9",
+  "Interpost-Hague.dme": "c31b0c77e2343b0f3d6e9cc8705d4f0a77fee5a5edb8d5f060f4e56d16468812",
+  "waterchip_video_regression.dme": "aacbf00ad44b7e92d1fe333b535bfb2c4ada27467d80c61628007da57b34ae88",
+  "nano/templates/hydroponics_control.tmpl": "c51e44579085f77a9212a25a0cdc1216cac2ca2a6337b6770d73b39d48d3b73d"
+}

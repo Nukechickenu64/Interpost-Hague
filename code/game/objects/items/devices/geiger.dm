@@ -32,7 +32,17 @@
 	if(ishuman(loc))
 		var/mob/living/carbon/human/wearer = loc
 		if(wearer.wrist_l == src || wearer.wrist_r == src)
-			to_chat(user, SPAN_NOTICE("Pulse: [wearer.get_pulse(1)]. Body temperature: [round(wearer.bodytemperature - T0C, 0.1)] C."))
+			var/list/reading = local_reading()
+			to_chat(user, SPAN_NOTICE("[html_encode(reading["area"])]. Pulse: [reading["pulse"]]. Body temperature: [reading["temperature"]] C. RAD: [reading["radiation"]]. Ambient radiation: [reading["ambient"]] Bq."))
+
+/obj/item/device/medical_bracelet/proc/local_reading()
+	if(!ishuman(loc))
+		return null
+	var/mob/living/carbon/human/wearer = loc
+	if(wearer.wrist_l != src && wearer.wrist_r != src)
+		return null
+	var/area/A = get_area(wearer)
+	return list("area" = A ? A.name : "Unknown", "pulse" = wearer.get_pulse(1), "temperature" = round(wearer.bodytemperature - T0C, 0.1), "radiation" = round(wearer.radiation, 0.1), "ambient" = round(SSradiation.get_rads_at_turf(get_turf(wearer)), 0.1))
 
 /obj/item/device/medical_bracelet/attack_self(mob/user)
 	set_sensors(user)

@@ -7,6 +7,7 @@
 	crew_data["tox"] = round(H.getToxLoss(), 1)
 	crew_data["fire"] = round(H.getFireLoss(), 1)
 	crew_data["brute"] = round(H.getBruteLoss(), 1)
+	crew_data["radiation"] = round(H.radiation, 0.1)
 	return ..()
 
 /**********
@@ -21,6 +22,7 @@
 	crew_data["tox"] = 0
 	crew_data["fire"] = 0
 	crew_data["brute"] = 0
+	crew_data["radiation"] = 0
 	return MOD_SUIT_SENSORS_HANDLED
 
 /crew_sensor_modifier/vital/jamming/oxy/process_crew_data(var/mob/living/carbon/human/H, var/obj/item/device/medical_bracelet/C, var/turf/pos, var/list/crew_data)

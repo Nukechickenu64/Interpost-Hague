@@ -1,0 +1,276 @@
+// Area SMES removal shim. The global power net powers every station area directly;
+// local "area SMES"/APC units no longer exist as gameplay objects. These stubs keep
+// map entries, wiring, malfunction and event code compiling and harmless.
+
+#define POWERCHAN_OFF		0	// Power channel is off
+#define POWERCHAN_OFF_TEMP	1	// Power channel is off until there is power
+#define POWERCHAN_OFF_AUTO	2	// Power channel is off until power passes a threshold
+#define POWERCHAN_ON		3	// Power channel is on until there is no power
+#define POWERCHAN_ON_AUTO	4	// Power channel is on until power drops below a threshold
+
+GLOBAL_LIST_EMPTY(area_smes_by_id)
+
+/area
+	var/obj/machinery/power/area_smes/area_smes = null
+
+/area/proc/get_area_smes()
+	return area_smes
+
+// All variants degrade to the same inert hull.
+/obj/machinery/power/area_smes/critical
+	is_critical = 1
+
+/obj/machinery/power/area_smes/high
+	cell_type = /obj/item/cell/high
+
+/obj/machinery/power/area_smes/high/inactive
+	lighting = 0
+	equipment = 0
+	environ = 0
+	locked = 0
+	coverlocked = 0
+
+/obj/machinery/power/area_smes/super
+	cell_type = /obj/item/cell/super
+
+/obj/machinery/power/area_smes/super/critical
+	is_critical = 1
+
+/obj/machinery/power/area_smes/hyper
+	cell_type = /obj/item/cell/hyper
+
+/obj/machinery/power/area_smes/derelict
+	cell_type = /obj/item/cell/crap/empty
+	lighting = 0
+	equipment = 0
+	environ = 0
+	locked = 0
+	coverlocked = 0
+
+// Inert shell kept for map/event compatibility. It provides no power of its own;
+// power comes from the global station grid.
+/obj/machinery/power/area_smes
+	name = "power storage unit"
+	desc = "A legacy power distribution unit. Station power is now supplied by the global grid."
+
+	icon_state = "smes"
+	density = 1
+	anchored = 1
+	use_power = POWER_USE_OFF
+	req_access = list(access_engine_equip)
+	clicksound = "switch"
+	var/area_id = null
+	var/list/area/served_areas = list()
+	var/area/area
+	var/obj/item/cell/cell
+	var/chargelevel = 0.0005
+	var/cell_type = /obj/item/cell/apc
+	var/opened = 0
+	var/shorted = 0
+	var/lighting = POWERCHAN_ON_AUTO
+	var/equipment = POWERCHAN_ON_AUTO
+	var/environ = POWERCHAN_ON_AUTO
+	var/operating = 0				// obsolete; the unit never "runs"
+	var/charging = 0
+	var/chargemode = 1
+	var/chargecount = 0
+	var/locked = 1
+	var/coverlocked = 1
+	var/aidisabled = 0
+	var/lastused_light = 0
+	var/lastused_equip = 0
+	var/lastused_environ = 0
+	var/lastused_charging = 0
+	var/lastused_total = 0
+	var/main_status = 0
+	var/mob/living/silicon/ai/hacker = null
+	var/wiresexposed = 0
+	var/debug = 0
+	var/autoflag = 0
+	var/beenhit = 0
+	var/longtermpower = 10
+	var/datum/wires/apc/wires = null
+	var/update_state = -1
+	var/update_overlay = -1
+	var/list/update_overlay_chan
+	var/is_critical = 0
+	var/failure_timer = 0
+	var/force_update = 0
+	var/emp_hardened = 0
+
+/obj/machinery/power/area_smes/Initialize(mapload, var/ndir)
+	// Never create wiring; the unit is decorative/inert.
+	if(ndir)
+		set_dir(ndir)
+	if(cell_type)
+		cell = new cell_type(src)
+	if(area_id)
+		GLOB.area_smes_by_id[area_id] = src
+	. = ..()
+	update_icon()
+
+/obj/machinery/power/area_smes/Destroy()
+	for(var/area/A in served_areas.Copy())
+		remove_served_area(A)
+	if(area_id && GLOB.area_smes_by_id[area_id] == src)
+		GLOB.area_smes_by_id -= area_id
+	if(hacker && hacker.hacked_apcs)
+		hacker.hacked_apcs -= src
+	qdel(wires)
+	wires = null
+	return ..()
+
+/obj/machinery/power/area_smes/updateDialog()
+	return
+
+/obj/machinery/power/area_smes/drain_power(var/drain_check, var/surge, var/amount = 0)
+	if(drain_check)
+		return 1
+	var/drained_energy = 0
+	if(cell)
+		drained_energy = cell.use(amount * CELLRATE)
+	return drained_energy / CELLRATE
+
+/obj/machinery/power/area_smes/proc/update_name()
+	if(area)
+		SetName("\improper [area.name] power storage unit")
+	else if(area_id)
+		SetName("\improper [area_id] power storage unit")
+
+/obj/machinery/power/area_smes/proc/add_served_area(area/A)
+	if(!A || (A in served_areas))
+		return
+	served_areas += A
+	A.area_smes = src
+	if(!area)
+		area = A
+		update_name()
+
+/obj/machinery/power/area_smes/proc/remove_served_area(area/A)
+	if(!(A in served_areas))
+		return
+	served_areas -= A
+	if(A.area_smes == src)
+		A.area_smes = null
+	if(area == A)
+		area = served_areas.len ? served_areas[1] : null
+
+/obj/machinery/power/area_smes/proc/energy_fail(var/duration)
+	return
+
+/obj/machinery/power/area_smes/examine(mob/user)
+	if(..(user, 1))
+		to_chat(user, "An obsolete local power distribution unit. The station is powered by the global grid now.")
+		if(cell)
+			to_chat(user, "Its storage cell holds [round(cell.percent())]% charge.")
+
+/obj/machinery/power/area_smes/update_icon()
+	overlays.Cut()
+	set_light(0)
+	return
+
+/obj/machinery/power/area_smes/attackby(obj/item/W, mob/user)
+	add_fingerprint(user)
+	if(isCrowbar(W) && opened)
+		opened = 0
+		update_icon()
+	else if(isCrowbar(W))
+		opened = 1
+		update_icon()
+	else if(istype(W, /obj/item/cell) && opened && !cell)
+		user.drop_item()
+		W.forceMove(src)
+		cell = W
+		user.visible_message("\The [user] inserts a cell into \the [src].")
+	else if(opened && cell && (isCrowbar(W) || isScrewdriver(W)))
+		cell.update_icon()
+		user.put_in_hands(cell)
+		cell = null
+		user.visible_message("\The [user] removes the cell from \the [src].")
+	else
+		. = ..()
+
+/obj/machinery/power/area_smes/emag_act(var/remaining_charges, var/mob/user)
+	emagged = 1
+	locked = 0
+	to_chat(user, "<span class='notice'>The obsolete interface accepts the override, but has nothing left to control.</span>")
+	update_icon()
+	return 1
+
+/obj/machinery/power/area_smes/attack_hand(mob/user)
+	add_fingerprint(user)
+	if(opened && cell)
+		user.put_in_hands(cell)
+		cell = null
+		user.visible_message("\The [user] removes the cell from \the [src].")
+
+/obj/machinery/power/area_smes/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
+	to_chat(user, "<span class='notice'>Local power distribution was removed. Station power is managed by the global grid.</span>")
+	return
+
+/obj/machinery/power/area_smes/Topic(href, href_list)
+	. = ..()
+	if(.)
+		return 1
+	return 0
+
+/obj/machinery/power/area_smes/proc/report()
+	return "[area_id || (area && area.name)] : GLOBAL GRID"
+
+/obj/machinery/power/area_smes/proc/toggle_breaker()
+	update_icon()
+
+/obj/machinery/power/area_smes/Process()
+	return PROCESS_KILL
+
+/obj/machinery/power/area_smes/emp_act(severity)
+	if(cell)
+		cell.emp_act(severity + 1)
+	..()
+
+/obj/machinery/power/area_smes/ex_act(severity)
+	if(severity == 1.0)
+		qdel(src)
+
+/obj/machinery/power/area_smes/proc/overload_lighting(var/chance = 100)
+	return
+
+/obj/machinery/power/area_smes/proc/ai_hack(var/mob/living/silicon/ai/A = null)
+	return 0
+
+// Kept for buildability references; crafting this module still works.
+/obj/item/weapon/module/power_control
+	name = "power control module"
+	desc = "Heavy-duty switching circuits for power control."
+	icon = 'icons/obj/module.dmi'
+	icon_state = "power_mod"
+	item_state = "electronic"
+	matter = list(DEFAULT_WALL_MATERIAL = 50, "glass" = 50)
+	w_class = ITEM_SIZE_SMALL
+	obj_flags = OBJ_FLAG_CONDUCTIBLE
+
+/////////////////////////////////////////////
+// Marker: inert map relic. Areas are powered
+// by the global grid regardless of markers.
+/////////////////////////////////////////////
+
+GLOBAL_LIST_EMPTY(area_power_markers)
+
+/obj/effect/area_power_marker
+	name = "area power marker"
+	desc = "Mapping marker: local area power wiring no longer exists."
+	icon = 'icons/mob/screen1.dmi'
+	icon_state = "x2"
+	anchored = 1
+	simulated = 0
+	invisibility = 101
+	var/area_id
+
+/obj/effect/area_power_marker/Initialize()
+	. = ..()
+	GLOB.area_power_markers += src
+	return INITIALIZE_HINT_NORMAL
+
+/obj/effect/area_power_marker/Destroy()
+	GLOB.area_power_markers -= src
+	return ..()

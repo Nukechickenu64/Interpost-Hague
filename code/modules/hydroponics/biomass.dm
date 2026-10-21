@@ -33,7 +33,7 @@
 
 /obj/item/hydroponics_supply/skimmer
 	name = "skimmer"
-	desc = "Stir a vat when its red light flashes. Scoop goo when its green light flashes, then empty the skimmer into a biomass press."
+	desc = "Scoop goo when a vat's green light flashes, then empty the skimmer into a biomass press. Red vats can also be stirred by hand."
 	icon = 'icons/os13/os13hydroitems.dmi'
 	icon_state = "spaceshovel0"
 	item_state = "shovel"
@@ -168,11 +168,12 @@
 
 /obj/machinery/biomass_vat
 	name = "hydroponics vat"
-	desc = "Fill from the hydroponics console, then add yeast and glig. Stir with a skimmer whenever the red light flashes; scoop the goo when the green light flashes."
+	desc = "Fill from the hydroponics console, then add yeast and glig. Stir by hand whenever the red light flashes; after five mixes, scoop the green-lit goo with a skimmer. Stand directly north of the vat to work it."
 	icon = 'icons/os13/objects/objects/pipes/vats.dmi'
 	icon_state = "vat_empty"
 	// The 64px art is centered on its solid base tile; leave space above and beside mapped vats.
 	pixel_x = -16
+	layer = STRUCTURE_LAYER
 	density = TRUE
 	anchored = TRUE
 	obj_flags = OBJ_FLAG_ANCHORABLE
@@ -182,18 +183,53 @@
 	var/has_yeast = FALSE
 	var/has_glig = FALSE
 	var/stirs = 0
-	var/stirs_required = 3
+	var/stirs_required = 5
 	var/portions = 0
 	var/batch_portions = 3
 	var/cycle_time = 30 SECONDS
 	var/work_left = 0
 	var/last_process = 0
 	var/obj/machinery/computer/hydroponics/water_supply
+	var/obj/effect/vat_access/access_blocker
 
 /obj/machinery/biomass_vat/Initialize()
 	. = ..()
 	last_process = world.time
+	maintain_access_blocker()
 	update_icon()
+
+// The vat's 64px body also occupies the tile directly north of it. A blocker
+// keeps foot traffic out of that tile except through its northern edge, so the
+// only working position is standing directly north of the vat.
+/obj/machinery/biomass_vat/proc/maintain_access_blocker()
+	var/turf/front = isturf(loc) ? get_step(src, NORTH) : null
+	if(!front)
+		if(access_blocker)
+			QDEL_NULL(access_blocker)
+		return
+	if(access_blocker && get_turf(access_blocker) != front)
+		QDEL_NULL(access_blocker)
+	if(!access_blocker)
+		access_blocker = new /obj/effect/vat_access(front)
+
+/obj/machinery/biomass_vat/Move(...)
+	. = ..()
+	if(.)
+		maintain_access_blocker()
+
+/obj/machinery/biomass_vat/forceMove(atom/destination)
+	. = ..()
+	maintain_access_blocker()
+
+/obj/machinery/biomass_vat/Destroy()
+	QDEL_NULL(access_blocker)
+	return ..()
+
+/obj/machinery/biomass_vat/proc/at_front_tile(mob/user)
+	if(!user)
+		return FALSE
+	var/turf/front = get_step(src, NORTH)
+	return front && get_turf(user) == front
 
 /obj/machinery/biomass_vat/proc/begin_filling(obj/machinery/computer/hydroponics/supply)
 	if(stage != BIOMASS_VAT_EMPTY || !supply || !supply.installed_chip || !supply.operable() || !supply.powered())
@@ -206,6 +242,7 @@
 	last_process = world.time
 	update_use_power(POWER_USE_ACTIVE)
 	update_icon()
+	flick("vat_filling", src)
 	return TRUE
 
 /obj/machinery/biomass_vat/Process()
@@ -239,6 +276,9 @@
 
 /obj/machinery/biomass_vat/attackby(obj/item/O, mob/user)
 	if(!user || user.incapacitated() || !Adjacent(user))
+		return
+	if(!at_front_tile(user))
+		to_chat(user, "You can only reach the vat from the tile directly north of it.")
 		return
 	if(istype(O, /obj/item/hydroponics_supply/skimmer))
 		var/obj/item/hydroponics_supply/skimmer/S = O
@@ -278,11 +318,7 @@
 	if(!S || S.loaded || !operable() || !powered())
 		return FALSE
 	if(stage == BIOMASS_VAT_STIR)
-		stirs++
-		stage = BIOMASS_VAT_GROWING
-		work_left = cycle_time
-		last_process = world.time
-		update_use_power(POWER_USE_ACTIVE)
+		return stir()
 	else if(stage == BIOMASS_VAT_READY && portions > 0)
 		S.loaded = TRUE
 		S.update_icon()
@@ -297,8 +333,26 @@
 	update_icon()
 	return TRUE
 
+/obj/machinery/biomass_vat/proc/stir()
+	if(stage != BIOMASS_VAT_STIR || !operable() || !powered())
+		return FALSE
+	stirs++
+	stage = BIOMASS_VAT_GROWING
+	work_left = cycle_time
+	last_process = world.time
+	update_use_power(POWER_USE_ACTIVE)
+	update_icon()
+	return TRUE
+
 /obj/machinery/biomass_vat/attack_hand(mob/user)
-	if(user && Adjacent(user))
+	if(!user || user.incapacitated() || !Adjacent(user))
+		return
+	if(!at_front_tile(user))
+		to_chat(user, "You can only reach the vat from the tile directly north of it.")
+		return
+	if(stir())
+		user.visible_message("[user] stirs the muck in the vat!", "You stir the muck in the vat.")
+	else
 		examine(user)
 
 /obj/machinery/biomass_vat/proc/get_status_text()
@@ -328,7 +382,7 @@
 		if(BIOMASS_VAT_GROWING)
 			to_chat(user, "The culture is growing. Mixes completed: [stirs]/[stirs_required].")
 		if(BIOMASS_VAT_STIR)
-			to_chat(user, "RED: growth has stopped. Mix the foam with an empty skimmer.")
+			to_chat(user, "RED: growth has stopped. Click with an empty hand to stir the muck.")
 		if(BIOMASS_VAT_READY)
 			to_chat(user, "GREEN: [portions] portion(s) of goo ready. Scoop with an empty skimmer.")
 	if(!operable() || !powered())
@@ -340,7 +394,7 @@
 		if(BIOMASS_VAT_EMPTY)
 			icon_state = "vat_empty"
 		if(BIOMASS_VAT_FILLING)
-			icon_state = "vat_filling"
+			icon_state = "vat_empty"
 		if(BIOMASS_VAT_FILLED)
 			icon_state = "vat_filled"
 		if(BIOMASS_VAT_GROWING)
@@ -360,6 +414,35 @@
 			status_light.pixel_x = 16
 			status_light.pixel_y = 16
 			overlays += status_light
+
+// Occupies the tile directly north of a vat: passable only straight through
+// its northern edge; east/west movement is blocked. Invisible to players.
+/obj/effect/vat_access
+	name = "hydroponics vat body"
+	desc = "The upper half of a hydroponics vat."
+	invisibility = INVISIBILITY_MAXIMUM
+	anchored = TRUE
+	density = TRUE
+	mouse_opacity = 0
+	unacidable = TRUE
+	simulated = FALSE
+	icon = null
+	icon_state = null
+
+/obj/effect/vat_access/CanPass(atom/movable/mover, turf/target, height = 0, air_group = 0)
+	// Air and items sliding at floor height flow over the vat body the same
+	// way they flow over a dense machine.
+	if(air_group || !height || !target)
+		return TRUE
+	// Reaching the service tile means walking south off its northern neighbour.
+	return get_dir(loc, target) == NORTH
+
+/obj/effect/vat_access/CheckExit(atom/movable/O, turf/target)
+	if(!target)
+		return TRUE
+	if(get_dir(loc, target) & (EAST|WEST))
+		return FALSE
+	return TRUE
 
 /obj/machinery/biomass_press
 	name = "biomass press"
@@ -389,6 +472,8 @@
 	last_process = world.time
 	update_use_power(POWER_USE_ACTIVE)
 	update_icon()
+	if("bricker_process" in icon_states(icon))
+		flick("bricker_process", src)
 
 /obj/machinery/biomass_press/attackby(obj/item/O, mob/user)
 	if(istype(O, /obj/item/hydroponics_supply/skimmer))
@@ -437,52 +522,206 @@
 	if(!operable() || !powered())
 		icon_state = "bricker"
 	else
-		icon_state = work_left ? "bricker_process" : (ready ? "bricker_ready" : "bricker")
+		icon_state = ready ? "bricker_ready" : "bricker"
 
+// Food Processing Units in the water-chip recording are loaded, then activated.
 /obj/machinery/biomass_press/food_processor
-	name = "food processor"
-	desc = "Use an empty hand to select a food shape, then insert one biomass brick. Take the meal when the green indicator lights up."
-	icon = 'icons/obj/machines/replicator.dmi'
-	icon_state = "replicator"
-	output_type = /obj/item/reagent_containers/food/snacks/tofuburger
-	var/list/food_shapes = list("Burger" = /obj/item/reagent_containers/food/snacks/tofuburger, "Sausage" = /obj/item/reagent_containers/food/snacks/sausage, "Wafers" = /obj/item/reagent_containers/food/snacks/soylenviridians)
+	name = "food processing unit"
+	desc = "Insert a biomass brick, then click with an empty hand to activate. Collect the finished meal with another click. Alt-click to unload an unprocessed brick."
+	icon = 'icons/os13/objects/objects/vending.dmi'
+	icon_state = "kitchen_base"
+	output_type = /obj/item/reagent_containers/food/snacks/ersatz/pizza
+	var/list/food_shapes = list("Pizza" = /obj/item/reagent_containers/food/snacks/ersatz/pizza, "Sandwich" = /obj/item/reagent_containers/food/snacks/ersatz/sandwich, "Shawarma" = /obj/item/reagent_containers/food/snacks/ersatz/shawarma, "Burger" = /obj/item/reagent_containers/food/snacks/tofuburger, "Sausage" = /obj/item/reagent_containers/food/snacks/sausage, "Wafers" = /obj/item/reagent_containers/food/snacks/soylenviridians)
+	var/fixed_shape
+	var/input_type = /obj/item/hydroponics_supply/biomass
+	var/input_name = "biomass brick"
+	var/obj/item/loaded_input
+	var/repairing = FALSE
+
+/obj/machinery/biomass_press/food_processor/pizza
+	fixed_shape = "Pizza"
+
+/obj/machinery/biomass_press/food_processor/sandwich
+	fixed_shape = "Sandwich"
+	output_type = /obj/item/reagent_containers/food/snacks/ersatz/sandwich
+
+/obj/machinery/biomass_press/food_processor/shawarma
+	fixed_shape = "Shawarma"
+	output_type = /obj/item/reagent_containers/food/snacks/ersatz/shawarma
+
+/obj/machinery/biomass_press/food_processor/shawarma/broken
+	stat = BROKEN
+
+/obj/machinery/biomass_press/food_processor/Initialize()
+	. = ..()
+	update_icon()
+
+/obj/machinery/biomass_press/food_processor/examine(mob/user)
+	. = ..()
+	if(stat & BROKEN)
+		to_chat(user, "Something is wrong with this one. Use an empty hand to repair its jammed mechanism.")
+	else
+		var/obj/item/food = output_type
+		to_chat(user, "This one is configured for making [initial(food.name)]. [loaded_input ? "Ingredient loaded; click to activate." : ""]")
 
 /obj/machinery/biomass_press/food_processor/attack_hand(mob/user)
 	if(!user || user.incapacitated() || !Adjacent(user))
 		return
+	if(stat & BROKEN)
+		if(repairing)
+			return
+		repairing = TRUE
+		to_chat(user, "You start clearing and resetting the food unit's jammed mechanism.")
+		if(do_after(user, 10 SECONDS, src) && !QDELETED(src) && (stat & BROKEN))
+			set_broken(FALSE)
+			user.visible_message("[user] fixes the Food Processing Unit.", "You fix the Food Processing Unit.")
+		repairing = FALSE
+		return
+	if(!operable() || !powered())
+		return
 	if(ready || work_left)
 		return ..()
-	var/choice = input(user, "Choose a shape for the next biomass brick.", "Food processor") as null|anything in food_shapes
-	if(!choice || QDELETED(src) || !Adjacent(user) || user.incapacitated() || work_left || ready)
+	if(loaded_input)
+		activate()
+		return
+	if(fixed_shape)
+		examine(user)
+		return
+	var/choice = input(user, "Choose a shape for the next biomass brick.", "Food processing unit") as null|anything in food_shapes
+	if(!choice || QDELETED(src) || !Adjacent(user) || user.incapacitated() || !operable() || !powered() || loaded_input || work_left || ready)
 		return
 	output_type = food_shapes[choice]
-	to_chat(user, "Selected [choice]. Insert a biomass brick.")
+	to_chat(user, "Selected [choice]. Insert a biomass brick, then click to activate.")
+	update_icon()
+
+/obj/machinery/biomass_press/food_processor/proc/activate()
+	if(!loaded_input || loaded_input.loc != src || work_left || ready || !operable() || !powered())
+		return FALSE
+	var/obj/item/B = loaded_input
+	loaded_input = null
+	consume_input(B)
+	begin_processing()
+	return TRUE
+
+/obj/machinery/biomass_press/food_processor/proc/consume_input(obj/item/I)
+	qdel(I)
+
+// A food unit accepts pressed bricks, never the press's raw-skimmer shortcut.
+/obj/machinery/biomass_press/food_processor/start_pressing(obj/item/hydroponics_supply/skimmer/S)
+	return FALSE
 
 /obj/machinery/biomass_press/food_processor/attackby(obj/item/O, mob/user)
 	if(isWrench(O))
 		return ..()
-	if(!istype(O, /obj/item/hydroponics_supply/biomass))
-		to_chat(user, "The food processor accepts pressed biomass bricks.")
+	if(!istype(O, input_type))
+		to_chat(user, "This unit accepts a [input_name].")
 		return
-	if(!user || user.incapacitated() || !Adjacent(user) || !operable() || !powered())
+	if(!user || user.incapacitated() || !Adjacent(user) || O.loc != user || !operable() || !powered())
 		return
-	if(work_left || ready)
+	if(loaded_input || work_left || ready)
 		to_chat(user, "Finish and collect the previous meal first.")
 		return
 	if(!user.unEquip(O, target = src))
 		return
-	qdel(O)
-	begin_processing()
-	to_chat(user, "The processor starts shaping the biomass into food.")
+	loaded_input = O
+	update_icon()
+	to_chat(user, "You load the [input_name]. Click the unit with an empty hand to activate it.")
+
+/obj/machinery/biomass_press/food_processor/AltClick(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user) || !loaded_input)
+		return ..()
+	var/obj/item/B = loaded_input
+	B.forceMove(get_turf(src))
+	user.put_in_hands(B)
+	return TRUE
+
+/obj/machinery/biomass_press/food_processor/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == loaded_input)
+		loaded_input = null
+		update_icon()
+
+/obj/machinery/biomass_press/food_processor/Destroy()
+	if(loaded_input)
+		loaded_input.forceMove(get_turf(src))
+	return ..()
 
 /obj/machinery/biomass_press/food_processor/update_icon()
 	overlays.Cut()
+	icon_state = "kitchen_base"
+	overlays += image(icon, "kitchen_inside")
 	if(!operable() || !powered())
-		icon_state = "replicator_d"
+		overlays += image(icon, "kitchen0")
 	else
-		icon_state = work_left ? "replicator_p" : "replicator"
-		if(ready)
-			overlays += image('icons/os13/objects/objects/hydroponics.dmi', "over_harvest3")
+		var/indicator = "kitchen1"
+		if(output_type == /obj/item/reagent_containers/food/snacks/ersatz/pizza)
+			indicator = "kitchen1b"
+		else if(output_type == /obj/item/reagent_containers/food/snacks/ersatz/sandwich)
+			indicator = "kitchen1c"
+		overlays += image(icon, indicator)
+		if(work_left)
+			overlays += image(icon, "kitchen_blink")
+	if(loaded_input)
+		overlays += image(loaded_input.icon, loaded_input.icon_state)
+	else if(ready)
+		var/obj/item/food = output_type
+		overlays += image(initial(food.icon), initial(food.icon_state))
+	if(work_left || (!loaded_input && !ready))
+		overlays += image(icon, "kitchen_door")
+
+// The separate Food Processor shown at 56:15 prepares real meat for cooking.
+// One slab becomes one raw meatball; all reagents are conserved, including toxins.
+/obj/machinery/biomass_press/food_processor/meat_processor
+	name = "food processor"
+	desc = "Load a slab of meat, then click to mince it into a raw meatball for cooking. This processor does not accept vat biomass. Alt-click to unload before activation."
+	icon = 'icons/os13/objects/objects/kitchen.dmi'
+	icon_state = "processor"
+	fixed_shape = "Meat"
+	input_type = /obj/item/reagent_containers/food/snacks/meat
+	input_name = "slab of meat"
+	output_type = /obj/item/reagent_containers/food/snacks/rawmeatball
+
+/obj/machinery/biomass_press/food_processor/meat_processor/Initialize()
+	. = ..()
+	create_reagents(1000)
+
+/obj/machinery/biomass_press/food_processor/meat_processor/consume_input(obj/item/I)
+	reagents.clear_reagents()
+	if(I.reagents)
+		I.reagents.trans_to_holder(reagents, I.reagents.total_volume)
+	return ..()
+
+/obj/machinery/biomass_press/food_processor/meat_processor/take_product()
+	var/obj/item/reagent_containers/food/snacks/product = ..()
+	if(product)
+		product.reagents.clear_reagents()
+		product.reagents.maximum_volume = max(product.reagents.maximum_volume, reagents.total_volume)
+		reagents.trans_to_holder(product.reagents, reagents.total_volume)
+	return product
+
+/obj/machinery/biomass_press/food_processor/meat_processor/update_icon()
+	overlays.Cut()
+	icon_state = (operable() && powered() && work_left) ? "processor_on" : "processor"
+
+/obj/item/reagent_containers/food/snacks/ersatz
+	name = "ersatz meal"
+	desc = "A meal shaped from vat-grown biomass."
+	icon = 'icons/os13/objects/objects/cooking.dmi'
+	nutriment_amt = 8
+	nutriment_desc = list("savory biomass" = 1)
+	bitesize = 2
+
+/obj/item/reagent_containers/food/snacks/ersatz/pizza
+	name = "ersatz-pizza"
+	icon_state = "pizza_pros_s1"
+
+/obj/item/reagent_containers/food/snacks/ersatz/sandwich
+	name = "ersatz-sandwich"
+	icon_state = "msandwich"
+
+/obj/item/reagent_containers/food/snacks/ersatz/shawarma
+	name = "ersatz-shawarma"
+	icon_state = "shaurma"
 
 /obj/machinery/vending/hydro_cultures
 	name = "vat culture dispenser"

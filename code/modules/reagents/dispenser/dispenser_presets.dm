@@ -1,6 +1,11 @@
 
-/obj/machinery/chemical_dispenser/full
-	spawn_cartridges = list(
+/obj/machinery/chemical_dispenser/full/New()
+	if(!spawn_cartridges)
+		spawn_cartridges = standard_cartridges()
+	return ..()
+
+/obj/machinery/chemical_dispenser/proc/standard_cartridges()
+	return list(
 			/obj/item/reagent_containers/chem_disp_cartridge/hydrazine,
 			/obj/item/reagent_containers/chem_disp_cartridge/lithium,
 			/obj/item/reagent_containers/chem_disp_cartridge/carbon,
@@ -64,8 +69,13 @@
 	ui_title = "Soda Dispenser"
 	accept_drinking = 1
 
-/obj/machinery/chemical_dispenser/bar_soft/full
-	spawn_cartridges = list(
+/obj/machinery/chemical_dispenser/bar_soft/full/New()
+	if(!spawn_cartridges)
+		spawn_cartridges = standard_cartridges()
+	return ..()
+
+/obj/machinery/chemical_dispenser/bar_soft/standard_cartridges()
+	return list(
 			/obj/item/reagent_containers/chem_disp_cartridge/water,
 			/obj/item/reagent_containers/chem_disp_cartridge/ice,
 			/obj/item/reagent_containers/chem_disp_cartridge/coffee,
@@ -92,8 +102,13 @@
 	ui_title = "Booze Dispenser"
 	accept_drinking = 1
 
-/obj/machinery/chemical_dispenser/bar_alc/full
-	spawn_cartridges = list(
+/obj/machinery/chemical_dispenser/bar_alc/full/New()
+	if(!spawn_cartridges)
+		spawn_cartridges = standard_cartridges()
+	return ..()
+
+/obj/machinery/chemical_dispenser/bar_alc/standard_cartridges()
+	return list(
 			/obj/item/reagent_containers/chem_disp_cartridge/lemon_lime,
 			/obj/item/reagent_containers/chem_disp_cartridge/sugar,
 			/obj/item/reagent_containers/chem_disp_cartridge/orange,
@@ -121,8 +136,13 @@
 	ui_title = "Coffee Dispenser"
 	accept_drinking = 1
 
-/obj/machinery/chemical_dispenser/bar_coffee/full
-	spawn_cartridges = list(
+/obj/machinery/chemical_dispenser/bar_coffee/full/New()
+	if(!spawn_cartridges)
+		spawn_cartridges = standard_cartridges()
+	return ..()
+
+/obj/machinery/chemical_dispenser/bar_coffee/standard_cartridges()
+	return list(
 			/obj/item/reagent_containers/chem_disp_cartridge/coffee,
 			/obj/item/reagent_containers/chem_disp_cartridge/cafe_latte,
 			/obj/item/reagent_containers/chem_disp_cartridge/soy_latte,
