@@ -361,9 +361,34 @@
 
 /datum/invader_ai/proc/melee_attack()
 	set waitfor = FALSE
-	owner.zone_sel.selecting = prob(70) ? BP_CHEST : pick(BP_HEAD, BP_GROIN, BP_L_ARM, BP_R_ARM)
+	switch(rand(1, 100))
+		if(1 to 55)
+			owner.zone_sel.selecting = BP_CHEST
+		if(56 to 65)
+			owner.zone_sel.selecting = BP_HEAD
+		if(66 to 73)
+			owner.zone_sel.selecting = BP_GROIN
+		if(74 to 81)
+			owner.zone_sel.selecting = pick(BP_L_ARM, BP_R_ARM)
+		if(82 to 89)
+			owner.zone_sel.selecting = pick(BP_L_LEG, BP_R_LEG)
+		if(90 to 94)
+			owner.zone_sel.selecting = BP_THROAT
+		if(95 to 100)
+			owner.zone_sel.selecting = BP_FACE
+	var/obj/item/weapon = get_melee_weapon(5)
+	owner.defense_intent = weapon ? I_PARRY : I_DODGE
+	if(owner.staminaloss >= 50)
+		owner.c_intent = I_DEFEND
+	else if(prob(20))
+		owner.c_intent = I_STRONG
+	else
+		owner.c_intent = I_QUICK
+	var/old_attack_intent = owner.a_intent
+	owner.a_intent = !weapon && prob(12) ? I_GRAB : I_HURT
 	reaction_at = world.time + clamp(round(gaussian(0.5, 0.5) * speed_multiplier), 0, 1)
 	owner.ClickOn(target, "")
+	owner.a_intent = old_attack_intent
 
 /datum/invader_ai/proc/get_gun()
 	if(istype(owner.r_hand, /obj/item/weapon/gun))
