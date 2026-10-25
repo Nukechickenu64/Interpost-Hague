@@ -2,6 +2,11 @@
 
 ## Status
 
+For the subsequent GURPS melee conversion, current validation and remaining
+parity gaps, see [combat-parity-implementation.md](combat-parity-implementation.md).
+The implementation inventory below describes the original Deathweb port; its
+ordinary human melee resolver and several timing rules have since been replaced.
+
 This is an integrated partial port, not a complete faithful replacement of Hague
 with Deathweb. The normal Hague project compiles with the port enabled. Runtime
 behavior has not been verified in-game.
@@ -36,7 +41,7 @@ import was performed.
 - Perception derived from intelligence, immunity derived from health, and
   willpower and speed fields. Speed remains a reserved modifier field, as it is
   in the inspected upstream human code.
-- Versioned, named temporary stat modifiers and two-minute willpower efforts.
+- Versioned, named temporary stat modifiers and one-minute willpower efforts.
   `Check Skills` displays effective attributes, ranks, and base roll targets.
 - Weapon hit-location accuracy, melee training and weapon specialty modifiers,
   posture and readiness modifiers, and strength-based weapon force.
@@ -88,8 +93,9 @@ the upstream disgust-resistance and perk-dependent efforts are not included.
 
 ## Validation
 
-Validation uses only the normal project compiler and focused static inspection.
-No unit tests, isolated harnesses, or Dream Maker IDE are used.
+The original port was checked with the normal compiler and static inspection.
+The subsequent combat conversion adds a focused DreamDaemon regression project;
+see the implementation follow-up for the tested behavior and startup limitations.
 
 Compile from the Interpost-Hague workspace root:
 
@@ -102,7 +108,7 @@ Manual in-game review still required:
 1. Create crew and NPC characters; confirm job/species values, skill lists,
    perception, and willpower in `Check Skills`.
 2. Spend willpower, verify only one active effort, and confirm it expires after
-   two minutes without interfering with another temporary stat effect.
+   one minute without interfering with another temporary stat effect.
 3. Try unarmed and weapon attacks on standing, prone, buckled, and grabbed
    targets; check actual wound location against the combat message.
 4. Exercise dodge, weapon and bare-hand parry, guard ripostes, dual attacks,

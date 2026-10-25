@@ -1,5 +1,6 @@
 var/global/list/deathweb_skill_defaults = list(
 	"melee" = list(STAT_DX, -4),
+	"shield" = list(STAT_DX, -4),
 	"ranged" = list(STAT_PER, -4),
 	"throwing" = list(STAT_PER, -5),
 	"gardening" = list(STAT_IQ, -5),
@@ -122,7 +123,7 @@ var/global/list/deathweb_skill_defaults = list(
 	return result
 
 /mob/proc/gurps_combat_skill(var/skill_type)
-	return skill_type in list("melee", "ranged", "throwing", "swords", "staffs", "knives", "unarmed", "axes_clubs", "flails", "crossbows", "bows")
+	return skill_type in list("melee", "ranged", "throwing", "swords", "staffs", "knives", "unarmed", "shield", "axes_clubs", "flails", "crossbows", "bows")
 
 /mob/living/carbon/human/proc/deathweb_learn_skill(var/skill_type, var/modifier = 0)
 	if(!mind || !(skill_type in deathweb_skill_defaults) || gurps_skill_rank(skill_type) >= 10)
@@ -265,7 +266,7 @@ var/global/list/deathweb_skill_defaults = list(
 	var/obj/item/weapon = get_active_hand()
 	var/chance
 	if(weapon)
-		modifier += weapon.deathweb_specialty_modifier(src) + weapon.block_chance
+		modifier += -weapon.deathweb_specialty_modifier(src) + weapon.block_chance
 		chance = (staminaloss < 50 ? 3 : 1) + gurps_skill_rank(SKILL_MELEE) * (staminaloss < 50 ? 5 : 3) + modifier
 	else
 		chance = (staminaloss < 50 ? 10 : 1) + gurps_skill_rank(SKILL_MELEE) * (staminaloss < 50 ? 5 : 3) + modifier
@@ -407,7 +408,7 @@ var/global/list/deathweb_skill_defaults = list(
 		applied_values[stat_type] = values[stat_type]
 		stats[stat_type] += values[stat_type]
 	deathweb_stat_modifier_serial++
-	deathweb_stat_modifiers[category] = list("values" = applied_values, "serial" = deathweb_stat_modifier_serial)
+	deathweb_stat_modifiers[category] = list("values" = applied_values, "serial" = deathweb_stat_modifier_serial, "expires" = duration > 0 ? world.time + duration : 0)
 	if(duration > 0)
 		addtimer(CALLBACK(src, /mob/proc/deathweb_clear_stat_modifier, category, deathweb_stat_modifier_serial), duration)
 	return TRUE
@@ -420,6 +421,8 @@ var/global/list/deathweb_skill_defaults = list(
 	for(var/stat_type in values)
 		stats[stat_type] -= values[stat_type]
 	deathweb_stat_modifiers -= category
+	if(category == "willpower")
+		to_chat(src, SPAN_NOTICE("My effort has ended."))
 	return TRUE
 
 /mob/living/carbon/human/proc/gain_willpower(var/amount = 1)
@@ -436,7 +439,13 @@ var/global/list/deathweb_skill_defaults = list(
 	if(!effort || stat || incapacitated() || gurps_stat(STAT_WP) <= 0 || deathweb_stat_modifiers["willpower"])
 		return
 	var/stat_type = efforts[effort]
+	if(activate_willpower_effort(stat_type))
+		to_chat(src, SPAN_NOTICE("You focus your willpower on [lowertext(effort)]."))
+
+/mob/living/carbon/human/proc/activate_willpower_effort(var/stat_type)
+	if(!(stat_type in list(STAT_ST, STAT_DX, STAT_IQ, STAT_HT, STAT_PER, STAT_IM)) || stat || incapacitated() || gurps_stat(STAT_WP) <= 0 || deathweb_stat_modifiers["willpower"])
+		return FALSE
 	var/amount = stat_type == STAT_IM ? 4 : (stat_type == STAT_PER ? 2 : 1)
-	deathweb_add_stat_modifier("willpower", list("[stat_type]" = amount), 2 MINUTES)
+	deathweb_add_stat_modifier("willpower", list("[stat_type]" = amount), 1 MINUTE)
 	gain_willpower(-1)
-	to_chat(src, SPAN_NOTICE("You focus your willpower on [lowertext(effort)]."))
+	return TRUE

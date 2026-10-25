@@ -408,7 +408,7 @@
 			pl_effects()
 			break
 
-	if(istype(src.loc, /turf/space) && !get_spacecraft_life_support()) // A supported spacecraft cabin prevents radiative heat loss to space.
+	if(istype(src.loc, /turf/space) && !istype(get_area(src), /area/arena) && !get_spacecraft_life_support()) // A supported spacecraft cabin prevents radiative heat loss to space.
 		//Don't bother if the temperature drop is less than 0.1 anyways. Hopefully BYOND is smart enough to turn this constant expression into a constant
 		if(bodytemperature > (0.1 * HUMAN_HEAT_CAPACITY/(HUMAN_EXPOSED_SURFACE_AREA*STEFAN_BOLTZMANN_CONSTANT))**(1/4) + COSMIC_RADIATION_TEMPERATURE)
 
@@ -738,39 +738,14 @@
 	if(sprinting && (m_intent != "run" || !canmove || resting))
 		update_movement_hud()
 
-	// Accumulation
-	var/is_moving = !client || client.moving
+	// Attack costs feed fatigue through adjustStaminaLoss. Stamina recovery
+	// has one owner (CheckStamina); fatigue recovery requires actual rest.
+	var/is_moving = (client && client.moving) || world.time < combat_last_step + COMBAT_TURN
 	if(m_intent == "run" && canmove && !resting && is_moving)
-		fatigue = min(max_fatigue, fatigue + 1)
-	else if(combat_mode && canmove)
-		fatigue = min(max_fatigue, fatigue + 1)
-	if(sprinting && canmove && !resting && is_moving)
-		fatigue = min(max_fatigue, fatigue + 1)
-
-	// Recovery
-	var/recovery = 2
-	if(resting || lying)
-		recovery++
-
-	// Better nutrition/hydration speeds recovery slightly
-	if(nutrition_icon && hydration_icon)
-		// We don't have direct values here; use a gentle baseline.
-		recovery += 0
-
-	fatigue = max(0, fatigue - recovery)
+		fatigue = min(max_fatigue, fatigue + (sprinting ? 2 : 1))
+	else if(!combat_mode && !is_moving)
+		fatigue = max(0, fatigue - ((resting || lying) ? 3 : 2))
 	update_stamina_hud()
-
-	// Adjust stamina regeneration based on fatigue level
-	// We cannot directly change CheckStamina() here, so apply a compensating effect:
-	if(fatigue >= 75)
-		// High fatigue dampens stamina recovery and increases drain
-		adjustStaminaLoss(1, TRUE)
-	else if(fatigue >= 50)
-		adjustStaminaLoss(0)
-	else if(fatigue >= 25)
-		adjustStaminaLoss(-1)
-	else
-		adjustStaminaLoss(-2)
 
 	// Messaging at thresholds
 	var/current_stage = (fatigue >= 90) ? 4 : (fatigue >= 65) ? 3 : (fatigue >= 35) ? 2 : (fatigue >= 15) ? 1 : 0

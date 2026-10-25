@@ -1,0 +1,3 @@
+// Standalone OS13 station. The normal project continues to load Alpha.
+#define OS13_RECREATION
+#include "Interpost-Hague.dme"

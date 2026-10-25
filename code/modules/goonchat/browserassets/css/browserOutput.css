@@ -691,3 +691,27 @@ a:visited {
     border: 1px solid rgba(65, 65, 65, 0.3);
     zoom: 1;
 }
+
+/* Atmosphere readout shown alongside the native Modcon Unit dialog. */
+.engineering-vent-report {
+    margin: 10px;
+    padding: 12px;
+    border: 1px solid rgba(65, 65, 65, 0.3);
+    background-color: rgba(50, 50, 50, 0.3);
+    color: #66877b;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: left;
+}
+.engineering-vent-report h3 {
+    margin: 0 0 40px;
+    color: #85535e;
+    font: 18px Georgia, serif;
+}
+.engineering-vent-report .engineering-vent i {
+    color: #8cdb94;
+}
+.engineering-lockdown-pressure {
+    color: #aaa0cf;
+    font-size: 14px;
+}

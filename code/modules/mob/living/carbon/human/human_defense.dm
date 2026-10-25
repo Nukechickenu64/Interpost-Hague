@@ -16,12 +16,13 @@ meteor_act
 		return "hits"
 
 /mob/living/carbon/human/proc/prepare_guard()
-	if(stat || incapacitated() || !canmove)
+	if(!combat_mode || !canClick() || !combat_can_act(hand, TRUE))
 		return FALSE
 	adjustStaminaLoss(5)
+	combat_commit(COMBAT_TURN, hand, TRUE)
 	guard_stance_charges = 1
-	guard_stance_until = world.time + 6
-	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+	guard_stance_until = combat_action_until + COMBAT_TURN
+	combat_defending_until = guard_stance_until
 	visible_message("<span class='combat'>[src] braces for an incoming attack.</span>")
 	return TRUE
 
@@ -61,46 +62,41 @@ meteor_act
 	return FALSE
 
 /mob/living/carbon/human/proc/perform_combat_feint(mob/living/carbon/human/target)
-	if(!target || target == src || !Adjacent(target) || stat || incapacitated() || !canmove)
+	if(!target || target == src || !Adjacent(target) || !canClick() || !combat_can_act(hand))
 		return FALSE
-	var/attacker_margin = skillcheck_margin(skills["melee"], "melee")
-	var/defender_margin = target.skillcheck_margin(target.skills["melee"], "melee")
-	var/contest_margin = attacker_margin - defender_margin
-	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-	if(contest_margin <= 0)
+	combat_commit(COMBAT_TURN, hand)
+	var/list/attack_roll = gurps_roll(combat_skill(get_active_hand()))
+	var/list/defense_roll = target.gurps_roll(target.combat_skill(target.get_active_hand()))
+	var/contest_margin = attack_roll["margin"] - max(0, defense_roll["margin"])
+	feint_target = null
+	feint_margin = 0
+	feint_expires = 0
+	if(!attack_roll["success"] || contest_margin <= 0)
 		visible_message("<span class='combat'>[src] attempts to feint [target], but [target] reads the movement.</span>")
 		return FALSE
 	feint_target = target
 	feint_margin = contest_margin
-	feint_expires = world.time + 6
+	feint_expires = combat_action_until + COMBAT_TURN
 	visible_message("<span class='combat'>[src] feints against [target].</span>")
 	return TRUE
 
 /mob/living/carbon/human/proc/perform_dual_attack(mob/living/carbon/human/target)
-	if(!target || target == src || !Adjacent(target) || stat || incapacitated() || !canmove || !combat_mode)
-		return FALSE
-	if(world.time < next_move)
+	if(!target || target == src || !canClick() || !combat_mode)
 		return FALSE
 	var/obj/item/offhand_item = get_inactive_hand()
 	if(offhand_item)
-		offhand_item.attack(target, src, zone_sel.selecting)
-	else
-		var/old_hand = hand
-		var/old_intent = a_intent
+		return perform_combat_strike(target, offhand_item, zone_sel.selecting)
+	var/old_hand = hand
+	swap_hand()
+	var/result = perform_combat_strike(target, null, zone_sel.selecting)
+	if(hand != old_hand)
 		swap_hand()
-		a_intent = I_HURT
-		target.attack_hand(src)
-		if(hand != old_hand)
-			swap_hand()
-		a_intent = old_intent
-	adjustStaminaLoss(4)
-	setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-	return TRUE
+	return result
 
 /mob/living/carbon/human/attack_hand_right(mob/user)
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
-		if(H.c_intent == I_GUARD)
+		if(H.c_intent == I_GUARD || H.c_intent == I_DEFEND)
 			return H.prepare_guard()
 		if(H.c_intent == I_DUAL)
 			return H.perform_dual_attack(src)
@@ -686,6 +682,11 @@ meteor_act
 	return perm
 
 /mob/living/carbon/human/kick_act(var/mob/living/user)
+	if(ishuman(user))
+		var/mob/living/carbon/human/H = user
+		if(H.middle_click_intent != "kick")
+			return FALSE
+		return H.perform_combat_strike(src, null, H.zone_sel ? H.zone_sel.selecting : BP_CHEST, "kick")
 	if(!..())//If we can't kick then this doesn't happen.
 		return
 	if(user == src)//Can't kick yourself dummy.

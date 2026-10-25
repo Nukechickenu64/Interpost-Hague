@@ -66,7 +66,10 @@
 
 		observer.started_as_observer = TRUE
 		var/obj/O = locate("landmark*Observer-Start")
-		if(istype(SSticker.mode, /datum/game_mode/space_wars))
+		if(istype(SSticker.mode, /datum/game_mode/arena))
+			var/datum/game_mode/arena/arena = SSticker.mode
+			observer.forceMove(arena.find_spawn(arena.player_spawns))
+		else if(istype(SSticker.mode, /datum/game_mode/space_wars))
 			var/datum/game_mode/space_wars/space_wars = SSticker.mode
 			observer.forceMove(locate(100, 100, space_wars.arena_z))
 		else if(istype(O))

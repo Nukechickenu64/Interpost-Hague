@@ -665,6 +665,10 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set name = "Respawn"
 	set category = "OOC"
 
+	if(istype(SSticker.mode, /datum/game_mode/arena))
+		var/datum/game_mode/arena/arena = SSticker.mode
+		return arena.respawn_player(src)
+
 	if(istype(SSticker.mode, /datum/game_mode/space_wars))
 		var/datum/game_mode/space_wars/space_wars = SSticker.mode
 		return space_wars.respawn_player(src)

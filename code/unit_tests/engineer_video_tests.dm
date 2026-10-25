@@ -142,40 +142,47 @@
 	contraband = list()
 
 /datum/unit_test/engineer_vending
-	name = "ENGINEER VIDEO - Compatible refill charges and stock preservation"
+	name = "ENGINEER VIDEO - Universal creation tokens and vending costs"
 
 /datum/unit_test/engineer_vending/start_test()
 	var/failure = ""
 	var/turf/T = engineer_test_turf()
 	var/mob/living/carbon/human/U = new(T)
 	var/obj/machinery/vending/engineering/video_test/V = new(T)
-	sleep(5) // Vending Initialize builds its inventory after four ticks.
-	var/obj/item/vending_charge/C = new(T)
-	var/obj/item/vending_charge/coffee/wrong = new(T)
-	U.put_in_hands(C)
-	if(V.refill_from_charge(C, U) || QDELETED(C))
-		failure += "A full vendor consumed a charge. "
+	sleep(5)
+	V.stat = 0
+	V.scan_id = FALSE
 	var/datum/stored_items/vending_products/R = V.product_records[1]
-	var/datum/stored_items/vending_products/uninstantiated = V.product_records[2]
-	var/datum/stored_items/vending_products/premium = V.product_records[3]
-	var/obj/item/vended = R.get_product(T)
-	var/obj/item/returned = R.instances[1]
-	returned.name = "returned screwdriver"
-	uninstantiated.amount = 0
-	premium.amount = 0
-	U.put_in_hands(wrong)
-	if(V.refill_from_charge(wrong, U) || QDELETED(wrong) || R.get_amount() != 3)
-		failure += "An incompatible refill was consumed or changed stock. "
-	if(!V.refill_from_charge(C, U) || !QDELETED(C) || R.get_amount() != 4 || uninstantiated.get_amount() != 3 || premium.get_amount())
-		failure += "Refilling failed to restore ordinary capacities or created premium stock. "
-	if(!(returned in R.instances) || returned.name != "returned screwdriver" || vended.loc != T)
-		failure += "Refilling replaced returned items or recalled a vended tool. "
-	for(var/atom/A in list(vended, V, wrong, U))
-		qdel(A)
+	var/before = V.creation_charges
+	var/list/original_items = T.contents.Copy()
+	V.vend(R, U)
+	if(V.creation_charges != before - R.charge_cost)
+		failure += "Vending did not deduct its creation cost. "
+	for(var/token_type in list(/obj/item/vending_charge, /obj/item/vending_charge/coffee, /obj/item/vending_charge/security))
+		var/obj/item/vending_charge/C = new token_type(T)
+		U.put_in_hands(C)
+		before = V.creation_charges
+		if(!V.refill_from_charge(C, U) || !QDELETED(C) || V.creation_charges != before + 10)
+			failure += "A universal token did not add exactly ten charges. "
+	var/obj/item/vending_charge/distant = new(T)
+	U.put_in_hands(distant)
+	before = V.creation_charges
+	U.forceMove(get_step(get_step(T, NORTH), NORTH))
+	if(V.refill_from_charge(distant, U) || QDELETED(distant) || V.creation_charges != before)
+		failure += "A distant user inserted a token. "
+	U.forceMove(T)
+	U.drop_from_inventory(distant)
+	if(V.refill_from_charge(distant, U) || QDELETED(distant) || V.creation_charges != before)
+		failure += "An unheld token was accepted. "
+	for(var/obj/item/I in T)
+		if(!(I in original_items))
+			qdel(I)
+	qdel(V)
+	qdel(U)
 	if(failure)
 		fail(failure)
 	else
-		pass("Wrong/full refills rejected; both stock representations replenished; returned and premium items preserved.")
+		pass("Universal token variants add ten charges; real vending spends its cost; distant/unheld tokens are rejected.")
 	return TRUE
 
 /datum/unit_test/engineer_power_sample
@@ -482,6 +489,7 @@
 	A.master_air_alarm = controller
 	var/obj/machinery/atmospherics/unary/vent_pump/vent = new(T)
 	vent.stat = 0
+	vent.malfunction_chance = 0
 	vent.set_engineering_mode("FILTER")
 	vent.Process()
 	if(T.test_air.get_gas(GAS_CO2) >= 5 || abs(T.test_air.get_gas(GAS_OXYGEN) - 10) > 0.001 || abs(T.test_air.get_gas(GAS_NITROGEN) - 30) > 0.001 || controller.cartridge.integrity != controller.cartridge.max_integrity)
@@ -512,16 +520,17 @@
 	vent.Process()
 	if(abs(T.test_air.total_moles - remaining) > 0.001)
 		failure += "Refill bypassed disabled supply. "
-	// A standalone scrubber must initialize during play and process only once.
+	// The current game uses filtering vents; the standalone scrubber was removed.
 	// With ample power, one 750 L cycle samples 42 of these 140 moles in 2500 L.
 	qdel(T.test_air)
 	T.test_air = new(2500, T20C)
 	T.test_air.adjust_multi(GAS_OXYGEN, 10, GAS_NITROGEN, 30, GAS_CO2, 100)
-	var/obj/machinery/atmospherics/unary/vent_scrubber/scrubber = new(T)
-	if(!scrubber.air_contents || scrubber.air_contents.volume != ATMOS_DEFAULT_VOLUME_FILTER || scrubber.icon || !(GAS_CO2 in scrubber.scrubbing_gas))
-		failure += "A newly built scrubber did not finish initialization. "
+	var/obj/machinery/atmospherics/unary/vent_pump/scrubber = new(T)
+	if(!scrubber.air_contents || scrubber.air_contents.volume != ATMOS_DEFAULT_VOLUME_PUMP || scrubber.icon)
+		failure += "A newly built filtering vent did not finish initialization. "
 	scrubber.stat = 0
-	scrubber.use_power = POWER_USE_IDLE
+	scrubber.set_engineering_mode("FILTER")
+	scrubber.malfunction_chance = 0
 	scrubber.power_rating = 1000000000
 	controller.cartridge.integrity = controller.cartridge.max_integrity
 	scrubber.Process()
@@ -536,7 +545,7 @@
 	if(failure)
 		fail(failure)
 	else
-		pass("Real gas filtering without modcon cartridge wear, welding, stop mode, finite-reserve refill and single-cycle scrubber flow verified.")
+		pass("Real gas filtering without modcon cartridge wear, welding, stop mode, finite-reserve refill and single-cycle filtering vent flow verified.")
 	return TRUE
 
 /datum/unit_test/engineer_timed_maintenance
@@ -552,7 +561,7 @@
 	W.setWelding(TRUE)
 	// Isolate task fuel from the welder's independent idle consumption.
 	STOP_PROCESSING(SSobj, W)
-	for(var/vent_type in list(/obj/machinery/atmospherics/unary/vent_pump, /obj/machinery/atmospherics/unary/vent_scrubber))
+	for(var/vent_type in list(/obj/machinery/atmospherics/unary/vent_pump))
 		var/obj/machinery/atmospherics/unary/V = new vent_type(T)
 		var/before = W.get_fuel()
 		var/start = world.time
@@ -610,7 +619,190 @@
 	if(failure)
 		fail(failure)
 	else
-		pass("Pump/scrubber welding and unwelding, held lit tools, fuel, concurrent use, movement/drop/shutdown interruptions and timed solar repair verified.")
+		pass("Vent welding and unwelding, held lit tools, fuel, concurrent use, movement/drop/shutdown interruptions and timed solar repair verified.")
+	return TRUE
+
+
+// Supply dialog answers while running the same session and authorization logic
+// used by real native inputs. Each answer can race a world-state change.
+/datum/engineering_atmos_menu/engineer_test
+	var/list/answers = list()
+	var/list/prompts = list()
+	var/list/reports = list()
+	var/change_at = 0
+	var/change_kind
+	var/atom/change_target
+	var/result
+
+/datum/engineering_atmos_menu/engineer_test/proc/change_state()
+	if(prompts.len != change_at)
+		return
+	switch(change_kind)
+		if("move")
+			user.forceMove(get_step(get_step(get_turf(source), NORTH), NORTH))
+		if("power")
+			source.stat |= NOPOWER
+		if("access")
+			source.req_one_access = list(access_engine_equip)
+		if("delete")
+			qdel(change_target)
+		if("lock")
+			controller.locked = TRUE
+		if("automatic")
+			controller.alarm_area.atmos_auto_lockdown = FALSE
+		if("selection")
+			console.selected_area = null
+
+/datum/engineering_atmos_menu/engineer_test/choose(prompt, title, list/choices)
+	prompts += list(list("prompt" = prompt, "title" = title, "choices" = choices.Copy()))
+	change_state()
+	return answers.len >= prompts.len ? answers[prompts.len] : null
+
+/datum/engineering_atmos_menu/engineer_test/choose_pressure(current)
+	prompts += list(list("prompt" = "pressure", "current" = current))
+	change_state()
+	return answers.len >= prompts.len ? answers[prompts.len] : null
+
+/datum/engineering_atmos_menu/engineer_test/report(message)
+	reports += message
+
+/datum/unit_test/engineer_native_atmos
+	name = "ENGINEER VIDEO - Native atmosphere menus, reports and stale dialogs"
+
+/datum/unit_test/engineer_native_atmos/proc/run_menu(obj/machinery/source, mob/user, list/answers, change_at = 0, change_kind = null, atom/change_target = null)
+	var/datum/engineering_atmos_menu/engineer_test/menu = new(source, user)
+	menu.answers = answers
+	menu.change_at = change_at
+	menu.change_kind = change_kind
+	menu.change_target = change_target
+	menu.result = menu.interact()
+	return menu
+
+/datum/unit_test/engineer_native_atmos/start_test()
+	var/failure = ""
+	var/turf/unsimulated/floor/engineer_atmos_test/T = engineer_test_turf().ChangeTurf(/turf/unsimulated/floor/engineer_atmos_test)
+	T.test_air = new(CELL_VOLUME, T20C)
+	T.test_air.adjust_gas(GAS_OXYGEN, PRESSURE_TO_MOLES(100))
+	var/area/A = get_area(T)
+	var/obj/machinery/alarm/old_master = A.master_air_alarm
+	var/list/old_tanks = station_gas_tanks.Copy()
+	var/old_name = A.name
+	var/old_manual = A.atmos_manual_lockdown
+	var/old_auto = A.atmos_auto_lockdown
+	var/old_pressure = A.atmos_pressure_lockdown
+	var/old_doors = A.air_doors_activated
+	A.name = "Engineering <Deck>"
+	A.atmos_auto_lockdown = TRUE
+	A.atmos_manual_lockdown = FALSE
+	var/obj/machinery/station_gas_tank/tank = new(T)
+	station_gas_tanks = list(tank)
+	tank.stat = 0
+	var/obj/machinery/alarm/controller = new(T)
+	A.master_air_alarm = controller
+	controller.stat = 0
+	controller.locked = FALSE
+	controller.req_one_access = list()
+	var/obj/machinery/computer/station_gas_control/C = new(T)
+	C.stat = 0
+	C.req_one_access = list()
+	var/list/vents = list()
+	for(var/i = 1 to 6)
+		var/obj/machinery/atmospherics/unary/vent_pump/vent = new(T)
+		vent.stat = 0
+		vent.malfunction_chance = 0
+		vent.set_engineering_mode("FILTER")
+		vents += vent
+	var/obj/machinery/atmospherics/unary/vent_pump/one = vents[1]
+	var/obj/machinery/atmospherics/unary/vent_pump/two = vents[2]
+	var/mob/living/carbon/human/U = new(T)
+	var/datum/engineering_atmos_menu/engineer_test/menu = run_menu(C, U, list(A.name, "Air Vent 2", "STOP"), 3, "selection")
+	if(!menu.result || one.engineering_mode_name() != "FILTER" || two.engineering_mode_name() != "STOP" || menu.prompts.len != 3)
+		failure += "Remote native vent selection was redirected or changed the wrong vent. "
+	if(menu.prompts.len == 3)
+		var/list/areas = menu.prompts[1]["choices"]
+		if(menu.prompts[1]["title"] != "Atmospherics Control Console" || menu.prompts[1]["prompt"] != "CHOOSE AREA" || areas[1] != "(SET LOCKDOWN PRESSURE)" || areas[areas.len] != "(CANCEL)")
+			failure += "Area dialog labels/order differ from the recording. "
+		if(menu.prompts[2]["title"] != "Modcon Unit" || menu.prompts[2]["prompt"] != "CHOOSE AN ACTION" || jointext(menu.prompts[2]["choices"], "|") != "Toggle Lockdown|Disable Auto-Lockdown|Air Vent 1|Air Vent 2|Air Vent 3|Air Vent 4|Air Vent 5|Air Vent 6|ALL VENTS|(Cancel)")
+			failure += "Modcon action labels/order differ from the recording. "
+		if(jointext(menu.prompts[3]["choices"], "|") != "REFILL|STOP|FILTER|(Cancel)")
+			failure += "Vent mode labels/order differ from the recording. "
+	if(menu.reports.len != 2 || !findtext(menu.reports[1], "*LOCKDOWN PRESSURE: 60 kPA") || !findtext(menu.reports[2], "Engineering &lt;Deck&gt;") || !findtext(menu.reports[2], "Vent-6") || !findtext(menu.reports[2], "&gt; Pressure: 100 kPa") || findtext(menu.reports[2], "href="))
+		failure += "Native report omitted real readings/numbering, failed escaping or included extra command links. "
+	fdel("tmp/engineer-video-check/native-atmos-fragment.html")
+	text2file(jointext(menu.reports, ""), "tmp/engineer-video-check/native-atmos-fragment.html")
+	qdel(menu)
+	menu = run_menu(controller, U, list("ALL VENTS", "FILTER"))
+	if(!menu.result || menu.prompts.len != 2 || two.engineering_mode_name() != "FILTER")
+		failure += "Local all-vent flow did not use the same mode dialog. "
+	qdel(menu)
+	for(var/list/cancel_answers in list(list("(CANCEL)"), list(A.name, "(Cancel)"), list(A.name, "ALL VENTS", "(Cancel)"), list(A.name, "ALL VENTS", null)))
+		menu = run_menu(C, U, cancel_answers)
+		if(menu.result || one.engineering_mode_name() != "FILTER")
+			failure += "A canceled dialog changed vents. "
+		qdel(menu)
+	for(var/change in list("move", "power", "access"))
+		menu = run_menu(C, U, list(A.name, "ALL VENTS", "STOP"), 3, change)
+		if(menu.result || one.engineering_mode_name() != "FILTER")
+			failure += "Native commands survived [change] during a dialog. "
+		qdel(menu)
+		U.forceMove(T)
+		C.stat = 0
+		C.req_one_access = list()
+	menu = run_menu(controller, U, list("ALL VENTS", "STOP"), 2, "lock")
+	if(menu.result || one.engineering_mode_name() != "FILTER")
+		failure += "A local dialog bypassed a relocked modcon. "
+	qdel(menu)
+	controller.locked = FALSE
+	menu = run_menu(C, U, list(A.name, "Air Vent 6", "STOP"), 3, "delete", vents[6])
+	if(menu.result || one.engineering_mode_name() != "FILTER")
+		failure += "A removed selected vent became an all-vent command. "
+	qdel(menu)
+	menu = run_menu(controller, U, list("Disable Auto-Lockdown"), 1, "automatic")
+	if(!menu.result || A.atmos_auto_lockdown)
+		failure += "A stale Disable action toggled automatic lockdown back on. "
+	qdel(menu)
+	menu = run_menu(controller, U, list("Enable Auto-Lockdown"))
+	if(!menu.result || !A.atmos_auto_lockdown)
+		failure += "Enable Auto-Lockdown did not restore automatic control. "
+	qdel(menu)
+	menu = run_menu(controller, U, list("Toggle Lockdown"))
+	if(!menu.result || !A.atmos_manual_lockdown)
+		failure += "Native manual lockdown failed. "
+	qdel(menu)
+	menu = run_menu(C, U, list("(SET LOCKDOWN PRESSURE)", 50))
+	if(!menu.result || tank.lockdown_pressure != 50)
+		failure += "Native pressure setting failed. "
+	qdel(menu)
+	menu = run_menu(C, U, list("(SET LOCKDOWN PRESSURE)", 70), 2, "power")
+	if(menu.result || tank.lockdown_pressure != 50)
+		failure += "An offline pressure dialog still committed. "
+	qdel(menu)
+	C.stat = 0
+	menu = run_menu(C, U, list("(SET LOCKDOWN PRESSURE)", null))
+	if(menu.result || tank.lockdown_pressure != 50)
+		failure += "Canceling pressure input overwrote the threshold. "
+	qdel(menu)
+	C.req_one_access = list(access_engine_equip)
+	menu = run_menu(C, U, list(A.name, "ALL VENTS", "STOP"))
+	if(menu.result || menu.prompts.len != 1 || menu.reports.len != 2 || one.engineering_mode_name() != "FILTER")
+		failure += "Read-only viewing offered native control actions. "
+	qdel(menu)
+	for(var/atom/fixture in vents + list(C, controller, tank, U))
+		if(!QDELETED(fixture))
+			qdel(fixture)
+	station_gas_tanks = old_tanks
+	A.master_air_alarm = old_master
+	A.name = old_name
+	A.atmos_manual_lockdown = old_manual
+	A.atmos_auto_lockdown = old_auto
+	A.atmos_pressure_lockdown = old_pressure
+	A.air_doors_activated = old_doors
+	qdel(T.test_air)
+	T.ChangeTurf(/turf/unsimulated/floor)
+	if(failure)
+		fail(failure)
+	else
+		pass("Native area/action/mode sequence, report numbering, exact menu labels, cancellation, stale-dialog checks and read-only viewing verified.")
 	return TRUE
 
 #endif

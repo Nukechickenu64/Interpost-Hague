@@ -161,6 +161,15 @@
 	if(initial_attempt && world.time < assailant.last_attack + bite_delay)
 		to_chat(assailant, "<span class='notice'>You can't bite again so soon.</span>")
 		return
+	// Bite effects remain a setting/medical adapter, but cannot create an extra
+	// action while the attacker's hands or special-action display are recovering.
+	if(!assailant.combat_can_act(assailant.hand, TRUE) || assailant.c_intent == I_DEFEND)
+		return FALSE
+	assailant.combat_commit(max(COMBAT_TURN, bite_delay), assailant.hand, TRUE)
+	assailant.combat_defending_until = 0
+	assailant.guard_stance_charges = 0
+	if(assailant.c_intent == I_STRONG || assailant.c_intent == I_QUICK)
+		assailant.combat_defenseless_until = assailant.combat_action_until
 	if(initial_attempt)
 		assailant.last_attack = world.time + 2
 		assailant.set_special_action_cooldown(assailant.last_attack + bite_delay)

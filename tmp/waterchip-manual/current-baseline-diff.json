@@ -1,0 +1,422 @@
+[
+  {
+    "position": [
+      94,
+      98,
+      4
+    ],
+    "before": [
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/atmospherics/unary/vent_pump/os13_reference",
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      98,
+      98,
+      4
+    ],
+    "before": [
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/light/small/os13_green_strip{dir = 1}",
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      98,
+      101,
+      4
+    ],
+    "before": [
+      "/obj/effect/floor_decal/rustyborder",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/light/small/os13_green_strip{dir = 2}",
+      "/obj/effect/floor_decal/rustyborder",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      98,
+      102,
+      4
+    ],
+    "before": [
+      "/turf/simulated/wall/os13/wwalls/state_rwall13",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/sign/os13_station_emblem",
+      "/turf/simulated/wall/os13/wwalls/state_rwall13",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      100,
+      99,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_os13b",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/paired_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      100,
+      106,
+      4
+    ],
+    "before": [
+      "/obj/machinery/computer/cryopod{icon = 'icons/os13/objects/objects/orbital_decor.dmi'; icon_state = \"scanner\"; density = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os3",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/computer/os13_scanner",
+      "/turf/simulated/floor/fixed/os13/floors/state_os3",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      102,
+      102,
+      4
+    ],
+    "before": [
+      "/turf/simulated/wall/os13/wwalls/state_rwall13",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/sign/os13_station_emblem",
+      "/turf/simulated/wall/os13/wwalls/state_rwall13",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      104,
+      103,
+      4
+    ],
+    "before": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"emergency\"; icon_closed = \"emergency\"; icon_opened = \"emergencyopen\"; opened = 0; density = 1; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tncopen\"; icon_closed = \"tnc\"; icon_opened = \"tncopen\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      104,
+      104,
+      4
+    ],
+    "before": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"emergencyopen\"; icon_closed = \"emergency\"; icon_opened = \"emergencyopen\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tncopen\"; icon_closed = \"tnc\"; icon_opened = \"tncopen\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      104,
+      105,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_osb1",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/plain_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      104,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/perforated_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      104,
+      108,
+      4
+    ],
+    "before": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tnc2open\"; icon_closed = \"tnc2\"; icon_opened = \"tnc2open\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tncopen\"; icon_closed = \"tnc\"; icon_opened = \"tncopen\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      105,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_os3",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/paired_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      98,
+      4
+    ],
+    "before": [
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/atmospherics/unary/vent_pump/os13_reference",
+      "/obj/effect/floor_decal/rustyborder{\n\tdir = 1\n\t}",
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      99,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_os13b",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/perforated_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      103,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_os3",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/panel_floor",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      104,
+      4
+    ],
+    "before": [
+      "/obj/structure{icon = 'icons/os13/objects/objects/structures.dmi'; icon_state = \"grille\"; name = \"square floor grille (approximate art)\"; anchored = 1; density = 0; transform = matrix(0.5, 0, 0, 0, 0.5, 0)}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/atmospherics/unary/vent_pump/os13_reference",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/perforated_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      107,
+      4
+    ],
+    "before": [
+      "/obj/structure{icon = 'icons/os13/objects/objects/structures.dmi'; icon_state = \"grille\"; name = \"square floor grille (approximate art)\"; anchored = 1; density = 0; transform = matrix(0.5, 0, 0, 0, 0.5, 0)}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/machinery/atmospherics/unary/vent_pump/os13_reference",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      106,
+      108,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_osb1",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/plain_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      107,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_os3",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/paired_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      108,
+      102,
+      4
+    ],
+    "before": [
+      "/turf/simulated/wall",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/sign/nt_answers/os13_reference",
+      "/turf/simulated/wall",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      108,
+      105,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/fixed/os13/floors/state_osb1",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/plain_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      108,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/floor/tiled",
+      "/area/space"
+    ],
+    "after": [
+      "/turf/simulated/floor/fixed/os13/perforated_cover",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      108,
+      108,
+      4
+    ],
+    "before": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tnc2open\"; icon_closed = \"tnc2\"; icon_opened = \"tnc2open\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/closet{icon = 'icons/os13/objects/objects/closet.dmi'; icon_state = \"tncopen\"; icon_closed = \"tnc\"; icon_opened = \"tncopen\"; opened = 1; density = 0; anchored = 1}",
+      "/turf/simulated/floor/fixed/os13/floors/state_os4",
+      "/area/space"
+    ]
+  },
+  {
+    "position": [
+      109,
+      106,
+      4
+    ],
+    "before": [
+      "/turf/simulated/wall/os13/wwalls/state_rwall3",
+      "/area/space"
+    ],
+    "after": [
+      "/obj/structure/sign/os13_station_emblem",
+      "/turf/simulated/wall/os13/wwalls/state_rwall3",
+      "/area/space"
+    ]
+  }
+]

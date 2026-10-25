@@ -1,0 +1,165 @@
+[
+  {
+    "name": "pyramid 1",
+    "pass": true
+  },
+  {
+    "name": "pyramid 2",
+    "pass": true
+  },
+  {
+    "name": "pyramid 4",
+    "pass": true
+  },
+  {
+    "name": "pyramid 16",
+    "pass": true
+  },
+  {
+    "name": "translation 0,0",
+    "pass": true,
+    "detail": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "translation 17,-11",
+    "pass": true,
+    "detail": [
+      0.06327642728536434,
+      17,
+      -11
+    ]
+  },
+  {
+    "name": "translation -24,32",
+    "pass": true,
+    "detail": [
+      0.125,
+      -24,
+      32
+    ]
+  },
+  {
+    "name": "no evidence",
+    "pass": true
+  },
+  {
+    "name": "stationary transient replaced",
+    "pass": true
+  },
+  {
+    "name": "recording 0 stationary",
+    "pass": true,
+    "detail": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "recording 1 stationary",
+    "pass": true,
+    "detail": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "recording 2 stationary",
+    "pass": true,
+    "detail": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "recording 3 stationary",
+    "pass": true,
+    "detail": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "isolated matching patch rejected",
+    "pass": true
+  },
+  {
+    "name": "automatic joins opt in",
+    "pass": true
+  },
+  {
+    "name": "HUD excluded",
+    "pass": true
+  },
+  {
+    "name": "video 0 moving pair reversible or withheld",
+    "pass": true,
+    "detail": {
+      "forward": [
+        4.433848277775506,
+        0,
+        47
+      ],
+      "reverse": [
+        4.433848277775506,
+        0,
+        -47
+      ]
+    }
+  },
+  {
+    "name": "video 1 moving pair reversible or withheld",
+    "pass": true,
+    "detail": {
+      "forward": [
+        0.09760250122245737,
+        0,
+        0
+      ],
+      "reverse": [
+        0.09760250122245737,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "name": "video 2 moving pair reversible or withheld",
+    "pass": true,
+    "detail": {
+      "forward": [
+        0.026317106188750272,
+        0,
+        0
+      ],
+      "reverse": [
+        0.026317106188750272,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "name": "video 3 moving pair reversible or withheld",
+    "pass": true,
+    "detail": {
+      "forward": [
+        0.033080618606671386,
+        0,
+        0
+      ],
+      "reverse": [
+        0.033080618606671386,
+        0,
+        0
+      ]
+    }
+  }
+]

@@ -339,6 +339,7 @@
 	var/obj/screen/combat/button = H.hud_used.combat_intent_button
 	button.intent = selected_intent
 	button.update_icon()
+	to_chat(H, SPAN_NOTICE(combat_style_description(selected_intent)))
 	screen_loc = null
 	return 1
 

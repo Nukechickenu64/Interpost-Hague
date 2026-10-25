@@ -1,0 +1,222 @@
+How to Fight - Lifeweb
+menu-left
+About
+Recent changes
+menu-right
+Index
+Random page
+From
+Jump to navigation
+Jump to search
+Contents
+1
+Combat Mode
+2
+Where to aim
+2.1
+Attack Modes
+2.2
+Alternative Grip
+3
+Combat Styles
+4
+Types of weapons
+5
+Protection
+5.1
+Armor
+5.2
+Helmets
+5.3
+Energy Shields
+5.4
+Shields
+5.5
+Firearms
+5.6
+Shooting
+5.6.1
+Ammunition
+6
+Advices
+6.1
+Hostage hold
+6.2
+Taking Alive
+6.3
+Murders and You
+Combat Mode
+Where to aim
+Hard to hit: Head, Eyes, Neck
+Easier to hit: Hands, Feet, Groin, Face
+Easy to hit: Body
+Attack unprotected enemy body parts.
+Any wound lowers the Dexterity of the injured for a few seconds. It makes sense to anticipate a lethal blow with a simple one.
+It is not difficult to finish off a fallen opponent.
+A kick in the groin is a male weakness.
+Armor joints: a stabbing attack with the Aimed intent can get through slits in single-piece armor (like platemail). It's considerably easier to do this with shorter weapons.
+Attack Modes
+LMB
+on a melee weapon allows you to choose the method of attack – using the blade, the tip, the blunt side, the shaft, and so on.
+Alternative Grip
+If you're wielding a sufficiently long sword, you can grab it by the blade with
+RMB
+. This allows you to perform precise attacks (for example, targeting armor joints) as if you were wielding a short weapon.
+If you switch to an attack with the pommel while holding the blade, you can use your sword as an effective blunt weapon.
+Combat Styles
+Fient (Feint).
+RMB
+performs a feint on the target. Makes the enemy parry prematurely, opening him for a real attack. A bad idea if the enemy is not alert or isn't planning to parry.
+Defense.
+Increases your reaction - parry and dodge, makes it possible to counterattack. Price: slows down movement, weakens your attack, increases vulnerability to feints.
+Dual (Dual).
+RMB
+strikes a target with a weapon in your secondary hand. Price: reduced accuracy.
+Guard (Guard).
+Use
+RMB
+in combat mode to automatically attack anyone who approaches you. A shooting weapon allows you to target any tile in vision.
+Reckless Attack (Fury).
+RMB
+will deal a reckless blow. The target will experience a penalty for dodging and parrying this attack, and the delay between your attacks will be lower. Price: attacks are conducted with -2 to the STR.
+Strong attack (Strong).
+RMB
+deals a powerful blow. The damage roll will use the highest number based off your character's STR. Price: quickly leads to fatigue.
+Gentle attack (Weak).
+Deals a gentle blow. Good for a friendly punch.
+Aimed attack (Aimed).
+RMB
+delivers an aimed strike. Improved chance to hit, improved chance to hit the selected zone. Price: extended delay between attacks.
+Types of weapons
+Blunt (clubs, staves, fists) - the most versatile weapon, but the runaway enemy is unlikely to die without help.
+Stabbing (spears, rapiers, daggers) - useless against zombies and skeletons.
+Penetrating (picks) - easily gets stuck when it is not asked for.
+Cutting (swords, knives) - even light armor can reduce its effectiveness.
+Slashing (axes) - gets rid of shields pretty well.
+Protection
+Armor
+Plates and strong single-piece armor reliably protects against any blows, but has joints and unprotected places.
+Chainmail and other soft armor will not let the blade through in your innermost places, but a bruise or fracture from blunt attack may remain.
+Quilted Armor like Gambesons further soften the blow, protecting against blunt danger.
+A lot of armor can be combined, and chainmail can even be worn under the baron's outfit.
+Almost no armor will protect you from bullets.
+Helmets
+Doesn't matter how good of a fighter you are, a good hit over the head will bring big changes into your brain. Wear a helmet.
+Energy Shields
+Energy shields brought the cold steel back to the north, although they're pretty rare and expensive.
+Energy Shields:
+Reflect bullets, arrows and energy blasts.
+Lower melee weapons' damage.
+Won't save you from syringe-guns.
+Can be in forms of ones that go on your belt, and ones that go on your wrist.
+Get disabled on contact with liquids.
+Can be used as weapons. Get close to the enemy and turn on two shields.
+Shields
+Give big advantage in melee combat.
+Smack your shield with your weapon to scare your enemies.
+Shield wall! Standing nearby your friend, who also carries a shield, you get even less vulnerable.
+Firearms
+Shooting
+Feed the firearm with a magazine.
+Reload the weapon (
+E
+or
+LMB
+on the weapon in active hand).
+Take off the safety: (
+CTRL
++
+E
+or
+RMB
+). Do not forget to engage it back after you finish shooting.
+Continuously hold your cursor over your target before shooting, this will increase the chances to land a hit.
+Shoot!
+Ammunition
+Full Metal Jacket
+: High penetration.
+Hollow Point
+:  High damage to an unarmored target, the bullet splits up once it's inside the body. Low chance of through-and-through wound.
+Armor Piercing
+: Does additional damage to armor because of the steel core.
+Tracer
+: Leaves a distinct bright tracer. Using them in an automatic weapon alongside other ammo helps correct your firing, increasing accuracy.
+Silver
+: Are used by superstitious inquisitors.
+Weapon
+Ammo
+ML-23
+.380
+Harat-83
+.380
+Karek R90
+.380
+Karek R89
+9mm
+Arbo 9
+9mm
+Screamer 17S
+.45
+Screamer 23
+.45
+Talon M12A3
+.45
+W93 Mother
+.357
+Neoclassic R&W10
+.357
+Neoclassic Duelista
+.357
+Neoclassic Richter
+.410, .45 Long
+Shotgun
+12 Gauge
+Kramm M2
+7.62
+Lakko H77
+7.62
+Princess
+7.62
+Boyarin
+7.62
+Grinder
+7.62
+Musket
+Musket bullet
+Cannon
+Cannonball
+Advices
+Hostage hold
+Do you have a knife or a pistol? You can take someone hostage!
+Enter combat mode.
+Grab the person's torso or mouth with your second hand. Now the barrel of the gun is pressed against their temple, or the blade is pressed against their throat, any resistance attempts will lead to an automatic attack.
+Now you can finally talk.
+Taking Alive
+Do not use cutting and piercing weapons. Combine grabs, clubs and throwing nets.
+Use DISARM to disarm the opponent.
+Throw the enemy down: Grab and Wrench his hand , then grab the enemy's body with your second hand and apply TAKEDOWN.
+While your enemy is down, stand on him and use TAKEDOWN to press him to the ground. Useful in cases of a civil arrest - take a criminal into captivity and call the guards.
+Murders and You
+The most vulgar kind of murder is an open attack in the middle of the street. Here, the interesting plot, and your own safety quickly dissolve and the chances of you succumbing to wounds or revenge rise quickly.
+Avoid open fights. When the enemy is not expecting an attack, the reaction of the player and character (Combat Mode OFF) is reduced, multiplying your chances. Attack suddenly, hit in the back!
+A few drops of poison on your weapon will do the job for you. Even the mighty censor won't be able to live through a couple drops of Tzchernide on your dagger.
+Inject poison into food or pour it into drinks. Ask someone to bring it over to them, do not forget to quietly get rid of the "courier".
+False reports are very effective. Substitute your enemy, accusing him of a crime - and watch how the local griefers are tearing him apart. Get the support of one or two false witnesses to make a lie more convincing.
+No body - no case. Hide corpses and evidence, while making an innocent face.
+Retrieved from "
+http://lfwb.at/index.php?title=How_to_Fight&oldid=2988
+"
+Log in
+How to Fight
+:
+Page
+Discussion
+View source
+View history
+Links
+Refresh
+Navigation
+Main page
+Recent changes
+Random page
+Help about MediaWiki

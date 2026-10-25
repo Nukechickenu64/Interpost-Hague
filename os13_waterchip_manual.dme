@@ -1,0 +1,4 @@
+// Incomplete manual video-reference map. Starts from the user's z=4 anchor.
+// Compile separately; ordinary builds continue to use their selected map.
+#define OS13_MANUAL_REFERENCE
+#include "Interpost-Hague.dme"

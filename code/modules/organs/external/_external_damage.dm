@@ -35,7 +35,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 
 	owner.updatehealth() //droplimb will call updatehealth() again if it does end up being called
 	//If limb took enough damage, try to cut or tear it off
-	if(owner && loc == owner && !is_stump())
+	if(owner && !owner.combat_injury_applying && loc == owner && !is_stump())
 		if(!cannot_amputate && config.limbs_can_break)
 			var/statht = owner.stats[STAT_HT] * 10
 			var/instance = 0
@@ -72,7 +72,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 	if(laser)
 		damage_amt += burn
 		cur_damage += burn_dam
-	if(internal_organs && internal_organs.len && (cur_damage + damage_amt >= max_damage || (((sharp && damage_amt >= 5) || damage_amt >= 10) && prob(5))))
+	if(!owner?.combat_injury_applying && internal_organs && internal_organs.len && (cur_damage + damage_amt >= max_damage || (((sharp && damage_amt >= 5) || damage_amt >= 10) && prob(5))))
 		// Damage an internal organ
 		var/list/victims = list()
 		for(var/obj/item/organ/internal/I in internal_organs)
@@ -93,7 +93,7 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 		if(can_feel_pain() && prob(40))
 			owner.emote("scream")	//getting hit on broken hand hurts
 
-	if(brute_dam > min_broken_damage && prob(brute_dam + brute * (1+blunt)) ) //blunt damage is gud at fracturing
+	if(!owner?.combat_injury_applying && brute_dam > min_broken_damage && prob(brute_dam + brute * (1+blunt)) ) //blunt damage is gud at fracturing
 		fracture()
 
 	// If the limbs can break, make sure we don't exceed the maximum damage a limb can take before breaking

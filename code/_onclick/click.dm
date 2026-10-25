@@ -61,12 +61,14 @@
 			LookFarClickOn(A)
 			return 1
 		}
+		if(!canClick())
+			return 1
 		var/obj/item/grab/mouth/bite_hold = A
 		if(istype(bite_hold) && isEquipped(bite_hold) && bite_hold.handle_hud_click(src, params))
 			return 1
 		if(ishuman(src))
 			var/mob/living/carbon/human/combat_user = src
-			if(combat_user.c_intent == I_GUARD)
+			if(combat_user.c_intent == I_GUARD || combat_user.c_intent == I_DEFEND)
 				combat_user.prepare_guard()
 				return 1
 		// Plain Right-Click -> call the new right-click interaction

@@ -34,7 +34,7 @@
 
 	// Should this all be in Touch()?
 	if(istype(H))
-		if(H != src && check_shields(0, null, H, H.zone_sel.selecting, H.name))
+		if(H.a_intent != I_HURT && H.a_intent != I_GRAB && H != src && check_shields(0, null, H, H.zone_sel.selecting, H.name))
 			H.do_attack_animation(src)
 			return 0
 
@@ -139,7 +139,7 @@
 					to_chat(H, "There is nothing to grab!")
 					return
 				if(M != src)
-					if(deathweb_grab_dodge(H))
+					if(!H.combat_attempt_grab(src, H.zone_sel.selecting))
 						return
 
 				switch(H.zone_sel.selecting)
@@ -184,103 +184,9 @@
 
 		if(I_HURT)
 			if(!istype(H))
-				attack_generic(H,rand(1,3),"punched")
+				attack_generic(M, rand(1,3), "punched")
 				return
-			var/rand_damage = rand(0, 4)
-			var/effective_strength = H.combat_strength()
-			rand_damage += deathweb_unarmed_damage(effective_strength, gurps_stat(STAT_HT))
-			var/hit_zone = H == src ? H.zone_sel.selecting : deathweb_hit_zone(H.zone_sel.selecting)
-			if(!hit_zone)
-				M.adjustStaminaLoss(rand(2, 3))
-				M.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-				visible_message(SPAN_DANGER("[H] misses [src] with an unarmed strike!"))
-				return
-			var/obj/item/organ/external/affecting = get_organ(hit_zone)
-
-			// See what attack they use
-			var/datum/unarmed_attack/attack = H.get_unarmed_attack(src, hit_zone)
-			if(!attack)
-				return 0
-			var/cooldown_modifier = H.c_intent == I_QUICK ? -2 : 0 //Quick mode lowers attack cooldown by 1/2th
-			cooldown_modifier += H.c_intent == I_STRONG ? 3 : 0 //Strong mode raises attack cooldown by 1/2th
-			cooldown_modifier += H.c_intent == I_DEFEND ? 3 : 0 //Defense mode raises attack cooldown by 1/2th
-			var/hand_ready_until = H.hand ? H.left_hand_ready_until : H.right_hand_ready_until
-			if(world.time < hand_ready_until)
-				to_chat(H, "<span class='notice'>You can't attack again so soon.</span>")
-				return 0
-			else
-				H.last_attack = world.time + cooldown_modifier
-				H.last_attack_delay = attack.delay
-				H.set_hand_ready_cooldown(H.hand, world.time + cooldown_modifier + attack.delay)
-			M.adjustStaminaLoss(rand(2, 3))
-
-			if(!affecting || affecting.is_stump())
-				to_chat(M, "<span class='danger'>You cannot attack something the enemy doesn't have.</span>")
-				return 1
-
-			H.deathweb_learn_skill("unarmed", -2)
-			if(!H.combat_mode || !prob(H.gurps_skill_rank(SKILL_MELEE) + 30))
-				rand_damage /= prob(60) ? 2 : 1.2
-
-			if(M != src)
-				if(attempt_dodge(H) || deathweb_parry(H, rand_damage))
-					return
-
-			var/miss_type = 0
-			var/attack_message
-
-			var/hitcheck = rand(0, 9)
-			if(istype(affecting, /obj/item/organ/external/head) && prob(hitcheck * (hit_zone == BP_MOUTH ? 5 : 1))) //MUCH higher chance to knock out teeth if you aim for mouth
-				var/obj/item/organ/external/head/U = affecting
-				if(U.knock_out_teeth(get_dir(H, src), round(rand(28, 38) * ((hitcheck*2)/100))))
-					src.visible_message("<span class='danger'>[src]'s teeth sail off in an arc!</span>", \
-										"<span class='userdanger'>[src]'s teeth sail off in an arc!</span>")
-
-			//H.do_attack_animation(src)
-			if(!attack_message)
-				H.attack_quality = null
-				attack.show_attack(H, src, hit_zone, rand_damage)
-				H.attack_quality = null
-			else
-				H.visible_message("<span class='danger'>[attack_message]</span>")
-
-			playsound(loc, ((miss_type) ? (miss_type == 1 ? attack.miss_sound : 'sound/weapons/thudswoosh.ogg') : attack.attack_sound), 25, 1, -1)
-			admin_attack_log(H, src, "[miss_type ? (miss_type == 1 ? "Has missed" : "Was blocked by") : "Has [pick(attack.attack_verb)]"] their victim.", "[miss_type ? (miss_type == 1 ? "Missed" : "Blocked") : "[pick(attack.attack_verb)]"] their attacker", "[miss_type ? (miss_type == 1 ? "has missed" : "was blocked by") : "has [pick(attack.attack_verb)]"]")
-
-			if(miss_type)
-				return 0
-
-			var/real_damage = rand_damage
-
-			real_damage += attack.get_unarmed_damage(H)
-			//real
-			real_damage *= damage_multiplier
-			//rand
-			rand_damage *= damage_multiplier
-			if(HULK in H.mutations)
-				real_damage *= 2 // Hulks do twice the damage
-				rand_damage *= 2
-
-			var/armour = deathweb_melee_armor(hit_zone, null, TRUE, H.gloves && H.gloves.armor["melee"] > 0)
-			if(armour && !H.gloves)
-				var/obj/item/organ/external/hand_organ = H.get_organ(H.hand ? BP_L_HAND : BP_R_HAND)
-				if(hand_organ)
-					hand_organ.take_external_damage(armour >= 100 ? 6 : 2)
-			// Apply additional unarmed effects.
-			attack.apply_effects(H, src, armour, rand_damage, hit_zone)
-
-			// Nerf attacks done while lying by 1/3rd
-			if (H.lying)
-				real_damage = max(real_damage * 0.66, 1)
-			if(istype(attack, /datum/unarmed_attack/bite))
-				real_damage = attack:ensure_nonzero_damage(real_damage)
-
-			// Finally, apply damage to target
-			var/harm_before = getBruteLoss() + getFireLoss() + getHalLoss()
-			apply_damage(real_damage, (attack.deal_halloss ? PAIN : BRUTE), hit_zone, armour, damage_flags=attack.damage_flags())
-			if(H != src && getBruteLoss() + getFireLoss() + getHalLoss() > harm_before)
-				H.complete_sanity_crisis(SANITY_CRISIS_HARM_OTHER)
-			receive_damage()
+			return H.perform_combat_strike(src, null, H.zone_sel.selecting)
 
 		if(I_DISARM)
 			if(H.species)

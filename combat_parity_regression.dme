@@ -1,0 +1,8 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/combat_rolls, new /datum/unit_test/combat_action_gate, new /datum/unit_test/combat_defenses, new /datum/unit_test/combat_feint, new /datum/unit_test/combat_armor_injury, new /datum/unit_test/combat_effort_fatigue, new /datum/unit_test/combat_motion_special, new /datum/unit_test/combat_profiles)
+	log_unit_test("Running focused combat parity regression tests.")

@@ -154,3 +154,41 @@ var/list/floor_light_cache = list()
 	if(A)
 		on = 0
 	. = ..()
+
+// Recessed, round grated fixture seen in the OS13 cryogenic/locker rooms.
+// This is a light, not a sewer hatch or a decorative floor overlay.
+/obj/machinery/floor_light/os13
+	name = "recessed floor light"
+	desc = "A floor lamp protected by a round metal grate."
+	icon = 'icons/os13/objects/objects/miscobjs.dmi'
+	icon_state = "floorlight0"
+	anchored = 1
+	density = 0
+	on = 0
+	use_power = POWER_USE_OFF
+
+/obj/machinery/floor_light/os13/Initialize()
+	. = ..()
+	update_brightness()
+
+/obj/machinery/floor_light/os13/power_change()
+	. = ..()
+	update_brightness()
+
+/obj/machinery/floor_light/os13/update_brightness()
+	var/lit = on && anchored && !broken()
+	update_use_power(lit ? POWER_USE_ACTIVE : POWER_USE_OFF)
+	if(lit)
+		set_light(default_light_range, default_light_power, default_light_colour)
+	else
+		set_light(0)
+	update_icon()
+
+/obj/machinery/floor_light/os13/update_icon()
+	// Do not inherit the square panel's cached "on"/"flicker" overlays.
+	overlays.Cut()
+	icon_state = "floorlight0"
+	if(on && anchored && use_power == POWER_USE_ACTIVE && !broken())
+		icon_state = "floorlight1"
+		if(!isnull(damaged))
+			icon_state = "floorlight01"

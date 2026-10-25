@@ -157,10 +157,14 @@
 	return 0
 
 /turf/return_air()
+	if(istype(get_area(src), /area/arena))
+		return arena_air()
 	//Create gas mixture to hold data for passing
 	return create_initial_air()
 
 /turf/proc/create_initial_air()
+	if(istype(get_area(src), /area/arena))
+		return arena_air()
 	var/datum/gas_mixture/GM = new
 	if(isspace(get_area(src)))
 		GM.temperature = TCMB
@@ -192,6 +196,8 @@
 
 /turf/simulated/return_air()
 	var/area/current_area = get_area(src)
+	if(istype(current_area, /area/arena))
+		return arena_air()
 	if(isspace(current_area))
 		return create_initial_air()
 	if(zone)

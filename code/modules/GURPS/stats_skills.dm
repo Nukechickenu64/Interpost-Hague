@@ -72,10 +72,13 @@
 	return FALSE
 
 /mob/proc/gurps_roll(var/target)
-	target = round(target)
 	var/dice = rand(1, 6) + rand(1, 6) + rand(1, 6)
+	return gurps_roll_result(target, dice)
+
+/proc/gurps_roll_result(var/target, var/dice)
+	target = round(target)
 	var/critical_success = dice <= 4 || (target >= 15 && dice <= 5) || (target >= 16 && dice <= 6)
-	var/critical_failure = dice == 18 || (dice == 17 && target < 15) || dice >= target + 10
+	var/critical_failure = !critical_success && (dice == 18 || (dice == 17 && target < 15) || dice >= target + 10)
 	return list("success" = !critical_failure && (critical_success || (dice < 17 && dice <= target)), "critical_success" = critical_success && !critical_failure, "critical_failure" = critical_failure, "margin" = target - dice, "dice" = dice, "target" = target)
 
 /mob/proc/is_perception_exempt()

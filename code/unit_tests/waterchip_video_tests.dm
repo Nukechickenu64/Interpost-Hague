@@ -134,15 +134,12 @@
 	for(var/vendor_type in vendors)
 		var/obj/machinery/vending/V = new vendor_type(T)
 		sleep(5)
-		var/datum/stored_items/vending_products/R = V.product_records[1]
-		var/old_stock = R.get_amount()
-		var/obj/item/vended = R.get_product(T)
+		var/old_charges = V.creation_charges
 		var/charge_type = vendors[vendor_type]
 		var/obj/item/vending_charge/refill = new charge_type(T)
 		U.put_in_hands(refill)
-		if(!V.refill_from_charge(refill, U) || !QDELETED(refill) || R.get_amount() != old_stock)
+		if(!V.refill_from_charge(refill, U) || !QDELETED(refill) || V.creation_charges != old_charges + 10)
 			failure += "[V.name] did not accept its refill family. "
-		qdel(vended)
 		qdel(V)
 	qdel(U)
 	if(failure)

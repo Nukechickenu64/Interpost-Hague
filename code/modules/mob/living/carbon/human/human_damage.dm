@@ -440,7 +440,7 @@ This function restores all organs.
 		return created_wound
 
 	// If the head was struck hard enough AND brain took notable damage, knock out.
-	if(head_trauma && brain_ref)
+	if(head_trauma && brain_ref && !combat_injury_applying)
 		// Head brute just applied is 'damage'; scale brain shock chance
 		if(damage >= 12)
 			// Helmet mitigation: if wearing protective headgear reduce effective damage and concussion gain.

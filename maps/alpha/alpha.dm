@@ -9,7 +9,15 @@
 	#include "alpha_presets.dm"
 	#include "alpha_shuttles.dm"
 
-	#include "alpha.dmm"
+	#ifdef OS13_MANUAL_REFERENCE
+		#include "../os13/waterchip-manual.dmm"
+	#else
+	#ifdef OS13_RECREATION
+		#include "../os13/recreation.dm"
+	#else
+		#include "alpha.dmm"
+	#endif
+	#endif
 	#include "../../maps/away/mining/mining.dm"
 
 	//#include "job/jobs.dm"
@@ -17,7 +25,11 @@
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 
-	#define using_map_DATUM /datum/map/alpha
+	#ifdef OS13_RECREATION
+		#define using_map_DATUM /datum/map/os13
+	#else
+		#define using_map_DATUM /datum/map/alpha
+	#endif
 
 #elif !defined(MAP_OVERRIDE)
 

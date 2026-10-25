@@ -1,0 +1,15 @@
+{
+  "video_path": "C:\\Users\\nukec\\Downloads\\Lifeweb 3 minutes of pure thanati docker combat - nocco (1080p, h264).mp4",
+  "sha256": "4d60ab98160e816675de6c9654dfca01a0fcc8fe6c716cd42b1a34fe90b3de41",
+  "duration_seconds": 180.087528,
+  "video_fps": 25,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "sampling": "fps=1; labels are approximate seconds; additional 4 fps review at 42-50 and 150-162 seconds",
+  "repo_head": "357be8a2cae20a5528901f5cfc0ba15639f9ae65",
+  "rules_target": "GURPS Third Edition advanced tactical combat; Space Second Edition supplement",
+  "source_limit": "Space book inspected; full Basic Set Third Edition advanced tables not supplied",
+  "validation": "Read-only source audit and visual/log video analysis; no game build or runtime validation; no audio classification"
+}

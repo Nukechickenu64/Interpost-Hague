@@ -58,7 +58,11 @@
 		dodge_modifier -= 3
 	else if(staminaloss >= 30)
 		dodge_modifier -= 1
-	var/list/result = gurps_roll(min(gurps_stat(STAT_DX), 13) + dodge_modifier - feint_penalty)
+	var/dodge_target = min(gurps_stat(STAT_DX), 13)
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		dodge_target = H.combat_dodge_target()
+	var/list/result = gurps_roll(dodge_target + dodge_modifier - feint_penalty)
 	if(result["success"])
 		do_dodge()
 		return TRUE
@@ -67,11 +71,9 @@
 	return FALSE
 
 /mob/living/proc/do_dodge()
-	var/lol = pick(GLOB.cardinal)//get a direction.
 	adjustStaminaLoss(max(0, 6 - (gurps_stat(STAT_DX) - 9)) + (c_intent == I_DEFEND ? 2 : 0))
 	playsound(loc, 'sound/weapons/punchmiss.ogg', 80, 1)//play a sound
-	step(src,lol)//move them
-	visible_message("<b><big>[src.name] dodges out of the way!</big></b>")//send a message
+	visible_message("<b>[src.name] dodges the attack!</b>")
 	//be on our way
 
 /mob/proc/surrender()//Surrending. I need to put this in a different file.
@@ -138,11 +140,12 @@
 		return
 	readycd.icon_state = "ready000"
 	readycd.overlays.Cut()
-	if(world.time < right_hand_ready_until)
+	var/action_busy = world.time < combat_action_until
+	if(action_busy || world.time < right_hand_ready_until)
 		readycd.overlays += image(readycd.icon, "ready100")
-	if(world.time < special_action_ready_until)
+	if(action_busy || world.time < special_action_ready_until)
 		readycd.overlays += image(readycd.icon, "ready010")
-	if(world.time < left_hand_ready_until)
+	if(action_busy || world.time < left_hand_ready_until)
 		readycd.overlays += image(readycd.icon, "ready001")
 
 /mob/living/carbon/human/proc/set_hand_ready_cooldown(var/left_hand, var/cooldown_until)

@@ -543,7 +543,9 @@
 	if(locked || buildstage != 2 || shorted || (stat & (NOPOWER|BROKEN)))
 		to_chat(user, SPAN_WARNING("The modcon controls are locked or offline."))
 		return
-	to_chat(user, modcon_report(user))
+	var/datum/engineering_atmos_menu/menu = new(src, user)
+	menu.interact()
+	qdel(menu)
 
 /obj/machinery/alarm/proc/modcon_report(mob/user)
 	var/can_control = can_use_modcon(user)
@@ -591,7 +593,7 @@
 		else
 			apply_modcon_action(usr, href_list)
 		if(can_use_modcon(usr))
-			interact(usr)
+			to_chat(usr, modcon_report(usr))
 		return
 	return ..()
 

@@ -113,11 +113,13 @@
 		mode = AALARM_MODE_SCRUBBING
 	return changed
 
-/obj/machinery/alarm/proc/can_use_modcon(mob/user)
+/obj/machinery/alarm/proc/can_use_modcon(mob/user, obj/machinery/computer/station_gas_control/console = null)
+	if(console)
+		return console.can_use_atmos_console(user, TRUE) && (alarm_area in console.controlled_areas()) && alarm_area.master_air_alarm == src && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
 	return user && !user.incapacitated() && user.Adjacent(src) && allowed(user) && !locked && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
 
-/obj/machinery/alarm/proc/apply_modcon_action(mob/user, list/command)
-	if(!can_use_modcon(user) || !alarm_area)
+/obj/machinery/alarm/proc/apply_modcon_action(mob/user, list/command, obj/machinery/computer/station_gas_control/console = null)
+	if(!can_use_modcon(user, console) || !alarm_area)
 		return FALSE
 	switch(command["modcon"])
 		if("lockdown")
@@ -125,7 +127,7 @@
 			alarm_area.update_atmos_lockdown()
 			return TRUE
 		if("automatic")
-			alarm_area.atmos_auto_lockdown = !alarm_area.atmos_auto_lockdown
+			alarm_area.atmos_auto_lockdown = ("enabled" in command) ? !!command["enabled"] : !alarm_area.atmos_auto_lockdown
 			alarm_area.update_atmos_lockdown()
 			return TRUE
 		if("vent")
@@ -137,6 +139,147 @@
 			var/obj/machinery/alarm/controller = alarm_area.master_air_alarm
 			return controller ? controller.set_engineering_vent_mode(target, command["mode"]) : FALSE
 	return FALSE
+
+// Native dialog sequence visible at 01:04:50-01:06:15 in the engineer recording.
+// Keep a session per user so concurrent area selections cannot redirect commands.
+/datum/engineering_atmos_menu
+	var/obj/machinery/source
+	var/mob/user
+	var/obj/machinery/computer/station_gas_control/console
+	var/obj/machinery/alarm/controller
+	var/obj/machinery/station_gas_tank/tank
+
+/datum/engineering_atmos_menu/New(obj/machinery/new_source, mob/new_user)
+	source = new_source
+	user = new_user
+	if(istype(source, /obj/machinery/computer/station_gas_control))
+		console = source
+		tank = get_station_gas_tank(console)
+	else if(istype(source, /obj/machinery/alarm))
+		controller = source
+	..()
+
+/datum/engineering_atmos_menu/Destroy()
+	source = null
+	user = null
+	console = null
+	controller = null
+	tank = null
+	return ..()
+
+/datum/engineering_atmos_menu/proc/available(require_access = FALSE)
+	if(QDELETED(source) || QDELETED(user))
+		return FALSE
+	if(console)
+		if(!console.can_use_atmos_console(user, require_access) || QDELETED(tank) || tank != get_station_gas_tank(console))
+			return FALSE
+		if(controller && (QDELETED(controller) || !(controller.alarm_area in console.controlled_areas()) || controller.alarm_area.master_air_alarm != controller))
+			return FALSE
+		return !require_access || !controller || controller.can_use_modcon(user, console)
+	return controller && !controller.locked && controller.buildstage == 2 && !controller.shorted && !(controller.stat & (NOPOWER|BROKEN)) && !user.incapacitated() && user.Adjacent(controller) && (!require_access || controller.allowed(user))
+
+/datum/engineering_atmos_menu/proc/choose(prompt, title, list/choices)
+	return input(user, prompt, title) as anything in choices
+
+/datum/engineering_atmos_menu/proc/choose_pressure(current)
+	return input(user, "SET LOCKDOWN PRESSURE (kPa)", "Atmospherics Control Console", current) as null|num
+
+/datum/engineering_atmos_menu/proc/report(message)
+	to_chat(user, message)
+
+/datum/engineering_atmos_menu/proc/interact()
+	if(!available())
+		return FALSE
+	if(console)
+		report("<span class='engineering-lockdown-pressure'>*LOCKDOWN PRESSURE: [round(tank.lockdown_pressure, 0.1)] kPA</span>")
+		var/list/areas = list("(SET LOCKDOWN PRESSURE)" = null)
+		for(var/area/A in console.controlled_areas())
+			var/label = A.name
+			var/suffix = 2
+			while((label in areas) || label == "(CANCEL)")
+				label = "[A.name] ([suffix++])"
+			areas[label] = A
+		areas["(CANCEL)"] = null
+		var/selection = choose("CHOOSE AREA", "Atmospherics Control Console", areas)
+		if(!available() || !(selection in areas) || selection == "(CANCEL)")
+			return FALSE
+		if(selection == "(SET LOCKDOWN PRESSURE)")
+			if(!available(TRUE))
+				return FALSE
+			var/value = choose_pressure(tank.lockdown_pressure)
+			if(!available(TRUE) || !isnum_safe(value))
+				return FALSE
+			tank.lockdown_pressure = between(0, value, ONE_ATMOSPHERE)
+			for(var/area/A in console.controlled_areas())
+				A.update_atmos_lockdown()
+			return TRUE
+		var/area/selected = areas[selection]
+		if(!(selected in console.controlled_areas()))
+			return FALSE
+		controller = selected.master_air_alarm
+	if(!controller || !available())
+		return FALSE
+	var/list/vents = controller.menu_vents()
+	report(controller.vent_report(vents))
+	if(!available(TRUE))
+		return FALSE
+	var/list/actions = list("Toggle Lockdown" = list("modcon" = "lockdown"))
+	var/automatic_label = controller.alarm_area.atmos_auto_lockdown ? "Disable Auto-Lockdown" : "Enable Auto-Lockdown"
+	actions[automatic_label] = list("modcon" = "automatic", "enabled" = !controller.alarm_area.atmos_auto_lockdown)
+	var/index = 0
+	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in vents)
+		actions["Air Vent [++index]"] = list("modcon" = "vent", "vent" = "\ref[vent]")
+	actions["ALL VENTS"] = list("modcon" = "vent", "vent" = "all")
+	actions["(Cancel)"] = null
+	var/action = choose("CHOOSE AN ACTION", "Modcon Unit", actions)
+	if(!available(TRUE) || !(action in actions) || action == "(Cancel)")
+		return FALSE
+	var/list/command = actions[action]
+	if(command["modcon"] == "vent")
+		var/list/modes = list("REFILL", "STOP", "FILTER", "(Cancel)")
+		var/mode = choose("CHOOSE AN ACTION", "Modcon Unit", modes)
+		if(!available(TRUE) || !(mode in modes) || mode == "(Cancel)")
+			return FALSE
+		command["mode"] = mode
+	return controller.apply_modcon_action(user, command, console)
+
+/obj/machinery/computer/station_gas_control/proc/can_use_atmos_console(mob/user, require_access = TRUE)
+	return user && !QDELETED(src) && !user.incapacitated() && user.Adjacent(src) && !(stat & (NOPOWER|BROKEN)) && (!require_access || allowed(user))
+
+/obj/machinery/computer/station_gas_control/proc/atmos_menu_interact(mob/user)
+	var/datum/engineering_atmos_menu/menu = new(src, user)
+	menu.interact()
+	qdel(menu)
+
+/obj/machinery/computer/station_gas_control/verb/reserve_controls()
+	set name = "Reserve Controls"
+	set src in oview(1)
+	if(can_use_atmos_console(usr, FALSE))
+		ui_interact(usr)
+
+/obj/machinery/alarm/proc/menu_vents()
+	var/list/vents = list()
+	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in alarm_area)
+		if(!QDELETED(vent))
+			vents += vent
+	return vents
+
+/obj/machinery/alarm/proc/vent_report(list/vents = null)
+	if(!vents)
+		vents = menu_vents()
+	var/text = "<div class='engineering-vent-report'><h3>[html_encode(alarm_area.name)]</h3>"
+	var/index = 0
+	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in vents)
+		var/turf/T = get_turf(vent)
+		var/datum/gas_mixture/air = T ? T.return_air() : null
+		text += "<div class='engineering-vent'><i>Vent-[++index]</i><br>&gt; Pressure: [air ? "[round(air.return_pressure(), 0.1)] kPa" : "UNKNOWN"]<br>&gt; Status: [vent.engineering_mode_name()]</div>"
+	return "[text]</div>"
+
+/obj/machinery/alarm/verb/diagnostic_readout()
+	set name = "Diagnostic Readout"
+	set src in oview(1)
+	if(can_use_modcon(usr))
+		to_chat(usr, modcon_report(usr))
 
 /obj/machinery/alarm/proc/vent_control_links(target_ref)
 	var/text = ""

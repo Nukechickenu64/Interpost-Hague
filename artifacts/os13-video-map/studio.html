@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video → Tilemap Studio — Verified Scene Stitching</title>
+<style>
+:root{--bg:#fff;--fg:#1c1c1e;--mut:#666;--card:#f3f3f5;--ac:#2f6fed;--bd:#d0d0d6;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#17181b;--fg:#ececf0;--mut:#9a9aa5;--card:#222428;--ac:#6b9bff;--bd:#3a3c42}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif;max-width:1100px;margin:auto}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:0 0 8px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:12px 0}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:8px 0}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut)}
+input,select{padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg);font-size:14px}
+button{padding:7px 12px;border:0;border-radius:6px;background:var(--ac);color:#fff;font-size:14px;cursor:pointer;margin:2px 4px 2px 0}
+button.s{background:var(--bd);color:var(--fg)}
+.m{color:var(--mut);font-size:12px}code{background:var(--bd);padding:1px 4px;border-radius:4px}
+.w{position:relative;overflow:auto;max-height:520px;border:1px solid var(--bd);background:repeating-conic-gradient(#8884 0 25%,#0000 0 50%) 0 0/16px 16px}
+canvas{display:block;image-rendering:pixelated;max-width:100%}
+.w canvas{max-width:none}.o{position:absolute;left:0;top:0;pointer-events:none}
+video{width:100%;max-height:260px;background:#000}
+#log{white-space:pre-wrap;font-family:monospace;font-size:12px;margin-top:6px}
+/* Studio interface: legible controls, informative stages, and inspectable previews. */
+:root{--bg:#0b1017;--fg:#eaf0fa;--mut:#aab7c8;--card:#141c27;--ac:#5b9bff;--bd:#304154;color-scheme:dark}
+*{box-sizing:border-box}body{padding:24px clamp(12px,3vw,28px) 56px;max-width:1250px;background:radial-gradient(circle at 85% 0%,#172945 0%,transparent 360px),var(--bg);font-size:15px;line-height:1.55}
+h1{font-size:clamp(25px,3vw,35px);letter-spacing:-.7px;margin:0 0 6px}h2{font-size:19px;margin:0 0 10px;letter-spacing:-.2px}
+section{border-radius:16px;padding:clamp(16px,2.5vw,25px);margin:18px 0;box-shadow:0 8px 32px #0002}
+.g{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin:13px 0}
+label{gap:5px;font-size:13px;font-weight:600}input,select{width:100%;min-width:0;padding:9px 11px;border-radius:8px;background:#101721;font-size:14px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+input[type=file]{border:1px dashed #647b98;padding:15px;background:#0e1828}
+button{padding:10px 15px;border:1px solid #3778de;border-radius:8px;background:#2e68ca;font-weight:650;transition:background .15s}
+button:hover:not(:disabled){background:#437fe3}button.s{background:#263447;border-color:#496078;color:var(--fg)}button.s:hover:not(:disabled){background:#33475f}button:disabled{opacity:.45;cursor:not-allowed}
+.m{font-size:13px}code{background:#27384b;padding:3px 6px;border-radius:5px;overflow-wrap:anywhere}
+.w{max-height:620px;min-height:80px;border-color:#455a70;border-radius:10px;background-color:#101820;background-image:linear-gradient(45deg,#293746 25%,transparent 25%),linear-gradient(-45deg,#293746 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#293746 75%),linear-gradient(-45deg,transparent 75%,#293746 75%);background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0}
+video{max-height:330px;border:1px solid var(--bd);border-radius:9px}
+#pv{margin:10px auto;max-height:320px;cursor:crosshair;border:1px solid var(--bd);border-radius:6px}
+#log{font-size:13px;margin:12px 0;padding:12px;background:#0c1520;border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:8px;min-height:42px}
+.lead{max-width:880px;color:#b8c8dc;margin:0 0 18px}.hint{font-size:13px;color:#aebdd0;margin:9px 0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.toolbar label{flex-direction:row;align-items:center;gap:10px}.toolbar select{width:auto;min-width:110px}
+details{background:#101721;border:1px solid var(--bd);border-radius:10px;padding:12px;margin:12px 0}summary{cursor:pointer;font-weight:650}
+#fileList{line-height:1.7;padding:12px;margin:10px 0;background:#101721;border-radius:8px}
+.pill{display:inline-block;border:1px solid #365d75;color:#bdeaff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:650}
+progress{width:100%;height:12px;accent-color:var(--ac);margin-top:8px}
+@media(max-width:650px){body{padding:14px 10px 36px}.g{grid-template-columns:repeat(2,minmax(0,1fr))}section{padding:15px}.toolbar{gap:4px}}
+</style></head><body>
+<h1>Video → Tilemap Studio</h1>
+<p class="lead">Reconstruct SS13/OS13 maps from local recordings. Detect camera movement, reconnect repeated locations, and review unresolved scenes before treating them as actual Z levels. All processing stays on your computer.</p>
+<p class="m">Download YouTube footage to a local file first:
+<code>yt-dlp -S vcodec:h264,res:1080 --merge-output-format mp4 -o map.mp4 "https://www.youtube.com/watch?v=kRaesf5j1h0"</code></p>
+
+<section><h2>1. Load videos &amp; pick the game viewport</h2>
+<input type="file" id="file" accept="video/*" multiple aria-label="Add multiple source videos">
+<button id="clearfiles" class="s">Clear video queue</button>
+<details><summary>Repair an existing all_z_layers.zip export</summary><p class="hint">Import a ZIP from an earlier run. All visible pixels and region boundaries are restored, and you can reconnect overlapping regions by clicking matching landmarks or running the overlap finder. It will not recover scenes that were never captured.</p>
+<input type="file" id="importzip" accept=".zip,application/zip" aria-label="Import previously exported map regions ZIP"></details>
+<label>Preview source video<select id="sourceSelect"><option value="">No videos loaded</option></select></label>
+<div id="fileList" class="m"></div>
+<video id="vid" controls muted playsinline></video>
+<p class="hint">Add local videos, then seek to a frame with the game visible. <strong>Drag on the preview below to select the game viewport</strong>; exclude the HUD, chat, and video borders. The crop scales for recordings at different resolutions.</p>
+<button id="os13crop" class="s">Use supplied OS13 viewport</button><p class="hint">Preset excludes the fixed side HUDs (256–1324 at 1920×1080). Check the preview after any recording layout change. Unseen pixels remain transparent; video cannot reveal hidden rooms.</p><canvas id="pv"></canvas>
+<div class="g">
+<label>Viewport left (X)<input id="cx" type="number" value="0"></label><label>Viewport top (Y)<input id="cy" type="number" value="0"></label>
+<label>Viewport width<input id="cw" type="number" value="0"></label><label>Viewport height<input id="ch" type="number" value="0"></label>
+</div></section>
+
+<section><h2>2. Extract &amp; stitch</h2>
+<p class="hint">Start with the <strong>Dark SS13 / OS13</strong> preset for the supplied example. Preview a short segment before processing hours of footage.</p>
+<div class="toolbar"><label>Quality preset <select id="preset"><option value="dark">Dark SS13 / OS13 (recommended)</option><option value="normal">Normally lit games</option><option value="strict">Strict / less ghosting</option><option value="custom">Custom settings</option></select></label></div>
+<div class="g">
+<label>Preview video start (s)<input id="t0" type="number" value="0" step="0.1"></label>
+<label>Preview video end (s; 0 = full)<input id="t1" type="number" value="0" step="0.1"></label>
+<label>Frame sampling interval (seconds)<input id="step" type="number" value="0.15" step="0.05" min="0.03"></label>
+<label>Mosaic size (px, square)<input id="ms" type="number" value="4096"></label>
+<label>Ignore pixels darker than (0–60)<input id="dark" type="number" value="14" min="0" max="60"></label>
+<label>Minimum visible scene (%)<input id="detail" type="number" value="2" min="0" max="70" step=".5"></label>
+</div>
+<details><summary>Advanced motion matching and Z-level detection</summary>
+<div class="g">
+<label>Maximum shift per frame (% of viewport)<input id="mx" type="number" value="24" min="2" max="80"></label>
+<label>Accept motion if mismatch ≤<input id="thr" type="number" value="14" min="0" max="40"></label>
+<label>Pixel vote tolerance<input id="vt" type="number" value="30" min="0" max="765"></label>
+<label>Start a scene-cut check if mismatch &gt;<input id="scene" type="number" value="27" min="0" max="40" step="1"></label>
+<label>Confirm after (frames)<input id="confirm" type="number" value="4" min="2" max="10"></label>
+<label>Max unresolved map regions<input id="maxz" type="number" value="80" min="1" max="100"></label>
+</div>
+<p class="hint">Unrecognized views are <strong>unlinked map regions</strong>, not proof of another floor. A scene return needs agreement across several frames and already-mapped RGB pixels; repeated floor patterns alone do not qualify. The program samples intervening footage to recover missed camera moves and checks other possible overlaps after capture. Match unresolved regions by clicking the same landmark in each.</p>
+</details>
+<p class="hint">Use a 10–30 second segment to verify registration. A large mosaic and multiple high-resolution videos require substantial memory.</p>
+<button id="run">Process all videos</button><button id="stop" class="s">Stop</button>
+<progress id="progress" value="0" max="100" aria-label="Batch processing progress"></progress>
+<div id="log"></div>
+<div class="g">
+<label>Viewing map region<select id="zselect" aria-label="Viewing map region"><option value="">No regions yet</option></select></label>
+<label>Rename selected region<input id="zname" placeholder="e.g. Maintenance, floor unverified"></label>
+</div>
+<div id="zstatus" class="m">Distinct map regions remain provisional until matched; they do not necessarily represent separate floors.</div>
+<p class="m">The detector cannot know true in-game Z from video alone. An isolated corridor may belong to an existing floor. Avoid assuming all exported region numbers are floors.</p>
+<div class="toolbar"><button id="reconcile" class="s">Find &amp; join overlapping regions</button><button id="pickpoints" class="s">Connect two matching landmarks</button><button id="resetpoints" class="s">Clear selected landmarks</button><button id="deleteregion" class="s">Discard a false scene</button></div>
+<label style="flex-direction:row;align-items:center;gap:8px"><input id="autojoin" type="checkbox" style="width:auto"> Automatically merge regions during capture (review recommended before enabling)</label><label style="flex-direction:row;align-items:center;gap:8px"><input id="autoreconcile" type="checkbox" style="width:auto"> Automatically check for overlapping regions after processing all videos</label>
+<div id="markstatus" class="hint">To repair a missed connection, click “Connect two matching landmarks,” click a recognizable point on one region, select another region, and click the identical point. Review the proposed match before merging.</div>
+<button id="applypoints" class="s" disabled>Merge marked regions</button>
+<details><summary>Detected scene transitions</summary><div id="events" class="m" style="white-space:pre-wrap;max-height:200px;overflow:auto"></div></details>
+<div class="toolbar"><span class="pill" id="maphealth">No mosaic yet</span><label>Map zoom <select id="zoom"><option value="50">50%</option><option value="100" selected>100%</option><option value="150">150%</option><option value="200">200%</option></select></label><label>Preview brightness <select id="gamma"><option value="1">Original</option><option value="1.4">Lighten</option><option value="1.8" selected>Lift shadows (recommended)</option><option value="2.3">Maximum visibility</option></select></label><label style="flex-direction:row;align-items:center"><input id="showgrid" type="checkbox" style="width:auto"> Show tile grid</label></div>
+<div class="w"><canvas id="mc"></canvas><canvas id="gc" class="o"></canvas></div>
+<button id="dm" class="s">Download raw region PNG</button><button id="dmb" class="s">Download brightened preview PNG</button><button id="allmasters" class="s">Download all map regions (.zip)</button>
+<button id="diagnostics" class="s">Download diagnostic report</button>
+<p class="hint">Darkness is treated as unknown space, not opaque black tiles. Preview brightness never changes the raw master PNG or tile data; it only changes the displayed and optional brightened preview.</p></section>
+
+<section><h2>3. Grid &amp; tiles</h2>
+<div class="g">
+<label>Tile size in mosaic (px, decimals ok)<input id="ts" type="number" value="32" step="0.01"></label>
+<label>Grid offset X<input id="gx" type="number" value="0" step="0.5"></label>
+<label>Grid offset Y<input id="gy" type="number" value="0" step="0.5"></label>
+<label>Output tile size (px)<input id="nat" type="number" value="32"></label>
+<label>Color bits to ignore (0-7)<input id="q" type="number" value="3"></label>
+<label>Near-match tolerance (0-255)<input id="tol" type="number" value="6"></label>
+<label>Min observed pixels per tile (%)<input id="minc" type="number" value="25" min="0" max="100"></label>
+</div>
+<button id="det" class="s">Auto-detect grid from mosaic</button><button id="gridbtn" class="s">Redraw grid overlay</button><button id="slice">Slice selected Z</button><button id="sliceall" class="s">Slice all Z levels</button>
+<p class="m">Auto-detect is a heuristic: check the overlay in step 2 and nudge size/offset until lines sit on tile edges. If the video is scaled, the tile size is the on-screen tile size (e.g. 32 × scale).</p>
+<div id="log2" class="m"></div></section>
+
+<section><h2>4. Results</h2>
+<p class="m">Tileset (index 0 = empty, then 1…N left-to-right, top-to-bottom)</p><div class="w" style="max-height:300px"><canvas id="sc"></canvas></div>
+<p class="m">Reconstructed map from tileset + grid (hover for tile id)</p><div class="w"><canvas id="rc"></canvas></div><div id="hov" class="m"></div>
+<button id="d1">tileset (selected Z).png</button><button id="d2">All Z levels map.json</button><button id="d3">map (selected Z).csv</button><button id="d4">reconstructed (selected Z).png</button></section>
+
+<script>
+const $=id=>document.getElementById(id),v=$('vid'),pv=$('pv'),pc=pv.getContext('2d'),mc=$('mc'),mx=mc.getContext('2d'),gc=$('gc');
+let M=null,R=null,levels=[],activeZ=-1,selectedZ=-1,running=false,stop=false,videoURL=null,queue=[],previewIndex=-1,reference=null,currentSourceName='',currentSourceIndex=-1,darkCut=14,lastStats=null,marks=[],marking=false,importedSources=[];
+const log=s=>$('log').textContent=s,tick=()=>new Promise(r=>setTimeout(r,0));
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const num=(id,min,max)=>{const n=Number($(id).value);if(!Number.isFinite(n)||n<min||n>max)throw Error(`${id}: expected a number between ${min} and ${max}`);return n};
+const fail=e=>log(`Error: ${e.message||e}`);
+const crop=()=>({x:+$('cx').value|0,y:+$('cy').value|0,w:+$('cw').value|0,h:+$('ch').value|0});
+const presets={dark:{step:.15,mx:24,thr:14,scene:27,vt:30,dark:14,detail:2,confirm:4},normal:{step:.2,mx:24,thr:15,scene:29,vt:45,dark:5,detail:3,confirm:4},strict:{step:.1,mx:16,thr:10,scene:25,vt:18,dark:22,detail:4,confirm:5}};
+$('preset').onchange=()=>{const p=presets[$('preset').value];if(!p)return;for(const[id,value]of Object.entries(p))$(id).value=value};
+for(const id of Object.keys(presets.dark))$(id).addEventListener('change',()=>{if($('preset').value!=='custom'&&+$(id).value!==presets[$('preset').value][id])$('preset').value='custom'});
+function resetMaps(){M=R=null;levels=[];activeZ=selectedZ=-1;lastStats=null;importedSources=[];resetMarks();refreshZ();for(const id of ['mc','gc','sc','rc']){$(id).width=0;$(id).height=0}$('events').textContent='';$('log2').textContent='';$('maphealth').textContent='No mosaic yet';$('progress').value=0}
+function refreshFiles(){const select=$('sourceSelect');select.replaceChildren();queue.forEach((entry,i)=>select.add(new Option(`${i+1}. ${entry.file.name}`,String(i))));if(previewIndex>=0&&queue[previewIndex])select.value=String(previewIndex);
+ $('fileList').textContent=queue.length?`${queue.length} queued video(s): ${queue.map((e,i)=>`${i+1}. ${e.file.name}${e.duration?' ('+e.duration.toFixed(1)+'s)':''}`).join(' · ')}`:'Choose video files to begin.'}
+function saveTrim(){if(previewIndex<0||!queue[previewIndex]||running)return;const e=queue[previewIndex];const a=Number($('t0').value),b=Number($('t1').value);if(Number.isFinite(a)&&a>=0)e.start=a;if(Number.isFinite(b)&&b>=0)e.end=b===0?null:b}
+['t0','t1'].forEach(id=>$(id).addEventListener('change',saveTrim));
+async function loadSource(entry){
+ if(!entry)throw Error('No video selected');if(videoURL)URL.revokeObjectURL(videoURL);videoURL=URL.createObjectURL(entry.file);
+ return new Promise((resolve,reject)=>{let timer;const clean=()=>{clearTimeout(timer);v.removeEventListener('loadeddata',ready);v.removeEventListener('error',bad)};
+  const ready=()=>{clean();if(!v.videoWidth||!Number.isFinite(v.duration))reject(Error(`Unsupported or incomplete video: ${entry.file.name}`));else{entry.duration=v.duration;currentSourceName=entry.file.name;resolve()}};
+  const bad=()=>{clean();reject(Error(`Cannot decode ${entry.file.name}. Try H.264 MP4.`))};
+  v.addEventListener('loadeddata',ready,{once:true});v.addEventListener('error',bad,{once:true});timer=setTimeout(()=>{clean();reject(Error(`Timed out loading ${entry.file.name}`))},15000);
+  try{v.src=videoURL;v.load()}catch(err){clean();reject(err)}
+ })}
+async function selectSource(i){if(running||!queue[i])return;saveTrim();previewIndex=i;refreshFiles();try{await loadSource(queue[i]);$('t0').value=queue[i].start;$('t1').value=queue[i].end??v.duration.toFixed(2);
+ if(!reference){reference={vw:v.videoWidth,vh:v.videoHeight};$('cx').value=0;$('cy').value=0;$('cw').value=v.videoWidth;$('ch').value=v.videoHeight}
+ drawPrev();log(`Previewing ${queue[i].file.name} (${i+1}/${queue.length})`)}catch(e){fail(e)}}
+$('file').onchange=async e=>{if(running){log('Stop processing before adding files');return}const files=Array.from(e.target.files||[]);if(!files.length)return;const first=queue.length;for(const f of files)queue.push({file:f,start:0,end:null,duration:null});e.target.value='';resetMaps();refreshFiles();await selectSource(first)};
+$('clearfiles').onclick=()=>{if(running)return;queue=[];previewIndex=-1;reference=null;if(videoURL)URL.revokeObjectURL(videoURL);videoURL=null;v.removeAttribute('src');v.load();resetMaps();refreshFiles();log('Video queue cleared')};
+$('sourceSelect').onchange=()=>selectSource(Number($('sourceSelect').value));
+function sourceCrop(base){if(!reference)throw Error('Missing reference viewport');const sx=v.videoWidth/reference.vw,sy=v.videoHeight/reference.vh;
+ const x=clamp(Math.round(base.x*sx),0,v.videoWidth-1),y=clamp(Math.round(base.y*sy),0,v.videoHeight-1);
+ return{x,y,w:clamp(Math.round(base.w*sx),1,v.videoWidth-x),h:clamp(Math.round(base.h*sy),1,v.videoHeight-y)}}
+function drawPrev(){if(running||!v.videoWidth||v.readyState<2)return;pv.width=v.videoWidth;pv.height=v.videoHeight;pc.drawImage(v,0,0);const c=sourceCrop(crop());pc.strokeStyle='red';pc.lineWidth=Math.max(2,v.videoWidth/300);pc.strokeRect(c.x,c.y,c.w,c.h)}
+v.addEventListener('seeked',drawPrev);v.addEventListener('timeupdate',drawPrev);['cx','cy','cw','ch'].forEach(i=>$(i).oninput=drawPrev);
+let drag=null;
+function previewPoint(e){const rect=pv.getBoundingClientRect(),sx=reference?.vw/v.videoWidth||1,sy=reference?.vh/v.videoHeight||1;return{x:clamp(Math.round((e.clientX-rect.left)/rect.width*v.videoWidth*sx),0,reference?.vw||v.videoWidth),y:clamp(Math.round((e.clientY-rect.top)/rect.height*v.videoHeight*sy),0,reference?.vh||v.videoHeight)}}
+pv.onpointerdown=e=>{if(running||!v.videoWidth)return;drag=previewPoint(e);pv.setPointerCapture?.(e.pointerId)};
+pv.onpointermove=e=>{if(!drag)return;const p=previewPoint(e),x=Math.min(drag.x,p.x),y=Math.min(drag.y,p.y),w=Math.abs(drag.x-p.x),h=Math.abs(drag.y-p.y);if(w<4||h<4)return;for(const[id,value]of Object.entries({cx:x,cy:y,cw:w,ch:h}))$(id).value=value;drawPrev()};
+pv.onpointerup=e=>{if(!drag)return;pv.onpointermove(e);drag=null;pv.releasePointerCapture?.(e.pointerId)};
+pv.onpointercancel=()=>drag=null;
+$('os13crop').onclick=()=>{if(running||!reference)return;for(const[id,value]of Object.entries({cx:256/1920*reference.vw,cy:0,cw:1068/1920*reference.vw,ch:reference.vh}))$(id).value=Math.round(value);drawPrev()};
+const seek=t=>new Promise((resolve,reject)=>{
+ if(stop){reject(Error('Stopped'));return}const target=clamp(t,0,Math.max(0,v.duration-.001));
+ if(v.readyState>=2&&Math.abs(v.currentTime-target)<.001){resolve();return}
+ let timer;const cleanup=()=>{clearTimeout(timer);v.removeEventListener('seeked',done);v.removeEventListener('error',bad)};
+ const done=()=>{cleanup();resolve()},bad=()=>{cleanup();reject(Error('Video decoding failed'))};
+ v.addEventListener('seeked',done,{once:true});v.addEventListener('error',bad,{once:true});
+ timer=setTimeout(()=>{cleanup();reject(Error(`Seek timed out at ${target.toFixed(2)}s (unsupported or damaged video?)`))},10000);
+ try{v.currentTime=target}catch(e){cleanup();reject(e)}
+});
+const fc=document.createElement('canvas'),fx=fc.getContext('2d',{willReadFrequently:true});
+function grab(c,outW=c.w,outH=c.h){fc.width=outW;fc.height=outH;fx.drawImage(v,c.x,c.y,c.w,c.h,0,0,outW,outH);return fx.getImageData(0,0,outW,outH)}
+function frameQuality(d){const p=d.data,w=d.width,h=d.height;let good=0,total=0;
+ for(let y=0;y<h;y+=4)for(let x=0;x<w;x+=4){const k=(y*w+x)*4;total++;if(p[k+3]&&Math.max(p[k],p[k+1],p[k+2])>darkCut)good++}
+ return total?good/total:0}
+function gray(d,s){const w=Math.floor(d.width/s),h=Math.floor(d.height/s),g=new Uint8Array(w*h),valid=new Uint8Array(w*h),p=d.data,W=d.width;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){let a=0,lit=0;for(let j=0;j<s;j++)for(let i=0;i<s;i++){const k=((y*s+j)*W+x*s+i)*4,r=p[k],gg=p[k+1],b=p[k+2];if(p[k+3]&&Math.max(r,gg,b)>darkCut){a+=r*.299+gg*.587+b*.114;lit++}}
+  const n=y*w+x;if(lit>=Math.max(1,Math.ceil(s*s*.02))){g[n]=Math.round(a/lit);valid[n]=1}}
+ return{g,valid,w,h}}
+// Compare only lit, mutually visible image detail. Blank/black video regions are not alignment evidence.
+function cost(A,B,dx,dy,st){const x0=Math.max(0,dx),x1=Math.min(A.w,B.w+dx),y0=Math.max(0,dy),y1=Math.min(A.h,B.h+dy);
+ if(x1-x0<A.w*.35||y1-y0<A.h*.35)return 1e9;
+ let sum=0,matched=0,union=0,samples=0;
+ for(let y=y0;y<y1;y+=st)for(let x=x0;x<x1;x+=st){const i=y*A.w+x,j=(y-dy)*B.w+x-dx,a=A.valid[i],b=B.valid[j];samples++;
+  if(a||b)union++;if(!a||!b)continue;const d=Math.abs(A.g[i]-B.g[j]);sum+=Math.min(60,d);matched++}
+ if(matched<Math.max(6,Math.ceil(samples*.012)))return 1e9;
+ return sum/matched+Math.max(0,1-matched/Math.max(1,union))*9+Math.hypot(dx,dy)/Math.max(A.w,A.h)*.8}
+function estimate(P,N,f,coarseOnly=false){
+ // Keep independent coarse hypotheses: repeated tiles must not eliminate the
+ // correct basin before finer pixels can distinguish walls and furnishings.
+ const A=P.g16,B=N.g16,r=Math.ceil(f*Math.max(A.w,A.h)),stride=r>=6?3:1;
+ const candidates=[{score:cost(A,B,0,0,1),x:0,y:0}];
+ for(let y=-r;y<=r;y+=stride)for(let x=-r;x<=r;x+=stride)candidates.push({score:cost(A,B,x,y,2),x,y});
+ candidates.sort((a,b)=>a.score-b.score||Math.hypot(a.x,a.y)-Math.hypot(b.x,b.y));
+ const seeds=[];
+ for(const q of candidates){if(q.score>=1e8)continue;if(seeds.every(p=>Math.hypot(p.x-q.x,p.y-q.y)>=2))seeds.push(q);if(seeds.length===4)break}
+ if(!seeds.length)return[1e9,0,0];
+ // Always evaluate stationary alignment, including when the coarse lattice
+ // misses zero or periodic floor texture makes other translations score well.
+ if(!seeds.some(q=>q.x===0&&q.y===0))seeds.push(candidates.find(q=>q.x===0&&q.y===0));
+ let best=[1e9,0,0];
+ const pick=(old,score,x,y)=>score<old[0]-.05||(Math.abs(score-old[0])<=.05&&x*x+y*y<old[1]*old[1]+old[2]*old[2])?[score,x,y]:old;
+ for(const seed of seeds){
+  let coarse=[seed.score,seed.x,seed.y];
+  for(let y=seed.y-stride;y<=seed.y+stride;y++)for(let x=seed.x-stride;x<=seed.x+stride;x++)coarse=pick(coarse,cost(A,B,x,y,1),x,y);
+  if(coarseOnly){best=pick(best,coarse[0],coarse[1]*16,coarse[2]*16);continue}
+  let mid=[1e9,0,0];
+  for(let y=coarse[2]*4-4;y<=coarse[2]*4+4;y++)for(let x=coarse[1]*4-4;x<=coarse[1]*4+4;x++)mid=pick(mid,cost(P.g4,N.g4,x,y,2),x,y);
+  const scale=P.g1&&N.g1?1:2,a=scale===1?P.g1:P.g2,b=scale===1?N.g1:N.g2;
+  for(let y=mid[2]*4/scale-3;y<=mid[2]*4/scale+3;y++)for(let x=mid[1]*4/scale-3;x<=mid[1]*4/scale+3;x++)best=pick(best,cost(a,b,x,y,Math.max(2,Math.floor(Math.min(a.w,a.h)/100))),x*scale,y*scale);
+ }
+ if(!coarseOnly&&!motionSupport(P,N,best[1],best[2]).ok)return[1e9,0,0];
+ return best;
+}
+// Require matching detail in separated parts of the viewport. A character,
+// popup, or a small surviving floor patch cannot establish camera motion.
+function motionSupport(P,N,dx,dy){
+ const A=P.g2,B=N.g2,cells=Array.from({length:16},()=>({n:0,close:0,edge:0}));
+ dx=Math.round(dx/2);dy=Math.round(dy/2);
+ for(let y=Math.max(1,dy+1);y<Math.min(A.h-1,B.h+dy-1);y+=3)for(let x=Math.max(1,dx+1);x<Math.min(A.w-1,B.w+dx-1);x+=3){
+  const i=y*A.w+x,j=(y-dy)*B.w+x-dx;if(!A.valid[i]||!B.valid[j])continue;
+  const c=cells[Math.min(3,Math.floor(y*4/A.h))*4+Math.min(3,Math.floor(x*4/A.w))];c.n++;
+  const edge=Math.abs(A.g[i-1]-A.g[i+1])+Math.abs(A.g[i-A.w]-A.g[i+A.w]);
+  if(edge>=12){c.edge++;if(Math.abs(A.g[i]-B.g[j])<=28)c.close++}
+ }
+ const supported=cells.map((c,i)=>({c,i})).filter(({c})=>c.n>=12&&c.edge>=8&&c.close/c.edge>=.65);
+ const rows=new Set(supported.map(q=>q.i>>2)),cols=new Set(supported.map(q=>q.i%4));
+ return{ok:supported.length>=3&&rows.size>=2&&cols.size>=2,cells:supported.length};
+}
+// Compute luminance once. Pool original valid samples directly at every scale
+// to preserve the dark-mask weighting without four full RGB conversions.
+function prep(d){
+ const w=d.width,h=d.height,p=d.data,g=new Uint8Array(w*h),valid=new Uint8Array(w*h),lum=new Float32Array(w*h);
+ for(let i=0;i<g.length;i++){const k=i*4;if(p[k+3]&&Math.max(p[k],p[k+1],p[k+2])>darkCut){valid[i]=1;lum[i]=p[k]*.299+p[k+1]*.587+p[k+2]*.114;g[i]=Math.round(lum[i])}}
+ const pool=s=>{const W=Math.floor(w/s),H=Math.floor(h/s),v=new Uint8Array(W*H),a=new Uint8Array(W*H);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){let sum=0,n=0;for(let j=0;j<s;j++)for(let i=0;i<s;i++){const k=(y*s+j)*w+x*s+i;if(valid[k]){sum+=lum[k];n++}}const k=y*W+x;if(n>=Math.max(1,Math.ceil(s*s*.02))){v[k]=1;a[k]=Math.round(sum/n)}}return{g:a,valid:v,w:W,h:H}};
+ return{g1:{g,valid,w,h},g2:pool(2),g4:pool(4),g16:pool(16)};
+}
+const anchorPrep=pr=>({g16:pr.g16,g4:pr.g4,g2:pr.g2});
+// Sparse 256px chunks avoid allocating a whole 4096² canvas for every Z level.
+const CH=256;
+function chunk(m,x,y,create=false){const key=`${x>>8},${y>>8}`;let a=m.chunks.get(key);if(!a&&create){a={rgb:new Uint8Array(CH*CH*3),seen:new Uint8Array(CH*CH),cnt:new Uint8Array(CH*CH)};m.chunks.set(key,a)}return a}
+function pixel(m,x,y){const a=chunk(m,x,y);if(!a)return null;const i=((y&255)*CH+(x&255));return a.seen[i]?[a.rgb[i*3],a.rgb[i*3+1],a.rgb[i*3+2]]:null}
+function paint(m,d,ox,oy,tol){const p=d.data,{W,H,b}=m,w=d.width;
+ let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+ for(let y=0;y<d.height;y++){const Y=oy+y;
+  for(let x=0;x<w;x++){const X=ox+x;const k=(y*w+x)*4;
+   if(!p[k+3]||Math.max(p[k],p[k+1],p[k+2])<=darkCut)continue;
+   if(X<minx)minx=X;if(X>maxx)maxx=X;if(Y<miny)miny=Y;if(Y>maxy)maxy=Y;
+   const a=chunk(m,X,Y,true),i=(Y&255)*CH+(X&255),j=i*3;
+   if(!a.seen[i]){a.seen[i]=1;a.rgb[j]=p[k];a.rgb[j+1]=p[k+1];a.rgb[j+2]=p[k+2];a.cnt[i]=1}
+   else{const df=Math.abs(a.rgb[j]-p[k])+Math.abs(a.rgb[j+1]-p[k+1])+Math.abs(a.rgb[j+2]-p[k+2]);
+    if(df<=tol){if(a.cnt[i]<8)a.cnt[i]++}else if(--a.cnt[i]<=0){a.rgb[j]=p[k];a.rgb[j+1]=p[k+1];a.rgb[j+2]=p[k+2];a.cnt[i]=1}}}}
+ if(minx!==Infinity){b.x0=Math.min(b.x0,minx);b.y0=Math.min(b.y0,miny);b.x1=Math.max(b.x1,maxx+1);b.y1=Math.max(b.y1,maxy+1)}}
+function showM(){if(!M)return;const{x0,y0,x1,y1}=M.b,w=x1-x0,h=y1-y0;if(w<=0||h<=0)return;mc.width=w;mc.height=h;const id=mx.createImageData(w,h),d=id.data,gamma=+$('gamma').value||1,light=gamma!==1,transform=light?new Uint8Array(256):null;let covered=0;
+ if(transform)for(let i=0;i<256;i++)transform[i]=Math.round(255*Math.pow(i/255,1/gamma));
+ for(const[key,a]of M.chunks){const[cx,cy]=key.split(',').map(Number),sx=cx*CH,sy=cy*CH,left=Math.max(x0,sx),right=Math.min(x1,sx+CH),top=Math.max(y0,sy),bottom=Math.min(y1,sy+CH);
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){const i=(y-sy)*CH+x-sx;if(!a.seen[i])continue;covered++;const k=((y-y0)*w+x-x0)*4,j=i*3;d[k]=light?transform[a.rgb[j]]:a.rgb[j];d[k+1]=light?transform[a.rgb[j+1]]:a.rgb[j+1];d[k+2]=light?transform[a.rgb[j+2]]:a.rgb[j+2];d[k+3]=255}}
+ mx.putImageData(id,0,0);$('maphealth').textContent=`${(100*covered/(w*h)).toFixed(1)}% visible pixels · ${w}×${h} px · ${covered.toLocaleString()} mapped`;applyZoom();grid()}
+function rawMapCanvas(map){const{x0,y0,x1,y1}=map.b,w=x1-x0,h=y1-y0,c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d'),id=ctx.createImageData(w,h),out=id.data;
+ for(const[key,a]of map.chunks){const[cx,cy]=key.split(',').map(Number),sx=cx*CH,sy=cy*CH,left=Math.max(x0,sx),right=Math.min(x1,sx+CH),top=Math.max(y0,sy),bottom=Math.min(y1,sy+CH);
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){const i=(y-sy)*CH+x-sx;if(!a.seen[i])continue;const j=i*3,k=((y-y0)*w+x-x0)*4;out[k]=a.rgb[j];out[k+1]=a.rgb[j+1];out[k+2]=a.rgb[j+2];out[k+3]=255}}
+ ctx.putImageData(id,0,0);return c}
+// Import our uncompressed ZIP export. Reusing the sparse mosaics lets a user
+// repair previously extracted regions without re-decoding hours of video.
+function readStoredZip(data){const bytes=new Uint8Array(data),dv=new DataView(data),td=new TextDecoder(),files=new Map();let off=0;
+ while(off+30<=bytes.length&&dv.getUint32(off,true)===0x04034b50){const flags=dv.getUint16(off+6,true),method=dv.getUint16(off+8,true),size=dv.getUint32(off+18,true),nameLen=dv.getUint16(off+26,true),extraLen=dv.getUint16(off+28,true),begin=off+30+nameLen+extraLen,end=begin+size;
+  if(method!==0||flags&8)throw Error('This importer supports ZIPs produced by the studio (stored entries). Re-export from this app or extract the files and repackage without compression.');
+  if(end>bytes.length)throw Error('Invalid or truncated ZIP entry');const name=td.decode(bytes.subarray(off+30,off+30+nameLen));files.set(name,bytes.subarray(begin,end));off=end;
+ }return files}
+function createAnchorsFromMosaic(l){const {x0,y0,x1,y1}=l.map.b,w=x1-x0,h=y1-y0,side=Math.floor(Math.min(512,w,h)/16)*16;if(side<64)return;
+ const canvas=rawMapCanvas(l.map),ctx=canvas.getContext('2d',{willReadFrequently:true});
+ // Imported mosaics can be several viewports across. Three samples per axis
+ // missed whole corridors; a bounded spatial grid covers more of each map.
+ const points=(span)=>{const count=Math.min(5,Math.ceil(span/256)+1),p=[];for(let i=0;i<count;i++)p.push(Math.round(span*i/Math.max(1,count-1)));return [...new Set(p)]};
+ const xs=points(w-side),ys=points(h-side);
+ for(const x of xs)for(const y of ys){
+  const d=ctx.getImageData(x,y,side,side);if(frameQuality(d)<.035)continue;
+  l.anchors.push({pr:anchorPrep(prep(d)),pos:[x0+x,y0+y],t:0});
+ }}
+$('importzip').onchange=async e=>{const file=e.target.files?.[0];e.target.value='';if(!file||running)return;running=true;const button=$('importzip');button.disabled=true;
+ try{log(`Reading ${file.name}…`);const files=readStoredZip(await file.arrayBuffer()),metaFile=files.get('map_all_z.json');if(!metaFile)throw Error('Expected map_all_z.json inside the ZIP');
+  const meta=JSON.parse(new TextDecoder().decode(metaFile));if(!Array.isArray(meta.levels)||!meta.levels.length)throw Error('No exported map regions found');
+  resetMaps();importedSources=Array.isArray(meta.sources)?meta.sources:[];
+  for(let i=0;i<meta.levels.length;i++){const info=meta.levels[i],pngBytes=files.get(`master_map_z${info.z}.png`);if(!pngBytes)throw Error(`Missing master_map_z${info.z}.png`);
+   const bitmap=await createImageBitmap(new Blob([pngBytes],{type:'image/png'})),b=info.mosaicBounds;
+   if(!b||bitmap.width!==b.x1-b.x0||bitmap.height!==b.y1-b.y0)throw Error(`Region ${info.z}: bounds do not match PNG dimensions`);
+   const temp=document.createElement('canvas');temp.width=bitmap.width;temp.height=bitmap.height;const ctx=temp.getContext('2d',{willReadFrequently:true});ctx.drawImage(bitmap,0,0);bitmap.close?.();const data=ctx.getImageData(0,0,temp.width,temp.height).data;
+   const m={W:Math.max(4096,temp.width,temp.height),H:Math.max(4096,temp.width,temp.height),b:{...b},chunks:new Map()};
+   for(let y=0;y<temp.height;y++)for(let x=0;x<temp.width;x++){const k=(y*temp.width+x)*4;if(data[k+3]===0)continue;const X=b.x0+x,Y=b.y0+y,a=chunk(m,X,Y,true),j=((Y&255)*CH+(X&255)),p=j*3;a.seen[j]=1;a.cnt[j]=1;a.rgb[p]=data[k];a.rgb[p+1]=data[k+1];a.rgb[p+2]=data[k+2]}
+   const l={map:m,prev:null,pos:[b.x0,b.y0],anchors:[],frames:info.acceptedFrames||0,first:0,last:0,lastSource:-1,name:info.name||`Region ${i+1}`,result:null,sources:new Map((info.sources||[]).map(s=>[s.sourceId,s])),mergeCheck:null};
+   levels.push(l);createAnchorsFromMosaic(l);log(`Restored ${i+1}/${meta.levels.length} map regions…`);await tick();
+  }
+  activeZ=-1;chooseZ(0);zEvent(0,`Imported ${levels.length} regions from ${file.name}; use Find & join or manual landmarks to repair connections`);
+  log(`Imported ${levels.length} existing regions. These are provisional regions, not known Z floors. Use “Find & join overlapping regions,” then repair missed links by clicking the same landmark on two regions.`);
+ }catch(err){fail(err)}finally{running=false;button.disabled=false;refreshZ()}}
+function applyZoom(){const z=Number($('zoom').value)/100||1;for(const c of [mc,gc]){c.style.width=`${Math.round(mc.width*z)}px`;c.style.height=`${Math.round(mc.height*z)}px`}}
+$('zoom').onchange=applyZoom;
+$('gamma').onchange=()=>{if(M)showM()};
+const zlabel=i=>`${levels[i].name} (${levels[i].frames} frames)`;
+function refreshZ(){const sel=$('zselect');sel.replaceChildren();levels.forEach((l,i)=>sel.add(new Option(zlabel(i),String(i))));if(selectedZ>=0&&selectedZ<levels.length){sel.value=String(selectedZ);$('zname').value=levels[selectedZ].name;$('zstatus').textContent=`${levels.length} unlinked/matched region(s) · viewing ${zlabel(selectedZ)} · currently tracking ${activeZ+1}`;}else{$('zname').value='';$('zstatus').textContent='No map regions yet.'} }
+function chooseZ(i){if(i<0||!levels[i])return;selectedZ=i;M=levels[i].map;R=levels[i].result||null;refreshZ();showM();showR()}
+$('zselect').onchange=()=>chooseZ(Number($('zselect').value));
+$('zname').onchange=()=>{if(selectedZ<0)return;levels[selectedZ].name=$('zname').value.trim().slice(0,80)||`Region ${selectedZ+1}`;refreshZ()};
+function zEvent(t,description){const line=`[${currentSourceName||'source'} @ ${t.toFixed(2)}s] ${description}`;$('events').textContent+=(($('events').textContent?'\n':'')+line)}
+function newLevel(W,c,t){const i=levels.length,m={W,H:W,chunks:new Map(),b:{x0:W,y0:W,x1:0,y1:0}},l={map:m,prev:null,pos:[Math.floor((W-c.w)/2),Math.floor((W-c.h)/2)],anchors:[],frames:0,first:t,last:t,lastSource:currentSourceIndex,name:`Region ${i+1}`,result:null,sources:new Map(),mergeCheck:null};levels.push(l);activeZ=i;selectedZ=i;M=m;R=null;refreshZ();zEvent(t,`Started ${l.name} (floor unknown)`);return l}
+function validPos(l,pos,w,h){const b=l.map.b,empty=b.x0>=b.x1;const x0=empty?pos[0]:Math.min(b.x0,pos[0]),y0=empty?pos[1]:Math.min(b.y0,pos[1]);const x1=empty?pos[0]+w:Math.max(b.x1,pos[0]+w),y1=empty?pos[1]+h:Math.max(b.y1,pos[1]+h);return x1-x0<=l.map.W&&y1-y0<=l.map.H&&Math.max(Math.abs(x0),Math.abs(y0),Math.abs(x1),Math.abs(y1))<30000}
+function accept(l,d,pr,pos,t,vt){paint(l.map,d,pos[0],pos[1],vt);l.pos=pos;l.prev=pr;l.frames++;l.last=t;l.lastSource=currentSourceIndex;l.result=null;
+ const source=l.sources.get(currentSourceIndex)||{file:currentSourceName,startSeconds:t,endSeconds:t,frames:0};source.startSeconds=Math.min(source.startSeconds,t);source.endSeconds=Math.max(source.endSeconds,t);source.frames++;l.sources.set(currentSourceIndex,source);
+ const width=d.width,height=d.height;
+ const nearest=l.anchors.reduce((best,a)=>Math.min(best,Math.hypot(a.pos[0]-pos[0],a.pos[1]-pos[1])),Infinity),latest=l.anchors.at(-1);
+ if(nearest>Math.min(width,height)*.3||latest&&t-latest.t>15&&nearest>Math.min(width,height)*.08){
+  if(l.anchors.length>=40)l.anchors.splice(8,1);
+  l.anchors.push({pr:anchorPrep(pr),pos:pos.slice(),t});
+ }
+}
+// The appearance of a familiar corridor is NOT sufficient to attach it to a
+// particular room. Keep alternative placements so we can check real RGB
+// overlap, and avoid choosing arbitrarily between near-identical locations.
+function findMatches(pr,f,thr,w,h,exclude=-1,perLevel=12){const matches=[];
+ for(let z=0;z<levels.length;z++){if(z===exclude)continue;const l=levels[z],step=Math.max(1,Math.ceil(l.anchors.length/perLevel));
+  const sampled=l.anchors.filter((_,i)=>i%step===0||i===l.anchors.length-1),shortlist=[];
+  // A fast 1/16-resolution scan eliminates implausible anchors before the
+  // expensive 1/2-resolution refinement. Keep several choices per region.
+  for(const a of sampled){if(a.pr.g16.w!==pr.g16.w||a.pr.g16.h!==pr.g16.h)continue;
+   const[rough]=estimate(a.pr,pr,Math.max(f,.4),true);
+   if(rough<=Math.max(24,thr+10))shortlist.push({a,rough});
+  }
+  const chosen=[],remaining=shortlist.slice();
+  while(chosen.length<4&&remaining.length){let bestIndex=0,bestRank=Infinity;
+   for(let i=0;i<remaining.length;i++){const q=remaining[i],spread=chosen.length?Math.min(...chosen.map(t=>Math.hypot(q.a.pos[0]-t.a.pos[0],q.a.pos[1]-t.a.pos[1]))):0;
+    const rank=q.rough-Math.min(3,spread/Math.max(w,h)*2);
+    if(rank<bestRank){bestRank=rank;bestIndex=i}
+   }chosen.push(remaining.splice(bestIndex,1)[0]);
+  }
+  for(const {a} of chosen){const[score,dx,dy]=estimate(a.pr,pr,Math.max(f,.4)),pos=[a.pos[0]+dx,a.pos[1]+dy];
+   if(score<=thr&&validPos(l,pos,w,h))matches.push({z,pos,score});
+  }
+ }return matches.sort((a,b)=>a.score-b.score)}
+// Compare actual incoming colour pixels with the existing mosaic at the
+// proposed coordinates. Sparse overlap and dark space cannot prove a match.
+function frameMapAgreement(frame,map,pos){const{width:w,height:h,data}=frame,stride=Math.max(2,Math.ceil(Math.sqrt(w*h/12000)));
+ let visible=0,count=0,close=0,sum=0;
+ for(let y=0;y<h;y+=stride)for(let x=0;x<w;x+=stride){const k=(y*w+x)*4,r=data[k],g=data[k+1],b=data[k+2];
+  if(!data[k+3]||Math.max(r,g,b)<=darkCut)continue;visible++;
+  const q=pixel(map,pos[0]+x,pos[1]+y);if(!q)continue;
+  const diff=(Math.abs(r-q[0])+Math.abs(g-q[1])+Math.abs(b-q[2]))/3;
+  count++;sum+=Math.min(diff,100);if(diff<=26)close++;
+ }
+ const fraction=count?close/count:0,mean=count?sum/count:Infinity,coverage=count/Math.max(1,visible);
+ const enough=count>=Math.max(36,Math.min(125,Math.ceil(w*h/(stride*stride)*.015)));
+ return{count,coverage,close:fraction,mean,ok:enough&&coverage>=.19&&fraction>=.58&&mean<=34};
+}
+function frameConflicts(frame,map,pos){const q=frameMapAgreement(frame,map,pos);
+ // Poor or black coverage is inconclusive, whereas widespread contradictory
+ // *observed* pixels are evidence of a false camera registration.
+ return q.count>=80&&q.coverage>=.25&&q.close<.55&&q.mean>30;
+}
+function verifySceneSequence(candidate,match,f,thr,w,h){const map=levels[match.z]?.map;if(!map)return false;
+ let pos=match.pos,prior=candidate.samples[0].pr,verified=0;
+ for(let i=0;i<candidate.samples.length;i++){
+  const sample=candidate.samples[i];if(i){const[score,dx,dy]=estimate(prior,sample.pr,f);pos=[pos[0]+dx,pos[1]+dy];
+   if(score>thr||!validPos(levels[match.z],pos,w,h))return false;
+  }
+  if(frameConflicts(sample.d,map,pos))return false;
+  if(frameMapAgreement(sample.d,map,pos).ok)verified++;
+  prior=sample.pr;
+ }
+ return verified>=Math.min(2,candidate.samples.length);
+}
+function findLevel(pr,f,thr,w,h,exclude=-1,perLevel=12,frame=null){const matches=findMatches(pr,f,thr,w,h,exclude,perLevel);
+ if(!frame)return matches[0]||null;
+ const unique=[],ranked=[];
+ for(const m of matches){if(unique.length>=72)break;
+  if(unique.some(a=>a.z===m.z&&Math.hypot(a.pos[0]-m.pos[0],a.pos[1]-m.pos[1])<9))continue;
+  unique.push(m);
+  const agreement=frameMapAgreement(frame,levels[m.z].map,m.pos);if(!agreement.ok)continue;
+  ranked.push({...m,agreement,rank:m.score+8*(1-agreement.close)+.09*agreement.mean});
+ }
+ ranked.sort((a,b)=>a.rank-b.rank);
+ if(ranked.length>1){const[a,b]=ranked;
+  // Repeated patterns with equally plausible RGB agreement are unresolved.
+  if(b.rank-a.rank<1.5&&(a.z!==b.z||Math.hypot(a.pos[0]-b.pos[0],a.pos[1]-b.pos[1])>12))return null;
+ }
+ return ranked[0]||null;
+}
+function mergeMaps(dst,src,dx,dy,tol){
+ for(const[key,a]of src.chunks){const[cx,cy]=key.split(',').map(Number),sx=cx*CH,sy=cy*CH;
+  for(let y=0;y<CH;y++)for(let x=0;x<CH;x++){const i=y*CH+x;if(!a.seen[i])continue;const X=sx+x+dx,Y=sy+y+dy;
+   const b=chunk(dst,X,Y,true),j=(Y&255)*CH+(X&255),u=i*3,k=j*3;
+   if(!b.seen[j]){b.seen[j]=1;b.rgb[k]=a.rgb[u];b.rgb[k+1]=a.rgb[u+1];b.rgb[k+2]=a.rgb[u+2];b.cnt[j]=a.cnt[i]}
+   else{const diff=Math.abs(b.rgb[k]-a.rgb[u])+Math.abs(b.rgb[k+1]-a.rgb[u+1])+Math.abs(b.rgb[k+2]-a.rgb[u+2]);
+    if(diff<=tol)b.cnt[j]=Math.min(8,b.cnt[j]+a.cnt[i]);else if(a.cnt[i]>b.cnt[j]){b.rgb[k]=a.rgb[u];b.rgb[k+1]=a.rgb[u+1];b.rgb[k+2]=a.rgb[u+2];b.cnt[j]=a.cnt[i]}}
+  }}
+ dst.b.x0=Math.min(dst.b.x0,src.b.x0+dx);dst.b.y0=Math.min(dst.b.y0,src.b.y0+dy);dst.b.x1=Math.max(dst.b.x1,src.b.x1+dx);dst.b.y1=Math.max(dst.b.y1,src.b.y1+dy);
+}
+function mergeLevels(from,to,dx,dy,tol,t){if(from===to)return to;const src=levels[from],dst=levels[to],a=src.map.b,b=dst.map.b;
+ const x0=Math.min(b.x0,a.x0+dx),y0=Math.min(b.y0,a.y0+dy),x1=Math.max(b.x1,a.x1+dx),y1=Math.max(b.y1,a.y1+dy);
+ if(x1-x0>8192||y1-y0>8192){zEvent(t,`Cannot merge ${src.name} with ${dst.name}: result exceeds 8192px; choose closer matching landmarks or use a larger external mosaic`);return from}
+ dst.map.W=dst.map.H=Math.max(dst.map.W,x1-x0,y1-y0);
+ mergeMaps(dst.map,src.map,dx,dy,tol);
+ // Preserve landmarks from both areas. Keeping only the first 36 anchors
+ // prevented merged maps from recognizing visits to their newly added wing.
+ const pool=dst.anchors.concat(src.anchors.map(a=>({...a,pos:[a.pos[0]+dx,a.pos[1]+dy]})));
+ if(pool.length<=40)dst.anchors=pool;
+ else{const chosen=[pool[0],pool[pool.length-1]],remaining=pool.slice(1,-1);
+  while(chosen.length<40&&remaining.length){let bestIndex=0,bestDistance=-1;
+   for(let i=0;i<remaining.length;i++){const a=remaining[i],distance=Math.min(...chosen.map(b=>(a.pos[0]-b.pos[0])**2+(a.pos[1]-b.pos[1])**2));
+    if(distance>bestDistance){bestDistance=distance;bestIndex=i}}
+   chosen.push(remaining.splice(bestIndex,1)[0]);
+  }dst.anchors=chosen;
+ }
+ for(const[id,s]of src.sources){const old=dst.sources.get(id);if(old){old.startSeconds=Math.min(old.startSeconds,s.startSeconds);old.endSeconds=Math.max(old.endSeconds,s.endSeconds);old.frames+=s.frames}else dst.sources.set(id,{...s})}
+ dst.frames+=src.frames;dst.first=Math.min(dst.first,src.first);dst.last=t;dst.lastSource=src.lastSource;dst.prev=src.prev;dst.pos=[src.pos[0]+dx,src.pos[1]+dy];dst.result=null;
+ zEvent(t,`Merged overlapping ${src.name} into ${dst.name} (offset ${dx},${dy})`);
+ levels.splice(from,1);const dest=to-(from<to?1:0);activeZ=selectedZ=dest;M=levels[dest].map;R=null;refreshZ();return dest
+}
+// A match between two similar-looking floor tiles is insufficient. Verify the
+// proposed offset against many independently observed, nontransparent pixels.
+function mapAgreement(src,dst,dx,dy){const a=src.b,b=dst.b,x0=Math.max(a.x0+dx,b.x0),y0=Math.max(a.y0+dy,b.y0),x1=Math.min(a.x1+dx,b.x1),y1=Math.min(a.y1+dy,b.y1);
+ if(x1<=x0||y1<=y0)return{count:0,close:0,mean:Infinity,ok:false};
+ const stride=Math.max(2,Math.ceil(Math.sqrt((x1-x0)*(y1-y0)/16000)));let count=0,close=0,sum=0;
+ for(let y=y0;y<y1;y+=stride)for(let x=x0;x<x1;x+=stride){const p=pixel(src,x-dx,y-dy),q=pixel(dst,x,y);if(!p||!q)continue;
+  const difference=(Math.abs(p[0]-q[0])+Math.abs(p[1]-q[1])+Math.abs(p[2]-q[2]))/3;sum+=Math.min(100,difference);count++;if(difference<=26)close++}
+ const mean=count?sum/count:Infinity;return{count,close:count?close/count:0,mean,ok:count>=130&&close/count>=.53&&mean<=34}}
+function resetMarks(){marks=[];marking=false;const button=$('applypoints');if(button)button.disabled=true;const note=$('markstatus');if(note)note.textContent='Select “Connect two matching landmarks,” then click the same identifiable point on two different map regions. Only merge genuinely identical places.'}
+function markText(){if(!marks.length)return'Click a recognizable landmark on the first region.';
+ if(marks.length===1)return`First point saved in ${levels[marks[0].z]?.name||'region'}. Switch to the other region, then click the SAME landmark.`;
+ const [a,b]=marks,dx=b.x-a.x,dy=b.y-a.y,quality=mapAgreement(levels[a.z].map,levels[b.z].map,dx,dy);
+ return `Proposed: ${levels[a.z].name} → ${levels[b.z].name} · offset (${dx}, ${dy}) px · ${quality.count} overlap samples · ${quality.close.toFixed(2)} close pixel fraction. Check positions before clicking Merge. This action cannot be undone.`}
+$('pickpoints').onclick=()=>{if(running)return;resetMarks();marking=true;$('markstatus').textContent=markText();grid()};
+$('resetpoints').onclick=()=>{resetMarks();grid()};
+$('deleteregion').onclick=()=>{if(running||selectedZ<0||!levels[selectedZ])return;const i=selectedZ,name=levels[i].name;
+ if(!window.confirm(`Discard ${name} permanently from this in-memory result? Export a ZIP backup first if you may need it.`))return;
+ levels.splice(i,1);if(activeZ===i)activeZ=-1;else if(activeZ>i)activeZ--;resetMarks();
+ if(levels.length)chooseZ(Math.min(i,levels.length-1));else{selectedZ=-1;M=R=null;for(const id of ['mc','gc','sc','rc']){$(id).width=$(id).height=0}refreshZ()}
+ log(`Discarded ${name}. Export the remaining regions when done.`)};
+mc.addEventListener('click',e=>{if(!marking||running||selectedZ<0||!M)return;
+ const rect=mc.getBoundingClientRect(),x=M.b.x0+Math.round((e.clientX-rect.left)*mc.width/rect.width),y=M.b.y0+Math.round((e.clientY-rect.top)*mc.height/rect.height);
+ if(!marks.length)marks=[{z:selectedZ,x,y}];else if(marks[0].z===selectedZ){marks=[{z:selectedZ,x,y}]}else marks=[marks[0],{z:selectedZ,x,y}];
+ $('applypoints').disabled=marks.length!==2;$('markstatus').textContent=markText();grid()});
+$('applypoints').onclick=()=>{if(running||marks.length!==2)return;const[a,b]=marks,src=levels[a.z],dst=levels[b.z];if(!src||!dst)return;
+ const dx=b.x-a.x,dy=b.y-a.y,quality=mapAgreement(src.map,dst.map,dx,dy);const to=b.z,from=a.z,was=levels.length;
+ if(!quality.ok&&!window.confirm(`The chosen landmarks are NOT independently verified by surrounding pixels. Only ${quality.count} overlapping samples were found; ${(100*quality.close).toFixed(0)}% agree. If the points differ, this will permanently corrupt the joined map in memory. Continue anyway?`))return;
+ const merged=mergeLevels(from,to,dx,dy,Number($('vt').value)||30,0);
+ if(levels.length<was){zEvent(0,`Manual landmark connection: ${src.name} → ${dst.name}; ${quality.count} observed overlap samples`);resetMarks();chooseZ(merged);log(`Connected ${src.name} to ${dst.name}. Review the mosaic for misplaced details.`)}
+ else log('Manual merge could not fit; check the scene landmark and position.');};
+// Conservative retrospective reconciliation, including within the SAME video.
+// Never merge based on a single repetitive tile: require map-pixel agreement.
+async function reconcileRegions(){if(running||levels.length<2){log('Load or process at least two map regions first');return}running=true;const button=$('reconcile');button.disabled=true;let merged=0,probed=0;
+ try{for(let pass=0;pass<3;pass++){let changed=false;
+  for(let from=levels.length-1;from>=0;from--){if(stop)break;const region=levels[from],anchors=region.anchors;if(!anchors.length)continue;
+   const candidates=[0,.25,.5,.75,1].map(k=>anchors[Math.floor((anchors.length-1)*k)]).filter((x,i,a)=>x&&a.indexOf(x)===i);
+   for(const a of candidates){const alternatives=findMatches(a.pr,.42,Math.min(11,Number($('thr').value)||14),a.pr.g4.w*4,a.pr.g4.h*4,from,8);probed++;
+    let verified=null;const examined=[];
+    for(const match of alternatives){if(examined.length>=24)break;
+     if(examined.some(q=>q.z===match.z&&Math.hypot(q.pos[0]-match.pos[0],q.pos[1]-match.pos[1])<9))continue;
+     examined.push(match);
+     const dx=match.pos[0]-a.pos[0],dy=match.pos[1]-a.pos[1],quality=mapAgreement(region.map,levels[match.z].map,dx,dy);
+     if(quality.ok){verified={...match,dx,dy,quality};break}
+    }
+    if(!verified)continue;
+    const destination=levels[verified.z].name,source=region.name,was=levels.length;
+    mergeLevels(from,verified.z,verified.dx,verified.dy,Number($('vt').value)||30,0);
+    if(levels.length<was){merged++;changed=true;zEvent(0,`Verified overlap: ${source} joined ${destination}; ${verified.quality.count} samples, avg difference ${verified.quality.mean.toFixed(1)}`);break}
+   }
+   if(probed%3===0){log(`Reviewing ${probed} region landmarks · ${merged} safe joins found`);await tick()}
+  }
+  if(!changed||stop)break;
+ }}finally{running=false;button.disabled=false;stop=false;if(levels.length)chooseZ(Math.max(0,selectedZ));log(`Overlap review complete: ${merged} verified joins, ${probed} reference views tested. Remaining regions are unresolved, not confirmed floors.`)}}
+$('reconcile').onclick=reconcileRegions;
+function grid(){if(!M)return;const w=mc.width,h=mc.height,T=+$('ts').value,ox=+$('gx').value,oy=+$('gy').value;gc.width=w;gc.height=h;
+ const g=gc.getContext('2d');g.clearRect(0,0,w,h);if($('showgrid').checked&&T>=4&&(w/T)*(h/T)<=2e5){g.strokeStyle='rgba(255,70,90,.65)';g.lineWidth=1;g.beginPath();
+ for(let x=((ox%T)+T)%T;x<=w;x+=T){g.moveTo(Math.round(x)+.5,0);g.lineTo(Math.round(x)+.5,h)}
+ for(let y=((oy%T)+T)%T;y<=h;y+=T){g.moveTo(0,Math.round(y)+.5);g.lineTo(w,Math.round(y)+.5,h)}g.stroke()}
+ for(const mark of marks){if(mark.z!==selectedZ)continue;const x=mark.x-M.b.x0,y=mark.y-M.b.y0;g.strokeStyle='#ffe26b';g.lineWidth=3;g.beginPath();g.moveTo(x-14,y);g.lineTo(x+14,y);g.moveTo(x,y-14);g.lineTo(x,y+14);g.stroke()}}
+$('gridbtn').onclick=grid;['ts','gx','gy'].forEach(i=>$(i).onchange=grid);
+$('showgrid').onchange=grid;
+
+// Recover camera movement missed by a large sampling interval. Probe a short
+// span at finer times, validate the ENTIRE path, and paint only on success.
+async function bridgeMotion(region,endFrame,endPr,endTime,source,f,thr,vt,minDetail){
+ if(region.lastSource!==currentSourceIndex)return 0;
+ const begin=region.last,elapsed=endTime-begin;if(elapsed<=.06||elapsed>1.25)return 0;
+ for(const pieces of [2,4,8]){if(elapsed/pieces<.035)break;
+  let prev=region.prev,pos=region.pos.slice(),path=[],valid=true;
+  for(let j=1;j<=pieces;j++){
+   if(stop)return 0;
+   const t=j===pieces?endTime:begin+j*elapsed/pieces;
+   if(j!==pieces)await seek(t);
+   const d=j===pieces?endFrame:grab(source,endFrame.width,endFrame.height);
+   if(frameQuality(d)<minDetail){valid=false;break}
+   const pr=j===pieces?endPr:prep(d),[score,dx,dy]=estimate(prev,pr,f);
+   pos=[pos[0]+dx,pos[1]+dy];if(score>thr||!validPos(region,pos,d.width,d.height)||frameConflicts(d,region.map,pos)){valid=false;break}
+   path.push({d,pr,pos:pos.slice(),t});prev=pr;
+  }
+  if(valid){for(const frame of path)accept(region,frame.d,frame.pr,frame.pos,frame.t,vt);return path.length}
+ }
+ return 0;
+}
+$('stop').onclick=()=>stop=true;
+$('run').onclick=async()=>{
+ if(running)return;
+ if(!queue.length||!v.videoWidth){log('Add at least one playable local video first.');return}
+ saveTrim();running=true;stop=false;R=null;v.pause();$('run').disabled=true;$('file').disabled=true;$('sourceSelect').disabled=true;$('clearfiles').disabled=true;
+ const stats={used:0,rej:0,dark:0,stat:0,n:0,completed:0,failed:[]};let message='',lastPreview=0;
+ try{
+  const c=crop(),W=Math.floor(num('ms',64,8192)),step=num('step',.03,60),f=num('mx',2,80)/100,thr=num('thr',0,40),vt=num('vt',0,765),scene=num('scene',0,40),confirm=Math.floor(num('confirm',2,10)),maxz=Math.floor(num('maxz',1,100)),minDetail=num('detail',0,70)/100;
+  darkCut=num('dark',0,60);
+  if(scene<=thr)throw Error('Scene-cut threshold must be greater than the accepted motion mismatch threshold');
+ if(c.w<64||c.h<64||c.x<0||c.y<0||!reference||c.x+c.w>reference.vw||c.y+c.h>reference.vh)throw Error('Reference crop must fit inside the preview video and be at least 64×64');
+  if(c.w>W||c.h>W)throw Error('Mosaic size must be larger than the crop');
+  resetMaps();
+  for(let fileIndex=0;fileIndex<queue.length&&!stop;fileIndex++){
+   const entry=queue[fileIndex];currentSourceIndex=fileIndex;currentSourceName=entry.file.name;let pending=null;
+   try{
+    await loadSource(entry);if(stop)break;v.pause();
+    const source=sourceCrop(c);if(source.x<0||source.y<0||source.x+source.w>v.videoWidth||source.y+source.h>v.videoHeight)throw Error('Scaled crop falls outside video');
+    const start=clamp(entry.start,0,v.duration),end=Math.min(v.duration,entry.end==null?v.duration:entry.end);
+    if(end<=start)throw Error('End time must be greater than start time');
+    if(Math.ceil((end-start)/step)>50000)throw Error('More than 50,000 samples in one video; increase interval');
+    activeZ=-1;zEvent(start,`Processing file ${fileIndex+1}/${queue.length}`);
+    const acceptScene=(candidate)=>{
+      const first=candidate.samples[0];let match=findLevel(first.pr,f,thr,c.w,c.h,-1,12,first.d);let destination,base;
+      if(match&&!verifySceneSequence(candidate,match,f,thr,c.w,c.h)){zEvent(candidate.t,'Rejected an inconsistent scene return; kept as a separate provisional region');match=null}
+      if(match){activeZ=match.z;destination=levels[match.z];base=match.pos;zEvent(candidate.t,`Verified return to ${destination.name} (${match.agreement.count} overlapping pixels; ${(100*match.agreement.close).toFixed(0)}% agree)`)}
+      else if(levels.length<maxz){destination=newLevel(W,c,candidate.t);base=destination.pos.slice()}
+      else{zEvent(candidate.t,`Region limit (${maxz}) reached. This is a capacity limit, NOT evidence of another floor.`);stats.rej+=candidate.samples.length;return}
+      accept(destination,first.d,first.pr,base,first.t,vt);stats.used++;
+      let pos=base,previous=first.pr;
+      for(const sample of candidate.samples.slice(1)){
+       const[score,dx,dy]=estimate(previous,sample.pr,f),np=[pos[0]+dx,pos[1]+dy];
+       if(score<=thr&&validPos(destination,np,c.w,c.h)){accept(destination,sample.d,sample.pr,np,sample.t,vt);stats.used++;pos=np;previous=sample.pr}else stats.rej++
+      }
+      selectedZ=activeZ;M=destination.map;R=null;
+    };
+    const freshPending=(pr,d,t)=>({pr,d,t,count:1,lastPr:pr,samples:[{pr,d,t}]});
+    const appendPending=(p,pr,d,t)=>{const motion=estimate(p.lastPr,pr,f);if(motion[0]>thr)return false;p.count++;p.lastPr=pr;p.samples.push({pr,d,t});return true};
+    for(let k=0,t=start;t<=end+1e-7&&!stop;k++,t=start+k*step){
+     await seek(t);if(stop)break;const d=grab(source,c.w,c.h);stats.n++;
+     if(frameQuality(d)<minDetail){stats.dark++;pending=null;
+      if(stats.n%8===0){$('progress').value=100*(fileIndex+(t-start)/(end-start))/queue.length;log(`Video ${fileIndex+1}/${queue.length}: ${entry.file.name} · ${t.toFixed(1)}/${end.toFixed(1)}s\nDark/empty frames skipped: ${stats.dark}. If nearly all frames are skipped, reduce Minimum visible scene (%).`);await tick()}
+      continue}
+     const pr=prep(d);
+     if(activeZ<0&&levels.length===0){const l=newLevel(W,c,t);accept(l,d,pr,l.pos,t,vt);stats.used++}
+     else if(activeZ<0){
+      if(!pending)pending=freshPending(pr,d,t);
+      else if(appendPending(pending,pr,d,t)){if(pending.count>=confirm){acceptScene(pending);pending=null}}
+      else{stats.rej+=pending.count;pending=freshPending(pr,d,t)}
+     }else{
+      const current=levels[activeZ],motion=estimate(current.prev,pr,f),[cs,dx,dy]=motion,np=[current.pos[0]+dx,current.pos[1]+dy];
+      const bridged=cs>thr?await bridgeMotion(current,d,pr,t,source,f,thr,vt,minDetail):0;
+      if(bridged){if(pending){stats.rej+=pending.count;pending=null}stats.used+=bridged;stats.bridged=(stats.bridged||0)+bridged}
+      else if(cs<=thr&&!frameConflicts(d,current.map,np)){
+       if(pending){stats.rej+=pending.count;pending=null}
+       if(!validPos(current,np,c.w,c.h))throw Error(`Mosaic boundary reached in ${current.name}; increase mosaic size`);
+       accept(current,d,pr,np,t,vt);stats.used++;if(dx===0&&dy===0)stats.stat++;
+      }else if(cs<=scene&&!frameConflicts(d,current.map,np)){stats.rej++;pending=null}
+      else if(!pending)pending=freshPending(pr,d,t);
+      else if(appendPending(pending,pr,d,t)){if(pending.count>=confirm){acceptScene(pending);pending=null}}
+      else{stats.rej+=pending.count;pending=freshPending(pr,d,t)}
+     }
+     // Cross-video AND same-video reconnection, only for a frame actually mapped
+     // to the current region. Verify spatial agreement before joining groups.
+     if($('autojoin').checked&&activeZ>=0&&levels.length>1&&levels[activeZ].prev===pr){const own=levels[activeZ];if(stats.n%96===0||own.mergeCheck&&stats.n%12===0){
+      const match=findLevel(pr,f,Math.min(thr,10),c.w,c.h,activeZ,4);
+      if(match){const dx=match.pos[0]-own.pos[0],dy=match.pos[1]-own.pos[1],old=own.mergeCheck;
+       const quality=mapAgreement(own.map,levels[match.z].map,dx,dy);
+       if(quality.ok&&old&&old.z===match.z&&Math.abs(old.dx-dx)<=5&&Math.abs(old.dy-dy)<=5){mergeLevels(activeZ,match.z,dx,dy,vt,t);stats.autoMerges=(stats.autoMerges||0)+1}
+       else own.mergeCheck=quality.ok?{z:match.z,dx,dy}:null;
+      }else own.mergeCheck=null;
+     }}
+     if(stats.n%4===0){if(activeZ>=0){selectedZ=activeZ;M=levels[activeZ].map;if(stats.n%16===0&&Date.now()-lastPreview>1100){showM();lastPreview=Date.now()}}refreshZ();$('progress').value=100*(fileIndex+(t-start)/(end-start))/queue.length;log(`Video ${fileIndex+1}/${queue.length}: ${entry.file.name} · ${t.toFixed(1)}/${end.toFixed(1)}s · ${levels.length} provisional regions\nAccepted ${stats.used} · motion-recovery frames ${stats.bridged||0} · safely joined ${stats.autoMerges||0} · skipped ${stats.rej} mismatches · ${stats.dark} dark/empty frames${pending?' · verifying scene cut':''}`);await tick()}
+    }
+    if(pending)stats.rej+=pending.count;
+    if(!stop){stats.completed++;zEvent(end,'Finished video')}
+   }catch(e){stats.failed.push(`${entry.file.name}: ${e.message||e}`);zEvent(0,`Skipped: ${e.message||e}`)}
+  }
+  if(!stop)$('progress').value=100;
+  message=stop?'Stopped':`Processed ${stats.completed}/${queue.length} videos`;
+ }catch(e){message=`Error: ${e.message||e}`}
+ finally{running=false;$('run').disabled=$('file').disabled=$('sourceSelect').disabled=$('clearfiles').disabled=false;
+  lastStats={...stats,settings:Object.fromEntries(['step','ms','mx','thr','scene','vt','dark','detail','confirm','maxz'].map(id=>[id,$(id).value]))};
+  if(levels.length)try{chooseZ(activeZ>=0?activeZ:Math.max(0,selectedZ))}catch(e){message+=` · preview error: ${e.message}`}
+  if(queue[previewIndex])try{await loadSource(queue[previewIndex]);drawPrev()}catch(e){message+=` · preview reload failed: ${e.message}`}
+  refreshFiles();log(`${message}. ${levels.length} unresolved/matched map region(s), ${stats.used} accepted frames, ${stats.bridged||0} recovered motion frames, ${stats.autoMerges||0} verified joins, ${stats.rej} mismatches and ${stats.dark} dark/empty frames skipped.${stats.failed.length?'\nFailed clips:\n'+stats.failed.join('\n'):''}`)
+ }
+ if(!stop&&levels.length>1&&$('autoreconcile').checked)await reconcileRegions();
+};
+
+// ---- grid auto-detect (edge-profile autocorrelation) ----
+function acorr(p,l){const L=p.length;let m=0,q=0,s=0;for(const x of p)m+=x;m/=L;for(let i=0;i<L;i++)q+=(p[i]-m)**2;for(let i=0;i<L-l;i++)s+=(p[i]-m)*(p[i+l]-m);return q?s/q*L/(L-l):0}
+$('det').onclick=()=>{if(!M||M.b.x1<=M.b.x0)return;const{x0,y0,x1,y1}=M.b,w=x1-x0,h=y1-y0,px=new Float32Array(w),py=new Float32Array(h);
+ for(let y=0;y<h-1;y++)for(let x=0;x<w-1;x++){const p=pixel(M,x+x0,y+y0),right=pixel(M,x+x0+1,y+y0),down=pixel(M,x+x0,y+y0+1);if(!p||!right||!down)continue;
+  px[x]+=Math.abs(p[0]-right[0])+Math.abs(p[1]-right[1])+Math.abs(p[2]-right[2]);
+  py[y]+=Math.abs(p[0]-down[0])+Math.abs(p[1]-down[1])+Math.abs(p[2]-down[2])}
+ const mxl=Math.min(200,Math.min(w,h)>>1),sc=[];let best=0;if(mxl<8){$('log2').textContent='Mosaic is too small to detect a grid';return}
+ for(let l=6;l<=mxl;l++){sc[l]=acorr(px,l)+acorr(py,l);best=Math.max(best,sc[l])}
+ if(best<.05){$('log2').textContent='Grid could not be detected: too little repeated geometry. Set tile size and offset manually.';return}
+ let L=6;for(let l=7;l<mxl;l++)if(sc[l]>=.75*best&&sc[l]>=sc[l-1]&&sc[l]>=sc[l+1]){L=l;break}
+ const a=sc[L-1]||0,b=sc[L]||0,c=sc[L+1]||0,den=a-2*b+c,T=clamp(L+(Math.abs(den)>1e-8?.5*(a-c)/den:0),4,200);
+ const fold=(p)=>{const nb=Math.round(T),f=new Float32Array(nb);for(let i=0;i<p.length;i++)f[Math.floor((i%T)/T*nb)]+=p[i];let bi=0;for(let i=1;i<nb;i++)if(f[i]>f[bi])bi=i;return(bi+1)*T/nb%T};
+ $('ts').value=T.toFixed(2);$('gx').value=fold(px).toFixed(1);$('gy').value=fold(py).toFixed(1);$('showgrid').checked=true;grid();
+ $('log2').textContent=`Detected tile ≈ ${T.toFixed(2)}px. Check the overlay and adjust if lines are off.`};
+
+// ---- slice + dedupe ----
+$('slice').onclick=()=>sliceLevels(false);
+$('sliceall').onclick=()=>sliceLevels(true);
+async function sliceLevels(all){if(running){$('log2').textContent='Finish stitching before slicing';return}if(!M||M.b.x1<=M.b.x0){$('log2').textContent='Stitch a video first';return}
+ let Ts,ox,oy,N,q,tol,minc;try{Ts=num('ts',4,1024);ox=num('gx',-8192,8192);oy=num('gy',-8192,8192);N=Math.floor(num('nat',1,128));q=Math.floor(num('q',0,7));tol=num('tol',0,255);minc=num('minc',0,100)/100}catch(e){$('log2').textContent=e.message;return}
+ $('slice').disabled=$('sliceall').disabled=true;
+ try{const list=all?levels.map((_,i)=>i):[selectedZ];for(const z of list){await sliceOne(z,Ts,ox,oy,N,q,tol,minc)}chooseZ(selectedZ);$('log2').textContent=all?`Sliced ${list.length} Z levels; download map.json to export all layers.`:$('log2').textContent}
+ catch(e){$('log2').textContent=`Slicing error: ${e.message||e}`}
+ finally{$('slice').disabled=$('sliceall').disabled=false}
+}
+async function sliceOne(z,Ts,ox,oy,N,q,tol,minc){const m=levels[z].map,{x0,y0,x1,y1}=m.b;
+ // Normalize phase so the first sliced cell begins inside the visible mosaic.
+ ox=((ox%Ts)+Ts)%Ts;oy=((oy%Ts)+Ts)%Ts;
+ const cols=Math.floor((x1-x0-ox)/Ts),rows=Math.floor((y1-y0-oy)/Ts);if(cols<1||rows<1)throw Error(`${levels[z].name}: grid produces no complete tiles`);
+ if(cols*rows>100000||cols*N>16384||rows*N>16384)throw Error(`${levels[z].name}: output exceeds browser canvas limits`);
+ const uniq=[null],umasks=[null],avg=[null],cnt=[0],km=new Map(),gridM=[],len=N*N*3;
+ for(let r=0;r<rows;r++){const row=[];
+  for(let c=0;c<cols;c++){const t=new Uint8Array(len),mask=new Uint8Array(N*N);let sn=0,a0=0,a1=0,a2=0,k=0;
+   for(let ty=0;ty<N;ty++){const sy=clamp(y0+Math.floor(oy+r*Ts+(ty+.5)*Ts/N),0,m.H-1);
+    for(let tx=0;tx<N;tx++){const sx=clamp(x0+Math.floor(ox+c*Ts+(tx+.5)*Ts/N),0,m.W-1),p=pixel(m,sx,sy);if(p){sn++;mask[k/3]=255;t[k]=p[0];t[k+1]=p[1];t[k+2]=p[2];a0+=p[0];a1+=p[1];a2+=p[2]}k+=3}}
+   if(!sn||sn<minc*N*N){row.push(0);cnt[0]++;continue}
+   a0/=sn;a1/=sn;a2/=sn;let h=2166136261;for(let i=0;i<len;i++)h=Math.imul(h^(mask[(i/3)|0]?(t[i]>>q):256),16777619);
+   let id=km.get(h);
+   // Hash collisions and quantization are only candidate matches, not proof.
+   if(id!==undefined){const U=uniq[id],V=umasks[id];for(let z=0;z<len;z++){const p=(z/3)|0;if(V[p]!==mask[p]||(mask[p]&&(U[z]>>q)!==(t[z]>>q))){id=undefined;break}}}
+   if(id===undefined){
+    for(let u=1;u<uniq.length&&id===undefined;u++){const A=avg[u];if((Math.abs(A[0]-a0)+Math.abs(A[1]-a1)+Math.abs(A[2]-a2))/3>tol)continue;
+     const U=uniq[u],V=umasks[u];let s=0,pairs=0,union=0;for(let i=0;i<N*N;i++){if(mask[i]||V[i])union++;if(!mask[i]||!V[i])continue;pairs++;const k=i*3;s+=Math.abs(U[k]-t[k])+Math.abs(U[k+1]-t[k+1])+Math.abs(U[k+2]-t[k+2]);if(s>tol*3*sn)break}
+     if(pairs>=Math.max(1,union*.85)&&s<=tol*3*pairs)id=u}
+    if(id===undefined){id=uniq.length;uniq.push(t);umasks.push(mask);avg.push([a0,a1,a2]);cnt[id]=0}
+    km.set(h,id)}
+   cnt[id]++;row.push(id)}
+  gridM.push(row);if(r%4===0){$('log2').textContent=`${levels[z].name}: row ${r+1}/${rows}, ${uniq.length-1} unique tiles`;await tick()}}
+ const U=uniq.length,sc=document.createElement('canvas'),sw=Math.ceil(Math.sqrt(U));if(sw*N>16384||Math.ceil(U/sw)*N>16384)throw Error('Tileset exceeds canvas size; increase deduplication tolerance');sc.width=sw*N;sc.height=Math.ceil(U/sw)*N;const sx=sc.getContext('2d');
+ for(let u=1;u<U;u++){const id=new ImageData(N,N);for(let p=0;p<N*N;p++){id.data[p*4]=uniq[u][p*3];id.data[p*4+1]=uniq[u][p*3+1];id.data[p*4+2]=uniq[u][p*3+2];id.data[p*4+3]=umasks[u][p]}
+  sx.putImageData(id,(u%sw)*N,Math.floor(u/sw)*N)}
+ const rc=document.createElement('canvas');rc.width=cols*N;rc.height=rows*N;const rx=rc.getContext('2d');
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const u=gridM[r][c];if(u)rx.drawImage(sc,(u%sw)*N,Math.floor(u/sw)*N,N,N,c*N,r*N,N,N)}
+ levels[z].result={grid:gridM,N,cols,rows,sw,U,cnt,sc,rc};if(z===selectedZ)R=levels[z].result;
+ $('log2').textContent=`${cols}×${rows} cells → ${U-1} unique tiles (${cnt[0]} empty cells). Raise near-match tolerance to merge more; lower it to split more.`;
+}
+function showR(){const sc=$('sc'),rc=$('rc');if(!R){sc.width=rc.width=0;sc.height=rc.height=0;return}for(const [target,source] of [[sc,R.sc],[rc,R.rc]]){target.width=source.width;target.height=source.height;target.getContext('2d').drawImage(source,0,0)}}
+$('rc').onmousemove=e=>{if(!R)return;const b=e.target.getBoundingClientRect(),c=Math.floor((e.clientX-b.left)/b.width*R.cols),r=Math.floor((e.clientY-b.top)/b.height*R.rows);
+ if(R.grid[r]&&R.grid[r][c]!==undefined){const u=R.grid[r][c];$('hov').textContent=`cell (${c}, ${r})  tile ${u}  used ${R.cnt[u]}×`}};
+const dl=(n,b)=>{if(!b){log('Export failed: browser could not generate the file');return}const url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=n;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)};
+$('diagnostics').onclick=()=>{const report={app:'Video to Tilemap Studio',created:new Date().toISOString(),sources:importedSources.length?importedSources:queue.map(x=>({file:x.file.name,durationSeconds:x.duration})),stats:lastStats,layers:levels.map((l,i)=>({region:i+1,name:l.name,frames:l.frames,mappedChunks:l.map.chunks.size,bounds:l.map.b,sources:[...l.sources.values()]})),transitions:$('events').textContent};dl('stitch_diagnostics.json',new Blob([JSON.stringify(report,null,2)],{type:'application/json'}))};
+const png=canvas=>new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+const allZData=()=>({format:'video-to-tilemap-multi-source',version:6,reconstructionStatus:'Observed pixels only; registration and floor assignments require review',viewport:reference?{...crop(),referenceWidth:reference.vw,referenceHeight:reference.vh}:null,note:'Numbered images are provisional stitched regions, NOT authoritative BYOND Z coordinates. Merge only proven overlapping views; use scene transitions and game knowledge to assign real floors.',automaticJoining:$('autojoin').checked,automaticReconciliation:$('autoreconcile').checked,sources:importedSources.length?importedSources:queue.map((e,i)=>({sourceId:i,file:e.file.name,startSeconds:e.start,endSeconds:e.end??e.duration,durationSeconds:e.duration})),levels:levels.map((l,i)=>({z:i+1,name:l.name,floorVerified:false,acceptedFrames:l.frames,sources:[...l.sources].map(([sourceId,s])=>({sourceId,...s})),mosaicBounds:l.map.b,...(l.result?{tileSize:l.result.N,columns:l.result.cols,rows:l.result.rows,tileCount:l.result.U-1,tilesetColumns:l.result.sw,emptyId:0,tiles:l.result.grid}:{tiles:null,needsSlicing:true})}))});
+// Self-contained, uncompressed ZIP (UTF-8 names, CRC-32), no third-party dependencies.
+const zipCRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let i=0;i<8;i++)c=c&1?(c>>>1)^0xedb88320:c>>>1;t[n]=c>>>0}return bytes=>{let c=0xffffffff;for(const b of bytes)c=t[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}})();
+function zipU16(n){return [n&255,(n>>>8)&255]}
+function zipU32(n){return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}
+function makeZip(files){let offset=0;const chunks=[],directory=[];for(const file of files){const name=new TextEncoder().encode(file.name),data=file.data,crc=zipCRC(data),size=data.length;
+  const local=new Uint8Array([80,75,3,4,20,0,0,8,0,0,0,0,0,0,...zipU32(crc),...zipU32(size),...zipU32(size),...zipU16(name.length),0,0]);
+  chunks.push(local,name,data);const central=new Uint8Array([80,75,1,2,20,0,20,0,0,8,0,0,0,0,0,0,...zipU32(crc),...zipU32(size),...zipU32(size),...zipU16(name.length),0,0,0,0,0,0,0,0,0,0,0,0,...zipU32(offset)]);
+  directory.push(central,name);offset+=local.length+name.length+size}
+ const centralSize=directory.reduce((s,c)=>s+c.length,0),end=new Uint8Array([80,75,5,6,0,0,0,0,...zipU16(files.length),...zipU16(files.length),...zipU32(centralSize),...zipU32(offset),0,0]);return new Blob([...chunks,...directory,end],{type:'application/zip'})}
+$('dm').onclick=()=>M&&M.b.x1>M.b.x0&&rawMapCanvas(M).toBlob(b=>dl(`master_map_z${selectedZ+1}.png`,b));
+$('dmb').onclick=()=>M&&mc.toBlob(b=>dl(`bright_preview_z${selectedZ+1}.png`,b));
+$('allmasters').onclick=async()=>{if(running){log('Stop stitching before exporting');return}if(!levels.length)return;const button=$('allmasters'),original=selectedZ,files=[];button.disabled=true;
+ try{files.push({name:'map_all_z.json',data:new TextEncoder().encode(JSON.stringify(allZData(),null,2))});
+ for(let i=0;i<levels.length;i++){chooseZ(i);await tick();const b=await png(rawMapCanvas(levels[i].map));if(!b)throw Error(`PNG generation failed for Z ${i+1}`);files.push({name:`master_map_z${i+1}.png`,data:new Uint8Array(await b.arrayBuffer())});
+  const preview=await png(mc);if(preview)files.push({name:`bright_preview_z${i+1}.png`,data:new Uint8Array(await preview.arrayBuffer())});
+  const r=levels[i].result;if(r){for(const[k,can]of[['tileset',r.sc],['reconstructed',r.rc]]){const img=await png(can);if(!img)throw Error(`Cannot export ${k} for Z ${i+1}`);files.push({name:`${k}_z${i+1}.png`,data:new Uint8Array(await img.arrayBuffer())})}files.push({name:`map_z${i+1}.csv`,data:new TextEncoder().encode(r.grid.map(row=>row.join(',')).join('\n'))})}
+ }dl('all_z_layers.zip',makeZip(files));log(`Exported ${levels.length} map regions (${files.length} files in ZIP). Real game Z levels must still be verified.`)
+ }catch(e){log(`ZIP export failed: ${e.message||e}`)}finally{if(original>=0)chooseZ(original);button.disabled=false}};
+$('d1').onclick=()=>R&&$('sc').toBlob(b=>dl(`tileset_z${selectedZ+1}.png`,b));
+$('d4').onclick=()=>R&&$('rc').toBlob(b=>dl(`reconstructed_z${selectedZ+1}.png`,b));
+$('d2').onclick=()=>{if(!levels.length)return;dl('map_all_z.json',new Blob([JSON.stringify(allZData(),null,2)],{type:'application/json'}))};
+$('d3').onclick=()=>R&&dl(`map_z${selectedZ+1}.csv`,new Blob([R.grid.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+</script></body></html>
