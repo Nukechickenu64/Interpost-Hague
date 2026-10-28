@@ -86,11 +86,11 @@ What is the naming convention for planes or layers?
 	//TURF PLANE
 	//TURF_LAYER = 2
 	#define TURF_DETAIL_LAYER           2.01
+	#define AO_LAYER                    2.015
 	#define TURF_SHADOW_LAYER           2.02
 	//ABOVE TURF
 	#define DECAL_LAYER                 2.03
 	#define RUNE_LAYER                  2.04
-	#define AO_LAYER                    2.045
 	#define ABOVE_TILE_LAYER            2.05
 	#define EXPOSED_PIPE_LAYER          2.06
 	#define EXPOSED_WIRE_LAYER          2.07
@@ -162,7 +162,8 @@ What is the naming convention for planes or layers?
 
 #define LIGHTING_PLANE           3 // For Lighting. - The highest plane (ignoring all other even higher planes)
   #define LIGHTBULB_LAYER          1
-  #define LIGHTING_LAYER           2
+  // Lightmap samples must sort by layer, not SIDE_MAP world position.
+  #define LIGHTING_LAYER           (TOPDOWN_LAYER + 2)
 
 #define ABOVE_LIGHTING_PLANE     4 // laser beams, etc. that shouldn't be affected by darkness
   #define ABOVE_LIGHTING_LAYER     1
@@ -201,6 +202,9 @@ What is the naming convention for planes or layers?
   #define HUD_ABOVE_ITEM_LAYER     4
   #define HUD_ABOVE_HUD_LAYER      5
 
+// Hidden source only; the additive display remains below beams and LOS.
+#define LIGHTING_VEIL_SOURCE_PLANE 13
+
 /atom
 	plane = DEFAULT_PLANE
 
@@ -235,12 +239,15 @@ What is the naming convention for planes or layers?
 #define EMISSIVE_BLOOM_SIZE      4
 #define EMISSIVE_BLOOM_OFFSET    2
 #define EMISSIVE_BLOOM_ALPHA     200
-#define LIGHTING_BLOOM_THRESHOLD "#e0e0e0"
-#define LIGHTING_BLOOM_SIZE      1
+#define LIGHTING_BLOOM_THRESHOLD "#808080"
+#define LIGHTING_BLOOM_SIZE      4
 #define LIGHTING_BLOOM_OFFSET    0
 #define LIGHTING_BLOOM_ALPHA     110
+#define LIGHTING_VEIL_STRENGTH   0.2
+#define LIGHTING_VEIL_BLUR        8
 
-// Lighting overlays are BLEND_MULTIPLY; they need the white backdrop inside the plane to multiply against.
+// Tile samples and their boundary padding form the lightmap; multiply it with
+// the world once. The white backdrop preserves areas without dynamic lighting.
 /obj/screen/plane_master/lighting
 	name = "lighting plane master"
 	plane = LIGHTING_PLANE
@@ -250,11 +257,16 @@ What is the naming convention for planes or layers?
 
 /obj/screen/plane_master/lighting/New()
 	. = ..()
+	// Soften the boundaries of uniform tile samples, then bloom bright tiles.
+	add_filter("light_softness", 1, list("type" = "blur", size = 2))
 	add_filter("bloom", 4, list("type" = "bloom", threshold = LIGHTING_BLOOM_THRESHOLD, size = LIGHTING_BLOOM_SIZE, offset = LIGHTING_BLOOM_OFFSET, alpha = LIGHTING_BLOOM_ALPHA))
 
 /obj/screen/plane_master/emissive
 	name = "emissive plane master"
 	plane = EMISSIVE_PLANE
+	// Emission adds light over the shaded world. Adding individual lens images
+	// inside an otherwise normal-blended plane still replaces the scene below.
+	blend_mode = BLEND_ADD
 
 /obj/screen/plane_master/emissive/New()
 	. = ..()
@@ -268,6 +280,27 @@ What is the naming convention for planes or layers?
 	blend_mode = BLEND_OVERLAY
 	mouse_opacity = 0
 	screen_loc = "CENTER"
+
+/obj/screen/plane_master/lighting_veil
+	name = "tile lighting glow source"
+	plane = LIGHTING_VEIL_SOURCE_PLANE
+	render_target = "*lighting_veil"
+	mouse_opacity = 0
+
+/obj/screen/plane_master/lighting_veil/New()
+	. = ..()
+	add_filter("tile_glow", 1, list("type" = "blur", size = LIGHTING_VEIL_BLUR))
+
+/obj/screen/lighting_veil_display
+	name = ""
+	// A plane render target starts at the screen's lower-left extent, including
+	// HUD borders; anchoring at CENTER shifts the light field by half a viewport.
+	screen_loc = "SCREEN_SOUTHWEST"
+	plane = ABOVE_LIGHTING_PLANE
+	layer = 0
+	render_source = "*lighting_veil"
+	blend_mode = BLEND_ADD
+	mouse_opacity = 0
 
 /obj/screen/lighting_backdrop/New()
 	. = ..()
@@ -351,10 +384,15 @@ var/global/icon/solid_white_icon
 /obj/screen/plane_master/shadowcasting
 	name = "shadowcasting plane master"
 	plane = SHADOWCASTING_PLANE
+	mouse_opacity = 0
 	render_target = "all3"
 
 /obj/screen/plane_master/shadowcasting/New()
 	. = ..()
+	// Registered reference frames measure a 7.65-8.19 source-pixel 10-90%
+	// transition. Size 3 measures 7.77 in the native fixture. Mask walls after
+	// feathering so visible wall faces and their mounted fixtures stay crisp.
+	add_filter("shadow_edge", 1, list("type" = "blur", size = 3))
 	// Keep in-view walls and wall-mounted objects crisp and unshadowed.
 	// Only under enhanced LOS: with it off, plane 7 is empty and an empty render_source can blank this whole plane.
 	if(enhanced_los_enabled)

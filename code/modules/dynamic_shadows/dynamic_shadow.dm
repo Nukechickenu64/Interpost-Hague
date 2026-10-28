@@ -25,6 +25,8 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	casts_dynamic_shadow = FALSE
 /obj/machinery/light
 	casts_dynamic_shadow = FALSE
+/obj/machinery/floor_light
+	casts_dynamic_shadow = FALSE
 /obj/machinery/camera
 	casts_dynamic_shadow = FALSE
 /obj/machinery/atmospherics
@@ -86,20 +88,26 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	var/turf/T = loc
 	var/ox = T.x + pixel_x / world.icon_size
 	var/oy = T.y + pixel_y / world.icon_size
-	// Strongest lights first; each entry is list(weight, dx, dy, dist)
+	// Rank the light actually reaching this tile, including cones, color and
+	// occlusion. Range alone used to cast shadows from lamps aimed elsewhere.
+	// Each entry is list(weight, dx, dy, dist, source).
 	var/list/casts = list()
 	for(var/datum/light_source/L as anything in T.affecting_lights)
 		if(L.destroyed || !L.applied || L.top_atom == src)
 			continue
-		var/turf/LT = L.pixel_turf || L.source_turf
+		var/turf/LT = L.source_turf
 		if(!LT || LT.z != T.z)
 			continue
-		var/dx = ox - LT.x
-		var/dy = oy - LT.y
+		var/list/light_center = L.dynamic_shadow_center()
+		var/dx = ox - light_center[1]
+		var/dy = oy - light_center[2]
 		var/dist = sqrt(dx * dx + dy * dy)
 		if(dist < 0.3)
 			continue
-		var/weight = L.light_power * max(0, 1 - dist / max(L.light_range, 1))
+		var/weight = 0
+		for(var/datum/lighting_corner/C in T.corners)
+			weight += max(0, L.effect_str[C]) / 4
+		weight *= max(L.applied_lum_r, L.applied_lum_g, L.applied_lum_b)
 		if(weight < DSHADOW_MIN_WEIGHT)
 			continue
 		var/insert_at = casts.len + 1
@@ -109,26 +117,28 @@ var/global/list/dynamic_shadow_icon_heights = list()
 				insert_at = i
 				break
 		casts.Insert(insert_at, null)
-		casts[insert_at] = list(weight, dx, dy, dist)
+		casts[insert_at] = list(weight, dx, dy, dist, L)
 
 	var/count = min(casts.len, DSHADOW_MAX_SHADOWS)
 	if(!count)
 		clear_dynamic_shadows()
 		return
 	LAZYINITLIST(dynamic_shadows)
-	while(dynamic_shadows.len > count)
-		var/atom/movable/dynamic_shadow/extra = dynamic_shadows[dynamic_shadows.len]
-		dynamic_shadows.len--
-		qdel(extra)
-	while(dynamic_shadows.len < count)
-		dynamic_shadows += new /atom/movable/dynamic_shadow(null, src)
+	// Keep each silhouette attached to its light when two lights trade rank.
+	// Reusing by rank made shadows sweep across the actor at that boundary.
+	var/list/retired = dynamic_shadows.Copy()
 
 	var/half_height = get_dynamic_shadow_icon_height() / 2
 	// While moving, finish the reshape exactly when the glide finishes so shadow and owner stay in step
 	var/anim_time = moving ? (world.icon_size / max(glide_size, 1)) * world.tick_lag : DSHADOW_ANIMATE_TIME
 	for(var/i in 1 to count)
 		var/list/cast = casts[i]
-		var/atom/movable/dynamic_shadow/S = dynamic_shadows[i]
+		var/datum/light_source/L = cast[5]
+		var/atom/movable/dynamic_shadow/S = dynamic_shadows[L]
+		if(!S)
+			S = new /atom/movable/dynamic_shadow(null, src)
+			dynamic_shadows[L] = S
+		retired -= L
 		S.sync_position()
 		S.copy_owner_appearance()
 		var/dist = cast[4]
@@ -139,11 +149,14 @@ var/global/list/dynamic_shadow_icon_heights = list()
 			height = height < 0 ? -0.2 : 0.2
 		// Pivot at the feet: x' = 0.9x + shear*(y+h), y' = height*(y+h) - h
 		var/matrix/M = matrix(transform) * matrix(0.9, shear, shear * half_height, 0, height, height * half_height - half_height)
-		animate(S, transform = M, alpha = round(DSHADOW_MAX_ALPHA * min(cast[1], 1)), time = anim_time)
+		S.set_projection(M, round(DSHADOW_MAX_ALPHA * min(cast[1], 1)), anim_time)
+	for(var/L in retired)
+		qdel(dynamic_shadows[L])
+		dynamic_shadows -= L
 
 /atom/movable/proc/clear_dynamic_shadows()
-	for(var/S in dynamic_shadows)
-		qdel(S)
+	for(var/L in dynamic_shadows)
+		qdel(dynamic_shadows[L])
 	dynamic_shadows = null
 
 /atom/movable/proc/get_dynamic_shadow_icon_height()
@@ -158,13 +171,14 @@ var/global/list/dynamic_shadow_icon_heights = list()
 
 /atom/movable/Move()
 	. = ..()
-	if(casts_dynamic_shadow && dynamic_shadows_enabled)
+	if(. && casts_dynamic_shadow && dynamic_shadows_enabled)
 		update_dynamic_shadow(TRUE)
 
 /atom/movable/forceMove()
 	. = ..()
 	if(casts_dynamic_shadow && dynamic_shadows_enabled)
-		update_dynamic_shadow(TRUE)
+		clear_dynamic_shadows()
+		update_dynamic_shadow()
 
 /atom/movable/set_dir()
 	. = ..()
@@ -187,6 +201,10 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	alpha = 0
 	var/atom/movable/owner
 	var/last_source_appearance
+	var/matrix/target_projection
+	var/target_alpha
+	var/projection_revision = 0
+	animate_movement = SYNC_STEPS
 
 /atom/movable/dynamic_shadow/New(loc, atom/movable/new_owner)
 	..()
@@ -203,10 +221,17 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	MA.mouse_opacity = 0
 	MA.invisibility = 0
 	MA.render_target = null
-	MA.appearance_flags = PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER
+	MA.render_source = null
+	MA.maptext = null
+	MA.appearance_flags = PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER | (owner.appearance_flags & LONG_GLIDE)
+	MA.animate_movement = SYNC_STEPS
 	MA.color = null
 	MA.opacity = 0
-	MA.luminosity = 0
+	MA.density = FALSE
+	MA.screen_loc = null
+	// Like the lightmap, this visual must be sent even on an engine-dark turf.
+	// Its black pixels cannot illuminate the scene's multiply lightmap.
+	MA.luminosity = 1
 	MA.alpha = alpha
 	MA.transform = transform
 	MA.pixel_x = pixel_x
@@ -218,9 +243,24 @@ var/global/list/dynamic_shadow_icon_heights = list()
 		if(O.plane == FLOAT_PLANE || O.plane == DEFAULT_PLANE)
 			kept_overlays += overlay
 	MA.overlays = kept_overlays
+	MA.underlays = null
 	appearance = MA
 	// Filters apply to the whole KEEP_TOGETHER composite, so RESET_COLOR overlays turn black too
 	filters = list(filter(type = "color", color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0)), filter(type = "blur", size = 1))
+
+/atom/movable/dynamic_shadow/proc/set_projection(matrix/M, strength, duration)
+	if(target_projection && target_projection ~= M && target_alpha == strength)
+		return
+	projection_revision++
+	if(!target_projection)
+		// The first frame must already be at the feet, never an upright black
+		// duplicate that slowly collapses onto the floor.
+		transform = M
+		alpha = strength
+	else
+		animate(src, transform = M, alpha = strength, time = duration)
+	target_projection = M
+	target_alpha = strength
 
 /atom/movable/dynamic_shadow/Destroy()
 	owner = null
@@ -249,6 +289,45 @@ var/global/list/dynamic_shadow_icon_heights = list()
 
 /atom/movable/dynamic_shadow/update_dynamic_shadow(moving = FALSE)
 	return
+
+/datum/light_source
+	var/shadow_center_icon
+	var/shadow_center_state
+	var/shadow_center_dir
+	var/list/shadow_center_sample
+
+// Alpha-weighted spatial center of the fixture, in continuous world coordinates.
+// Cache just its sprite sample; offsets and transforms are evaluated every time.
+/datum/light_source/proc/dynamic_shadow_center()
+	var/atom/A = top_atom
+	if(!A || !source_turf)
+		return list(0, 0)
+	if(!shadow_center_sample || A.icon != shadow_center_icon || A.icon_state != shadow_center_state || A.dir != shadow_center_dir)
+		shadow_center_icon = A.icon
+		shadow_center_state = A.icon_state
+		shadow_center_dir = A.dir
+		var/icon/I = A.icon ? icon(A.icon, A.icon_state, A.dir, 1) : null
+		var/w = I ? I.Width() : world.icon_size
+		var/h = I ? I.Height() : world.icon_size
+		var/sum_x = 0
+		var/sum_y = 0
+		var/weight = 0
+		if(I)
+			for(var/x in 1 to w)
+				for(var/y in 1 to h)
+					var/pixel = I.GetPixel(x, y)
+					if(!pixel) continue
+					var/alpha_weight = length(pixel) == 9 ? text2num(copytext(pixel, 8, 10), 16) : 255
+					sum_x += x * alpha_weight
+					sum_y += y * alpha_weight
+					weight += alpha_weight
+		shadow_center_sample = list(weight ? sum_x / weight - (w + 1) / 2 : 0, weight ? sum_y / weight - (h + 1) / 2 : 0, (w - world.icon_size) / 2, (h - world.icon_size) / 2)
+	var/cx = shadow_center_sample[1]
+	var/cy = shadow_center_sample[2]
+	var/matrix/M = A.transform
+	var/tx = M ? M.a * cx + M.b * cy + M.c : cx
+	var/ty = M ? M.d * cx + M.e * cy + M.f : cy
+	return list(source_turf.x + (tx + shadow_center_sample[3] + A.pixel_x + A.pixel_w) / world.icon_size, source_turf.y + (ty + shadow_center_sample[4] + A.pixel_y + A.pixel_z) / world.icon_size)
 
 #undef DSHADOW_MAX_ALPHA
 #undef DSHADOW_MIN_WEIGHT

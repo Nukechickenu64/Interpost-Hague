@@ -275,3 +275,26 @@ area/space/atmosalert()
 /area/thunderfield
 	name = "Thunderfield"
 	icon_state = "yellow"
+
+// Plain station areas
+
+/area/cargo_and_expedition
+	name = "Cargo and Expedition"
+
+/area/technical
+	name = "Technical"
+
+/area/crew_habitation
+	name = "Crew Habitation"
+
+/area/research_and_development
+	name = "Research and Development"
+
+/area/intensecure
+	name = "Intensecure"
+
+/area/medbay
+	name = "Medbay"
+
+/area/cargo_bay
+	name = "Cargo Bay"

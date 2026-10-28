@@ -18,6 +18,7 @@ var/list/floor_light_cache = list()
 	var/default_light_range = 4
 	var/default_light_power = 2
 	var/default_light_colour = "#F9C763"
+	var/image/emissive_overlay
 
 /obj/machinery/floor_light/prebuilt
 	anchored = 1
@@ -105,6 +106,7 @@ var/list/floor_light_cache = list()
 
 /obj/machinery/floor_light/update_icon()
 	overlays.Cut()
+	emissive_overlay = null
 	if(use_power && !broken())
 		if(isnull(damaged))
 			var/cache_key = "floorlight-[default_light_colour]"
@@ -115,6 +117,7 @@ var/list/floor_light_cache = list()
 				I.layer = layer+0.001
 				floor_light_cache[cache_key] = I
 			overlays |= floor_light_cache[cache_key]
+			emissive_overlay = overlay_image(icon, "on", default_light_colour, RESET_COLOR, EMISSIVE_PLANE, EMISSIVE_LAYER)
 		else
 			if(damaged == 0) //Needs init.
 				damaged = rand(1,4)
@@ -126,6 +129,10 @@ var/list/floor_light_cache = list()
 				I.layer = layer+0.001
 				floor_light_cache[cache_key] = I
 			overlays |= floor_light_cache[cache_key]
+			emissive_overlay = overlay_image(icon, "flicker[damaged]", default_light_colour, RESET_COLOR, EMISSIVE_PLANE, EMISSIVE_LAYER)
+	if(emissive_overlay)
+		emissive_overlay.blend_mode = BLEND_ADD
+		overlays += emissive_overlay
 
 /obj/machinery/floor_light/proc/broken()
 	return (stat & (BROKEN|NOPOWER))
@@ -187,8 +194,26 @@ var/list/floor_light_cache = list()
 /obj/machinery/floor_light/os13/update_icon()
 	// Do not inherit the square panel's cached "on"/"flicker" overlays.
 	overlays.Cut()
+	emissive_overlay = null
 	icon_state = "floorlight0"
 	if(on && anchored && use_power == POWER_USE_ACTIVE && !broken())
 		icon_state = "floorlight1"
 		if(!isnull(damaged))
 			icon_state = "floorlight01"
+		else
+			// The authored lens is amber. Its red channel contains its brightness
+			// mask; multiplying the amber RGB by a white/blue lamp color retained
+			// that baked tint. Use the mask for both the visible lens and emission.
+			icon_state = "floorlight0"
+			var/list/lens_color = floor_light_lens_color(default_light_colour)
+			overlays += overlay_image(icon, "floorlight2", lens_color, RESET_COLOR, plane, layer + 0.001)
+			emissive_overlay = overlay_image(icon, "floorlight2", lens_color, RESET_COLOR, EMISSIVE_PLANE, EMISSIVE_LAYER)
+			emissive_overlay.blend_mode = BLEND_ADD
+			overlays += emissive_overlay
+
+// Preserve the lens alpha and shade; tint a neutral emission mask rather than
+// multiplying two independent spectra (the atlas amber and the lamp color).
+/proc/floor_light_lens_color(light_colour)
+	var/list/channels = ReadRGB(light_colour)
+	return list(channels[1] / 255, channels[2] / 255, channels[3] / 255, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)

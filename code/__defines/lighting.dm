@@ -10,7 +10,11 @@
 
 #define LIGHTING_SOFT_THRESHOLD 0 // If the max of the lighting lumcounts of each spectrum drops below this, disable luminosity on the lighting overlays.  This also should be the transparancy of the "soft_dark" icon state.
 
-#define LIGHTING_MULT_FACTOR 0.43
+// Exponential exposure gives bright local pools with a smooth shoulder, while
+// weak spill approaches black instead of being lifted by a square-root curve.
+#define LIGHTING_EXPOSURE 2.4
+#define LIGHTING_COLOR_GAMMA 0.85
+#define LIGHTING_TRANSITION_TIME 1
 
 #define STARLIGHT_POWER 0.35
 #define STARLIGHT_COLOR "#b8c8ff"

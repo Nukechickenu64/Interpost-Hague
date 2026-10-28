@@ -1,0 +1,9 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+#include "code\unit_tests\lighting_los_tests.dm"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/lighting_los_geometry, new /datum/unit_test/lighting_los_door, new /datum/unit_test/lighting_los_light, new /datum/unit_test/lighting_los_look_far, new /datum/unit_test/lighting_los_mesh, new /datum/unit_test/lighting_los_response, new /datum/unit_test/lighting_los_emission, new /datum/unit_test/lighting_los_drop_shadow)
+	log_unit_test("Running focused Artemis lighting and LOS regression tests.")

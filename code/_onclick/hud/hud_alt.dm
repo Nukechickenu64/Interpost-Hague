@@ -337,7 +337,7 @@
 
 	if(!client) return
 	for(var/obj/screen/S in client.screen)
-		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/lighting_backdrop))
+		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/plane_master/lighting_veil) || istype(S, /obj/screen/lighting_veil_display) || istype(S, /obj/screen/lighting_backdrop))
 			client.screen -= S
 	var/obj/screen/plane_master/shadowcasting/p3 = new
 	var/obj/screen/plane_master/lighting/p4 = new
@@ -352,4 +352,6 @@
 	client.screen.Add(p4)
 	client.screen.Add(new /obj/screen/lighting_backdrop)
 	client.screen.Add(new /obj/screen/plane_master/emissive)
+	client.screen.Add(new /obj/screen/plane_master/lighting_veil)
+	client.screen.Add(new /obj/screen/lighting_veil_display)
 	//client.screen.Add(p4)

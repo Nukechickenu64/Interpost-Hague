@@ -27,6 +27,10 @@
 		GLOB.opacity_set_event.raise_event(src, !opaque_counter, !!opaque_counter)
 		reconsider_lights()
 		shadowcast_queue_invalidate(src)
+		// Exposure of shared wall corners changes with the surrounding geometry,
+		// even if a light source's existing corner values do not change.
+		for(var/turf/T in range(1, src))
+			T.lighting_overlay?.update_overlay()
 		return TRUE
 	return FALSE
 
@@ -38,6 +42,7 @@
 /turf/proc/lighting_clear_overlay()
 	if(lighting_overlay)
 		qdel(lighting_overlay)
+	refresh_lighting_edge_guards()
 
 	for(var/datum/lighting_corner/C in corners)
 		C.update_active()
@@ -45,6 +50,7 @@
 // Builds a lighting overlay for us, but only if our area is dynamic.
 /turf/proc/lighting_build_overlay()
 	if(lighting_overlay)
+		lighting_overlay.update_edge_guard()
 		return
 
 	if(TURF_IS_DYNAMICALLY_LIT_UNSAFE(src))
@@ -60,6 +66,12 @@
 					S.recalc_corner(C)
 
 				C.active = TRUE
+	if(lighting_overlays_initialised)
+		refresh_lighting_edge_guards()
+
+/turf/proc/refresh_lighting_edge_guards()
+	for(var/turf/T in range(1, src))
+		T.lighting_overlay?.update_edge_guard()
 
 // Used to get a scaled lumcount.
 /turf/proc/get_lumcount(var/minlum = 0, var/maxlum = 1)

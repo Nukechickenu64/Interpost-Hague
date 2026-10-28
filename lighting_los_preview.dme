@@ -1,0 +1,5 @@
+// Local interactive fixture using the production renderer and HUD.
+#define ARTEMIS_LOS_PREVIEW
+#include "Interpost-Hague.dme"
+#include "tools\lighting_los\preview.dm"
+#include "tools\lighting_los\reference_scene.dm"

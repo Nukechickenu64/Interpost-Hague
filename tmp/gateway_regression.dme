@@ -1,9 +1,0 @@
-#define UNIT_TEST
-// Temporary compatibility shim for an unrelated in-progress Space Wars change.
-#define CORPSE_CANNOT_REENTER 0
-#include "../Interpost-Hague.dme"
-
-/datum/controller/subsystem/unit_tests/Initialize(timeofday)
-	. = ..()
-	queue = list(new /datum/unit_test/movement/gateway_activation)
-	log_unit_test("Running focused gateway activation regression.")

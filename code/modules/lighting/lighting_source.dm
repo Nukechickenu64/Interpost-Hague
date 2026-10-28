@@ -221,7 +221,7 @@
 //Original/Euclidean (circular) lighting falloff. This looks the best and gives a circular light shape.
 // Uses LIGHTING_HEIGHT to simulate pseudo-z falloff.
 #if LIGHTING_FALLOFF == 1
-#define LUM_FALLOFF(C, T) (1 - CLAMP01(sqrt((C.x - T.x) ** 2 + (C.y - T.y) ** 2 + LIGHTING_HEIGHT) / max(1, light_range)))
+#define LUM_FALLOFF(C, T) lighting_radial_falloff(C.x - T.x, C.y - T.y, light_range)
 
 //Manhattan (diamond) falloff. Kept for compatibility if toggled via LIGHTING_FALLOFF define.
 #elif LIGHTING_FALLOFF == 2
@@ -449,3 +449,8 @@
 #undef LUM_FALLOFF
 #undef REMOVE_CORNER
 #undef APPLY_CORNER
+
+// Smooth finite-radius pool: zero value and zero slope at the outer edge.
+/proc/lighting_radial_falloff(dx, dy, radius)
+	var/remaining = 1 - CLAMP01(sqrt(dx * dx + dy * dy + LIGHTING_HEIGHT) / max(1, radius))
+	return remaining * remaining * (3 - 2 * remaining)

@@ -99,9 +99,10 @@
 
 /datum/lighting_corner/proc/update_overlays()
 	// Cache these values a head of time so 4 individual lighting overlays don't all calculate them individually.
-	var/lum_r = src.lum_r > 0 ? LIGHTING_MULT_FACTOR * sqrt(src.lum_r) : src.lum_r
-	var/lum_g = src.lum_g > 0 ? LIGHTING_MULT_FACTOR * sqrt(src.lum_g) : src.lum_g
-	var/lum_b = src.lum_b > 0 ? LIGHTING_MULT_FACTOR * sqrt(src.lum_b) : src.lum_b
+	var/list/rgb = lighting_display_rgb(src.lum_r, src.lum_g, src.lum_b)
+	var/lum_r = rgb[1]
+	var/lum_g = rgb[2]
+	var/lum_b = rgb[3]
 
 	var/mx = max(lum_r, lum_g, lum_b) // Scale it so 1 is the strongest lum, if it is above 1.
 	. = 1 // factor
@@ -132,3 +133,15 @@
 
 /datum/lighting_corner/dummy/New()
 	return
+
+// Tone-map brightness once, then preserve the relative spectrum. Applying sqrt
+// independently to all three channels washed saturated green/violet lamps out.
+/proc/lighting_display_rgb(red, green, blue)
+	red = max(0, red)
+	green = max(0, green)
+	blue = max(0, blue)
+	var/peak = max(red, green, blue)
+	if(peak <= 0)
+		return list(0, 0, 0)
+	var/value = 1 - 2 ** (-LIGHTING_EXPOSURE * peak)
+	return list(value * (red / peak) ** LIGHTING_COLOR_GAMMA, value * (green / peak) ** LIGHTING_COLOR_GAMMA, value * (blue / peak) ** LIGHTING_COLOR_GAMMA)

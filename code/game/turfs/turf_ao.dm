@@ -40,7 +40,10 @@
 	var/image/I = image('icons/turf/flooring/shadows.dmi', cstr, dir = 1 << (i-1))
 	I.alpha = WALL_AO_ALPHA
 	I.blend_mode = BLEND_OVERLAY
-	I.appearance_flags = RESET_ALPHA|RESET_COLOR|TILE_BOUND
+	// Stay in the turf's plane (including lower-Z copies), but outside any
+	// parent's combined draw group so raised objects always sort above AO.
+	I.appearance_flags = RESET_ALPHA|RESET_COLOR|TILE_BOUND|KEEP_APART
+	I.plane = FLOAT_PLANE
 	I.layer = AO_LAYER
 	// If there's an offset, counteract it.
 	if (px || py || pz || pw)
