@@ -19,7 +19,7 @@
 
 /obj/structure/AIcore/attackby(obj/item/P as obj, mob/user as mob)
 	if(!authorized)
-		if(access_ai_upload in P.GetAccess())
+		if(check_mapper_access(P.GetAccess(), access_ai_upload in P.GetAccess()))
 			to_chat(user, "<span class='notice'>You swipe [P] at [src] and authorize it to connect into the systems of [GLOB.using_map.full_name].</span>")
 			authorized = 1
 	switch(state)

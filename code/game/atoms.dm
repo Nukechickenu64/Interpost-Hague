@@ -66,6 +66,7 @@
 	if(atom_flags & ATOM_FLAG_INITIALIZED)
 		crash_with("Warning: [src]([type]) initialized multiple times!")
 	atom_flags |= ATOM_FLAG_INITIALIZED
+	sync_world_render_plane()
 
 	if(light_power && light_range)
 		update_light()
@@ -98,6 +99,7 @@
 
 /atom/movable/Initialize(ml, ...)
 	. = ..()
+	apply_map_access()
 	if (!follow_repository.excluded_subtypes[type] && follow_repository.followed_subtypes_tcache[type])
 		follow_repository.add_subject(src)
 

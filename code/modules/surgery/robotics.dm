@@ -337,15 +337,19 @@
 	for(var/organ in target.internal_organs_by_name)
 		var/obj/item/organ/I = target.internal_organs_by_name[organ]
 		if(I && !(I.status & ORGAN_CUT_AWAY) && I.parent_organ == target_zone)
-			attached_organs |= organ
+			attached_organs[organ] = I
 
 	var/organ_to_remove = input(user, "Which organ do you want to prepare for removal?") as null|anything in attached_organs
 	if(!organ_to_remove)
 		return 0
+	var/obj/item/organ/selected = attached_organs[organ_to_remove]
+	if(QDELETED(target) || QDELETED(affected) || QDELETED(selected) || target.internal_organs_by_name[organ_to_remove] != selected || selected.owner != target || (selected.status & ORGAN_CUT_AWAY))
+		to_chat(user, "<span class='warning'>That organ is no longer available to decouple.</span>")
+		return SURGERY_FAILURE
 
 	target.op_stage.current_organ = organ_to_remove
 
-	return 1
+	return ..() && affected.hatch_state == HATCH_OPENED
 
 /datum/surgery_step/robotics/detatch_organ_robotic/begin_step(mob/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	user.visible_message("[user] starts to decouple [target]'s [target.op_stage.current_organ] with \the [tool].", \
@@ -387,13 +391,17 @@
 	var/list/removable_organs = list()
 	for(var/obj/item/organ/I in affected.implants)
 		if ((I.status & ORGAN_CUT_AWAY) && (I.robotic >= ORGAN_ROBOT) && (I.parent_organ == target_zone))
-			removable_organs |= I.organ_tag
+			removable_organs[I.organ_tag] = I
 
 	var/organ_to_replace = input(user, "Which organ do you want to reattach?") as null|anything in removable_organs
 	if(!organ_to_replace)
 		return 0
+	var/obj/item/organ/selected = removable_organs[organ_to_replace]
+	if(QDELETED(target) || QDELETED(affected) || QDELETED(selected) || !(selected in affected.implants) || selected.loc != target || !(selected.status & ORGAN_CUT_AWAY) || affected.hatch_state != HATCH_OPENED)
+		to_chat(user, "<span class='warning'>That organ is no longer available to attach.</span>")
+		return SURGERY_FAILURE
 
-	target.op_stage.current_organ = organ_to_replace
+	target.op_stage.current_organ = selected
 	return ..()
 
 /datum/surgery_step/robotics/attach_organ_robotic/begin_step(mob/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
@@ -406,12 +414,10 @@
 	"<span class='notice'>You have reattached [target]'s [target.op_stage.current_organ] with \the [tool].</span>")
 
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
-	for (var/obj/item/organ/I in affected.implants)
-		if (I.organ_tag == target.op_stage.current_organ)
-			I.status &= ~ORGAN_CUT_AWAY
-			affected.implants -= I
-			I.replaced(target, affected)
-			break
+	var/obj/item/organ/selected = target.op_stage.current_organ
+	selected.status &= ~ORGAN_CUT_AWAY
+	affected.implants -= selected
+	selected.replaced(target, affected)
 
 /datum/surgery_step/robotics/attach_organ_robotic/fail_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	user.visible_message("<span class='warning'>[user]'s hand slips, disconnecting \the [tool].</span>", \

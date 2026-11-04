@@ -3,13 +3,18 @@
 #define DSHADOW_MAX_SHADOWS		3
 #define DSHADOW_FLATTEN			0.55
 #define DSHADOW_ANIMATE_TIME	3
+#define DSHADOW_MASK_STEP		4
 
-var/global/dynamic_shadows_enabled = FALSE
+var/global/dynamic_shadows_enabled = TRUE
 var/global/list/dynamic_shadow_icon_heights = list()
+#ifdef ARTEMIS_LOS_PREVIEW
+var/global/shadow_preview_legacy_rotation = FALSE
+#endif
 
 /atom/movable
 	var/casts_dynamic_shadow = FALSE
 	var/list/dynamic_shadows
+	var/dynamic_shadow_move_depth = 0
 
 /mob/living
 	casts_dynamic_shadow = TRUE
@@ -71,7 +76,7 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	casts_dynamic_shadow = FALSE
 
 /atom/movable/proc/should_cast_dynamic_shadow()
-	if(!dynamic_shadows_enabled || !casts_dynamic_shadow || !isturf(loc) || !icon)
+	if(!dynamic_shadows_enabled || !casts_dynamic_shadow || !isturf(loc) || (!icon && !overlays.len))
 		return FALSE
 	if(invisibility || alpha < 50 || layer < TABLE_LAYER)
 		return FALSE
@@ -104,10 +109,7 @@ var/global/list/dynamic_shadow_icon_heights = list()
 		var/dist = sqrt(dx * dx + dy * dy)
 		if(dist < 0.3)
 			continue
-		var/weight = 0
-		for(var/datum/lighting_corner/C in T.corners)
-			weight += max(0, L.effect_str[C]) / 4
-		weight *= max(L.applied_lum_r, L.applied_lum_g, L.applied_lum_b)
+		var/weight = L.dynamic_shadow_tile_weight(T)
 		if(weight < DSHADOW_MIN_WEIGHT)
 			continue
 		var/insert_at = casts.len + 1
@@ -116,8 +118,12 @@ var/global/list/dynamic_shadow_icon_heights = list()
 			if(weight > other[1])
 				insert_at = i
 				break
+		if(insert_at > DSHADOW_MAX_SHADOWS)
+			continue
 		casts.Insert(insert_at, null)
 		casts[insert_at] = list(weight, dx, dy, dist, L)
+		if(casts.len > DSHADOW_MAX_SHADOWS)
+			casts.len = DSHADOW_MAX_SHADOWS
 
 	var/count = min(casts.len, DSHADOW_MAX_SHADOWS)
 	if(!count)
@@ -140,19 +146,50 @@ var/global/list/dynamic_shadow_icon_heights = list()
 			dynamic_shadows[L] = S
 		retired -= L
 		S.sync_position()
-		S.copy_owner_appearance()
+		S.copy_owner_appearance(dynamic_shadow_sprite_dir(cast[2], cast[3]))
 		var/dist = cast[4]
 		var/shadow_length = Clamp(0.3 + dist * 0.25, 0.4, 1.4)
-		var/shear = cast[2] / dist * shadow_length
-		var/height = cast[3] / dist * shadow_length * DSHADOW_FLATTEN
-		if(abs(height) < 0.2)
-			height = height < 0 ? -0.2 : 0.2
-		// Pivot at the feet: x' = 0.9x + shear*(y+h), y' = height*(y+h) - h
-		var/matrix/M = matrix(transform) * matrix(0.9, shear, shear * half_height, 0, height, height * half_height - half_height)
+		var/matrix/M = matrix(transform) * get_dynamic_shadow_projection(cast[2], cast[3], dist, shadow_length, half_height)
+		S.update_light_mask(L, M, cast[2], cast[3], dist)
 		S.set_projection(M, round(DSHADOW_MAX_ALPHA * min(cast[1], 1)), anim_time)
 	for(var/L in retired)
 		qdel(dynamic_shadows[L])
 		dynamic_shadows -= L
+
+// The width axis must rotate with the projected height axis. Keeping width
+// horizontal made the two axes almost parallel under an east/west light.
+/proc/dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+	var/along_x = dx / distance * shadow_length
+	var/along_y = dy / distance * shadow_length * DSHADOW_FLATTEN
+	var/across_x = -dy / distance * 0.9
+	var/across_y = dx / distance * 0.9 * DSHADOW_FLATTEN
+	return matrix(across_x, along_x, along_x * half_height, across_y, along_y, along_y * half_height - half_height)
+
+// Objects, nonhuman casters and prone humans use the original flatter shear.
+/atom/movable/proc/get_dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+	var/shear = dx / distance * shadow_length
+	var/height = dy / distance * shadow_length * DSHADOW_FLATTEN
+	if(abs(height) < 0.2)
+		height = height < 0 ? -0.2 : 0.2
+	return matrix(0.9, shear, shear * half_height, 0, height, height * half_height - half_height)
+
+/mob/living/carbon/human/get_dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+	if(lying)
+		return ..()
+	return dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+
+/atom/movable/proc/dynamic_shadow_sprite_dir(dx, dy)
+	return dir
+
+// A north-side lamp is the unrotated reference for the authored sprite facings.
+// Rotate into the lamp's frame using its continuous visual center.
+/mob/living/carbon/human/dynamic_shadow_sprite_dir(dx, dy)
+	if(lying)
+		return ..()
+	var/source_angle = Atan2(-dy, -dx)
+	// The previous half-turn reversed both side profiles and front/back views.
+	var/relative_angle = (dir2angle(dir) - source_angle + 720) % 360
+	return angle2dir((round(relative_angle / 90 + 0.5) * 90) % 360)
 
 /atom/movable/proc/clear_dynamic_shadows()
 	for(var/L in dynamic_shadows)
@@ -170,8 +207,11 @@ var/global/list/dynamic_shadow_icon_heights = list()
 		dynamic_shadow_icon_heights[icon] = .
 
 /atom/movable/Move()
+	var/atom/origin = loc
+	dynamic_shadow_move_depth++
 	. = ..()
-	if(. && casts_dynamic_shadow && dynamic_shadows_enabled)
+	dynamic_shadow_move_depth--
+	if(!dynamic_shadow_move_depth && loc != origin && casts_dynamic_shadow && dynamic_shadows_enabled)
 		update_dynamic_shadow(TRUE)
 
 /atom/movable/forceMove()
@@ -182,7 +222,9 @@ var/global/list/dynamic_shadow_icon_heights = list()
 
 /atom/movable/set_dir()
 	. = ..()
-	if(. && dynamic_shadows)
+	// Move also changes direction. Submit its final position/facing together,
+	// with the movement duration, instead of starting a stationary turn first.
+	if(. && dynamic_shadows && !dynamic_shadow_move_depth)
 		update_dynamic_shadow()
 
 /atom/movable/Destroy()
@@ -195,35 +237,58 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	mouse_opacity = 0
 	anchored = TRUE
 	simulated = FALSE
-	plane = DEFAULT_PLANE
+	plane = WORLD_SHADOW_SOURCE_PLANE
 	layer = MOB_SHADOW_LAYER
-	appearance_flags = PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER
+	blend_mode = BLEND_OVERLAY
+	appearance_flags = TILE_BOUND | PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER
 	alpha = 0
 	var/atom/movable/owner
 	var/last_source_appearance
+	var/last_sprite_dir
 	var/matrix/target_projection
 	var/target_alpha
 	var/projection_revision = 0
+	var/projection_duration = 0
+	var/icon/light_mask
+	var/light_mask_signature
+	var/list/mask_geometry
+	/// Sample -> distinct tile index (zero for out-of-map samples).
+	var/list/mask_receivers
+	/// Coordinates, rather than turf refs, survive ChangeTurf on receivers.
+	var/list/mask_tiles
+	var/list/mask_tile_alpha
+	var/source_width = 32
+	var/source_height = 32
 	animate_movement = SYNC_STEPS
 
 /atom/movable/dynamic_shadow/New(loc, atom/movable/new_owner)
 	..()
 	owner = new_owner
 
-/atom/movable/dynamic_shadow/proc/copy_owner_appearance()
-	if(!owner || owner.appearance == last_source_appearance)
+/atom/movable/dynamic_shadow/proc/copy_owner_appearance(sprite_dir)
+	if(!owner)
+		return
+	if(isnull(sprite_dir))
+		sprite_dir = owner.dir
+	if(owner.appearance == last_source_appearance && sprite_dir == last_sprite_dir)
 		return
 	last_source_appearance = owner.appearance
+	last_sprite_dir = sprite_dir
+	var/icon/source_icon = owner.icon ? icon(owner.icon) : null
+	source_width = source_icon ? source_icon.Width() : world.icon_size
+	source_height = source_icon ? source_icon.Height() : world.icon_size
 	var/mutable_appearance/MA = new(owner)
 	MA.name = ""
-	MA.plane = DEFAULT_PLANE
+	MA.dir = sprite_dir
+	MA.plane = WORLD_SHADOW_SOURCE_PLANE
 	MA.layer = MOB_SHADOW_LAYER
+	MA.blend_mode = BLEND_OVERLAY
 	MA.mouse_opacity = 0
 	MA.invisibility = 0
 	MA.render_target = null
 	MA.render_source = null
 	MA.maptext = null
-	MA.appearance_flags = PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER | (owner.appearance_flags & LONG_GLIDE)
+	MA.appearance_flags = TILE_BOUND | PIXEL_SCALE | KEEP_APART | KEEP_TOGETHER | (owner.appearance_flags & LONG_GLIDE)
 	MA.animate_movement = SYNC_STEPS
 	MA.color = null
 	MA.opacity = 0
@@ -232,37 +297,165 @@ var/global/list/dynamic_shadow_icon_heights = list()
 	// Like the lightmap, this visual must be sent even on an engine-dark turf.
 	// Its black pixels cannot illuminate the scene's multiply lightmap.
 	MA.luminosity = 1
-	MA.alpha = alpha
-	MA.transform = transform
-	MA.pixel_x = pixel_x
-	MA.pixel_y = pixel_y
 	// Overlays on their own planes (glows, emissives) render outside KEEP_TOGETHER and would escape the black filter
 	var/list/kept_overlays = list()
 	for(var/overlay in MA.overlays)
-		var/mutable_appearance/O = overlay
-		if(O.plane == FLOAT_PLANE || O.plane == DEFAULT_PLANE)
-			kept_overlays += overlay
+		var/mutable_appearance/O = dynamic_shadow_overlay(overlay, ismob(owner) ? sprite_dir : null)
+		if(O)
+			kept_overlays += O
 	MA.overlays = kept_overlays
 	MA.underlays = null
-	appearance = MA
+	// Do not assign the complete appearance: it contains the server's target
+	// transform/alpha, which can snap a still-gliding client to the endpoint
+	// when a walking pose or equipment changes. Only replace sprite content.
+	icon = MA.icon
+	icon_state = MA.icon_state
+	dir = MA.dir
+	overlays = MA.overlays
+	underlays = null
+	appearance_flags = MA.appearance_flags
+	luminosity = 1
 	// Filters apply to the whole KEEP_TOGETHER composite, so RESET_COLOR overlays turn black too
-	filters = list(filter(type = "color", color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0)), filter(type = "blur", size = 1))
+	set_shadow_filters()
+
+/atom/movable/dynamic_shadow/proc/set_shadow_filters()
+	filters = list(filter(type = "color", color = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0)))
+	if(light_mask)
+		filters += filter(type = "alpha", icon = light_mask)
+	filters += filter(type = "blur", size = 1)
+
+// Sample the receiving floor, not just the caster's tile. A flashlight can
+// illuminate the end of a shadow without ever illuminating the caster.
+/atom/movable/dynamic_shadow/proc/update_light_mask(datum/light_source/casting_light, matrix/M, dx, dy, distance)
+	var/width = source_width + world.icon_size
+	var/height = source_height + world.icon_size
+	var/ox = owner.x + (owner.pixel_x + (source_width - world.icon_size) / 2) / world.icon_size
+	var/oy = owner.y + (owner.pixel_y + (source_height - world.icon_size) / 2) / world.icon_size
+	var/list/geometry = list(width, height, ox, oy, owner.z, M.a, M.b, M.c, M.d, M.e, M.f, world.maxx, world.maxy, world.maxz)
+	var/geometry_changed = !mask_geometry
+	if(mask_geometry)
+		for(var/i in 1 to geometry.len)
+			if(geometry[i] != mask_geometry[i])
+				geometry_changed = TRUE
+				break
+	if(geometry_changed)
+		mask_geometry = geometry
+		mask_receivers = list()
+		mask_tiles = list()
+		var/list/tile_indices = list()
+		for(var/py in 1 to height step DSHADOW_MASK_STEP)
+			for(var/px in 1 to width step DSHADOW_MASK_STEP)
+				var/u = px + (DSHADOW_MASK_STEP - 1) / 2 - (width + 1) / 2
+				var/v = py + (DSHADOW_MASK_STEP - 1) / 2 - (height + 1) / 2
+				var/tx = round(ox + (M.a * u + M.b * v + M.c) / world.icon_size + 0.5)
+				var/ty = round(oy + (M.d * u + M.e * v + M.f) / world.icon_size + 0.5)
+				var/turf/receiver = locate(tx, ty, owner.z)
+				var/index = 0
+				if(receiver)
+					index = tile_indices[receiver]
+					if(!index)
+						mask_tiles += list(list(tx, ty, owner.z))
+						index = mask_tiles.len
+						tile_indices[receiver] = index
+				mask_receivers += index
+	// Re-read every receiving tile's lighting, even when geometry is unchanged.
+	// Facing/centers depend on the light and caster, not on the receiving tile.
+	var/list/light_facing = list()
+	var/list/tile_strengths = list()
+	mask_tile_alpha = list()
+	for(var/list/coords as anything in mask_tiles)
+		var/turf/receiver = locate(coords[1], coords[2], coords[3])
+		var/strength = receiver ? round(255 * owner.dynamic_shadow_retention(casting_light, receiver, dx, dy, distance, light_facing)) : 0
+		tile_strengths += strength
+		if(receiver)
+			mask_tile_alpha[receiver] = strength
+	var/list/samples = list()
+	var/needs_mask = FALSE
+	for(var/index in mask_receivers)
+		var/strength = index ? tile_strengths[index] : 0
+		samples += strength
+		if(strength != 255) needs_mask = TRUE
+	var/signature = "[width],[height]:[jointext(samples, ",")]"
+	if(signature == light_mask_signature)
+		return
+	light_mask_signature = signature
+	light_mask = null
+	if(needs_mask)
+		light_mask = icon(get_solid_white_icon())
+		light_mask.Scale(width, height)
+		light_mask.Blend("#00000000", ICON_MULTIPLY)
+		var/i = 0
+		for(var/py in 1 to height step DSHADOW_MASK_STEP)
+			for(var/px in 1 to width step DSHADOW_MASK_STEP)
+				light_mask.DrawBox(rgb(255, 255, 255, samples[++i]), px, py, min(px + DSHADOW_MASK_STEP - 1, width), min(py + DSHADOW_MASK_STEP - 1, height))
+	set_shadow_filters()
+
+/datum/light_source/proc/dynamic_shadow_tile_weight(turf/T)
+	if(destroyed || !applied || !(src in T.affecting_lights))
+		return 0
+	. = 0
+	for(var/datum/lighting_corner/C in T.corners)
+		. += max(0, effect_str[C]) / 4
+	. *= max(applied_lum_r, applied_lum_g, applied_lum_b)
+
+/atom/movable/proc/dynamic_shadow_retention(datum/light_source/casting_light, turf/receiver, dx, dy, distance, list/light_facing = null)
+	var/cast_weight = casting_light.dynamic_shadow_tile_weight(receiver)
+	if(cast_weight <= 0)
+		return 0
+	var/fill = 0
+	var/ox = x + pixel_x / world.icon_size
+	var/oy = y + pixel_y / world.icon_size
+	for(var/datum/light_source/L as anything in receiver.affecting_lights)
+		if(L == casting_light)
+			continue
+		var/weight = L.dynamic_shadow_tile_weight(receiver)
+		if(weight <= 0)
+			continue
+		// Lights on the receiving side fill the silhouette. Co-located lamps
+		// behind the caster must not erase the shadow they both project.
+		var/facing = light_facing ? light_facing[L] : null
+		if(isnull(facing))
+			var/list/center = L.dynamic_shadow_center()
+			var/lx = center[1] - ox
+			var/ly = center[2] - oy
+			var/light_distance = sqrt(lx * lx + ly * ly)
+			facing = light_distance > 0.1 ? CLAMP01((dx * lx + dy * ly) / (distance * light_distance)) : 1
+			if(light_facing)
+				light_facing[L] = facing
+		fill += weight * facing
+	return CLAMP01(1 - fill / cast_weight)
 
 /atom/movable/dynamic_shadow/proc/set_projection(matrix/M, strength, duration)
 	if(target_projection && target_projection ~= M && target_alpha == strength)
 		return
 	projection_revision++
+	projection_duration = duration
 	if(!target_projection)
 		// The first frame must already be at the feet, never an upright black
 		// duplicate that slowly collapses onto the floor.
 		transform = M
 		alpha = strength
 	else
-		animate(src, transform = M, alpha = strength, time = duration)
+		// These are projected floor bases, including reflection/shear. BYOND's
+		// rotation-preserving decomposition can choose the opposite turn when
+		// the caster crosses a lamp's horizontal axis. Interpolate the basis.
+		var/animation_flags = ANIMATION_LINEAR_TRANSFORM
+#ifdef ARTEMIS_LOS_PREVIEW
+		if(shadow_preview_legacy_rotation)
+			animation_flags = 0
+#endif
+		animate(src, transform = M, alpha = strength, time = duration, flags = animation_flags)
 	target_projection = M
 	target_alpha = strength
+	// Rebind after the projection changes. A filtered KEEP_TOGETHER group
+	// prepared with the previous transform can retain stale sideways bounds.
+	set_shadow_filters()
 
 /atom/movable/dynamic_shadow/Destroy()
+	mask_receivers = null
+	mask_tiles = null
+	mask_tile_alpha = null
+	mask_geometry = null
 	owner = null
 	loc = null
 	return ..()
@@ -289,6 +482,65 @@ var/global/list/dynamic_shadow_icon_heights = list()
 
 /atom/movable/dynamic_shadow/update_dynamic_shadow(moving = FALSE)
 	return
+
+// Rehome physical sprite parts into the shadow pass. Their old world plane
+// would otherwise break out of KEEP_TOGETHER and escape the black silhouette.
+/proc/dynamic_shadow_overlay(source, sprite_dir)
+	var/mutable_appearance/O = new(source)
+	if(O.plane != FLOAT_PLANE && O.plane != DEFAULT_PLANE)
+		return null
+	O.plane = FLOAT_PLANE
+	if(!isnull(sprite_dir))
+		O.dir = sprite_dir
+	O.appearance_flags &= ~(KEEP_APART|PLANE_MASTER)
+	O.render_source = null
+	O.render_target = null
+	O.maptext = null
+	var/list/parts = list()
+	for(var/part in O.overlays)
+		var/mutable_appearance/physical = dynamic_shadow_overlay(part, sprite_dir)
+		if(physical) parts += physical
+	O.overlays = parts
+	O.underlays = null
+	return O
+
+/atom/proc/sync_world_render_plane()
+	// Pipes and cables must remain underneath the terrain, rather than being
+	// promoted above the completed floor when normal objects are composited.
+	if(isobj(src) && plane == DEFAULT_PLANE && layer < TURF_LAYER)
+		plane = WORLD_TERRAIN_SOURCE_PLANE
+	// Explicitly overhead turfs retain their foreground behaviour.
+	else if(isturf(src) && plane == WORLD_TERRAIN_SOURCE_PLANE && layer >= OBJ_LAYER)
+		plane = DEFAULT_PLANE
+
+/obj/screen/plane_master/world_terrain
+	name = "world terrain source"
+	plane = WORLD_TERRAIN_SOURCE_PLANE
+	render_target = "*world_terrain"
+	mouse_opacity = 1
+
+/obj/screen/plane_master/world_shadows
+	name = "world floor shadow source"
+	plane = WORLD_SHADOW_SOURCE_PLANE
+	render_target = "*world_floor_shadows"
+	mouse_opacity = 0
+
+/obj/screen/world_terrain_display
+	name = ""
+	screen_loc = "SCREEN_SOUTHWEST"
+	plane = WORLD_TERRAIN_DISPLAY_PLANE
+	layer = WORLD_TERRAIN_DISPLAY_LAYER
+	render_source = "*world_terrain"
+	appearance_flags = PASS_MOUSE
+	mouse_opacity = 1
+
+/obj/screen/world_shadow_display
+	name = ""
+	screen_loc = "SCREEN_SOUTHWEST"
+	plane = WORLD_SHADOW_DISPLAY_PLANE
+	layer = WORLD_SHADOW_DISPLAY_LAYER
+	render_source = "*world_floor_shadows"
+	mouse_opacity = 0
 
 /datum/light_source
 	var/shadow_center_icon
@@ -334,3 +586,4 @@ var/global/list/dynamic_shadow_icon_heights = list()
 #undef DSHADOW_MAX_SHADOWS
 #undef DSHADOW_FLATTEN
 #undef DSHADOW_ANIMATE_TIME
+#undef DSHADOW_MASK_STEP

@@ -461,6 +461,10 @@
 	update_values()
 	other.update_values()
 
+	// Full two-way equalization wrote the same per-tile gases and temperature
+	// to both mixtures. Zone edges use this path; a second comparison is redundant.
+	if(ratio == 1 && !one_way)
+		return 1
 	return compare(other, compare_pressure = FALSE)
 
 

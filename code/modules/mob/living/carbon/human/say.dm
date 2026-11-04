@@ -181,6 +181,18 @@
 		. = ..(message_data)
 
 /mob/living/carbon/human/handle_message_mode(message_mode, message, verb, speaking, used_radios, alt_name)
+	if(message_mode == "headset" && !istype(l_ear, /obj/item/device/radio) && !istype(r_ear, /obj/item/device/radio))
+		var/obj/item/device/radio/os13_handheld/handheld
+		if(istype(get_active_hand(), /obj/item/device/radio/os13_handheld))
+			handheld = get_active_hand()
+		else if(istype(get_inactive_hand(), /obj/item/device/radio/os13_handheld))
+			handheld = get_inactive_hand()
+		else if(istype(wear_amulet, /obj/item/device/radio/os13_handheld))
+			handheld = wear_amulet
+		if(handheld)
+			if(handheld.talk_into(src, message, null, verb, speaking))
+				used_radios += handheld
+			return
 	switch(message_mode)
 		if("intercom")
 			if(!src.restrained())
@@ -207,8 +219,8 @@
 				R = r_hand
 				has_radio = 1
 			if(has_radio)
-				R.talk_into(src,message,null,verb,speaking)
-				used_radios += R
+				if(R.talk_into(src,message,null,verb,speaking) || !istype(R, /obj/item/device/radio/os13_handheld))
+					used_radios += R
 		if("left ear")
 			var/obj/item/device/radio/R
 			var/has_radio = 0
@@ -219,8 +231,8 @@
 				R = l_hand
 				has_radio = 1
 			if(has_radio)
-				R.talk_into(src,message,null,verb,speaking)
-				used_radios += R
+				if(R.talk_into(src,message,null,verb,speaking) || !istype(R, /obj/item/device/radio/os13_handheld))
+					used_radios += R
 		if("whisper")
 			whisper_say(message, speaking, alt_name)
 			return 1

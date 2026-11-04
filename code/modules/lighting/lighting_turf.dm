@@ -5,6 +5,7 @@
 	var/lighting_corners_initialised = FALSE
 
 	var/list/datum/light_source/affecting_lights       // List of light sources affecting this turf.
+	var/list/datum/light_source/lighting_visibility_sources // Also watch blocked cross-deck rays.
 	var/atom/movable/lighting_overlay/lighting_overlay // Our lighting overlay.
 	var/list/datum/lighting_corner/corners
 	var/opaque_counter
@@ -12,6 +13,7 @@
 /turf/set_opacity(new_opacity)
 	if(!..())
 		return FALSE
+	queue_ao()
 	return RecalculateOpacity()
 
 /turf/proc/RecalculateOpacity()
@@ -22,15 +24,18 @@
 		var/atom/A = a
 		opaque_counter += A.opacity
 
-	// If the counter changed and was or became 0 then lift event/reconsider lights
-	if(opaque_counter != old_opaque_counter && (!opaque_counter || !old_opaque_counter))
+	// Only a change between transparent and opaque affects visibility. In
+	// particular, an uninitialized (null) counter becoming zero is not a change.
+	if(!!opaque_counter != !!old_opaque_counter)
 		GLOB.opacity_set_event.raise_event(src, !opaque_counter, !!opaque_counter)
 		reconsider_lights()
 		shadowcast_queue_invalidate(src)
 		// Exposure of shared wall corners changes with the surrounding geometry,
 		// even if a light source's existing corner values do not change.
-		for(var/turf/T in range(1, src))
-			T.lighting_overlay?.update_overlay()
+		// Every startup overlay is already queued for the final light pass.
+		if(lighting_overlays_initialised)
+			for(var/turf/T in range(1, src))
+				T.lighting_overlay?.update_overlay()
 		return TRUE
 	return FALSE
 
@@ -38,6 +43,17 @@
 /turf/proc/reconsider_lights()
 	for(var/datum/light_source/L in affecting_lights)
 		L.vis_update()
+	for(var/datum/light_source/L in lighting_visibility_sources)
+		L.vis_update()
+
+// A hole displays the floor below, so its lightmap must refresh with that floor.
+/turf/proc/queue_lighting_overlay_updates()
+	var/turf/T = src
+	while(T)
+		T.lighting_overlay?.queue_update()
+		T = T.above
+		if(!T || T.opaque_counter || !(T.z_flags & ZM_MIMIC_BELOW) || !(T.z_flags & ZM_MIMIC_OVERWRITE))
+			break
 
 /turf/proc/lighting_clear_overlay()
 	if(lighting_overlay)
@@ -50,7 +66,8 @@
 // Builds a lighting overlay for us, but only if our area is dynamic.
 /turf/proc/lighting_build_overlay()
 	if(lighting_overlay)
-		lighting_overlay.update_edge_guard()
+		if(lighting_overlays_initialised)
+			lighting_overlay.update_edge_guard()
 		return
 
 	if(TURF_IS_DYNAMICALLY_LIT_UNSAFE(src))

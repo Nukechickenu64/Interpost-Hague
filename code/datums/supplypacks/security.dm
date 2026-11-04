@@ -1,6 +1,27 @@
 /decl/hierarchy/supply_pack/security
 	name = "Security"
 
+/decl/hierarchy/supply_pack/security/os13_nt5
+	name = "NT5 revolvers and ammunition"
+	contains = list(/obj/item/weapon/gun/projectile/revolver/os13_nt5 = 2, /obj/item/ammo_magazine/a357 = 4)
+	containertype = /obj/structure/closet/crate/secure
+	containername = "NT5 service weapons crate"
+	access = access_security
+
+/decl/hierarchy/supply_pack/security/os13_tnc_laser
+	name = "TNC Laser Guns"
+	contains = list(/obj/item/weapon/gun/energy/laser/os13_tnc = 2)
+	containertype = /obj/structure/closet/crate/secure
+	containername = "TNC laser weapons crate"
+	access = access_security
+
+/decl/hierarchy/supply_pack/security/os13_rax
+	name = "RAX Shotguns and buckshot"
+	contains = list(/obj/item/weapon/gun/projectile/shotgun/pump/os13_rax = 2, /obj/item/ammo_casing/shotgun/pellet/os13 = 12)
+	containertype = /obj/structure/closet/crate/secure
+	containername = "RAX shotgun crate"
+	access = access_security
+
 /decl/hierarchy/supply_pack/security/specialops
 	name = "Special Ops supplies"
 	contains = list(/obj/item/storage/box/emps,

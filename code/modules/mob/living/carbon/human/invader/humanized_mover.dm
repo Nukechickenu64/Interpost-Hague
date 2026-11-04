@@ -37,6 +37,8 @@
 	var/turf/shuffle_home
 	var/in_combat = FALSE
 	var/crawling = FALSE
+	var/adjacency_proc = /turf/proc/InvaderAdjacentTurfs
+	var/distance_proc = /turf/proc/InvaderDistance
 
 /datum/humanized_mover/New(var/mob/living/carbon/human/new_owner)
 	..()
@@ -195,7 +197,7 @@
 	if(!here || !goal || here.z != goal.z)
 		clear()
 		return FALSE
-	route = AStar(here, goal, /turf/proc/InvaderAdjacentTurfs, /turf/proc/InvaderDistance, 0, MOVER_ROUTE_DEPTH, goal_dist, null, owner)
+	route = AStar(here, goal, adjacency_proc, distance_proc, 0, MOVER_ROUTE_DEPTH, goal_dist, null, owner)
 	if(!islist(route) || !route.len)
 		clear()
 		return FALSE
@@ -216,12 +218,12 @@
 		var/turf/aim = waypoint
 		// Aim slightly off the exact route, like clicking roughly across the screen.
 		if(idx < route.len && prob(40))
-			var/list/near = waypoint.InvaderAdjacentTurfs(owner)
+			var/list/near = call(waypoint, adjacency_proc)(owner)
 			if(near.len)
 				aim = pick(near)
-		var/list/local = AStar(here, aim, /turf/proc/InvaderAdjacentTurfs, /turf/proc/InvaderDistance, 0, MOVER_LOCAL_DEPTH, 0, null, owner)
+		var/list/local = AStar(here, aim, adjacency_proc, distance_proc, 0, MOVER_LOCAL_DEPTH, 0, null, owner)
 		if((!islist(local) || !local.len) && aim != waypoint)
-			local = AStar(here, waypoint, /turf/proc/InvaderAdjacentTurfs, /turf/proc/InvaderDistance, 0, MOVER_LOCAL_DEPTH, 0, null, owner)
+			local = AStar(here, waypoint, adjacency_proc, distance_proc, 0, MOVER_LOCAL_DEPTH, 0, null, owner)
 		if(!islist(local) || !local.len)
 			return FALSE
 		if(local.len >= 2)

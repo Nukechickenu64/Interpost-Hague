@@ -80,28 +80,29 @@
 
 	switch(M.a_intent)
 		if(I_HELP)
-			if(istype(H) && (is_asystole() || (status_flags & FAKEDEATH)))
+			if(istype(H) && H != src && stat != DEAD && (H.zone_sel.selecting in list(BP_CHEST, BP_MOUTH)) && (is_asystole() || (status_flags & FAKEDEATH) || (H.zone_sel.selecting == BP_MOUTH && stat == UNCONSCIOUS)))
 				if (!cpr_time)
 					return 0
 
+				var/cpr_zone = H.zone_sel.selecting
 				cpr_time = 0
-				spawn(30)
-					cpr_time = 1
+				H.visible_message("<span class='notice'>\The [H] is trying to perform [cpr_zone == BP_MOUTH ? "mouth-to-mouth respiration" : "chest compressions"] on \the [src].</span>")
 
-				H.visible_message("<span class='notice'>\The [H] is trying to perform CPR on \the [src].</span>")
-
-				if(!do_after(H, 30, src))
+				var/completed = do_after(H, 30, src)
+				cpr_time = 1
+				if(!completed || stat == DEAD)
 					return
 
-				H.visible_message("<span class='notice'>\The [H] performs CPR on \the [src]!</span>")
-				if(prob(20 - usr.stats[STAT_IQ]))
+				if(cpr_zone == BP_CHEST)
 					var/obj/item/organ/external/chest = get_organ(BP_CHEST)
-					if(chest)
+					if(!chest || chest.is_stump() || chest.robotic >= ORGAN_ROBOT)
+						return
+					H.visible_message("<span class='notice'>\The [H] performs chest compressions on \the [src]!</span>")
+					if(prob(20 - H.stats[STAT_IQ]))
 						chest.fracture()
-				if(stat != DEAD)
 					if(prob(H.skills[SKILL_MED]))
 						resuscitate()
-
+				else
 					if(!H.check_has_mouth())
 						to_chat(H, "<span class='warning'>You don't have a mouth, you cannot do mouth-to-mouth resustication!</span>")
 						return
@@ -121,6 +122,7 @@
 						return
 					var/obj/item/organ/internal/lungs/L = internal_organs_by_name[species.breathing_organ]
 					if(L)
+						H.visible_message("<span class='notice'>\The [H] performs mouth-to-mouth respiration on \the [src]!</span>")
 						var/datum/gas_mixture/breath = H.get_breath_from_environment()
 						var/fail = L.handle_breath(breath, 1)
 						if(!fail)

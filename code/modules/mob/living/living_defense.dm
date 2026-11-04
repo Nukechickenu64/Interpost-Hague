@@ -257,12 +257,15 @@
 	src.embedded += O
 	src.verbs += /mob/proc/yank_out_object
 
-//This is called when the mob is thrown into a dense turf
-/mob/living/proc/turf_collision(var/turf/T, var/speed)
-	visible_message("<span class='danger'>[src] slams into \the [T]!</span>")
+//This is called when the mob is thrown into a dense turf or window.
+/mob/living/proc/turf_collision(var/atom/collision_target, var/speed)
+	var/surface_name = "\the [collision_target]"
+	if(istype(collision_target, /turf/simulated/wall))
+		surface_name = "the Strong Wall"
+	visible_message("<span class='danger'>[src] hits [surface_name]!</span>")
 	playsound(loc, 'sound/effects/bangtaper.ogg', 50, 1, -1)
 	if(jolt_impact)
-		jolt_collision(T)
+		jolt_collision(collision_target)
 		jolt_impact = 0
 	else
 		src.take_organ_damage(1)

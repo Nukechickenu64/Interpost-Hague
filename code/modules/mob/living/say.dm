@@ -244,6 +244,9 @@ proc/get_radio_key_from_channel(var/channel)
 	if(!message || message == "")
 		return 0
 
+	os13_recent_phrase = message
+	os13_recent_phrase_time = world.time
+
 	var/list/obj/item/used_radios = new
 	if(handle_message_mode(message_mode, message, verb, speaking, used_radios, alt_name))
 		return 1

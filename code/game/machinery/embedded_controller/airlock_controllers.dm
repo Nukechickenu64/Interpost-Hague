@@ -1,6 +1,8 @@
 //base type for controllers of two-door systems
 /obj/machinery/embedded_controller/radio/airlock
 	// Setup parameters only
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "zshu1"
 	radio_filter = RADIO_AIRLOCK
 	var/tag_exterior_door
 	var/tag_interior_door
@@ -13,6 +15,14 @@
 	var/tag_secure = 0
 	var/list/dummy_terminals = list()
 	var/cycle_to_external_air = 0
+
+/obj/machinery/embedded_controller/radio/airlock/update_icon()
+	if(!on || !program)
+		icon_state = "zshu0"
+	else if(program.memory["processing"])
+		icon_state = "zshu00"
+	else
+		icon_state = "zshu1"
 
 /obj/machinery/embedded_controller/radio/airlock/New()
 	..()
@@ -263,8 +273,8 @@
 
 //Access controller for door control - used in virology and the like
 /obj/machinery/embedded_controller/radio/airlock/access_controller
-	icon = 'icons/obj/airlock_machines.dmi'
-	icon_state = "access_control_standby"
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "izshu1"
 
 	name = "Access Controller"
 	tag_secure = 1
@@ -274,10 +284,6 @@
 
 /obj/machinery/embedded_controller/radio/airlock/access_controller/update_icon()
 	if(on && program)
-		if(program.memory["processing"])
-			icon_state = "access_control_process"
-		else
-			icon_state = "access_control_standby"
+		icon_state = "izshu1"
 	else
-		icon_state = "access_control_off"
-
+		icon_state = "izshu0"

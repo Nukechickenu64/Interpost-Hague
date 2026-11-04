@@ -12,7 +12,7 @@
 		EXCEPTION("Invalid target given")
 	if (goal_number)
 		goal = goal_number
-	bar = image('icons/effects/progessbar.dmi', target, "prog_bar_0")
+	bar = image('icons/os13/objects/objects/progressbar.dmi', target, "1")
 	bar.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA
 	bar.plane = MAP_HUD_PLANE
 	bar.layer = PROGRESSBAR_LAYER
@@ -40,7 +40,7 @@
 		client = user.client
 
 	progress = clamp(progress, 0, goal)
-	bar.icon_state = "prog_bar_[round(((progress / goal) * 100), 5)]"
+	bar.icon_state = "[round((progress / goal) * 15) + 1]"
 	if (!shown && user.get_preference_value(/datum/client_preference/show_progress_bar) == GLOB.PREF_SHOW)
 		user.client.images += bar
 		shown = 1

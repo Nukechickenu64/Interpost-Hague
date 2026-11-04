@@ -241,6 +241,7 @@
 	//DISCONNECT//
 	//////////////
 /client/Del()
+	clear_os13_parallax()
 	clear_vehicle_placement()
 	clear_atmos_subarea_visualizer()
 	ticket_panels -= src

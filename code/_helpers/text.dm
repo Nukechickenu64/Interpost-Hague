@@ -358,11 +358,8 @@ proc/TextPreview(var/string,var/len=40)
 
 #define gender2text(gender) capitalize(gender)
 
-/**
- * Strip out the special beyond characters for \proper and \improper
- * from text that will be sent to the browser.
- */
-#define strip_improper(input_text) replacetext(replacetext(input_text, "\proper", ""), "\improper", "")
+// strip_improper() is defined in code\__defines\misc.dm so that
+// earlier-compiled helpers (e.g. device_ui.dm) can use it.
 
 /proc/pencode2html(t)
 	t = replacetext(t, "\n", "<BR>")

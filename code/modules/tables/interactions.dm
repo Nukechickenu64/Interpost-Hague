@@ -53,6 +53,11 @@
 	visible_message("<span class='warning'>\The [P] hits [src]!</span>")
 	return 0
 
+/obj/structure/table/attack_hand(mob/user)
+	if(user.a_intent == I_HURT)
+		user.visible_message("<span class='danger'>\The [user] hits \the [src]!</span>")
+	return ..()
+
 /obj/structure/table/CheckExit(atom/movable/O as mob|obj, target as turf)
 	if(istype(O) && O.checkpass(PASS_FLAG_TABLE))
 		return 1

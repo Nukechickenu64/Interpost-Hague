@@ -265,7 +265,7 @@
 		if(src.gun_setting_icon)
 			src.client.screen |= src.gun_setting_icon
 
-		src.hud_used.action_intent.screen_loc = ui_acti //Restore intent selection to the original position
+		src.hud_used.action_intent.screen_loc = initial(src.hud_used.action_intent.screen_loc)
 		src.client.screen += src.zone_sel				//This one is a special snowflake
 
 	hud_used.hidden_inventory_update()
@@ -303,7 +303,7 @@
 			src.client.screen += src.hud_used.hotkeybuttons
 		if(src.internals)
 			src.client.screen |= src.internals
-		src.hud_used.action_intent.screen_loc = ui_acti //Restore intent selection to the original position
+		src.hud_used.action_intent.screen_loc = initial(src.hud_used.action_intent.screen_loc)
 
 	hud_used.hidden_inventory_update()
 	hud_used.persistant_inventory_update()
@@ -337,8 +337,11 @@
 
 	if(!client) return
 	for(var/obj/screen/S in client.screen)
-		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/plane_master/lighting_veil) || istype(S, /obj/screen/lighting_veil_display) || istype(S, /obj/screen/lighting_backdrop))
+		if(istype(S, /obj/screen/plane_master/world_ao) || istype(S, /obj/screen/plane_master/world_ao_receivers) || istype(S, /obj/screen/world_ao_display) || istype(S, /obj/screen/plane_master/world_terrain) || istype(S, /obj/screen/plane_master/world_shadows) || istype(S, /obj/screen/world_terrain_display) || istype(S, /obj/screen/world_shadow_display))
 			client.screen -= S
+		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_geometry) || istype(S, /obj/screen/plane_master/los_visible_objects) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/plane_master/lighting_veil) || istype(S, /obj/screen/lighting_veil_display) || istype(S, /obj/screen/lighting_backdrop))
+			client.screen -= S
+	client.screen.Add(new /obj/screen/plane_master/world_terrain, new /obj/screen/plane_master/world_shadows, new /obj/screen/world_terrain_display, new /obj/screen/world_shadow_display)
 	var/obj/screen/plane_master/shadowcasting/p3 = new
 	var/obj/screen/plane_master/lighting/p4 = new
 
@@ -346,12 +349,45 @@
 	p3.render_target = "all3"
 
 	client.screen.Add(p3)
-	// A contentless plane master can corrupt other planes (see ghost_dummy), so only add it when enhanced LOS populates it.
+	// These additional mask passes are only used by enhanced LOS.
 	if(enhanced_los_enabled)
-		client.screen.Add(new /obj/screen/plane_master/los_occluders)
+		client.screen.Add(new /obj/screen/plane_master/los_occluders, new /obj/screen/plane_master/los_geometry, new /obj/screen/plane_master/los_visible_objects)
 	client.screen.Add(p4)
 	client.screen.Add(new /obj/screen/lighting_backdrop)
 	client.screen.Add(new /obj/screen/plane_master/emissive)
 	client.screen.Add(new /obj/screen/plane_master/lighting_veil)
 	client.screen.Add(new /obj/screen/lighting_veil_display)
+	client.sync_world_plane_guards()
 	//client.screen.Add(p4)
+
+// Native visibility can empty a source plane between movement updates (no
+// projected silhouettes, wall masks or rays). Keep each renderer pass populated
+// just as ghost_master does, so an empty target cannot corrupt the terrain pass.
+/client/proc/sync_world_plane_guards()
+	var/list/world_planes = list(WORLD_TERRAIN_SOURCE_PLANE, WORLD_SHADOW_SOURCE_PLANE, SHADOWCASTING_PLANE, SHADOWCASTING_REFLECTOR_PLANE, SHADOWCASTING_GEOMETRY_PLANE, DEFAULT_PLANE, LIGHTING_PLANE, EMISSIVE_PLANE, LIGHTING_VEIL_SOURCE_PLANE)
+	var/list/planes = list()
+	for(var/obj/screen/plane_master/P in screen)
+		if((P.appearance_flags & PLANE_MASTER) && (P.plane in world_planes))
+			planes["[P.plane]"] = TRUE
+	var/list/guarded = list()
+	for(var/obj/screen/plane_master/ghost_dummy/world_render/G in screen)
+		var/key = "[G.plane]"
+		if(!planes[key] || guarded[key])
+			screen -= G
+			qdel(G)
+		else
+			guarded[key] = TRUE
+	for(var/key in planes)
+		if(!guarded[key])
+			var/obj/screen/plane_master/ghost_dummy/world_render/G = new
+			G.plane = text2num(key)
+			screen += G
+
+/obj/screen/plane_master/ghost_dummy/world_render
+	name = "world render plane guard"
+	mouse_opacity = 0
+	globalscreen = FALSE
+
+/obj/screen/plane_master/ghost_dummy/world_render/New()
+	. = ..()
+	icon = get_solid_white_icon()

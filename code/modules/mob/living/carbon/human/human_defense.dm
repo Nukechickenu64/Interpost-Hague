@@ -167,6 +167,8 @@ meteor_act
 	affected.stun_act(stun_amount, agony_amount)
 
 	..(stun_amount, agony_amount, def_zone)
+	if(stun_amount > 0 || agony_amount > 0)
+		os13_offer_clone()
 
 /mob/living/carbon/human/getarmor(var/def_zone, var/type)
 	var/psi_mod = psi ? psi.get_armour(type) : 0
@@ -332,6 +334,9 @@ meteor_act
 
 	if(hit_zone != aim_zone && !(aim_zone in list(BP_MOUTH, BP_THROAT, BP_EYES, BP_FACE, BP_VITALS, BP_BELLY)))//This is ugly but it works.
 		visible_message("<span class='combat'>[user] aimed for [src]\'s [aimed.name], but [I.get_attack_name()] \his [organ_hit] [user.attack_quality ? user.attack_quality : ""] instead. [(blocked < 20 && blocked > 1)  ? "Slight damage was done." : ""]</span>")
+	else if(istype(I, /obj/item/weapon/melee/baton/loaded/intensecure) && hit_zone == BP_R_HAND && aim_zone == BP_R_HAND)
+		var/obj/item/weapon/melee/baton/loaded/intensecure/baton = I
+		visible_message("<span class='combat'>[baton.os13_hit_message(user, src, hit_zone, aim_zone)]</span>")
 
 	else if(blocked < 20 && blocked > 1)//This is ugly and it doesn't work.
 		visible_message("<span class='combat'>[user] [I.get_attack_name()] [src]\'s [organ_hit] [user.attack_quality ? user.attack_quality : ""] with the [I.name]! Slight damage was done.</span>")

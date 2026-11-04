@@ -23,6 +23,7 @@ SUBSYSTEM_DEF(atoms)
 /datum/controller/subsystem/atoms/Initialize(timeofday)
 	atom_init_stage = INITIALIZATION_INNEW_MAPLOAD
 	InitializeAtoms()
+	initialize_starlight()
 	return ..()
 
 /datum/controller/subsystem/atoms/proc/InitializeAtoms()

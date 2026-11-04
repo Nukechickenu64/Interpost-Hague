@@ -1,0 +1,12 @@
+Captain=1
+Chief Engineer=1
+Engineer=2
+Marshal=1
+Pilot=1
+Geneticist=1
+Medical Officer=1
+Scientific Overseer=1
+Cybertechnician=1
+Psionic-Counselor=1
+Logistics Officer=1
+Cadet=1

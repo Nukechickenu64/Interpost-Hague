@@ -210,7 +210,7 @@ var/global/datum/controller/occupations/job_master
 			if(job.minimum_character_age && (player.client.prefs.age < job.minimum_character_age))
 				continue
 
-			if(istype(job, GetJob("Assistant"))) // We don't want to give him assistant, that's boring!
+			if(job.title == GLOB.using_map.default_job)
 				continue
 
 			if(job.is_restricted(player.client.prefs))
@@ -312,12 +312,12 @@ var/global/datum/controller/occupations/job_master
 
 		//People who wants to be assistants, sure, go on.
 		Debug("DO, Running Assistant Check 1")
-		var/datum/job/assist = new DEFAULT_JOB_TYPE ()
-		var/list/assistant_candidates = FindOccupationCandidates(assist, 3)
+		var/datum/job/assist = GetJob(GLOB.using_map.default_job)
+		var/list/assistant_candidates = assist && assist.title == "Assistant" ? FindOccupationCandidates(assist, 3) : list()
 		Debug("AC1, Candidates: [assistant_candidates.len]")
 		for(var/mob/new_player/player in assistant_candidates)
 			Debug("AC1 pass, Player: [player]")
-			AssignRole(player, "Assistant")
+			AssignRole(player, assist.title)
 			assistant_candidates -= player
 		Debug("DO, AC1 end")
 
@@ -388,7 +388,10 @@ var/global/datum/controller/occupations/job_master
 					var/datum/mil_branch/branch = mil_branches.get_branch(player.get_branch_pref())
 					AssignRole(player, branch.assistant_job)
 				else
-					AssignRole(player, "Assistant")
+					if(!AssignRole(player, GLOB.using_map.default_job))
+						player.ready = FALSE
+						unassigned -= player
+						to_chat(player, "<span class='warning'>The fallback job is unavailable. You have been returned to the lobby.</span>")
 
 		//For ones returning to lobby
 		for(var/mob/new_player/player in unassigned)
@@ -527,16 +530,19 @@ var/global/datum/controller/occupations/job_master
 				W.set_dir(H.dir)
 				W.buckled_mob = H
 				W.add_fingerprint(H)
-		if(job.wakeup_flavor)
+		var/os13_awakening = istype(GLOB.using_map, /datum/map/alpha) && istype(job, /datum/job/os13)
+		if(os13_awakening)
+			os13_send_awakening(H, job, joined_late)
+		if(job.wakeup_flavor && !os13_awakening)
 			to_chat(H, "<B>.......<B>")
-		if(H.mind.assigned_role == "Captain" && job.wakeup_flavor)
+		if(H.mind.assigned_role == "Captain" && job.wakeup_flavor && !os13_awakening)
 			spawn(30)
 				to_chat("<B><span class = 'wakeup'>Enough ruminating on recent events, I'm the captain of this place and I've got a job to do and by [H.religion] I'll do it.</span>")
 				spawn(50)
 					to_chat(H, "<B>.......<B> ")
 					spawn(50)
 						to_chat(H, "<B><span class = 'wakeup'>I should gather the officers for a meeting.</span> <span class = 'nanotrasen'>Nanotrasen</span><span class = 'wakeup'>'s bound to have sent us some new job to do...<B></span>")
-		else if(job.wakeup_flavor)
+		else if(job.wakeup_flavor && !os13_awakening)
 			spawn(20)
 				to_chat(H, "<B><span class = 'wakeup'>Wh-where am I?</B></span>")
 				spawn(20)
@@ -711,6 +717,9 @@ var/global/datum/controller/occupations/job_master
 			if(name && value)
 				var/datum/job/J = GetJob(name)
 				if(!J)	continue
+				// Explicit Job Editor definitions keep independent total/start limits.
+				if(("strongdmm_job_slots" in J.vars) && J.vars["strongdmm_job_slots"])
+					continue
 				J.total_positions = text2num(value)
 				J.spawn_positions = text2num(value)
 				if(name == "AI" || name == "Cyborg")//I dont like this here but it will do for now
@@ -753,7 +762,7 @@ var/global/datum/controller/occupations/job_master
 		switch(rank)
 			if("Captain", "Executive Officer")
 				H.combat_music = GLOB.command_combat_music
-			if("Major", "Enforcer")
+			if("Major", "Enforcer", "Marshal", "Pilot")
 				H.combat_music = GLOB.security_combat_music
 			if("Supreme Arbiter", "Arbiter")
 				H.combat_music = GLOB.religion_combat_music

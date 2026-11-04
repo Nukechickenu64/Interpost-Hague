@@ -27,6 +27,7 @@
 	var/breathing = 0
 	var/last_failed_breath
 	var/breath_fail_ratio // How badly they failed a breath. Higher is worse.
+	var/last_no_breath_warning = 0
 
 /obj/item/organ/internal/lungs/proc/can_drown()
 	return (is_broken() || !has_gills)
@@ -165,6 +166,10 @@
 	if(inhale_efficiency < 1)
 		if(prob(20) && active_breathing)
 			owner.emote("gasp")
+		// OS13 parity: near-total breath failure is spelled out (marshal video 1:03:09).
+		if(inhale_efficiency <= 0.05 && owner.stat == CONSCIOUS && world.time >= last_no_breath_warning + 15 SECONDS)
+			last_no_breath_warning = world.time
+			to_chat(owner, "<span class='danger'>You cannot breathe anymore.</span>")
 
 		breath_fail_ratio = 1 - inhale_efficiency
 		failed_inhale = 1

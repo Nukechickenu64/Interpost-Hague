@@ -8,6 +8,7 @@
 	var/possible_transfer_amounts = "5;10;15;25;30"
 	var/volume = 30
 	var/label_text
+	var/announce_pouring = FALSE
 
 /obj/item/reagent_containers/verb/set_APTFT() //set amount_per_transfer_from_this
 	set name = "Set transfer amount"
@@ -187,7 +188,11 @@
 		return 1
 
 	var/trans = reagents.trans_to(target, amount_per_transfer_from_this)
-	to_chat(user, "<span class='notice'>You transfer [trans] unit\s of the solution to \the [target].</span>")
+	var/transfer_message = "<span class='notice'>You transfer [trans] unit\s of the solution to \the [target].</span>"
+	if(announce_pouring && trans > 0)
+		user.visible_message("<span class='notice'>[user] fills \the [target] from [src].</span>", transfer_message)
+	else
+		to_chat(user, transfer_message)
 	playsound(src, 'sound/effects/Liquid_transfer_mono.wav', 80, 1)
 	return 1
 

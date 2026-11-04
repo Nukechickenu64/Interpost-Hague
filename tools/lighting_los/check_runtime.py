@@ -21,6 +21,8 @@ expected = {
     "Exposure spectrum and smooth light boundary",
     "Floor lamp bloom follows power and damage",
     "Projected silhouettes follow actual light",
+    "Ambient occlusion disabled",
+    "Bidirectional light through open decks",
 }
 passed = re.findall(r"\*\*\* SUCCESS \*\*\* \[ARTEMIS - ([^\]]+)\]", tests)
 if (set(passed) != expected or len(passed) != len(expected)

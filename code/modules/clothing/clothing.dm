@@ -366,7 +366,7 @@ BLIND		// can't see anything
 		var/mob/living/carbon/human/user_human = user_mob
 		bodytype = user_human.species.get_bodytype(user_human)
 	var/cache_key = "[light_overlay]_[bodytype]"
-	if(on && light_overlay_cache[cache_key] && slot == slot_head_str)
+	if(on && light_overlay && light_overlay_cache[cache_key] && slot == slot_head_str)
 		ret.overlays |= light_overlay_cache[cache_key]
 	return ret
 
@@ -426,7 +426,7 @@ BLIND		// can't see anything
 	if(istype(user,/mob/living/carbon/human))
 		H = user
 
-	if(on)
+	if(on && light_overlay)
 
 		// Generate object icon.
 		if(!light_overlay_cache["[light_overlay]_icon"])

@@ -1,0 +1,11 @@
+#define DEBUG
+#include "Interpost-Hague.dme"
+#include "tools\os13_parity\regression.dm"
+#include "tools\os13_parity\weapon_regression.dm"
+#include "tools\os13_parity\remote_regression.dm"
+#include "tools\os13_parity\medicine_regression.dm"
+#include "tools\os13_parity\psychocorrection_regression.dm"
+#include "tools\os13_parity\rax_regression.dm"
+#include "tools\os13_parity\gravpulser_regression.dm"
+#include "tools\os13_parity\stun_mine_regression.dm"
+#include "tools\os13_parity\energy_arms_regression.dm"

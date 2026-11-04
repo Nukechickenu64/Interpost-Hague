@@ -85,7 +85,10 @@
 			to_chat(user, "<span class='warning'>No! I cannot remove \the [src]'s [target_slot.name].</span>")
 			return
 
-		visible_message("<span class='danger'>\The [user] is trying to remove \the [src]'s [target_slot.name]!</span>")
+		if(text2num(slot_to_strip_text) == slot_handcuffed)
+			visible_message("<span class='danger'>\The [user] is trying to unhandcuff [src]!</span>")
+		else
+			visible_message("<span class='danger'>\The [user] is trying to remove \the [src]'s [target_slot.name]!</span>")
 	else
 		visible_message("<span class='danger'>\The [user] is trying to put \a [held] on \the [src]!</span>")
 

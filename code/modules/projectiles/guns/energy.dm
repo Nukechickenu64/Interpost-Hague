@@ -97,7 +97,7 @@
 
 /obj/item/weapon/gun/energy/examine(mob/user)
 	. = ..(user)
-	var/shots_remaining = round(power_supply.charge / charge_cost)
+	var/shots_remaining = power_supply ? round(power_supply.charge / charge_cost) : 0
 	to_chat(user, "Has [shots_remaining] shot\s remaining.")
 	return
 

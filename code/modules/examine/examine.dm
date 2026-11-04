@@ -63,7 +63,14 @@
 
 //override examinate verb to update description holders when things are examined
 /mob/examinate(atom/A as mob|obj|turf in view())
-	if(..())
+	var/result = ..()
+	if(ishuman(src))
+		var/mob/living/carbon/human/H = src
+		if(isobj(A))
+			H.os13_psychometry(A)
+		else if(ishuman(A))
+			H.os13_read_emotions(A)
+	if(result)
 		return 1
 
 	var/is_antag = ((mind && mind.special_role) || isghost(src)) //ghosts don't have minds

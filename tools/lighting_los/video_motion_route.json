@@ -1,0 +1,482 @@
+[
+  {
+    "time": 2.1,
+    "x": 130,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 3.1,
+    "x": 131,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 3.9167,
+    "x": 132,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 5.1833,
+    "x": 133,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 6.1,
+    "x": 134,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 6.85,
+    "x": 135,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 7.75,
+    "x": 134,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 8.4833,
+    "x": 133,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 9.1416,
+    "x": 132,
+    "y": 128,
+    "observed": false
+  },
+  {
+    "time": 9.8,
+    "x": 131,
+    "y": 128,
+    "observed": false
+  },
+  {
+    "time": 10.4583,
+    "x": 130,
+    "y": 128,
+    "observed": false
+  },
+  {
+    "time": 11.1167,
+    "x": 129,
+    "y": 128,
+    "observed": false
+  },
+  {
+    "time": 11.3667,
+    "x": 130,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 11.5667,
+    "x": 131,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 11.8833,
+    "x": 132,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 12.15,
+    "x": 133,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 12.5,
+    "x": 134,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 12.7833,
+    "x": 135,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 13.2,
+    "x": 134,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 13.4833,
+    "x": 133,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 14.0833,
+    "x": 133,
+    "y": 127,
+    "observed": true
+  },
+  {
+    "time": 15.5,
+    "x": 132,
+    "y": 127,
+    "observed": false
+  },
+  {
+    "time": 16.9167,
+    "x": 131,
+    "y": 127,
+    "observed": false
+  },
+  {
+    "time": 18.3333,
+    "x": 130,
+    "y": 127,
+    "observed": false
+  },
+  {
+    "time": 18.5833,
+    "x": 130,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 18.8667,
+    "x": 130,
+    "y": 129,
+    "observed": true
+  },
+  {
+    "time": 19.1667,
+    "x": 130,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 19.65,
+    "x": 130,
+    "y": 129,
+    "observed": true
+  },
+  {
+    "time": 19.9167,
+    "x": 130,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 20.2167,
+    "x": 130,
+    "y": 127,
+    "observed": true
+  },
+  {
+    "time": 20.55,
+    "x": 130,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 20.9167,
+    "x": 131,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 21.2,
+    "x": 132,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 21.4833,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 21.8,
+    "x": 134,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 22.1167,
+    "x": 135,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 22.6833,
+    "x": 135,
+    "y": 127,
+    "observed": true
+  },
+  {
+    "time": 23.0,
+    "x": 135,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 23.4083,
+    "x": 135,
+    "y": 129,
+    "observed": false
+  },
+  {
+    "time": 23.8167,
+    "x": 135,
+    "y": 130,
+    "observed": false
+  },
+  {
+    "time": 24.0833,
+    "x": 134,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 24.4333,
+    "x": 133,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 24.7833,
+    "x": 132,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 25.15,
+    "x": 131,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 25.925,
+    "x": 130,
+    "y": 130,
+    "observed": false
+  },
+  {
+    "time": 26.7,
+    "x": 129,
+    "y": 130,
+    "observed": false
+  },
+  {
+    "time": 26.95,
+    "x": 130,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 27.3833,
+    "x": 131,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 27.7167,
+    "x": 132,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 28.0833,
+    "x": 133,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 28.4833,
+    "x": 134,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 28.8167,
+    "x": 135,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 29.15,
+    "x": 136,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 29.5167,
+    "x": 137,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 30.4833,
+    "x": 138,
+    "y": 130,
+    "observed": true
+  },
+  {
+    "time": 30.7667,
+    "x": 138,
+    "y": 129,
+    "observed": true
+  },
+  {
+    "time": 31.0667,
+    "x": 138,
+    "y": 128,
+    "observed": true
+  },
+  {
+    "time": 31.45,
+    "x": 138,
+    "y": 127,
+    "observed": true
+  },
+  {
+    "time": 31.8167,
+    "x": 138,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 32.1667,
+    "x": 137,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 32.55,
+    "x": 136,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 32.8833,
+    "x": 135,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 33.25,
+    "x": 134,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 33.65,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 34.25,
+    "x": 132,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 34.5333,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 35.0333,
+    "x": 134,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 35.45,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 36.5167,
+    "x": 134,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 37.15,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 38.1333,
+    "x": 133,
+    "y": 127,
+    "observed": true
+  },
+  {
+    "time": 38.6916,
+    "x": 134,
+    "y": 127,
+    "observed": false
+  },
+  {
+    "time": 39.25,
+    "x": 135,
+    "y": 127,
+    "observed": false
+  },
+  {
+    "time": 39.55,
+    "x": 135,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 40.0,
+    "x": 135,
+    "y": 125,
+    "observed": true
+  },
+  {
+    "time": 40.2833,
+    "x": 134,
+    "y": 125,
+    "observed": true
+  },
+  {
+    "time": 40.7167,
+    "x": 134,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 41.1333,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 41.7333,
+    "x": 132,
+    "y": 126,
+    "observed": true
+  },
+  {
+    "time": 42.0333,
+    "x": 133,
+    "y": 126,
+    "observed": true
+  }
+]

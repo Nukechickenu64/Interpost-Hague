@@ -1026,6 +1026,8 @@
 	if(stat == UNCONSCIOUS && world.time - l_move_time < 5 && prob(10))
 		to_chat(src,"<span class='notice'>I feel like I'm [pick("moving","flying","floating","falling","hovering")].</span>")
 
+	handle_posthib_psychosis()
+
 /mob/living/carbon/human/proc/handle_changeling()
 	if(mind && mind.changeling)
 		mind.changeling.regenerate()
@@ -1297,7 +1299,10 @@
 			reset_view(null)
 	else
 		var/isRemoteObserve = 0
+		var/obj/item/organ/internal/os13_psiboost/amplifier = os13_psiboost()
 		if(z_eye)
+			isRemoteObserve = 1
+		else if(amplifier && amplifier.viewing())
 			isRemoteObserve = 1
 		else if((mRemote in mutations) && remoteview_target)
 			if(remoteview_target.stat == CONSCIOUS)

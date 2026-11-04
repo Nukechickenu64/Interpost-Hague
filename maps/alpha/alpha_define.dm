@@ -53,20 +53,33 @@
 	name = "OS13 Classic"
 	full_name = "Orbital Station 13 Classic"
 	path = "os13classic"
-	station_levels = list(2,3,4,5,6,7,8,9)
-	admin_levels = list(10)
-	atmos_isolated_z_levels = list(1,10)
-	contact_levels = list(2,3,4,5,6,7,8,9)
-	player_levels = list(2,3,4,5,6,7,8,9)
-	map_levels = list(2,3,4,5,6,7,8,9)
-	accessible_z_levels = list("2"=1,"3"=1,"4"=1,"5"=1,"6"=1,"7"=1,"8"=1,"9"=1)
+	lobby_icon = 'maps/os13/os13_lobby.dmi'
+	lobby_screens = list("os13_title")
+	// Classic is the two-deck map. The separate recreation has eight decks.
+	station_levels = list(1,2)
+	admin_levels = list()
+	atmos_isolated_z_levels = list()
+	contact_levels = list(1,2)
+	player_levels = list(1,2)
+	map_levels = list(1,2)
+	accessible_z_levels = list("1"=1,"2"=1)
 	station_name = "Orbital Station 13"
 	station_short = "OS13"
 
 /datum/map/os13classic/setup_map()
+	// Establish the physical stack before atom initialization. Keep this in the
+	// map configuration so saving the DMM cannot remove the deck connections.
+	new /obj/effect/landmark/map_data/os13classic(locate(1, 1, 3))
 	. = ..()
 	station_name = "Orbital Station 13"
 	station_short = "OS13"
+	lobby_music = new /lobby_music/os13
+
+/obj/effect/landmark/map_data/os13classic
+	height = 3
+
+/lobby_music/os13
+	song = 'sound/music/os13_lobby.ogg'
 
 /datum/map/os13classic/perform_map_generation()
 	return TRUE

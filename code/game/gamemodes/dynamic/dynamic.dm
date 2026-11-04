@@ -41,10 +41,6 @@
 	if(SSdirector)
 		SSdirector.on_round_start()
 
-	// Schedule the shift report
-	spawn(rand(waittime_l, waittime_h))
-		GLOB.using_map.send_welcome()
-
 /datum/game_mode/dynamic/process()
 	// The Director subsystem handles all processing via SSdirector.fire()
 	// This is just a passthrough for any gamemode-specific logic

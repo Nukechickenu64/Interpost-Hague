@@ -1,5 +1,115 @@
 #ifdef UNIT_TEST
 
+/datum/unit_test/cyberdeck_area_link
+	name = "CYBERDECK - Area-wide chair links and debug disk workflow"
+
+/datum/unit_test/cyberdeck_area_link/start_test()
+	var/failure = ""
+	var/turf/origin = locate(world.maxx - 30, world.maxy - 30, world.maxz)
+	var/turf/nearby = get_step(origin, EAST)
+	var/turf/distant = locate(origin.x + 8, origin.y, origin.z)
+	var/turf/other_level = locate(origin.x, origin.y, origin.z - 1)
+	var/list/original_areas = list()
+	var/area/cyberdeck_archive/test_area = new
+	var/area/cyberdeck_archive/neighbor_area = new
+	for(var/turf/T in list(origin, nearby, distant, other_level))
+		original_areas[T] = get_area(T)
+	// These corners are outside the reserved archive footprint.
+	test_area.contents.Add(origin, distant, other_level)
+	neighbor_area.contents.Add(nearby)
+	var/obj/machinery/computer/cyberdeck/debug/C = new(origin)
+	var/obj/machinery/computer/cyberdeck/debug/neighbor = new(nearby)
+	var/mob/living/carbon/human/H = new(distant)
+	STOP_PROCESSING(SSmobs, H)
+	var/datum/mind/M = new
+	M.transfer_to(H)
+	if(!C.prepare_operator(H))
+		failure += "Debug preparation did not equip, implant, seat and link the operator. "
+	var/obj/structure/bed/chair/cyberdeck/chair = H.buckled
+	var/list/screen = C.screen_data()
+	var/list/chairs = screen["chairs"]
+	if(get_dist(C, chair) <= 3 || !C.eligible_operator(H, chair) || !screen["can_boot"] || chairs.len != 1)
+		failure += "A distant chair in the same area was not offered for boot. "
+	if(!screen["debug_tools"] || !findtext(cyberdeck_ui_html(screen, "byond://?src=\ref[C]"), "action=debug"))
+		failure += "Debug tools were not exposed on the debug console. "
+	if(neighbor.eligible_operator(H, chair))
+		failure += "A console linked a chair in a different area. "
+	var/obj/structure/bed/chair/cyberdeck/foreign_chair = new(nearby)
+	if(C.chair_in_link_area(foreign_chair))
+		failure += "A neighboring chair across an area boundary was accepted. "
+	test_area.contents.Add(nearby)
+	neighbor_area.contents.Add(distant)
+	C.forceMove(nearby)
+	if(C.eligible_operator(H, chair))
+		failure += "Area boundaries were ignored. "
+	C.forceMove(origin)
+	test_area.contents.Add(distant)
+	neighbor_area.contents.Add(nearby)
+	var/obj/structure/bed/chair/cyberdeck/other_chair = new(other_level)
+	if(C.chair_in_link_area(other_chair))
+		failure += "A chair on another z-level was accepted in the same area. "
+	var/tech_type
+	for(var/candidate in research_technology_types())
+		var/datum/tech/T = candidate
+		if(initial(T.level) > 0 && C.archive_available(candidate) && !C.archive_complete(candidate))
+			tech_type = candidate
+			break
+	var/obj/item/disk/tech_disk/blank = C.disk
+	var/obj/item/disk/tech_disk/recorded = C.create_disk(origin, tech_type, 4)
+	var/obj/item/disk/tech_disk/independent = C.create_disk(origin, tech_type, 4)
+	if(!blank || blank.stored || !recorded || !recorded.stored || recorded.stored == independent.stored || recorded.stored.type != tech_type)
+		failure += "Debug disks were not blank or independently recorded. "
+	if(istype(GLOB.using_map, /datum/map/alpha) && recorded.stored.level != 1)
+		failure += "An OS13 debug disk did not preserve the binary extraction level. "
+	C.linked_chair = null
+	if(!tech_type || !C.begin_dive(H, tech_type))
+		failure += "A distant same-area operator could not auto-link and boot. "
+	else
+		var/mob/living/simple_animal/cyber_avatar/V = C.dive_body
+		if(C.linked_chair != chair || !C.physical_link_valid() || !C.dive_valid(V))
+			failure += "The running dive rejected the distant chair. "
+		neighbor_area.contents.Add(distant)
+		if(C.physical_link_valid() || C.dive_valid(V))
+			failure += "An active link survived crossing an area boundary. "
+		test_area.contents.Add(distant)
+		if(C.instance.collection_mode)
+			var/list/nodes = C.instance.nodes.Copy()
+			for(var/obj/effect/cyberdeck_node/data_fragment/N in nodes)
+				V.forceMove(get_turf(N))
+				if(!QDELETED(N) && !N.collected)
+					N.interact(V)
+		else
+			C.instance.decrypted = C.instance.required_keys
+			C.complete_dive(V)
+		if(C.state != CYBERDECK_IDLE || M.current != H || !blank.stored || blank.stored.type != tech_type || chair.linked_console)
+			failure += "Collecting data did not record the disk, restore the operator and release the chair. "
+	// The importer must be usable without a station power bus or scientist ID.
+	var/obj/machinery/computer/rdconsole/cyberdeck_debug/importer = new(nearby)
+	if(!C.powered() || (C.stat & NOPOWER) || !importer.powered() || (importer.stat & NOPOWER) || !importer.allowed(H) || !importer.files || importer.linked_lathe)
+		failure += "The debug equipment requires power/access or claims live fabricators. "
+	C.end_dive("Debug regression cleanup.")
+	qdel(importer)
+	qdel(C)
+	qdel(neighbor)
+	qdel(other_chair)
+	qdel(foreign_chair)
+	qdel(chair)
+	qdel(H)
+	qdel(M)
+	qdel(blank)
+	qdel(recorded)
+	qdel(independent)
+	for(var/turf/T in original_areas)
+		var/area/A = original_areas[T]
+		A.contents.Add(T)
+	qdel(test_area)
+	qdel(neighbor_area)
+	if(length(failure))
+		fail(failure)
+	else
+		pass("Distant chairs, area/z boundaries, auto-link, active connection validation, debug preparation, independent disks, data collection/download and a self-powered importer passed.")
+	return TRUE
+
 // Keep the fixture independent of the live station's changing power network.
 /obj/machinery/computer/cyberdeck/unit_test
 	var/test_power = TRUE

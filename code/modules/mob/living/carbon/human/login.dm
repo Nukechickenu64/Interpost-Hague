@@ -6,4 +6,6 @@
 	update_hud()
 	if(species) species.handle_login_special(src)
 	updatePig()
+	if(GAME_STATE == RUNLEVEL_GAME && SSticker.mode && SSticker.mode.os13_loyal_sheets_ready)
+		os13_send_loyal_crew_sheet(src)
 	return

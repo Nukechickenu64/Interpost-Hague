@@ -10,7 +10,6 @@
 	opacity = 1
 	density = 1
 	layer = CLOSED_DOOR_LAYER
-	los_never_cull = TRUE
 	var/open_layer = OPEN_DOOR_LAYER
 	var/closed_layer = CLOSED_DOOR_LAYER
 
@@ -39,18 +38,6 @@
 	var/atom/movable/overlay/c_animation = null
 
 	atmos_canpass = CANPASS_PROC
-
-/obj/machinery/door/sync_los_cull_exemption()
-	if(los_never_cull && isturf(loc))
-		var/turf/T = loc
-		if(density)
-			T.vis_contents |= src
-		else
-			T.vis_contents -= src
-
-/obj/machinery/door/set_density(var/new_density)
-	. = ..()
-	sync_los_cull_exemption()
 
 /obj/machinery/door/attack_generic(var/mob/user, var/damage)
 	if(damage >= 10)
@@ -372,6 +359,8 @@
 
 
 /obj/machinery/door/update_icon()
+	if(os13_update_door_icon())
+		return
 	if(density)
 		icon_state = "door1"
 	else
@@ -381,6 +370,8 @@
 
 
 /obj/machinery/door/proc/do_animate(animation)
+	if(os13_animate_door(animation))
+		return
 	switch(animation)
 		if("opening")
 			if(p_open)
@@ -411,7 +402,8 @@
 	if (filler)
 		filler.set_opacity(0)
 	do_animate("opening")
-	icon_state = "door0"
+	var/open_state = os13_door_state(FALSE)
+	icon_state = open_state ? open_state : "door0"
 	set_opacity(0)
 	sleep(3)
 	src.set_density(0)
@@ -447,6 +439,8 @@
 	sleep(3)
 	if(!can_close_on_occupants())
 		operating = 0
+		os13_door_animation = null
+		os13_door_animation_serial++
 		update_icon()
 		if(autoclose)
 			addtimer(CALLBACK(src, .proc/close), next_close_time(), TIMER_UNIQUE|TIMER_OVERRIDE)

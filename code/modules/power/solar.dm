@@ -383,6 +383,9 @@ var/list/solars_list = list()
 		return
 	icon_state = "solar"
 	overlays.Cut()
+	var/image/glow = os13_computer_glow(icon, icon_state)
+	if(glow)
+		overlays += glow
 	if(cdir > -1)
 		overlays += image('icons/obj/computer.dmi', "solcon-o", ABOVE_OBJ_LAYER, angle2dir(cdir))
 	return

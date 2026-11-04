@@ -226,6 +226,7 @@ GLOBAL_LIST_INIT(pony_names, world.file2list("config/names/pony.txt"))
 	attack_noun = list("fangs")
 	damage = 2
 	sharp = TRUE
+	fang_text = "fangs"
 
 /datum/species/pony/proc/handle_nutriment(var/mob/living/carbon/human/H, var/datum/reagent/nutriment/food, var/removed)
 	if(istype(food, /datum/reagent/nutriment/protein))

@@ -17,6 +17,7 @@
 	idle_power_usage = 50		//when inactive, this turret takes up constant 50 Equipment power
 	active_power_usage = 300	//when active, this turret takes up constant 300 Equipment power
 	power_channel = EQUIP	//drains power from the EQUIPMENT channel
+	req_one_access = list(access_security, access_heads)
 
 	var/raised = 0			//if the turret cover is "open" and the turret is raised
 	var/raising= 0			//if the turret is currently opening or closing its cover
@@ -60,6 +61,8 @@
 	var/last_target			//last target fired at, prevents turrets from erratically firing at all valid targets in range
 
 /obj/machinery/porta_turret/crescent
+	req_one_access = list()
+	req_access = list(access_cent_specops)
 	enabled = 0
 	ailock = 1
 	check_synth	 = 0
@@ -87,8 +90,6 @@
 
 /obj/machinery/porta_turret/New()
 	..()
-	req_access.Cut()
-	req_one_access = list(access_security, access_heads)
 
 	//Sets up a spark system
 	spark_system = new /datum/effect/effect/system/spark_spread
@@ -96,11 +97,6 @@
 	spark_system.attach(src)
 
 	setup()
-
-/obj/machinery/porta_turret/crescent/New()
-	..()
-	req_one_access.Cut()
-	req_access = list(access_cent_specops)
 
 /obj/machinery/porta_turret/Destroy()
 	qdel(spark_system)

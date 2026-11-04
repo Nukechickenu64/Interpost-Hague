@@ -19,47 +19,65 @@
 	var/loading = 0 // Nice loading text
 
 /obj/machinery/computer/cloning/Initialize()
-	..()
+	. = ..()
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		SetName("Genetics Console")
 	set_extension(src, /datum/extension/interactive/multitool, /datum/extension/interactive/multitool/cryo, list(/proc/is_operable))
 	updatemodules()
 
 /obj/machinery/computer/cloning/Destroy()
+	if(diskette)
+		diskette.dropInto(get_turf(src))
 	releasecloner()
 	return ..()
 
 /obj/machinery/computer/cloning/proc/updatemodules()
 	src.scanner = findscanner()
-	releasecloner()
+	for(var/obj/machinery/clonepod/P in pods.Copy())
+		if(QDELETED(P))
+			pods -= P
+		else if(P.connected != src)
+			pods -= P
+		else if(!P.anchored)
+			release_pod(P)
 	findcloner()
 
 /obj/machinery/computer/cloning/proc/findscanner()
 	var/obj/machinery/dna_scannernew/scannerf = null
 
 	//Try to find scanner on adjacent tiles first
-	for(dir in list(NORTH,EAST,SOUTH,WEST))
-		scannerf = locate(/obj/machinery/dna_scannernew, get_step(src, dir))
+	for(var/direction in GLOB.cardinal)
+		scannerf = locate(/obj/machinery/dna_scannernew, get_step(src, direction))
 		if (scannerf)
 			return scannerf
 
 	//Then look for a free one in the area
 	if(!scannerf)
 		var/area/A = get_area(src)
+		if(!A)
+			return
 		for(var/obj/machinery/dna_scannernew/S in A.get_contents())
-			return S
+			if(S.z == z)
+				return S
 
 	return
 
 /obj/machinery/computer/cloning/proc/releasecloner()
 	for(var/obj/machinery/clonepod/P in pods)
-		P.connected = null
-		P.name = initial(P.name)
+		if(!QDELETED(P) && P.connected == src)
+			P.connected = null
+			P.name = initial(P.name)
 	pods.Cut()
 
 /obj/machinery/computer/cloning/proc/connect_pod(var/obj/machinery/clonepod/P)
+	if(QDELETED(P) || !P.anchored)
+		return 0
 	if(P in pods)
 		return 0
 
 	if(P.connected)
+		if(P.occupant || P.attempting)
+			return 0
 		P.connected.release_pod(P)
 	P.connected = src
 	pods += P
@@ -71,31 +89,37 @@
 	if(!(P in pods))
 		return
 
-	P.connected = null
-	P.name = initial(P.name)
+	if(!QDELETED(P) && P.connected == src)
+		P.connected = null
+		P.name = initial(P.name)
 	pods -= P
 	rename_pods()
 	return 1
 
 /obj/machinery/computer/cloning/proc/rename_pods()
+	for(var/i = pods.len; i >= 1; i--)
+		var/obj/machinery/clonepod/P = pods[i]
+		if(QDELETED(P) || P.connected != src)
+			pods.Cut(i, i + 1)
 	for(var/i = 1 to pods.len)
 		var/atom/P = pods[i]
-		P.name = "[initial(P.name)] #[i]"
+		P.name = istype(GLOB.using_map, /datum/map/alpha) ? "Clonepod [ascii2text(64 + i)]" : "[initial(P.name)] #[i]"
 
 /obj/machinery/computer/cloning/proc/findcloner()
-	var/num = 1
 	var/area/A = get_area(src)
+	if(!A)
+		return
 	for(var/obj/machinery/clonepod/P in A.get_contents())
-		if(!P.connected)
+		if(!QDELETED(P) && P.anchored && P.z == z && !P.connected)
 			pods += P
 			P.connected = src
-			P.name = "[initial(P.name)] #[num++]"
+	rename_pods()
 
 /obj/machinery/computer/cloning/attackby(obj/item/W as obj, mob/user as mob)
 	if (istype(W, /obj/item/disk/data)) //INSERT SOME DISKETTES
 		if (!src.diskette)
-			user.drop_item()
-			W.forceMove(src)
+			if(!user || user.incapacitated() || !user.Adjacent(src) || W.loc != user || !user.unEquip(W, target = src))
+				return
 			src.diskette = W
 			to_chat(user, "You insert \the [W].")
 			src.updateUsrDialog()
@@ -104,10 +128,18 @@
 		..()
 	return
 
+/obj/machinery/computer/cloning/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == diskette)
+		diskette = null
+		updateUsrDialog()
+
 /obj/machinery/computer/cloning/attack_ai(mob/user as mob)
 	return attack_hand(user)
 
 /obj/machinery/computer/cloning/attack_hand(mob/user as mob)
+	if(!user || CanUseTopic(user) != STATUS_INTERACTIVE || !operable() || !powered())
+		return
 	user.set_machine(src)
 	add_fingerprint(user)
 
@@ -164,13 +196,15 @@
 			dat += "<a href='byond://?src=\ref[src];menu=2'>View Records</a><br>"
 			if (src.diskette)
 				dat += "<a href='byond://?src=\ref[src];disk=eject'>Eject Disk</a>"
+				dat += " | <a href='byond://?src=\ref[src];disk=load'>Import genetic record</a>"
 
 
 		if(2)
 			dat += "<h4>Current records</h4>"
 			dat += "<a href='byond://?src=\ref[src];menu=1'>Back</a><br><br>"
 			for(var/datum/dna2/record/R in src.records)
-				dat += "<li><a href='byond://?src=\ref[src];view_rec=\ref[R]'>[R.dna.real_name]</a></li>"
+				if(!QDELETED(R) && R.dna)
+					dat += "<li><a href='byond://?src=\ref[src];view_rec=\ref[R]'>[html_encode(R.dna.real_name)]</a></li>"
 
 		if(3)
 			dat += "<h4>Selected Record</h4>"
@@ -180,7 +214,7 @@
 				dat += "<font color=red>ERROR: Record not found.</font>"
 			else
 				dat += {"<br><font size=1><a href='byond://?src=\ref[src];del_rec=1'>Delete Record</a></font><br>
-					<b>Name:</b> [src.active_record.dna.real_name]<br>"}
+					<b>Name:</b> [html_encode(src.active_record.dna.real_name)]<br>"}
 				var/obj/item/implant/health/H = null
 				if(src.active_record.implant)
 					H=locate(src.active_record.implant)
@@ -196,15 +230,16 @@
 					dat += " | Save: <a href='byond://?src=\ref[src];save_disk=ue'>UI + UE</a>"
 					dat += " | Save: <a href='byond://?src=\ref[src];save_disk=ui'>UI</a>"
 					dat += " | Save: <a href='byond://?src=\ref[src];save_disk=se'>SE</a>"
+					dat += " | <a href='byond://?src=\ref[src];save_disk=full'>Save GENECODE</a>"
 					dat += "<br>"
 				else
 					dat += "<br>" //Keeping a line empty for appearances I guess.
 
-				dat += "<b>Identity DNA:</b> [identity_record ? identity_record.dna.real_name : "Not selected"] "
+				dat += "<b>Identity DNA:</b> [identity_record ? html_encode(identity_record.dna.real_name) : "Not selected"] "
 				dat += "<a href='byond://?src=\ref[src];select_dna=identity;select_dna_record=\ref[src.active_record]'>Select this</a><br>"
-				dat += "<b>Second DNA:</b> [donor_record ? donor_record.dna.real_name : "Not selected"] "
+				dat += "<b>Second DNA:</b> [donor_record ? html_encode(donor_record.dna.real_name) : "Not selected"] "
 				dat += "<a href='byond://?src=\ref[src];select_dna=donor;select_dna_record=\ref[src.active_record]'>Select this</a><br>"
-				if(identity_record && donor_record && identity_record == donor_record)
+				if(identity_record && donor_record && (identity_record == donor_record || identity_record.dna.unique_enzymes == donor_record.dna.unique_enzymes))
 					dat += "<font color=red><b>Warning:</b> Using one DNA profile twice will create a severely mutated clone.</font><br>"
 				else
 					dat += "Two DNA profiles will be combined to create the clone.<br>"
@@ -247,15 +282,25 @@
 
 	if(loading)
 		return
+	if(CanUseTopic(usr) != STATUS_INTERACTIVE || !operable() || !powered())
+		return
+	updatemodules()
 
 	if ((href_list["scan"]) && (!isnull(src.scanner)))
 		scantemp = ""
 
 		loading = 1
+		var/obj/machinery/dna_scannernew/scan_source = scanner
+		var/mob/living/carbon/human/subject = scan_source.occupant
 		src.updateUsrDialog()
 
 		spawn(20)
-			src.scan_mob(src.scanner.occupant)
+			if(QDELETED(src))
+				return
+			if(!operable() || !powered() || QDELETED(scan_source) || scan_source != scanner || !scan_source.operable() || !scan_source.powered() || scan_source.occupant != subject || QDELETED(subject))
+				scantemp = "Scan interrupted: scanner, subject or power changed."
+			else
+				scan_mob(subject)
 
 			loading = 0
 			src.updateUsrDialog()
@@ -269,13 +314,10 @@
 			src.scanner.locked = 0
 
 	else if (href_list["view_rec"])
-		src.active_record = locate(href_list["view_rec"])
-		if(istype(src.active_record,/datum/dna2/record))
-			if ((isnull(src.active_record.ckey)))
-				qdel(src.active_record)
-				src.temp = "ERROR: Record Corrupt"
-			else
-				src.menu = 3
+		var/datum/dna2/record/selected = locate(href_list["view_rec"])
+		if(istype(selected) && (selected in records) && selected.dna)
+			active_record = selected
+			menu = 3
 		else
 			src.active_record = null
 			src.temp = "Record missing."
@@ -286,6 +328,8 @@
 			selected = src.active_record
 		if(!(selected in src.records))
 			temp = "Error: DNA record is no longer available."
+		else if(!selected.is_complete_genotype())
+			temp = "Error: Cloning requires a complete GENECODE record (UI, UE and SE)."
 		else if(href_list["select_dna"] == "identity")
 			identity_record = selected
 			temp = "Identity DNA selected."
@@ -318,18 +362,13 @@
 	else if (href_list["disk"]) //Load or eject.
 		switch(href_list["disk"])
 			if("load")
-				if ((isnull(src.diskette)) || isnull(src.diskette.buf))
+				if (!diskette || diskette.loc != src || !diskette.buf || !diskette.buf.dna || !diskette.buf.types)
 					src.temp = "Load error."
 					src.updateUsrDialog()
 					return
-				if (isnull(src.active_record))
-					src.temp = "Record error."
-					src.menu = 1
-					src.updateUsrDialog()
-					return
-
-				src.active_record = src.diskette.buf
-
+				active_record = diskette.buf.clone_record()
+				records += active_record
+				menu = 3
 				src.temp = "Load successful."
 			if("eject")
 				if (!isnull(src.diskette))
@@ -337,23 +376,28 @@
 					src.diskette = null
 
 	else if (href_list["save_disk"]) //Save to disk!
-		if ((isnull(src.diskette)) || (src.diskette.read_only) || (isnull(src.active_record)))
+		if (!diskette || diskette.loc != src || diskette.read_only || !(active_record in records) || !active_record.dna)
 			src.temp = "Save error."
 			src.updateUsrDialog()
 			return
 
-		// DNA2 makes things a little simpler.
-		src.diskette.buf=src.active_record
-		src.diskette.buf.types=0
+		var/save_types
 		switch(href_list["save_disk"]) //Save as Ui/Ui+Ue/Se
 			if("ui")
-				src.diskette.buf.types=DNA2_BUF_UI
+				save_types = DNA2_BUF_UI
 			if("ue")
-				src.diskette.buf.types=DNA2_BUF_UI|DNA2_BUF_UE
+				save_types = DNA2_BUF_UI|DNA2_BUF_UE
 			if("se")
-				src.diskette.buf.types=DNA2_BUF_SE
-		src.diskette.name = "data disk - '[src.active_record.dna.real_name]'"
-		src.temp = "Save \[[href_list["save_disk"]]\] successful."
+				save_types = DNA2_BUF_SE
+			if("full")
+				save_types = DNA2_BUF_UI|DNA2_BUF_UE|DNA2_BUF_SE
+		if(!save_types || (active_record.types & save_types) != save_types)
+			temp = "Save error: the record does not contain all requested genetic data."
+		else
+			diskette.buf = active_record.clone_record()
+			diskette.buf.types = save_types
+			diskette.update_genetic_label()
+			temp = "Save \[[href_list["save_disk"]]\] successful."
 
 	else if (href_list["refresh"])
 		src.updateUsrDialog()
@@ -362,15 +406,28 @@
 		var/datum/dna2/record/C = identity_record
 		var/datum/dna2/record/D = donor_record
 		//Look for that player! They better be dead!
-		if(istype(C) && istype(D) && (C in records) && (D in records))
+		if(istype(C) && istype(D) && (C in records) && (D in records) && C.is_complete_genotype() && D.is_complete_genotype())
 			//Can't clone without someone to clone.  Or a pod.  Or if the pod is busy. Or full of gibs.
 			if(!pods.len)
 				temp = "Error: No clone pods detected."
 			else
 				var/obj/machinery/clonepod/pod = pods[1]
+				var/list/choices = pods.Copy()
+				var/mob/operator = usr
 				if (pods.len > 1)
-					pod = input(usr,"Select a cloning pod to use", "Pod selection") as anything in pods
-				if(pod.occupant)
+					pod = input(operator,"Select a cloning pod to use", "Pod selection") as null|anything in choices
+				if(!pod)
+					return
+				if(QDELETED(src) || QDELETED(operator))
+					return
+				if(CanUseTopic(operator) != STATUS_INTERACTIVE || !operable() || !powered())
+					to_chat(operator, SPAN_WARNING("Cloning interrupted: the operator or Genetics Console is unavailable."))
+					return
+				if(QDELETED(pod) || !pod.anchored || !(pod in pods) || pod.connected != src || !(C in records) || !(D in records) || C != identity_record || D != donor_record)
+					temp = "Error: Selected pod or genetic records changed. Select again."
+				else if(!pod.operable() || !pod.powered())
+					temp = "Error: Clonepod is not operational."
+				else if(pod.occupant || pod.attempting)
 					temp = "Error: Clonepod is currently occupied."
 				else if(pod.biomass < CLONE_BIOMASS)
 					temp = "Error: Not enough biomass."
@@ -428,12 +485,16 @@
 	subject.dna.check_integrity()
 
 	var/datum/dna2/record/R = new /datum/dna2/record()
-	R.dna=subject.dna
+	R.dna = subject.dna.Clone()
+	R.dna.body_markings = list()
+	for(var/marking in subject.dna.body_markings)
+		var/list/data = subject.dna.body_markings[marking]
+		R.dna.body_markings[marking] = data.Copy()
 	R.ckey = subject.ckey ? subject.ckey : "no ckey"
 	R.id= copytext(md5(subject.real_name), 2, 6)
 	R.name=R.dna.real_name
 	R.types=DNA2_BUF_UI|DNA2_BUF_UE|DNA2_BUF_SE
-	R.languages=subject.languages
+	R.languages = subject.languages.Copy()
 	R.flavor=subject.flavor_texts.Copy()
 
 	//Add an implant if needed

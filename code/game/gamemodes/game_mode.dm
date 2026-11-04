@@ -219,6 +219,9 @@ var/global/list/additional_antag_types = list()
 
 	refresh_event_modifiers()
 
+	spawn (300)
+		os13_distribute_loyal_crew_sheets()
+
 	spawn (ROUNDSTART_LOGOUT_REPORT_TIME)
 		display_roundstart_logout_report()
 

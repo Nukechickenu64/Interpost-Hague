@@ -4,6 +4,8 @@
 /datum/controller/subsystem/unit_tests/Initialize(timeofday)
 	. = ..()
 	queue = list(new /datum/unit_test/cyberdeck_layout, new /datum/unit_test/cyberdeck_session, new /datum/unit_test/cyberdeck_preallocation)
+	if(world.params["cyberdeck_area"])
+		queue = list(new /datum/unit_test/cyberdeck_layout, new /datum/unit_test/cyberdeck_area_link, new /datum/unit_test/cyberdeck_preallocation)
 	if(world.params["cyberdeck_client"])
 		// Round-start character creation must not replace the test client's body.
 		SSticker.can_fire = FALSE

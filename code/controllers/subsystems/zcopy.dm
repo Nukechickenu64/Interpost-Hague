@@ -167,7 +167,7 @@ SUBSYSTEM_DEF(zcopy)
 				// This openturf doesn't care about its icon, so we can just overwrite it.
 				if (T.below.bound_overlay)
 					QDEL_NULL(T.below.bound_overlay)
-				T.appearance = T.below
+				T.appearance = T.below.ao_mimic_appearance()
 				T.name = initial(T.name)
 				T.desc = initial(T.desc)
 				T.gender = initial(T.gender)
@@ -178,7 +178,7 @@ SUBSYSTEM_DEF(zcopy)
 				if (!T.below.bound_overlay)
 					T.below.bound_overlay = new(T)
 				var/atom/movable/openspace/turf_overlay/TO = T.below.bound_overlay
-				TO.appearance = T.below
+				TO.appearance = T.below.ao_mimic_appearance()
 				TO.name = T.name
 				TO.gender = T.gender	// Need to grab this too so PLURAL works properly in examine.
 				TO.opacity = FALSE

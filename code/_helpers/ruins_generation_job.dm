@@ -26,7 +26,6 @@ var/datum/ruins_generation_job/ruins_gen_job
 		return FALSE
 	cancelled = FALSE
 	last_error = null
-	salvage = salvage_mission
 	areas = list()
 	var/area/space/ruins/ruins_area = get_space_ruins_area()
 	if(!ruins_area || !get_space_ruins_z())
@@ -47,6 +46,7 @@ var/datum/ruins_generation_job/ruins_gen_job
 	profile_type = null
 	if(profile_path && ispath(profile_path, /datum/ruins_generation_profile))
 		profile_type = profile_path
+	salvage = salvage_mission
 	ensure_mining_space_landmark()
 	// Metrics and signal: announce job configured
 	metrics_inc("ruins.total", total)

@@ -1,5 +1,5 @@
 /obj/item/vending_charge
-	name = "universal creation token"
+	name = "Equipment Charge"
 	desc = "A sealed fabrication token. Inserting it into any vending machine adds ten creation charges."
 	icon = 'icons/os13/objects/objects/vending.dmi'
 	icon_state = "equipment-charge"
@@ -9,32 +9,65 @@
 	var/dispenser_family
 
 /obj/item/vending_charge/coffee
+	name = "Coffee Charge"
 	icon_state = "coffee-charge"
 	dispenser_family = "coffee"
 
+/obj/item/vending_charge/coffee/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/coffee)
+
 /obj/item/vending_charge/soda
+	name = "Soda Machine Charge"
 	icon_state = "soda-charge"
 	dispenser_family = "soda"
 
+/obj/item/vending_charge/soda/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/cola)
+
 /obj/item/vending_charge/cigarette
+	name = "Cigarette Charge"
 	icon_state = "cigarette-charge"
 
+/obj/item/vending_charge/cigarette/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/cigarette)
+
 /obj/item/vending_charge/bar
+	name = "Bar Charge"
 	icon_state = "bar-charge"
 	dispenser_family = "bar"
 
+/obj/item/vending_charge/bar/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/boozeomat)
+
 /obj/item/vending_charge/chemistry
+	name = "Chemistry Charge"
+	desc = "A sealed chemical feedstock charge. Adds five charge points to a Chemfab, or refills compatible cartridge dispensers."
 	icon_state = "chemistry-charge"
 	dispenser_family = "chemistry"
 
+/obj/item/vending_charge/chemistry/compatible(obj/machinery/vending/V)
+	return FALSE
+
 /obj/item/vending_charge/hydroponics
+	name = "Hydroponics Charge"
 	icon_state = "hydro-charge"
 
+/obj/item/vending_charge/hydroponics/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/hydro_cultures)
+
 /obj/item/vending_charge/snack
+	name = "Snack Charge"
 	icon_state = "snack-charge"
 
+/obj/item/vending_charge/snack/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/snack)
+
 /obj/item/vending_charge/security
+	name = "Security Charge"
 	icon_state = "security-charge"
+
+/obj/item/vending_charge/security/compatible(obj/machinery/vending/V)
+	return istype(V, /obj/machinery/vending/security)
 
 /obj/machinery/vending/engineering/os13
 	name = "equipment vendor"
@@ -47,7 +80,7 @@
 	return istype(V)
 
 /obj/item/vending_charge/afterattack(obj/item/target, mob/user, proximity)
-	if(!proximity || !istype(target) || !target.hidden_uplink?.active)
+	if(type != /obj/item/vending_charge || !proximity || !istype(target) || !target.hidden_uplink?.active)
 		return ..()
 	if(loc != user || user.incapacitated() || !user.unEquip(src, target = target))
 		return
@@ -65,7 +98,7 @@
 		return FALSE
 	creation_charges += 10
 	qdel(C)
-	to_chat(user, SPAN_NOTICE("You insert the creation token. The machine now has [creation_charges] charges."))
+	to_chat(user, SPAN_NOTICE("You insert the charge into the machine. The machine now has [creation_charges] charges."))
 	SSnano.update_uis(src)
 	return TRUE
 

@@ -43,10 +43,10 @@ var/global/list/deathweb_skill_defaults = list(
 /mob/proc/gurps_stat(var/stat_type)
 	switch(stat_type)
 		if(STAT_PER)
-			return max(0, round(stats[STAT_IQ] + stats[STAT_PER] - 10))
+			return max(0, round(effective_stat(STAT_IQ) + effective_stat(STAT_PER) - 10))
 		if(STAT_IM)
-			return max(0, round(stats[STAT_HT] + stats[STAT_IM]))
-	return max(0, round(stats[stat_type]))
+			return max(0, round(effective_stat(STAT_HT) + effective_stat(STAT_IM)))
+	return max(0, round(effective_stat(stat_type)))
 
 /mob/proc/gurps_skill_rank(var/skill_type)
 	return max(0, round(skills[skill_type] / 10))

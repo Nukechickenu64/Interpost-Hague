@@ -266,7 +266,7 @@
 		if(disk.stored)
 			if(load_data(disk.stored))
 				to_chat(user, "<font color='blue'>Download successful; disk erased.</font>")
-				disk.stored = null
+				disk.set_research(null)
 			else
 				to_chat(user, "<span class='warning'>The disk is corrupt. It is useless to you.</span>")
 		else

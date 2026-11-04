@@ -16,17 +16,39 @@
 	var/implant=null
 	var/ckey=null
 	var/mind=null
-	var/languages=null
+	var/list/languages=null
 	var/list/flavor=null
+
+/datum/dna2/record/proc/clone_record()
+	var/datum/dna2/record/copy = new
+	if(dna)
+		copy.dna = dna.Clone()
+		copy.dna.body_markings = list()
+		for(var/marking in dna.body_markings)
+			var/list/data = dna.body_markings[marking]
+			copy.dna.body_markings[marking] = data.Copy()
+	copy.types = types
+	copy.name = name
+	copy.id = id
+	copy.implant = implant
+	copy.ckey = ckey
+	copy.mind = mind
+	copy.languages = languages ? languages.Copy() : list()
+	copy.flavor = flavor ? flavor.Copy() : list()
+	return copy
+
+/datum/dna2/record/proc/is_complete_genotype()
+	var/required = DNA2_BUF_UI|DNA2_BUF_UE|DNA2_BUF_SE
+	return dna && dna.unique_enzymes && (types & required) == required && length(dna.UI) == DNA_UI_LENGTH && length(dna.SE) == DNA_SE_LENGTH
 
 /datum/dna2/record/proc/GetData()
 	var/list/ser=list("data" = null, "owner" = null, "label" = null, "type" = null, "ue" = 0)
 	if(dna)
 		ser["ue"] = (types & DNA2_BUF_UE) == DNA2_BUF_UE
-		if(types & DNA2_BUF_SE)
-			ser["data"] = dna.SE
-		else
+		if(types & DNA2_BUF_UI)
 			ser["data"] = dna.UI
+		else
+			ser["data"] = dna.SE
 		ser["owner"] = src.dna.real_name
 		ser["label"] = name
 		if(types & DNA2_BUF_UI)
@@ -258,8 +280,8 @@
 /obj/machinery/computer/scan_consolenew/attackby(obj/item/I as obj, mob/user as mob)
 	if (istype(I, /obj/item/disk/data)) //INSERT SOME diskS
 		if (!src.disk)
-			user.drop_item()
-			I.loc = src
+			if(!user || user.incapacitated() || !user.Adjacent(src) || I.loc != user || !user.unEquip(I, target = src))
+				return
 			src.disk = I
 			to_chat(user, "You insert \the [I].")
 			SSnano.update_uis(src) // update all UIs attached to src
@@ -282,6 +304,12 @@
 				return
 		else
 	return
+
+/obj/machinery/computer/scan_consolenew/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == disk)
+		disk = null
+		SSnano.update_uis(src)
 
 /obj/machinery/computer/scan_consolenew/New()
 	..()
@@ -307,9 +335,12 @@
 	var/pos = findtext(blk,":")
 	if(!pos) return 0
 	var/id = text2num(copytext(blk,1,pos))
-	if(!id) return 0
+	var/max_block = (buffer.types & DNA2_BUF_SE) ? DNA_SE_LENGTH : DNA_UI_LENGTH
+	if(!isnum_safe(id) || id != round(id) || id < 1 || id > max_block)
+		return 0
 	I.block = id
-	I.buf = buffer
+	I.buf = buffer.clone_record()
+	I.buf.types = (buffer.types & DNA2_BUF_SE) ? DNA2_BUF_SE : DNA2_BUF_UI
 	return 1
 
 /*
@@ -668,18 +699,19 @@
 
 		// These bufferOptions do not require a bufferId
 		if (bufferOption == "wipeDisk")
-			if ((isnull(src.disk)) || (src.disk.read_only))
-				//src.temphtml = "Invalid disk. Please try again."
+			if (!disk || disk.loc != src || disk.read_only)
+				to_chat(usr, SPAN_WARNING("Insert a writable genetic disk first."))
 				return 0
 
 			src.disk.buf=null
+			src.disk.update_genetic_label()
 			//src.temphtml = "Data saved."
 			return 1
 
 		if (bufferOption == "ejectDisk")
-			if (!src.disk)
+			if (!disk || disk.loc != src)
 				return
-			src.disk.loc = get_turf(src)
+			disk.dropInto(get_turf(src))
 			src.disk = null
 			return 1
 
@@ -689,13 +721,13 @@
 
 		var/bufferId = text2num(href_list["bufferId"])
 
-		if (bufferId < 1 || bufferId > 3)
+		if (!isnum_safe(bufferId) || bufferId != round(bufferId) || bufferId < 1 || bufferId > 3)
 			return 0 // Not a valid buffer id
 
 		if (bufferOption == "saveUI")
 			if(src.connected.occupant && src.connected.occupant.dna)
 				var/datum/dna2/record/databuf=new
-				databuf.types = DNA2_BUF_UE
+				databuf.types = DNA2_BUF_UI
 				databuf.dna = src.connected.occupant.dna.Clone()
 				if(ishuman(connected.occupant))
 					databuf.dna.real_name=connected.occupant.dna.real_name
@@ -731,88 +763,129 @@
 
 		if (bufferOption == "changeLabel")
 			var/datum/dna2/record/buf = src.buffers[bufferId]
-			var/text = sanitize(input(usr, "New Label:", "Edit Label", buf.name) as text|null, MAX_NAME_LEN)
-			buf.name = text
-			src.buffers[bufferId] = buf
+			var/mob/operator = usr
+			var/text = input(operator, "New Label:", "Edit Label", buf.name) as text|null
+			if(isnull(text) || QDELETED(src))
+				return 0
+			if(QDELETED(operator) || CanUseTopic(operator) != STATUS_INTERACTIVE || !operable() || !powered() || buf != buffers[bufferId])
+				to_chat(operator, SPAN_WARNING("The genetic buffer or console changed; its label was not updated."))
+				return 0
+			var/label = sanitize(text, MAX_NAME_LEN)
+			if(!label)
+				to_chat(operator, SPAN_WARNING("Enter a non-empty genetic buffer label shorter than [MAX_NAME_LEN] characters."))
+				return 0
+			buf.name = label
 			return 1
 
 		if (bufferOption == "transfer")
 			if (!src.connected.occupant || (NOCLONE in src.connected.occupant.mutations) || !src.connected.occupant.dna)
 				return
 
+			var/datum/dna2/record/buffer = buffers[bufferId]
+			if(!buffer || !buffer.dna || !buffer.types)
+				to_chat(usr, SPAN_WARNING("The selected genetic buffer is empty."))
+				return 0
+			var/datum/dna2/record/snapshot = buffer.clone_record()
+			var/obj/machinery/dna_scannernew/scan_source = connected
+			var/mob/living/carbon/subject = scan_source.occupant
 			irradiating = 2
-			var/lock_state = src.connected.locked
-			src.connected.locked = 1//lock it
+			var/lock_state = scan_source.locked
+			scan_source.locked = 1
 			SSnano.update_uis(src) // update all UIs attached to src
 
 			sleep(10*2) // sleep for 2 seconds
 
+			if(!QDELETED(scan_source))
+				scan_source.locked = lock_state
+			if(QDELETED(src))
+				qdel(snapshot)
+				return
 			irradiating = 0
-			src.connected.locked = lock_state
+			if(QDELETED(scan_source) || scan_source != connected || QDELETED(subject) || scan_source.occupant != subject || !subject.dna || (NOCLONE in subject.mutations) || !operable() || !powered() || !scan_source.operable() || !scan_source.powered())
+				to_chat(usr, SPAN_WARNING("Genetic transfer interrupted: scanner, subject or power changed."))
+				qdel(snapshot)
+				return 0
 
-			var/datum/dna2/record/buf = src.buffers[bufferId]
-
-			if ((buf.types & DNA2_BUF_UI))
-				if ((buf.types & DNA2_BUF_UE))
-					src.connected.occupant.real_name = buf.dna.real_name
-					src.connected.occupant.name = buf.dna.real_name
-				src.connected.occupant.UpdateAppearance(buf.dna.UI.Copy())
-			else if (buf.types & DNA2_BUF_SE)
-				src.connected.occupant.dna.SE = buf.dna.SE
-				src.connected.occupant.dna.UpdateSE()
-				domutcheck(src.connected.occupant,src.connected)
-			src.connected.occupant.apply_effect(rand(20,50), IRRADIATE, blocked = 0)
+			if(snapshot.types & DNA2_BUF_UE)
+				subject.real_name = snapshot.dna.real_name
+				subject.name = snapshot.dna.real_name
+				subject.dna.real_name = snapshot.dna.real_name
+				subject.dna.unique_enzymes = snapshot.dna.unique_enzymes
+			if(snapshot.types & DNA2_BUF_UI)
+				subject.UpdateAppearance(snapshot.dna.UI.Copy())
+			subject.apply_effect(rand(20,50), IRRADIATE, blocked = 0)
+			if(snapshot.types & DNA2_BUF_SE)
+				subject.dna.SE = snapshot.dna.SE.Copy()
+				subject.dna.UpdateSE()
+				domutcheck(subject, scan_source)
+			qdel(snapshot)
 			return 1
 
 		if (bufferOption == "createInjector")
-			if (src.injector_ready || waiting_for_user_input)
-
-				var/success = 1
-				var/obj/item/dnainjector/I = new /obj/item/dnainjector
-				var/datum/dna2/record/buf = src.buffers[bufferId]
-				if(href_list["createBlockInjector"])
-					waiting_for_user_input=1
-					var/list/selectedbuf
-					if(buf.types & DNA2_BUF_SE)
-						selectedbuf=buf.dna.SE
-					else
-						selectedbuf=buf.dna.UI
-					var/blk = input(usr,"Select Block","Block") in all_dna_blocks(selectedbuf)
-					success = setInjectorBlock(I,blk,buf)
-				else
-					I.buf = buf
-				waiting_for_user_input=0
-				if(success)
-					I.loc = src.loc
-					I.name += " ([buf.name])"
-					//src.temphtml = "Injector created."
-					src.injector_ready = 0
-					spawn(300)
-						src.injector_ready = 1
-				//else
-					//src.temphtml = "Error in injector creation."
-			//else
-				//src.temphtml = "Replicator not ready yet."
+			if(!injector_ready || waiting_for_user_input)
+				to_chat(usr, SPAN_WARNING("The injector fabricator is not ready."))
+				return 0
+			var/datum/dna2/record/buffer = buffers[bufferId]
+			if(!buffer || !buffer.dna || !buffer.types)
+				to_chat(usr, SPAN_WARNING("The selected genetic buffer is empty."))
+				return 0
+			var/datum/dna2/record/snapshot = buffer.clone_record()
+			var/mob/operator = usr
+			var/blk
+			waiting_for_user_input = TRUE
+			if(href_list["createBlockInjector"])
+				var/structural = snapshot.types & DNA2_BUF_SE
+				var/list/selectedbuf = structural ? snapshot.dna.SE : snapshot.dna.UI
+				blk = input(operator, "Select a [structural ? "structural" : "identity"] DNA block.", "DNA Injector") as null|anything in all_dna_blocks(selectedbuf)
+			if(QDELETED(src))
+				qdel(snapshot)
+				return 0
+			waiting_for_user_input = FALSE
+			if(href_list["createBlockInjector"] && !blk)
+				qdel(snapshot)
+				return 0
+			if(QDELETED(operator) || CanUseTopic(operator) != STATUS_INTERACTIVE || !operable() || !powered() || !injector_ready)
+				to_chat(operator, SPAN_WARNING("Injector fabrication interrupted: operator or machine is unavailable."))
+				qdel(snapshot)
+				return 0
+			var/obj/item/dnainjector/I = new(get_turf(src))
+			I.name += " ([snapshot.name])"
+			if(href_list["createBlockInjector"])
+				if(!setInjectorBlock(I, blk, snapshot))
+					to_chat(operator, SPAN_WARNING("The selected DNA block is invalid."))
+					qdel(I)
+					qdel(snapshot)
+					return 0
+				qdel(snapshot)
+			else
+				I.buf = snapshot
+			injector_ready = FALSE
+			spawn(300)
+				if(!QDELETED(src))
+					injector_ready = TRUE
 			return 1
 
 		if (bufferOption == "loadDisk")
-			if ((isnull(src.disk)) || (!src.disk.buf))
-				//src.temphtml = "Invalid disk. Please try again."
+			if (!src.disk || src.disk.loc != src || !src.disk.buf || !src.disk.buf.dna)
+				to_chat(usr, SPAN_WARNING("Insert a disk containing genetic data first."))
 				return 0
 
-			src.buffers[bufferId]=src.disk.buf
+			src.buffers[bufferId] = src.disk.buf.clone_record()
 			//src.temphtml = "Data loaded."
 			return 1
 
 		if (bufferOption == "saveDisk")
-			if ((isnull(src.disk)) || (src.disk.read_only))
-				//src.temphtml = "Invalid disk. Please try again."
+			if (!src.disk || src.disk.loc != src || src.disk.read_only)
+				to_chat(usr, SPAN_WARNING("Insert a writable genetic disk first."))
 				return 0
 
 			var/datum/dna2/record/buf = src.buffers[bufferId]
 
-			src.disk.buf = buf
-			src.disk.name = "data disk - '[buf.dna.real_name]'"
+			if(!buf || !buf.dna)
+				to_chat(usr, SPAN_WARNING("The selected genetic buffer is empty."))
+				return 0
+			src.disk.buf = buf.clone_record()
+			src.disk.update_genetic_label()
 			//src.temphtml = "Data saved."
 			return 1
 

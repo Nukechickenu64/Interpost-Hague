@@ -178,7 +178,11 @@ What is the naming convention for planes or layers?
   #define TRAY_SCAN_LAYER          1
   #define PROGRESSBAR_LAYER        2
 
+#define WORLD_TERRAIN_DISPLAY_PLANE -2
+#define WORLD_SHADOW_DISPLAY_PLANE  -1
+
 #define SHADOWCASTING_REFLECTOR_PLANE 7
+#define SHADOWCASTING_GEOMETRY_PLANE 14
 
 #define SHADOWCASTING_PLANE 8
 
@@ -205,6 +209,15 @@ What is the naming convention for planes or layers?
 // Hidden source only; the additive display remains below beams and LOS.
 #define LIGHTING_VEIL_SOURCE_PLANE 13
 
+// Hidden world passes, composed behind ordinary SIDE_MAP objects. Fractional
+// layers alone cannot keep a projected sprite above a neighbouring turf.
+#define WORLD_TERRAIN_SOURCE_PLANE -5
+#define WORLD_AO_RECEIVER_SOURCE_PLANE -6
+#define WORLD_SHADOW_SOURCE_PLANE -4
+#define WORLD_AO_DISPLAY_LAYER (BACKGROUND_LAYER + AO_LAYER)
+#define WORLD_TERRAIN_DISPLAY_LAYER (BACKGROUND_LAYER + TURF_LAYER)
+#define WORLD_SHADOW_DISPLAY_LAYER (BACKGROUND_LAYER + MOB_SHADOW_LAYER)
+
 /atom
 	plane = DEFAULT_PLANE
 
@@ -215,6 +228,7 @@ What is the naming convention for planes or layers?
 /atom/proc/reset_plane_and_layer()
 	plane = initial(plane)
 	layer = initial(layer)
+	sync_world_render_plane()
 
 /*
   PLANE MASTERS
@@ -229,8 +243,70 @@ What is the naming convention for planes or layers?
 	plane = OBSERVER_PLANE
 
 /obj/screen/plane_master/blur_all
-	plane = DEFAULT_PLANE
-	filters = filter(type = "blur", size = 2)
+	appearance_flags = 0
+	mouse_opacity = 0
+	alpha = 0
+	var/client/blur_client
+	var/list/blurred_masters = list()
+	var/list/owned_screens = list()
+
+/obj/screen/plane_master/blur_all/proc/apply(client/C)
+	if(blur_client != C || !(src in C.screen))
+		clear()
+		blur_client = C
+
+	// Filter visible world passes, not UI or hidden LOS/light-mask sources.
+	var/list/world_planes = list(SPACE_PLANE, SKYBOX_PLANE, DUST_PLANE, STAR_PLANE, OVER_OPENSPACE_PLANE, WORLD_TERRAIN_DISPLAY_PLANE, WORLD_SHADOW_DISPLAY_PLANE, BLACKNESS_PLANE, DEFAULT_PLANE, OBSERVER_PLANE, LIGHTING_PLANE, ABOVE_LIGHTING_PLANE, EMISSIVE_PLANE, SHADOWCASTING_PLANE)
+	for(var/i in 0 to OPENTURF_MAX_DEPTH)
+		world_planes += OPENTURF_MAX_PLANE - i
+
+	var/list/masters = list()
+	for(var/obj/screen/plane_master/P in C.screen)
+		if((P.appearance_flags & PLANE_MASTER) && (P.plane in world_planes))
+			var/obj/screen/plane_master/current = masters["[P.plane]"]
+			if(!current || P.layer >= current.layer)
+				masters["[P.plane]"] = P
+
+	for(var/obj/screen/plane_master/P in blurred_masters)
+		if(!P || P.gc_destroyed)
+			blurred_masters -= P
+			continue
+		if(masters["[P.plane]"] != P)
+			P.filters -= blurred_masters[P]
+			blurred_masters -= P
+
+	for(var/world_plane in world_planes)
+		var/obj/screen/plane_master/P = masters["[world_plane]"]
+		if(!P)
+			P = new /obj/screen/plane_master
+			P.plane = world_plane
+			// Empty plane masters need a dummy to avoid corrupting other planes.
+			var/obj/screen/plane_master/ghost_dummy/D = new
+			D.plane = world_plane
+			owned_screens.Add(P, D)
+			C.screen.Add(P, D)
+		if(!(blurred_masters[P] in P.filters))
+			// Append directly: named filters rebuild the list and erase native drug filters.
+			P.filters += filter(type = "blur", size = 2)
+			blurred_masters[P] = P.filters[P.filters.len]
+	C.screen |= src
+
+/obj/screen/plane_master/blur_all/proc/clear()
+	for(var/obj/screen/plane_master/P in blurred_masters)
+		if(P && !P.gc_destroyed)
+			P.filters -= blurred_masters[P]
+	blurred_masters.Cut()
+	if(blur_client)
+		blur_client.screen -= owned_screens
+		blur_client.screen -= src
+	for(var/obj/screen/S in owned_screens)
+		qdel(S)
+	owned_screens.Cut()
+	blur_client = null
+
+/obj/screen/plane_master/blur_all/Destroy()
+	clear()
+	return ..()
 
 /obj/screen/plane_master/blurs
 	filters = filter(type = "blur", size = 2)
@@ -387,22 +463,53 @@ var/global/icon/solid_white_icon
 	mouse_opacity = 0
 	render_target = "all3"
 
+// Foreground pixels must pass geometric LOS before protecting them from the
+// floor's feathered edge. Native visibility alone admits sprites behind corners.
+/obj/screen/plane_master/los_visible_objects
+	name = "visible foreground LOS protection"
+	plane = DEFAULT_PLANE
+	render_target = "los_visible_objects"
+	mouse_opacity = 1
+
+/obj/screen/plane_master/los_visible_objects/New()
+	. = ..()
+	add_filter("object_los", 1, list("type" = "alpha", render_source = "*los_geometry", flags = MASK_INVERSE))
+
+// A sharp copy of the same animated rays, independent of the foreground mask.
+/obj/screen/plane_master/los_geometry
+	name = "foreground LOS geometry"
+	plane = SHADOWCASTING_GEOMETRY_PLANE
+	render_target = "*los_geometry"
+	mouse_opacity = 0
+
+/obj/screen/plane_master/los_geometry/New()
+	. = ..()
+	add_filter("wall_mask", 1, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
+
 /obj/screen/plane_master/shadowcasting/New()
 	. = ..()
 	// Registered reference frames measure a 7.65-8.19 source-pixel 10-90%
 	// transition. Size 3 measures 7.77 in the native fixture. Mask walls after
 	// feathering so visible wall faces and their mounted fixtures stay crisp.
-	add_filter("shadow_edge", 1, list("type" = "blur", size = 3))
 	// Keep in-view walls and wall-mounted objects crisp and unshadowed.
 	// Only under enhanced LOS: with it off, plane 7 is empty and an empty render_source can blank this whole plane.
 	if(enhanced_los_enabled)
+		add_filter("shadow_edge", 1, list("type" = "blur", size = 3))
 		add_filter("wall_mask", 5, list("type" = "alpha", render_source = "*los_occluders", flags = MASK_INVERSE))
+		add_filter("visible_objects", 6, list("type" = "alpha", render_source = "los_visible_objects", flags = MASK_INVERSE))
 
 /obj/screen/plane_master/los_occluders
 	name = "los occluder plane master"
 	plane = SHADOWCASTING_REFLECTOR_PLANE
 	render_target = "*los_occluders"
 	mouse_opacity = 0
+
+/obj/screen/plane_master/los_occluders/New()
+	. = ..()
+	// White wall tiles and black projected rays are depth-ordered together.
+	// Extract red as alpha so a nearer ray removes rear-wall protection without
+	// punching through the wall that casts it. Transparent background stays empty.
+	add_filter("wall_depth", 1, list("type" = "color", "color" = list(0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,0, 1,1,1,0)))
 
 /obj/screen/plane_master/ghost_dummy
 	// this avoids a bug which means plane masters which have nothing to control get angry and mess with the other plane masters out of spite

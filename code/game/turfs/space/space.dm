@@ -13,11 +13,21 @@
 	var/dirt = 0
 	has_coldbreath = FALSE
 
-/turf/space/Initialize()
+/turf/space/Initialize(mapload)
 	. = ..()
-	update_starlight()
+	if(mapload && !SSatoms.initialized && config.starlight)
+		// Startup finds space along the simulated map's boundary in one pass.
+		// Clear mapped light overrides just as update_starlight() would for
+		// space that does not border a simulated turf.
+		if(light_range)
+			set_light(0)
+	else
+		update_starlight()
 
-	appearance = SSskybox.space_appearance_cache[(((x + y) ^ ~(x * y) + z) % 25) + 1]
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		appearance = SSskybox.os13_space_appearance
+	else
+		appearance = SSskybox.space_appearance_cache[(((x + y) ^ ~(x * y) + z) % 25) + 1]
 
 	if(!HasBelow(z))
 		return
@@ -65,6 +75,19 @@
 			set_light(config.starlight, STARLIGHT_POWER, STARLIGHT_COLOR)
 			return
 	set_light(0)
+
+// Only boundary space can emit starlight. Walking outward from simulated turfs
+// avoids checking eight neighbors on every empty turf in reserved z-levels.
+/proc/initialize_starlight()
+	if(!config.starlight)
+		return
+	var/list/visited = list()
+	for(var/turf/simulated/S in world)
+		for(var/turf/space/T in orange(1, S))
+			if(!visited[T])
+				visited[T] = TRUE
+				T.set_light(config.starlight, STARLIGHT_POWER, STARLIGHT_COLOR)
+		CHECK_TICK
 
 /turf/space/attackby(obj/item/C as obj, mob/user as mob)
 

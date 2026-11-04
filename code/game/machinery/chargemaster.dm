@@ -1,7 +1,7 @@
 // Reference: Fliche's water-chip video, 18:30-20:00 and 1:03:45-1:06:15.
 // One precursor makes one refill. Duration and cargo prices are local balance.
 /obj/item/precursor_charge
-	name = "precursor charge"
+	name = "Precursor Charge"
 	desc = "An unconfigured refill pack. Select a product on a ChargeMaster, then insert this charge."
 	icon = 'icons/os13/objects/objects/vending.dmi'
 	icon_state = "generic-charge"
@@ -80,7 +80,7 @@
 	qdel(consumed)
 	update_use_power(POWER_USE_IDLE)
 	update_icon()
-	visible_message(SPAN_NOTICE("[name]: Happy charging."))
+	visible_message(SPAN_NOTICE("\[[name]\] Happy charging."))
 	ping()
 
 /obj/machinery/chargemaster/AltClick(mob/user)

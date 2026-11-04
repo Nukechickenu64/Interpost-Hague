@@ -105,7 +105,7 @@ var/list/global/tank_gauge_cache = list()
 				descriptive = "bitterly cold"
 		to_chat(user, "<span class='notice'>\The [src] feels [descriptive].</span>")
 
-	to_chat(user, "<span class='notice'>It has [remaining_gas_percent()]% of its gas remaining.</span>")
+	to_chat(user, SPAN_NOTICE(remaining_gas_message()))
 	if(proxyassembly.assembly || wired)
 		to_chat(user, "<span class='warning'>It seems to have [wired? "some wires ": ""][wired && proxyassembly.assembly? "and ":""][proxyassembly.assembly ? "some sort of assembly ":""]attached to it.</span>")
 	if(valve_welded)
@@ -268,6 +268,9 @@ var/list/global/tank_gauge_cache = list()
 	if(!air_contents || max_gas_moles <= 0 || air_contents.total_moles <= 0)
 		return 0
 	return min(100, max(1, round(air_contents.total_moles / max_gas_moles * 100)))
+
+/obj/item/tank/proc/remaining_gas_message()
+	return "It has [remaining_gas_percent()]% of its gas remaining."
 
 /obj/item/tank/Process()
 	//Allow for reactions

@@ -281,3 +281,9 @@
 #define END_FOR_DVIEW GLOB.dview_mob.loc = null
 
 #define subtypesof(prototype) (typesof(prototype) - prototype)
+
+/**
+ * Strip out the special beyond characters for \proper and \improper
+ * from text that will be sent to the browser.
+ */
+#define strip_improper(input_text) replacetext(replacetext(input_text, "\proper", ""), "\improper", "")

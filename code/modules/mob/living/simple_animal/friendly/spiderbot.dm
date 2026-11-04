@@ -12,6 +12,7 @@
 	var/obj/machinery/camera/camera = null
 	var/obj/item/device/mmi/mmi = null
 	var/list/req_access = list(access_robotics) //Access needed to pop out the brain.
+	var/mapped_access_requires_all = FALSE
 	var/positronic
 
 	name = "spider-bot"
@@ -122,7 +123,7 @@
 			var/obj/item/device/pda/pda = O
 			id_card = pda.id
 
-		if(access_robotics in id_card.access)
+		if(id_card && has_access(mapped_access_requires_all ? req_access : list(), mapped_access_requires_all ? list() : req_access, id_card.access))
 			to_chat(user, "<span class='notice'>You swipe your access card and pop the brain out of \the [src].</span>")
 			eject_brain()
 			if(held_item)
@@ -135,6 +136,14 @@
 
 	else
 		O.attack(src, user, user.zone_sel.selecting)
+
+/mob/living/simple_animal/spiderbot/apply_map_access()
+	if(isnull(map_access))
+		return
+	var/list/requirements = parse_mapper_access(map_access, src)
+	var/list/all_access = requirements["all"]
+	mapped_access_requires_all = !!all_access.len
+	req_access = mapped_access_requires_all ? all_access : requirements["any"]
 
 /mob/living/simple_animal/spiderbot/emag_act(var/remaining_charges, var/mob/user)
 	if (emagged)

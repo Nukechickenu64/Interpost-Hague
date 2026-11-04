@@ -145,6 +145,24 @@
 	upkeep_multiplier = new_upkeep
 
 
+/obj/machinery/power/shield_generator/proc/shock_crawlspace_occupant(mob/living/occupant)
+	if(!running || overloaded || offline_for || (stat & BROKEN) || QDELETED(src) || !is_station_turf(get_turf(src)))
+		return FALSE
+	if(!istype(occupant.loc, /turf/simulated/open/crawlspace) || !istype(get_area(occupant), /area/maintenance) || !is_station_turf(occupant.loc))
+		return FALSE
+	if(occupant.stat == DEAD || world.time < occupant.next_crawlspace_shock)
+		return FALSE
+	// Share the cooldown across tiles and generators, including resisted shocks.
+	occupant.next_crawlspace_shock = world.time + 2 SECONDS
+	return occupant.electrocute_act(20, src) > 0
+
+/obj/machinery/power/shield_generator/proc/shock_maintenance_crawlspaces()
+	if(!running || overloaded || offline_for || (stat & BROKEN) || !is_station_turf(get_turf(src)))
+		return
+	for(var/mob/living/occupant in GLOB.living_mob_list_)
+		shock_crawlspace_occupant(occupant)
+
+
 /obj/machinery/power/shield_generator/Process()
 	upkeep_power_usage = 0
 	power_usage = 0
@@ -192,6 +210,8 @@
 			S.regenerate()
 	else if (field_integrity() > 25)
 		overloaded = 0
+
+	shock_maintenance_crawlspaces()
 
 
 /obj/machinery/power/shield_generator/attackby(obj/item/O as obj, mob/user as mob)
@@ -281,6 +301,7 @@
 			return
 		running = SHIELD_RUNNING
 		regenerate_field()
+		shock_maintenance_crawlspaces()
 		return TOPIC_REFRESH
 
 	// Instantly drops the shield, but causes a cooldown before it may be started again. Also carries a risk of EMP at high charge.

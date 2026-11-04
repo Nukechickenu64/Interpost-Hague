@@ -317,7 +317,7 @@
 		itemsize = I.w_class
 
 	var/throw_range = item.throw_range
-	src.visible_message("<span class='warning'>[src] is trying to throw [item].</span>")
+	src.visible_message("<span class='warning'>[src] is trying to throw \the [item]!</span>")
 	if (istype(item, /obj/item/grab))
 		var/obj/item/grab/G = item
 		item = G.throw_held() //throw the person instead of the grab
@@ -346,7 +346,7 @@
 		return
 
 	//actually throw it!
-	src.visible_message("<span class='warning'>[src] has thrown [item].</span>", range = min(itemsize*2,world.view))
+	src.visible_message("<span class='warning'>[src] throws \the [item]!</span>", range = min(itemsize*2,world.view))
 	playsound(src, 'sound/effects/throw.ogg', 50, 1)
 
 	if((istype(src.loc, /turf/space)) || !src.mob_has_gravity())

@@ -22,6 +22,7 @@
 
 	//#include "job/jobs.dm"
 	#include "../shared/job/jobs.dm"
+	#include "job/os13_jobs.dm"
 
 	#include "../../code/modules/lobby_music/generic_songs.dm"
 

@@ -8,6 +8,12 @@
 					/obj/item/tank/air = 3)
 	containername = "\improper Internals crate"
 
+/decl/hierarchy/supply_pack/atmospherics/os13_oxygen_tanks
+	name = "OS13 oxygen tanks"
+	contains = list(/obj/item/tank/oxygen/os13 = 3,
+					/obj/item/tank/emergency/oxygen/os13 = 3)
+	containername = "OS13 oxygen tank crate"
+
 /decl/hierarchy/supply_pack/atmospherics/evacuation
 	name = "Emergency equipment"
 	contains = list(/obj/item/storage/toolbox/emergency = 2,
@@ -37,6 +43,12 @@
 	name = "Air canister"
 	contains = list(/obj/machinery/portable_atmospherics/canister/air)
 	containername = "\improper Air canister crate"
+	containertype = /obj/structure/largecrate
+
+/decl/hierarchy/supply_pack/atmospherics/os13_canister_air
+	name = "OS13 Air Canister"
+	contains = list(/obj/machinery/portable_atmospherics/canister/air/os13)
+	containername = "Air Canister crate"
 	containertype = /obj/structure/largecrate
 
 /decl/hierarchy/supply_pack/atmospherics/canister_oxygen

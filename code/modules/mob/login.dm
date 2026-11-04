@@ -75,7 +75,7 @@
 	set_sight(sight|SEE_SELF)
 
 	// During a mind transfer usr can still be the body the client just left.
-	client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
+	client.mouse_pointer_icon = 'icons/os13/mob/mob/other/pointer_s.dmi'
 
 	..()
 

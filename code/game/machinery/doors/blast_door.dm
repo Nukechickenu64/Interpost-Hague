@@ -47,6 +47,9 @@
 		set_opacity(0)
 		layer = open_layer
 
+	if(os13_door_states())
+		update_icon()
+
 	implicit_material = get_material_by_name("plasteel")
 
 /obj/machinery/door/airlock/Destroy()
@@ -67,6 +70,8 @@
 // Parameters: None
 // Description: Updates icon of this object. Uses icon state variables.
 /obj/machinery/door/blast/update_icon()
+	if(os13_update_door_icon())
+		return
 	if(density)
 		icon_state = icon_state_closed
 	else
@@ -80,10 +85,14 @@
 /obj/machinery/door/blast/proc/force_open()
 	src.operating = 1
 	playsound(src.loc, open_sound, 100, 1)
-	flick(icon_state_opening, src)
+	var/os13 = os13_door_states()
+	if(!os13)
+		flick(icon_state_opening, src)
 	src.set_density(0)
 	update_nearby_tiles()
 	src.update_icon()
+	if(os13)
+		os13_animate_door("opening", 15)
 	src.set_opacity(0)
 	sleep(15)
 	src.layer = open_layer
@@ -98,10 +107,14 @@
 	src.operating = 1
 	playsound(src.loc, close_sound, 100, 1)
 	src.layer = closed_layer
-	flick(icon_state_closing, src)
+	var/os13 = os13_door_states()
+	if(!os13)
+		flick(icon_state_closing, src)
 	src.set_density(1)
 	update_nearby_tiles()
 	src.update_icon()
+	if(os13)
+		os13_animate_door("closing", 15)
 	src.set_opacity(1)
 	sleep(15)
 	src.operating = 0

@@ -23,6 +23,7 @@
 
 	var/state = STATE_IDLE
 	var/target_state = TARGET_NONE
+	var/last_cycle_report = 0
 
 	var/cycle_to_external_air = 0
 	var/tag_pump_out_external
@@ -202,6 +203,12 @@
 	if ((state == STATE_PRESSURIZE || state == STATE_DEPRESSURIZE) && !check_doors_secured())
 		//the airlock will not allow itself to continue to cycle when any of the doors are forced open.
 		stop_cycling()
+
+	// OS13 parity: occupants are told the cycle status (marshal video 1:02:54, 1:11:45).
+	if((state == STATE_PRESSURIZE || state == STATE_DEPRESSURIZE) && master && world.time >= last_cycle_report + 4 SECONDS)
+		last_cycle_report = world.time
+		var/kpa = round(memory["chamber_sensor_pressure"] * ONE_ATMOSPHERE / MOLES_CELLSTANDARD, 0.1)
+		master.audible_message("<span class='notice'>Cycling in progress. Pressure: [kpa] kPa</span>", hearing_distance = 5)
 
 	switch(state)
 		if(STATE_PREPARE)

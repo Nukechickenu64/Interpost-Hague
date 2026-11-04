@@ -119,6 +119,9 @@
 /obj/item/proc/do_surgery(mob/living/carbon/M, mob/living/user, fuckup_prob)
 	if(!istype(M))
 		return 0
+	if(!user || user.incapacitated() || !user.Adjacent(M) || !(src in user.contents))
+		to_chat(user, "<span class='warning'>You must hold the tool beside your patient to operate.</span>")
+		return 1
 	if (user.a_intent == I_HURT)	//check for Hippocratic Oath
 		return 0
 	var/zone = user.zone_sel.selecting
@@ -128,32 +131,72 @@
 	for(var/datum/surgery_step/S in surgery_steps)
 		//check if tool is right or close enough and if this step is possible
 		if(S.tool_quality(src))
+			// Reserve the region before a step can open an organ-selection dialog.
+			M.op_stage.in_progress += zone
+			var/mob/living/carbon/human/patient = M
+			var/obj/item/organ/external/original_region
+			if(istype(patient))
+				original_region = patient.get_organ(zone)
+			var/had_region = !!original_region
+			M.op_stage.current_organ = null
 			var/step_is_valid = S.can_use(user, M, zone, src)
+			if(QDELETED(src) || QDELETED(user) || QDELETED(M) || user.incapacitated() || !user.Adjacent(M) || !(src in user.contents) || user.zone_sel.selecting != zone || (had_region && (QDELETED(original_region) || patient.get_organ(zone) != original_region)))
+				if(!QDELETED(M))
+					M.op_stage.in_progress -= zone
+				to_chat(user, "<span class='warning'>The surgical conditions changed. The operation was cancelled.</span>")
+				return 1
 			if(step_is_valid && S.is_valid_target(M))
 				if(step_is_valid == SURGERY_FAILURE) // This is a failure that already has a message for failing.
+					M.op_stage.in_progress -= zone
 					return 1
-				M.op_stage.in_progress += zone
+				var/selected_organ = M.op_stage.current_organ
+				var/obj/item/organ/selected_object
+				if(istype(selected_organ, /obj/item/organ))
+					selected_object = selected_organ
+				else if(istype(patient) && istext(selected_organ))
+					selected_object = patient.internal_organs_by_name[selected_organ]
+				var/had_selection = !!selected_object
+				var/atom/selected_location = selected_object ? selected_object.loc : null
+				var/mob/living/carbon/selected_owner = selected_object ? selected_object.owner : null
 				S.begin_step(user, M, zone, src)		//start on it
+				var/datum/wound/original_incision = original_region ? original_region.get_incision() : null
+				var/had_incision = !!original_incision
 				//We had proper tools! (or RNG smiled.) and user did not move or change hands.
-				if(prob(S.success_chance(user, M, src)) && do_mob(user, M, rand(S.min_duration, S.max_duration)))
+				var/tool_success = prob(S.success_chance(user, M, src))
+				var/completed = tool_success ? do_mob(user, M, rand(S.min_duration, S.max_duration)) : TRUE
+				var/conditions_valid = !QDELETED(src) && !QDELETED(user) && !QDELETED(M)
+				if(conditions_valid)
+					conditions_valid = !user.incapacitated() && user.Adjacent(M) && (src in user.contents) && user.zone_sel.selecting == zone
+				if(conditions_valid && had_region)
+					conditions_valid = !QDELETED(original_region) && patient.get_organ(zone) == original_region
+				if(conditions_valid && had_incision)
+					conditions_valid = !QDELETED(original_incision) && original_region.get_incision() == original_incision
+				if(conditions_valid && had_selection)
+					conditions_valid = !QDELETED(selected_object) && selected_object.loc == selected_location && selected_object.owner == selected_owner
+				if(!completed || !conditions_valid)
+					to_chat(user, "<span class='warning'>Surgery interrupted. The step was not completed.</span>")
+				else if(tool_success)
+					// Different regions may be operated on concurrently.
+					M.op_stage.current_organ = selected_organ
 					if(user.statcheck(user.stats[STAT_IQ], user.skillcheck(user.skills["medical"], 45, null, "Medical"), "6d6", 20) >= SUCCESS)
 						S.end_step(user, M, zone, src)		//finish successfully
 					else
 						visible_message("<span class='warning'>[user] messes up the surgery step. They must try again.</span>")
 						S.fail_step(user, M, zone, src)
 						//user.my_skills[SKILL(surgery)].give_xp(25, user)//If they fail it then give them some XP for trying.
-				else if ((src in user.contents) && user.Adjacent(M))			//or
+				else
+					M.op_stage.current_organ = selected_organ
 					visible_message("<span class='warning'>[user] messes up the surgery step. They must try again.</span>")
 					S.fail_step(user, M, zone, src)		//malpractice~
 					//user.my_skills[SKILL(surgery)].give_xp(25, user)//If they fail it then give them some XP for trying.
-				else // This failing silently was a pain.
-					to_chat(user, "<span class='warning'>You must remain close to your patient to conduct surgery.</span>")
-				if (M)
+				if (!QDELETED(M))
 					M.op_stage.in_progress -= zone 									// Clear the in-progress flag.
-				if (ishuman(M))
+				if (!QDELETED(M) && ishuman(M))
 					var/mob/living/carbon/human/H = M
 					H.update_surgery()
 				return	1	  												//don't want to do weapony things after surgery
+			if(!QDELETED(M))
+				M.op_stage.in_progress -= zone
 	return 0
 
 /proc/sort_surgeries()

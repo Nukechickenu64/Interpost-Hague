@@ -56,15 +56,17 @@
 
 /proc/crew_signal_report(list/readings)
 	var/report = "<b>MEDICAL BRACELET SIGNALS</b><br>"
+	var/entry_number = 0
 	for(var/list/entry in readings)
+		entry_number++
 		var/crew_name = html_encode(entry["name"])
 		if(entry["missing"])
-			report += "<span class='warning'>[crew_name] - NOT RESPONDING.</span><br>"
+			report += "<span class='warning'>[entry_number]. ### [crew_name] - NOT RESPONDING.</span><br>"
 		else if(entry["sensor_type"] >= SUIT_SENSOR_VITAL)
 			var/location = entry["sensor_type"] >= SUIT_SENSOR_TRACKING ? html_encode(entry["area"]) : "Location unavailable"
-			report += "[crew_name] ([location]) PLS: [entry["pulse"]][entry["radiation"] ? " RAD: [entry["radiation"]]" : ""]<br>"
+			report += "[entry_number]. ### [crew_name] ([location]) PLS: [entry["pulse"]][entry["radiation"] ? " RAD: [entry["radiation"]]" : ""]<br>"
 		else
-			report += "[crew_name] - [entry["dead"] ? "No life signs" : "Life signs detected"].<br>"
+			report += "[entry_number]. ### [crew_name] - [entry["dead"] ? "No life signs" : "Life signs detected"].<br>"
 	return report
 
 /datum/nano_module/crew_monitor/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)

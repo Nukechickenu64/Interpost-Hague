@@ -43,6 +43,7 @@ var/const/MAP_HAS_RANK = 2		//Rank system, also togglable
 	//This list contains the z-level numbers which can be accessed via space travel and the percentile chances to get there.
 	var/list/accessible_z_levels = list()
 
+	var/default_job = "Assistant"
 	var/list/allowed_jobs	       //Job datums to use.
 	                               //Works a lot better so if we get to a point where three-ish maps are used
 	                               //We don't have to C&P ones that are only common between two of them

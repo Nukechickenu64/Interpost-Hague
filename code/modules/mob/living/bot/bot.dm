@@ -55,6 +55,17 @@
 	else
 		turn_off()
 
+/mob/living/bot/apply_map_access()
+	if(isnull(map_access))
+		return
+	var/list/requirements = parse_mapper_access(map_access, src)
+	req_access = requirements["all"]
+	req_one_access = requirements["any"]
+	// On mapload the scanner was already created in New().
+	if(access_scanner)
+		access_scanner.req_access = req_access.Copy()
+		access_scanner.req_one_access = req_one_access.Copy()
+
 /mob/living/bot/Life()
 	..()
 	if(health <= 0)

@@ -9,6 +9,14 @@
 	containertype = /obj/structure/largecrate
 	containername = "reagent dispenser crate"
 
+/decl/hierarchy/supply_pack/reagents/os13_chemfabricator
+	name = "Chemfabricator"
+	contains = list(
+			/obj/machinery/chemical_dispenser/os13{anchored = 0}
+		)
+	containertype = /obj/structure/largecrate
+	containername = "Chemfabricator crate"
+
 /decl/hierarchy/supply_pack/reagents/beer_dispenser
 	name = "Booze dispenser"
 	contains = list(

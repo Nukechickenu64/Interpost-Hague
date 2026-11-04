@@ -4,6 +4,7 @@
 	shredding = 0
 	sharp = 1
 	edge = 1
+	fang_text = "sharp fangs"
 
 /datum/unarmed_attack/diona
 	attack_verb = list("lashed", "bludgeoned")
@@ -67,6 +68,7 @@
 	attack_verb = list("mauled")
 	damage = 8
 	shredding = 1
+	fang_text = "huge fangs"
 
 /datum/unarmed_attack/slime_glomp
 	attack_verb = list("glomped")

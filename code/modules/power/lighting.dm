@@ -161,6 +161,7 @@
 	var/bridge_startup_pending = FALSE
 	var/light_type = /obj/item/light/tube		// the type of light item
 	var/construct_type = /obj/machinery/light_construct
+	var/apply_directional_offset = TRUE
 
 	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
 
@@ -219,15 +220,16 @@
 	on = powered()
 	update_icon(0)
 	GLOB.cryo_startup_effect.register_light(src)
-	switch(dir)
-		if(NORTH)
-			pixel_y = 2
-		if(EAST)
-			pixel_x = 2
-		if(SOUTH)
-			pixel_y = -2
-		if(WEST)
-			pixel_x = -2
+	if(apply_directional_offset)
+		switch(dir)
+			if(NORTH)
+				pixel_y = 2
+			if(EAST)
+				pixel_x = 2
+			if(SOUTH)
+				pixel_y = -2
+			if(WEST)
+				pixel_x = -2
 
 /*
 /obj/machinery/light/Process()

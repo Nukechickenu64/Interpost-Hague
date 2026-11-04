@@ -444,7 +444,7 @@
 		return
 	var/datum/tech/T = new board_type()
 	T.level = target_level
-	disk.stored = T
+	disk.set_research(T)
 	board_cooldowns[board_id] = world.time + board_cooldown
 	state = BBS_COMPLETE
 	code = null
@@ -454,10 +454,17 @@
 	playsound(loc, 'sound/machines/ping.ogg', 30, 1)
 
 // Highest level the station's research network already has, so downloads are always an upgrade.
+// Replicator consoles store their own technology data, so no R&D server is needed.
 /obj/machinery/computer/bbs_terminal/proc/get_network_level(var/tech_type)
 	var/datum/tech/base = tech_type
 	. = initial(base.level)
 	var/id = initial(base.id)
+	for(var/obj/machinery/computer/rdconsole/C in SSmachines.machinery)
+		if(!C.files)
+			continue
+		for(var/datum/tech/known in C.files.known_tech)
+			if(known.id == id)
+				. = max(., known.level)
 	for(var/obj/machinery/r_n_d/server/S in SSmachines.machinery)
 		if(istype(S, /obj/machinery/r_n_d/server/centcom) || !S.files)
 			continue

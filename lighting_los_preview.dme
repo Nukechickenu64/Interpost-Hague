@@ -3,3 +3,4 @@
 #include "Interpost-Hague.dme"
 #include "tools\lighting_los\preview.dm"
 #include "tools\lighting_los\reference_scene.dm"
+#include "tools\lighting_los\openspace_preview.dm"

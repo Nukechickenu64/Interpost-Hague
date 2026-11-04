@@ -89,10 +89,75 @@
 	icon = 'icons/os13/turf/turf/walls.dmi'
 	icon_state = "wall0"
 
+// Cache of icon_states() lists, keyed by icon file, so smoothing only picks states that exist.
+var/global/list/os13_wall_state_cache = list()
+
+// Returns the junction state prefix ("wall", "rwall" or "flesh_") if this
+// wall type uses one of the classic bitfield-numbered state sets, else null.
+/turf/simulated/wall/os13/proc/get_os13_smooth_prefix()
+	var/base_state = initial(icon_state)
+	if(base_state == "r_wall")
+		return "rwall"
+	if(copytext(base_state, 1, 7) == "flesh_")
+		return "flesh_"
+	var/prefix
+	var/suffix
+	if(copytext(base_state, 1, 6) == "rwall")
+		prefix = "rwall"
+		suffix = copytext(base_state, 6)
+	else if(copytext(base_state, 1, 5) == "wall")
+		prefix = "wall"
+		suffix = copytext(base_state, 5)
+	else
+		return null
+	var/junction = text2num(suffix)
+	if(isnull(junction) || "[junction]" != suffix || junction < 0 || junction > 15)
+		return null
+	return prefix
+
+// Bitfield of cardinal directions with an adjacent OS13 wall from the same tileset.
+/turf/simulated/wall/os13/proc/get_os13_junction()
+	var/junction = 0
+	for(var/stepdir in GLOB.cardinal)
+		var/turf/simulated/wall/os13/W = get_step(src, stepdir)
+		if(istype(W) && W.icon == icon)
+			junction |= stepdir
+	return junction
+
+// Computes the self-connecting icon state, falling back to the mapped
+// state when the tileset lacks the needed junction state.
+/turf/simulated/wall/os13/proc/get_os13_wall_state()
+	var/prefix = get_os13_smooth_prefix()
+	if(!prefix)
+		return initial(icon_state)
+	var/junction = get_os13_junction()
+	var/state
+	if(prefix == "flesh_")
+		// Flesh state letters mark the EXPOSED (unconnected) edges.
+		state = "flesh_"
+		if(!(junction & NORTH))
+			state += "N"
+		if(!(junction & SOUTH))
+			state += "S"
+		if(!(junction & WEST))
+			state += "W"
+		if(!(junction & EAST))
+			state += "E"
+	else
+		state = "[prefix][junction]"
+	var/key = "[icon]"
+	var/list/states = os13_wall_state_cache[key]
+	if(!states)
+		states = icon_states(icon)
+		os13_wall_state_cache[key] = states
+	if(state in states)
+		return state
+	return initial(icon_state)
+
 /turf/simulated/wall/os13/update_icon()
 	. = ..()
 	icon = initial(icon)
-	icon_state = initial(icon_state)
+	icon_state = get_os13_wall_state()
 	color = initial(color)
 	overlays.Cut()
 	if(damage && material)

@@ -25,6 +25,8 @@
 	if(character.mind)
 		character.mind.generate_goals(character.mind.assigned_job, is_spawning=TRUE)
 		character.show_goals()
+		if(MODE_TRAITOR in antag_tags)
+			os13_send_loyal_crew_sheet(character)
 	return 0
 
 /datum/game_mode/proc/process_autoantag()

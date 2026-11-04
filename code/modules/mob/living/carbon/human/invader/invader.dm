@@ -77,10 +77,6 @@ GLOBAL_LIST_INIT(invader_allied_antag_ids, list(MODE_TRAITOR, MODE_MERCENARY, MO
 	a_intent = old_intent
 	tmob.a_intent = old_other_intent
 
-// ClickOn calls this and it dereferences usr.client, which client-less invaders don't have.
-/mob/living/carbon/human/invader/switch_pointer()
-	return
-
 /mob/living/carbon/human/invader/hear_say(var/message, var/verb = "says", var/datum/language/language = null, var/alt_name = "", var/italics = 0, var/mob/speaker = null, var/sound/speech_sound, var/sound_vol)
 	if(brain && speaker)
 		brain.on_heard(speaker)

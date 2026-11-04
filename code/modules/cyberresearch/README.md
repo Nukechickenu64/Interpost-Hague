@@ -1,7 +1,9 @@
 # Cyberdeck research
 
 Insert a **blank technology disk** into the cyberdeck research console. Buckle a
-technician into a cyberdeck chair within three tiles and equip a cyberdeck helmet.
+technician into a cyberdeck chair in the console's area on the same z-level and
+equip a cyberdeck helmet. The console discovers every eligible chair in that area,
+regardless of distance; a chair across an area boundary cannot connect.
 The console operator selects the occupied chair and boots a research field.
 You can boot yourself while seated in a chair beside the console. Keep the console
 within arm's reach when using its controls yourself. A successful boot closes the
@@ -52,3 +54,28 @@ For an in-game check, use two players (console operator and seated technician),
 complete a dive, eject/import its disk, then verify the next level is offered.
 Repeat with emergency recall, unbuckling, helmet removal and a console power cut.
 Inspect human and tailed-species avatars in all four directions.
+
+For a quick test setup, admin-spawn `/obj/machinery/computer/cyberdeck/debug`.
+Open it and click **Debug tools**, then **Prepare me for a dive** while standing
+beside it in the same area. Remove other headgear first. This equips the helmet,
+installs a standard neural port on Alpha if missing, creates and buckles you into
+a chair, and loads a blank disk if the drive is empty. Select an archive normally.
+The debug console runs without station power and has no fabrication recipe.
+
+Debug tools also create blank technology/design disks, recorded technology disks,
+Scan Mk.I/Mk.II and ICE-Pick MK2 software disks, and standard/advanced neural ports.
+Recorded disks are independent snapshots and must be imported to install research.
+**Create research import console** places a self-powered, unrestricted importer on
+a clear neighboring floor tile. Use its normal menus to import, back up and erase
+disks. Imported research is visible to the station's cyberdecks; the importer does
+not claim fabrication devices. To test a fresh dive before installing its reward,
+leave its completed disk unimported. A second operator can use the debug tools to
+reset avatar ability cooldowns, complete a test download, or recall a test dive.
+Debug completion deliberately restores destroyed-data progress for that test.
+
+Run `cyberdeck_test.dmb -invisible -trusted -close -params "cyberdeck_area=1"`
+with DreamDaemon after compiling `cyberdeck_test.dme` to check area-wide discovery,
+area/z boundaries, auto-linking, an active dive, real Alpha data collection and
+disk recording, debug preparation and importer availability, plus archive layout
+and preallocation. The avatar's Scan ability retains its existing visible-screen
+range.

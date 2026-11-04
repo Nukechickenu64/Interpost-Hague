@@ -77,7 +77,7 @@
 		if(amount < 0)
 			user.visible_message("<span class='danger'>\The [user] hits \the [src] with \the [W] with no visible effect.</span>")
 		else
-			user.visible_message("<span class='danger'>\The [user] forcefully strikes \the [src] with \the [W]!</span>")
+			user.visible_message("<span class='danger'>\The [user] hits \the [src] with \the [W]!</span>")
 			playsound(src.loc, hitsound, 100, 1)
 	health -= amount
 	if(health <= 0)

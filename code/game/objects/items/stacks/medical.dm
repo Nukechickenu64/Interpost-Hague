@@ -78,21 +78,57 @@
 		var/mob/living/carbon/human/H = M
 		var/obj/item/organ/external/affecting = H.get_organ(user.zone_sel.selecting) //nullchecked by ..()
 
+		var/obj/item/weapon/material/stick/support = user.get_inactive_hand()
+		if(istype(support) && support.material && support.material.name == "wood" && !support.sharp && affecting.is_broken() && !affecting.splinted && (affecting.organ_tag in list(BP_L_ARM, BP_R_ARM, BP_L_LEG, BP_R_LEG, BP_L_HAND, BP_R_HAND, BP_L_FOOT, BP_R_FOOT)))
+			if(M == user && ((!user.hand && (affecting.organ_tag in list(BP_R_ARM, BP_R_HAND))) || (user.hand && (affecting.organ_tag in list(BP_L_ARM, BP_L_HAND)))))
+				to_chat(user, "<span class='warning'>You can't apply a splint to the arm you're using!</span>")
+				return 1
+			if(affecting.is_dislocated())
+				to_chat(user, "<span class='warning'>You need to relocate [M]'s [affecting.joint] before splinting it.</span>")
+				return 1
+			user.visible_message("<span class='notice'>[user] starts binding a wooden splint to [M]'s [affecting.name].</span>")
+			if(!do_mob(user, M, 50))
+				return 1
+			if(QDELETED(src) || QDELETED(support) || QDELETED(affecting) || amount < 1 || user.get_inactive_hand() != support || user.get_active_hand() != src || !support.material || support.material.name != "wood" || support.sharp || H.get_organ(affecting.organ_tag) != affecting || !affecting.is_broken() || affecting.is_dislocated() || affecting.splinted)
+				return 1
+			if(!user.drop_from_inventory(support))
+				return 1
+			if(affecting.apply_splint(support))
+				support.forceMove(affecting)
+				user.visible_message("<span class='notice'>[user] binds [support] to [M]'s [affecting.name] with [src].</span>")
+				use(1)
+				H.update_bandaging()
+				H.update_bleeding()
+				return 1
+			return 1
+
 		if(affecting.is_bandaged())
 			to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been bandaged.</span>")
 			return 1
 		else
 			user.visible_message("<span class='notice'>\The [user] starts treating [M]'s [affecting.name].</span>", \
 					             "<span class='notice'>You start treating [M]'s [affecting.name].</span>" )
-			var/used = 0
-			for (var/datum/wound/W in affecting.wounds)
-				if(W.bandaged)
+			for (var/datum/wound/W in affecting.wounds.Copy())
+				if(QDELETED(W) || W.bandaged)
 					continue
-				if(used == amount)
+				if(amount < 1)
 					break
 				if(!do_mob(user, M, W.damage/5))
 					to_chat(user, "<span class='notice'>You must stand still to bandage wounds.</span>")
 					break
+				if(QDELETED(user))
+					return 1
+				if(QDELETED(src) || QDELETED(H) || QDELETED(affecting))
+					to_chat(user, "<span class='warning'>The patient, limb or bandages are no longer available.</span>")
+					return 1
+				if(H.get_organ(affecting.organ_tag) != affecting || affecting.robotic >= ORGAN_ROBOT || user.incapacitated() || !user.Adjacent(H) || (user.get_active_hand() != src && user.get_inactive_hand() != src) || amount < 1)
+					to_chat(user, "<span class='warning'>The bandaging conditions changed.</span>")
+					break
+				if((affecting.organ_tag == BP_HEAD && istype(H.head, /obj/item/clothing/head/helmet/space)) || (affecting.organ_tag != BP_HEAD && istype(H.wear_suit, /obj/item/clothing/suit/space)))
+					to_chat(user, "<span class='warning'>You can no longer reach the wound through the patient's suit.</span>")
+					break
+				if(QDELETED(W) || !(W in affecting.wounds) || W.bandaged)
+					continue
 
 				if (W.current_stage <= W.max_bleeding_stage)
 					user.visible_message("<span class='notice'>\The [user] bandages \a [W.desc] on [M]'s [affecting.name].</span>", \
@@ -105,19 +141,26 @@
 					user.visible_message("<span class='notice'>\The [user] places a bandaid over \a [W.desc] on [M]'s [affecting.name].</span>", \
 					                              "<span class='notice'>You place a bandaid over \a [W.desc] on [M]'s [affecting.name].</span>" )
 				W.bandage()
+				on_wound_bandaged(user, H, affecting, W)
+				var/healing = heal_brute
 				if (user.skillcheck(user.skills[SKILL_MED], 65, null, "Medical"))
-					heal_brute += user.skills[SKILL_MED] * 0.1
-				W.heal_damage(heal_brute)
-				used++
+					healing += user.skills[SKILL_MED] * 0.1
+				W.heal_damage(healing)
+				var/depleted = amount == 1
+				if(depleted)
+					if(affecting.is_bandaged())
+						to_chat(user, "<span class='warning'>\The [src] is used up.</span>")
+					else
+						to_chat(user, "<span class='warning'>\The [src] is used up, but there are more wounds to treat on \the [affecting.name].</span>")
+				use(1)
+				if(depleted)
+					break
 			affecting.update_damages()
-			if(used == amount)
-				if(affecting.is_bandaged())
-					to_chat(user, "<span class='warning'>\The [src] is used up.</span>")
-				else
-					to_chat(user, "<span class='warning'>\The [src] is used up, but there are more wounds to treat on \the [affecting.name].</span>")
-			use(used)
 			H.update_bandaging()
 			H.update_bleeding()
+
+/obj/item/stack/medical/bruise_pack/proc/on_wound_bandaged(mob/user, mob/living/carbon/human/patient, obj/item/organ/external/affected, datum/wound/wound)
+	return
 
 /obj/item/stack/medical/ointment
 	name = "ointment"

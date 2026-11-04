@@ -1,7 +1,32 @@
-<!-- 
-Title: Chem Dispenser 5000 UI 
-Used In File(s): \code\modules\reagents\Chemistry-Machinery.dm
+<!--
+Title: Chemical Dispenser / Chemfabricator UI
+Used In File(s): \code\modules\reagents\dispenser\dispenser2.dm
  -->
+{{if data.chemfabricator}}
+<div class="statusDisplay">
+	<b>Chemfabricator Supplies</b><br>
+	Controls: {{if data.locked}}<span class="bad">Keycard-locked</span>{{else}}Unlocked{{/if}}<br>
+	Water: {{:data.waterVolume}} / {{:data.waterCapacity}} units<br>
+	Charge: {{:data.chemicalStock}} / {{:data.chargeCapacity}}<br>
+	Each Chemistry Charge adds {{:data.chargeRefill}} charge points. Load a beaker of clean water, then:
+	{{:helper.link('Load Water', 'circle-arrow-up', {'loadWater' : 1}, (data.isBeakerLoaded && !data.locked) ? null : 'disabled')}}
+	<br>Compatibility beaker dispensing consumes one unit each of water and feedstock per output unit.
+</div>
+<div class="statusDisplay">
+	<b>Select a drug to synthesize</b><br>
+	Each injector contains one {{:data.injectorVolume}}-unit dose and uses {{:data.injectorVolume}} units of water.
+	The number in parentheses is its feedstock cost.<br>
+	{{for data.injectors}}
+		{{if value.available}}
+			{{:helper.link('(' + value.cost + ') ' + value.label + ' injector', 'plus', {'makeInjector' : value.label}, data.locked ? 'disabled' : null)}}
+		{{else}}
+			<span class="average">({{:value.cost}}) {{:value.label}}: formulation unavailable</span><br>
+		{{/if}}
+	{{/for}}
+</div>
+{{if !data.locked}}<h3>Compatibility beaker dispensing</h3>{{/if}}
+{{/if}}
+{{if !data.chemfabricator || !data.locked}}
 <div class="item">
 	<div class="itemLabel">
 		Dispense:
@@ -63,7 +88,7 @@ Used In File(s): \code\modules\reagents\Chemistry-Machinery.dm
 				{{/for}}
 			{{else}}
 				<span class="average"><i>
-					No 
+					No
 					{{if data.glass}}
 						Glass
 					{{else}}
@@ -74,3 +99,4 @@ Used In File(s): \code\modules\reagents\Chemistry-Machinery.dm
 		</div>
 	</div>
 </div>
+{{/if}}

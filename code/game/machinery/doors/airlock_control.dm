@@ -238,8 +238,8 @@ obj/machinery/airlock_sensor/airlock_exterior
 	command = "cycle_exterior"
 
 obj/machinery/access_button
-	icon = 'icons/obj/airlock_machines.dmi'
-	icon_state = "access_button_standby"
+	icon = 'icons/os13/objects/objects/device.dmi'
+	icon_state = "doorctrl00"
 	name = "access button"
 
 	anchored = 1
@@ -256,9 +256,9 @@ obj/machinery/access_button
 
 obj/machinery/access_button/update_icon()
 	if(on)
-		icon_state = "access_button_standby"
+		icon_state = "doorctrl00"
 	else
-		icon_state = "access_button_off"
+		icon_state = "doorctrl-p"
 
 obj/machinery/access_button/attackby(obj/item/I as obj, mob/user as mob)
 	//Swiping ID on the access button
@@ -279,7 +279,7 @@ obj/machinery/access_button/attack_hand(mob/user)
 		signal.data["command"] = command
 
 		radio_connection.post_signal(src, signal, range = AIRLOCK_CONTROL_RANGE, filter = RADIO_AIRLOCK)
-	flick("access_button_cycle", src)
+	flick("doorctrl1", src)
 
 
 obj/machinery/access_button/proc/set_frequency(new_frequency)

@@ -786,8 +786,8 @@ default behaviour is:
 		return
 
 	visible_message(
-		"<span class='danger'>[src] tries to resist!</span>",
-		"<span class='warning'>You try to resist!</span>"
+		"<span class='danger'>[src] is trying to break loose from the grip!</span>",
+		"<span class='warning'>You are trying to break loose from the grip!</span>"
 	)
 	for(var/obj/item/grab/G in grabs_to_resist)
 		if(G && !QDELETED(G))
@@ -953,6 +953,7 @@ default behaviour is:
 	return 1
 
 /mob/living/Destroy()
+	QDEL_NULL(blur_effect)
 	if(auras)
 		for(var/a in auras)
 			remove_aura(a)

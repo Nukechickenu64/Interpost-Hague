@@ -1,6 +1,54 @@
 // Telemetry data collection for the Director Engine
 // Gathers live station state data: power grid, atmos, security, loyalty, etc.
 
+// Topology candidates only. Damage, station membership and area names remain
+// live readings. Coordinate keys survive turf replacement and direct new turfs.
+var/global/list/telemetry_structural_walls
+var/global/list/telemetry_structural_boundaries
+var/global/list/telemetry_structural_dirty
+
+/proc/telemetry_queue_structural_turf(turf/T)
+	telemetry_structural_dirty["[T.x],[T.y],[T.z]"] = list(T.x, T.y, T.z)
+	for(var/direction in GLOB.cardinal)
+		var/turf/neighbor = get_step(T, direction)
+		if(neighbor)
+			telemetry_structural_dirty["[neighbor.x],[neighbor.y],[neighbor.z]"] = list(neighbor.x, neighbor.y, neighbor.z)
+
+/proc/telemetry_refresh_structural_candidates()
+	if(isnull(telemetry_structural_dirty))
+		telemetry_structural_dirty = list()
+		telemetry_structural_walls = list()
+		telemetry_structural_boundaries = list()
+		var/visited = 0
+		for(var/turf/simulated/T in world)
+			if(istype(T, /turf/simulated/wall))
+				telemetry_structural_walls["[T.x],[T.y],[T.z]"] = T
+			for(var/direction in GLOB.cardinal)
+				var/turf/space/S = get_step(T, direction)
+				if(istype(S))
+					telemetry_structural_boundaries["[S.x],[S.y],[S.z]"] = S
+			if(++visited % 256 == 0)
+				CHECK_TICK
+	// Only topology edits and their immediate neighbors need reclassification.
+	// Swapping the queue also preserves edits made while this pass yields.
+	var/list/dirty = telemetry_structural_dirty
+	telemetry_structural_dirty = list()
+	var/visited = 0
+	for(var/key in dirty)
+		var/list/coords = dirty[key]
+		var/turf/T = locate(coords[1], coords[2], coords[3])
+		telemetry_structural_walls -= key
+		telemetry_structural_boundaries -= key
+		if(istype(T, /turf/simulated/wall))
+			telemetry_structural_walls[key] = T
+		if(istype(T, /turf/space))
+			for(var/direction in GLOB.cardinal)
+				if(istype(get_step(T, direction), /turf/simulated))
+					telemetry_structural_boundaries[key] = T
+					break
+		if(++visited % 256 == 0)
+			CHECK_TICK
+
 /datum/telemetry
 	var/name = "telemetry"
 
@@ -15,6 +63,7 @@
 	var/arrests_since_sample = 0
 	var/deaths_since_sample = 0
 	var/comms_blackout_active = FALSE
+	var/power_controllers_total = 0
 
 /datum/telemetry/New()
 	for(var/key in list(
@@ -78,17 +127,17 @@
 // === Individual samplers ===
 
 /datum/telemetry/proc/sample_power_grid()
-	// Count powered vs unpowered APCs on station
 	var/powered = 0
 	var/total = 0
 	for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)
 		if(!is_station_turf(get_turf(A)))
 			continue
 		total++
-		if(A.operating)
+		if(A.is_supplying_power())
 			powered++
+	power_controllers_total = total
 	if(total == 0)
-		samples[TELEMETRY_POWER_GRID] = 100
+		samples[TELEMETRY_POWER_GRID] = 0
 	else
 		samples[TELEMETRY_POWER_GRID] = round((powered / total) * 100)
 
@@ -100,13 +149,17 @@
 		if(!A || !isStationLevel(A.z) || istype(A, /area/space))
 			continue
 		var/dangerous = FALSE
+		// A zone shares one mixture across all its turfs. Check each mixture
+		// once per area, while still including unzoned turf air.
+		var/list/checked_air = list()
 		for(var/turf/simulated/T in A.contents)
 			if(T.blocks_air)
 				continue
 			// Read air directly; return_air() would queue zone updates as a side effect.
 			var/datum/gas_mixture/air = T.zone ? T.zone.air : T.air
-			if(!air)
+			if(!air || checked_air[air])
 				continue
+			checked_air[air] = TRUE
 			// Station baseline is cold (turf default 253.5K); match air alarm danger thresholds.
 			if(air.temperature > T0C + 66 || air.temperature < T0C - 26)
 				dangerous = TRUE
@@ -176,31 +229,36 @@
 
 /datum/telemetry/proc/sample_structural_integrity()
 	set background = TRUE
-	// Check for damaged walls/floors on station
+	telemetry_refresh_structural_candidates()
+	// Sample only walls and possible breaches. Turf lifecycle hooks keep the
+	// candidate sets current without another world scan on every sample.
 	var/intact = 0
 	var/damaged = 0
-	for(var/turf/simulated/wall/W in world)
-		if(!isStationLevel(W.z))
+	var/visited = 0
+	for(var/key in telemetry_structural_walls)
+		var/turf/simulated/wall/W = telemetry_structural_walls[key]
+		if(!istype(W) || !isStationLevel(W.z))
 			continue
 		if(W.damage < 50)
 			intact++
 		else
 			damaged++
-	// Also count space turfs where station should be (rough heuristic)
-	for(var/turf/space/S in world)
-		if(!isStationLevel(S.z))
+		if(++visited % 256 == 0)
+			CHECK_TICK
+	for(var/key in telemetry_structural_boundaries)
+		var/turf/space/S = telemetry_structural_boundaries[key]
+		if(!istype(S) || !isStationLevel(S.z))
 			continue
-		// Count space turfs adjacent to station areas as potential breaches
-		var/adjacent_station = FALSE
-		for(var/dir in list(NORTH, SOUTH, EAST, WEST))
-			var/turf/T = get_step(S, dir)
-			if(istype(T, /turf/simulated))
-				var/area/A = T.loc
-				if(A && isStationLevel(T.z) && !findtext(A.name, "Space"))
-					adjacent_station = TRUE
-					break
-		if(adjacent_station)
-			damaged++
+		for(var/direction in GLOB.cardinal)
+			var/turf/simulated/T = get_step(S, direction)
+			if(!istype(T))
+				continue
+			var/area/A = T.loc
+			if(A && !findtext(A.name, "Space"))
+				damaged++
+				break
+		if(++visited % 256 == 0)
+			CHECK_TICK
 	var/total = intact + damaged
 	if(total == 0)
 		samples[TELEMETRY_STRUCTURAL] = 100

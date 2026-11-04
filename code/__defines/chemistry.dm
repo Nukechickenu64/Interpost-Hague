@@ -43,3 +43,6 @@
 //reagent flags
 #define IGNORE_MOB_SIZE 0x1
 #define AFFECTS_DEAD    0x2
+// Chemistry dispenser starts with 21
+// ERT dispenser starts with 28
+#define DISPENSER_MAX_CARTRIDGES 30

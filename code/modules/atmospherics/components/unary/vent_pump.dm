@@ -87,7 +87,12 @@
 	air_contents.volume = ATMOS_DEFAULT_VOLUME_PUMP
 	icon = null
 
+/obj/machinery/atmospherics/unary/vent_pump/Initialize(mapload, d=0)
+	. = ..()
+	station_supply_vents += src
+
 /obj/machinery/atmospherics/unary/vent_pump/Destroy()
+	station_supply_vents -= src
 	unregister_radio(src, frequency)
 	malfunction_smoke = null
 	if(initial_loc)

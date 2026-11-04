@@ -42,10 +42,8 @@
 	occupied = new_occupied
 	if(occupied)
 		unoccupied_color = color
-		animate(src, color = "#444444", time = 1, loop = -1)
-		animate(color = unoccupied_color, time = 1, loop = -1)
+		color = "#444444"
 	else
-		animate(src)
 		color = unoccupied_color
 
 /obj/screen/close

@@ -114,6 +114,14 @@ var/global/list/sparring_attack_cache = list()
 	damage = 0
 	sharp = 0
 	edge = 0
+	var/fang_text = "teeth"   // OS13 parity: species fangs read differently
+
+// OS13 parity bite prose: "X bites Y's throat with his teeth!" (marshal video 1:32+, finale)
+/datum/unarmed_attack/bite/show_attack(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone, var/attack_damage)
+	var/obj/item/organ/external/affecting = target.get_organ(zone)
+	var/quality = user.attack_quality == "powerfully" ? " effortlessly" : ""
+	user.visible_message("<span class='warning'>[user] bites[quality] [target]'s [affecting.name] with \his [fang_text]!</span>")
+	playsound(user.loc, attack_sound, 25, 1, -1)
 
 /datum/unarmed_attack/bite/proc/ensure_nonzero_damage(var/attack_damage)
 	return max(1, attack_damage)
@@ -139,7 +147,16 @@ var/global/list/sparring_attack_cache = list()
 /datum/unarmed_attack/punch/show_attack(var/mob/living/carbon/human/user, var/mob/living/carbon/human/target, var/zone, var/attack_damage)
 	var/obj/item/organ/external/affecting = target.get_organ(zone)
 	var/organ = affecting.name
-	var/quality = user.attack_quality ? " [user.attack_quality]" : ""
+	var/quality = ""
+	switch(user.attack_quality)
+		if("powerfully")
+			quality = " effortlessly"
+		if("solidly")
+			quality = " neatly"
+		if("weakly")
+			quality = " clumsily"
+		else if(user.attack_quality)
+			quality = " [user.attack_quality]"
 
 	attack_damage = clamp(attack_damage, 1, 5) // We expect damage input of 1 to 5 for this proc. But we leave this check juuust in case.
 
@@ -208,6 +225,20 @@ var/global/list/sparring_attack_cache = list()
 	var/organ = affecting.name
 
 	attack_damage = clamp(attack_damage, 1, 5)
+
+	var/quality
+	switch(user.attack_quality)
+		if("powerfully")
+			quality = "effortlessly"
+		if("solidly")
+			quality = "neatly"
+		if("weakly")
+			quality = "clumsily"
+		else
+			quality = user.attack_quality
+	if(quality)
+		user.visible_message("<span class='danger'>[user] [quality] [pick(attack_verb)] [target] in \his [organ]!</span>")
+		return
 
 	switch(attack_damage)
 		if(1 to 2)	user.visible_message("<span class='danger'>[user] threw [target] a glancing [pick(attack_noun)] to the [organ]!</span>") //it's not that they're kicking lightly, it's that the kick didn't quite connect

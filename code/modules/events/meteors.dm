@@ -18,6 +18,9 @@
 	endWhen = worst_case_end()
 
 /datum/event/meteor_wave/announce()
+	// OS13 parity: proximity countdown to first impact (marshal video 32:45).
+	var/seconds_to_impact = max(0, round((next_meteor - activeFor) * 2))
+	to_world("<span class='danger'><b>DANGER! Proximity alert! [seconds_to_impact]s until the collision!</b></span>")
 	switch(severity)
 		if(EVENT_LEVEL_MAJOR)
 			GLOB.using_map.meteors_detected_announcement()

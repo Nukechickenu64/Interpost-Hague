@@ -432,11 +432,6 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 		H.set_fullscreen(H.equipment_tint_total, "welder", /obj/screen/fullscreen/impaired, H.equipment_tint_total)
 	var/how_nearsighted = get_how_nearsighted(H)
 	H.set_fullscreen(how_nearsighted, "nearsighted", /obj/screen/fullscreen/oxy, how_nearsighted)
-	if(H.eye_blurry)
-		H.set_all_blur()
-	else
-		H.remove_all_blur()
-	//H.set_fullscreen(H.eye_blurry, "blurry", /obj/screen/fullscreen/blurry)
 	H.set_fullscreen(H.druggy, "high", /obj/screen/fullscreen/high)
 	if(H.druggy)
 		H.add_client_color(/datum/client_color/oversaturated)
@@ -444,6 +439,11 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	else
 		H.remove_client_color(/datum/client_color/oversaturated)
 		H.remove_all_blur_drugs()
+
+	if(H.eye_blurry)
+		H.set_all_blur()
+	else
+		H.remove_all_blur()
 
 	for(var/overlay in H.equipment_overlays)
 		H.client.screen |= overlay
@@ -599,12 +599,10 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 /mob/living/proc/set_all_blur()
 	if(!client)
 		return
-	client.screen += blur_effect
+	blur_effect.apply(client)
 
 /mob/living/proc/remove_all_blur()
-	if(!client)
-		return
-	client.screen -= blur_effect
+	blur_effect.clear()
 
 /mob/living/proc/set_all_blur_drugs()
 	if(!client)

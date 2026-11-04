@@ -74,6 +74,7 @@
 	var/spawn_sound = 'sound/voice/liveagain.ogg'
 	var/pitch_toggle = 1
 	var/list/req_access = list(access_robotics)
+	var/mapped_access_requires_all = FALSE
 	var/ident = 0
 	var/viewalerts = 0
 	var/modtype = "Default"
@@ -704,7 +705,17 @@
 			return 1
 	return 0
 
+/mob/living/silicon/robot/apply_map_access()
+	if(isnull(map_access))
+		return
+	var/list/requirements = parse_mapper_access(map_access, src)
+	var/list/all_access = requirements["all"]
+	mapped_access_requires_all = !!all_access.len
+	req_access = mapped_access_requires_all ? all_access : requirements["any"]
+
 /mob/living/silicon/robot/proc/check_access(obj/item/card/id/I)
+	if(mapped_access_requires_all)
+		return has_access(req_access, list(), I ? I.GetAccess() : list())
 	if(!istype(req_access, /list)) //something's very wrong
 		return 1
 

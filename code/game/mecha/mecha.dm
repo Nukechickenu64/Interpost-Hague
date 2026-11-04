@@ -66,6 +66,9 @@
 
 	var/list/operation_req_access = list()//required access level for mecha operation
 	var/list/internals_req_access = list(access_engine,access_robotics)//required access level to open cell compartment
+	var/mapped_operation_requires_all = TRUE
+	var/mapped_service_requires_all = FALSE
+	var/map_service_access = null
 
 	var/datum/global_iterator/pr_int_temp_processor //normalizes internal air mixture temperature
 	var/datum/global_iterator/pr_inertial_movement //controls intertial movement in spesss
@@ -1135,6 +1138,17 @@
 ////// Access stuff /////
 /////////////////////////
 
+/obj/mecha/apply_map_access()
+	..()
+	if(!isnull(map_access))
+		mapped_operation_requires_all = !!req_access.len
+		operation_req_access = mapped_operation_requires_all ? req_access.Copy() : req_one_access.Copy()
+	if(!isnull(map_service_access))
+		var/list/requirements = parse_mapper_access(map_service_access, src, "map_service_access")
+		var/list/all_access = requirements["all"]
+		mapped_service_requires_all = !!all_access.len
+		internals_req_access = mapped_service_requires_all ? all_access : requirements["any"]
+
 /obj/mecha/proc/operation_allowed(mob/living/carbon/human/H)
 	for(var/ID in list(H.get_active_hand(), H.wear_id, H.belt))
 		if(src.check_access(ID,src.operation_req_access))
@@ -1150,6 +1164,10 @@
 
 
 /obj/mecha/check_access(obj/item/card/id/I, list/access_list)
+	if(!isnull(map_access) && access_list == operation_req_access)
+		return has_access(mapped_operation_requires_all ? operation_req_access : list(), mapped_operation_requires_all ? list() : operation_req_access, I ? I.GetAccess() : list())
+	if(!isnull(map_service_access) && access_list == internals_req_access)
+		return has_access(mapped_service_requires_all ? internals_req_access : list(), mapped_service_requires_all ? list() : internals_req_access, I ? I.GetAccess() : list())
 	if(!istype(access_list))
 		return 1
 	if(!access_list.len) //no requirements

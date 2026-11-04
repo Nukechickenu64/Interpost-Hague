@@ -36,8 +36,6 @@
 
 #define SOUND_MINIMUM_PRESSURE 10
 
-#define STD_BREATH_VOLUME      12 // Liters in a normal breath.
-
 #define PRESSURE_DAMAGE_COEFFICIENT 40
 #define    MAX_HIGH_PRESSURE_DAMAGE 40
 #define         LOW_PRESSURE_DAMAGE 20

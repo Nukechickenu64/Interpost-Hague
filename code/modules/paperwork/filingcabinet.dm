@@ -97,19 +97,33 @@
 
 
 /obj/structure/filingcabinet/Initialize()
+	if(!istype(src, /obj/structure/filingcabinet/id_records))
+		can_hold = can_hold.Copy()
+		can_hold |= /obj/item/os13_investigation_file
 	for(var/obj/item/I in loc)
-		if(istype(I, /obj/item/paper) || istype(I, /obj/item/folder) || istype(I, /obj/item/photo) || istype(I, /obj/item/paper_bundle))
+		if(istype(I, /obj/item/paper) || istype(I, /obj/item/folder) || istype(I, /obj/item/photo) || istype(I, /obj/item/paper_bundle) || (istype(I, /obj/item/os13_investigation_file) && !istype(src, /obj/structure/filingcabinet/id_records)))
 			I.loc = src
 	. = ..()
 
 /obj/structure/filingcabinet/attackby(obj/item/P as obj, mob/user as mob)
 	if(is_type_in_list(P, can_hold))
+		if(!user.Adjacent(src) || !CanPhysicallyInteract(user) || (user.get_active_hand() != P && user.get_inactive_hand() != P))
+			to_chat(user, "<span class='warning'>You must hold the document beside the cabinet to file it.</span>")
+			return
+		if(!user.unEquip(P, target = src))
+			to_chat(user, "<span class='warning'>You cannot release [P] to file it.</span>")
+			return
+		if(QDELETED(P) || P.loc != src)
+			to_chat(user, "<span class='warning'>The document could not be filed.</span>")
+			return
+		if(istype(P, /obj/item/os13_investigation_file))
+			os13_archive_created = TRUE
 		add_fingerprint(user)
 		to_chat(user, "<span class='notice'>You put [P] in [src].</span>")
-		user.drop_item()
-		P.loc = src
 		icon_state = "[initial(icon_state)]-open"
 		sleep(5)
+		if(QDELETED(src))
+			return
 		icon_state = initial(icon_state)
 		updateUsrDialog()
 	else
@@ -118,6 +132,11 @@
 
 
 /obj/structure/filingcabinet/attack_hand(mob/user as mob)
+	if(!user.Adjacent(src) || !CanPhysicallyInteract(user))
+		to_chat(user, "<span class='warning'>You cannot reach or operate the cabinet.</span>")
+		return
+	if(istype(user, /mob/living/carbon/human))
+		os13_prepare_archive()
 	if(contents.len <= 0)
 		to_chat(user, "<span class='notice'>\The [src] is empty.</span>")
 		return
@@ -125,7 +144,12 @@
 	user.set_machine(src)
 	var/dat = "<center><table>"
 	for(var/obj/item/P in src)
-		dat += "<tr><td><a href='?src=\ref[src];retrieve=\ref[P]'>[P.name]</a></td></tr>"
+		dat += "<tr><td><a href='?src=\ref[src];retrieve=\ref[P]'>[html_encode(P.name)]</a></td>"
+		if(istype(GLOB.using_map, /datum/map/alpha) && istype(P, /obj/item/os13_investigation_file))
+			var/obj/item/os13_investigation_file/file = P
+			dat += "<td>[file.pages_left == 0 ? "Exhausted" : file.pages_left < 0 ? "Unread" : "[file.pages_left] pages left"]</td>"
+			dat += "<td><a href='?src=\ref[src];investigate=\ref[P]'>Investigate</a></td>"
+		dat += "</tr>"
 	dat += "</table></center>"
 	var/page = ui_build_styled_html(name, dat)
 	user << browse(page, "window=filingcabinet;size=350x300")
@@ -142,6 +166,8 @@
 	if(contents.len)
 		if(prob(40 + contents.len * 5))
 			var/obj/item/I = pick(contents)
+			if(istype(I, /obj/item/os13_investigation_file))
+				os13_archive_created = TRUE
 			I.loc = loc
 			if(prob(25))
 				step_rand(I)
@@ -150,15 +176,33 @@
 	to_chat(user, "<span class='notice'>You find nothing in [src].</span>")
 
 /obj/structure/filingcabinet/Topic(href, href_list)
+	if(href_list["retrieve"] || href_list["investigate"])
+		if(!usr.Adjacent(src) || !CanPhysicallyInteract(usr))
+			to_chat(usr, "<span class='warning'>You can no longer reach or operate the cabinet.</span>")
+			return
+	if(href_list["investigate"])
+		var/obj/item/os13_investigation_file/file = locate(href_list["investigate"])
+		if(!istype(GLOB.using_map, /datum/map/alpha) || !istype(file) || file.loc != src || !istype(usr, /mob/living/carbon/human))
+			to_chat(usr, "<span class='warning'>That investigation file is unavailable.</span>")
+			return
+		usr << browse("", "window=filingcabinet")
+		os13_investigate_archive(usr, file)
+		return
 	if(href_list["retrieve"])
 		usr << browse("", "window=filingcabinet") // Close the menu
 
 		//var/retrieveindex = text2num(href_list["retrieve"])
 		var/obj/item/P = locate(href_list["retrieve"])//contents[retrieveindex]
 		if(istype(P) && (P.loc == src) && src.Adjacent(usr))
-			usr.put_in_hands(P)
+			if(istype(P, /obj/item/os13_investigation_file))
+				os13_archive_created = TRUE
+			if(!usr.put_in_hands(P))
+				to_chat(usr, "<span class='notice'>You have no free usable hand; [P] was placed at your feet.</span>")
 			updateUsrDialog()
 			icon_state = "[initial(icon_state)]-open"
 			spawn(0)
 				sleep(5)
-				icon_state = initial(icon_state)
+				if(!QDELETED(src))
+					icon_state = initial(icon_state)
+		else
+			to_chat(usr, "<span class='warning'>That document is no longer in the cabinet.</span>")

@@ -58,6 +58,12 @@
 				attack_generic(user,1,"slices")
 	return ..()
 
+/obj/structure/hitby(atom/movable/AM as mob|obj)
+	if(AM.throwing && isliving(AM))
+		var/mob/living/M = AM
+		M.visible_message("<span class='danger'>[M] hits [src]!</span>")
+	..()
+
 /obj/structure/attack_tk()
 	return
 

@@ -43,7 +43,7 @@
 		using.dir = NORTH
 		using.icon = 'icons/mob/screen/backgrounds.dmi'
 		using.icon_state = "1"
-		using.screen_loc = "WEST-3:12,SOUTH"
+		using.screen_loc = ui_os13_background
 		using.layer = UNDER_HUD_LAYER
 		adding += using
 

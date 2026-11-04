@@ -7,20 +7,42 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	var/issued = FALSE
 	var/list/completed = list()
 	var/power_stable_since = 0
+	var/progress_timer
 
 /datum/bridge_crew_objectives/proc/reset()
+	stop_tracking()
 	issued = FALSE
 	completed.Cut()
 	power_stable_since = 0
 
+/datum/bridge_crew_objectives/proc/stop_tracking()
+	if(progress_timer)
+		deltimer(progress_timer)
+		progress_timer = null
+
 /datum/bridge_crew_objectives/proc/issue()
+	if(issued)
+		check_progress()
+		return
 	issued = TRUE
+	update_progress()
+
+/datum/bridge_crew_objectives/proc/update_progress()
+	progress_timer = null
+	if(!issued || GAME_STATE != RUNLEVEL_GAME)
+		return
 	check_progress()
+	if(length(completed) < 3)
+		progress_timer = addtimer(CALLBACK(src, /datum/bridge_crew_objectives/proc/update_progress), 1 SECOND, TIMER_STOPPABLE)
+
+/datum/bridge_crew_objectives/Destroy()
+	reset()
+	return ..()
 
 /datum/bridge_crew_objectives/proc/check_progress()
-	if(!issued)
+	if(!issued || GAME_STATE != RUNLEVEL_GAME)
 		return
-	if(!completed["wake_station"] && GLOB.station_wake_sequence.started && !GLOB.station_wake_sequence.active)
+	if(!completed["wake_station"] && GLOB.station_wake_sequence.finished)
 		complete_objective("wake_station", "Station wake-up", 5)
 	if(!completed["water_service"] && GLOB.waterchip_installed)
 		complete_objective("water_service", "Water service restoration", 5)
@@ -34,7 +56,7 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 		if(!is_station_turf(get_turf(controller)))
 			continue
 		total++
-		if(controller.operating)
+		if(controller.is_supplying_power())
 			powered++
 	if(!total || powered * 100 < total * 90)
 		power_stable_since = 0
@@ -59,15 +81,17 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 
 /datum/bridge_crew_objectives/proc/get_status_report()
 	if(!issued)
-		return "<p><b>Bridge recovery contract:</b> no report has been printed this shift.</p>"
+		return "<p><b>Bridge recovery contract:</b> no recovery report has been opened this shift.</p>"
 	var/wake_status = completed["wake_station"] ? "Complete" : "Pending"
 	var/water_status = completed["water_service"] ? "Complete" : "Pending"
 	var/power_status = completed["power_grid"] ? "Complete" : "Pending"
-	return "<h3>Bridge Recovery Objectives</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td></tr><tr><td>Keep at least 90% of station power controllers online for 30 seconds</td><td>[power_status]</td></tr></table>"
+	return "<h3>Bridge Recovery Objectives</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td></tr><tr><td>Keep at least 90% of station power controllers supplying a distribution channel for 30 seconds</td><td>[power_status]</td></tr></table>"
 
 /datum/station_wake_sequence
 	var/active = FALSE
 	var/started = FALSE
+	var/finished = FALSE
+	var/advance_timer
 	var/list/targets = list()
 	var/list/enabled_rooms = list()
 	var/next_target = 1
@@ -76,8 +100,11 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	var/mob/operator
 
 /datum/station_wake_sequence/proc/start(mob/user)
+	if(GAME_STATE != RUNLEVEL_GAME)
+		to_chat(user, "<span class='warning'>Station wake-up is available during the round.</span>")
+		return FALSE
 	if(started)
-		to_chat(user, "<span class='warning'>[active ? "A station wake sequence is already in progress." : "The station has already been awakened. Adjust lights and thermostats locally."]</span>")
+		to_chat(user, "<span class='warning'>[active ? "A station wake sequence is already in progress." : (finished ? "The station has already been awakened. Adjust lights and thermostats locally." : "The station wake sequence was interrupted. Adjust lights and thermostats locally.")]</span>")
 		return FALSE
 	started = TRUE
 	active = TRUE
@@ -105,6 +132,12 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 		room.set_lightswitch(TRUE, bridge_startup = TRUE)
 
 /datum/station_wake_sequence/proc/advance()
+	advance_timer = null
+	if(!active)
+		return
+	if(GAME_STATE != RUNLEVEL_GAME)
+		stop()
+		return
 	while(next_target <= length(targets))
 		var/obj/machinery/target = targets[next_target++]
 		if(QDELETED(target))
@@ -126,9 +159,10 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 			var/obj/machinery/alarm/alarm = target
 			alarm.target_temperature = T20C
 			thermostats_reset++
-		addtimer(CALLBACK(src, /datum/station_wake_sequence/proc/advance), 0.5 SECONDS)
+		advance_timer = addtimer(CALLBACK(src, /datum/station_wake_sequence/proc/advance), 0.5 SECONDS, TIMER_STOPPABLE)
 		return
 	active = FALSE
+	finished = TRUE
 	targets.Cut()
 	enabled_rooms.Cut()
 	if(!QDELETED(operator))
@@ -136,9 +170,33 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	operator = null
 	GLOB.bridge_crew_objectives.check_progress()
 
+/datum/station_wake_sequence/proc/stop()
+	active = FALSE
+	if(advance_timer)
+		deltimer(advance_timer)
+		advance_timer = null
+	for(var/obj/machinery/light/fixture in targets)
+		if(!QDELETED(fixture) && fixture.bridge_startup_pending)
+			fixture.bridge_startup_pending = FALSE
+			fixture.power_change()
+	targets.Cut()
+	enabled_rooms.Cut()
+	operator = null
+
+/datum/station_wake_sequence/Destroy()
+	stop()
+	return ..()
+
 /obj/machinery/computer/bridge
 	name = "bridge computer"
 	desc = "A battered command console wired into station comms and navigation. The CRT hums faintly."
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "tncC"
+	icon_keyboard = null
+	icon_screen = null
+	bound_width = 64
+	bound_y = 32
+	bound_height = 32
 	var/dispensed = 0 //why yes, I am stealing this from the nano code, how could you t-ACK!
 	var/centcomm_message_cooldown = 0
 	var/announcment_cooldown = 0
@@ -147,6 +205,23 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	var/current_viewing_message = null
 	var/new_sound = 'sound/machines/announce_alarm.ogg'
 	var/new_sound_red = 'sound/machines/announce_alarm_red.ogg'
+
+/obj/machinery/computer/bridge/CanPass(atom/movable/mover, turf/target, height=1.5, air_group=0)
+	// Tile-based checks inspect our anchor on the walkable bottom row.
+	// The bounding box above still blocks movement through the upper two tiles.
+	return TRUE
+
+/obj/machinery/computer/bridge/update_icon()
+	overlays.Cut()
+	var/state_suffix = (stat & NOPOWER) ? "0" : ""
+	icon_state = "tncA[state_suffix]"
+	if(stat & NOPOWER)
+		set_light(0)
+	else
+		set_light(light_range_on, light_power_on)
+	overlays += image(icon, "tncB[state_suffix]", pixel_x = 32)
+	overlays += image(icon, "tncC[state_suffix]", pixel_y = 32)
+	overlays += image(icon, "tncD[state_suffix]", pixel_x = 32, pixel_y = 32)
 
 /obj/machinery/computer/bridge/proc/topic_requires_command_access(var/list/href_list)
 	if(!href_list || !href_list["action"])
@@ -162,8 +237,30 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	if(get_dist(src, usr) > 1)
 		return
 	switch(href_list["action"])
+		if("os13_general_report", "os13_today_reports", "os13_approved_documents", "os13_erase_documents", "os13_salvage")
+			if(!os13_command_available(usr))
+				return
+			switch(href_list["action"])
+				if("os13_general_report")
+					os13_show_general_report(usr)
+				if("os13_today_reports")
+					os13_show_reports(usr)
+				if("os13_approved_documents")
+					os13_show_documents(usr)
+				if("os13_erase_documents")
+					os13_erase_documents(usr)
+				if("os13_salvage")
+					os13_toggle_salvage(usr)
+			if(!QDELETED(src))
+				show_menu(usr)
+		if("os13_toggle_shields", "os13_shield_direction")
+			if(!istype(GLOB.using_map, /datum/map/alpha))
+				to_chat(usr, "<span class='warning'>OS13 shield control is not available on this station.</span>")
+				return
+			os13_control_shields(usr, href_list["action"])
+			show_menu(usr)
 		if("cancel_shuttle")
-			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(!check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
@@ -172,12 +269,12 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				return
 			if(alert(usr, "Are you sure you want to cancel the escape shuttle?", name, "No", "Yes") != "Yes")
 				return
-			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				return
 			cancel_call_proc(usr)
 			show_menu(usr)
 		if("call_shuttle")
-			if(!usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(!check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
@@ -186,19 +283,19 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				return
 			if(alert(usr, "Are you sure you want to call the escape shuttle?", name, "No", "Yes") != "Yes")
 				return
-			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(src.CanUseTopic(usr, GLOB.default_state, href_list) != STATUS_INTERACTIVE || get_dist(src, usr) > 1 || !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				return
 			call_shuttle_proc(usr)
 			show_menu(usr)
 		if("wake_station")
-			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
 			wake_station()
 			show_menu(usr)
 		if("printstatus")
-			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
@@ -211,8 +308,10 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				var/sname = station_name()
 				var/full_text = "<b>BRIDGE COMMUNICATIONS REPORT</b>\n\n<b>From:</b> Emergency Operations Relay\n<b>To:</b> [sname] Bridge Operations\n<b>Subject:</b> Reserve-mode service restoration\n\nThe station is running on reserve-mode protocols. External traffic is intermittent; no off-station assignment or rescue operation has been authorized. Restore the services below so local operations can resume.\n\n<b>CREW RECOVERY OBJECTIVES</b>\n\n<ol><li><b>Wake the station.</b> Use WAKE STATION at this console. The sequence restores bridge-controlled lighting and resets station air-alarm thermostats to 20°C.</li><li><b>Restore water service.</b> Install the portable water control chip in its holder.</li><li><b>Stabilize the power grid.</b> Keep at least 90% of station power controllers online for 30 seconds.</li></ol>\n\nCompletion is verified automatically. Review STATION STATUS at this console for live objective progress."
 				GLOB.bridge_crew_objectives.issue()
+				if(istype(GLOB.using_map, /datum/map/alpha))
+					full_text = os13_general_report()
 				R.set_content(full_text)
-				R.name = "Bridge Recovery Report"
+				R.name = istype(GLOB.using_map, /datum/map/alpha) ? "General Report" : "Bridge Recovery Report"
 				var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
 				stampoverlay.icon_state = "paper_stamp-hos"
 				R.stamped += /obj/item/stamp
@@ -221,9 +320,9 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				dispensed = 1
 				show_menu(usr)
 			else
-				to_chat(usr, "<span class='warning'>Communication logs have already been printed. The printer is unavailable.</span>")
+				to_chat(usr, "<span class='warning'>Communication logs have already been printed. The printer is unavailable.[istype(GLOB.using_map, /datum/map/alpha) ? " Read GENERAL REPORT on screen for an updated copy." : ""]</span>")
 		if("checkstationintegrity")
-			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
@@ -236,33 +335,44 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 			popup.set_content("[GLOB.bridge_crew_objectives.get_status_report()]<hr>[SSdirector.station_status_report()]")
 			popup.open()
 		if("announce")
-			if(topic_requires_command_access(href_list) && !usr.GetAccess(ACCESS_REGION_COMMAND))
+			if(topic_requires_command_access(href_list) && !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
-			if(usr)
-				var/obj/item/card/id/id_card = usr.GetIdCard()
-				crew_announcement.announcer = GetNameAndAssignmentFromId(id_card)
-			else
-				crew_announcement.announcer = "Unknown"
+			var/mob/user = usr
+			var/client/operator_client = user.client
+			var/datum/mind/operator_mind = user.mind
 			if(announcment_cooldown)
-				to_chat(usr, "Please allow at least ten minutes to pass between announcements.")
+				to_chat(user, "Please allow at least ten minutes to pass between announcements.")
 				return TRUE
-			var/input = input(usr, "Please write a message to announce to the [station_name()].", "Priority Announcement") as null|message
-			if(!input || get_dist(src, usr) > 1)
-				return 1
+			var/message = input(user, "Please write a message to announce to the [station_name()].", "Priority Announcement") as null|message
+			if(isnull(message))
+				return
+			if(QDELETED(src) || QDELETED(user))
+				return
+			if(user.client != operator_client || user.mind != operator_mind || CanUseTopic(user, GLOB.default_state, href_list) != STATUS_INTERACTIVE || !user.Adjacent(src) || user.incapacitated() || !check_mapper_access(user.GetAccess(), user.GetAccess(ACCESS_REGION_COMMAND)) || !operable() || !powered())
+				to_chat(user, SPAN_WARNING("Announcement cancelled: remain at an operational bridge console with command authorization."))
+				return
+			if(announcment_cooldown)
+				to_chat(user, SPAN_WARNING("Another announcement was broadcast while you were writing. Please wait for the cooldown."))
+				return
 			if(GLOB.in_character_filter.len)
-				if(findtext(input, config.ic_filter_regex))
-					to_chat(usr, "<span class='warning'>You rethink your decision and decide that Nanotrasen will fire you if you announce that.</span>")
-					return 1
+				if(findtext(message, config.ic_filter_regex))
+					to_chat(user, "<span class='warning'>You rethink your decision and decide that Nanotrasen will fire you if you announce that.</span>")
+					return
+			message = sanitize(message, extra = FALSE)
+			if(!length(message))
+				to_chat(user, SPAN_WARNING("No announcement was sent. Enter a non-empty message shorter than [MAX_MESSAGE_LEN] characters."))
+				return
 			var/decl/security_state/security_state = decls_repository.get_decl(GLOB.using_map.security_state)
 			var/decl/security_level/default/df = security_state.current_security_level
-			if(df.code == GREEN_CODE)
-				crew_announcement.Announce(input, new_sound = 'sound/machines/announce_alarm.ogg')
-				announcment_cooldown = 1
-			else if(df.code == RED_CODE)
-				crew_announcement.Announce(input, new_sound = 'sound/machines/announce_alarm_red.ogg')
-				announcment_cooldown = 1
+			var/announcement_sound = 'sound/machines/announce_alarm.ogg'
+			if(df.code == RED_CODE)
+				announcement_sound = 'sound/machines/announce_alarm_red.ogg'
+			var/obj/item/card/id/id_card = user.GetIdCard()
+			crew_announcement.announcer = id_card ? GetNameAndAssignmentFromId(id_card) : "Unknown"
+			announcment_cooldown = 1
+			crew_announcement.Announce(message, new_sound = announcement_sound, msg_sanitized = TRUE)
 			spawn(6000)//Ten-minute cooldown
 				announcment_cooldown = 0
 /obj/machinery/computer/bridge/proc/wake_station()
@@ -274,7 +384,7 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	..()
 	if(stat & (BROKEN|NOPOWER))
 		return
-	if(!user.GetAccess(ACCESS_REGION_COMMAND))
+	if(!check_mapper_access(user.GetAccess(), user.GetAccess(ACCESS_REGION_COMMAND)))
 		to_chat(user, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 		return
@@ -283,8 +393,16 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 /obj/machinery/computer/bridge/proc/show_menu(mob/user)
 	var/menu = "\n<div class='firstdivmood'><div class='compbox'><span class='graytext'>The console sputters to life, offering the following functions:</span>\n<hr>"
 	if(!dispensed)
-		menu += "<span class='feedback'><a href='?src=\ref[src];action=printstatus'>PRINT COMMUNICATION LOGS</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=printstatus'>[istype(GLOB.using_map, /datum/map/alpha) ? "PRINT GENERAL REPORT" : "PRINT COMMUNICATION LOGS"]</a></span>\n"
 	menu += "<span class='feedback'><a href='?src=\ref[src];action=checkstationintegrity'>STATION STATUS</a></span>\n"
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_general_report'>GENERAL REPORT</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_today_reports'>TODAY REPORTS</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_approved_documents'>APPROVED DOCUMENTS LIST</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_erase_documents'>ERASE APPROVED DOCUMENTS LIST</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_salvage'>SALVAGE COORDINATES: [GLOB.os13_salvage_authorized ? "ALLOWED" : "PROHIBITED"]</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_toggle_shields'>TOGGLE SHIELDS</a></span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_shield_direction'>SELECT SHIELDS</a></span>\n"
 	if(!GLOB.station_wake_sequence.started)
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=wake_station'>WAKE STATION</a></span>\n"
 	var/datum/evacuation_controller/evacuation = SSevac.evacuation_controller

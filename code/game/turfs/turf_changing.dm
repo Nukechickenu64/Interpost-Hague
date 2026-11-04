@@ -33,6 +33,8 @@
 	var/old_corners = corners
 	var/old_ao_neighbors = ao_neighbors
 	var/old_opaque_counter = opaque_counter
+	var/old_z_flags = z_flags
+	var/old_lighting_visibility_sources = lighting_visibility_sources
 	var/datum/gas_mixture/old_air
 	if(istype(src, /turf/simulated))
 		var/turf/simulated/old_turf = src
@@ -96,9 +98,16 @@
 	if(lighting_overlays_initialised)
 		lighting_overlay = old_lighting_overlay
 		affecting_lights = old_affecting_lights
+		lighting_visibility_sources = old_lighting_visibility_sources
 		corners = old_corners
-		if((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting))
+		if((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || ((old_z_flags ^ z_flags) & ZM_ALLOW_LIGHTING))
 			reconsider_lights()
+			// Opening the first hole must also find lights on the deck below.
+			var/turf/lower = GetBelow(W)
+			lower?.reconsider_lights()
+			var/turf/upper = GetAbove(W)
+			upper?.reconsider_lights()
+		queue_lighting_overlay_updates()
 		if(dynamic_lighting != old_dynamic_lighting)
 			if(TURF_IS_DYNAMICALLY_LIT_UNSAFE(W))
 				lighting_build_overlay()

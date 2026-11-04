@@ -27,6 +27,16 @@
 	loadDataPig()
 	lobbyPig()
 
+/client/verb/toggle_walking_animation()
+	set name = "ToggleWalkingAnimation"
+	set category = "OOC"
+	set hidden = TRUE
+	if(!mob || !prefs || !cycle_preference(/datum/client_preference/walking_animation))
+		return
+	SScharacter_setup.queue_preferences_save(prefs)
+	var/enabled = get_preference_value(/datum/client_preference/walking_animation) == GLOB.PREF_YES
+	to_chat(src, SPAN_NOTICE("Your human's walking animation is now [enabled ? "on" : "off"]."))
+
 /proc/generateVerbHtml(var/verbname = "", var/displayname = "", var/number = 1, var/mob/user)
 	var/command_href = user ? "?src=\ref[user];porco_action=[url_encode(verbname)]" : "byond://winset?command=[url_encode(verbname)]"
 	if(number % 2)
@@ -486,10 +496,12 @@
 	var/noteHTML = ""
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		noteHTML += "<span style='white-space: nowrap' class='segment1 ST'>ST: <span id='st'>[H.stats[STAT_ST]]</span>$HT: <span id='ht'>[H.stats[STAT_HT]]</span>$IN: <span id='int'>[H.stats[STAT_IQ]]</span>$DX: <span id='dx'>[H.stats[STAT_DX]]</span></span>"
+		noteHTML += "<span style='white-space: nowrap' class='segment1 ST'>ST: <span id='st'>[H.effective_stat(STAT_ST)]</span>$HT: <span id='ht'>[H.effective_stat(STAT_HT)]</span>$IN: <span id='int'>[H.effective_stat(STAT_IQ)]</span>$DX: <span id='dx'>[H.effective_stat(STAT_DX)]</span></span>"
 	client.changebuttoncontent("#note", noteHTML)
 	client.changebuttoncontent("#Verb", verbUpdate())
 	var/list/ooc_options = list(list("OOC", "OOC"), list("Adminhelp", "Admin Help"), list("ShowAchievements", "Show Achievements"))
+	var/walking_enabled = get_preference_value(/datum/client_preference/walking_animation) == GLOB.PREF_YES
+	ooc_options += list(list("ToggleWalkingAnimation", "Walking animation: [walking_enabled ? "On" : "Off"]"))
 	client.changebuttoncontent("#options", "<span class='segment1'>" + generateVerbList(ooc_options) + "</span>")
 	client.changebuttoncontent("#Emotes", {"<span class='segment1'>[generateVerbList(list(list("slap", "Slap"), list("Nod", "Nod"), list("Hug", "Hug"), list("Bow", "Bow"), list("Scream", "Scream"), list("Whimper", "Whimper"), list("Laugh", "Laugh"), list("Sigh", "Sigh")))]</span>"} + {"<span class='segment2'>[generateVerbList(list(list("Cough", "Cough"), list("Yawn", "Yawn"), list("Wink", "Wink"), list("Grumble", "Grumble"), list("Charge", "Charge"), list("Cry", "Cry"), list("Hem", "Hem"), list("ClearThroat", "Clear Throat"), list("Smile", "Smile")), 2)]</span>"})
 	client.changebuttoncontent("#Craft", {"<span class='segment1'>[generateVerbList(list(list("CraftMenu", "Craft Menu")))]</span>"})
@@ -605,10 +617,10 @@
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		// change() uses getElementById(), which needs the bare id, not a CSS selector
-		client << output(list2params(list("st", "[H.stats[STAT_ST]]")), "outputwindow.browser:change")
-		client << output(list2params(list("ht", "[H.stats[STAT_HT]]")), "outputwindow.browser:change")
-		client << output(list2params(list("int", "[H.stats[STAT_IQ]]")), "outputwindow.browser:change")
-		client << output(list2params(list("dx", "[H.stats[STAT_DX]]")), "outputwindow.browser:change")
+		client << output(list2params(list("st", "[H.effective_stat(STAT_ST)]")), "outputwindow.browser:change")
+		client << output(list2params(list("ht", "[H.effective_stat(STAT_HT)]")), "outputwindow.browser:change")
+		client << output(list2params(list("int", "[H.effective_stat(STAT_IQ)]")), "outputwindow.browser:change")
+		client << output(list2params(list("dx", "[H.effective_stat(STAT_DX)]")), "outputwindow.browser:change")
 
 /*
 	if(ishuman(src))

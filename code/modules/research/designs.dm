@@ -85,6 +85,13 @@ other types of metals and chemistry for reagents).
 	build_path = /obj/item/disk/tech_disk
 	sort_string = "AAAAB"
 
+/datum/design/item/disk/tech/os13
+	name = "Diskette"
+	desc = "Produce an OS13 diskette for recording and importing technology data."
+	id = "os13_tech_diskette"
+	build_path = /obj/item/disk/tech_disk/os13
+	sort_string = "AAAAC"
+
 /datum/design/item/stock_part
 	build_type = PROTOLATHE
 

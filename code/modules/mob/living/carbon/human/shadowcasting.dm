@@ -1,10 +1,12 @@
 #define SHADOWCAST_RANGE 7
 #define LOS_CULL_MAX_RANGE 20
 
-// Artemis reference: continuous wall/door silhouettes, not just native tile culling.
-var/global/enhanced_los_enabled = TRUE
+// Temporarily disabled: use native tile visibility until smooth LOS is revisited.
+var/global/enhanced_los_enabled = FALSE
 #ifdef ARTEMIS_LOS_PREVIEW
 var/global/los_preview_legacy_images = FALSE
+var/global/los_preview_legacy_corner_promotion = FALSE
+var/global/los_preview_legacy_wall_motion = FALSE
 #endif
 
 /turf
@@ -13,14 +15,19 @@ var/global/los_preview_legacy_images = FALSE
 	var/shadowcast_considered
 	var/shadowcasting_initialized = FALSE
 	var/shadowcasting_range = 0
-	var/list/shadowcasting_edges = list()
-	var/list/shadowcasting_overlays = list()
-	var/list/shadowcasting_occluders = list()
-	var/list/shadowcasting_visible_turfs = list()
-	var/list/shadowcasting_visible_walls = list()
+	// create_shadowcast_overlays() fills these on first use. Most map turfs
+	// never become a viewer's center, so do not allocate six empty lists each.
+	var/list/shadowcasting_edges
+	var/list/shadowcasting_overlays
+	var/list/shadowcasting_occluders
+	var/list/shadowcasting_visible_turfs
+	var/list/shadowcasting_visible_walls
+	var/list/shadowcasting_mask_walls
 
 /turf/New()
 	. = ..()
+	if(!isnull(telemetry_structural_dirty))
+		telemetry_queue_structural_turf(src)
 	if(shadowcasting_controller.initialized)
 		shadowcast_queue_invalidate(src)
 
@@ -30,11 +37,13 @@ var/global/los_preview_legacy_images = FALSE
 	shadowcasting_initialized = TRUE
 
 var/global/list/shadowcast_dirty_centers = list()
+var/global/list/los_wall_face_bounds = list()
 
 /// Queues cache invalidation for every turf whose shadow geometry could include T.
 /proc/shadowcast_queue_invalidate(turf/T)
 	if(!shadowcasting_controller.initialized || !istype(T))
 		return
+	los_wall_face_bounds.Cut()
 	if(!shadowcast_dirty_centers.len)
 		spawn(1)
 			shadowcast_process_invalidations()
@@ -102,7 +111,7 @@ var/global/shadowcast_generation = 0
 			var/dx = wall.x - object_turf.x
 			var/dy = wall.y - object_turf.y
 			for(var/obj/O in object_turf)
-				if((dx && O.pixel_x * dx > 0) || (dy && O.pixel_y * dy > 0))
+				if((dx && O.pixel_x * dx >= 16) || (dy && O.pixel_y * dy >= 16))
 					hidden[O] = TRUE
 	return hidden
 
@@ -143,6 +152,7 @@ var/global/shadowcast_generation = 0
 	var/list/occluders = list()
 	var/list/visible_turfs = list()
 	var/list/visible_walls = list()
+	var/list/mask_walls = list()
 	FOR_DVIEW(var/turf/T, vrange, locturf, INVISIBILITY_MAXIMUM)
 		T.shadowcast_inview = moveid
 		visible_turfs[T] = TRUE
@@ -152,7 +162,13 @@ var/global/shadowcast_generation = 0
 			continue
 		if(T.shadowcast_inview == moveid)
 			visible_walls += T
-			occluders += make_los_occluder(T.x - locturf.x, T.y - locturf.y)
+		var/include_mask = TRUE
+#ifdef ARTEMIS_LOS_PREVIEW
+		if(los_preview_legacy_wall_motion) include_mask = T.shadowcast_inview == moveid
+#endif
+		if(include_mask)
+			mask_walls += T
+			occluders += make_los_occluder(T.x - locturf.x, T.y - locturf.y, los_wall_protection_depth(T, locturf))
 		for(var/direction in GLOB.cardinal)
 			var/turf/neighbor = get_step(T, direction)
 			if(neighbor?.opaque_counter)
@@ -179,6 +195,7 @@ var/global/shadowcast_generation = 0
 	locturf.shadowcasting_occluders = occluders
 	locturf.shadowcasting_visible_turfs = visible_turfs
 	locturf.shadowcasting_visible_walls = visible_walls
+	locturf.shadowcasting_mask_walls = mask_walls
 
 /atom/movable/triangle
 	name = ""
@@ -225,17 +242,140 @@ var/global/shadowcast_generation = 0
 	mouse_opacity = 0
 	opacity = 0
 
-/atom/movable/los_occluder/New(dx, dy, new_tag)
+/atom/movable/los_occluder/New(dx, dy, new_tag, depth)
 	icon = get_solid_white_icon()
 	pixel_x = dx * world.icon_size
 	pixel_y = dy * world.icon_size
+	layer = (depth || los_wall_mask_depth(dx, dy)) + 0.001
 	tag = new_tag
 
-/proc/make_los_occluder(dx, dy)
-	var/tag = "los-occluder-solid-[dx]-[dy]"
+// Along a ray through grid cells, Manhattan distance increases at every cell
+// boundary. Draw each wall above its own shadow, and below nearer wall shadows.
+/proc/los_wall_mask_depth(dx, dy)
+	return 1 + (2 * LOS_CULL_MAX_RANGE + 4 - abs(dx) - abs(dy)) * 0.01
+
+// Trace open cell interiors. At an exact grid corner, advance both axes so a
+// wall touching only that point cannot hide an exposed neighbouring wall cap.
+/proc/los_floor_ray_visible(turf/viewer, turf/target, turf/protected_wall, view_x, view_y)
+	if(!target || target.z != viewer.z || target.opaque_counter) return FALSE
+	return los_wall_point_visible(viewer, target.x, target.y, protected_wall, FALSE, view_x, view_y)
+
+/proc/los_same_wall_run(turf/first, turf/second)
+	if(first.z != second.z || (first.x != second.x && first.y != second.y)) return FALSE
+	var/direction = get_dir(first, second)
+	var/turf/cell = first
+	for(var/i in 1 to 2 * LOS_CULL_MAX_RANGE + 4)
+		if(!cell?.opaque_counter) return FALSE
+		if(cell == second) return TRUE
+		cell = get_step(cell, direction)
+	return FALSE
+
+/proc/los_wall_cap_neighbor(turf/blocker, turf/wall, include_run)
+	return wall && (get_dist(blocker, wall) <= 1 || (include_run && los_same_wall_run(blocker, wall)))
+
+/proc/los_wall_point_visible(turf/viewer, target_x, target_y, turf/protected_wall, ignore_adjacent = FALSE, view_x, view_y)
+	if(isnull(view_x)) view_x = viewer.x
+	if(isnull(view_y)) view_y = viewer.y
+	var/dx = target_x - view_x
+	var/dy = target_y - view_y
+	var/step_x = dx > 0 ? 1 : (dx < 0 ? -1 : 0)
+	var/step_y = dy > 0 ? 1 : (dy < 0 ? -1 : 0)
+	var/delta_x = dx ? 1 / abs(dx) : 1e9
+	var/delta_y = dy ? 1 / abs(dy) : 1e9
+	var/cell_x = round(view_x + 0.5)
+	var/cell_y = round(view_y + 0.5)
+	var/next_x = dx ? (cell_x + step_x * 0.5 - view_x) / dx : 1e9
+	var/next_y = dy ? (cell_y + step_y * 0.5 - view_y) / dy : 1e9
+	for(var/i in 1 to 2 * LOS_CULL_MAX_RANGE + 4)
+		// A surface endpoint belongs to the wall being tested; only the open
+		// segment before that endpoint can be blocked by another wall.
+		if(min(next_x, next_y) >= 1 - 0.000001) return TRUE
+		if(abs(next_x - next_y) < 0.000001)
+			var/turf/side_x = locate(cell_x + step_x, cell_y, viewer.z)
+			var/turf/side_y = locate(cell_x, cell_y + step_y, viewer.z)
+			// Only a cap touching its own neighbouring wall may use this corner.
+			// A remote wall cannot peek through a nearer blocker's silhouette tip.
+			if(side_x?.opaque_counter && !los_wall_cap_neighbor(side_x, protected_wall, ignore_adjacent)) return FALSE
+			if(side_y?.opaque_counter && !los_wall_cap_neighbor(side_y, protected_wall, ignore_adjacent)) return FALSE
+			cell_x += step_x
+			cell_y += step_y
+			next_x += delta_x
+			next_y += delta_y
+		else if(next_x < next_y)
+			cell_x += step_x
+			next_x += delta_x
+		else
+			cell_y += step_y
+			next_y += delta_y
+		var/turf/cell = locate(cell_x, cell_y, viewer.z)
+		if(!cell) return FALSE
+		if(cell.opaque_counter && (!ignore_adjacent || !los_wall_cap_neighbor(cell, protected_wall, TRUE))) return FALSE
+	return FALSE
+
+// Preserve an adjoining cap as a complete tile, but do not extend that
+// exemption across a shadow from a separate wall further along the sightline.
+/proc/los_wall_tile_exposed(turf/wall, turf/viewer, view_x, view_y)
+	for(var/offset_x in list(-0.5, 0.5))
+		for(var/offset_y in list(-0.5, 0.5))
+			if(!los_wall_point_visible(viewer, wall.x + offset_x, wall.y + offset_y, wall, TRUE, view_x, view_y)) return FALSE
+	return TRUE
+
+/proc/los_wall_protection_depth(turf/wall, turf/viewer, protect_exposed = TRUE, view_x, view_y)
+	if(isnull(view_x)) view_x = viewer.x
+	if(isnull(view_y)) view_y = viewer.y
+	var/depth = 0
+	var/check_full_tile = TRUE
+#ifdef ARTEMIS_LOS_PREVIEW
+	check_full_tile = !los_preview_legacy_corner_promotion
+#endif
+	if(protect_exposed && check_full_tile && !los_wall_tile_exposed(wall, viewer, view_x, view_y)) protect_exposed = FALSE
+	if(protect_exposed && view_x != wall.x && view_y != wall.y)
+		var/front_x = wall.x + (view_x > wall.x ? 1 : -1)
+		var/front_y = wall.y + (view_y > wall.y ? 1 : -1)
+		var/turf/side_x = locate(front_x, wall.y, wall.z)
+		var/turf/side_y = locate(wall.x, front_y, wall.z)
+		// Inside an L-shaped wall, the corner tile borders the visible room only
+		// diagonally. Its two connected wall neighbours must not erase that cap.
+		if(side_x?.opaque_counter && side_y?.opaque_counter && los_floor_ray_visible(viewer, locate(front_x, front_y, wall.z), wall, view_x, view_y)) return 2
+	for(var/direction in GLOB.cardinal)
+		if((direction == NORTH && view_y <= wall.y) || (direction == SOUTH && view_y >= wall.y) || (direction == EAST && view_x <= wall.x) || (direction == WEST && view_x >= wall.x)) continue
+		var/turf/front = get_step(wall, direction)
+		if(!front || front.opaque_counter) continue
+		// This is the first wall bordering a visible floor, including a diagonal
+		// cap. Preserve its entire authored tile, not a triangle cut by its peers.
+		if(protect_exposed && los_floor_ray_visible(viewer, front, wall, view_x, view_y)) return 2
+		depth = max(depth, los_wall_face_depth(wall, direction, view_x, view_y))
+	return depth || los_wall_mask_depth(wall.x - view_x, wall.y - view_y)
+
+// A straight, exposed face is one surface. Adjacent tiles on that surface must
+// not carve diagonal notches into one another's wall mask.
+/proc/los_wall_face_depth(turf/wall, direction, eye_x, eye_y)
+	var/horizontal = direction & (NORTH|SOUTH)
+	var/key = "\ref[wall]:[direction]"
+	var/list/bounds = los_wall_face_bounds[key]
+	if(!bounds)
+		var/low = horizontal ? wall.x : wall.y
+		var/high = low
+		for(var/side in (horizontal ? list(WEST, EAST) : list(SOUTH, NORTH)))
+			var/turf/end = wall
+			for(var/i in 1 to LOS_CULL_MAX_RANGE * 2)
+				var/turf/next = get_step(end, side)
+				if(!next?.opaque_counter || get_step(next, direction)?.opaque_counter) break
+				end = next
+			var/coordinate = horizontal ? end.x : end.y
+			low = min(low, coordinate)
+			high = max(high, coordinate)
+		bounds = list(low, high)
+		los_wall_face_bounds[key] = bounds
+	var/eye_along_face = horizontal ? eye_x : eye_y
+	var/closest = Clamp(eye_along_face, bounds[1], bounds[2])
+	return horizontal ? los_wall_mask_depth(closest - eye_x, wall.y - eye_y) : los_wall_mask_depth(wall.x - eye_x, closest - eye_y)
+
+/proc/make_los_occluder(dx, dy, depth)
+	var/tag = "los-occluder-solid-[dx]-[dy]-[depth]"
 	var/atom/movable/los_occluder/O = locate(tag)
 	if(!O)
-		O = new(dx, dy, tag)
+		O = new(dx, dy, tag, depth)
 	return O
 
 /datum/los_edge_mesh
@@ -261,13 +401,22 @@ var/global/shadowcast_generation = 0
 /datum/los_edge_mesh/New(turf/new_wall, new_direction)
 	wall = new_wall
 	direction = new_direction
-	for(var/i in 1 to 2)
+	for(var/i in 1 to 6)
 		var/image/I = image('icons/effects/triangle.dmi', wall, "triangle")
-		I.plane = SHADOWCASTING_PLANE
+		I.plane = i <= 2 ? SHADOWCASTING_PLANE : (i <= 4 ? SHADOWCASTING_GEOMETRY_PLANE : SHADOWCASTING_REFLECTOR_PLANE)
 		I.color = "#000000"
 		I.mouse_opacity = 0
 		I.appearance_flags = RESET_COLOR | RESET_TRANSFORM | KEEP_APART
 		triangles += I
+
+/datum/los_edge_mesh/proc/anchor(turf/viewer)
+	// Every pass must survive the same native visibility decision. Leaving the
+	// floor/object rays on their wall while moving only the depth rays to the
+	// viewer lets native culling remove one half of the composite mid-step.
+	for(var/image/I in triangles)
+		I.loc = viewer
+		I.pixel_w = (wall.x - viewer.x) * world.icon_size
+		I.pixel_z = (wall.y - viewer.y) * world.icon_size
 
 /datum/los_edge_mesh/proc/reshape(eye_x, eye_y, projection, duration = 0, start_eye_x, start_eye_y)
 	// Life/opacity refreshes must not cancel a glide just because they default to
@@ -285,17 +434,21 @@ var/global/shadowcast_generation = 0
 		crossing = los_edge_crossing(direction, (start_eye_x - wall.x) * 32, (start_eye_y - wall.y) * 32, (eye_x - wall.x) * 32, (eye_y - wall.y) * 32)
 		if(!isnull(crossing))
 			intermediate = los_edge_matrices(direction, (start_eye_x + (eye_x - start_eye_x) * crossing - wall.x) * 32, (start_eye_y + (eye_y - start_eye_y) * crossing - wall.y) * 32, projection)
-	for(var/i in 1 to 2)
+	for(var/i in 1 to triangles.len)
 		var/image/I = triangles[i]
+		var/vertex = (i - 1) % 2 + 1
+		var/depth = i >= 5 ? los_wall_face_depth(wall, direction, eye_x, eye_y) : I.layer
 		if(intermediate)
-			animate(I, transform = intermediate[i], time = duration * crossing, flags = ANIMATION_LINEAR_TRANSFORM)
-			animate(I, transform = matrices[i], time = duration * (1 - crossing), flags = ANIMATION_LINEAR_TRANSFORM | ANIMATION_CONTINUE)
+			var/mid_depth = i >= 5 ? los_wall_face_depth(wall, direction, start_eye_x + (eye_x - start_eye_x) * crossing, start_eye_y + (eye_y - start_eye_y) * crossing) : I.layer
+			animate(I, transform = intermediate[vertex], layer = mid_depth, time = duration * crossing, flags = ANIMATION_LINEAR_TRANSFORM)
+			animate(I, transform = matrices[vertex], layer = depth, time = duration * (1 - crossing), flags = ANIMATION_LINEAR_TRANSFORM | ANIMATION_CONTINUE)
 		else if(duration)
 			// Interruptions continue from the client's interpolated transform.
-			animate(I, transform = matrices[i], time = duration, flags = ANIMATION_LINEAR_TRANSFORM)
+			animate(I, transform = matrices[vertex], layer = depth, time = duration, flags = ANIMATION_LINEAR_TRANSFORM)
 		else
 			animate(I)
-			I.transform = matrices[i]
+			I.transform = matrices[vertex]
+			I.layer = depth
 	last_eye_x = eye_x
 	last_eye_y = eye_y
 	last_projection = projection
@@ -344,6 +497,10 @@ var/global/shadowcast_generation = 0
 /client
 	var/list/los_meshes = list()
 	var/list/los_hidden_mount_images = list()
+	var/list/los_wall_images = list()
+	var/list/los_retained_walls = list()
+	var/list/los_retained_appearances = list()
+	var/los_wall_motion_generation = 0
 	var/image/los_wall_mask
 	var/atom/movable/los_wall_anchor
 	var/turf/last_shadow_turf
@@ -396,6 +553,18 @@ var/global/shadowcast_generation = 0
 
 /client/proc/clear_opacity_image()
 	restore_los_camera_glide()
+	los_wall_motion_generation++
+	for(var/atom/A in los_retained_walls)
+		var/image/I = los_retained_walls[A]
+		images -= I
+		qdel(I)
+	los_retained_walls.Cut()
+	los_retained_appearances.Cut()
+	for(var/turf/W in los_wall_images)
+		var/image/I = los_wall_images[W]
+		images -= I
+		qdel(I)
+	los_wall_images.Cut()
 	for(var/obj/O in los_hidden_mount_images)
 		var/image/I = los_hidden_mount_images[O]
 		images -= I
@@ -428,6 +597,119 @@ var/global/shadowcast_generation = 0
 		los_hidden_mount_images[O] = I
 		images += I
 
+/client/proc/update_wall_depth_masks(turf/T, view_x, view_y)
+	for(var/turf/W in los_wall_images - T.shadowcasting_mask_walls)
+		var/image/I = los_wall_images[W]
+		images -= I
+		los_wall_images -= W
+		qdel(I)
+	for(var/i in 1 to T.shadowcasting_mask_walls.len)
+		var/turf/W = T.shadowcasting_mask_walls[i]
+		var/atom/movable/los_occluder/mask = T.shadowcasting_occluders[i]
+		var/image/I = los_wall_images[W]
+		if(!I)
+			I = image(icon = get_solid_white_icon(), loc = T)
+			I.plane = SHADOWCASTING_REFLECTOR_PLANE
+			I.mouse_opacity = 0
+			I.appearance_flags = RESET_COLOR | RESET_TRANSFORM | KEEP_APART
+			los_wall_images[W] = I
+			images += I
+		var/depth = isnull(view_x) ? mask.layer : los_wall_protection_depth(W, T, TRUE, view_x, view_y) + 0.001
+		if(abs(I.layer - depth) > 0.000001)
+			I.layer = depth
+		I.loc = T
+		// Ground offsets would reintroduce SIDE_MAP's positional sorting.
+		I.pixel_w = mask.pixel_x
+		I.pixel_z = mask.pixel_y
+
+// Native tile culling can remove a wall before a pixel glide has reached it.
+// Keep only its physical appearance in the world passes; the same geometric
+// LOS still hides rear faces. No mobs or nonopaque contents are copied.
+/client/proc/update_retained_los_walls(turf/T)
+	var/list/wanted = list()
+	var/retain = TRUE
+#ifdef ARTEMIS_LOS_PREVIEW
+	retain = !los_preview_legacy_wall_motion
+#endif
+	if(retain)
+		var/list/current = los_motion.position()
+		for(var/turf/W in T.shadowcasting_mask_walls)
+			if(T.shadowcasting_visible_turfs[W]) continue
+			// Retain connecting exposed caps only; remote rooms need no copies.
+			if(los_wall_protection_depth(W, T) < 2 && los_wall_protection_depth(W, T, TRUE, current[1], current[2]) < 2) continue
+			for(var/atom/A in los_wall_render_sources(W, los_hidden_mount_images)) wanted[A] = TRUE
+	for(var/atom/A in los_retained_walls - wanted)
+		var/image/I = los_retained_walls[A]
+		images -= I
+		los_retained_walls -= A
+		los_retained_appearances -= A
+		qdel(I)
+	for(var/atom/A in wanted)
+		var/image/I = los_retained_walls[A]
+		if(!I)
+			I = image(loc = T)
+			los_retained_walls[A] = I
+			images += I
+		if(los_retained_appearances[A] != A.appearance)
+			I.appearance = los_retained_wall_appearance(A)
+			los_retained_appearances[A] = A.appearance
+		I.loc = T
+		I.pixel_x = I.pixel_y = 0
+		I.pixel_w = (A.x - T.x) * world.icon_size + A.pixel_x + A.pixel_w
+		I.pixel_z = (A.y - T.y) * world.icon_size + A.pixel_y + A.pixel_z
+
+/proc/los_wall_render_sources(turf/W, list/hidden_mounts)
+	var/list/sources = list()
+	if(W.opacity && (W.icon || W.overlays.len)) sources += W
+	for(var/obj/O in W)
+		if(O.opacity && (O.icon || O.overlays.len) && !hidden_mounts?[O]) sources += O
+	// Native culling removes the light sample with the wall art. Retaining only
+	// the art exposes the white backdrop, so retain its lighting in the same pass.
+	var/atom/movable/lighting_overlay/light = W.lighting_overlay
+	if(light)
+		sources += light
+		if(light.edge_guard) sources += light.edge_guard
+		if(light.tile_glow) sources += light.tile_glow
+	return sources
+
+/proc/los_retained_wall_appearance(source, physical_plane)
+	var/mutable_appearance/MA = new(source)
+	if(isnull(physical_plane)) physical_plane = MA.plane
+	MA.mouse_opacity = 0
+	MA.maptext = null
+	MA.render_source = null
+	MA.render_target = null
+	var/list/physical_overlays = list()
+	for(var/part in MA.overlays)
+		var/mutable_appearance/O = new(part)
+		if(!(O.plane in list(FLOAT_PLANE, DEFAULT_PLANE, physical_plane, WORLD_TERRAIN_SOURCE_PLANE))) continue
+		O = los_retained_wall_appearance(O, physical_plane)
+		O.plane = FLOAT_PLANE
+		physical_overlays += O
+	MA.overlays = physical_overlays
+	var/list/physical_underlays = list()
+	for(var/part in MA.underlays)
+		var/mutable_appearance/O = new(part)
+		if(!(O.plane in list(FLOAT_PLANE, DEFAULT_PLANE, physical_plane, WORLD_TERRAIN_SOURCE_PLANE))) continue
+		O = los_retained_wall_appearance(O, physical_plane)
+		O.plane = FLOAT_PLANE
+		physical_underlays += O
+	MA.underlays = physical_underlays
+	return MA
+
+/client/proc/refresh_los_wall_depths(turf/T, view_x, view_y)
+	update_wall_depth_masks(T, view_x, view_y)
+
+/client/proc/start_los_wall_glide(turf/T)
+	var/generation = ++los_wall_motion_generation
+	spawn(0)
+		while(generation == los_wall_motion_generation && last_shadow_turf == T && mob)
+			var/now = world.time
+			var/list/current = los_motion.position(now)
+			refresh_los_wall_depths(T, current[1], current[2])
+			if(now >= los_motion.ends) break
+			sleep(min(los_motion.ends - now, world.tick_lag))
+
 /client/proc/shadowcast_view_range()
 	var/range = ceil(max(last_view_x_dim, last_view_y_dim) / 2)
 	if(look_far_active())
@@ -447,18 +729,18 @@ var/global/shadowcast_generation = 0
 	if(T == last_shadow_turf && last_shadow_range == view_range && T.shadowcasting_initialized && T.shadowcasting_range == view_range && !shadowcast_force)
 		// Offset objects can move without changing opacity or the viewer's turf.
 		update_wall_mount_visibility(T)
+		update_retained_los_walls(T)
 		return
 	if(!T.shadowcasting_initialized || T.shadowcasting_range != view_range)
 		T.update_shadowcasting_overlays(view_range)
 	update_wall_mount_visibility(T)
 	var/turf/from = los_move_origin || last_shadow_turf
-	// DreamSeeker can briefly replay a completed image transform when a new
-	// sequence supersedes it. Retire that image before starting another glide.
-	// Keep in-flight images so interrupted movement continues from the actual
-	// client interpolation instead of snapping to a server-estimated position.
-	var/renew_meshes = allow_glide && world.time >= los_motion.ends
+	// Clear a completed animation before starting the next one. Replacing every
+	// image at this boundary drops whole render passes for a frame on the client.
+	// Interrupted glides keep their sequence and interpolated starting point.
+	var/finish_animation = allow_glide && world.time >= los_motion.ends
 #ifdef ARTEMIS_LOS_PREVIEW
-	if(los_preview_legacy_images) renew_meshes = FALSE
+	if(los_preview_legacy_images) finish_animation = FALSE
 #endif
 	if(allow_glide && mob.animate_movement != NO_STEPS && from && from.z == T.z && get_dist(from, T) == 1)
 		los_motion.begin(from.x, from.y, T.x, T.y, mob.glide_size, world.tick_lag, mob.appearance_flags & LONG_GLIDE)
@@ -474,22 +756,37 @@ var/global/shadowcast_generation = 0
 		los_meshes -= key
 	for(var/key in T.shadowcasting_edges)
 		var/datum/los_edge_mesh/mesh = los_meshes[key]
-		if(mesh && renew_meshes && duration)
-			images -= mesh.triangles
-			qdel(mesh)
-			mesh = null
+		if(mesh && finish_animation && duration)
+			for(var/image/I in mesh.triangles)
+				animate(I)
 		if(!mesh)
 			var/list/edge = T.shadowcasting_edges[key]
 			mesh = new(edge[1], edge[2])
 			los_meshes[key] = mesh
 			mesh.reshape(current_eye[1], current_eye[2], projection)
 			images |= mesh.triangles
+		// SIDE_MAP sorts different map rows before fractional layers. Keep all
+		// depth-mask draws at one anchor, using visual-only w/z offsets, so nearer
+		// shadows can cover rear walls without changing their ground sort position.
+		mesh.anchor(T)
+		// Ray transform and depth share one sequence; per-tick parallel depth
+		// changes can replay the transform's base appearance on DreamSeeker.
 		mesh.reshape(T.x, T.y, projection, duration, current_eye[1], current_eye[2])
 	los_wall_anchor.loc = T
-	los_wall_mask.vis_contents = T.shadowcasting_occluders
+	update_retained_los_walls(T)
+	var/continuous_walls = TRUE
+#ifdef ARTEMIS_LOS_PREVIEW
+	continuous_walls = !los_preview_legacy_wall_motion
+#endif
+	if(continuous_walls)
+		refresh_los_wall_depths(T, current_eye[1], current_eye[2])
+	else
+		refresh_los_wall_depths(T, T.x, T.y)
 	last_shadow_turf = T
 	last_shadow_range = view_range
 	shadowcast_force = FALSE
+	if(continuous_walls)
+		start_los_wall_glide(T)
 
 /client/Del()
 	clear_opacity_image()
@@ -529,6 +826,19 @@ var/global/shadowcast_generation = 0
 		return FALSE
 	return (object.pixel_x && (viewer.x - source.x) * object.pixel_x > 0) || (object.pixel_y && (viewer.y - source.y) * object.pixel_y > 0)
 
+// A boundary may be an opaque turf or an opaque object (such as a closed door)
+// on a floor. Both expose the same viewer-facing edge to the culling pass.
+/proc/los_boundary_face_visible(turf/boundary, turf/viewer, list/visible)
+	if(!boundary.opaque_counter || visible[boundary] || (boundary.lighting_overlay && !boundary.lighting_overlay.luminosity))
+		return FALSE
+	for(var/direction in GLOB.cardinal)
+		var/turf/face = get_step(boundary, direction)
+		if(!face || face.opaque_counter || !visible[face])
+			continue
+		if((face.x - boundary.x) * (viewer.x - boundary.x) > 0 || (face.y - boundary.y) * (viewer.y - boundary.y) > 0)
+			return TRUE
+	return FALSE
+
 /// Black strips over every tile within range that BYOND culls for opacity/darkness, so pixel-offset sprites from visible tiles can't draw over them.
 /proc/get_los_cull_strips(turf/center, range, mob/viewer, use_viewer = FALSE)
 	var/list/visible = list()
@@ -545,15 +855,8 @@ var/global/shadowcast_generation = 0
 		END_FOR_DVIEW
 	var/list/visible_faces = list()
 	FOR_DVIEW(var/turf/wall, range, visibility_center, INVISIBILITY_MAXIMUM)
-		if(!wall.opacity || visible[wall] || (wall.lighting_overlay && !wall.lighting_overlay.luminosity))
-			continue
-		for(var/direction in GLOB.cardinal)
-			var/turf/face = get_step(wall, direction)
-			if(!face || face.opaque_counter || !visible[face])
-				continue
-			if((face.x - wall.x) * (visibility_center.x - wall.x) > 0 || (face.y - wall.y) * (visibility_center.y - wall.y) > 0)
-				visible_faces[wall] = TRUE
-				break
+		if(los_boundary_face_visible(wall, visibility_center, visible))
+			visible_faces[wall] = TRUE
 	END_FOR_DVIEW
 	visible |= visible_faces
 	var/list/strips = list()

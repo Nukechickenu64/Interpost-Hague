@@ -63,7 +63,13 @@ var/list/civ13_mining_expeditions = list()
 	return T.z == rect[5] && T.x >= rect[1] && T.x <= rect[3] && T.y >= rect[2] && T.y <= rect[4]
 
 /proc/mining_menu_link(var/atom/holder, var/action, var/label)
-	return "<span class='feedback'><a href='?src=\ref[holder];action=[action]'>[label]</a></span>"
+	if(action == "salvage" && !os13_salvage_allowed())
+		return "<span class='graytext'>SALVAGE COORDINATES PROHIBITED BY BRIDGE</span>"
+	var/scout_binding = ""
+	if(istype(holder, /obj/machinery/computer/os13_scout_controls))
+		var/datum/mining_expedition_controller/controller = os13_scout_controller(holder)
+		scout_binding = ";scout_controller=\ref[controller]"
+	return "<span class='feedback'><a href='?src=\ref[holder];action=[action][scout_binding]'>[label]</a></span>"
 
 /obj/effect/shuttle_landmark/proc/force_clear_footprint(var/datum/shuttle/shuttle)
 	if(!shuttle || !shuttle.current_location || shuttle.current_location == src)
@@ -255,6 +261,15 @@ var/list/civ13_mining_expeditions = list()
 /datum/mining_expedition_controller/proc/is_expedition_landmark(var/obj/effect/shuttle_landmark/L)
 	return istype(L) && (L.landmark_tag == MINING_RUINS_LANDMARK || L.landmark_tag == MINING_SATELLITE_LANDMARK)
 
+/datum/mining_expedition_controller/proc/can_visit(var/obj/effect/shuttle_landmark/destination)
+	if(QDELETED(destination))
+		return FALSE
+	if(os13_salvage_allowed() || is_home_landmark(destination))
+		return TRUE
+	if(findtext(destination.landmark_tag, "nav_mining_ruin_") == 1)
+		return FALSE
+	return destination.landmark_tag != MINING_RUINS_LANDMARK || !ruins_gen_job || !ruins_gen_job.salvage
+
 /datum/mining_expedition_controller/proc/location_label(var/obj/effect/shuttle_landmark/L)
 	if(!L)
 		return "UNKNOWN"
@@ -279,8 +294,13 @@ var/list/civ13_mining_expeditions = list()
 			return "DEPARTING FOR DEBRIS FIELD"
 		var/eta = max(0, ceil((S.arrive_time - world.time) / 10))
 		return "EN ROUTE TO DEBRIS FIELD - SURVEY COMPLETE - ETA [eta] SECONDS"
-	if(S.moving_status != SHUTTLE_IDLE || S.process_state != IDLE_STATE)
-		return S.next_location ? "EN ROUTE TO [location_label(S.next_location)]" : "BUSY"
+	if(S.moving_status == SHUTTLE_INTRANSIT)
+		var/eta = max(0, ceil((S.arrive_time - world.time) / 10))
+		return "EN ROUTE TO [location_label(S.next_location)] - ETA [eta] SECONDS"
+	if(S.moving_status == SHUTTLE_WARMUP || S.process_state == WAIT_LAUNCH || S.process_state == FORCE_LAUNCH)
+		return "DEPARTING FOR [location_label(S.next_location)]"
+	if(S.process_state != IDLE_STATE)
+		return "DOCKING AT [location_label(S.current_location)]"
 	return "STANDING BY AT [location_label(S.current_location)]"
 
 /datum/mining_expedition_controller/proc/is_away()
@@ -337,17 +357,26 @@ var/list/civ13_mining_expeditions = list()
 		return fail(user, "UNABLE TO ESTABLISH LINK WITH THE SHUTTLE.")
 	if(!istype(destination))
 		return fail(user, "NAVIGATION DATA UNAVAILABLE.")
+	if(!can_visit(destination))
+		return fail(user, "SALVAGE COORDINATES PROHIBITED BY BRIDGE.")
 	if(S.current_location == destination)
 		return fail(user, "THE SHUTTLE IS ALREADY THERE.")
 	if(!shuttle_is_idle(S) || mission_pending)
 		return fail(user, "THE SHUTTLE IS BUSY.")
-	S.move_time = travel_time || initial(S.move_time)
-	S.next_location = destination
 	if(is_expedition_landmark(destination))
 		destination.force_clear_footprint(S)
+	if(!destination.is_valid(S))
+		return fail(user, "LANDING SITE IS OBSTRUCTED OR UNAVAILABLE.")
+	S.move_time = travel_time || initial(S.move_time)
+	S.next_location = destination
 	S.launch(user)
+	if(S.process_state != WAIT_LAUNCH)
+		return fail(user, "THE SHUTTLE COULD NOT INITIATE DEPARTURE.")
 	if(user)
-		to_chat(user, "<span class='notice'>Course plotted. The shuttle is departing for the [lowertext(location_label(destination))].</span>")
+		if(istype(GLOB.using_map, /datum/map/alpha) && os13_scout_is_onboard(user, src))
+			to_chat(user, SPAN_NOTICE("You launch the shuttle. ETA: [S.move_time]s"))
+		else
+			to_chat(user, "<span class='notice'>Course plotted. The shuttle is departing for the [lowertext(location_label(destination))].</span>")
 	return TRUE
 
 /datum/mining_expedition_controller/proc/get_ruins_dock(var/mob/user)
@@ -366,11 +395,15 @@ var/list/civ13_mining_expeditions = list()
 	return dock
 
 /datum/mining_expedition_controller/proc/start_mission(var/mob/user, var/salvage)
+	if(salvage && !os13_salvage_allowed())
+		return fail(user, "SALVAGE COORDINATES PROHIBITED BY BRIDGE.")
 	var/datum/shuttle/autodock/S = get_shuttle()
 	if(!S)
 		return fail(user, "UNABLE TO ESTABLISH LINK WITH THE SHUTTLE.")
 	if(!shuttle_is_idle(S) || mission_pending || loading_ruins || (ruins_gen_job && ruins_gen_job.is_active()))
 		return fail(user, "THE SHUTTLE IS BUSY.")
+	if(!is_home_dock(S))
+		return fail(user, "RETURN TO THE STATION BEFORE STARTING A NEW SURVEY.")
 	if(get_space_ruins_z() && !can_regenerate_ruins(user))
 		return FALSE
 	if(!has_transit_navigation(S))
@@ -425,6 +458,10 @@ var/list/civ13_mining_expeditions = list()
 			return
 		if(!mission_dock.is_valid(S))
 			mission_error = "DEBRIS FIELD LANDING SITE IS BLOCKED."
+			finish_mission()
+			return
+		if(mission_salvage && !os13_salvage_allowed())
+			mission_error = "SALVAGE AUTHORIZATION WAS WITHDRAWN DURING SURVEY."
 			finish_mission()
 			return
 		mission_ready = TRUE
@@ -645,7 +682,7 @@ var/list/civ13_mining_expeditions = list()
 /obj/machinery/computer/mining_shuttle_comms/attack_hand(mob/user)
 	if(..())
 		return
-	if(!user.GetAccess(ACCESS_REGION_COMMAND))
+	if(!check_mapper_access(user.GetAccess(), access_heads in user.GetAccess()))
 		to_chat(user, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 		return
 	var/datum/mining_expedition_controller/C = get_mining_expedition()
@@ -662,7 +699,7 @@ var/list/civ13_mining_expeditions = list()
 /obj/machinery/computer/mining_shuttle_comms/OnTopic(var/mob/user, var/href_list)
 	if(stat & (BROKEN|NOPOWER))
 		return TOPIC_HANDLED
-	if(!user.GetAccess(ACCESS_REGION_COMMAND))
+	if(!check_mapper_access(user.GetAccess(), access_heads in user.GetAccess()))
 		to_chat(user, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 		return TOPIC_HANDLED
 	var/datum/mining_expedition_controller/C = get_mining_expedition()

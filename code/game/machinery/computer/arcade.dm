@@ -258,7 +258,7 @@
 
 /obj/machinery/computer/arcade/proc/explode()
 	explosion(loc, 0, 1, 2, 3)
-	qdel(src)
+	set_broken(TRUE)
 
 /obj/machinery/computer/arcade/battle/emag_act(var/charges, var/mob/user)
 	if(!emagged)

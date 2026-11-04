@@ -1275,4 +1275,4 @@ proc/uh(var/S)
 	return FALSE
 
 /mob/proc/return_pointer(var/client/client)
-	usr.client.mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
+	usr.client.mouse_pointer_icon = 'icons/os13/mob/mob/other/pointer_s.dmi'

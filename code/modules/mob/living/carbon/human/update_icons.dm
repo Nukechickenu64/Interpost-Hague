@@ -116,52 +116,24 @@ If you have any questions/constructive-comments/bugs-to-report/or have a massivl
 Please contact me on #coderbus IRC. ~Carn x
 */
 
-//Human Overlays Indexes/////////
-#define MUTATIONS_LAYER			1
-#define SKIN_LAYER				2
-#define HUMAN_DAMAGE_LAYER		3
-#define BODYHAIR_LAYER			4
-#define SURGERY_LEVEL			5		//bs12 specific.
-#define UNDERWEAR_LAYER         6
-#define BANDAGES_LAYER			7
-#define UNIFORM_LAYER			8
-#define ID_LAYER				9
-#define AMULET_LAYER			10
-#define SHOES_LAYER				11
-#define GLOVES_LAYER			12
-#define BELT_LAYER				13
-#define SUIT_LAYER				14
-#define TAIL_LAYER				15		//bs12 specific. this hack is probably gonna come back to haunt me
-#define GLASSES_LAYER			16
-#define BELT_LAYER_ALT			17
-#define SUIT_STORE_LAYER		18
-#define BACK_LAYER				19
-#define HAIR_LAYER				20		//TODO: make part of head layer?
-#define GOGGLES_LAYER			21
-#define EARS_LAYER				22
-#define FACEMASK_LAYER			23
-#define HEAD_LAYER				24
-#define COLLAR_LAYER			25
-#define HANDCUFF_LAYER			26
-#define L_HAND_LAYER			27
-#define R_HAND_LAYER			28
-#define BLEEDING_LAYER			29
-#define HUMAN_FIRE_LAYER		30		//If you're on fire
-#define TARGETED_LAYER			31		//BS12: Layer for the target overlay from weapon targeting system
-#define FLIES_LAYER				32
-#define COLDBREATH_LAYER		33
-#define MOUTH_ITEM_LAYER		34
-#define TOTAL_LAYERS			34
+//Human Overlays Indexes are defined in code\__defines\mobs.dm so that
+//earlier-compiled files (e.g. cyberresearch) can reference them.
 
 /mob/living/carbon/human
 	var/list/overlays_standing[TOTAL_LAYERS]
 	var/previous_damage_appearance // store what the body last looked like, so we only have to update it if something changed
 
 //UPDATES OVERLAYS FROM OVERLAYS_LYING/OVERLAYS_STANDING
-/mob/living/carbon/human/update_icons()
+/mob/living/carbon/human/update_icons(var/walking_frame_only = FALSE)
+	if(!walking_frame_only)
+		clear_walking_cache()
+	if(walking_phase && !can_animate_walking())
+		walking_phase = 0
+		walking_generation++
 	lying_prev = lying	//so we don't update overlays for lying/standing unless our stance changes again
 	hanging_prev = hanging
-	update_hud()		//TODO: remove the need for this
+	if(!walking_frame_only)
+		update_hud()		//TODO: remove the need for this
 	overlays.Cut()
 
 	var/list/visible_overlays = overlays_standing
@@ -177,19 +149,25 @@ Please contact me on #coderbus IRC. ~Carn x
 		else
 			icon = stand_icon
 			icon_state = null
+			if(walking_phase)
+				icon = null
+				overlays += walking_body_overlay()
 
 		var/matrix/M = matrix()
 		if(lying && (species.prone_overlay_offset[1] || species.prone_overlay_offset[2]))
 			M.Translate(species.prone_overlay_offset[1], species.prone_overlay_offset[2])
-		for(var/entry in visible_overlays)
+		for(var/overlay_index = 1, overlay_index <= visible_overlays.len, overlay_index++)
+			var/entry = visible_overlays[overlay_index]
+			var/animate_layer = walking_phase && (overlay_index in list(SKIN_LAYER, HUMAN_DAMAGE_LAYER, BODYHAIR_LAYER, SURGERY_LEVEL, UNDERWEAR_LAYER, BANDAGES_LAYER, UNIFORM_LAYER, SHOES_LAYER, SUIT_LAYER, BLEEDING_LAYER))
+			var/garment = overlay_index == SUIT_LAYER || (overlay_index == UNIFORM_LAYER && w_uniform && (w_uniform.flags_inv & HIDESHOES))
 			if(istype(entry, /image))
 				var/image/overlay = entry
 				overlay.transform = M
-				overlays += overlay
+				overlays += animate_layer ? walking_overlay(overlay, garment) : overlay
 			else if(istype(entry, /list))
 				for(var/image/overlay in entry)
 					overlay.transform = M
-					overlays += overlay
+					overlays += animate_layer ? walking_overlay(overlay, garment) : overlay
 		if(species.has_floating_eyes)
 			overlays |= species.get_eyes(src)
 

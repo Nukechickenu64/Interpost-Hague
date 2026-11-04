@@ -1,5 +1,13 @@
 # Marrow
 
+## Mapper access
+
+Use one `map_access` field for doors and other ID-restricted objects:
+`"medical"`, `"medical | engineering"` (either), `"medical & engineering"`
+(both), or `"public"` (clear inherited requirements). Leave it unset to keep
+existing restrictions. See the [mapper access guide](docs/mapper_access.md)
+for names, examples, electronics, mecha and specialized controls.
+
 ## Cyberdeck research
 
 Research now advances through cyberspace dives recorded onto technology disks.
@@ -8,6 +16,14 @@ an archive from the research console. Decrypt its relays and download the data
 core, then import the disk at R&D. Higher technology levels generate larger maps.
 BBS and infernal research remain alternative disk sources.
 See [cyberdeck controls and verification](code/modules/cyberresearch/README.md).
+
+## Blurred vision
+
+Human blurred vision affects every visible world rendering plane, including
+terrain, objects, lighting, emissive effects, and LOS shadows. HUD controls,
+map-anchored UI, floating chat, and fullscreen status overlays stay sharp.
+Manual in-game check: trigger blurred vision near lights and beams, confirm
+the world blurs while UI remains readable, then confirm recovery clears it.
 
 ## Spacecraft cabins and flight controls
 
@@ -432,7 +448,9 @@ The base `/turf/simulated/open/crawlspace` uses `hh`. Available subtypes are:
 
 - `/maintenance`: wiring that automatically connects to cardinally adjacent wired
   crawlspaces, choosing straight runs, corners, T-junctions, or hubs. Connections
-  refresh when tiles are placed or replaced. Isolated tiles use the hub sprite;
+  refresh when tiles are placed or replaced. Corner states use the opposite corner
+  name in the sprite sheet (for example, north/east neighbors use `sw`). Isolated
+  tiles use the hub sprite;
   single-neighbor tiles use a straight run because the sheet has no end caps.
 - `/hatch`: the vent hatch (the empty icon state).
 - `/panel`: the divided panel (`hhh`).

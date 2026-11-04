@@ -1,0 +1,8 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+#include "test/walking_animation.dm"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	queue = list(new /datum/unit_test/walking_pixels, new /datum/unit_test/walking_equipment, new /datum/unit_test/walking_lifecycle)

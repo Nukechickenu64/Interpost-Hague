@@ -19,11 +19,6 @@
 		var/stage = clamp(round(damage / material.integrity * 6) + 1, 1, 7)
 		overlays += image('icons/os13/turf/turf/walls.dmi', "damage[stage]")
 
-/obj/structure/sign/os13_deck
-	name = "deck number"
-	icon = 'icons/os13/objects/objects/orbital_decor.dmi'
-	icon_state = "odeck1"
-
 /obj/structure/sign/os13_label
 	name = "department sign"
 	icon = 'icons/os13/objects/objects/orbital_decor2.dmi'

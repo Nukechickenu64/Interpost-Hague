@@ -126,9 +126,11 @@
 	report_danger_level = 0
 	breach_detection = 0
 
+/obj/machinery/alarm/server
+	req_access = list(access_rd, access_atmospherics, access_engine_equip)
+
 /obj/machinery/alarm/server/New()
 	..()
-	req_access = list(access_rd, access_atmospherics, access_engine_equip)
 	TLV["temperature"] =	list(T0C-26, T0C-20, T0C+30, T0C+40) // K
 	target_temperature = T0C+10
 

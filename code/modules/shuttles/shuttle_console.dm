@@ -1,8 +1,9 @@
 /obj/machinery/computer/shuttle_control
 	name = "shuttle control console"
-	icon = 'icons/obj/computer.dmi'
-	icon_keyboard = "atmos_key"
-	icon_screen = "shuttle"
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "rcomm"
+	icon_keyboard = null
+	icon_screen = null
 	circuit = null
 
 	var/shuttle_tag  // Used to coordinate data in shuttle controller.
@@ -10,12 +11,66 @@
 
 	var/ui_template = "shuttle_control_console.tmpl"
 
+/obj/machinery/computer/proc/update_shuttle_console_icon()
+	overlays.Cut()
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	if(stat & BROKEN)
+		icon_state = "rcommb"
+		set_light(0)
+	else if(stat & NOPOWER)
+		icon_state = "rcomm0"
+		set_light(0)
+	else
+		icon_state = "rcomm"
+		set_light(light_range_on, light_power_on)
+
+/obj/machinery/computer/shuttle_control/update_icon()
+	update_shuttle_console_icon()
+
 
 /obj/machinery/computer/shuttle_control/proc/get_shuttle()
 	return SSshuttle.shuttles[shuttle_tag]
 
 /obj/machinery/computer/shuttle_control/mining/get_shuttle()
 	return get_mining_expedition().get_shuttle()
+
+/obj/machinery/computer/shuttle_control/lift2
+	icon = 'icons/obj/computer.dmi'
+	icon_state = "platform"
+
+/obj/machinery/computer/shuttle_control/lift2/update_icon()
+	overlays.Cut()
+	if(stat & NOPOWER)
+		icon_state = "platform_off"
+		set_light(0)
+	else
+		icon_state = "platform"
+		set_light(light_range_on, light_power_on)
+
+/obj/machinery/computer/shuttle_control/lift2/attack_hand(mob/user)
+	if(inoperable(MAINT) || user.incapacitated())
+		return
+	if(!allowed(user))
+		to_chat(user, "<span class='warning'>Access Denied.</span>")
+		return
+
+	var/datum/shuttle/autodock/ferry/lift2/lift = get_shuttle()
+	if(!istype(lift))
+		to_chat(user, "<span class='warning'>Unable to establish link with the mining lift.</span>")
+		return
+	if(lift.process_state != IDLE_STATE || !lift.can_launch())
+		to_chat(user, "<span class='warning'>The mining lift is not ready to move.</span>")
+		return
+
+	if(lift.current_location == lift.waypoint_station)
+		lift.next_location = lift.waypoint_offsite
+	else if(lift.current_location == lift.waypoint_offsite)
+		lift.next_location = lift.waypoint_station
+	else
+		to_chat(user, "<span class='warning'>The mining lift is not at a recognized stop.</span>")
+		return
+
+	lift.launch(src)
 
 /obj/machinery/computer/shuttle_control/attack_hand(user as mob)
 	if(..(user))

@@ -105,7 +105,7 @@
 		update_icon()
 
 /obj/machinery/button/remote/id/trigger()
-	for(var/obj/machinery/door/blast/iddoor/ID in world)
+	for(var/obj/machinery/door/blast/ID in world)
 		if(ID.id == src.id)
 			if(ID.density)
 				spawn(5)

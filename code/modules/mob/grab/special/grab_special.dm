@@ -19,7 +19,12 @@
 	var/grab_string = O.name
 	if(assailant.zone_sel.selecting == BP_THROAT)
 		grab_string = "throat"
-	visible_message("<span class='warning'>[assailant] grabs [affecting]'s [grab_string]!</span>")
+	// OS13 parity: chest grab with a blade in the off hand reads as a hostage take.
+	var/obj/item/offhand = assailant.get_inactive_hand()
+	if(assailant.zone_sel.selecting == BP_THROAT && istype(offhand) && offhand.sharp)
+		visible_message("<span class='danger'>[assailant] grabs [affecting]'s chest, putting \the [offhand] to [affecting]'s throat!</span>")
+	else
+		visible_message("<span class='warning'>[assailant] grabs [affecting]'s [grab_string]!</span>")
 	affecting.grabbed_by += src
 
 /obj/item/grab/special/strangle
@@ -64,8 +69,10 @@
 	state_name = GRAB_WRENCH
 
 /datum/grab/special/wrench/attack_self_act(var/obj/item/grab/G)
+	var/mob/living/carbon/human/assailant = G.assailant
 	do_wrench(G)
-	G.assailant.setClickCooldown(DEFAULT_SLOW_COOLDOWN)
+	if(!QDELETED(assailant))
+		assailant.setClickCooldown(DEFAULT_SLOW_COOLDOWN)
 
 /datum/grab/special/wrench/proc/do_wrench(var/obj/item/grab/G)
 	var/obj/item/organ/external/O = G.get_targeted_organ()
@@ -79,13 +86,31 @@
 		to_chat(assailant, "<span class='warning'>[affecting] is missing that body part!</span>")
 		return
 
-	assailant.doing_something = TRUE
-	assailant.visible_message("<span class='danger'>[assailant] tries to break [affecting]'s [O.name]!</span>")
+	var/relocating = O.dislocated > 0
+	if(relocating && O.is_parent_dislocated())
+		to_chat(assailant, "<span class='warning'>You need to relocate the joint above [O.name] first!</span>")
+		return
 
-	if(!do_after(assailant, 15, affecting))
+	assailant.doing_something = TRUE
+	if(relocating)
+		assailant.visible_message("<span class='warning'>[assailant] tries to relocate [affecting]'s [O.joint]!</span>")
+	else
+		assailant.visible_message("<span class='danger'>[assailant] tries to break [affecting]'s [O.name]!</span>")
+
+	if(!do_after(assailant, relocating ? 30 : 15, affecting))
 		assailant.doing_something = FALSE
 		return
 
+	if(QDELETED(G) || QDELETED(O) || O.owner != affecting || G.get_targeted_organ() != O)
+		assailant.doing_something = FALSE
+		return
+
+	if(relocating)
+		if(O.dislocated > 0 && !O.is_parent_dislocated())
+			O.undislocate()
+			assailant.visible_message("<span class='notice'>[assailant] pops [affecting]'s [O.joint] back into place!</span>")
+		assailant.doing_something = FALSE
+		return
 
 	if(!O.is_broken())
 		var/break_chance

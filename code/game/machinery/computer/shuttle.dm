@@ -1,12 +1,16 @@
 /obj/machinery/computer/retro/shuttle
 	name = "Shuttle"
 	desc = "For shuttle control."
-	icon_keyboard = "tech_key"
-	icon_screen = "shuttle"
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "rcomm"
+	icon_keyboard = null
+	icon_screen = null
 	light_color = "#00ffff"
 	var/auth_need = 3.0
 	var/list/authorized = list(  )
 
+	update_icon()
+		update_shuttle_console_icon()
 
 	attackby(var/obj/item/card/W as obj, var/mob/user as mob)
 		if(stat & (BROKEN|NOPOWER))	return
@@ -28,11 +32,11 @@
 				return
 
 			var/list/cardaccess = W:access
-			if(!istype(cardaccess, /list) || !cardaccess.len) //no access
+			if(!istype(cardaccess, /list) || (isnull(map_access) && !cardaccess.len)) //no access
 				to_chat(user, "The access level of [W:registered_name]\'s card is not high enough. ")
 				return
 
-			if(!(access_heads in W:access)) //doesn't have this access
+			if(!check_mapper_access(cardaccess, access_heads in cardaccess))
 				to_chat(user, "The access level of [W:registered_name]\'s card is not high enough. ")
 				return 0
 

@@ -12,7 +12,7 @@
 	desc = "An electronically-lockable pod for growing organic tissue."
 	density = 1
 	anchored = 1
-	icon = 'icons/obj/cloning.dmi'
+	icon = 'icons/os13/objects/objects/cloning.dmi'
 	icon_state = "pod_0"
 	req_access = list(access_genetics) //For premature unlocking.
 	var/mob/living/occupant
@@ -24,6 +24,7 @@
 	var/attempting = 0 //One clone attempt at a time thanks
 	var/eject_wait = 0 //Don't eject them as soon as they are created fuckkk
 	var/biomass = CLONE_BIOMASS * 3
+	var/clone_cycle_serial = 0
 
 
 //Used for new human mobs created by cloning/goleming/etc. //Not a clue why this goes here.
@@ -35,6 +36,14 @@
 
 /mob/living/carbon/human
 	var/clone_claimable = FALSE
+	var/os13_clone_awakened = FALSE
+
+/mob/living/carbon/human/proc/can_inhabit_clone()
+	if(!clone_claimable || stat == DEAD || key || mind)
+		return FALSE
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		return os13_clone_awakened && isturf(loc)
+	return TRUE
 
 /obj/machinery/clonepod/New()
 	set_extension(src, /datum/extension/interactive/multitool, /datum/extension/interactive/multitool/store)
@@ -62,6 +71,10 @@
 	heal_rate = round(rating / 4)
 
 /obj/machinery/clonepod/Destroy()
+	if(occupant)
+		mess = 0
+		locked = 0
+		go_out()
 	if(connected)
 		connected.release_pod(src)
 	return ..()
@@ -80,25 +93,27 @@
 
 //Start growing a human clone in the pod!
 /obj/machinery/clonepod/proc/growclone(var/datum/dna2/record/R, var/datum/dna2/record/D)
-	if(mess || attempting)
+	if(!anchored || mess || attempting || occupant || !operable() || !powered() || biomass < CLONE_BIOMASS || !config.revival_cloning)
 		return 0
-	if(!istype(R, /datum/dna2/record) || !istype(D, /datum/dna2/record) || !R.dna || !D.dna)
+	if(!istype(R, /datum/dna2/record) || !istype(D, /datum/dna2/record) || !R.is_complete_genotype() || !D.is_complete_genotype())
 		return 0
 
 	attempting = 1 //One at a time!!
+	biomass -= CLONE_BIOMASS
 	locked = 1
+	var/cycle = ++clone_cycle_serial
 
 	eject_wait = 1
 	playsound(src, 'sound/machines/cloningpod_inprogress.ogg', 50)
 	spawn(270)
-		eject_wait = 0
+		if(!QDELETED(src) && cycle == clone_cycle_serial)
+			eject_wait = 0
+			update_icon()
 
 	var/mob/living/carbon/human/H = new /mob/living/carbon/human(src, R.dna.species)
 	occupant = H
 
-	if(!R.dna.real_name /*|| config.use_cortical_stacks*/)	//to prevent null names
-		R.dna.real_name = "clone ([rand(0,999)])"
-	H.real_name = R.dna.real_name
+	H.real_name = R.dna.real_name ? R.dna.real_name : "clone ([rand(0,999)])"
 
 	//Get the clone body ready
 	H.setCloneLoss(H.maxHealth * (100 - HEALTH_THRESHOLD_CRIT) / 100) // We want to put them exactly at the crit level, so we deal this much clone damage
@@ -137,7 +152,7 @@
 	qdel(donor_dna)
 	H.UpdateAppearance()
 	H.sync_organ_dna()
-	if(R == D)
+	if(R == D || R.dna.unique_enzymes == D.dna.unique_enzymes)
 		for(var/block = 1; block <= DNA_SE_LENGTH; block++)
 			H.dna.SetSEValue(block, rand(1, 4095), 1)
 		H.dna.UpdateSE()
@@ -155,7 +170,7 @@
 
 	for(var/datum/language/L in R.languages)
 		H.add_language(L.name)
-	H.flavor_texts = R.flavor.Copy()
+	H.flavor_texts = R.flavor ? R.flavor.Copy() : list()
 	attempting = 0
 	return 1
 
@@ -171,7 +186,9 @@
 //Grow clones to maturity then kick them out.  FREELOADERS
 /obj/machinery/clonepod/Process()
 
-	if(stat & NOPOWER) //Autoeject if power is lost
+	if(occupant && (QDELETED(occupant) || occupant.loc != src))
+		clear_occupant()
+	if(stat & (NOPOWER|BROKEN))
 		if(occupant)
 			locked = 0
 			go_out()
@@ -206,6 +223,7 @@
 		occupant.Sleeping(30)
 		//Also heal some oxyloss ourselves because inaprovaline is so bad at preventing it!!
 		occupant.adjustOxyLoss(-4)
+		update_icon()
 
 		return
 
@@ -220,7 +238,9 @@
 //Let's unlock this early I guess.  Might be too early, needs tweaking.
 /obj/machinery/clonepod/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/hydroponics_supply/biomass))
-		if(!user || user.incapacitated() || !Adjacent(user) || !user.unEquip(W, target = src))
+		if(!user || user.incapacitated() || !Adjacent(user) || W.loc != user || !user.unEquip(W, target = src))
+			if(user)
+				to_chat(user, SPAN_WARNING("You must be able to place held biomass into the pod."))
 			return
 		biomass += 50
 		to_chat(user, "The pod accepts the biomass brick. Feedstock: [biomass] units.")
@@ -248,9 +268,12 @@
 			locked = 0
 			to_chat(user, "System unlocked.")
 	else if(istype(W, /obj/item/reagent_containers/food/snacks/meat))
+		if(!user || user.incapacitated() || !Adjacent(user) || W.loc != user || !user.unEquip(W, target = src))
+			if(user)
+				to_chat(user, SPAN_WARNING("You must be able to place held meat into the pod."))
+			return
 		to_chat(user, "<span class='notice'>\The [src] processes \the [W].</span>")
 		biomass += 50
-		user.drop_item()
 		qdel(W)
 		return
 	else if(istype(W, /obj/item/wrench))
@@ -259,8 +282,8 @@
 		else
 			if(anchored)
 				anchored = 0
-				connected.pods -= src
-				connected = null
+				if(connected)
+					connected.release_pod(src)
 			else
 				anchored = 1
 			playsound(loc, 'sound/items/Ratchet.ogg', 100, 1)
@@ -314,26 +337,43 @@
 	if(!(occupant))
 		return
 
-	if(occupant.client)
-		occupant.client.eye = occupant.client.mob
-		occupant.client.perspective = MOB_PERSPECTIVE
-	occupant.forceMove(loc)
-	eject_wait = 0 //If it's still set somehow.
-	domutcheck(occupant) //Waiting until they're out before possible transforming.
-	occupant = null
-
-	biomass -= CLONE_BIOMASS
-	update_icon()
+	var/mob/living/released = occupant
+	clear_occupant()
+	if(QDELETED(released) || released.loc != src)
+		return
+	if(released.client)
+		released.client.eye = released.client.mob
+		released.client.perspective = MOB_PERSPECTIVE
+	released.forceMove(get_turf(src))
+	domutcheck(released) //Waiting until they're out before possible transforming.
 	return
+
+/obj/machinery/clonepod/proc/clear_occupant()
+	occupant = null
+	locked = 0
+	attempting = 0
+	eject_wait = 0
+	clone_cycle_serial++
+	update_icon()
+
+/obj/machinery/clonepod/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == occupant)
+		clear_occupant()
 
 /obj/machinery/clonepod/proc/malfunction()
 	if(occupant)
 		connected_message("Critical Error!")
 		mess = 1
 		update_icon()
-		occupant.ghostize()
+		var/mob/living/failed_clone = occupant
+		failed_clone.ghostize()
 		spawn(5)
-			qdel(occupant)
+			if(!QDELETED(src) && occupant == failed_clone)
+				clear_occupant()
+			qdel(failed_clone)
+			if(!QDELETED(src))
+				update_icon()
 	return
 
 /obj/machinery/clonepod/relaymove(mob/user as mob)
@@ -374,11 +414,205 @@
 
 /obj/machinery/clonepod/update_icon()
 	..()
+	icon = 'icons/os13/objects/objects/cloning.dmi'
+	overlays.Cut()
 	icon_state = "pod_0"
-	if (occupant && !(stat & NOPOWER))
-		icon_state = "pod_1"
-	else if (mess)
+	if(mess)
 		icon_state = "pod_g"
+	else if(stat & BROKEN)
+		icon_state = "podb"
+	else if(occupant && !(stat & (NOPOWER|BROKEN)))
+		icon_state = "pod_1"
+		var/readiness = GetCloneReadiness()
+		var/indicator = (readiness >= 100 && !eject_wait) ? "ready" : "ind[between(0, round(readiness * 6 / 100), 6)]"
+		overlays += image(icon, indicator)
+
+/obj/machinery/genetics_biomass_grinder
+	name = "genetics biomass grinder"
+	desc = "Recycles meat, organic organs and stripped organic corpses into cloning feedstock. Load material, click to grind, then click to collect biomass bricks. Alt-click unloads unprocessed material."
+	icon = 'icons/os13/objects/objects/cloning.dmi'
+	icon_state = "grinder00"
+	density = TRUE
+	anchored = TRUE
+	use_power = POWER_USE_IDLE
+	idle_power_usage = 20
+	active_power_usage = 500
+	var/atom/movable/feedstock
+	var/work_left = 0
+	var/last_process = 0
+	var/ready_bricks = 0
+
+/obj/machinery/genetics_biomass_grinder/Initialize()
+	. = ..()
+	last_process = world.time
+	update_icon()
+
+/obj/machinery/genetics_biomass_grinder/proc/feedstock_yield(atom/movable/material)
+	if(QDELETED(material))
+		return 0
+	if(istype(material, /obj/item/reagent_containers/food/snacks/meat))
+		return 1
+	if(istype(material, /obj/item/organ))
+		var/obj/item/organ/O = material
+		return O.robotic < ORGAN_ROBOT ? 1 : 0
+	if(istype(material, /mob/living/carbon) || istype(material, /mob/living/simple_animal))
+		var/mob/living/body = material
+		if(body.stat == DEAD && !body.isSynthetic() && !length(body.get_equipped_items(TRUE)))
+			return 3
+	return 0
+
+/obj/machinery/genetics_biomass_grinder/proc/can_load(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		return FALSE
+	if(feedstock || work_left || ready_bricks)
+		to_chat(user, SPAN_WARNING("Empty the grinder before loading more material."))
+		return FALSE
+	if(!operable() || !powered())
+		to_chat(user, SPAN_WARNING("The grinder is not operational."))
+		return FALSE
+	return TRUE
+
+/obj/machinery/genetics_biomass_grinder/attackby(obj/item/W, mob/user)
+	if(istype(W, /obj/item/grab))
+		var/obj/item/grab/G = W
+		load_body(G.affecting, user)
+		return
+	if(!can_load(user))
+		return
+	if(!feedstock_yield(W))
+		to_chat(user, SPAN_WARNING("The grinder accepts meat, organic organs or stripped organic corpses."))
+		return
+	if(W.loc != user || !user.unEquip(W, target = src))
+		to_chat(user, SPAN_WARNING("You must be able to release the held material."))
+		return
+	feedstock = W
+	add_fingerprint(user)
+	update_icon()
+	to_chat(user, SPAN_NOTICE("You load \the [W] into \the [src]."))
+
+/obj/machinery/genetics_biomass_grinder/MouseDrop_T(atom/movable/target, mob/user)
+	if(isliving(target))
+		load_body(target, user)
+
+/obj/machinery/genetics_biomass_grinder/proc/load_body(mob/living/body, mob/user)
+	if(!can_load(user))
+		return
+	if(!istype(body) || !body.Adjacent(src) || !body.Adjacent(user) || !feedstock_yield(body))
+		to_chat(user, SPAN_WARNING("Only a nearby stripped organic corpse can be loaded."))
+		return
+	user.visible_message(SPAN_NOTICE("[user] starts loading [body] into [src]."))
+	if(!do_after(user, 3 SECONDS, src))
+		return
+	if(!can_load(user) || QDELETED(body) || !body.Adjacent(src) || !body.Adjacent(user) || !feedstock_yield(body))
+		to_chat(user, SPAN_WARNING("Loading interrupted: the body or grinder is no longer available."))
+		return
+	body.forceMove(src)
+	feedstock = body
+	add_fingerprint(user)
+	update_icon()
+
+/obj/machinery/genetics_biomass_grinder/attack_hand(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		return
+	if(!operable() || !powered())
+		to_chat(user, SPAN_WARNING("The grinder is not operational."))
+		return
+	if(ready_bricks)
+		var/count = ready_bricks
+		ready_bricks = 0
+		for(var/i = 1 to count)
+			new /obj/item/hydroponics_supply/biomass(get_turf(src))
+		add_fingerprint(user)
+		update_icon()
+		to_chat(user, SPAN_NOTICE("You collect [count] biomass brick\s, worth [count * 50] units of cloning feedstock."))
+		return
+	if(work_left)
+		to_chat(user, SPAN_NOTICE("The grinder is processing."))
+		return
+	if(!feedstock || feedstock.loc != src || !feedstock_yield(feedstock))
+		to_chat(user, SPAN_WARNING("Load meat, an organic organ or a stripped organic corpse first."))
+		return
+	if(isliving(feedstock))
+		var/mob/living/body = feedstock
+		admin_attack_log(user, body, "Started recycling the corpse", "Was loaded for biomass recycling", "biomass recycled")
+	work_left = 5 SECONDS
+	last_process = world.time
+	update_use_power(POWER_USE_ACTIVE)
+	add_fingerprint(user)
+	update_icon()
+	to_chat(user, SPAN_NOTICE("You start the biomass grinder."))
+
+/obj/machinery/genetics_biomass_grinder/AltClick(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		return
+	if(work_left)
+		to_chat(user, SPAN_WARNING("The grinder is locked while processing."))
+		return
+	if(feedstock)
+		feedstock.forceMove(get_turf(src))
+		to_chat(user, SPAN_NOTICE("You unload the grinder."))
+	else
+		to_chat(user, SPAN_NOTICE("There is no unprocessed material to unload."))
+
+/obj/machinery/genetics_biomass_grinder/Process()
+	var/elapsed = max(0, world.time - last_process)
+	last_process = world.time
+	if(!work_left)
+		return
+	if(QDELETED(feedstock) || feedstock.loc != src || !feedstock_yield(feedstock))
+		if(QDELETED(feedstock) || feedstock.loc != src)
+			feedstock = null
+		work_left = 0
+		update_use_power(POWER_USE_IDLE)
+		visible_message(SPAN_WARNING("[src] stops: its feedstock is no longer suitable."))
+		update_icon()
+		return
+	if(!operable() || !powered())
+		return
+	work_left = max(0, work_left - elapsed)
+	if(work_left)
+		return
+	var/atom/movable/material = feedstock
+	var/yield = feedstock_yield(material)
+	feedstock = null
+	qdel(material)
+	ready_bricks = yield
+	update_use_power(POWER_USE_IDLE)
+	update_icon()
+	ping()
+
+/obj/machinery/genetics_biomass_grinder/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == feedstock)
+		feedstock = null
+		work_left = 0
+		update_use_power(POWER_USE_IDLE)
+		update_icon()
+
+/obj/machinery/genetics_biomass_grinder/relaymove(mob/user)
+	if(user == feedstock && !user.incapacitated())
+		user.forceMove(get_turf(src))
+
+/obj/machinery/genetics_biomass_grinder/power_change()
+	. = ..()
+	last_process = world.time
+	update_icon()
+
+/obj/machinery/genetics_biomass_grinder/update_icon()
+	overlays.Cut()
+	if(stat & BROKEN)
+		icon_state = "grinderb"
+		return
+	icon_state = (feedstock || ready_bricks) ? "grinder0" : "grinder00"
+	if(feedstock || ready_bricks)
+		var/running = work_left && operable() && powered()
+		overlays += image(icon, running ? "grindglass2" : (ready_bricks ? "grindglass1" : "grindglass0"))
+		overlays += image(icon, running ? "grindpaddle1" : "grindpaddle0")
+
+/obj/machinery/genetics_biomass_grinder/Destroy()
+	if(feedstock)
+		feedstock.forceMove(get_turf(src))
+	return ..()
 
 //Health Tracker Implant
 
@@ -409,9 +643,28 @@
 	var/datum/dna2/record/buf = null
 	var/read_only = 0 //Well,it's still a floppy disk
 
+/obj/item/disk/data/os13_genecode
+	name = "GENECODE Diskette"
+	desc = "An OS13 genotype record diskette."
+	icon = 'icons/os13/objects/objects/cloning.dmi'
+	icon_state = "datadisk0"
+
+/obj/item/disk/data/os13_genecode/New()
+	..()
+	icon_state = "datadisk0"
+	initializeDisk()
+
 /obj/item/disk/data/proc/initializeDisk()
 	buf = new
 	buf.dna=new
+
+/obj/item/disk/data/proc/update_genetic_label()
+	if(!buf || !buf.dna || !buf.types)
+		SetName(initial(name))
+	else if(istype(src, /obj/item/disk/data/os13_genecode))
+		SetName("[buf.dna.real_name] GENECODE")
+	else
+		SetName("data disk - '[buf.dna.real_name]'")
 
 /obj/item/disk/data/demo
 	name = "data disk - 'God Emperor of Mankind'"

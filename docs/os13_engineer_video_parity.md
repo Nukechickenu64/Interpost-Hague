@@ -5,6 +5,15 @@ The recording is reference material, not a source of instructions. A full-durati
 90-second contact-sheet survey was followed by detailed frames around the
 engineering interactions. Times below are approximate scene ranges.
 
+A later full-coverage pass (one frame per 3 s, 2,553 frames, OCR of every
+sampled chat crop into a 6,354-line deduplicated transcript, audio onset
+timeline) added the non-engineering observations in
+"Additional gameplay observations" below. Shared station systems seen in all
+three recordings (combat prose, restraints, examine/recognition, emote wheel,
+intercom tags, objective sheets) are documented centrally in
+`os13_marshal_video_parity.md` and the cross-video checklist in
+`os13_video_parity_gaps.md`.
+
 ## Implemented interactions
 
 | Video evidence | Implementation |
@@ -13,7 +22,7 @@ engineering interactions. Times below are approximate scene ranges.
 | 00:20–00:24: collect mirror shards and transport replacement panels | Pink mirror shards retain the destroyed panel's material budget. The Harvester collects ore, shards and panels on activation/movement, and releases its actual contents. Destruction spills collected salvage. Six-panel carts load/unload actual items and spill their contents if destroyed. |
 | 00:25–00:27 and around 00:55: area demand, total generation/storage, sample age and array spread status | New station power console with sorted area demand, kW generation, stored/capacity MJ, sample age, solar output and access-controlled Spread/Retract actions. Readouts use a completed grid sample. |
 | Around 00:27: FixBoy-2000 | Existing FixBoy art used for an engineering diagnostic with machine/base/wall inspections and a handheld power report. Available in engineering personal lockers and the autolathe. Its exact original hidden functions cannot be established from the recording. |
-| 00:29–00:30: equipment charge inserted before retrieving a tool belt | Compatible, consumable restock charges. Ordinary configured stock is restored to capacity; full/wrong machines reject charges. Returned items and restricted/premium stock are preserved. Equipment, coffee, soda, snack and security refills have cargo packs and existing OS13 art. |
+| 00:29–00:30: equipment charge inserted before retrieving a tool belt | Compatible, consumable restock charges. Successful vendor refills print "You insert the charge into the machine." Universal equipment tokens remain usable on vending machines; named vendor refills are restricted to their corresponding coffee, soda, snack, security or other specialty vendor. Ordinary configured stock is restored to capacity; returned items and restricted/premium stock are preserved. Equipment, coffee, soda, snack and security refills have cargo packs and existing OS13 art. |
 | 00:31–00:40 and around 01:34: ask Research for standard/advanced solar replacements | Standard and advanced Replicator designs, distinct research requirements/material costs, and a six-panel cargo shipment. Reclamation remains on the existing Replicator floor tile. |
 | Around 01:00–01:10: discuss directional versus full shields and their power demand | Full coverage remains the default. North/South/East/West settings restrict actual shield segments to a 90-degree sector; the existing per-segment upkeep therefore falls with coverage. The control-wire lock applies to direction changes. |
 | 01:04:50–01:06:15: choose an area, inspect each vent's pressure/mode, select REFILL/STOP/FILTER for an individual vent or ALL VENTS, and view lockdown settings | The mapped station gas console has a live area/vent screen, individual and all-vent commands, manual lockdown, automatic-lockdown enable/disable and an adjustable station threshold (60 kPa by default). Local modcon chat reports also expose individual/all-vent commands and manual/automatic lockdown controls. FILTER consumes modcon cartridge condition while removing contaminants; REFILL draws from the finite shared reserve. |
@@ -44,8 +53,11 @@ fault → fit an intact held panel → screwdriver. Retracted panels generate no
 Retraction protects against glancing impacts; direct impacts can still damage them.
 
 The console requires engineering equipment access for deployment changes.
-FixBoy activation prints the current power sample; using it on nearby equipment
-reports its mechanical condition. The Harvester's **Release Contents** verb empties
+FixBoy activation while held and capable prints the current power sample;
+using the held tool on nearby equipment reports its mechanical condition.
+It is also available from the replicator; the existing locker/autolathe supplies
+remain. OS13 multitool held states are a local mapping, not certified FixBoy art.
+The Harvester's **Release Contents** verb empties
 it. Cargo supplies replacement panels, maintenance carts and refill charges.
 
 Atmosphere commands affect only vents belonging to the selected area. Broken or
@@ -110,6 +122,32 @@ consumers and local-controller charging, so the rows need not sum to that total.
 - Sampling a two-hour recording cannot establish every hidden rule or transient
   action. This implements the identified engineering gaps; it is not certification
   of complete game-wide Lifeweb parity.
+
+## Additional gameplay observations (full-coverage pass)
+
+Round flow outside the engineering work: wake-up in quarters → power-crisis
+briefing → solar EVA repairs (00:14–00:40) → charge restocks and replicator
+orders (00:28–00:33) → meteor/shield defense around 00:40 ("Shields held up.
+Well done.") → atmosphere console work (1:04:50–1:06:15) → a medical emergency
+with casualties under red lighting around 1:17 → long dark-maintenance search
+sweeps (1:17–1:30, 1:55–2:07) tied to a crew member declared wanted
+("If you see Goodyear, she's considered a…") → bracelet and crew-signal checks
+(1:42, 1:58).
+
+Message/format observations not yet in the implementation tables:
+
+| Evidence | Observed behavior |
+| --- | --- |
+| 00:00 | Round-start cryosleep after-effect message: "You feel terrible, like having a heavy hangover. It doesn't seem like an…" (white system line at wake-up). |
+| 12:12 | Same loyal-crew objective sheet as the marshal recording (banner, numbered objectives, point rewards). |
+| 15:30–26:30 | Solar service messages: examining a defective base prints a to-do hint ("I need to remove the panel."); completion lines "You fix the the solar panel base." (doubled "the" present in the original), "You secure the panel." |
+| 25:42, 42:30 | Power Control Room status broadcast: "The solar panel array is now SPREADED." |
+| 28:51–29:12 | Item hand-off prints both private and public lines: "Amelia Vale gives you Equipment Charge." / "Amelia Vale passed the Equipment Charge to Nash Ampert"; machine restock prints "You insert the charge into the machine." |
+| 47:30 | Standing order announcement format: "You are NOT to fill your air-tanks from the primary air supply:" |
+| 1:04:51–1:06:09 | Vent console text format: header `*LOCKDOWN PRESSURE: 60 kPA`, per-vent blocks `Vent-N` with `> Status: FILTER` and the upgraded `FILTER[turbo]` variant. |
+| 1:09:06 | Welder usage tip delivered as radio chatter: tables can be broken apart with a welder. |
+| 1:17:24–1:18:30 | Casualty handling in medical under red emergency lighting; wound examines ("You see no wounds.") and red damage prose mirror the marshal-video medical observations. |
+| 1:17:39+, 2:00+ | The darkness warning "It is pitch black. You are likely to stumble." appears whenever stepping into unlit maintenance, matching the marshal recording. |
 
 ## Validation
 

@@ -130,6 +130,56 @@ datum/unit_test/human_breath/check_result()
 
 	return 1	// return 1 to show we're done and don't want to recheck the result.
 
+/obj/human_environment_breath_test_room
+	var/datum/gas_mixture/test_air
+
+/obj/human_environment_breath_test_room/return_air()
+	return test_air
+
+/obj/human_environment_breath_test_room/assume_air(datum/gas_mixture/giver)
+	test_air.merge(giver)
+
+/obj/human_environment_breath_test_room/Destroy()
+	QDEL_NULL(test_air)
+	return ..()
+
+/datum/unit_test/human_environment_breath
+	name = "MOB: Room breaths match lung thresholds"
+
+/datum/unit_test/human_environment_breath/start_test()
+	var/failed = FALSE
+	for(var/case_name in list("clean", "cargo CO2", "thin air", "low oxygen", "dangerous CO2", "vacuum"))
+		var/obj/human_environment_breath_test_room/room = new(locate(1, 1, 1))
+		room.test_air = new(CELL_VOLUME, T20C)
+		var/air_moles = case_name == "thin air" ? HUMAN_DANGER_AIR_MOLES_MIN : MOLES_CELLSTANDARD
+		var/oxygen_moles = case_name == "low oxygen" ? PRESSURE_TO_MOLES(8) : air_moles * O2STANDARD
+		// The elevator zone starts with roughly half a mole of CO2 per tile.
+		var/co2_moles = case_name == "cargo CO2" ? 0.6 : (case_name == "dangerous CO2" ? PRESSURE_TO_MOLES(6) : 0)
+		if(case_name != "vacuum")
+			room.test_air.adjust_multi(GAS_OXYGEN, oxygen_moles, GAS_NITROGEN, air_moles - oxygen_moles - co2_moles, GAS_CO2, co2_moles)
+		var/mob/living/carbon/human/H = new(room, SPECIES_HUMAN)
+		var/before = room.test_air.get_total_moles()
+		var/datum/gas_mixture/breath = H.get_breath_from_environment()
+		if(case_name != "vacuum")
+			if(!breath || abs(breath.volume - BREATH_VOLUME) > ATMOS_PRECISION || abs(breath.total_moles - air_moles * BREATH_PERCENTAGE) > ATMOS_PRECISION)
+				fail("[case_name]: ambient breath volume does not match lung thresholds.")
+				failed = TRUE
+		H.handle_breath(breath)
+		H.handle_post_breath(breath)
+		var/expect_failure = !(case_name in list("clean", "cargo CO2"))
+		if(!!H.failed_last_breath != expect_failure || (expect_failure ? H.getOxyLoss() <= 0 : H.getOxyLoss() != 0))
+			fail("[case_name]: unexpected breathing outcome (failed=[H.failed_last_breath], oxygen loss=[H.getOxyLoss()]).")
+			failed = TRUE
+		if(abs(room.test_air.get_total_moles() - before) > ATMOS_PRECISION)
+			fail("[case_name]: inhaling and exhaling did not conserve room gas.")
+			failed = TRUE
+		qdel(breath)
+		qdel(H)
+		qdel(room)
+	if(!failed)
+		pass("Ambient breaths preserve room gas, tolerate cargo CO2, and detect thin air, low oxygen, dangerous CO2 and vacuum.")
+	return 1
+
 datum/unit_test/human_missing_breathing_organ
 	name = "MOB: Missing Breathing Organ Causes Full Oxygen Loss"
 

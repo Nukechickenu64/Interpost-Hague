@@ -38,6 +38,24 @@
 /obj/structure/bed/get_material()
 	return material
 
+/obj/structure/bed/os13
+	name = "OS13 bed"
+	icon = 'icons/os13/objects/objects/orbital_decor.dmi'
+	icon_state = "bed1"
+	material_alteration = MATERIAL_ALTERATION_NONE
+
+/obj/structure/bed/os13/update_icon()
+	overlays.Cut()
+	icon_state = initial(icon_state)
+
+/obj/structure/bed/os13/bed0
+	name = "OS13 bed (white)"
+	icon_state = "bed0"
+
+/obj/structure/bed/os13/bedo
+	name = "OS13 side bed"
+	icon_state = "bedo"
+
 // Reuse the cache/code from stools, todo maybe unify.
 /obj/structure/bed/update_icon()
 	// Prep icon.

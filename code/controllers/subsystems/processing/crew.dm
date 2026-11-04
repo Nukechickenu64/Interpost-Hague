@@ -1,0 +1,4 @@
+PROCESSING_SUBSYSTEM_DEF(crew)
+	name = "AI Crew"
+	wait = 2
+	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING|SS_NO_INIT

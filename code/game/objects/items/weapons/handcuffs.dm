@@ -44,6 +44,9 @@
 				place_handcuffs(user, user)
 				return
 
+			if(src.type == /obj/item/weapon/handcuffs)
+				user.visible_message("<span class='danger'>[user] swings with handcuffs!</span>")
+
 			//check for an aggressive grab (or robutts)
 			if(can_place(C, user))
 				place_handcuffs(C, user)

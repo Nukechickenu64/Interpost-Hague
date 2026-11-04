@@ -40,6 +40,10 @@
 	message_title = sanitizeSafe(message_title)
 
 	var/msg = FormMessage(message, message_title)
+	if(istype(GLOB.using_map, /datum/map/alpha) && (src == command_announcement || src == minor_announcement))
+		GLOB.os13_bridge_reports += "<p><b>[stationtime2text()] - [message_title]</b><br>[message]</p>"
+		if(length(GLOB.os13_bridge_reports) > 100)
+			GLOB.os13_bridge_reports.Cut(1, length(GLOB.os13_bridge_reports) - 99)
 	for(var/mob/M in GLOB.player_list)
 		if((M.z in (GLOB.using_map.contact_levels | GLOB.using_map.admin_levels)) && !istype(M,/mob/new_player) && !isdeaf(M))
 			if(!do_newscast || !newscast)

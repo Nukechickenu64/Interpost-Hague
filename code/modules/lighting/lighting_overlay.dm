@@ -1,6 +1,7 @@
 /var/total_lighting_overlays = 0
 /atom/movable/lighting_overlay
 	name = ""
+	z_flags = ZMM_IGNORE // Openspace samples this lightmap; never copy it as scenery.
 	mouse_opacity = 0
 	simulated = 0
 	anchored = 1
@@ -20,6 +21,7 @@
 	var/lum_b = 0
 
 	var/needs_update = FALSE
+	var/has_light_sample = FALSE
 	var/edge_guard_key
 	var/atom/movable/lighting_edge_guard/edge_guard
 	var/atom/movable/lighting_veil/tile_glow
@@ -39,12 +41,23 @@
 		icon = get_solid_white_icon()
 		T.lighting_overlay = src
 		T.luminosity = 0
-		update_edge_guard()
 		if(no_update)
+			update_edge_guard()
 			return
-		update_overlay()
+		if(lighting_overlays_initialised)
+			update_overlay()
+		else
+			// The initial light pass has not run yet. Sample once after all
+			// opacity, light sources and shared corners have their final values.
+			luminosity = enhanced_los_enabled
+			queue_update()
 	else
 		qdel(src)
+
+/atom/movable/lighting_overlay/proc/queue_update()
+	if(!needs_update)
+		needs_update = TRUE
+		SSlighting.overlay_queue += src
 
 /atom/movable/lighting_overlay/proc/update_overlay()
 	set waitfor = FALSE
@@ -65,10 +78,28 @@
 	// Sample one light value for the whole tile. The light plane supplies spatial
 	// blur and bloom; the tile itself must not bilinearly interpolate four colors.
 	var/list/rgb = lighting_tile_rgb(T)
+	var/set_luminosity = max(rgb[1], rgb[2], rgb[3]) > 1e-6
+	luminosity = enhanced_los_enabled ? TRUE : set_luminosity
+	// Keep geometry/visibility current, but do not restart identical color and
+	// bloom animations when adjacent corners cancel out or only membership changes.
+	if(has_light_sample && lum_r == rgb[1] && lum_g == rgb[2] && lum_b == rgb[3])
+		return
+	has_light_sample = TRUE
 	lum_r = rgb[1]
 	lum_g = rgb[2]
 	lum_b = rgb[3]
-	var/set_luminosity = max(lum_r, lum_g, lum_b) > 1e-6
+	if(!lum_r && !lum_g && !lum_b)
+		// Most startup tiles are dark. Reuse the same black matrix instead of
+		// allocating two 20-value matrices per tile. Keep a matrix so later
+		// transitions into light still animate through the normal path.
+		var/static/list/black_color = list(0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+		animate(src)
+		color = black_color
+		if(tile_glow)
+			animate(tile_glow)
+			tile_glow.color = black_color
+		return
 	var/list/target_color = list(
 		lum_r, 0, 0, 0,
 		0, lum_g, 0, 0,
@@ -104,6 +135,15 @@
 	// 	T.above.shadower.copy_lighting(src)
 
 /proc/lighting_tile_rgb(turf/T)
+	// Overwritten open turfs show a lower floor, not a surface at this height.
+	// Shade that visible surface once; the existing Z-copy multiplier supplies
+	// the depth cue. Crawlspace covers keep their own surface lighting.
+	var/turf/surface = T
+	while(surface.below && !surface.opaque_counter && (surface.z_flags & ZM_MIMIC_BELOW) && (surface.z_flags & ZM_MIMIC_OVERWRITE))
+		surface = surface.below
+	if(surface != T && !TURF_IS_DYNAMICALLY_LIT_UNSAFE(surface))
+		return list(1, 1, 1)
+	T = surface
 	var/red = 0
 	var/green = 0
 	var/blue = 0
@@ -134,6 +174,7 @@ var/global/list/lighting_edge_guard_cache = list()
 
 /atom/movable/lighting_edge_guard
 	name = ""
+	z_flags = ZMM_IGNORE // Black lightmap padding must not cover lower-deck scenery.
 	mouse_opacity = 0
 	anchored = TRUE
 	simulated = FALSE
@@ -217,6 +258,7 @@ var/global/list/lighting_edge_guard_cache = list()
 
 /atom/movable/lighting_veil
 	name = ""
+	z_flags = ZMM_IGNORE // The upper opening creates its own optical glow sample.
 	plane = LIGHTING_VEIL_SOURCE_PLANE
 	layer = LIGHTING_LAYER
 	color = "#000000"

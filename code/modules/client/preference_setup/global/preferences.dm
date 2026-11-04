@@ -124,6 +124,18 @@ var/list/_client_preferences_by_type
 	description ="Show item labels"
 	key = "SHOW_ITEMS"
 
+/datum/client_preference/walking_animation
+	description = "Animate my human's walking"
+	key = "HUMAN_WALKING_ANIMATION"
+
+/datum/client_preference/walking_animation/changed(var/mob/preference_mob, var/new_value)
+	if(ishuman(preference_mob))
+		var/mob/living/carbon/human/H = preference_mob
+		H.stop_walking_animation()
+		H.clear_walking_cache()
+	if(preference_mob)
+		preference_mob.updateButtons()
+
 /datum/client_preference/show_item_names/changed(var/mob/preference_mob, var/new_value)
 	if(ishuman(preference_mob))
 		var/mob/living/carbon/human/H = preference_mob

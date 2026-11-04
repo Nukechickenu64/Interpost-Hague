@@ -881,6 +881,8 @@
 	return 1
 
 /obj/item/rig/check_access(obj/item/I)
+	if(!isnull(map_access))
+		return ..()
 	return TRUE
 
 /obj/item/rig/proc/force_rest(var/mob/user)

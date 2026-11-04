@@ -595,6 +595,16 @@ GLOBAL_LIST_EMPTY(area_smes_by_id)
 /obj/machinery/power/area_smes/proc/report()
 	return "[area_id || (area && area.name)] : [equipment]/[lighting]/[environ] ([lastused_equip+lastused_light+lastused_environ]) : [cell? cell.percent() : "N/C"] ([charging])"
 
+/obj/machinery/power/area_smes/proc/is_supplying_power()
+	if(QDELETED(src) || (stat & (BROKEN|MAINT)) || !operating || shorted || failure_timer || QDELETED(cell) || cell.charge <= 0)
+		return FALSE
+	for(var/area/served in served_areas)
+		if(QDELETED(served) || !served.requires_power || served.area_smes != src)
+			continue
+		if((lighting >= POWERCHAN_ON && served.power_light) || (equipment >= POWERCHAN_ON && served.power_equip) || (environ >= POWERCHAN_ON && served.power_environ))
+			return TRUE
+	return FALSE
+
 /obj/machinery/power/area_smes/proc/update()
 	for(var/area/A in served_areas)
 		if(operating && !shorted && !failure_timer)

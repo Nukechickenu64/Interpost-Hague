@@ -75,14 +75,15 @@
 			icon_state = "vertical"
 		if(EAST, WEST, EAST | WEST)
 			icon_state = "horizontal"
+		// The corner states are named for the opposite corner in the sprite sheet.
 		if(NORTH | EAST)
-			icon_state = "ne"
-		if(NORTH | WEST)
-			icon_state = "nw"
-		if(SOUTH | EAST)
-			icon_state = "se"
-		if(SOUTH | WEST)
 			icon_state = "sw"
+		if(NORTH | WEST)
+			icon_state = "se"
+		if(SOUTH | EAST)
+			icon_state = "nw"
+		if(SOUTH | WEST)
+			icon_state = "ne"
 		if(NORTH | SOUTH | EAST)
 			icon_state = "nse"
 		if(NORTH | SOUTH | WEST)
@@ -123,6 +124,17 @@
 			to_chat(M, SPAN_WARNING("You need to be crawling to move into [src]."))
 			return FALSE
 	return ..()
+
+/mob/living
+	var/next_crawlspace_shock = 0
+
+/turf/simulated/open/crawlspace/Entered(atom/movable/mover, atom/oldloc)
+	. = ..()
+	if(!isliving(mover) || mover.loc != src || !istype(get_area(src), /area/maintenance) || !is_station_turf(src))
+		return
+	for(var/obj/machinery/power/shield_generator/generator in SSmachines.machinery)
+		if(generator.shock_crawlspace_occupant(mover))
+			break
 
 /turf/simulated/open/update_dirt()
 	return 0

@@ -26,6 +26,11 @@
 	if(!O)
 		to_chat(src, "<span class='notice'>There is nothing of interest in this direction.</span>")
 		return
+	for(var/turf/T in list(start, O))
+		for(var/obj/structure/os13_floor_door/hatch in T)
+			if(!hatch.hatch_open || direction != DOWN)
+				to_chat(src, "<span class='warning'>You can only move downward through this floor door, and only while it is open.</span>")
+				return FALSE
 	var/obj/item/tank/jetpack/thrust = get_jetpack()
 	if(thrust && (istype(start, /turf/space) || !mob_has_gravity(start)))
 		if(!canmove || incapacitated() || restrained() || buckled || anchored || pinned.len)
@@ -58,7 +63,12 @@
 				climb_target = T
 			else
 				for(var/obj/I in T)
-					if(I.obj_flags & OBJ_FLAG_NOFALL)
+					if(istype(I, /obj/structure/os13_floor_door))
+						var/obj/structure/os13_floor_door/hatch = I
+						if(hatch.hatch_open && direction == DOWN)
+							climb_target = hatch
+							break
+					else if(I.obj_flags & OBJ_FLAG_NOFALL)
 						climb_target = I
 						break
 			if(climb_target)

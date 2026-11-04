@@ -101,7 +101,7 @@
 	load_unit_test_changes()
 #endif
 
-	Master.Initialize(10, FALSE)
+	Master.Initialize(0, FALSE)
 
 #undef RECOMMENDED_VERSION
 

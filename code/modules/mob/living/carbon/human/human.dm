@@ -1789,7 +1789,8 @@ var/list/rank_prefix = list(\
 		return (!L || L.can_drown())
 	return FALSE
 
-/mob/living/carbon/human/get_breath_from_environment(var/volume_needed = STD_BREATH_VOLUME)
+/mob/living/carbon/human/get_breath_from_environment(var/volume_needed = BREATH_VOLUME)
+	// Match internals and the sample volume used by lung gas thresholds.
 	var/datum/gas_mixture/breath = ..(volume_needed)
 	var/turf/T = get_turf(src)
 	if(istype(T) && T.is_flooded(lying) && should_have_organ(BP_LUNGS))

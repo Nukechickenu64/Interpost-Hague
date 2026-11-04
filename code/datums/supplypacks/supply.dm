@@ -78,3 +78,14 @@
 	containertype = /obj/structure/closet/crate/secure
 	containername = "\improper Shaft miner equipment"
 	access = access_mining
+
+/decl/hierarchy/supply_pack/supply/os13_harvester
+	name = "Harvester ore collector"
+	contains = list(/obj/structure/harvester)
+	containertype = /obj/structure/closet/crate/large
+	containername = "Harvester delivery crate"
+
+/decl/hierarchy/supply_pack/supply/os13_distress_beacons
+	name = "Distress Beacons"
+	contains = list(/obj/item/device/os13_distress_beacon = 4)
+	containername = "Distress Beacon crate"

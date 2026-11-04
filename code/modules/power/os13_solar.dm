@@ -35,7 +35,7 @@ GLOBAL_LIST_EMPTY(solar_bases)
 
 /obj/machinery/power/solar_base
 	name = "solar panel base"
-	desc = "A serviceable solar mount. Examine it for faults; unsecure its panel with a screwdriver before removing it. A welder repairs the exposed base."
+	desc = "A serviceable solar mount. Examine it for faults; unsecure its panel with a screwdriver before removing it. A wrench or welder repairs the exposed base."
 	icon = 'icons/os13/objects/objects/legacy.dmi'
 	icon_state = "solar_panel_base"
 	density = TRUE
@@ -111,7 +111,7 @@ GLOBAL_LIST_EMPTY(solar_bases)
 		return
 	to_chat(user, SPAN_NOTICE("The array is [deployed ? "spread" : "retracted"]. [panel ? "The panel is [secured ? "secured" : "unsecured"]." : "The mount is empty."]"))
 	if(defective || (stat & BROKEN))
-		to_chat(user, SPAN_WARNING("You notice a defect! Remove the panel before welding the base."))
+		to_chat(user, SPAN_WARNING("You notice a defect! Remove the panel before repairing the base with a wrench or welder."))
 	if(panel && panel.broken)
 		to_chat(user, SPAN_WARNING("The panel is shattered and needs replacing."))
 	to_chat(user, SPAN_NOTICE("Output: [round(power_output() / 1000, 0.01)] kW."))
@@ -192,6 +192,22 @@ GLOBAL_LIST_EMPTY(solar_bases)
 			return
 		servicing = FALSE
 		if(completed && !panel && WT.loc == user && WT.remove_fuel(1, user) && repair_base())
+			to_chat(user, SPAN_NOTICE("You fix the solar panel base."))
+		return
+	if(isWrench(W))
+		if(panel)
+			to_chat(user, SPAN_WARNING("Remove the panel before repairing the base."))
+			return
+		if(!defective && !(stat & BROKEN))
+			to_chat(user, SPAN_NOTICE("The base has no defects."))
+			return
+		servicing = TRUE
+		to_chat(user, SPAN_NOTICE("You begin tightening the solar panel base's damaged fittings."))
+		var/completed = do_after(user, 3 SECONDS, src)
+		if(QDELETED(src))
+			return
+		servicing = FALSE
+		if(completed && !panel && W.loc == user && repair_base())
 			to_chat(user, SPAN_NOTICE("You fix the solar panel base."))
 		return
 	return ..()
@@ -308,4 +324,3 @@ GLOBAL_LIST_EMPTY(solar_bases)
 	name = "Solar maintenance carts"
 	contains = list(/obj/structure/solar_panel_cart/loaded, /obj/structure/harvester)
 	containername = "solar maintenance crate"
-

@@ -201,7 +201,7 @@
 				var/obj/effect/shuttle_landmark/L = SSshuttle.get_landmark(destination_tag)
 				if(istype(L))
 					// If a landmark is restricted, only include it if it's for the Mining shuttle
-					if(!L.shuttle_restricted || L.shuttle_restricted == "Mining")
+					if((!L.shuttle_restricted || L.shuttle_restricted == "Mining") && get_mining_expedition().can_visit(L))
 						destinations_cache["[L.name]"] = L
 						included++
 					else
@@ -210,7 +210,7 @@
 			log_debug("Mining.build_destinations_cache: at-space include=[included] skip=[skipped]")
 	else
 		// Not at space: only allow going to the available Mining space waypoint.
-		if(istype(space_waypoint))
+		if(istype(space_waypoint) && get_mining_expedition().can_visit(space_waypoint))
 			destinations_cache["Space"] = space_waypoint
 		if(config && config.log_debug)
 			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(space_waypoint)] tag=[space_waypoint_tag]")
@@ -229,6 +229,11 @@
 
 /datum/shuttle/autodock/multi/mining/process_launch()
 	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(next_location && !expedition.can_visit(next_location))
+		expedition.fail(ismob(in_use) ? in_use : null, "SALVAGE COORDINATES PROHIBITED BY BRIDGE. DEPARTURE CANCELLED.")
+		cancel_launch(in_use)
+		next_location = null
+		return
 	if(expedition.mission_pending && (!next_location || !next_location.is_valid(src)))
 		expedition.mission_error = "TRANSIT NAVIGATION IS NOT READY."
 		expedition.finish_mission()
@@ -267,6 +272,12 @@
 	landmark_tag = "nav_mining_start"
 	docking_controller = "mining_airlock" // matches the airlock docking_port id_tag placed in alpha.dmm
 	base_turf = /turf/space
+
+// Classic's mapped Scout uses ordinary side airlocks at an exterior catwalk,
+// rather than Alpha's docking-port controller. Do not bind an absent device.
+/obj/effect/shuttle_landmark/mining/station/os13
+	name = "Scout berth"
+	docking_controller = null
 
 // Transit and open-space waypoints have no airlock to dock with, so they must not
 // inherit the station's docking controller tag.
@@ -535,10 +546,11 @@
 	name = "mining lift controls"
 	shuttle_tag = "Mining Lift"
 	ui_template = "shuttle_control_console_lift.tmpl"
-	icon_state = "tiny"
-	icon_keyboard = "tiny_keyboard"
-	icon_screen = "lift"
-	density = 0
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "platform"
+	icon_keyboard = null
+	icon_screen = null
+	density = 1
 
 /area/shuttle/lift3
   name = "Cryo Lift"

@@ -3,6 +3,88 @@
 /obj/var/list/req_access = list()
 /obj/var/list/req_one_access = list()
 
+/atom/movable/var/map_access = null // Mapper shorthand; null preserves the subtype's access requirements.
+
+/proc/mapper_access_key(value)
+	return replacetext(replacetext(lowertext(trim(value)), " ", "_"), "-", "_")
+
+/proc/get_mapper_access_names()
+	var/static/list/names
+	if(!names)
+		names = list()
+		var/list/access_datums = get_all_access_datums()
+		for(var/datum/access/A in access_datums)
+			if(A.id > 0 && length(A.desc))
+				names[mapper_access_key(A.desc)] = A.id
+		// Subtype names take precedence over descriptions (notably "security").
+		for(var/datum/access/A in access_datums)
+			if(A.id > 0)
+				var/list/path_parts = splittext("[A.type]", "/")
+				names[mapper_access_key(path_parts[path_parts.len])] = A.id
+		names["command"] = access_heads
+		names["medbay"] = access_medical
+		names["supply"] = access_cargo
+		names["brig"] = access_brig
+		names["synth"] = access_synth
+	return names
+
+// Returns the existing all/any requirement lists, or a fail-closed requirement.
+/proc/parse_mapper_access(expression, atom/owner, field = "map_access")
+	var/list/all_access = list()
+	var/list/any_access = list()
+	var/error
+	if(!istext(expression))
+		error = "expected access names as text"
+	else
+		expression = trim(expression)
+		if(lowertext(expression) == "public")
+			return list("all" = all_access, "any" = any_access)
+		var/require_all = findtext(expression, "&")
+		if(!length(expression))
+			error = "empty expression; use public to remove restrictions"
+		else if(require_all && (findtext(expression, "|") || findtext(expression, ",")))
+			error = "cannot mix & with | or commas"
+		else
+			var/list/names = get_mapper_access_names()
+			var/list/tokens = splittext(replacetext(expression, ",", "|"), require_all ? "&" : "|")
+			for(var/token in tokens)
+				var/key = mapper_access_key(token)
+				if(findtext(key, "access_") == 1)
+					key = copytext(key, 8)
+				var/id = names[key]
+				if(!id)
+					var/numeric_id = text2num(key)
+					if(numeric_id > 0 && "[numeric_id]" == key && get_access_by_id(numeric_id))
+						id = numeric_id
+				if(!id)
+					error = "unknown access '[token]'"
+					break
+				if(require_all)
+					all_access |= id
+				else
+					any_access |= id
+			if(!error && !all_access.len && !any_access.len)
+				error = "no access names; use public to remove restrictions"
+	if(error)
+		log_warning("Mapper access: [owner.type] at ([owner.x],[owner.y],[owner.z]), [field]: [error]. Access denied until corrected.")
+		return list("all" = list(-1), "any" = list())
+	return list("all" = all_access, "any" = any_access)
+
+/atom/movable/proc/apply_map_access()
+	if(!isnull(map_access))
+		log_warning("Mapper access: [type] at ([x],[y],[z]) does not support map_access.")
+
+/obj/apply_map_access()
+	if(isnull(map_access))
+		return
+	var/list/requirements = parse_mapper_access(map_access, src)
+	req_access = requirements["all"]
+	req_one_access = requirements["any"]
+
+// Preserve specialized authorization rules unless a mapper explicitly overrides them.
+/obj/proc/check_mapper_access(list/accesses, default_allowed)
+	return isnull(map_access) ? default_allowed : check_access_list(accesses)
+
 //returns 1 if this mob has sufficient access to use this object
 /obj/proc/allowed(mob/M)
 	//check if it doesn't require any access at all

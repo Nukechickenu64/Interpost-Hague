@@ -12,6 +12,7 @@
 	var/filling_states   // List of percentages full that have icons
 	var/base_name = null // Name to put in front of drinks, i.e. "[base_name] of [contents]"
 	var/base_icon = null // Base icon name for fill states
+	var/announce_drinking = FALSE
 
 	pull_sound = "pull_glass"
 
@@ -69,7 +70,11 @@
 	return ..()
 
 /obj/item/reagent_containers/food/drinks/self_feed_message(var/mob/user)
-	to_chat(user, "<span class='notice'>You swallow a gulp from \the [src].</span>")
+	var/drink_message = "<span class='notice'>You swallow a gulp from \the [src].</span>"
+	if(announce_drinking)
+		user.visible_message("<span class='notice'>[user] swallows a gulp of [src].</span>", drink_message)
+	else
+		to_chat(user, drink_message)
 	if(user.has_personal_goal(/datum/goal/achievement/specific_object/drink))
 		for(var/datum/reagent/R in reagents.reagent_list)
 			user.update_personal_goal(/datum/goal/achievement/specific_object/drink, R.type)

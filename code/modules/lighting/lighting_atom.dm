@@ -2,6 +2,12 @@
 	var/light_power = 1 // intensity of the light
 	var/light_range = 0 // range in tiles of the light
 	var/light_color		// Hexadecimal RGB string representing the colour of the light
+	// Per-instance mapper settings. Apply only when the source is emitting;
+	// power loss, switches and broken bulbs must still be able to turn it off.
+	var/map_light_override = FALSE
+	var/map_light_range = 0
+	var/map_light_power = 1
+	var/map_light_color = "#ffffff"
 	var/light_cone_angle = 0 // half-width in degrees; 0 = omnidirectional
 	var/light_cone_dir = 0   // degrees, 0 = north, clockwise
 	var/light_glow_range = 0 // omnidirectional glow radius around a cone light
@@ -15,6 +21,10 @@
 #define NONSENSICAL_VALUE -99999
 /atom/proc/set_light(l_range, l_power, l_color = NONSENSICAL_VALUE)
 	. = 0 //make it less costly if nothing's changed
+	if(map_light_override && (l_range > 0 || (isnull(l_range) && light_range > 0)) && (isnull(l_power) || l_power > 0))
+		l_range = map_light_range
+		l_power = map_light_power
+		l_color = map_light_color
 
 	if(l_power != null && l_power != light_power)
 		light_power = l_power
@@ -46,6 +56,10 @@
 
 /atom/proc/update_light()
 	set waitfor = FALSE
+	if(map_light_override && light_range > 0 && light_power > 0)
+		light_range = map_light_range
+		light_power = map_light_power
+		light_color = map_light_color
 
 	if(!light_power || !light_range)
 		if(light)

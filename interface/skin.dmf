@@ -269,6 +269,71 @@ macro "keypadentry"
 		name = "Escape"
 		command = ".airlock_keypad_cancel"
 
+macro "tbox"
+	elem
+		name = "West"
+		command = ".tboxkey 0 1"
+	elem
+		name = "West+UP"
+		command = ".tboxkey 0 0"
+	elem
+		name = "East"
+		command = ".tboxkey 1 1"
+	elem
+		name = "East+UP"
+		command = ".tboxkey 1 0"
+	elem
+		name = "North"
+		command = ".tboxkey 2 1"
+	elem
+		name = "North+UP"
+		command = ".tboxkey 2 0"
+	elem
+		name = "South"
+		command = ".tboxkey 3 1"
+	elem
+		name = "South+UP"
+		command = ".tboxkey 3 0"
+	elem
+		name = "Z"
+		command = ".tboxkey 4 1"
+	elem
+		name = "Z+UP"
+		command = ".tboxkey 4 0"
+	elem
+		name = "X"
+		command = ".tboxkey 5 1"
+	elem
+		name = "X+UP"
+		command = ".tboxkey 5 0"
+	elem
+		name = "A"
+		command = ".tboxkey 6 1"
+	elem
+		name = "A+UP"
+		command = ".tboxkey 6 0"
+	elem
+		name = "S"
+		command = ".tboxkey 7 1"
+	elem
+		name = "S+UP"
+		command = ".tboxkey 7 0"
+	elem
+		name = "Return"
+		command = ".tboxkey 8 1"
+	elem
+		name = "Return+UP"
+		command = ".tboxkey 8 0"
+	elem
+		name = "P"
+		command = ".tboxkey 9 1"
+	elem
+		name = "P+UP"
+		command = ".tboxkey 9 0"
+	elem
+		name = "Escape"
+		command = ".tboxquit"
+
 macro "macro"
 	elem 
 		name = "Center+REP"

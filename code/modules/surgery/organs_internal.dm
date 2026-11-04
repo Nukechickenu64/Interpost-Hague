@@ -151,11 +151,15 @@
 	for(var/organ in target.internal_organs_by_name)
 		var/obj/item/organ/I = target.internal_organs_by_name[organ]
 		if(I && !(I.status & ORGAN_CUT_AWAY) && I.parent_organ == target_zone)
-			attached_organs |= organ
+			attached_organs[organ] = I
 
 	var/organ_to_remove = input(user, "Which organ do you want to separate?") as null|anything in attached_organs
 	if(!organ_to_remove)
 		return 0
+	var/obj/item/organ/selected = attached_organs[organ_to_remove]
+	if(QDELETED(target) || QDELETED(selected) || target.internal_organs_by_name[organ_to_remove] != selected || selected.owner != target || (selected.status & ORGAN_CUT_AWAY))
+		to_chat(user, "<span class='warning'>That organ is no longer available to separate.</span>")
+		return SURGERY_FAILURE
 
 	target.op_stage.current_organ = organ_to_remove
 
@@ -218,6 +222,10 @@
 	var/organ_to_remove = input(user, "Which organ do you want to remove?") as null|anything in removable_organs
 	if(!organ_to_remove)
 		return 0
+	var/obj/item/organ/internal/selected = organ_to_remove
+	if(QDELETED(target) || QDELETED(selected) || QDELETED(affected) || !(selected in affected.implants) || selected.loc != target || !(selected.status & ORGAN_CUT_AWAY))
+		to_chat(user, "<span class='warning'>That organ is no longer available to remove.</span>")
+		return SURGERY_FAILURE
 
 	target.op_stage.current_organ = organ_to_remove
 	return ..()
@@ -244,11 +252,6 @@
 			playsound(target.loc, 'sound/effects/squelch1.ogg', 15, 1)
 		else
 			playsound(target.loc, 'sound/items/Ratchet.ogg', 50, 1)
-	if(istype(O, /obj/item/organ/internal/mmi_holder))
-		var/obj/item/organ/internal/mmi_holder/brain = O
-		brain.transfer_and_delete()
-
-	// Just in case somehow the organ we're extracting from an organic is an MMI
 	if(istype(O, /obj/item/organ/internal/mmi_holder))
 		var/obj/item/organ/internal/mmi_holder/brain = O
 		brain.transfer_and_delete()
@@ -317,12 +320,13 @@
 
 /datum/surgery_step/internal/replace_organ/end_step(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
+	if(!user.unEquip(tool, target = target))
+		to_chat(user, "<span class='warning'>You cannot release the organ for transplantation.</span>")
+		return
 	user.visible_message("<span class='notice'>[user] has transplanted \the [tool] into [target]'s [affected.name].</span>", \
 	"<span class='notice'>You have transplanted \the [tool] into [target]'s [affected.name].</span>")
 	var/obj/item/organ/O = tool
 	if(istype(O))
-		user.remove_from_mob(O)
-		O.forceMove(target)
 		affected.implants |= O //move the organ into the patient. The organ is properly reattached in the next step
 		if(!(O.status & ORGAN_CUT_AWAY))
 			log_debug("[user] ([user.ckey]) replaced organ [O], which didn't have ORGAN_CUT_AWAY set, in [target] ([target.ckey])")
@@ -370,6 +374,9 @@
 	var/obj/item/organ/organ_to_replace = input(user, "Which organ do you want to reattach?") as null|anything in attachable_organs
 	if(!organ_to_replace)
 		return 0
+	if(QDELETED(target) || QDELETED(organ_to_replace) || QDELETED(affected) || !(organ_to_replace in affected.implants) || organ_to_replace.loc != target || !(organ_to_replace.status & ORGAN_CUT_AWAY))
+		to_chat(user, "<span class='warning'>That organ is no longer available to attach.</span>")
+		return SURGERY_FAILURE
 	if(organ_to_replace.parent_organ != affected.organ_tag)
 		to_chat(user, "<span class='warning'>You can't find anywhere to attach [organ_to_replace] to!</span>")
 		return SURGERY_FAILURE
@@ -444,6 +451,9 @@
 	var/obj/item/organ/internal/organ_to_fix = input(user, "Which organ do you want to regenerate?") as null|anything in dead_organs
 	if(!organ_to_fix)
 		return 0
+	if(QDELETED(target) || QDELETED(organ_to_fix) || organ_to_fix.owner != target || !(organ_to_fix in target.internal_organs) || (organ_to_fix.status & ORGAN_CUT_AWAY) || !(organ_to_fix.status & ORGAN_DEAD))
+		to_chat(user, "<span class='warning'>That organ is no longer available to regenerate.</span>")
+		return SURGERY_FAILURE
 	if(!organ_to_fix.can_recover())
 		to_chat(user, "<span class='notice'>The [organ_to_fix.name] is necrotic and can't be saved, it will need to be replaced.</span>")
 		return 0

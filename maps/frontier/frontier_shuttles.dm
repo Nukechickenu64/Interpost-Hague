@@ -384,7 +384,8 @@
 	name = "mining lift controls"
 	shuttle_tag = "Mining Lift"
 	ui_template = "shuttle_control_console_lift.tmpl"
-	icon_state = "tiny"
-	icon_keyboard = "tiny_keyboard"
-	icon_screen = "lift"
-	density = 0
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "platform"
+	icon_keyboard = null
+	icon_screen = null
+	density = 1

@@ -2,8 +2,8 @@
 
 Vending machines start with 10 creation charges. Product catalogs are recipes,
 not inventories: creating an item consumes charges rather than product stock.
-Every universal creation token is consumed on insertion and adds 10 charges to
-the machine's existing balance. Refills can accumulate above 10.
+Every universal Equipment Charge is consumed on insertion and adds 10 charges
+to a compatible vendor's existing balance. Refills can accumulate above 10.
 
 ## Costs
 
@@ -19,9 +19,10 @@ The shared `creation_charge_cost()` helper assigns these tiers:
 
 Computer vendors start at 3 charges per device, with additional charges for
 selected hardware upgrades. Antagonist uplinks use creation charges and the
-same item tiers, keeping their existing role restrictions. Universal tokens
-also refill an active uplink. Telecrystals remain physical teleportation
-supplies; they no longer refill uplinks or function as equipment currency.
+same item tiers, keeping their existing role restrictions. The universal
+Equipment Charge also refills an active uplink; specialty vendor charges do not.
+Telecrystals remain physical teleportation supplies; they no longer refill
+uplinks or function as equipment currency.
 Uplinks created as equipment start empty to prevent charge duplication.
 Human traitors retain their one-time plant collection of a charged fabricator;
 collection is independent of the removed Leverage shop.
@@ -35,8 +36,9 @@ biomass, research, electrical, and deity-power resources remain separate.
 ## Manual In-Game Checks
 
 - A security vendor starts at 10; a flash leaves 8 and handcuffs leave 7.
-- Inserting any existing refill-token variant adds 10, consumes the token, and
-  updates every open vendor interface.
+- Inserting an Equipment Charge into a compatible vendor adds 10, consumes the
+  charge, and updates every open vendor interface. Specialty charges are
+  accepted only by their matching vendor family.
 - An exhausted vendor creates nothing; refilling allows creation to resume.
 - Item returns do not restore charges or create per-product stock.
 - Access restrictions, hidden recipes, power checks, and vending delays remain

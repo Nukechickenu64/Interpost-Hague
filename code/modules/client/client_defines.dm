@@ -26,7 +26,7 @@
 	var/fullscreen = FALSE
 
 	perspective = EYE_PERSPECTIVE
-	mouse_pointer_icon = 'icons/misc/pointer_cursor.dmi'
+	mouse_pointer_icon = 'icons/os13/mob/mob/other/pointer_s.dmi'
 
 	var/widescreen = 0
 	var/vert_split = 0

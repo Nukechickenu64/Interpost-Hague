@@ -7,6 +7,8 @@
 	name = "OS13"
 	full_name = "Orbital Station 13"
 	path = "os13"
+	lobby_icon = 'maps/os13/os13_lobby.dmi'
+	lobby_screens = list("os13_title")
 	station_name = "Orbital Station 13"
 	station_short = "OS13"
 	station_levels = list(2,3,4,5,6,7,8,9)
@@ -21,6 +23,7 @@
 	. = ..()
 	station_name = "Orbital Station 13"
 	station_short = "OS13"
+	lobby_music = new /lobby_music/os13
 
 // The shell's first level is space, not Alpha's generated asteroid.
 /datum/map/os13/perform_map_generation()

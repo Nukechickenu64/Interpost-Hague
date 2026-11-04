@@ -13,6 +13,7 @@
 	icon_state = "ore"
 	randpixel = 8
 	w_class = ITEM_SIZE_SMALL
+	var/replicator_material_id
 
 /obj/item/ore/os13/attackby(obj/item/weapon/W, mob/user)
 	if(istype(W, /obj/item/device/core_sampler))
@@ -32,22 +33,25 @@
 /obj/item/ore/os13/iron
 	name = "iron ore"
 	ore = /ore/hematite
-	matter = list("steel" = 2000)
+	replicator_material_id = DEFAULT_WALL_MATERIAL
+	matter = list(DEFAULT_WALL_MATERIAL = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/ore/os13/zbrite
 	name = "zbrite"
 	ore = /ore/zbrite
-	matter = list("glass" = 2000)
+	replicator_material_id = "glass"
+	matter = list("glass" = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/ore/os13/elerium
 	name = "elerium"
 	ore = /ore/elerium
-	matter = list("plasteel" = 2000)
+	replicator_material_id = "plasteel"
+	matter = list("plasteel" = SHEET_MATERIAL_AMOUNT)
 
 /********************** Grav Cutter **********************/
 
 /obj/item/pickaxe/gravcutter
-	name = "grav cutter"
+	name = "TNC Gravcutter"
 	desc = "A portable graviton shear that cleanly slices mineral deposits apart in a single pass."
 	icon = 'icons/os13/objects/objects/weapons/gun.dmi'
 	icon_state = "gravcutter"
@@ -68,10 +72,19 @@
 /obj/item/pickaxe/gravcutter/get_digspeed(var/mob/user)
 	return 0
 
+/datum/design/item/os13_gravcutter
+	name = "TNC Gravcutter"
+	id = "os13_gravcutter"
+	req_tech = list(TECH_MATERIAL = 4, TECH_PHORON = 3, TECH_ENGINEERING = 3)
+	build_type = PROTOLATHE
+	materials = list(DEFAULT_WALL_MATERIAL = 2500, "plasteel" = 1000)
+	build_path = /obj/item/pickaxe/gravcutter
+	sort_string = "VAACDJ"
+
 /********************** Harvester **********************/
 
 /obj/structure/harvester
-	name = "harvester"
+	name = "Harvester"
 	desc = "A heavy collection crate on treads. While powered on, it collects loose ore, shards and scrap. Click it to power it, and use Release Contents in its right-click menu to empty it."
 	icon = 'icons/os13/objects/objects/mining.dmi'
 	icon_state = "harvester0"
@@ -83,6 +96,9 @@
 	icon_state = on ? "harvester1" : "harvester0"
 
 /obj/structure/harvester/attack_hand(mob/user)
+	if(!Adjacent(user) || user.incapacitated() || user.restrained())
+		to_chat(user, SPAN_WARNING("You cannot operate the Harvester from here or in your current condition."))
+		return
 	add_fingerprint(user)
 	on = !on
 	if(on)
@@ -103,11 +119,12 @@
 	var/turf/T = get_turf(src)
 	if(!T)
 		return
-	for(var/obj/item/O in T.contents)
-		if(O.anchored || !can_collect(O))
+	for(var/obj/item/O in T.contents.Copy())
+		if(QDELETED(O) || O.loc != T || O.anchored || !can_collect(O))
 			continue
 		O.forceMove(src)
-		scooped |= O
+		if(!QDELETED(O) && O.loc == src)
+			scooped |= O
 	if(scooped.len)
 		flick("harvester1", src)
 
@@ -137,9 +154,14 @@
 	var/turf/T = get_turf(src)
 	if(!T)
 		return FALSE
-	for(var/obj/item/O in contents)
+	for(var/obj/item/O in contents.Copy())
+		if(QDELETED(O) || O.loc != src)
+			continue
 		O.forceMove(T)
-	scooped.Cut()
+	scooped &= contents
+	for(var/obj/item/O in contents)
+		if(!QDELETED(O))
+			return FALSE
 	return TRUE
 
 /obj/structure/harvester/verb/release_ores()
@@ -150,7 +172,8 @@
 	if(!istype(usr, /mob/living/carbon/human))
 		to_chat(usr, "<span class='warning'>You are physically incapable of emptying the harvester.</span>")
 		return
-	if(usr.stat || usr.restrained())
+	if(usr.incapacitated() || usr.restrained())
+		to_chat(usr, SPAN_WARNING("You cannot empty the Harvester in your current condition."))
 		return
 	if(!Adjacent(usr))
 		to_chat(usr, "You cannot reach the harvester.")
@@ -163,5 +186,7 @@
 		to_chat(usr, "<span class='warning'>The harvester is empty.</span>")
 		return
 
-	release_contents()
+	if(!release_contents())
+		to_chat(usr, SPAN_WARNING("The Harvester could not release all of its contents."))
+		return
 	to_chat(usr, "<span class='notice'>You release everything the harvester has collected.</span>")

@@ -1,5 +1,7 @@
 var/global/list/station_gas_tanks = list()
 var/global/list/station_filter_hubs = list()
+// Same initialization order as machinery, without scanning unrelated machines.
+var/global/list/station_supply_vents = list()
 
 /proc/retire_legacy_piping(list/machines)
 	var/list/atmos_machinery_to_remove = list()
@@ -82,7 +84,7 @@ var/global/list/station_filter_hubs = list()
 	name = "station gas tank"
 	desc = "A large reserve of breathable gas for the station's atmosphere controls."
 	icon = 'icons/os13/objects/objects/machines/atmos2.dmi'
-	icon_state = "0,1"
+	icon_state = "0,0"
 	anchored = TRUE
 	density = FALSE
 	bound_width = 96
@@ -106,18 +108,23 @@ var/global/list/station_filter_hubs = list()
 	station_gas_tanks |= src
 	update_tile_appearance()
 
-// The reserve renders as a 3x2 arrangement of per-tile sprites from atmos2.dmi.
-// Row y = 0 is the north row, y = 1 is the south row; the object anchors the
-// southwest tile with icon_state "0,1".
+// The reserve renders as a 3-wide x 2-tall footprint of per-tile sprites from
+// atmos2.dmi, with a third row of art drawn above it. State "c,r" is column c,
+// row r counted from the southwest: row 0 is the south row, row 1 is the row
+// above it, and row 2 is overflow art above the footprint. The object anchors
+// the southwest tile with icon_state "0,0".
 /obj/machinery/station_gas_tank/proc/update_tile_appearance()
 	overlays.Cut()
-	icon_state = "0,1"
+	icon_state = "0,0"
 	var/list/tile_offsets = list(
-		list("1,1", 32, 0),
-		list("2,1", 64, 0),
-		list("0,0", 0, 32),
-		list("1,0", 32, 32),
-		list("2,0", 64, 32)
+		list("1,0", 32, 0),
+		list("2,0", 64, 0),
+		list("0,1", 0, 32),
+		list("1,1", 32, 32),
+		list("2,1", 64, 32),
+		list("0,2", 0, 64),
+		list("1,2", 32, 64),
+		list("2,2", 64, 64)
 	)
 	for(var/list/tile in tile_offsets)
 		var/image/piece = image(icon, tile[1])
@@ -137,7 +144,7 @@ var/global/list/station_filter_hubs = list()
 	if(get_supply_status())
 		return 1
 	var/list/demands = list()
-	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in SSmachines.machinery)
+	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in station_supply_vents)
 		if(QDELETED(vent))
 			continue
 		var/demand = vent.get_supply_demand(src)

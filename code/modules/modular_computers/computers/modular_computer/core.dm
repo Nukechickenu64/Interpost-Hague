@@ -103,6 +103,10 @@
 				icon_state = "os13_bsod"
 			else
 				icon_state = full_state
+			if(enabled && damage <= broken_damage)
+				var/image/glow = os13_computer_glow(icon, icon_state)
+				if(glow)
+					overlays += glow
 			return
 
 	icon_state = icon_state_unpowered

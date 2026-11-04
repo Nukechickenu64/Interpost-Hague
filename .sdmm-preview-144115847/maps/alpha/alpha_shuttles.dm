@@ -1,0 +1,629 @@
+//Helpers for the pods
+//If you want to make a new one
+//Just copy paste the pod 1 code and change 1 for 2 and so on
+/*
+/datum/shuttle/autodock/ferry/escape_pod
+	category = /datum/shuttle/autodock/ferry/escape_pod
+	sound_takeoff = 'sound/effects/rocket.ogg'
+	sound_landing = 'sound/effects/rocket_backwards.ogg'
+	var/number
+
+/datum/shuttle/autodock/ferry/escape_pod/New()
+	name = "Escape Pod [number]"
+	dock_target = "escape_pod_[number]"
+	arming_controller = "escape_pod_[number]_berth"
+	waypoint_station = "escape_pod_[number]_start"
+	landmark_transition = "escape_pod_[number]_internim"
+	waypoint_offsite = "escape_pod_[number]_out"
+	..()
+
+/obj/effect/shuttle_landmark/escape_pod/
+	var/number
+
+/obj/effect/shuttle_landmark/escape_pod/start
+	name = "Docked"
+
+/obj/effect/shuttle_landmark/escape_pod/start/New()
+	landmark_tag = "escape_pod_[number]_start"
+	docking_controller = "escape_pod_[number]_berth"
+	..()
+
+/obj/effect/shuttle_landmark/escape_pod/transit
+	name = "In transit"
+
+/obj/effect/shuttle_landmark/escape_pod/transit/New()
+	landmark_tag = "escape_pod_[number]_internim"
+	..()
+
+/obj/effect/shuttle_landmark/escape_pod/out
+	name = "Escaped"
+
+/obj/effect/shuttle_landmark/escape_pod/out/New()
+	landmark_tag = "escape_pod_[number]_out"
+	..()
+
+//Actually pods
+
+/datum/shuttle/autodock/ferry/escape_pod/escape_pod1
+	shuttle_area = /area/shuttle/escape_pod1/station
+	number = 1
+/obj/effect/shuttle_landmark/escape_pod/start/pod1
+	number = 1
+/obj/effect/shuttle_landmark/escape_pod/out/pod1
+	number = 1
+/obj/effect/shuttle_landmark/escape_pod/transit/pod1
+	number = 1
+*/
+//Rescue shuttle
+/*
+/datum/shuttle/autodock/multi/antag/rescue
+	name = "Rescue"
+	warmup_time = 0
+	destination_tags = list(
+		"nav_ert_deck1",
+		"nav_ert_deck2",
+		"nav_ert_deck3",
+		"nav_ert_deck4",
+		"nav_ert_deck5",
+		"nav_away_4",
+		"nav_derelict_4",
+		"nav_cluster_4",
+		"nav_ert_dock",
+		"nav_ert_start",
+		"nav_lost_supply_base_antag",
+		"nav_marooned_antag",
+		"nav_smugglers_antag",
+		"nav_magshield_antag",
+		"nav_casino_antag",
+		"nav_yacht_antag",
+		"nav_slavers_base_antag",
+		)
+	shuttle_area = /area/rescue_base/start
+	dock_target = "rescue_shuttle"
+	current_location = "nav_ert_start"
+	landmark_transition = "nav_ert_transition"
+	home_waypoint = "nav_ert_start"
+	announcer = "SEV Torch Sensor Array"
+	arrival_message = "Attention, vessel detected entering vessel proximity."
+	departure_message = "Attention, vessel detected leaving vessel proximity."
+
+/obj/effect/shuttle_landmark/ert/start
+	name = "Response Team Base"
+	landmark_tag = "nav_ert_start"
+	docking_controller = "rescue_base"
+
+/obj/effect/shuttle_landmark/ert/internim
+	name = "In transit"
+	landmark_tag = "nav_ert_transition"
+
+/obj/effect/shuttle_landmark/ert/dock
+	name = "Docking Port"
+	landmark_tag = "nav_ert_dock"
+	docking_controller = "rescue_shuttle_dock_airlock"
+
+/obj/effect/shuttle_landmark/ert/deck1
+	name =  "Southwest of Fourth deck"
+	landmark_tag = "nav_ert_deck1"
+
+/obj/effect/shuttle_landmark/ert/deck2
+	name = "Northwest of Third deck"
+	landmark_tag = "nav_ert_deck2"
+
+/obj/effect/shuttle_landmark/ert/deck3
+	name = "Northwest of Second deck"
+	landmark_tag = "nav_ert_deck3"
+
+/obj/effect/shuttle_landmark/ert/deck4
+	name = "Southwest of First Deck"
+	landmark_tag = "nav_ert_deck4"
+
+/obj/effect/shuttle_landmark/ert/deck5
+	name = "West of Bridge"
+	landmark_tag = "nav_ert_deck5"
+
+//SCGMC Assault Pod
+
+/datum/shuttle/autodock/ferry/specops/ert
+	name = "Special Operations"
+	warmup_time = 10
+	shuttle_area = /area/shuttle/specops/centcom
+	dock_target = "specops_shuttle_fore"
+	waypoint_station = "nav_specops_start"
+	waypoint_offsite = "nav_specops_out"
+
+/obj/effect/shuttle_landmark/specops/start
+	name = "Centcom"
+	landmark_tag = "nav_specops_start"
+	docking_controller = "specops_shuttle_port"
+
+/obj/effect/shuttle_landmark/specops/out
+	name = "Docking Bay"
+	landmark_tag = "nav_specops_out"
+	docking_controller = "specops_dock_airlock"
+*/
+//Cargo shuttle
+
+/datum/shuttle/autodock/ferry/supply/drone
+	name = "Supply"
+	location = 1
+	warmup_time = 10
+	shuttle_area = /area/supply/dock
+	dock_target = "supply_shuttle"
+	waypoint_offsite = "nav_cargo_start"
+	waypoint_station = "nav_cargo_station"
+
+/obj/effect/shuttle_landmark/supply/centcom
+	name = "Centcom"
+	landmark_tag = "nav_cargo_start"
+
+/obj/effect/shuttle_landmark/supply/station
+	name = "Dock Station"
+	landmark_tag = "nav_cargo_station"
+	docking_controller = "cargo_bay"
+
+
+//Mining shuttle
+/datum/shuttle/autodock/multi/mining
+	name = "Mining"
+	warmup_time = 10
+	move_time = 120
+	shuttle_area = /area/shuttle/mining/station
+	dock_target = "mining_shuttle"
+	current_location = "nav_mining_start"
+	landmark_transition = "mining_transition"
+	destination_tags = list(
+		"nav_mining_start"
+		)
+
+/datum/shuttle/autodock/multi/mining/build_destinations_cache()
+	last_cache_rebuild_time = world.time
+	destinations_cache.Cut()
+	var/obj/effect/shuttle_landmark/space_waypoint = get_station_space_waypoint()
+	var/space_waypoint_tag = space_waypoint ? space_waypoint.landmark_tag : null
+
+	// Require travelling to the Space waypoint before other nav_mining_* destinations become available
+	// Debug trace: log current location and count of registered nav_mining* waypoints
+	if(config && config.log_debug)
+		var/cl_tag = (current_location ? current_location.landmark_tag : "<null>")
+		var/nav_count = 0
+		for(var/_tag in SSshuttle.registered_shuttle_landmarks)
+			if(findtext(_tag, "nav_mining_") == 1)
+				nav_count++
+		log_debug("Mining.build_destinations_cache: current=[cl_tag] registered_nav_mining=[nav_count] total_landmarks=[SSshuttle.registered_shuttle_landmarks.len] space_tag=[space_waypoint_tag]")
+
+	if(current_location && (current_location.landmark_tag == "nav_mining_space_ruins" || current_location.landmark_tag == "mining_space"))
+		// At space: discover all mining-related waypoints dynamically, including SOS beacons
+		var/static/regex/token_finder = regex("^nav_mining_")
+		var/included = 0
+		var/skipped = 0
+		for(var/destination_tag in SSshuttle.registered_shuttle_landmarks)
+			if(token_finder.Find(destination_tag) || destination_tag == "mining_space" || destination_tag == "nav_mining_space_ruins")
+				var/obj/effect/shuttle_landmark/L = SSshuttle.get_landmark(destination_tag)
+				if(istype(L))
+					// If a landmark is restricted, only include it if it's for the Mining shuttle
+					if((!L.shuttle_restricted || L.shuttle_restricted == "Mining") && get_mining_expedition().can_visit(L))
+						destinations_cache["[L.name]"] = L
+						included++
+					else
+						skipped++
+		if(config && config.log_debug)
+			log_debug("Mining.build_destinations_cache: at-space include=[included] skip=[skipped]")
+	else
+		// Not at space: only allow going to the available Mining space waypoint.
+		if(istype(space_waypoint) && get_mining_expedition().can_visit(space_waypoint))
+			destinations_cache["Space"] = space_waypoint
+		if(config && config.log_debug)
+			log_debug("Mining.build_destinations_cache: not-at-space has_space=[istype(space_waypoint)] tag=[space_waypoint_tag]")
+
+/datum/shuttle/autodock/multi/mining/proc/get_station_space_waypoint()
+	if(!SSshuttle)
+		return null
+	var/obj/effect/shuttle_landmark/open_space = SSshuttle.get_landmark("mining_space")
+	if(istype(open_space))
+		return open_space
+	return SSshuttle.get_landmark("nav_mining_space_ruins")
+
+/datum/shuttle/autodock/multi/mining/get_destinations()
+	build_destinations_cache()
+	return destinations_cache
+
+/datum/shuttle/autodock/multi/mining/process_launch()
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(next_location && !expedition.can_visit(next_location))
+		expedition.fail(ismob(in_use) ? in_use : null, "SALVAGE COORDINATES PROHIBITED BY BRIDGE. DEPARTURE CANCELLED.")
+		cancel_launch(in_use)
+		next_location = null
+		return
+	if(expedition.mission_pending && (!next_location || !next_location.is_valid(src)))
+		expedition.mission_error = "TRANSIT NAVIGATION IS NOT READY."
+		expedition.finish_mission()
+		process_state = IDLE_STATE
+		in_use = null
+		return
+	if(next_location && expedition.is_expedition_landmark(next_location))
+		next_location.force_clear_footprint(src)
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/cancel_launch(var/user)
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(can_cancel() && expedition.mission_pending)
+		expedition.finish_mission()
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/attempt_move(var/obj/effect/shuttle_landmark/destination)
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(destination && expedition.is_expedition_landmark(destination))
+		if(destination.landmark_tag == "nav_mining_space_ruins" && ruins_gen_job)
+			if(ruins_gen_job.is_active() || ruins_gen_job.last_error || (expedition.mission_pending && !expedition.mission_ready))
+				return FALSE
+		destination.force_clear_footprint(src)
+	return ..()
+
+/datum/shuttle/autodock/multi/mining/process_arrived()
+	next_location = current_location
+	var/datum/mining_expedition_controller/expedition = get_mining_expedition()
+	if(expedition.mission_pending && current_location == expedition.mission_dock)
+		expedition.has_last_location = TRUE
+		expedition.finish_mission()
+	return ..()
+
+/obj/effect/shuttle_landmark/mining/station
+	name = "Station"
+	landmark_tag = "nav_mining_start"
+	docking_controller = "mining_airlock" // matches the airlock docking_port id_tag placed in alpha.dmm
+	base_turf = /turf/space
+
+// Classic's mapped Scout uses ordinary side airlocks at an exterior catwalk,
+// rather than Alpha's docking-port controller. Do not bind an absent device.
+/obj/effect/shuttle_landmark/mining/station/os13
+	name = "Scout berth"
+	docking_controller = null
+
+// Transit and open-space waypoints have no airlock to dock with, so they must not
+// inherit the station's docking controller tag.
+/obj/effect/shuttle_landmark/mining/transit
+	name = "In transit"
+	landmark_tag = "mining_transition"
+	base_turf = /turf/space
+
+/obj/effect/shuttle_landmark/mining/open_space
+	name = "Space"
+	landmark_tag = "mining_space"
+	base_turf = /turf/space
+
+// Intermediate free-fly waypoint to reach open space before discovering ruins
+/obj/effect/shuttle_landmark/mining/space
+	name = "Space Ruins"
+	landmark_tag = "nav_mining_space_ruins"
+	// No docking controller: this is a free space location
+	base_turf = /turf/space
+	base_area = /area/space/ruins
+
+// Ensure the space waypoint clears enough room for the mining shuttle to arrive
+/obj/effect/shuttle_landmark/mining/space
+	var/clear_radius = 8
+
+/obj/effect/shuttle_landmark/mining/space/Initialize()
+	. = ..()
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/effect/shuttle_landmark/mining/space/LateInitialize()
+	// Clear dense turfs in a circle so the shuttle can land safely
+	var/list/victims = circlerangeturfs(get_turf(src), clear_radius)
+	for(var/turf/T in victims)
+		if(T.density)
+			T.ChangeTurf(get_base_turf_by_area(T))
+
+/obj/effect/shuttle_landmark/mining/asteroid
+	name = "Asteroid"
+	landmark_tag = "nav_mining_asteroid"
+	docking_controller = "mining_outpost_airlock"
+	base_turf = /turf/simulated/floor/asteroid
+
+/obj/effect/shuttle_landmark/mining/derelict
+	name = "Derelict Outpost"
+	landmark_tag = "nav_mining_derelict"
+	docking_controller = "mining_outpost_airlock"
+	base_turf = /turf/simulated/floor/asteroid
+
+//Emergency shuttle
+
+/datum/shuttle/autodock/ferry/emergency/centcom
+	name = "Escape"
+	location = 1
+	warmup_time = 10
+	shuttle_area = /area/shuttle/escape/centcom
+	dock_target = "escape_shuttle"
+	landmark_transition = "nav_escape_transition"
+	waypoint_offsite = "nav_centcom_dock"
+	waypoint_station = "nav_escape_dock"
+
+/obj/effect/shuttle_landmark/escape/centcom
+	name = "Centcom"
+	landmark_tag = "nav_centcom_dock"
+	docking_controller = "centcom_dock"
+
+/obj/effect/shuttle_landmark/escape/internim
+	name = "In transit"
+	landmark_tag = "nav_escape_transition"
+
+/obj/effect/shuttle_landmark/escape/station
+	name = "Station"
+	landmark_tag = "nav_escape_dock"
+	docking_controller = "escape_dock"
+
+//Commented out till I map these in.
+//Merc
+
+/datum/shuttle/autodock/multi/antag/mercenary
+	name = "Mercenary"
+	warmup_time = 0
+	destination_tags = list(
+		"nav_merc_dock",
+		"nav_merc_north",
+		"nav_merc_south",
+		"nav_merc_east",
+		"nav_merc_west"
+		)
+	shuttle_area = /area/syndicate_station/start
+	dock_target = "merc_shuttle"
+	current_location = "nav_merc_start"
+	landmark_transition = "nav_merc_transition"
+	announcer = "Alpha Sensor Array"
+	home_waypoint = "nav_merc_start"
+	arrival_message = "Attention, vessel detected entering station proximity."
+	departure_message = "Attention, vessel detected leaving station proximity."
+
+/obj/effect/shuttle_landmark/merc/start
+	name = "Mercenary Base"
+	landmark_tag = "nav_merc_start"
+	docking_controller = "merc_base"
+	base_area = /area/syndicate_mothership
+	base_turf = /turf/simulated/floor/snow
+
+/obj/effect/shuttle_landmark/merc/internim
+	name = "In transit"
+	landmark_tag = "nav_merc_transition"
+
+/obj/effect/shuttle_landmark/merc/dock
+	name = "Arrival Port"
+	landmark_tag = "nav_merc_dock"
+	docking_controller = "specops_dock_airlock"
+
+/obj/effect/shuttle_landmark/merc/north
+	name = "North of the Station"
+	landmark_tag = "nav_merc_north"
+
+/obj/effect/shuttle_landmark/merc/south
+	name = "South of the Station"
+	landmark_tag = "nav_merc_south"
+
+/obj/effect/shuttle_landmark/merc/east
+	name = "East of the Station"
+	landmark_tag = "nav_merc_east"
+
+/obj/effect/shuttle_landmark/merc/west
+	name = "West of the Station"
+	landmark_tag = "nav_merc_west"
+
+//Ninja
+
+//Ninja Shuttle.
+
+//Skipjack
+/*
+/datum/shuttle/autodock/multi/antag/skipjack
+	name = "Skipjack"
+	warmup_time = 0
+	destination_tags = list(
+		"nav_skipjack_deck1",
+		"nav_skipjack_deck2",
+		"nav_skipjack_deck3",
+		"nav_skipjack_deck4",
+		"nav_skipjack_deck5",
+		"nav_away_7",
+		"nav_derelict_7",
+		"nav_cluster_7",
+		"nav_skipjack_dock",
+		"nav_skipjack_start",
+		"nav_lost_supply_base_antag",
+		"nav_marooned_antag",
+		"nav_smugglers_antag",
+		"nav_magshield_antag",
+		"nav_casino_antag",
+		"nav_yacht_antag",
+		"nav_slavers_base_antag",
+		)
+	shuttle_area =  /area/skipjack_station/start
+	dock_target = "skipjack_shuttle"
+	current_location = "nav_skipjack_start"
+	landmark_transition = "nav_skipjack_transition"
+	announcer = "SEV Torch Sensor Array"
+	home_waypoint = "nav_skipjack_start"
+	arrival_message = "Attention, vessel detected entering vessel proximity."
+	departure_message = "Attention, vessel detected leaving vessel proximity."
+
+/obj/effect/shuttle_landmark/skipjack/start
+	name = "Raider Outpost"
+	landmark_tag = "nav_skipjack_start"
+	docking_controller = "skipjack_base"
+
+/obj/effect/shuttle_landmark/skipjack/internim
+	name = "In transit"
+	landmark_tag = "nav_skipjack_transition"
+
+/obj/effect/shuttle_landmark/skipjack/dock
+	name = "Docking Port"
+	landmark_tag = "nav_skipjack_dock"
+	docking_controller = "skipjack_shuttle_dock_airlock"
+
+/obj/effect/shuttle_landmark/skipjack/deck1
+	name = "Northwest of First Deck"
+	landmark_tag = "nav_skipjack_deck1"
+
+/obj/effect/shuttle_landmark/skipjack/deck2
+	name = "Southwest of the Second deck"
+	landmark_tag = "nav_skipjack_deck2"
+
+/obj/effect/shuttle_landmark/skipjack/deck3
+	name = "Southeast of Third deck"
+	landmark_tag = "nav_skipjack_deck3"
+
+/obj/effect/shuttle_landmark/skipjack/deck4
+	name = "Northwest of Fourth Deck"
+	landmark_tag = "nav_skipjack_deck4"
+
+/obj/effect/shuttle_landmark/skipjack/deck5
+	name = "South of Bridge"
+	landmark_tag = "nav_skipjack_deck5"
+*/
+ //////////////////////////////////////////////////
+
+/area/shuttle/lift
+  name = "Cargo Lift"
+  icon_state = "shuttle3"
+
+/obj/effect/shuttle_landmark/lift/top
+	name = "Top Deck"
+	landmark_tag = "nav_lift_top"
+	base_area = /area/quartermaster/office
+	base_turf = /turf/simulated/open
+
+/obj/effect/shuttle_landmark/lift/bottom
+	name = "Lower Deck"
+	landmark_tag = "nav_lift_bottom"
+	base_area = /area/quartermaster/storage
+	base_turf = /turf/simulated/floor/plating
+
+/datum/shuttle/autodock/ferry/lift
+	name = "Cargo Lift"
+	shuttle_area = /area/shuttle/lift
+	warmup_time = 3	//give those below some time to get out of the way
+	waypoint_station = "nav_lift_top"
+	waypoint_offsite = "nav_lift_bottom"
+	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
+	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
+	ceiling_type = null
+	knockdown = 0
+
+/obj/machinery/computer/shuttle_control/lift
+	name = "cargo lift controls"
+	shuttle_tag = "Cargo Lift"
+	ui_template = "shuttle_control_console_lift.tmpl"
+	icon_state = "tiny"
+	icon_keyboard = "tiny_keyboard"
+	icon_screen = "lift"
+	density = 0
+
+/area/shuttle/lift2
+  name = "Mining Lift"
+  icon_state = "shuttle3"
+
+/obj/effect/shuttle_landmark/lift2/top
+	name = "Top Deck"
+	landmark_tag = "nav_mine_lift_top"
+	base_area = /area/quartermaster/storage
+	base_turf = /turf/simulated/open
+
+/obj/effect/shuttle_landmark/lift2/bottom
+	name = "Lower Deck"
+	landmark_tag = "nav_mine_lift_bottom"
+	base_area = /area/quartermaster/miningdock
+	base_turf = /turf/simulated/floor/plating
+
+/datum/shuttle/autodock/ferry/lift2
+	name = "Mining Lift"
+	shuttle_area = /area/shuttle/lift2
+	warmup_time = 6	//give those below some time to get out of the way
+	waypoint_station = "nav_mine_lift_top"
+	waypoint_offsite = "nav_mine_lift_bottom"
+	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
+	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
+	ceiling_type = null
+	knockdown = 0
+
+/obj/machinery/computer/shuttle_control/lift2
+	name = "mining lift controls"
+	shuttle_tag = "Mining Lift"
+	ui_template = "shuttle_control_console_lift.tmpl"
+	icon = 'icons/os13/objects/objects/computer.dmi'
+	icon_state = "platform"
+	icon_keyboard = null
+	icon_screen = null
+	density = 1
+
+/area/shuttle/lift3
+  name = "Cryo Lift"
+  icon_state = "shuttle3"
+
+/obj/effect/shuttle_landmark/lift3/top
+	name = "Top Deck"
+	landmark_tag = "nav_cryo_lift_top"
+	base_area = /area/quartermaster/storage
+	base_turf = /turf/simulated/open
+
+/obj/effect/shuttle_landmark/lift3/bottom
+	name = "Lower Deck"
+	landmark_tag = "nav_cryo_lift_bottom"
+	base_area = /area/quartermaster/miningdock
+	base_turf = /turf/simulated/floor/plating
+
+/datum/shuttle/autodock/ferry/lift3
+	name = "Cryo Lift"
+	defer_initialisation = TRUE
+	shuttle_area = /area/shuttle/lift3
+	warmup_time = 6	//give those below some time to get out of the way
+	waypoint_station = "nav_cryo_lift_top"
+	waypoint_offsite = "nav_cryo_lift_bottom"
+	sound_takeoff = 'sound/effects/lift_heavy_start.ogg'
+	sound_landing = 'sound/effects/lift_heavy_stop.ogg'
+	current_location = "nav_cryo_lift_bottom"
+	ceiling_type = null
+	knockdown = 0
+
+/obj/machinery/computer/shuttle_control/lift3
+	name = "cryogenic lift controls"
+	shuttle_tag = "Cryo Lift"
+	ui_template = "shuttle_control_console_lift.tmpl"
+	icon_state = "tiny"
+	icon_keyboard = "tiny_keyboard"
+	icon_screen = "lift"
+	density = 0
+
+
+/obj/turbolift_map_holder/alpha
+	icon = 'icons/obj/turbolift_preview_3x3.dmi'
+	depth = 2
+	lift_size_x = 4
+	lift_size_y = 4
+
+/obj/turbolift_map_holder/alpha/freight_elevator
+	name = "Alpha turbolift map placeholder"
+	areas_to_use = list(
+		/area/turbolift/first,
+		/area/turbolift/second
+		)
+
+// Elevator areas.
+/area/turbolift/first
+	name = "First Floor"
+	lift_floor_label = "Sector A"
+	lift_floor_name = "Under"
+	lift_announce_str = "Arrived to the Lower Floor."
+	base_turf = /turf/simulated/floor
+
+/area/turbolift/second
+	name = "Second Floor"
+	lift_floor_label = "Sector B"
+	lift_floor_name = "Upper"
+	lift_announce_str = "Arrived to the Upper Floor."
+
+/obj/turbolift_map_holder/alpha/cargo
+	icon = 'icons/obj/turbolift_preview_2x2.dmi'
+	depth = 2
+	lift_size_x = 3
+	lift_size_y = 3
+	areas_to_use = list(
+		/area/turbolift/first,
+		/area/turbolift/second
+		)

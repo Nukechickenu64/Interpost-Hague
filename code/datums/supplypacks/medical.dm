@@ -21,6 +21,26 @@
 	contains = list(/obj/item/storage/box/bloodpacks = 3)
 	containername = "\improper Blood pack crate"
 
+/decl/hierarchy/supply_pack/medical/os13_genecode
+	name = "Blank GENECODE diskettes"
+	contains = list(/obj/item/disk/data/os13_genecode = 5)
+	containername = "GENECODE diskette crate"
+
+/decl/hierarchy/supply_pack/medical/os13_surgery
+	name = "OS13 surgical instruments"
+	contains = list(/obj/item/storage/firstaid/surgery/os13)
+	containername = "OS13 surgical instruments crate"
+
+/decl/hierarchy/supply_pack/medical/os13_psychocorrection
+	name = "Psychocorrection equipment"
+	contains = list(/obj/machinery/os13_correctional_apparatus{anchored = FALSE}, /obj/machinery/computer/os13_psychocorrection{anchored = FALSE})
+	containername = "Psychocorrection equipment crate"
+
+/decl/hierarchy/supply_pack/medical/os13_neuroinhibitor
+	name = "Stationary Neuroinhibitor"
+	contains = list(/obj/machinery/os13_neuroinhibitor{anchored = FALSE})
+	containername = "Stationary Neuroinhibitor crate"
+
 /decl/hierarchy/supply_pack/medical/blood
 	name = "Nanoblood crate"
 	contains = list(/obj/item/reagent_containers/ivbag/nanoblood = 4)

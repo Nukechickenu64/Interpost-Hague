@@ -85,7 +85,7 @@ GLOBAL_LIST_INIT(replicator_material_names, list("steel" = "steel", "plasteel" =
 	return ..()
 
 /obj/machinery/replicator_storage_compartment/proc/connected()
-	return !QDELETED(controller) && !(stat & BROKEN) && !(controller.stat & BROKEN) && isturf(controller.loc) && loc == get_step(controller, position)
+	return !QDELETED(src) && !(stat & BROKEN) && !QDELETED(controller) && !(controller.stat & BROKEN) && isturf(controller.loc) && loc == get_step(controller, position)
 
 /obj/machinery/replicator_storage_compartment/examine(mob/user)
 	. = ..()
@@ -123,10 +123,13 @@ GLOBAL_LIST_INIT(replicator_material_names, list("steel" = "steel", "plasteel" =
 	if(!istype(item, /obj/item/stack/material))
 		return ..()
 	var/obj/item/stack/material/sheets = item
-	if(!connected() || sheets.uses_charge || sheets.material.name != material_id)
+	if(!connected())
+		to_chat(user, SPAN_WARNING("The [material_label] compartment is unavailable."))
+		return
+	if(sheets.uses_charge || sheets.material.name != material_id)
 		to_chat(user, SPAN_WARNING("This [material_label] compartment only accepts [material_id] sheets."))
 		return
-	var/amount = min(sheets.get_amount(), round((capacity - stored_material) / sheets.perunit))
+	var/amount = min(sheets.get_amount(), floor((capacity - stored_material) / sheets.perunit))
 	if(amount < 1)
 		to_chat(user, SPAN_WARNING("There is no room for another sheet."))
 		return
@@ -198,5 +201,7 @@ GLOBAL_LIST_INIT(replicator_material_names, list("steel" = "steel", "plasteel" =
 			missing += "[required] [material_name(material_id)]"
 	for(var/chemical in D.chemicals)
 		if(!reagents.has_reagent(chemical, D.chemicals[chemical] * mat_efficiency))
-			missing += chemical
+			var/datum/reagent/R = chemical
+			var/required = D.chemicals[chemical] * mat_efficiency - reagents.get_reagent_amount(chemical)
+			missing += "[required] units of [initial(R.name)]"
 	return english_list(missing)

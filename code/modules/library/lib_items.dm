@@ -57,7 +57,8 @@
 	if(contents.len)
 		var/obj/item/book/choice = input("Which book would you like to remove from the shelf?") as null|obj in contents
 		if(choice)
-			if(!usr.canmove || usr.stat || usr.restrained() || !in_range(loc, usr))
+			if(!user.canmove || user.stat || user.restrained() || !Adjacent(user) || choice.loc != src)
+				to_chat(user, SPAN_WARNING("You can no longer retrieve that book from the shelf."))
 				return
 			if(ishuman(user))
 				if(!user.get_active_hand())
@@ -93,6 +94,45 @@
 		icon_state = "book-[contents.len]"
 	else
 		icon_state = "book-5"
+
+/obj/structure/bookcase/os13
+	icon = 'icons/os13/objects/objects/bookcase.dmi'
+	icon_state = "bookcase"
+
+/obj/structure/bookcase/os13/update_icon()
+	var/book_count = 0
+	for(var/obj/item/book/B in src)
+		book_count++
+	icon_state = book_count ? "a[min(book_count, 15)]" : "bookcase"
+
+/obj/structure/bookcase/os13/attackby(obj/O, mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		if(user)
+			to_chat(user, SPAN_WARNING("You must be able to reach the bookcase."))
+		return
+	if(istype(O, /obj/item/book))
+		var/obj/item/book/B = O
+		if(B.loc != user || !user.unEquip(B, target = src))
+			to_chat(user, SPAN_WARNING("You must be able to release the held book."))
+			return
+		update_icon()
+		return
+	return ..()
+
+/obj/structure/bookcase/os13/attack_hand(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		if(user)
+			to_chat(user, SPAN_WARNING("You must be able to reach the bookcase."))
+		return
+	return ..()
+
+/obj/structure/bookcase/os13/Entered(atom/movable/O, atom/oldloc)
+	. = ..()
+	update_icon()
+
+/obj/structure/bookcase/os13/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	update_icon()
 
 
 

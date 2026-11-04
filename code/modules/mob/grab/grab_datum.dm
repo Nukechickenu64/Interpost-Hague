@@ -372,8 +372,8 @@
 		else
 			report_resist_contest(G, modifier_lines, break_strength, break_chance, "[affecting] breaks free.")
 			affecting.visible_message(
-				"<span class='combat'>[affecting] has broken free of [assailant]'s grip!</span>",
-				"<span class='notice'>You break free of [assailant]'s grip!</span>"
+				"<span class='combat'>[affecting] struggles with [assailant] and wins!</span>",
+				"<span class='notice'>You struggle with [assailant] and win!</span>"
 			)
 			let_go(G)
 	else

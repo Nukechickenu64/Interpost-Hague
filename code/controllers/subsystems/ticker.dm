@@ -27,6 +27,8 @@ SUBSYSTEM_DEF(ticker)
 	var/looking_for_antags = 0
 	var/round_started_without_captain = 0
 	var/bypass_captain_check = 0
+	var/ai_crew_enabled = FALSE
+	var/datum/crew_roster/ai_crew
 
 	var/datum/round_event/eof
 
@@ -141,7 +143,8 @@ SUBSYSTEM_DEF(ticker)
 			return
 
 	// This means we succeeded in picking a game mode.
-	var/skip_captain_check = GLOB.role_debug_mode || bypass_captain_check || !mode.uses_station_jobs
+	var/crew_captain = ai_crew_enabled && mode.uses_station_jobs && crew_can_staff_captain()
+	var/skip_captain_check = GLOB.role_debug_mode || bypass_captain_check || !mode.uses_station_jobs || crew_captain
 	bypass_captain_check = 0
 	if(!skip_captain_check && !captain_assigned())
 		mode.fail_setup()
@@ -158,6 +161,11 @@ SUBSYSTEM_DEF(ticker)
 	collect_minds()
 	//matchmaker.do_family_matchmaking()  //Do this before equipping
 	var/captainless = equip_characters()
+	if(ai_crew_enabled && mode.uses_station_jobs)
+		ai_crew = new
+		ai_crew.populate()
+		if(ai_crew.has_captain())
+			captainless = FALSE
 	round_started_without_captain = captainless
 	if (config.roundstart_events && mode.uses_station_jobs)
 		eof = captainless ? new /datum/round_event/captainless : pick_round_event()
@@ -170,6 +178,8 @@ SUBSYSTEM_DEF(ticker)
 
 	callHook("roundstart")
 	GLOB.cryo_startup_effect.start()
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		GLOB.using_map.send_welcome()
 
 	spawn(0)//Forking here so we dont have to wait for this to finish
 		mode.post_setup()
@@ -195,6 +205,9 @@ SUBSYSTEM_DEF(ticker)
 
 	if(mode_finished && game_finished())
 		Master.SetRunLevel(RUNLEVEL_POSTGAME)
+		GLOB.station_wake_sequence.stop()
+		GLOB.cryo_startup_effect.stop()
+		GLOB.bridge_crew_objectives.stop_tracking()
 		end_game_state = END_GAME_READY_TO_END
 		INVOKE_ASYNC(src, .proc/declare_completion)
 		if(config.allow_map_switching && config.auto_map_vote && GLOB.all_maps.len > 1)
@@ -285,6 +298,8 @@ SUBSYSTEM_DEF(ticker)
 	delay_notified = SSticker.delay_notified
 
 	minds = SSticker.minds
+	ai_crew_enabled = SSticker.ai_crew_enabled
+	ai_crew = SSticker.ai_crew
 
 /*
 Helpers

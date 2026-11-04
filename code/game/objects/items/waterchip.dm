@@ -3,8 +3,13 @@ GLOBAL_VAR_INIT (waterchip_installed,0)
 /obj/item/device/waterchip
 	name = "water chip"
 	desc = "This neat thing provides water to the entire station if installed properly."
-	icon_state = "chip"
-	icon = 'icons/obj/waterchip.dmi'
+	icon_state = "module1"
+	icon = 'icons/os13/objects/objects/hitech_parts.dmi'
+	item_state = "electronic"
+	item_icons = list(
+		slot_l_hand_str = 'icons/os13/mob/mob/items/items_lefthand.dmi',
+		slot_r_hand_str = 'icons/os13/mob/mob/items/items_righthand.dmi'
+	)
 	force = 1
 	w_class = 3
 	slot_flags = SLOT_HEAD | SLOT_MASK

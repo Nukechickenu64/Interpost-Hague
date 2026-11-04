@@ -5,7 +5,7 @@
 	var/mob/living/carbon/human/occupant
 	var/locked
 	name = "Body Scanner"
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/os13/objects/objects/Cryogenic2.dmi'
 	icon_state = "body_scanner_0"
 	density = 1
 	anchored = 1
@@ -13,6 +13,40 @@
 
 	idle_power_usage = 60
 	active_power_usage = 10000	//10 kW. It's a big all-body scanner.
+	var/scanner_state_prefix = "body_scanner"
+	var/scanner_glow_state = "bodyscan0"
+
+/obj/machinery/bodyscanner/mirrored
+	icon_state = "body_scanner1_0"
+	scanner_state_prefix = "body_scanner1"
+	scanner_glow_state = "bodyscan1"
+
+/obj/machinery/bodyscanner/Initialize()
+	. = ..()
+	update_icon()
+
+/obj/machinery/bodyscanner/update_icon()
+	overlays.Cut()
+	var/running = occupant && !QDELETED(occupant) && occupant.loc == src && operable() && powered()
+	icon_state = "[scanner_state_prefix]_[running ? "1" : "0"]"
+	if(running)
+		overlays += overlay_image(icon, scanner_glow_state, plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+	set_light(running ? 1 : 0, 0.5, "#80eaff")
+
+/obj/machinery/bodyscanner/power_change()
+	. = ..()
+	update_icon()
+
+/obj/machinery/bodyscanner/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	if(O == occupant)
+		if(occupant.client)
+			occupant.client.eye = occupant
+			occupant.client.perspective = MOB_PERSPECTIVE
+		occupant = null
+		locked = FALSE
+		update_use_power(POWER_USE_IDLE)
+		update_icon()
 
 /obj/machinery/bodyscanner/Destroy()
 	if(occupant && occupant.loc == src)
@@ -54,7 +88,7 @@
 	if (src.occupant && QDELETED(src.occupant))
 		src.occupant = null
 		update_use_power(1)
-		src.icon_state = "body_scanner_0"
+		update_icon()
 	if (src.occupant)
 		to_chat(usr, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -68,7 +102,7 @@
 	src.occupant = usr
 	playsound(src, 'sound/machines/scanner_entry.ogg', 50)
 	update_use_power(2)
-	src.icon_state = "body_scanner_1"
+	update_icon()
 	for(var/obj/O in src.contents.Copy())
 		O.dropInto(loc)
 	src.add_fingerprint(usr)
@@ -78,7 +112,7 @@
 	if (src.occupant && QDELETED(src.occupant))
 		src.occupant = null
 		update_use_power(1)
-		src.icon_state = "body_scanner_0"
+		update_icon()
 	if ((!( src.occupant ) || src.locked))
 		return
 	for(var/obj/O in src)
@@ -91,7 +125,7 @@
 	src.occupant.dropInto(loc)
 	src.occupant = null
 	update_use_power(1)
-	src.icon_state = "body_scanner_0"
+	update_icon()
 	return
 
 /obj/machinery/bodyscanner/attackby(obj/item/grab/normal/G, user as mob)
@@ -102,7 +136,7 @@
 	if (src.occupant && QDELETED(src.occupant))
 		src.occupant = null
 		update_use_power(1)
-		src.icon_state = "body_scanner_0"
+		update_icon()
 	if (src.occupant)
 		to_chat(user, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -113,7 +147,7 @@
 	M.forceMove(src)
 	src.occupant = M
 	update_use_power(2)
-	src.icon_state = "body_scanner_1"
+	update_icon()
 	for(var/obj/O in src.contents.Copy())
 		O.forceMove(loc)
 	src.add_fingerprint(user)
@@ -128,7 +162,7 @@
 	if (src.occupant && QDELETED(src.occupant))
 		src.occupant = null
 		update_use_power(1)
-		src.icon_state = "body_scanner_0"
+		update_icon()
 	if (src.occupant)
 		to_chat(user, "<span class='warning'>The scanner is already occupied!</span>")
 		return
@@ -141,11 +175,14 @@
 	user.visible_message("<span class='notice'>\The [user] begins placing \the [target] into \the [src].</span>", "<span class='notice'>You start placing \the [target] into \the [src].</span>")
 	if(!do_after(user, 30, src))
 		return
+	if(QDELETED(target) || occupant || !CanMouseDrop(target, user) || target.abiotic() || target.buckled)
+		to_chat(user, "<span class='warning'>Loading interrupted: the subject or scanner is no longer available.</span>")
+		return
 	var/mob/M = target
 	M.forceMove(src)
 	src.occupant = M
 	update_use_power(2)
-	src.icon_state = "body_scanner_1"
+	update_icon()
 	for(var/obj/O in src.contents.Copy())
 		O.forceMove(loc)
 	src.add_fingerprint(user)
@@ -197,11 +234,8 @@
 	return
 
 /obj/machinery/body_scanconsole/update_icon()
-	if(stat & BROKEN)
+	if(stat & (BROKEN|NOPOWER))
 		icon_state = "body_scannerconsole-p"
-	else if (stat & NOPOWER)
-		spawn(rand(0, 15))
-			src.icon_state = "body_scannerconsole-p"
 	else
 		icon_state = initial(icon_state)
 
@@ -210,7 +244,7 @@
 	var/delete
 	var/temphtml
 	name = "Body Scanner Console"
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/os13/objects/objects/Cryogenic2.dmi'
 	icon_state = "body_scannerconsole"
 	density = 0
 	anchored = 1

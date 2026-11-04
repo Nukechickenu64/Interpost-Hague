@@ -47,6 +47,10 @@ mob/var/last_airflow_stun = 0
 					movable.GotoAirflowDest(local_strength / 10)
 				else
 					movable.RepelAirflowDest(local_strength / 10)
+			// Distance six is the last affected ring. Building the seventh
+			// frontier only performs collision checks for tiles never processed.
+			if(distance == 6)
+				continue
 			for(var/direction in GLOB.cardinal)
 				var/turf/simulated/neighbor = get_step(current, direction)
 				if(!istype(neighbor) || neighbor.zone != src || routes[neighbor])

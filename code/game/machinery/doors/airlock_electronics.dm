@@ -16,6 +16,17 @@
 	var/last_configurator = null
 	var/locked = 1
 	var/lockable = 1
+	var/map_door_access = null // Access programmed onto the installed door, not access to configure this board.
+
+/obj/item/airlock_electronics/apply_map_access()
+	..()
+	if(isnull(map_door_access))
+		return
+	var/list/requirements = parse_mapper_access(map_door_access, src, "map_door_access")
+	var/list/all_access = requirements["all"]
+	var/list/any_access = requirements["any"]
+	one_access = !!any_access.len
+	conf_access = one_access ? any_access : all_access
 
 
 /obj/item/airlock_electronics/attack_self(mob/user as mob)

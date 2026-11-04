@@ -1,0 +1,29 @@
+#define UNIT_TEST
+#include "Interpost-Hague.dme"
+#include "code\unit_tests\lighting_los_tests.dm"
+#include "code\unit_tests\simulation_optimization_tests.dm"
+#include "code\unit_tests\runtime_profile_tests.dm"
+
+/datum/controller/subsystem/unit_tests/Initialize(timeofday)
+	. = ..()
+	SSticker.can_fire = FALSE
+	// The production map does not contain generic atmosphere test landmarks.
+	// Supply a sealed, powered fixture away from the lighting/engineer fixtures.
+	var/area/test_area/powered_non_dynamic_lighting/test_area = new
+	var/turf/center = locate(world.maxx - 65, world.maxy - 65, world.maxz)
+	for(var/turf/T in range(2, center))
+		test_area.contents += T
+		if(get_dist(T, center) == 2)
+			T.ChangeTurf(/turf/simulated/wall)
+		else
+			T.ChangeTurf(/turf/simulated/floor)
+	var/turf/safe = locate(center.x, center.y, center.z)
+	var/turf/space = locate(center.x + 8, center.y, center.z)
+	test_area.contents += space
+	space = space.ChangeTurf(/turf/space)
+	queue = list(new /datum/unit_test/simulation_optimization_atmos, new /datum/unit_test/simulation_optimization_shadows, new /datum/unit_test/atmos_machinery/station_supply, new /datum/unit_test/atmos_machinery/modcon_refill, new /datum/unit_test/atmos_machinery/canister_refill, new /datum/unit_test/atmos_machinery/modcon_recovery, new /datum/unit_test/atmos_machinery/modcon_cold_start, new /datum/unit_test/engineer_atmos_controls, new /datum/unit_test/engineer_atmos_flow, new /datum/unit_test/lighting_los_geometry, new /datum/unit_test/lighting_los_door, new /datum/unit_test/lighting_los_light, new /datum/unit_test/lighting_los_look_far, new /datum/unit_test/lighting_los_mesh, new /datum/unit_test/lighting_los_response, new /datum/unit_test/lighting_los_emission, new /datum/unit_test/lighting_los_drop_shadow, new /datum/unit_test/lighting_los_ao)
+	log_unit_test("Running atmospherics and lighting optimization regressions.")
+	queue += new /datum/unit_test/runtime_profile_telemetry
+	for(var/datum/unit_test/test in queue)
+		test.safe_landmark = safe
+		test.space_landmark = space

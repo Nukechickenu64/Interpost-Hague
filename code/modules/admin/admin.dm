@@ -640,6 +640,13 @@ var/global/floorIsLava = 0
 	if(SSticker.master_mode == "secret")
 		dat += "<A href='?src=\ref[src];f_secret=1'>(Force Secret Mode)</A><br>"
 
+	dat += "<br>AI crew: <b>[SSticker.ai_crew_enabled ? "Enabled" : "Disabled"]</b><br>"
+	if(GAME_STATE == RUNLEVEL_LOBBY)
+		dat += "<A href='?src=\ref[src];toggle_ai_crew=1'>Toggle round-start AI crew</A><br>"
+	else
+		dat += "Round-start setting locked.<br>"
+	dat += "Fills vacant crew jobs. Experimental: advanced job AI is incomplete.<br>"
+
 	dat += {"
 		<BR>
 		<A href='?src=\ref[src];create_object=1'>Create Object</A><br>
@@ -652,7 +659,7 @@ var/global/floorIsLava = 0
 		</html>
 		"}
 
-	usr << browse(dat, "window=admin2;size=210x280")
+	usr << browse(dat, "window=admin2;size=300x430")
 	return
 
 /datum/admins/proc/Secrets(var/datum/admin_secret_category/active_category = null)

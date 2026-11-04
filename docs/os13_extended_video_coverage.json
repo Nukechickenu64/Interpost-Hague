@@ -1,0 +1,28 @@
+{
+  "scope": "Eight unique recordings from nine supplied paths",
+  "review_method": "Full-duration 10-second sampling and chat OCR; all 2-minute overviews and selected full-resolution frames inspected",
+  "every_frame_reviewed": false,
+  "audio_semantically_reviewed": false,
+  "unique_duration_seconds": 44017.286145,
+  "total_samples": 4413,
+  "total_ocr_records": 4236,
+  "unchanged_chat_samples": 177,
+  "source_directory": "D:\\os13archive",
+  "sources": [
+    {"id": "OVR", "slug": "overseer", "file": "Lifeweb OS13 A good Scientist Overseer story - Fliche (1080p, h264).mp4", "duration_seconds": 6077.133334, "nominal_fps": 60, "samples": 609, "ocr_records": 588, "unchanged_chat_samples": 21, "first_second": 0, "last_second": 6076},
+    {"id": "MED", "slug": "medical", "file": "Lifeweb OS13 A medical officer who end in a shot - Fliche (1080p, h264).mp4", "duration_seconds": 4021.294966, "nominal_fps": 25, "samples": 403, "ocr_records": 389, "unchanged_chat_samples": 14, "first_second": 0, "last_second": 4020},
+    {"id": "CAP", "slug": "captain", "file": "Lifeweb OS13 Another captain round - Fliche (1080p, h264).mp4", "duration_seconds": 7992.348277, "nominal_fps": 60, "samples": 801, "ocr_records": 766, "unchanged_chat_samples": 35, "first_second": 0, "last_second": 7991},
+    {"id": "GEN", "slug": "genetic-ai", "file": "Lifeweb OS13 More genetic and finally a working AI - Fliche (1080p, h264).mp4", "duration_seconds": 4649.789365, "nominal_fps": 60, "samples": 466, "ocr_records": 461, "unchanged_chat_samples": 5, "first_second": 0, "last_second": 4648},
+    {"id": "ALIEN", "slug": "pilot-alien", "file": "Lifeweb OS13 Second time pilot and alien return - Fliche (1080p, h264).mp4", "duration_seconds": 4993.166054, "nominal_fps": 60, "samples": 501, "ocr_records": 440, "unchanged_chat_samples": 61, "first_second": 0, "last_second": 4992},
+    {"id": "PIL", "slug": "pilot-second", "file": "Lifeweb OS13 Second time piloting - Fliche (1080p, h264).mp4", "duration_seconds": 4114.708730, "nominal_fps": 60, "samples": 413, "ocr_records": 412, "unchanged_chat_samples": 1, "first_second": 0, "last_second": 4113},
+    {"id": "RUIN", "slug": "pilot-ruin", "file": "Lifeweb OS13 Third time piloting and ruin exploration - Fliche (1080p, h264).mp4", "duration_seconds": 5118.344943, "nominal_fps": 25, "samples": 513, "ocr_records": 484, "unchanged_chat_samples": 29, "first_second": 0, "last_second": 5117},
+    {"id": "SCI", "slug": "science", "file": "Lifeweb OS13 Very productive Science story - Fliche (1080p, h264).mp4", "duration_seconds": 7050.500476, "nominal_fps": 60, "samples": 707, "ocr_records": 696, "unchanged_chat_samples": 11, "first_second": 0, "last_second": 7050}
+  ],
+  "duplicates": [
+    {
+      "canonical_id": "CAP",
+      "file": "Lifeweb OS13 Another captain round - Fliche (1080p, h264)(1).mp4",
+      "sha256_both_files": "C0FFE7B99C179C3F7ADF289737E0B1333DC6BC1B28D4C95DCDBD30D3AD03B275"
+    }
+  ]
+}

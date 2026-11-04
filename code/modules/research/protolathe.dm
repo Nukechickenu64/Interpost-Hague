@@ -11,6 +11,7 @@
 	active_power_usage = 5000
 
 	var/list/datum/design/queue = list()
+	var/queue_revision = 0
 	var/mat_efficiency = 1
 	var/converting = FALSE
 	var/datum/radiation_source/replicator/radiation_field
@@ -41,10 +42,18 @@
 	..()
 	if(converting || busy || panel_open || stat || !powered())
 		return
-	if(length(queue))
+	while(length(queue))
 		var/datum/design/D = queue[1]
+		if(!supports_design(D))
+			log_debug("Replicator [src] at [x],[y],[z] discarded an unavailable queued design.")
+			visible_message(SPAN_WARNING("\The [src] rejects an unavailable queued blueprint."))
+			removeFromQueue(1)
+			if(linked_console)
+				linked_console.updateUsrDialog()
+			continue
 		if(build(D))
 			removeFromQueue(1)
+		break
 
 /obj/machinery/r_n_d/protolathe/RefreshParts()
 	var/T = 0
@@ -66,33 +75,35 @@
 		return 1
 
 	if(istype(O, /obj/item/ore/os13))
-		if(!user)
+		if(!user || user.incapacitated() || !user.Adjacent(src) || O.loc != user)
+			to_chat(user, SPAN_WARNING("Hold the ore beside an operational Replicator to feed it in."))
 			return 1
-		var/material_id
-		if(istype(O, /obj/item/ore/os13/iron))
-			material_id = DEFAULT_WALL_MATERIAL
-		else if(istype(O, /obj/item/ore/os13/zbrite))
-			material_id = "glass"
-		else if(istype(O, /obj/item/ore/os13/elerium))
-			material_id = "plasteel"
+		var/obj/item/ore/os13/raw_ore = O
+		var/material_id = raw_ore.replicator_material_id
 		if(!material_id)
 			to_chat(user, "<span class='warning'>The replicator cannot make sense of this ore.</span>")
 			return 1
 		if(stat || !powered() || panel_open)
 			to_chat(user, "<span class='warning'>The replicator is offline right now.</span>")
 			return 1
+		if(material_capacity(material_id) - material_amount(material_id) < SHEET_MATERIAL_AMOUNT)
+			to_chat(user, "<span class='warning'>The replicator needs room for [SHEET_MATERIAL_AMOUNT] units of [material_name(material_id)] to accept this ore without wasting it.</span>")
+			return 1
 		var/ore_label = O.name
-		if(user.get_active_hand() == O)
-			user.drop_item()
-		O.forceMove(src)
-		var/recovered = store_material(material_id, SHEET_MATERIAL_AMOUNT)
+		if(!user.unEquip(O, FALSE, src))
+			to_chat(user, "<span class='warning'>You cannot feed \the [O] into the replicator while it cannot be removed from your inventory.</span>")
+			return 1
+		if(material_capacity(material_id) - material_amount(material_id) < SHEET_MATERIAL_AMOUNT)
+			O.forceMove(get_turf(user))
+			to_chat(user, "<span class='warning'>The available storage changed. The ore was returned without being consumed.</span>")
+			return 1
+		var/recovered = recover_os13_ore(raw_ore)
 		if(recovered <= 0)
 			O.forceMove(get_turf(user))
 			to_chat(user, "<span class='warning'>The replicator cannot store any more [material_name(material_id)] right now.</span>")
 			return 1
 		use_power_oneoff(active_power_usage)
 		conversion_pulse()
-		qdel(O)
 		to_chat(user, "<span class='notice'>You feed the [ore_label] into the replicator, recovering [recovered] units of [material_name(material_id)].</span>")
 		Process()
 		if(linked_console)
@@ -112,14 +123,30 @@
 	return 1
 
 /obj/machinery/r_n_d/protolathe/proc/addToQueue(var/datum/design/D)
+	if(!supports_design(D))
+		return FALSE
+	if(istype(GLOB.using_map, /datum/map/alpha) && (!linked_console || !linked_console.files || !linked_console.files.DesignHasReqs(D)))
+		return FALSE
 	queue += D
+	queue_revision++
 	Process()
+	return TRUE
 
 /obj/machinery/r_n_d/protolathe/proc/removeFromQueue(var/index)
+	if(!isnum(index) || index != round(index) || index < 1 || index > length(queue))
+		return FALSE
 	queue.Cut(index, index + 1)
-	return
+	queue_revision++
+	return TRUE
+
+/obj/machinery/r_n_d/protolathe/proc/supports_design(var/datum/design/D)
+	return istype(D) && !QDELETED(D) && D.build_path && (D.build_type & PROTOLATHE) && (!istype(GLOB.using_map, /datum/map/alpha) || (D.type in os13_research_designs()))
 
 /obj/machinery/r_n_d/protolathe/proc/canBuild(var/datum/design/D)
+	if(!supports_design(D))
+		return FALSE
+	if(istype(GLOB.using_map, /datum/map/alpha) && (!linked_console || !linked_console.files || !linked_console.files.DesignHasReqs(D)))
+		return FALSE
 	for(var/M in D.materials)
 		if(material_amount(M, TRUE) < D.materials[M] * mat_efficiency)
 			return 0
@@ -147,11 +174,12 @@
 
 /obj/machinery/r_n_d/protolathe/proc/finish_production()
 	var/datum/design/D = producing_design
-	if(!D)
-		return
 	// Recheck locks and shared stock at completion so another replicator cannot
 	// spend the same material, and locking a compartment stops it being consumed.
-	if(!stat && powered() && !panel_open && get_turf(src) == production_turf && canBuild(D))
+	if(!supports_design(D))
+		log_debug("Replicator [src] at [x],[y],[z] cancelled production because its blueprint became unavailable.")
+		visible_message(SPAN_WARNING("\The [src] cancels production: the blueprint is unavailable. No feedstock was consumed."))
+	else if(!stat && powered() && !panel_open && get_turf(src) == production_turf && canBuild(D))
 		for(var/M in D.materials)
 			consume_material(M, D.materials[M] * mat_efficiency)
 		for(var/C in D.chemicals)
@@ -164,6 +192,7 @@
 					new_item.matter[material] *= mat_efficiency
 	else
 		queue.Insert(1, D)
+		queue_revision++
 	producing_design = null
 	production_turf = null
 	busy = FALSE
@@ -175,6 +204,10 @@
 	// Only loose objects on the platform: never held, equipped, inserted or adjacent items.
 	if(!item || QDELETED(item) || !isturf(loc) || item.loc != loc || item.anchored || (item in component_parts))
 		return FALSE
+	if(istype(item, /obj/item/ore/os13))
+		var/obj/item/ore/os13/raw_ore = item
+		var/material_id = raw_ore.replicator_material_id
+		return !length(raw_ore.contents) && (material_id in GLOB.replicator_material_names) && material_capacity(material_id) - material_amount(material_id) >= SHEET_MATERIAL_AMOUNT
 	if(istype(item, /obj/item/stack/material))
 		var/obj/item/stack/material/sheets = item
 		return !sheets.uses_charge && sheets.get_amount() > 0 && (sheets.material.name in GLOB.replicator_material_names)
@@ -212,17 +245,19 @@
 /obj/machinery/r_n_d/protolathe/proc/recover_item(obj/item/item)
 	if(!can_reclaim(item))
 		return FALSE
+	if(istype(item, /obj/item/ore/os13))
+		return recover_os13_ore(item) > 0
 	if(istype(item, /obj/item/stack/material))
 		var/obj/item/stack/material/sheets = item
 		var/material_name = sheets.material.name
-		var/amount = min(sheets.get_amount(), round((material_capacity(material_name) - material_amount(material_name)) / sheets.perunit))
+		var/amount = min(sheets.get_amount(), floor((material_capacity(material_name) - material_amount(material_name)) / sheets.perunit))
 		var/recovered = amount * sheets.perunit
 		if(amount <= 0 || !sheets.use(amount))
 			return FALSE
 		store_material(material_name, recovered)
 		return TRUE
 	var/recovered_any = FALSE
-	if(istype(item, /obj/item/device/electronic_assembly))
+	if(istype(item, /obj/item/device/electronic_assembly) && !istype(GLOB.using_map, /datum/map/alpha))
 		linked_console.add_ic_design(item)
 		recovered_any = TRUE
 	// Match a stock analyzer's recovery; upgrades improve it without creating matter.
@@ -234,6 +269,16 @@
 		return FALSE
 	qdel(item)
 	return TRUE
+
+/obj/machinery/r_n_d/protolathe/proc/recover_os13_ore(obj/item/ore/os13/raw_ore)
+	if(QDELETED(raw_ore) || raw_ore.anchored || length(raw_ore.contents) || !isturf(loc) || (raw_ore.loc != src && raw_ore.loc != loc))
+		return 0
+	var/material_id = raw_ore.replicator_material_id
+	if(!(material_id in GLOB.replicator_material_names) || material_capacity(material_id) - material_amount(material_id) < SHEET_MATERIAL_AMOUNT)
+		return 0
+	var/recovered = store_material(material_id, SHEET_MATERIAL_AMOUNT)
+	qdel(raw_ore)
+	return recovered
 
 /obj/machinery/r_n_d/protolathe/proc/conversion_pulse(flash_duration = 4)
 	var/turf/origin = get_turf(src)

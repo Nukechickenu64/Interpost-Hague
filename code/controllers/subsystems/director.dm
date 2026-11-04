@@ -671,8 +671,10 @@ SUBSYSTEM_DEF(director)
 		html += "<p><b>Monitoring offline:</b> AI Director updates are disabled; these are the last recorded readings.</p>"
 	else if(world.time - last_telemetry_sample > 2 * TELEMETRY_SAMPLE_INTERVAL)
 		html += "<p><b>Warning:</b> Telemetry is stale. Verify conditions locally.</p>"
+	if(!telemetry.power_controllers_total)
+		html += "<p><b>Power telemetry unavailable:</b> No station area power controllers were detected in this sample.</p>"
 	var/list/metrics = list(
-		list("key" = TELEMETRY_POWER_GRID, "name" = "Power supply", "meaning" = "Station area power controllers operating.", "advice" = "Check engine output, cabling and area power controllers."),
+		list("key" = TELEMETRY_POWER_GRID, "name" = "Power supply", "meaning" = "Station area power controllers supplying at least one distribution channel.", "advice" = "Check engine output, cabling, storage cells and area power controllers."),
 		list("key" = TELEMETRY_ATMOS_INTEGRITY, "name" = "Atmosphere", "meaning" = "Station areas passing temperature, oxygen and phoron checks.", "advice" = "Inspect air alarms, isolate unsafe compartments and restore breathable air."),
 		list("key" = TELEMETRY_STRUCTURAL, "name" = "Hull integrity", "meaning" = "Estimated intact structure; exposed station edges count as possible breaches.", "advice" = "Inspect damaged walls and exposed compartments; seal confirmed hull breaches."),
 		list("key" = TELEMETRY_COMMS_STATUS, "name" = "Communications", "meaning" = "Station telecomms relays enabled.", "advice" = "Inspect relay power and telecomms equipment; establish local communications."),

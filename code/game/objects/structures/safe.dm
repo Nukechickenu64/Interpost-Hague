@@ -13,8 +13,8 @@ FLOOR SAFES
 	anchored = 1
 	density = 1
 	var/open = 0		//is the safe open?
-	var/tumbler_1_pos	//the tumbler position- from 0 to 72
-	var/tumbler_1_open	//the tumbler position to open at- 0 to 72
+	var/tumbler_1_pos	//the tumbler position- from 0 to 71
+	var/tumbler_1_open	//the tumbler position to open at- 0 to 71
 	var/tumbler_2_pos
 	var/tumbler_2_open
 	var/dial = 0		//where is the dial pointing?
@@ -23,21 +23,22 @@ FLOOR SAFES
 
 
 /obj/structure/safe/New()
-	tumbler_1_pos = rand(0, 72)
-	tumbler_1_open = rand(0, 72)
+	tumbler_1_pos = rand(0, 71)
+	tumbler_1_open = rand(0, 71)
 
-	tumbler_2_pos = rand(0, 72)
-	tumbler_2_open = rand(0, 72)
+	tumbler_2_pos = rand(0, 71)
+	tumbler_2_open = rand(0, 71)
+	..()
 
 
 /obj/structure/safe/Initialize()
+	. = ..()
 	for(var/obj/item/I in loc)
 		if(space >= maxspace)
-			return
+			break
 		if(I.w_class + space <= maxspace) //todo replace with internal storage or something
 			space += I.w_class
 			I.forceMove(src)
-	. = ..()
 
 /obj/structure/safe/proc/check_unlocked(mob/user as mob, canhear)
 	if(user && canhear)
@@ -163,6 +164,90 @@ FLOOR SAFES
 
 obj/structure/safe/ex_act(severity)
 	return
+
+/obj/structure/safe/os13
+	name = "electronic safe"
+	desc = "A compact safe with a combination dial and illuminated lock indicators."
+	icon = 'icons/os13/objects/objects/newsafe.dmi'
+	icon_state = "safe_closed"
+	var/safe_sprite_prefix = "safe"
+	var/safe_animation
+	var/safe_animation_serial = 0
+
+/obj/structure/safe/os13/old
+	name = "old electronic safe"
+	icon_state = "oldsafe_closed"
+	safe_sprite_prefix = "oldsafe"
+
+/obj/structure/safe/os13/Initialize()
+	. = ..()
+	recount_space()
+	update_icon()
+
+/obj/structure/safe/os13/proc/recount_space()
+	space = 0
+	for(var/obj/item/I in src)
+		space += I.w_class
+
+/obj/structure/safe/os13/update_icon()
+	overlays.Cut()
+	icon_state = "[safe_sprite_prefix]_[open ? "open" : "closed"]"
+	var/light_state = safe_animation ? "[safe_sprite_prefix]_[safe_animation]1" : "[icon_state]1"
+	overlays += overlay_image(icon, light_state, plane = ABOVE_LIGHTING_PLANE, layer = ABOVE_LIGHTING_LAYER)
+
+/obj/structure/safe/os13/proc/animate_safe(state)
+	safe_animation = state
+	var/serial = ++safe_animation_serial
+	update_icon()
+	flick("[safe_sprite_prefix]_[state]", src)
+	addtimer(CALLBACK(src, .proc/finish_safe_animation, serial), 10)
+
+/obj/structure/safe/os13/proc/finish_safe_animation(serial)
+	if(serial != safe_animation_serial)
+		return
+	safe_animation = null
+	update_icon()
+
+/obj/structure/safe/os13/attack_hand(mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		if(user)
+			to_chat(user, SPAN_WARNING("You must be able to reach the safe's controls."))
+		return
+	return ..()
+
+/obj/structure/safe/os13/Topic(href, href_list)
+	if(!usr || usr.incapacitated() || !Adjacent(usr) || !ishuman(usr))
+		if(usr)
+			to_chat(usr, SPAN_WARNING("You can no longer operate the safe's controls."))
+		return
+	var/was_open = open
+	. = ..()
+	if(was_open != open)
+		animate_safe(open ? "opening" : "closing")
+	else if(href_list["open"])
+		animate_safe("denied")
+
+/obj/structure/safe/os13/attackby(obj/item/I, mob/user)
+	if(!user || user.incapacitated() || !Adjacent(user))
+		if(user)
+			to_chat(user, SPAN_WARNING("You must be able to reach the safe."))
+		return
+	if(!open)
+		return ..()
+	recount_space()
+	if(I.w_class + space > maxspace)
+		to_chat(user, SPAN_WARNING("\The [I] won't fit in \the [src]."))
+		return
+	if(I.loc != user || !user.unEquip(I, target = src))
+		to_chat(user, SPAN_WARNING("You must be able to release the held item."))
+		return
+	recount_space()
+	to_chat(user, SPAN_NOTICE("You put \the [I] in \the [src]."))
+	updateUsrDialog()
+
+/obj/structure/safe/os13/Exited(atom/movable/O, atom/newloc)
+	. = ..()
+	recount_space()
 
 //FLOOR SAFES
 /obj/structure/safe/floor

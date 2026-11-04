@@ -12,7 +12,11 @@
 		new_danger = atmosalm
 	if(tank && controller && controller.buildstage == 2 && !(controller.stat & (NOPOWER|BROKEN)) && !controller.shorted)
 		var/minimum_air = null
-		for(var/obj/machinery/atmospherics/unary/vent_pump/vent in src)
+		// Use the live vent registry instead of traversing every area turf and
+		// its contents. Resolve the current area so moved vents still count.
+		for(var/obj/machinery/atmospherics/unary/vent_pump/vent as anything in station_supply_vents)
+			if(!isturf(vent.loc) || get_area(vent) != src)
+				continue
 			var/turf/T = get_turf(vent)
 			var/datum/gas_mixture/air = T ? T.return_air() : null
 			if(air)
@@ -113,13 +117,15 @@
 		mode = AALARM_MODE_SCRUBBING
 	return changed
 
-/obj/machinery/alarm/proc/can_use_modcon(mob/user, obj/machinery/computer/station_gas_control/console = null)
+/obj/machinery/alarm/proc/can_use_modcon(mob/user, obj/machinery/computer/station_gas_control/console = null, obj/item/device/fixboy/advanced/remote = null)
+	if(remote)
+		return remote.can_control(user, src)
 	if(console)
 		return console.can_use_atmos_console(user, TRUE) && (alarm_area in console.controlled_areas()) && alarm_area.master_air_alarm == src && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
 	return user && !user.incapacitated() && user.Adjacent(src) && allowed(user) && !locked && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
 
-/obj/machinery/alarm/proc/apply_modcon_action(mob/user, list/command, obj/machinery/computer/station_gas_control/console = null)
-	if(!can_use_modcon(user, console) || !alarm_area)
+/obj/machinery/alarm/proc/apply_modcon_action(mob/user, list/command, obj/machinery/computer/station_gas_control/console = null, obj/item/device/fixboy/advanced/remote = null)
+	if(!can_use_modcon(user, console, remote) || !alarm_area)
 		return FALSE
 	switch(command["modcon"])
 		if("lockdown")
@@ -241,6 +247,9 @@
 		if(!available(TRUE) || !(mode in modes) || mode == "(Cancel)")
 			return FALSE
 		command["mode"] = mode
+	return apply_command(command)
+
+/datum/engineering_atmos_menu/proc/apply_command(list/command)
 	return controller.apply_modcon_action(user, command, console)
 
 /obj/machinery/computer/station_gas_control/proc/can_use_atmos_console(mob/user, require_access = TRUE)
@@ -341,7 +350,7 @@
 	name = "filter hub"
 	desc = "Centralized contaminant filtration feeding the station atmosphere reserve."
 	icon = 'icons/os13/objects/objects/machines/atmos2.dmi'
-	icon_state = "4"
+	icon_state = "1"
 	anchored = TRUE
 	density = FALSE
 	bound_width = 64
@@ -369,15 +378,15 @@
 	cartridges = null
 	return ..()
 
-// The hub renders as a 2x2 arrangement of per-tile sprites. State 4 is the
-// southwest anchor; 3 is southeast, 2 is northwest, 1 is northeast.
+// The hub renders as a 2x2 arrangement of per-tile sprites. State 1 is the
+// southwest anchor; 2 is southeast, 3 is northwest, 4 is northeast.
 /obj/machinery/filter_hub/proc/update_tile_appearance()
 	overlays.Cut()
-	icon_state = "4"
+	icon_state = "1"
 	var/list/tile_offsets = list(
-		list("3", 32, 0),
-		list("2", 0, 32),
-		list("1", 32, 32)
+		list("2", 32, 0),
+		list("3", 0, 32),
+		list("4", 32, 32)
 	)
 	for(var/list/tile in tile_offsets)
 		var/image/piece = image(icon, tile[1])

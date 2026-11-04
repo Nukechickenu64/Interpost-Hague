@@ -89,6 +89,8 @@
 
 // God that was a mess, now to do the rest of the corner code! Hooray!
 /datum/lighting_corner/proc/update_lumcount(var/delta_r, var/delta_g, var/delta_b)
+	if(!delta_r && !delta_g && !delta_b)
+		return
 	lum_r += delta_r
 	lum_g += delta_g
 	lum_b += delta_b
@@ -125,10 +127,7 @@
 
 	for (var/TT in masters)
 		var/turf/T = TT
-		if (T.lighting_overlay)
-			if (!T.lighting_overlay.needs_update)
-				T.lighting_overlay.needs_update = TRUE
-				SSlighting.overlay_queue += T.lighting_overlay
+		T.queue_lighting_overlay_updates()
 
 
 /datum/lighting_corner/dummy/New()

@@ -30,6 +30,8 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	if(world.time >= end_time)
 		return
 	for(var/obj/machinery/cryopod/pod in world)
+		if(!is_station_turf(get_turf(pod)))
+			continue
 		var/area/room = get_area(pod)
 		if(!room || istype(room, /area/crew_quarters/captain) || istype(room, /area/crew_quarters/heads/hop))
 			continue
@@ -40,12 +42,13 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	for(var/area/room in rooms)
 		room.set_lightswitch(TRUE)
 		for(var/obj/machinery/light/fixture in room)
-			fixtures |= fixture
+			if(affects(fixture))
+				fixtures |= fixture
 	stop_timer = addtimer(CALLBACK(src, /datum/cryo_startup_effect/proc/stop), end_time - world.time, TIMER_STOPPABLE)
 	pulse()
 
 /datum/cryo_startup_effect/proc/affects(var/obj/machinery/light/fixture)
-	return active && world.time < end_time && (get_area(fixture) in rooms)
+	return active && world.time < end_time && is_station_turf(get_turf(fixture)) && (get_area(fixture) in rooms)
 
 /datum/cryo_startup_effect/proc/register_light(var/obj/machinery/light/fixture)
 	if(affects(fixture))
@@ -58,7 +61,7 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	pulse_timer = null
 	if(!active)
 		return
-	if(world.time >= end_time)
+	if(GAME_STATE != RUNLEVEL_GAME || world.time >= end_time)
 		stop()
 		return
 	var/phase = ((world.time - round_start_time) % (10 SECONDS)) / (10 SECONDS)
@@ -913,6 +916,12 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 	occupant.resting = TRUE
 	occupant.update_canmove()
 	occupant.fatigue = occupant.max_fatigue
+	// OS13 parity: cryosleep after-effects (all three recordings, 00:00).
+	if(occupant.client)
+		to_chat(occupant, "<span class='warning'>You feel terrible, like having a heavy hangover. It doesn't seem like an ordinary sleep.</span>")
+		if(ishuman(occupant) && prob(15))
+			var/mob/living/carbon/human/sleeper = occupant
+			sleeper.acquire_posthib_psychosis()
 	if(isliving(occupant))
 		var/mob/living/released_occupant = occupant
 		released_occupant.update_stamina_hud()

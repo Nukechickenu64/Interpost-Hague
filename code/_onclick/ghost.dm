@@ -18,7 +18,7 @@
 		if(clone.clone_claimable)
 			if(!MayRespawn(1))
 				return
-			if(clone.stat == DEAD || clone.key || clone.mind)
+			if(!clone.can_inhabit_clone())
 				to_chat(src, "<span class='warning'>That clone is already inhabited or unavailable.</span>")
 				return
 			clone.clone_claimable = FALSE

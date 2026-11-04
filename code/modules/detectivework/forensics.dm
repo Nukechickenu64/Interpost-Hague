@@ -12,10 +12,12 @@ atom/var/list/suit_fibers
 atom/var/list/fingerprints
 atom/var/list/fingerprintshidden
 atom/var/fingerprintslast = null
+atom/var/psychometric_touch_name
 
 /atom/proc/add_hiddenprint(mob/M)
 	if(!M || !M.key)
 		return
+	psychometric_touch_name = M.real_name
 	if(fingerprintslast == M.key)
 		return
 	fingerprintslast = M.key

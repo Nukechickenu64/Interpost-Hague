@@ -55,7 +55,15 @@
 	..()
 	cur_health = max_health
 	electronics = new/obj/item/airlock_electronics/brace(src)
+	apply_map_access()
 	update_access()
+
+/obj/item/airlock_brace/apply_map_access()
+	..()
+	if(isnull(map_access) || !electronics)
+		return
+	electronics.one_access = !!req_one_access.len
+	electronics.conf_access = electronics.one_access ? req_one_access.Copy() : req_access.Copy()
 
 /obj/item/airlock_brace/Destroy()
 	if(airlock)

@@ -378,6 +378,8 @@
 	return TRUE
 
 /obj/machinery/door/firedoor/do_animate(animation)
+	if(os13_animate_door(animation))
+		return
 	switch(animation)
 		if("opening")
 			flick("door_opening", src)
@@ -387,30 +389,35 @@
 
 
 /obj/machinery/door/firedoor/update_icon()
-	overlays.Cut()
+	var/os13 = os13_update_door_icon()
+	if(!os13)
+		overlays.Cut()
 	set_light(0)
 	var/do_set_light = FALSE
+	var/status_icon = os13 ? 'icons/obj/doors/DoorHazard.dmi' : icon
 
 	if(density)
-		icon_state = "door_closed"
+		if(!os13)
+			icon_state = "door_closed"
 		if(hatch_open)
-			overlays += image(icon, "hatch")
+			overlays += image(status_icon, "hatch")
 		if(blocked)
-			overlays += image(icon, "welded")
+			overlays += image(icon, os13 ? "door_welded" : "welded")
 		if(pdiff_alert)
-			overlays += image(icon, "palert")
+			overlays += image(status_icon, "palert")
 			do_set_light = TRUE
 		if(dir_alerts)
 			for(var/d=1;d<=4;d++)
 				var/cdir = GLOB.cardinal[d]
 				for(var/i=1;i<=ALERT_STATES.len;i++)
 					if(dir_alerts[d] & (1<<(i-1)))
-						overlays += image(icon, "alert_[ALERT_STATES[i]]", dir = cdir)
+						overlays += image(status_icon, "alert_[ALERT_STATES[i]]", dir = cdir)
 						do_set_light = TRUE
 	else
-		icon_state = "door_open"
+		if(!os13)
+			icon_state = "door_open"
 		if(blocked)
-			overlays += image(icon, "welded_open")
+			overlays += image(status_icon, "welded_open")
 
 	if(do_set_light)
 		set_light(1.5, 0.5, COLOR_SUN)

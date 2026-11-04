@@ -7,8 +7,13 @@
 	mouse_opacity = 0
 
 /obj/effect/lobby_image/Initialize()
-	icon = 'icons/misc/fullscreen_lobby.dmi'
-	icon_state = "orbital"
+	if(GLOB.using_map && GLOB.using_map.lobby_icon)
+		icon = GLOB.using_map.lobby_icon
+		if(GLOB.using_map.lobby_screens.len)
+			icon_state = pick(GLOB.using_map.lobby_screens)
+	else
+		icon = 'icons/misc/fullscreen_lobby.dmi'
+		icon_state = "orbital"
 
 	. = ..()
 
@@ -31,7 +36,6 @@
 	var/obj/effect/lobby_image/lobby = new
 	var/view_w = update_client_view()
 	if(view_w > 15)
-		// Uniform "cover" scaling: keeps the aspect ratio, fills the widened view, and crops the overflow top and bottom.
 		var/matrix/M = matrix()
 		M.Scale(view_w / 15, view_w / 15)
 		M.Translate((view_w - 15) * 16, 0)

@@ -13,22 +13,16 @@ on a menu, nothing is to stop the person from using the options on that menu (al
 one). You can also lock the console on the settings menu if you're feeling paranoid and you don't want anyone messing with it who
 doesn't have toxins access.
 
-When a R&D console is destroyed or even partially disassembled, you lose all research data on it. However, there are two ways around
-this dire fate:
-- The easiest way is to go to the settings menu and select "Sync Database with Network." That causes it to upload (but not download)
-it's data to every other device in the game. Each console has a "disconnect from network" option that'll will cause data base sync
-operations to skip that console. This is useful if you want to make a "public" R&D console or, for example, give the engineers
-a circuit imprinter with certain designs on it and don't want it accidentally updating. The downside of this method is that you have
-to have physical access to the other console to send data back. Note: An R&D console is on CentCom so if a random griffan happens to
-cause a ton of data to be lost, an admin can go send it back.
-- The second method is with Technology Disks and Design Disks. Each of these disks can hold a single technology or design datum in
-it's entirety. You can then take the disk to any R&D console and upload it's data to it. This method is a lot more secure (since it
-won't update every console in existence) but it's more of a hassle to do. Also, the disks can be stolen.
+Each console stores its technology levels and designs locally. It neither syncs with research servers nor automatically backs up
+to the Central R&D Database. Fabrication uses the linked console's local data, without requiring a server.
+
+Resetting, destroying, or disassembling a console loses its research. Back up or transfer data using Technology Disks and Design
+Disks, each of which holds one technology or design. Technology exports are snapshots: later console upgrades do not change a disk.
 */
 
 /obj/machinery/computer/rdconsole
 	name = "replicator console"
-	desc = "Console controlling the various fabrication devices. Uses self-learning matrix to hold and optimize blueprints. Prone to corrupting said matrix, so back up often."
+	desc = "Console controlling the various fabrication devices. Stores technology and blueprints in its own learning matrix without a research server. Back up research using technology and design disks."
 	icon_keyboard = "rd_key"
 	icon_screen = "rdcomp"
 	light_color = "#a97faa"
@@ -42,8 +36,8 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	var/obj/machinery/r_n_d/circuit_imprinter/linked_imprinter = null	//Linked Circuit Imprinter
 
 	var/screen = 1.0	//Which screen is currently showing.
-	var/id = 0			//ID of the computer (for server restrictions).
-	var/sync = 1		//If sync = 0, it doesn't show up on Server Control Console
+	var/id = 0			//Legacy ID retained for map compatibility.
+	var/sync = 0		//Legacy server-controller field; local consoles never connect.
 
 	req_access = list(access_research)	//Data and setting manipulation requires scientist access.
 
@@ -110,24 +104,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 /obj/machinery/computer/rdconsole/proc/add_ic_design(var/obj/item/device/electronic_assembly/assembly)
 	files.AddDesign2Known(new /datum/design/prefab(files,create_prefab_from_assembly(assembly)))
 
-/obj/machinery/computer/rdconsole/proc/griefProtection() //Have it automatically push research to the centcomm server so wild griffins can't fuck up R&D's work
-	for(var/obj/machinery/r_n_d/server/centcom/C in SSmachines.machinery)
-		for(var/datum/tech/T in files.known_tech)
-			C.files.AddTech2Known(T)
-		for(var/datum/design/D in files.known_designs)
-			C.files.AddDesign2Known(D)
-		C.files.RefreshResearch()
-
 /obj/machinery/computer/rdconsole/New()
 	..()
 	files = new /datum/research(src) //Setup the research data holder.
-	if(!id)
-		for(var/obj/machinery/r_n_d/server/centcom/S in SSmachines.machinery)
-			S.update_connections()
-			break
 
 /obj/machinery/computer/rdconsole/Initialize()
 	. = ..()
+	sync = FALSE
 	// All map machines must be registered before choosing the nearest replicator.
 	return INITIALIZE_HINT_LATELOAD
 
@@ -135,6 +118,13 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	SyncRDevices()
 
 /obj/machinery/computer/rdconsole/Destroy()
+	if(!QDELETED(t_disk) && t_disk.loc == src)
+		t_disk.dropInto(loc)
+	t_disk = null
+	if(!QDELETED(d_disk) && d_disk.loc == src)
+		d_disk.dropInto(loc)
+	d_disk = null
+	QDEL_NULL(files)
 	for(var/obj/machinery/r_n_d/D in list(linked_destroy, linked_lathe, linked_imprinter))
 		if(D.linked_console == src)
 			D.linked_console = null
@@ -150,15 +140,16 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			to_chat(user, "A disk is already loaded into the machine.")
 			return
 
-		if(istype(D, /obj/item/disk/tech_disk))
-			t_disk = D
-		else if (istype(D, /obj/item/disk/design_disk))
-			d_disk = D
-		else
+		if(!istype(D, /obj/item/disk/tech_disk) && !istype(D, /obj/item/disk/design_disk))
 			to_chat(user, "<span class='notice'>Machine cannot accept disks in that format.</span>")
 			return
-		user.drop_item()
-		D.loc = src
+		if(!user.unEquip(D, FALSE, src))
+			to_chat(user, "<span class='warning'>You cannot insert \the [D] while it cannot be removed from your inventory.</span>")
+			return
+		if(istype(D, /obj/item/disk/tech_disk))
+			t_disk = D
+		else
+			d_disk = D
 		to_chat(user, "<span class='notice'>You add \the [D] to the machine.</span>")
 	else
 		//The construction/deconstruction of the console code.
@@ -201,7 +192,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			return TRUE
 	return FALSE
 
-/obj/machinery/computer/rdconsole/OnTopic(user, href_list)
+/obj/machinery/computer/rdconsole/OnTopic(mob/user, href_list)
 	if(href_list["ui_close"] || href_list["close"]) {
 		usr << browse(null, "window=rdconsole")
 		usr.unset_machine()
@@ -213,64 +204,197 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 
 	else if(href_list["updt_tech"]) //Update the research holder with information from the technology disk.
 		if(!t_disk || !t_disk.stored)
+			to_chat(user, "<span class='notice'>Insert a technology disk containing research.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(t_disk) || t_disk.loc != src || href_list["disk"] != "\ref[t_disk]" || href_list["recording"] != "\ref[t_disk.stored]")
+			to_chat(user, "<span class='warning'>The disk or its recording changed. Review the current contents before importing it.</span>")
 			return TOPIC_REFRESH
 		var/obj/item/disk/tech_disk/upload_disk = t_disk
 		var/datum/tech/upload_tech = t_disk.stored
+		if(QDELETED(upload_tech))
+			to_chat(user, "<span class='warning'>The research recording is no longer available.</span>")
+			return TOPIC_REFRESH
+		if(istype(GLOB.using_map, /datum/map/alpha) && (!(upload_tech.type in research_technology_types()) || upload_tech.level != 1))
+			to_chat(user, "<span class='warning'>This recording is not an extracted technology from the OS13 wiki catalogue.</span>")
+			return TOPIC_REFRESH
+		var/datum/research/upload_files = files
+		var/upload_id = upload_tech.id
+		var/upload_level = upload_tech.level
 		screen = 0.0
 		. = TOPIC_REFRESH
 		spawn(50)
-			if(QDELETED(src) || QDELETED(upload_disk) || t_disk != upload_disk || upload_disk.loc != src || upload_disk.stored != upload_tech || (stat & (BROKEN|NOPOWER)))
-				if(!QDELETED(src))
-					screen = 1.0
-					updateUsrDialog()
+			if(QDELETED(src))
+				return
+			if(files != upload_files || QDELETED(upload_files))
+				to_chat(user, "<span class='warning'>Technology import cancelled: the console's research database changed.</span>")
+				return
+			if(QDELETED(upload_disk) || QDELETED(upload_tech) || t_disk != upload_disk || upload_disk.loc != src || upload_disk.stored != upload_tech || (stat & (BROKEN|NOPOWER)) || !powered())
+				screen = 1.0
+				to_chat(user, "<span class='warning'>Technology import interrupted: check the disk and console power.</span>")
+				updateUsrDialog()
+				return
+			if(upload_tech.id != upload_id || upload_tech.level != upload_level)
+				screen = 1.2
+				to_chat(user, "<span class='warning'>Technology import cancelled: the recording's technology or level changed during processing. Review its current contents before importing again.</span>")
+				updateUsrDialog()
 				return
 			screen = 1.2
-			files.AddTech2Known(upload_tech)
+			var/list/previous_designs = files.known_designs.Copy()
+			var/list/previous_archives = list()
+			if(istype(GLOB.using_map, /datum/map/alpha))
+				for(var/tech_type in research_technology_types())
+					if(research_archive_available(tech_type))
+						previous_archives += tech_type
+			if(!files.AddTech2Known(upload_tech))
+				to_chat(user, "<span class='warning'>Technology import refused: the recording is outside this research catalogue.</span>")
+				updateUsrDialog()
+				return
 			files.RefreshResearch() // Newly uploaded technology may unlock additional fabrication designs.
+			if(istype(GLOB.using_map, /datum/map/alpha))
+				to_chat(user, "<span class='notice'>[html_encode(upload_tech.name)] technology installed.</span>")
+				for(var/tech_type in research_technology_types())
+					if(tech_type == upload_tech.type || (tech_type in previous_archives) || !research_archive_available(tech_type))
+						continue
+					var/datum/tech/os13/revealed = tech_type
+					to_chat(user, "<span class='notice'>New cyberspace archive available: [html_encode(initial(revealed.name))]. Extract and install its data to unlock its technology.</span>")
+				var/unlocked_designs = 0
+				for(var/datum/design/D in files.known_designs)
+					if((D in previous_designs) || !D.build_path || !(D.build_type & PROTOLATHE))
+						continue
+					unlocked_designs++
+					to_chat(user, "<span class='notice'>New replicator design available: [html_encode(D.name)].</span>")
+				if(!unlocked_designs)
+					to_chat(user, "<span class='notice'>Technology disk processed. No additional replicator designs unlocked.</span>")
 			updateUsrDialog()
-			griefProtection() //Update centcomm too
 
 	else if(href_list["clear_tech"]) //Erase data on the technology disk.
-		t_disk.stored = null
+		if(!t_disk)
+			to_chat(user, "<span class='notice'>No technology disk is loaded.</span>")
+			return TOPIC_REFRESH
+		if(t_disk.loc != src || href_list["disk"] != "\ref[t_disk]" || !t_disk.stored || href_list["recording"] != "\ref[t_disk.stored]")
+			to_chat(user, "<span class='warning'>The disk or its recording changed. Review the current contents before clearing it.</span>")
+			return TOPIC_REFRESH
+		t_disk.set_research(null)
 		. = TOPIC_REFRESH
 
 	else if(href_list["eject_tech"]) //Eject the technology disk.
+		if(!t_disk)
+			to_chat(user, "<span class='notice'>No technology disk is loaded.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(t_disk) || t_disk.loc != src || href_list["disk"] != "\ref[t_disk]")
+			to_chat(user, "<span class='warning'>The disk changed. Review the current media before ejecting it.</span>")
+			return TOPIC_REFRESH
 		t_disk.dropInto(loc)
 		t_disk = null
 		screen = 1.0
 		. = TOPIC_REFRESH
 
 	else if(href_list["copy_tech"]) //Copys some technology data from the research holder to the disk.
+		if(!t_disk)
+			to_chat(user, "<span class='notice'>Insert a technology disk to back up research.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(t_disk) || t_disk.loc != src || href_list["disk"] != "\ref[t_disk]")
+			to_chat(user, "<span class='warning'>The disk changed. Review the current media before copying research.</span>")
+			return TOPIC_REFRESH
+		if(t_disk.stored)
+			to_chat(user, "<span class='warning'>The technology disk already contains data. Clear it before copying new research.</span>")
+			return TOPIC_REFRESH
+		if(!files || QDELETED(files) || href_list["database"] != "\ref[files]")
+			to_chat(user, "<span class='warning'>The research database changed. Review the current technology before copying it.</span>")
+			return TOPIC_REFRESH
+		var/copied = FALSE
 		for(var/datum/tech/T in files.known_tech)
-			if(href_list["copy_tech_ID"] == T.id)
-				t_disk.stored = T
+			if(href_list["copy_tech_ID"] == T.id && href_list["technology"] == "\ref[T]" && href_list["level"] && text2num(href_list["level"]) == T.level)
+				if(istype(GLOB.using_map, /datum/map/alpha) && T.level <= 0)
+					to_chat(user, "<span class='warning'>Extract and install this technology before backing it up.</span>")
+					return TOPIC_REFRESH
+				var/datum/tech/backup = new T.type()
+				backup.level = T.level
+				t_disk.set_research(backup)
+				copied = TRUE
 				break
+		if(!copied)
+			to_chat(user, "<span class='warning'>That technology or its level changed. Review the current research before copying it.</span>")
 		screen = 1.2
 		. = TOPIC_REFRESH
 
 	else if(href_list["updt_design"]) //Updates the research holder with design data from the design disk.
+		if(!d_disk || !d_disk.blueprint)
+			to_chat(user, "<span class='notice'>Insert a design disk containing a blueprint.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(d_disk) || d_disk.loc != src || href_list["disk"] != "\ref[d_disk]" || href_list["recording"] != "\ref[d_disk.blueprint]")
+			to_chat(user, "<span class='warning'>The disk or its recording changed. Review the current contents before importing it.</span>")
+			return TOPIC_REFRESH
+		var/obj/item/disk/design_disk/upload_disk = d_disk
+		var/datum/design/upload_design = d_disk.blueprint
+		if(istype(GLOB.using_map, /datum/map/alpha) && !files.DesignHasReqs(upload_design))
+			to_chat(user, "<span class='warning'>This blueprint is outside the installed OS13 wiki technologies. Install the matching technology first.</span>")
+			return TOPIC_REFRESH
+		var/datum/research/upload_files = files
 		screen = 0.0
 		. = TOPIC_REFRESH
 		spawn(50)
+			if(QDELETED(src))
+				return
+			if(files != upload_files || QDELETED(upload_files))
+				to_chat(user, "<span class='warning'>Design import cancelled: the console's research database changed.</span>")
+				return
+			if(QDELETED(upload_disk) || QDELETED(upload_design) || d_disk != upload_disk || upload_disk.loc != src || upload_disk.blueprint != upload_design || (stat & (BROKEN|NOPOWER)) || !powered())
+				screen = 1.0
+				to_chat(user, "<span class='warning'>Design import interrupted: check the disk and console power.</span>")
+				updateUsrDialog()
+				return
 			screen = 1.4
-			files.AddDesign2Known(d_disk.blueprint)
+			if(istype(GLOB.using_map, /datum/map/alpha) && !files.DesignHasReqs(upload_design))
+				to_chat(user, "<span class='warning'>Design import refused: its OS13 technology is no longer installed.</span>")
+				updateUsrDialog()
+				return
+			files.AddDesign2Known(upload_design)
 			updateUsrDialog()
-			griefProtection() //Update centcomm too
 
 	else if(href_list["clear_design"]) //Erases data on the design disk.
+		if(!d_disk)
+			to_chat(user, "<span class='notice'>No design disk is loaded.</span>")
+			return TOPIC_REFRESH
+		if(d_disk.loc != src || href_list["disk"] != "\ref[d_disk]" || !d_disk.blueprint || href_list["recording"] != "\ref[d_disk.blueprint]")
+			to_chat(user, "<span class='warning'>The disk or its recording changed. Review the current contents before clearing it.</span>")
+			return TOPIC_REFRESH
 		d_disk.blueprint = null
 		. = TOPIC_REFRESH
 
 	else if(href_list["eject_design"]) //Eject the design disk.
+		if(!d_disk)
+			to_chat(user, "<span class='notice'>No design disk is loaded.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(d_disk) || d_disk.loc != src || href_list["disk"] != "\ref[d_disk]")
+			to_chat(user, "<span class='warning'>The disk changed. Review the current media before ejecting it.</span>")
+			return TOPIC_REFRESH
 		d_disk.dropInto(loc)
 		d_disk = null
 		screen = 1.0
+		. = TOPIC_REFRESH
 
 	else if(href_list["copy_design"]) //Copy design data from the research holder to the design disk.
+		if(!d_disk)
+			to_chat(user, "<span class='notice'>Insert a design disk to back up a blueprint.</span>")
+			return TOPIC_REFRESH
+		if(QDELETED(d_disk) || d_disk.loc != src || href_list["disk"] != "\ref[d_disk]")
+			to_chat(user, "<span class='warning'>The disk changed. Review the current media before copying a blueprint.</span>")
+			return TOPIC_REFRESH
+		if(d_disk.blueprint)
+			to_chat(user, "<span class='warning'>The design disk already contains data. Clear it before copying a new blueprint.</span>")
+			return TOPIC_REFRESH
+		if(!files || QDELETED(files) || href_list["database"] != "\ref[files]")
+			to_chat(user, "<span class='warning'>The research database changed. Review the current designs before copying a blueprint.</span>")
+			return TOPIC_REFRESH
+		var/copied = FALSE
 		for(var/datum/design/D in files.known_designs)
-			if(href_list["copy_design_ID"] == D.id)
+			if(href_list["copy_design_ID"] == D.id && href_list["design"] == "\ref[D]")
 				d_disk.blueprint = D
+				copied = TRUE
 				break
+		if(!copied)
+			to_chat(user, "<span class='warning'>That blueprint is no longer available in the console's research database.</span>")
 		screen = 1.4
 		. = TOPIC_REFRESH
 
@@ -341,55 +465,31 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			to_chat(usr, "Unauthorized Access.")
 		. = TOPIC_REFRESH
 
-	else if(href_list["sync"]) //Sync the research holder with all the R&D consoles in the game that aren't sync protected.
-		screen = 0.0
-		if(!sync)
-			to_chat(usr, "<span class='notice'>You must connect to the network first.</span>")
-		else
-			. = TOPIC_HANDLED
-			griefProtection() //Putting this here because I dont trust the sync process
-			spawn(30)
-				if(src)
-					for(var/obj/machinery/r_n_d/server/S in SSmachines.machinery)
-						var/server_processed = 0
-						if((id in S.id_with_upload) || istype(S, /obj/machinery/r_n_d/server/centcom))
-							for(var/datum/tech/T in files.known_tech)
-								S.files.AddTech2Known(T)
-							for(var/datum/design/D in files.known_designs)
-								S.files.AddDesign2Known(D)
-							S.files.RefreshResearch()
-							server_processed = 1
-						if((id in S.id_with_download) && !istype(S, /obj/machinery/r_n_d/server/centcom))
-							for(var/datum/tech/T in S.files.known_tech)
-								files.AddTech2Known(T)
-							for(var/datum/design/D in S.files.known_designs)
-								files.AddDesign2Known(D)
-							files.RefreshResearch()
-							server_processed = 1
-						if(!istype(S, /obj/machinery/r_n_d/server/centcom) && server_processed)
-							S.produce_heat()
-					screen = 1.6
-					attack_hand(user)
-
-	else if(href_list["togglesync"]) //Prevents the console from being synced by other consoles. Can still send data.
-		sync = !sync
+	else if(href_list["sync"] || href_list["togglesync"])
+		to_chat(user, "<span class='notice'>Research is stored locally. Use technology and design disks to transfer or back up data.</span>")
+		screen = 1.6
 		. = TOPIC_REFRESH
 
-	else if(href_list["reclaim"] && linked_lathe)
-		var/obj/item/target = locate(href_list["reclaim"]) in get_turf(linked_lathe)
-		if(!linked_lathe.reclaim(target))
-			to_chat(user, "<span class='notice'>The replicator cannot reclaim that item right now. Check that it is on the platform, the machine has power, and a matching storage compartment has room.</span>")
+	else if(href_list["reclaim"])
+		if(!linked_lathe || QDELETED(linked_lathe) || href_list["replicator"] != "\ref[linked_lathe]")
+			to_chat(user, "<span class='warning'>The linked replicator changed. Review the current platform before reclaiming an item.</span>")
+		else
+			var/obj/item/target = locate(href_list["reclaim"]) in get_turf(linked_lathe)
+			if(!linked_lathe.reclaim(target))
+				to_chat(user, "<span class='notice'>The replicator cannot reclaim that item right now. Check that it is on the platform, the machine has power, and a matching storage compartment has room.</span>")
 		. = TOPIC_REFRESH
 
 	else if(href_list["build"]) //Causes the Replicator to build something.
-		if(linked_lathe)
+		if(!linked_lathe || QDELETED(linked_lathe) || href_list["replicator"] != "\ref[linked_lathe]" || !files || QDELETED(files) || href_list["database"] != "\ref[files]")
+			to_chat(user, "<span class='warning'>The linked replicator or research database changed. Review the current designs before requesting production.</span>")
+		else
 			var/datum/design/being_built = null
 			for(var/datum/design/D in files.known_designs)
-				if(D.id == href_list["build"])
+				if(D.id == href_list["build"] && href_list["design"] == "\ref[D]")
 					being_built = D
 					break
-			if(being_built)
-				linked_lathe.addToQueue(being_built)
+			if(!being_built || !linked_lathe.addToQueue(being_built))
+				to_chat(user, "<span class='warning'>That design is not available for production on the replicator.</span>")
 
 		screen = 3.1
 		. = TOPIC_REFRESH
@@ -402,7 +502,8 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 					being_built = D
 					break
 			if(being_built)
-				linked_imprinter.addToQueue(being_built)
+				if(!linked_imprinter.addToQueue(being_built))
+					to_chat(user, "<span class='warning'>That blueprint is not available for production on the circuit imprinter.</span>")
 		screen = 4.1
 		. = TOPIC_REFRESH
 
@@ -420,18 +521,24 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		linked_imprinter.removeFromQueue(text2num(href_list["removeI"]))
 		. = TOPIC_REFRESH
 
-	else if(href_list["disposeP"] && linked_lathe)  //Causes the protolathe to dispose of a single reagent (all of it)
-		var/datum/reagent/R = locate(href_list["disposeP"]) in linked_lathe.reagents.reagent_list
-		if(R)
-			linked_lathe.reagents.del_reagent(R.type)
-		. = TOPIC_REFRESH
-
-	else if(href_list["disposeallP"] && linked_lathe) //Causes the protolathe to dispose of all it's reagents.
-		linked_lathe.reagents.clear_reagents()
+	else if(href_list["disposeP"] || href_list["disposeallP"])
+		if(QDELETED(linked_lathe) || !linked_lathe.reagents || QDELETED(linked_lathe.reagents) || href_list["replicator"] != "\ref[linked_lathe]" || href_list["chemical_holder"] != "\ref[linked_lathe.reagents]")
+			to_chat(user, "<span class='warning'>The replicator or its chemical storage changed. Review the current storage before purging chemicals.</span>")
+		else if(href_list["disposeP"])
+			var/datum/reagent/R = locate(href_list["disposeP"]) in linked_lathe.reagents.reagent_list
+			if(QDELETED(R))
+				to_chat(user, "<span class='warning'>That chemical is no longer stored. Review the current contents before purging.</span>")
+			else
+				linked_lathe.reagents.del_reagent(R.type)
+		else
+			linked_lathe.reagents.clear_reagents()
 		. = TOPIC_REFRESH
 
 	else if(href_list["removeP"] && linked_lathe)
-		linked_lathe.removeFromQueue(text2num(href_list["removeP"]))
+		if(href_list["queue_machine"] != "\ref[linked_lathe]" || !href_list["queue_revision"] || text2num(href_list["queue_revision"]) != linked_lathe.queue_revision)
+			to_chat(user, "<span class='notice'>The replicator queue changed. Review the refreshed queue before removing a job.</span>")
+		else if(!linked_lathe.removeFromQueue(text2num(href_list["removeP"])))
+			to_chat(user, "<span class='notice'>That queue entry is no longer available. Refresh the queue before removing another job.</span>")
 		. = TOPIC_REFRESH
 
 	else if(href_list["lathe_ejectsheet"] && linked_lathe) //Causes the protolathe to eject a sheet of material
@@ -464,25 +571,43 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		. = TOPIC_REFRESH
 
 	else if(href_list["reset"]) //Reset the R&D console's database.
-		griefProtection()
-		var/choice = alert("R&D Console Database Reset", "Are you sure you want to reset the R&D console's database? Data lost cannot be recovered.", "Continue", "Cancel")
+		var/datum/research/reset_files = files
+		var/choice = alert(user, "Reset this console's local research? There is no server backup. Export technology and designs to disks first.", "R&D Console Database Reset", "Continue", "Cancel")
 		. = TOPIC_HANDLED
 		if(choice == "Continue")
+			if(QDELETED(src) || QDELETED(user))
+				return TOPIC_NOACTION
+			if(files != reset_files || QDELETED(reset_files))
+				to_chat(user, "<span class='warning'>Reset cancelled: the research database changed during confirmation. Review the current data before resetting it.</span>")
+				return TOPIC_REFRESH
+			if((stat & (BROKEN|NOPOWER)) || !powered() || (!allowed(user) && !emagged))
+				to_chat(user, "<span class='warning'>Reset cancelled: check console power and research access.</span>")
+				return TOPIC_REFRESH
 			screen = 0.0
 			qdel(files)
 			files = new /datum/research(src)
 			spawn(20)
-				screen = 1.6
-				attack_hand(user)
+				if(!QDELETED(src) && screen == 0.0)
+					screen = 1.6
+					updateUsrDialog()
 
 	else if (href_list["print"]) //Print research information
+		var/datum/research/print_files = files
+		var/is_detailed = (text2num(href_list["print"]) == 2)
 		screen = 0.5
 		. = TOPIC_HANDLED
 		spawn(20)
+			if(QDELETED(src))
+				return
+			if(files != print_files || QDELETED(print_files) || (stat & (BROKEN|NOPOWER)) || !powered())
+				to_chat(user, "<span class='warning'>Research report cancelled: the database changed or the console lost power.</span>")
+				if(screen == 0.5)
+					screen = (is_detailed ? 5.0 : 1.1)
+				updateUsrDialog()
+				return
 			var/obj/item/paper/PR = new/obj/item/paper
 			PR.name = "fabricator report"
 			PR.info = "<center><b>[station_name()] Fabricator Laboratory</b>"
-			var/is_detailed = (text2num(href_list["print"]) == 2)
 			var/title_str = is_detailed ? "Detailed" : ""
 			PR.info += "<h2>[title_str] Fabricator Status Report</h2>"
 			PR.info += "<i>report prepared at [stationtime2text()] local time</i></center><br>"
@@ -494,8 +619,9 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			PR.icon_state = "paper_words"
 			PR.dropInto(loc)
 			spawn(10)
-				screen = (is_detailed ? 5.0 : 1.1)
-				attack_hand(user)
+				if(!QDELETED(src) && screen == 0.5)
+					screen = (is_detailed ? 5.0 : 1.1)
+					updateUsrDialog()
 
 	if(. == TOPIC_REFRESH)
 		attack_hand(user)
@@ -509,7 +635,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		dat += "<LI>"
 		dat += "[T.name]"
 		dat += "<UL>"
-		dat +=  "<LI>Level: [T.level]"
+		dat +=  "<LI>[istype(T, /datum/tech/os13) ? "Tier" : "Level"]: [T.display_level()]"
 		dat +=  "<LI>Summary: [T.desc]"
 		dat += "</UL>"
 	return dat
@@ -531,6 +657,12 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 	var/dat = ""
 	files.RefreshResearch()
 	switch(screen) //A quick check to make sure you get the right screen when a device is disconnected.
+		if(1.2, 1.3)
+			if(!t_disk || QDELETED(t_disk) || t_disk.loc != src)
+				screen = 1.0
+		if(1.4, 1.5)
+			if(!d_disk || QDELETED(d_disk) || d_disk.loc != src)
+				screen = 1.0
 		if(2 to 2.9)
 			if(linked_destroy == null)
 				screen = 2.0
@@ -570,7 +702,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 		if(1.0) //Main Menu
 			dat += "Main Menu:<BR><BR>"
 			dat += "Loaded disk: "
-			dat += (t_disk || d_disk) ? (t_disk ? "technology storage disk" : "design storage disk") : "none"
+			dat += (t_disk || d_disk) ? html_encode(t_disk ? t_disk.name : d_disk.name) : "none"
 			dat += "<HR><UL>"
 			dat += "<LI><A href='?src=\ref[src];menu=1.1'>Current Fabricator Learning Matrix Status</A>"
 			dat += "<LI><A href='?src=\ref[src];menu=5.0'>View Available Designs</A>"
@@ -599,69 +731,82 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
 			dat += "Disk Contents: (Technology Data Disk)<BR><BR>"
+			dat += "Disk: [html_encode(t_disk.name)]<BR>"
+			if(istype(GLOB.using_map, /datum/map/alpha))
+				dat += "<B>Technologies:</B><BR>"
 			if(t_disk.stored == null)
 				dat += "The disk has no data stored on it.<HR>"
 				dat += "Operations: "
 				dat += "<A href='?src=\ref[src];menu=1.3'>Load Tech to Disk</A> || "
 			else
-				dat += "Name: [t_disk.stored.name]<BR>"
-				dat += "Level: [t_disk.stored.level]<BR>"
-				dat += "Description: [t_disk.stored.desc]<HR>"
+				dat += "Name: [html_encode(t_disk.stored.name)]<BR>"
+				dat += "[istype(t_disk.stored, /datum/tech/os13) ? "Tier" : "Level"]: [t_disk.stored.display_level()]<BR>"
+				dat += "Description: [html_encode(t_disk.stored.desc)]<HR>"
 				dat += "Operations: "
-				dat += "<A href='?src=\ref[src];updt_tech=1'>Upload to Database</A> || "
-				dat += "<A href='?src=\ref[src];clear_tech=1'>Clear Disk</A> || "
-			dat += "<A href='?src=\ref[src];eject_tech=1'>Eject Disk</A>"
+				dat += "<A href='?src=\ref[src];updt_tech=1;disk=\ref[t_disk];recording=\ref[t_disk.stored]'>Upload to Database</A> || "
+				dat += "<A href='?src=\ref[src];clear_tech=1;disk=\ref[t_disk];recording=\ref[t_disk.stored]'>Clear Disk</A> || "
+			dat += "<A href='?src=\ref[src];eject_tech=1;disk=\ref[t_disk]'>Eject Disk</A>"
 
 		if(1.3) //Technology Disk submenu
 			dat += "<BR><A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=1.2'>Return to Disk Operations</A><HR>"
 			dat += "Load Technology to Disk:<BR><BR>"
+			dat += "Disk: [html_encode(t_disk.name)]<BR>"
 			dat += "<UL>"
 			for(var/datum/tech/T in files.known_tech)
-				dat += "<LI>[T.name] "
-				dat += "\[<A href='?src=\ref[src];copy_tech=1;copy_tech_ID=[T.id]'>copy to disk</A>\]"
+				if(istype(GLOB.using_map, /datum/map/alpha) && T.level <= 0)
+					continue
+				dat += "<LI>[html_encode(T.name)] ([istype(T, /datum/tech/os13) ? "tier" : "level"] [T.display_level()]) "
+				dat += "\[<A href='?src=\ref[src];copy_tech=1;copy_tech_ID=[T.id];disk=\ref[t_disk];database=\ref[files];technology=\ref[T];level=[T.level]'>copy to disk</A>\]"
 			dat += "</UL>"
 
 		if(1.4) //Design Disk menu.
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
+			dat += "Disk: [html_encode(d_disk.name)]<BR>"
 			if(d_disk.blueprint == null)
 				dat += "The disk has no data stored on it.<HR>"
 				dat += "Operations: "
 				dat += "<A href='?src=\ref[src];menu=1.5'>Load Design to Disk</A> || "
 			else
-				dat += "Name: [d_disk.blueprint.name]<BR>"
-				switch(d_disk.blueprint.build_type)
-					if(IMPRINTER) dat += "Lathe Type: Circuit Imprinter<BR>"
-					if(PROTOLATHE) dat += "Fabricator Type: Replicator<BR>"
-				dat += "Required Materials:<BR>"
+				dat += "Name: [html_encode(d_disk.blueprint.name)]<BR>"
+				if(d_disk.blueprint.build_type & PROTOLATHE)
+					dat += "Fabricator Type: Replicator<BR>"
+				if(d_disk.blueprint.build_type & IMPRINTER)
+					dat += "Fabricator Type: Circuit Imprinter<BR>"
+				dat += "Base Required Materials (before machine efficiency):<BR>"
 				for(var/M in d_disk.blueprint.materials)
-					if(copytext(M, 1, 2) == "$") dat += "* [copytext(M, 2)] x [d_disk.blueprint.materials[M]]<BR>"
-					else dat += "* [M] x [d_disk.blueprint.materials[M]]<BR>"
+					var/material_id = copytext(M, 1, 2) == "$" ? copytext(M, 2) : M
+					var/material_label = GLOB.replicator_material_names[material_id]
+					if(!material_label)
+						material_label = CallMaterialName(material_id)
+					dat += "* [html_encode(material_label)] x [d_disk.blueprint.materials[M]] material units<BR>"
+				if(length(d_disk.blueprint.chemicals))
+					dat += "Base Required Chemicals (before machine efficiency):<BR>"
+					for(var/chemical in d_disk.blueprint.chemicals)
+						dat += "* [html_encode(CallReagentName(chemical))] x [d_disk.blueprint.chemicals[chemical]] reagent units<BR>"
 				dat += "<HR>Operations: "
-				dat += "<A href='?src=\ref[src];updt_design=1'>Upload to Database</A> || "
-				dat += "<A href='?src=\ref[src];clear_design=1'>Clear Disk</A> || "
-			dat += "<A href='?src=\ref[src];eject_design=1'>Eject Disk</A>"
+				dat += "<A href='?src=\ref[src];updt_design=1;disk=\ref[d_disk];recording=\ref[d_disk.blueprint]'>Upload to Database</A> || "
+				dat += "<A href='?src=\ref[src];clear_design=1;disk=\ref[d_disk];recording=\ref[d_disk.blueprint]'>Clear Disk</A> || "
+			dat += "<A href='?src=\ref[src];eject_design=1;disk=\ref[d_disk]'>Eject Disk</A>"
 
 		if(1.5) //Technology disk submenu
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=1.4'>Return to Disk Operations</A><HR>"
 			dat += "Load Design to Disk:<BR><BR>"
+			dat += "Disk: [html_encode(d_disk.name)]<BR>"
 			dat += "<UL>"
 			for(var/datum/design/D in files.known_designs)
 				if(D.build_path)
-					dat += "<LI>[D.name] "
-					dat += "<A href='?src=\ref[src];copy_design=1;copy_design_ID=[D.id]'>\[copy to disk\]</A>"
+					dat += "<LI>[html_encode(D.name)] "
+					dat += "<A href='?src=\ref[src];copy_design=1;copy_design_ID=[D.id];disk=\ref[d_disk];database=\ref[files];design=\ref[D]'>\[copy to disk\]</A>"
 			dat += "</UL>"
 
 		if(1.6) //R&D console settings
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A><HR>"
 			dat += "R&D Console Setting:<HR>"
+			dat += "Technology and designs are stored locally on this console. No research server is required.<BR>"
+			dat += "Back up or transfer research using technology and design disks. Resetting or dismantling this console loses its local data.<HR>"
 			dat += "<UL>"
-			if(sync)
-				dat += "<LI><A href='?src=\ref[src];sync=1'>Sync Database with Network</A><BR>"
-				dat += "<LI><A href='?src=\ref[src];togglesync=1'>Disconnect from Fabrication Network</A><BR>"
-			else
-				dat += "<LI><A href='?src=\ref[src];togglesync=1'>Connect to Fabrication Network</A><BR>"
 			dat += "<LI><A href='?src=\ref[src];menu=1.7'>Device Linkage Menu</A><BR>"
 			dat += "<LI><A href='?src=\ref[src];lock=0.2'>Lock Console</A><BR>"
 			dat += "<LI><A href='?src=\ref[src];reset=1'>Reset R&D Database</A><BR>"
@@ -735,7 +880,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "<B>Reclamation:</B> Place an item or material sheets on the platform, then select it below. <A href='?src=\ref[src];menu=3.1'>Refresh</A><BR>"
 			for(var/obj/item/item in get_turf(linked_lathe))
 				if(linked_lathe.can_reclaim(item))
-					dat += "<A href='?src=\ref[src];reclaim=\ref[item]'>Reclaim [html_encode(item.name)] (destroys item)</A><BR>"
+					dat += "<A href='?src=\ref[src];reclaim=\ref[item];replicator=\ref[linked_lathe]'>Reclaim [html_encode(item.name)] (destroys item)</A><BR>"
 			dat += "<B>Shared storage:</B> [round(linked_lathe.TotalMaterials() / SHEET_MATERIAL_AMOUNT, 0.01)] sheets. Only unlocked compartments can supply production.<BR>"
 			for(var/material_id in GLOB.replicator_material_names)
 				dat += "[capitalize(linked_lathe.material_name(material_id))]: [round(linked_lathe.material_amount(material_id, TRUE) / SHEET_MATERIAL_AMOUNT, 0.01)] sheets available<BR>"
@@ -752,7 +897,7 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 				if(temp_dat)
 					temp_dat = " \[[copytext(temp_dat, 3)]\]"
 				if(linked_lathe.canBuild(D))
-					dat += "<LI><B><A href='?src=\ref[src];build=[D.id]'>[D.name]</A></B>[temp_dat]"
+					dat += "<LI><B><A href='?src=\ref[src];build=[D.id];replicator=\ref[linked_lathe];database=\ref[files];design=\ref[D]'>[D.name]</A></B>[temp_dat]"
 				else
 					dat += "<LI><B>[D.name]</B>[temp_dat]"
 			dat += "</UL>"
@@ -783,28 +928,44 @@ won't update every console in existence) but it's more of a hassle to do. Also, 
 			dat += "Chemical Storage<BR><HR>"
 			for(var/datum/reagent/R in linked_lathe.reagents.reagent_list)
 				dat += "Name: [R.name] | Units: [R.volume] "
-				dat += "<A href='?src=\ref[src];disposeP=\ref[R]'>(Purge)</A><BR>"
-				dat += "<A href='?src=\ref[src];disposeallP=1'><U>Disposal All Chemicals in Storage</U></A><BR>"
+				dat += "<A href='?src=\ref[src];disposeP=\ref[R];replicator=\ref[linked_lathe];chemical_holder=\ref[linked_lathe.reagents]'>(Purge)</A><BR>"
+			if(length(linked_lathe.reagents.reagent_list))
+				dat += "<A href='?src=\ref[src];disposeallP=1;replicator=\ref[linked_lathe];chemical_holder=\ref[linked_lathe.reagents]'><U>Dispose All Chemicals in Storage</U></A><BR>"
 
 		if(3.4) // Replicator queue
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "
 			dat += "<A href='?src=\ref[src];menu=3.1'>Produce</A><HR>"
 			dat += "Queue<BR><HR>"
+			dat += "<A href='?src=\ref[src];menu=3.4'>Refresh queue</A><BR>"
 			if(linked_lathe.producing_design)
 				dat += "<B>Producing: [html_encode(linked_lathe.producing_design.name)]</B><BR>"
-			if(!linked_lathe.queue.len)
-				dat += "Empty"
-			else
-				var/tmp = 1
-				for(var/datum/design/D in linked_lathe.queue)
-					if(tmp == 1)
-						if(linked_lathe.busy)
-							dat += "<B>1: [D.name]</B><BR>"
-						else
-							dat += "<B>1: [D.name]</B> (Awaiting materials) <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
+			else if(length(linked_lathe.queue))
+				if(linked_lathe.stat || !linked_lathe.powered())
+					dat += "<B>Production paused: Replicator offline.</B><BR>"
+				else if(linked_lathe.panel_open)
+					dat += "<B>Production paused: close the Replicator's maintenance panel.</B><BR>"
+				else if(linked_lathe.busy || linked_lathe.converting)
+					dat += "<B>Production paused: Replicator busy.</B><BR>"
+				else
+					var/datum/design/next_design = linked_lathe.queue[1]
+					if(!linked_lathe.supports_design(next_design))
+						dat += "<B>Unavailable blueprint: this job will be discarded on the next production cycle.</B><BR>"
+					else if(istype(GLOB.using_map, /datum/map/alpha) && !files.DesignHasReqs(next_design))
+						dat += "<B>Production paused: install the matching OS13 technology on this linked console.</B><BR>"
 					else
-						dat += "[tmp]: [D.name] <A href='?src=\ref[src];removeP=[tmp]'>(Remove)</A><BR>"
-					++tmp
+						var/missing_materials = linked_lathe.getLackingMaterials(next_design)
+						if(missing_materials)
+							dat += "<B>Insufficient resources for [html_encode(next_design.name)]: [html_encode(missing_materials)].</B><BR>"
+							dat += "Only unlocked, connected storage supplies production.<BR>"
+						else
+							dat += "Next job is awaiting the production cycle.<BR>"
+			if(!linked_lathe.queue.len)
+				dat += "No waiting jobs."
+			else
+				for(var/index = 1, index <= length(linked_lathe.queue), index++)
+					var/datum/design/D = linked_lathe.queue[index]
+					var/design_label = linked_lathe.supports_design(D) ? html_encode(D.name) : "Unavailable blueprint"
+					dat += "[index]: [design_label] <A href='?src=\ref[src];removeP=[index];queue_machine=\ref[linked_lathe];queue_revision=[linked_lathe.queue_revision]'>(Remove)</A><BR>"
 
 		///////////////////CIRCUIT IMPRINTER SCREENS////////////////////
 		if(4.0)

@@ -540,10 +540,24 @@
 	var/list/event = list("target" = target, "weapon" = weapon, "zone" = zone, "roll" = roll, "outcome" = "miss", "injury" = 0, "ready_at" = combat_action_until)
 	last_combat_event = event
 	attack_quality = attack_quality_from_margin(roll["margin"], roll["success"])
+	var/message_attack_quality = attack_quality
+	if(roll["success"])
+		switch(attack_quality)
+			if("powerfully")
+				message_attack_quality = "effortlessly"
+			if("solidly")
+				message_attack_quality = "neatly"
+			if("weakly")
+				message_attack_quality = "clumsily"
 	admin_attack_log(src, target, "Attacked [zone] using [weapon ? weapon : "an unarmed strike"].", "Was attacked.", "attacked")
 	deathweb_learn_skill(weapon && weapon.deathweb_weapon_skill ? weapon.deathweb_weapon_skill : "unarmed", -2)
 	if(!roll["success"])
-		visible_message(SPAN_DANGER("[src] [attack_quality] misses [target] with [weapon ? weapon : "an unarmed strike"]!"))
+		if(kicking)
+			var/obj/item/organ/external/missed_organ = target.get_organ(zone)
+			var/missed_location = missed_organ ? missed_organ.name : combat_location_name(zone)
+			visible_message(SPAN_DANGER("[src] misses trying to attack [target]'s [missed_location] with the foot!"))
+		else
+			visible_message(SPAN_DANGER("[src] [attack_quality] misses [target] with [weapon ? weapon : "an unarmed strike"]!"))
 		if(roll["critical_failure"])
 			// Conservative mishap until the full advanced critical table is sourced.
 			combat_commit(duration + COMBAT_TURN, left, kicking)
@@ -603,7 +617,14 @@
 		if(natural_attack)
 			natural_attack.show_attack(src, target, zone, injury)
 		else
-			target.visible_message("<span class='combat'>[src] [attack_quality] [weapon ? weapon.get_attack_name() : "kicks"] [target]'s [location_name] with [weapon ? weapon : "a foot"]!</span>")
+			var/recorded_hit_message
+			if(istype(weapon, /obj/item/weapon/melee/baton/loaded/intensecure))
+				var/obj/item/weapon/melee/baton/loaded/intensecure/baton = weapon
+				recorded_hit_message = baton.os13_hit_message(src, target, zone, zone)
+			if(recorded_hit_message)
+				target.visible_message("<span class='combat'>[recorded_hit_message]</span>")
+			else
+				target.visible_message("<span class='combat'>[src] [message_attack_quality] [weapon ? weapon.get_attack_name() : "kicks"] [target]'s [location_name] with [weapon ? weapon : "a foot"]!</span>")
 		if(natural_attack && natural_attack.deal_halloss)
 			target.apply_damage(injury * target.maxHealth / max(1, target.gurps_stat(STAT_HT)), PAIN, zone, 0)
 		else

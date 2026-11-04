@@ -121,6 +121,8 @@
 	var lastTs = 0;
 	var acc = 0;
 	var running = false;
+	var frameCount = 0;              // total emulated steps, used as savestate/stream sequence
+	var baselineGlobals = null;      // global names present before the cart runs (API + stdlib)
 
 	var lastError = '';
 	var onGpio = null;
@@ -713,6 +715,7 @@
 			blit();
 			acc -= FRAME_MS;
 			steps++;
+			frameCount++;
 
 			if (gpioMem[0] > 0) {
 				var v = gpioMem[0];
@@ -740,6 +743,7 @@
 		prevKey.fill(false);
 		gpioMem.fill(0);
 		rng = 0x524F43;
+		frameCount = 0;
 		lastError = '';
 	}
 
@@ -751,7 +755,10 @@
 		imgData = ctx.createImageData(WIDTH, HEIGHT);
 	}
 
-	function loadCart(src, el) {
+	// Loads a cartridge. If `state` (an object produced by saveState) is given,
+	// the cart source is executed to define its functions and then the saved
+	// state is restored instead of calling _init, resuming exactly where it was.
+	function loadCart(src, el, state) {
 		if (!FW) { return; }
 		if (rafId !== null) {
 			cancelAnimationFrame(rafId);
@@ -772,15 +779,26 @@
 		var code = extractLua(String(src));
 		vm = new LuaVM();
 		registerAPI(vm);
+		captureBaseline(vm.S);
 
 		if (!vm.execute(code)) {
 			fail(vm.lastError);
 			return;
 		}
-		var r = vm.call('_init');
-		if (r === false) {
-			fail(vm.lastError);
-			return;
+		if (state) {
+			try {
+				applyState(state);
+			} catch (e) {
+				fail('savestate restore failed');
+				return;
+			}
+			blit();
+		} else {
+			var r = vm.call('_init');
+			if (r === false) {
+				fail(vm.lastError);
+				return;
+			}
 		}
 
 		running = true;
@@ -803,12 +821,211 @@
 		keyState[i] = !!down;
 	}
 
+	// ---- savestate support -----------------------------------------------------
+	// Serializes the full console state (video memories, camera, rng, elapsed
+	// time and all cart-defined Lua globals) into a plain JSON-safe object.
+	// Cart functions are not serialized; they are recreated by re-executing the
+	// cart source on restore, so state must live in plain data globals
+	// (numbers, strings, booleans and tables of those), which holds for all
+	// bundled cartridges.
+
+	function rleEncode(arr) {
+		var out = '';
+		var i = 0;
+		var n = arr.length;
+		while (i < n) {
+			var c = arr[i] & 15;
+			var j = i;
+			while (j < n && (arr[j] & 15) === c) { j++; }
+			out += c.toString(16) + (j - i).toString(36) + '.';
+			i = j;
+		}
+		return out;
+	}
+
+	function rleDecode(str, out) {
+		var pos = 0;
+		var idx = 0;
+		var n = out.length;
+		while (pos < str.length && idx < n) {
+			var c = parseInt(str.charAt(pos), 16);
+			pos++;
+			var dot = str.indexOf('.', pos);
+			if (dot < 0) { break; }
+			var len = parseInt(str.substring(pos, dot), 36);
+			pos = dot + 1;
+			if (isNaN(c) || isNaN(len)) { break; }
+			for (var k = 0; k < len && idx < n; k++) { out[idx++] = c; }
+		}
+	}
+
+	function captureBaseline(S) {
+		baselineGlobals = {};
+		lua.lua_pushglobaltable(S);
+		var t = lua.lua_gettop(S);
+		lua.lua_pushnil(S);
+		while (lua.lua_next(S, t) !== 0) {
+			if (lua.lua_type(S, -2) === lua.LUA_TSTRING) {
+				baselineGlobals[to_jsstring(lua.lua_tostring(S, -2))] = true;
+			}
+			lua.lua_pop(S, 1);
+		}
+		lua.lua_pop(S, 1);
+	}
+
+	// Encoding: numbers/booleans are stored as-is, strings as ['s', str],
+	// tables as ['t', [[key, value], ...]]; anything else is skipped.
+	function encodeLuaValue(S, idx, depth, seen) {
+		var t = lua.lua_type(S, idx);
+		if (t === lua.LUA_TNUMBER) { return lua.lua_tonumber(S, idx); }
+		if (t === lua.LUA_TBOOLEAN) { return !!lua.lua_toboolean(S, idx); }
+		if (t === lua.LUA_TSTRING) { return ['s', to_jsstring(lua.lua_tostring(S, idx))]; }
+		if (t !== lua.LUA_TTABLE || depth > 10) { return undefined; }
+		var ptr = lua.lua_topointer ? lua.lua_topointer(S, idx) : null;
+		if (ptr !== null) {
+			if (seen.indexOf(ptr) >= 0) { return undefined; } // refuse cycles
+			seen.push(ptr);
+		}
+		var abs = lua.lua_absindex(S, idx);
+		var entries = [];
+		lua.lua_pushnil(S);
+		while (lua.lua_next(S, abs) !== 0) {
+			var kt = lua.lua_type(S, -2);
+			var key;
+			if (kt === lua.LUA_TNUMBER) {
+				key = lua.lua_tonumber(S, -2);
+			} else if (kt === lua.LUA_TSTRING) {
+				key = ['s', to_jsstring(lua.lua_tostring(S, -2))];
+			}
+			if (key !== undefined) {
+				var val = encodeLuaValue(S, -1, depth + 1, seen);
+				if (val !== undefined) { entries.push([key, val]); }
+			}
+			lua.lua_pop(S, 1);
+		}
+		if (ptr !== null) { seen.pop(); }
+		return ['t', entries];
+	}
+
+	function decodeLuaValue(S, v) {
+		if (typeof v === 'number') {
+			lua.lua_pushnumber(S, isFinite(v) ? v : 0);
+			return;
+		}
+		if (typeof v === 'boolean') {
+			lua.lua_pushboolean(S, v);
+			return;
+		}
+		if (v && v.length === 2 && v[0] === 's') {
+			lua.lua_pushstring(S, to_luastring(String(v[1])));
+			return;
+		}
+		if (v && v.length === 2 && v[0] === 't') {
+			var entries = v[1] || [];
+			lua.lua_createtable(S, entries.length, 0);
+			for (var i = 0; i < entries.length; i++) {
+				decodeLuaValue(S, entries[i][0]);
+				decodeLuaValue(S, entries[i][1]);
+				lua.lua_settable(S, -3);
+			}
+			return;
+		}
+		lua.lua_pushnil(S);
+	}
+
+	function saveState() {
+		if (!vm || !vm.S || !baselineGlobals) { return null; }
+		var S = vm.S;
+		try {
+			var globals = {};
+			var seen = [];
+			lua.lua_pushglobaltable(S);
+			var t = lua.lua_gettop(S);
+			lua.lua_pushnil(S);
+			while (lua.lua_next(S, t) !== 0) {
+				if (lua.lua_type(S, -2) === lua.LUA_TSTRING) {
+					var name = to_jsstring(lua.lua_tostring(S, -2));
+					if (!baselineGlobals[name]) {
+						var enc = encodeLuaValue(S, -1, 0, seen);
+						if (enc !== undefined) { globals[name] = enc; }
+					}
+				}
+				lua.lua_pop(S, 1);
+			}
+			lua.lua_pop(S, 1);
+			return {
+				v: 1,
+				seq: frameCount,
+				fb: rleEncode(fb),
+				gfx: rleEncode(gfx),
+				map: rleEncode(mapMem),
+				cx: camX,
+				cy: camY,
+				rng: rng,
+				el: Math.max(0, performance.now() - startTime),
+				g: globals
+			};
+		} catch (e) {
+			return null;
+		}
+	}
+
+	function applyState(st) {
+		var S = vm.S;
+		fb.fill(0);
+		gfx.fill(0);
+		mapMem.fill(0);
+		if (st.fb) { rleDecode(String(st.fb), fb); }
+		if (st.gfx) { rleDecode(String(st.gfx), gfx); }
+		if (st.map) { rleDecode(String(st.map), mapMem); }
+		camX = (st.cx || 0) | 0;
+		camY = (st.cy || 0) | 0;
+		rng = (st.rng | 0) || 0x524F43;
+		startTime = performance.now() - (st.el > 0 ? st.el : 0);
+		frameCount = (st.seq | 0) || 0;
+		var globals = st.g || {};
+		for (var name in globals) {
+			if (Object.prototype.hasOwnProperty.call(globals, name)) {
+				decodeLuaValue(S, globals[name]);
+				lua.lua_setglobal(S, to_luastring(name));
+			}
+		}
+	}
+
+	// Blits an external 128x128 framebuffer (array of palette indices) onto any
+	// canvas, used by spectator views that do not run the emulator.
+	function drawTo(el, arr) {
+		if (!el) { return; }
+		var c = el.getContext('2d');
+		c.imageSmoothingEnabled = false;
+		var img = el._p8img;
+		if (!img) {
+			img = c.createImageData(WIDTH, HEIGHT);
+			el._p8img = img;
+		}
+		var data = img.data;
+		for (var i = 0; i < WIDTH * HEIGHT; i++) {
+			var col = arr[i] & 15;
+			var o = i * 4;
+			data[o] = PALETTE_RGB[col * 4];
+			data[o + 1] = PALETTE_RGB[col * 4 + 1];
+			data[o + 2] = PALETTE_RGB[col * 4 + 2];
+			data[o + 3] = 255;
+		}
+		c.putImageData(img, 0, 0);
+	}
+
 	// ---- public API ----------------------------------------------------------
 	var api = {
 		load: loadCart,
 		destroy: destroy,
 		bind: bind,
 		setButton: setButton,
+		saveState: saveState,
+		drawTo: drawTo,
+		rleEncode: rleEncode,
+		rleDecode: rleDecode,
+		getScreen: function () { return { seq: frameCount, fb: fb }; },
 		isRunning: function () { return running; },
 		getLastError: function () { return lastError; }
 	};

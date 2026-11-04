@@ -10,6 +10,17 @@
 		check_antagonists()
 		return
 
+	if(href_list["toggle_ai_crew"])
+		if(!check_rights(R_ADMIN))
+			return
+		if(GAME_STATE != RUNLEVEL_LOBBY)
+			to_chat(usr, SPAN_WARNING("AI crew must be configured before round setup begins."))
+			return
+		SSticker.ai_crew_enabled = !SSticker.ai_crew_enabled
+		log_and_message_admins("set round-start AI crew to [SSticker.ai_crew_enabled ? "enabled" : "disabled"].")
+		Game()
+		return
+
 	if(href_list["dbsearchckey"] || href_list["dbsearchadmin"])
 
 		var/adminckey = href_list["dbsearchadmin"]

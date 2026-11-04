@@ -35,6 +35,7 @@
 
 	var/list/datum/lighting_corner/effect_str     // List used to store how much we're affecting corners.
 	var/list/turf/affecting_turfs
+	var/list/turf/visibility_turfs // Cross-deck ray paths, including the first blocker.
 
 	var/applied = FALSE // Whether we have applied our light yet or not.
 
@@ -221,16 +222,16 @@
 //Original/Euclidean (circular) lighting falloff. This looks the best and gives a circular light shape.
 // Uses LIGHTING_HEIGHT to simulate pseudo-z falloff.
 #if LIGHTING_FALLOFF == 1
-#define LUM_FALLOFF(C, T) lighting_radial_falloff(C.x - T.x, C.y - T.y, light_range)
+#define LUM_FALLOFF(C, T) lighting_radial_falloff(C.x - T.x, C.y - T.y, light_range, C.z - T.z)
 
 //Manhattan (diamond) falloff. Kept for compatibility if toggled via LIGHTING_FALLOFF define.
 #elif LIGHTING_FALLOFF == 2
-#define LUM_FALLOFF(C, T) (1 - CLAMP01(((abs(C.x - T.x) + abs(C.y - T.y))) / max(1, light_range+1)))
+#define LUM_FALLOFF(C, T) (1 - CLAMP01((abs(C.x - T.x) + abs(C.y - T.y) + abs(C.z - T.z) * LIGHTING_Z_HEIGHT) / max(1, light_range+1)))
 
 //Chebyshev/Octagonal approximation (square-ish). Alternative option if desired.
 #else
 #define GET_LUM_DIST(DISTX, DISTY) (DISTX + DISTY + abs(DISTX - DISTY)*0.4)
-#define LUM_FALLOFF(C, T) (1 - CLAMP01((GET_LUM_DIST(abs(C.x - T.x), abs(C.y - T.y))) / max(1, light_range+1)))
+#define LUM_FALLOFF(C, T) (1 - CLAMP01((GET_LUM_DIST(abs(C.x - T.x), abs(C.y - T.y)) + abs(C.z - T.z) * LIGHTING_Z_HEIGHT) / max(1, light_range+1)))
 #endif
 
 /datum/light_source/proc/prepare_cone()
@@ -264,6 +265,8 @@
 	if(light_glow_range && (light_glow_range < 0 || glow_dist_squared < light_glow_range * light_glow_range))
 		. = 1 - CLAMP01(sqrt(glow_dist_squared) / light_glow_range)
 	if(!cone_target_dist)
+		if(C.z != source_turf.z)
+			. *= lighting_radial_falloff(dx, dy, light_range, C.z - source_turf.z) / max(0.0001, lighting_radial_falloff(dx, dy, light_range))
 		return
 	var/along = dx * cone_unit_x + dy * cone_unit_y
 	var/across = abs(dx * cone_unit_y - dy * cone_unit_x)
@@ -278,6 +281,8 @@
 	if(spot_dist_squared < 1.4 * 1.4)
 		spot = 1 - CLAMP01(sqrt(spot_dist_squared) / 1.4)
 	. = max(., beam, spot)
+	if(C.z != source_turf.z)
+		. *= lighting_radial_falloff(dx, dy, light_range, C.z - source_turf.z) / max(0.0001, lighting_radial_falloff(dx, dy, light_range))
 
 /datum/light_source/proc/update_cone_lum()
 	// Aiming changes intensity, not visibility or corner membership.
@@ -302,10 +307,7 @@
 	applied_lum_g = lum_g
 	applied_lum_b = lum_b
 
-	FOR_DVIEW(var/turf/T, light_range, source_turf, INVISIBILITY_LIGHTING)
-		check_t:
-		if(!T)
-			continue
+	for(var/turf/T in visible_turfs())
 		if(!T.lighting_corners_initialised)
 			T.generate_missing_corners()
 
@@ -330,47 +332,11 @@
 		T.affecting_lights += src
 		affecting_turfs    += T
 
-		if ((T.z_flags & ZM_ALLOW_LIGHTING) && T.below)
-			T = T.below
-			goto check_t
-
-	END_FOR_DVIEW
-
 	update_gen++
-
-/datum/light_source/proc/process_the_turf(var/turf/T, update_gen)
-
-	if(!T.lighting_corners_initialised)
-		T.generate_missing_corners()
-
-	for(var/datum/lighting_corner/C in T.get_corners())
-		if(C.update_gen == update_gen)
-			continue
-
-		C.update_gen = update_gen
-		C.affecting += src
-
-		if(!C.active)
-			effect_str[C] = 0
-			continue
-
-		APPLY_CORNER(C)
-
-
-
-	if(!T.affecting_lights)
-		T.affecting_lights = list()
-
-	T.affecting_lights += src
-	affecting_turfs    += T
-
-	var/turf/simulated/open/O = T
-	if(istype(O) && O.below)
-		return O.below
-	return null
 
 /datum/light_source/proc/remove_lum()
 	applied = FALSE
+	set_visibility_turfs(null)
 
 	for(var/turf/T in affecting_turfs)
 		if(!T.affecting_lights)
@@ -396,16 +362,11 @@
 /datum/light_source/proc/smart_vis_update()
 	var/list/datum/lighting_corner/corners = list()
 	var/list/turf/turfs                    = list()
-	FOR_DVIEW(var/turf/T, light_range, source_turf, 0)
+	for(var/turf/T in visible_turfs())
 		if(!T.lighting_corners_initialised)
 			T.generate_missing_corners()
 		corners |= T.get_corners()
 		turfs   += T
-
-		var/turf/simulated/open/O = T
-		if(istype(O) && O.below)
-			// Consider the turf below us as well. (Z-lights)
-			for(T = O.below; !isnull(T); T = update_the_turf(T,corners, turfs));
 
 	var/list/L = turfs - affecting_turfs // New turfs, add us to the affecting lights of them.
 	affecting_turfs += L
@@ -434,16 +395,95 @@
 		effect_str -= C
 
 
-/datum/light_source/proc/update_the_turf(var/turf/T, var/list/datum/lighting_corner/corners, var/list/turf/turfs)
-	if(!T.lighting_corners_initialised)
-		T.generate_missing_corners()
-	corners |= T.get_corners()
-	turfs   += T
+// Keep native same-deck visibility. Only lights that can see an aperture need
+// cross-deck rays; solid rooms retain the cheap, single view() pass.
+/datum/light_source/proc/visible_turfs()
+	var/list/turfs = list()
+	var/list/watched = list()
+	var/spill_up = FALSE
+	var/spill_down = FALSE
+	FOR_DVIEW(var/turf/T, light_range, source_turf, INVISIBILITY_LIGHTING)
+		turfs += T
+		if((T.z_flags & ZM_ALLOW_LIGHTING) && HasBelow(T.z))
+			spill_down = TRUE
+		var/turf/upper = GetAbove(T)
+		if(upper && (upper.z_flags & ZM_ALLOW_LIGHTING))
+			spill_up = TRUE
+	END_FOR_DVIEW
+	for(var/direction in list(DOWN, UP))
+		if(direction == DOWN ? !spill_down : !spill_up)
+			continue
+		var/target_z = source_turf.z
+		var/z_step = direction == UP ? 1 : -1
+		while(direction == UP ? HasAbove(target_z) : HasBelow(target_z))
+			target_z += z_step
+			var/height = abs(target_z - source_turf.z) * LIGHTING_Z_HEIGHT
+			if(height >= light_range)
+				break
+			var/radius = ceil(sqrt(light_range * light_range - height * height))
+			for(var/turf/T in block(locate(max(1, source_turf.x - radius), max(1, source_turf.y - radius), target_z), locate(min(world.maxx, source_turf.x + radius), min(world.maxy, source_turf.y + radius), target_z)))
+				if(!lighting_radial_falloff(T.x - source_turf.x, T.y - source_turf.y, light_range, target_z - source_turf.z))
+					continue
+				if(multiz_los(T, watched))
+					turfs += T
+	set_visibility_turfs(watched)
+	return turfs
 
-	var/turf/simulated/open/O = T
-	if(istype(O) && O.below)
-		return O.below
-	return null
+/datum/light_source/proc/set_visibility_turfs(list/watched)
+	for(var/turf/T in visibility_turfs)
+		T.lighting_visibility_sources -= src
+	visibility_turfs = watched
+	for(var/turf/T in visibility_turfs)
+		LAZYADD(T.lighting_visibility_sources, src)
+
+// Walk every voxel intersected by the straight 3D ray. A floor belongs to the
+// upper cell of a deck boundary. Tied axes check the side cells too, preventing
+// light from slipping diagonally between walls or through a solid floor edge.
+/datum/light_source/proc/multiz_los(turf/target, list/watched)
+	var/turf/current = source_turf
+	var/dx = target.x - current.x
+	var/dy = target.y - current.y
+	var/dz = target.z - current.z
+	var/step_x = dx > 0 ? 1 : (dx < 0 ? -1 : 0)
+	var/step_y = dy > 0 ? 1 : (dy < 0 ? -1 : 0)
+	var/step_z = dz > 0 ? 1 : (dz < 0 ? -1 : 0)
+	var/delta_x = dx ? 1 / abs(dx) : 1e6
+	var/delta_y = dy ? 1 / abs(dy) : 1e6
+	var/delta_z = dz ? 1 / abs(dz) : 1e6
+	var/next_x = delta_x / 2
+	var/next_y = delta_y / 2
+	var/next_z = delta_z / 2
+	while(current != target)
+		var/next_boundary = min(next_x, next_y, next_z)
+		var/cross_x = abs(next_x - next_boundary) < 0.00001
+		var/cross_y = abs(next_y - next_boundary) < 0.00001
+		var/cross_z = abs(next_z - next_boundary) < 0.00001
+		var/tx = current.x + cross_x * step_x
+		var/ty = current.y + cross_y * step_y
+		var/tz = current.z + cross_z * step_z
+		if(cross_x && cross_y)
+			var/turf/side_x = locate(tx, current.y, current.z)
+			var/turf/side_y = locate(current.x, ty, current.z)
+			watched[side_x] = TRUE
+			watched[side_y] = TRUE
+			if(side_x.opaque_counter || side_y.opaque_counter)
+				return FALSE
+		if(cross_z)
+			var/upper_z = max(current.z, tz)
+			var/turf/upper_start = locate(current.x, current.y, upper_z)
+			var/turf/upper_end = locate(tx, ty, upper_z)
+			watched[upper_start] = TRUE
+			watched[upper_end] = TRUE
+			if(!(upper_start.z_flags & ZM_ALLOW_LIGHTING) || !(upper_end.z_flags & ZM_ALLOW_LIGHTING) || upper_start.opaque_counter || upper_end.opaque_counter)
+				return FALSE
+		current = locate(tx, ty, tz)
+		watched[current] = TRUE
+		if(current.opaque_counter && current != target)
+			return FALSE
+		if(cross_x) next_x += delta_x
+		if(cross_y) next_y += delta_y
+		if(cross_z) next_z += delta_z
+	return TRUE
 
 #undef effect_update
 #undef LUM_FALLOFF
@@ -451,6 +491,7 @@
 #undef APPLY_CORNER
 
 // Smooth finite-radius pool: zero value and zero slope at the outer edge.
-/proc/lighting_radial_falloff(dx, dy, radius)
-	var/remaining = 1 - CLAMP01(sqrt(dx * dx + dy * dy + LIGHTING_HEIGHT) / max(1, radius))
+/proc/lighting_radial_falloff(dx, dy, radius, dz = 0)
+	var/height = dz * LIGHTING_Z_HEIGHT
+	var/remaining = 1 - CLAMP01(sqrt(dx * dx + dy * dy + height * height + LIGHTING_HEIGHT) / max(1, radius))
 	return remaining * remaining * (3 - 2 * remaining)

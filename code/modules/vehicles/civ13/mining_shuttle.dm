@@ -72,6 +72,11 @@ var/civ13_mining_shuttle_serial = 0
 		moving_status = SHUTTLE_IDLE
 
 /datum/shuttle/autodock/multi/civ13_mining/process_launch()
+	if(controller && next_location && !controller.can_visit(next_location))
+		controller.fail(ismob(in_use) ? in_use : null, "SALVAGE COORDINATES PROHIBITED BY BRIDGE. DEPARTURE CANCELLED.")
+		cancel_launch(in_use)
+		next_location = null
+		return
 	if(!next_location || !next_location.is_valid(src))
 		process_state = IDLE_STATE
 		in_use = null
@@ -240,7 +245,7 @@ var/civ13_mining_shuttle_serial = 0
 		return
 	if(action == "Leave Seat")
 		return user_unbuckle_mob(user)
-	if(!user.GetAccess(access_mining))
+	if(!check_mapper_access(user.GetAccess(), user.GetAccess(access_mining)))
 		to_chat(user, SPAN_WARNING("ACCESS DENIED: Mining authorization required."))
 		return
 	if(!chassis.mining_controller || !chassis.mining_controller.get_shuttle())
@@ -250,7 +255,7 @@ var/civ13_mining_shuttle_serial = 0
 
 /obj/structure/bed/chair/civ13/driver/spacecraft/mining/OnTopic(var/mob/user, var/list/href_list)
 	var/obj/structure/vehicleparts/axis/spacecraft/mining/chassis = vehicle_axis
-	if(buckled_mob != user || !istype(chassis) || user.incapacitated() || !user.GetAccess(access_mining))
+	if(buckled_mob != user || !istype(chassis) || user.incapacitated() || !check_mapper_access(user.GetAccess(), user.GetAccess(access_mining)))
 		return TOPIC_HANDLED
 	if(chassis.mining_controller && chassis.mining_controller.handle_menu_action(user, href_list))
 		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1)
@@ -266,7 +271,7 @@ var/civ13_mining_shuttle_serial = 0
 /obj/machinery/computer/civ13_mining_shuttle_comms/attack_hand(mob/user)
 	if(..())
 		return
-	if(!user.GetAccess(ACCESS_REGION_COMMAND))
+	if(!check_mapper_access(user.GetAccess(), user.GetAccess(ACCESS_REGION_COMMAND)))
 		to_chat(user, SPAN_WARNING("ACCESS DENIED: Command authorization required."))
 		return
 	if(!mining_controller || !mining_controller.get_shuttle())
@@ -278,7 +283,7 @@ var/civ13_mining_shuttle_serial = 0
 	mining_controller.show_remote_menu(user, src)
 
 /obj/machinery/computer/civ13_mining_shuttle_comms/OnTopic(var/mob/user, var/list/href_list)
-	if(stat & (BROKEN|NOPOWER) || !user.GetAccess(ACCESS_REGION_COMMAND))
+	if(stat & (BROKEN|NOPOWER) || !check_mapper_access(user.GetAccess(), user.GetAccess(ACCESS_REGION_COMMAND)))
 		return TOPIC_HANDLED
 	if(!mining_controller || !mining_controller.get_shuttle() || mining_controller.remote_forbidden)
 		return TOPIC_HANDLED

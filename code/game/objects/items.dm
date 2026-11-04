@@ -360,6 +360,11 @@
 		if(!temp)
 			to_chat(user, "<span class='notice'>You try to use your hand, but realize it is no longer attached!</span>")
 			return
+		// OS13 parity: bending for floor items hurts with a badly damaged chest.
+		if(isturf(loc))
+			var/obj/item/organ/external/chest = H.organs_by_name[BP_CHEST]
+			if(chest && ((chest.status & ORGAN_BROKEN) || chest.brute_dam >= 20))
+				to_chat(user, "<span class='danger'><b>YOUR CHEST HURTS!</b> You hardly bend down to pick up \the [src].</span>")
 
 	var/old_loc = src.loc
 
@@ -375,6 +380,9 @@
 		if(isliving(src.loc))
 			return
 	if(user.put_in_active_hand(src))
+		// OS13 parity: readying a weapon is announced (marshal video, throughout).
+		if(force >= 6 && isliving(user) && isturf(old_loc))
+			user.visible_message("<span class='warning'>[user] grabs a weapon.</span>")
 		if(ishuman(user))
 			var/mob/living/carbon/human/leech = user
 			if(leech.leech_touch_silver(src))

@@ -2,7 +2,7 @@
 	icon = 'icons/turf/floors.dmi'
 	level = 1
 
-	plane = DEFAULT_PLANE
+	plane = WORLD_TERRAIN_SOURCE_PLANE
 	layer = TURF_LAYER
 
 	var/turf_flags
@@ -45,7 +45,7 @@
 
 	RecalculateOpacity()
 
-	if (mapload && permit_ao)
+	if (permit_ao)
 		queue_ao()
 
 	if (z_flags & ZM_MIMIC_BELOW)
@@ -71,6 +71,11 @@
 	//queue_ao(FALSE)
 
 /turf/Destroy()
+	if(!isnull(telemetry_structural_dirty))
+		telemetry_queue_structural_turf(src)
+	if(ao_receiver)
+		overlays -= ao_receiver.appearance
+	QDEL_NULL(ao_receiver)
 	QDEL_NULL(liquids)
 	remove_cleanables()
 
