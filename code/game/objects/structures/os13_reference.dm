@@ -51,6 +51,10 @@
 	name = "deck 3 marker"
 	icon_state = "odeck3"
 
+// Legacy path used by the manual Waterchip map and its generator.
+/obj/structure/sign/os13_reference_deck
+	parent_type = /obj/structure/sign/os13_deck/three
+
 /obj/structure/sign/os13_deck/four
 	name = "deck 4 marker"
 	icon_state = "odeck4"

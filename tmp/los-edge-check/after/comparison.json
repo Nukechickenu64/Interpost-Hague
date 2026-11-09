@@ -1,0 +1,39 @@
+{
+  "hud_registration": {
+    "offset": [
+      0,
+      0
+    ],
+    "mean_error": 0.0
+  },
+  "before_dark-filtered": {
+    "max_channel": 64,
+    "nonblack_pixels": 10340
+  },
+  "before_dark-unfiltered": {
+    "max_channel": 0,
+    "nonblack_pixels": 0
+  },
+  "after_dark-filtered": {
+    "max_channel": 0,
+    "nonblack_pixels": 0
+  },
+  "after_dark-unfiltered": {
+    "max_channel": 0,
+    "nonblack_pixels": 0
+  },
+  "lit_floor_max_difference": 21,
+  "lit_floor_mean_rgb_before": [
+    73.19404761904762,
+    71.55119047619047,
+    79.54880952380952
+  ],
+  "lit_floor_mean_rgb_after": [
+    72.78809523809524,
+    71.17142857142858,
+    79.13214285714285
+  ],
+  "lit_floor_mean_rgb_difference": 0.4166666666666714,
+  "lit_floor_contrast_difference": 0.5330074080461831,
+  "lit_floor_correlation": 0.8807707922754094
+}

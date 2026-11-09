@@ -72,7 +72,7 @@ var/global/list/ores_by_type = list()
 /ore/zbrite
 	name = "zbrite"
 	display_name = "zbrite"
-	smelts_to = "glass"
+	smelts_to = "zbrite"
 	alloy = 1
 	result_amount = 1
 	spread = 0
@@ -82,7 +82,7 @@ var/global/list/ores_by_type = list()
 /ore/elerium
 	name = "elerium"
 	display_name = "elerium"
-	smelts_to = "plasteel"
+	smelts_to = "elerium"
 	alloy = 1
 	result_amount = 1
 	spread = 0

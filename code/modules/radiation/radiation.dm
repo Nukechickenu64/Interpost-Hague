@@ -77,3 +77,9 @@
 		src.apply_effect(severity, IRRADIATE, src.getarmor(null, "rad"))
 		for(var/atom/I in src)
 			I.rad_act(severity)
+
+/mob/living/carbon/human/rad_act(var/severity)
+	if(istype(wear_suit, /obj/item/clothing/suit/space) && istype(head, /obj/item/clothing/head/helmet/space))
+		if((wear_suit.item_flags & ITEM_FLAG_STOPPRESSUREDAMAGE) && (head.item_flags & ITEM_FLAG_STOPPRESSUREDAMAGE))
+			severity = max(0, severity - COSMIC_RADS_BASE)
+	return ..(severity)

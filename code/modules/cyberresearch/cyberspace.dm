@@ -107,6 +107,7 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	var/turf/entry_turf
 	var/list/floors = list()
 	var/list/nodes = list()
+	var/list/guardian_trail = list()
 	var/list/cells = list()
 	var/required_keys
 	var/decrypted = 0
@@ -204,6 +205,11 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 				add_node(/obj/effect/cyberdeck_node/data_fragment, pick_n_take(available))
 			for(var/i = 1, i <= min(level * 2, available.len), i++)
 				add_node(/obj/effect/cyberdeck_node/ice, pick_n_take(available))
+			if(istype(GLOB.using_map, /datum/map/os13classic))
+				add_node(/obj/effect/cyberdeck_node/guardian/scanner, pick_n_take(available))
+				add_node(/obj/effect/cyberdeck_node/guardian/spore, pick_n_take(available))
+				if(level >= 3)
+					add_node(/obj/effect/cyberdeck_node/guardian/carp, pick_n_take(available))
 			generating = FALSE
 			return TRUE
 		var/turf/core_turf
@@ -242,6 +248,19 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	N.generation = generation
 	nodes += N
 	return N
+
+/datum/cyberdeck_instance/proc/advance_guardians(mob/living/simple_animal/cyber_avatar/avatar)
+	if(!collection_mode || !istype(GLOB.using_map, /datum/map/os13classic) || world.time < owner.protection_active_at)
+		return
+	var/turf/current_tile = get_turf(avatar)
+	guardian_trail -= current_tile
+	guardian_trail.Insert(1, current_tile)
+	if(length(guardian_trail) > 12)
+		guardian_trail.Cut(13)
+	for(var/obj/effect/cyberdeck_node/guardian/guardian in nodes)
+		guardian.patrol(avatar)
+		if(cancelled)
+			return
 
 /datum/cyberdeck_instance/proc/can_traverse_ice(turf/unsimulated/wall/cyberdeck/T, mob/living/simple_animal/cyber_avatar/V)
 	if(!collection_mode || cancelled || generating || QDELETED(owner) || owner.instance != src || !owner.dive_valid(V) || !owner.advanced_port_active() || !istype(T) || T.z != z_level)
@@ -299,6 +318,7 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	for(var/obj/effect/cyberdeck_node/N in nodes)
 		qdel(N)
 	nodes.Cut()
+	guardian_trail.Cut()
 	for(var/turf/T in floors)
 		T.ChangeTurf(/turf/unsimulated/wall/cyberdeck)
 	floors.Cut()
@@ -453,3 +473,77 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 		to_chat(V, SPAN_WARNING("Red ICE strips 20 avatar integrity!"))
 		if(V.health <= 0)
 			V.death()
+
+/obj/effect/cyberdeck_node/guardian
+	icon = 'icons/os13/objects/objects/newcyber.dmi'
+	var/detection_range = 0
+	var/next_hit = 0
+
+/obj/effect/cyberdeck_node/guardian/Crossed(atom/movable/AM)
+	. = ..()
+	var/mob/living/simple_animal/cyber_avatar/avatar = AM
+	contact(avatar)
+
+/obj/effect/cyberdeck_node/guardian/proc/track(mob/living/simple_animal/cyber_avatar/avatar)
+	return null
+
+/obj/effect/cyberdeck_node/guardian/proc/patrol(mob/living/simple_animal/cyber_avatar/avatar)
+	if(QDELETED(src))
+		return
+	if(contact(avatar))
+		return
+	var/turf/target = track(avatar)
+	var/list/steps = list()
+	var/best_distance = INFINITY
+	for(var/direction in GLOB.cardinal)
+		var/turf/next = get_step(src, direction)
+		if(!istype(next, /turf/unsimulated/floor/cyberdeck) || next == instance.entry_turf)
+			continue
+		var/distance = target ? get_dist(next, target) : 0
+		if(distance < best_distance)
+			best_distance = distance
+			steps.Cut()
+		if(distance == best_distance)
+			steps += next
+	if(length(steps))
+		forceMove(pick(steps))
+		contact(avatar)
+
+/obj/effect/cyberdeck_node/guardian/proc/contact(mob/living/simple_animal/cyber_avatar/avatar)
+	if(!can_interact(avatar) || loc != avatar.loc || world.time < instance.owner.protection_active_at || world.time < next_hit)
+		return FALSE
+	next_hit = world.time + 2 SECONDS
+	strike(avatar)
+	return TRUE
+
+/obj/effect/cyberdeck_node/guardian/proc/strike(mob/living/simple_animal/cyber_avatar/avatar)
+	instance.owner.forced_eject("[name] detected you and terminated the connection. No data was written.")
+
+/obj/effect/cyberdeck_node/guardian/scanner
+	name = "archive scanner"
+	icon_state = "access"
+
+/obj/effect/cyberdeck_node/guardian/spore
+	name = "mysterious spore"
+	icon_state = "spore"
+	detection_range = 6
+
+/obj/effect/cyberdeck_node/guardian/spore/track(mob/living/simple_animal/cyber_avatar/avatar)
+	for(var/turf/trace in instance.guardian_trail)
+		if(trace != loc && get_dist(src, trace) <= detection_range)
+			return trace
+
+/obj/effect/cyberdeck_node/guardian/carp
+	name = "cyberspace carp"
+	icon_state = "spesscarp"
+	detection_range = 12
+
+/obj/effect/cyberdeck_node/guardian/carp/track(mob/living/simple_animal/cyber_avatar/avatar)
+	if(get_dist(src, avatar) <= detection_range)
+		return get_turf(avatar)
+
+/obj/effect/cyberdeck_node/guardian/carp/strike(mob/living/simple_animal/cyber_avatar/avatar)
+	if(++avatar.guardian_fatigue >= 3)
+		instance.owner.forced_eject("The cyberspace carp exhausted your avatar and forced an ejection. No data was written.")
+	else
+		to_chat(avatar, SPAN_WARNING("The cyberspace carp saps your strength. Your avatar slows down."))

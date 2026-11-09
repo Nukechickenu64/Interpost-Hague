@@ -197,6 +197,12 @@
 	var/datum/gas_mixture/environment = loc ? loc.return_air() : null
 	if(!environment)
 		return "no room atmosphere"
+	if(engineering_mode == "SIPHON")
+		if(!tank || !tank.enabled || (tank.stat & (NOPOWER|BROKEN)))
+			return "station gas tank offline"
+		if(!airlock_controlled && !area_modcon.scrub_efficiency())
+			return "filter cartridge missing or exhausted"
+		return last_flow_rate > 0 ? "recovering room gas" : "awaiting gas recovery"
 	var/target_pressure = get_target_pressure()
 	if(environment.get_tile_moles() > PRESSURE_TO_MOLES(target_pressure + 0.5))
 		return last_flow_rate > 0 ? "recovering excess gas" : "above target"
@@ -265,6 +271,8 @@
 		last_flow_rate = tank.supply(environment, transfer_moles, src)
 	else
 		var/transfer_moles = get_transfer_moles(environment)
+		if(engineering_mode == "SIPHON")
+			transfer_moles = min(transfer_moles, tank.max_output_moles)
 		if(transfer_moles < MINIMUM_MOLES_TO_PUMP)
 			return 0
 		var/obj/machinery/alarm/area_modcon = initial_loc ? initial_loc.master_air_alarm : null
@@ -495,13 +503,17 @@
 	if(isScrewdriver(W))
 		if(!malfunction)
 			return ..()
+		if(user.incapacitated() || !Adjacent(user) || user.get_active_hand() != W)
+			return TRUE
+		vent_servicing = TRUE
 		to_chat(user, SPAN_NOTICE("You begin servicing the malfunctioning valves on \the [src]..."))
 		playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
-		if(do_after(user, 4 SECONDS, src) && user.get_active_hand() == W && !QDELETED(W))
+		if(do_after(user, 4 SECONDS, src) && !QDELETED(src) && !QDELETED(W) && Adjacent(user) && user.get_active_hand() == W && malfunction)
 			user.visible_message(SPAN_NOTICE("\The [user] services \the [src] with \the [W], and the smoke subsides."))
 			fix_malfunction()
 		else
 			to_chat(user, SPAN_WARNING("You stop servicing \the [src]."))
+		vent_servicing = FALSE
 		return TRUE
 	if(isWelder(W))
 		weld_vent(W, user)

@@ -26,7 +26,7 @@ fs.writeFileSync(path.join(out, 'modcon.html'), '<!doctype html><html><head><met
       assert(state.width <= state.viewport, 'Report overflows at ' + width);
       assert(!state.text.includes('undefined') && state.text.includes('FILTER'));
       assert(state.commands.some(h => h.includes('modcon=lockdown')));
-      assert(state.commands.filter(h => h.includes('modcon=vent')).length === 9);
+      assert(state.commands.filter(h => h.includes('modcon=vent')).length === 12);
       await page.screenshot({ path: path.join(out, 'modcon-' + width + '.png'), fullPage: true });
     }
     console.log('PASS: live modcon report renders all commands at 360/500px without overflow or missing values.');

@@ -177,6 +177,68 @@
 	allowed_directions = UP|DOWN
 	icon_state = "ladder11"
 
+/obj/structure/shladder
+	parent_type = /obj/structure/ladder
+	desc = "A ladder leading through the opening above. It faces the upper landing."
+	icon = 'icons/os13/objects/objects/multiz.dmi'
+	icon_state = "shladder"
+	allowed_directions = UP
+	movable_flags = MOVABLE_FLAG_Z_INTERACT
+
+/obj/structure/shladder/update_icon()
+	icon_state = "shladder"
+
+/obj/structure/shladder/proc/get_climb_destination(mob/user)
+	var/turf/lower = get_turf(src)
+	var/turf/opening = GetAbove(src)
+	var/turf/landing = get_step(opening, dir)
+	if(!lower || !isopenspace(opening) || !landing || !lower.is_floor() || !landing.is_floor() || lower.density || landing.density)
+		to_chat(user, "<span class='warning'>The ladder needs an open passage and solid landings.</span>")
+		return
+	var/going_up = user.z == lower.z
+	if(!going_up && user.z != opening.z)
+		return
+	var/turf/start = going_up ? lower : opening
+	var/direction = going_up ? UP : DOWN
+	if(!lower.CanZPass(start, direction) || !opening.CanZPass(start, direction))
+		to_chat(user, "<span class='warning'>The passage is blocked.</span>")
+		return
+	for(var/atom/obstacle in opening)
+		if(!obstacle.CanPass(user, start, 1.5, 0))
+			to_chat(user, "<span class='warning'>\The [obstacle] blocks the ladder.</span>")
+			return
+	return going_up ? landing : lower
+
+/obj/structure/shladder/climb(mob/user)
+	var/turf/lower = get_turf(src)
+	var/turf/opening = GetAbove(src)
+	var/going_up = user.z == z
+	var/atom/reach_target = going_up ? src : opening
+	if(!reach_target || !user.may_climb_ladders(reach_target))
+		return
+	var/turf/destination = get_climb_destination(user)
+	if(!destination)
+		return
+	if(going_up && !user.Move(lower))
+		to_chat(user, "<span class='warning'>I fail to reach \the [src].</span>")
+		return
+	add_fingerprint(user)
+	for(var/obj/item/grab/grab in user)
+		grab.adjust_position()
+	var/direction = going_up ? "up" : "down"
+	user.visible_message("<span class='notice'>\The [user] begins climbing [direction] \the [src]!</span>", "I begin climbing [direction] \the [src]!", "I hear a metal ladder being used.")
+	if(do_after(user, climb_time, reach_target))
+		if(!user.may_climb_ladders(reach_target) || get_climb_destination(user) != destination)
+			return
+		if(climbLadder(user, destination))
+			for(var/obj/item/grab/grab in user)
+				grab.adjust_position(force = 1)
+
+/obj/structure/shladder/instant_climb(mob/user)
+	var/turf/destination = get_climb_destination(user)
+	if(destination)
+		user.forceMove(destination)
+
 /obj/structure/stairs
 	name = "Stairs"
 	desc = "Stairs leading to another deck. this one is steep."

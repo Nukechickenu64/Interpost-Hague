@@ -148,6 +148,8 @@
 	sort_string = "VAACC"
 
 /mob/living/carbon/human/proc/os13_offer_clone()
+	if(!wraith_effects_allowed())
+		return
 	if(!istype(GLOB.using_map, /datum/map/alpha) || !clone_claimable || key || mind || stat == DEAD || !isturf(loc) || world.time < os13_next_clone_offer)
 		return
 	os13_clone_awakened = TRUE
@@ -202,7 +204,7 @@
 
 /obj/item/organ/internal/os13_psiboost
 	name = "PsiBoost Implant"
-	desc = "An implanted neural amplifier providing remote vision and thought transmission."
+	desc = "An implanted neural amplifier providing remote vision, thought transmission, and three psionic powers."
 	icon = 'icons/os13/objects/objects/weapons/items.dmi'
 	icon_state = "neuroimplant"
 	parent_organ = BP_HEAD
@@ -222,6 +224,8 @@
 /obj/item/organ/internal/os13_psiboost/proc/grant_controls()
 	owner.verbs |= /mob/living/carbon/human/proc/os13_remote_vision
 	owner.verbs |= /mob/living/carbon/human/proc/os13_transmit_thought
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		owner.verbs |= /mob/living/carbon/human/proc/os13_use_psiboost
 
 /obj/item/organ/internal/os13_psiboost/replaced(mob/living/carbon/human/target, obj/item/organ/external/affected)
 	. = ..()
@@ -238,6 +242,8 @@
 
 /obj/item/organ/internal/os13_psiboost/die()
 	stop_viewing()
+	if(owner)
+		owner.os13_psi_armor_until = 0
 	return ..()
 
 /obj/item/organ/internal/os13_psiboost/proc/remove_controls()
@@ -245,9 +251,13 @@
 	if(owner)
 		owner.verbs -= /mob/living/carbon/human/proc/os13_remote_vision
 		owner.verbs -= /mob/living/carbon/human/proc/os13_transmit_thought
+		owner.verbs -= /mob/living/carbon/human/proc/os13_use_psiboost
+		owner.os13_psi_armor_until = 0
+		if(owner.os13_psi_control?.caster == owner)
+			owner.os13_psi_control.finish()
 
 /obj/item/organ/internal/os13_psiboost/proc/can_operate()
-	return owner && owner.internal_organs_by_name[organ_tag] == src && is_usable() && !owner.incapacitated() && owner.has_brain() && !owner.isSynthetic()
+	return owner && !owner.os13_psi_control && owner.internal_organs_by_name[organ_tag] == src && is_usable() && !owner.incapacitated() && owner.has_brain() && !owner.isSynthetic()
 
 /obj/item/organ/internal/os13_psiboost/proc/valid_target(mob/living/carbon/human/target)
 	if(!can_operate() || QDELETED(target) || !target.client || target == owner || target.stat != CONSCIOUS || !target.has_brain() || target.isSynthetic())

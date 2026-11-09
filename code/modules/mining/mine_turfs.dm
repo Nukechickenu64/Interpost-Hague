@@ -10,16 +10,16 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 /**********************Mineral deposits**************************/
 /turf/unsimulated/mineral
 	name = "impassable rock"
-	icon = 'icons/turf/walls.dmi'
-	icon_state = "rock-dark"
+	icon = 'icons/os13/turf/turf/caves_new4.dmi'
+	icon_state = "wall0"
 	blocks_air = 1
 	density = 1
 	opacity = 1
 
 /turf/simulated/mineral //wall piece
 	name = "rock"
-	icon = 'icons/turf/walls.dmi'
-	icon_state = "rock"
+	icon = 'icons/os13/turf/turf/caves_new4.dmi'
+	icon_state = "wall0"
 	initial_gas = null
 	opacity = 1
 	density = 1
@@ -81,13 +81,17 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 	return 1
 
 /turf/simulated/mineral/update_icon(var/update_neighbors)
-	if(!mineral)
-		SetName(initial(name))
-		icon_state = "rock"
-	else
-		SetName("[mineral.display_name] deposit")
+	SetName("rock")
+	icon_state = initial(icon_state)
 
 	overlays.Cut()
+	if(icon == 'icons/os13/turf/turf/caves_new4.dmi')
+		clear_attached_overlays()
+		if(excav_overlay)
+			overlays += excav_overlay
+		if(archaeo_overlay)
+			overlays += archaeo_overlay
+		return
 
 	spawn(1)
 		clear_attached_overlays()
@@ -448,16 +452,13 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 				R.amount = rand(5,25)
 
 			if(2)
-				var/obj/item/stack/material/plasteel/R = new(src)
-				R.amount = rand(5,25)
+				new /obj/item/stack/material/plasteel(src, rand(5,25))
 
 			if(3)
-				var/obj/item/stack/material/steel/R = new(src)
-				R.amount = rand(5,25)
+				new /obj/item/stack/material/steel(src, rand(5,25))
 
 			if(4)
-				var/obj/item/stack/material/plasteel/R = new(src)
-				R.amount = rand(5,25)
+				new /obj/item/stack/material/plasteel(src, rand(5,25))
 
 			if(5)
 				var/quantity = rand(1,3)
@@ -474,9 +475,9 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 				R.amount = rand(5,25)
 
 /turf/simulated/mineral/random
-	name = "Mineral deposit"
+	name = "rock"
 	var/mineralSpawnChanceList = list("Iron" = 70, "Zbrite" = 23, "Elerium" = 7)
-	var/mineralChance = 100 //10 //means 10% chance of this plot changing to a mineral deposit
+	var/mineralChance = 10
 
 /turf/simulated/mineral/random/New()
 	if (prob(mineralChance) && !mineral)
@@ -489,7 +490,7 @@ proc/mineral_overlay_elegibility(var/turf/T)// Fuck this bullshit I'm just makin
 	. = ..()
 
 /turf/simulated/mineral/random/high_chance
-	mineralChance = 100 //25
+	mineralChance = 25
 	mineralSpawnChanceList = list("Iron" = 60, "Zbrite" = 27, "Elerium" = 13)
 
 

@@ -250,6 +250,7 @@
 	return
 
 /obj/machinery/computer/scan_consolenew
+	var/os13_infected = FALSE
 	name = "DNA Modifier Access Console"
 	desc = "Scan DNA."
 	icon = 'icons/obj/computer.dmi'
@@ -278,6 +279,11 @@
 	var/waiting_for_user_input=0 // Fix for #274 (Mash create block injector without answering dialog to make unlimited injectors) - N3X
 
 /obj/machinery/computer/scan_consolenew/attackby(obj/item/I as obj, mob/user as mob)
+	if(os13_infected && istype(I, /obj/item/device/multitool))
+		if(do_after(user, 8 SECONDS, src) && !QDELETED(src) && !QDELETED(I) && os13_infected && Adjacent(user) && I.loc == user && operable() && powered())
+			os13_infected = FALSE
+			to_chat(user, SPAN_NOTICE("You purge the foreign program from the Genetics console."))
+		return
 	if (istype(I, /obj/item/disk/data)) //INSERT SOME diskS
 		if (!src.disk)
 			if(!user || user.incapacitated() || !user.Adjacent(src) || I.loc != user || !user.unEquip(I, target = src))
@@ -372,8 +378,11 @@
   * @return nothing
   */
 /obj/machinery/computer/scan_consolenew/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
-
-	if(user == connected.occupant || user.stat)
+	if(os13_infected)
+		if(!ui)
+			to_chat(user, SPAN_WARNING("GENETICS CONTROL OFFLINE. Foreign program detected. Purge it with a multitool."))
+		return
+	if(!connected || user == connected.occupant || user.stat)
 		return
 
 	// this is the data which will be sent to the ui
@@ -466,6 +475,8 @@
 /obj/machinery/computer/scan_consolenew/Topic(href, href_list)
 	if(..())
 		return 0 // don't update uis
+	if(os13_infected)
+		return 0
 	if(!istype(usr.loc, /turf))
 		return 0 // don't update uis
 	if(!src || !src.connected)

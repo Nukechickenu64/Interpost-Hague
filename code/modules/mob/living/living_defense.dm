@@ -153,6 +153,8 @@
 	..()
 
 /mob/living/proc/resolve_item_attack(obj/item/I, mob/living/user, var/target_zone)
+	if(has_gurps_anatomy() && user != src && !user.gurps_melee_attack_check(src))
+		return null
 	return target_zone
 
 //Called when the mob is hit with an item in combat. Returns the blocked result
@@ -179,6 +181,10 @@
 
 	//Apply weapon damage
 	var/damage_flags = I.damage_flags()
+	if(has_gurps_anatomy() && ishuman(user) && I.damtype == BRUTE)
+		var/mob/living/carbon/human/attacker = user
+		var/damage_type = I.edge ? "cut" : (I.sharp ? "imp" : "cr")
+		return gurps_receive_damage(attacker.combat_roll_damage(I, damage_type), BRUTE, hit_zone, blocked, damage_flags, I)
 	if(prob(blocked)) //armour provides a chance to turn sharp/edge weapon attacks into blunt ones
 		damage_flags &= ~(DAM_SHARP|DAM_EDGE)
 
@@ -295,7 +301,10 @@
 		if(!animal_attacker.gurps_melee_attack_check(src))
 			return 0
 
-	adjustBruteLoss(damage)
+	if(has_gurps_anatomy())
+		apply_damage(damage, BRUTE, user.zone_sel?.selecting || ran_zone())
+	else
+		adjustBruteLoss(damage)
 	admin_attack_log(user, src, "Attacked", "Was attacked", "attacked")
 
 	src.visible_message("<span class='danger'>[user] has [attack_message] [src]!</span>")

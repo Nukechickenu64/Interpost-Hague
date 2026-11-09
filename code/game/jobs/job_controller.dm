@@ -425,7 +425,7 @@ var/global/datum/controller/occupations/job_master
 
 			H.social_class = job.social_class
 			if(!H.job_character_initialized)
-				job.initialize_character(H)
+				job.initialize_character(H, no_starting_equipment)
 				H.job_character_initialized = TRUE
 
 			//Equip job items.

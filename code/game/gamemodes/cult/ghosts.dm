@@ -17,7 +17,11 @@
 				M.verbs += /mob/observer/ghost/proc/toggle_visiblity
 
 /mob/observer/ghost/proc/ghost_ability_check()
+	if(!can_affect_world(TRUE))
+		return FALSE
 	var/turf/T = get_turf(src)
+	if(!T)
+		return FALSE
 	if(T.holy)
 		to_chat(src, "<span class='notice'>You may not use your abilities on the blessed ground.</span>")
 		return 0
@@ -35,7 +39,7 @@
 		return
 
 	for(var/obj/machinery/light/L in range(3))
-		L.flicker()
+		L.flicker(spectral_source = src)
 
 	ghost_magic_cd = world.time + 30 SECONDS
 

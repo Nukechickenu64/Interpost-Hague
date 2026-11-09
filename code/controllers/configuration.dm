@@ -7,6 +7,8 @@ var/list/gamemode_cache = list()
 	var/tts_http_token = null
 	var/tts_max_concurrent_requests = 4
 	var/list/tts_voice_blacklist = list()
+	var/os13_cryo_speaker = "Lakamaka's Voice"
+	var/list/os13_cryo_captions
 	var/server_name = null				// server name (for world name / status)
 	var/server_suffix = 0				// generate numeric suffix based on server port
 
@@ -254,6 +256,24 @@ var/list/gamemode_cache = list()
 					src.votable_modes += M.config_tag
 	src.votable_modes += "secret"
 
+/datum/configuration/proc/add_os13_cryo_caption(value)
+	if(!value)
+		return FALSE
+	var/list/fields = splittext(value, "|")
+	if(length(fields) != 3)
+		return FALSE
+	var/start = text2num(trim(fields[1]))
+	var/finish = text2num(trim(fields[2]))
+	var/caption = trim(fields[3])
+	if(!isnum(start) || !isnum(finish) || start < 0 || finish <= start || finish SECONDS > OS13_CRYO_RELEASE_TIME || !caption)
+		return FALSE
+	if(length(os13_cryo_captions))
+		var/list/previous = os13_cryo_captions[length(os13_cryo_captions)]
+		if(start SECONDS < previous[2])
+			return FALSE
+	LAZYADD(os13_cryo_captions, list(list(start SECONDS, finish SECONDS, caption)))
+	return TRUE
+
 /datum/configuration/proc/load(filename, type = "config") //the type can also be game_options, in which case it uses a different switch. not making it separate to not copypaste code - Urist
 	var/list/Lines = file2list(filename)
 
@@ -289,6 +309,12 @@ var/list/gamemode_cache = list()
 					config.tts_max_concurrent_requests = clamp(text2num(value), 1, 16)
 				if ("tts_voice_blacklist")
 					config.tts_voice_blacklist = splittext(value, ",")
+				if ("os13_cryo_speaker")
+					if(trim(value))
+						os13_cryo_speaker = trim(value)
+				if ("os13_cryo_caption")
+					if(!add_os13_cryo_caption(value))
+						log_world("Invalid OS13_CRYO_CAPTION in [filename]: [value]")
 				if ("resource_urls")
 					config.resource_urls = splittext(value, " ")
 

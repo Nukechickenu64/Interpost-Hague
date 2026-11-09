@@ -7,10 +7,10 @@
 /****************************** Ores ******************************/
 
 /obj/item/ore/os13
-	name = "ore"
-	desc = "A lump of ore that looks like any other rock."
+	name = "rock"
+	desc = "A lump of asteroid rock."
 	icon = 'icons/os13/objects/objects/mining.dmi'
-	icon_state = "ore"
+	icon_state = "rock"
 	randpixel = 8
 	w_class = ITEM_SIZE_SMALL
 	var/replicator_material_id
@@ -22,31 +22,29 @@
 	else
 		return ..()
 
-// Keep the generic rock sprite; only sync names/tech from the ore datum so the
-// processing unit can account for smelting.
 /obj/item/ore/os13/update_ore()
 	if(!ore)
 		return
-	SetName(ore.display_name)
+	SetName("rock")
 	origin_tech = ore.origin_tech.Copy()
 
 /obj/item/ore/os13/iron
-	name = "iron ore"
+	name = "rock"
 	ore = /ore/hematite
 	replicator_material_id = DEFAULT_WALL_MATERIAL
 	matter = list(DEFAULT_WALL_MATERIAL = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/ore/os13/zbrite
-	name = "zbrite"
+	name = "rock"
 	ore = /ore/zbrite
-	replicator_material_id = "glass"
-	matter = list("glass" = SHEET_MATERIAL_AMOUNT)
+	replicator_material_id = "zbrite"
+	matter = list("zbrite" = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/ore/os13/elerium
-	name = "elerium"
+	name = "rock"
 	ore = /ore/elerium
-	replicator_material_id = "plasteel"
-	matter = list("plasteel" = SHEET_MATERIAL_AMOUNT)
+	replicator_material_id = "elerium"
+	matter = list("elerium" = SHEET_MATERIAL_AMOUNT)
 
 /********************** Grav Cutter **********************/
 

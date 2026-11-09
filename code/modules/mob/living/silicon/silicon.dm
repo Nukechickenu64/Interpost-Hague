@@ -1,5 +1,6 @@
 /mob/living/silicon
 	gender = NEUTER
+	gurps_damage_resistance = 4
 	voice_name = "synthesized voice"
 	var/syndicate = 0
 	var/const/MAIN_CHANNEL = "Main Frequency"
@@ -104,18 +105,14 @@
 	return
 
 /mob/living/silicon/IsAdvancedToolUser()
-	return 1
+	return gurps_manipulator_usable()
 
-/mob/living/silicon/bullet_act(var/obj/item/projectile/Proj)
+/mob/living/silicon/bullet_act(var/obj/item/projectile/Proj, var/def_zone)
 
 	if(!Proj.nodamage)
-		switch(Proj.damage_type)
-			if(BRUTE)
-				adjustBruteLoss(Proj.damage)
-			if(BURN)
-				adjustFireLoss(Proj.damage)
+		apply_damage(Proj.damage, Proj.damage_type, def_zone, damage_flags = Proj.damage_flags(), used_weapon = Proj)
 
-	Proj.on_hit(src,100) //wow this is a terrible hack
+	Proj.on_hit(src, 0, def_zone)
 	updatehealth()
 	return 100
 
@@ -133,7 +130,7 @@
 // this function shows the health of the AI in the Status panel
 /mob/living/silicon/proc/show_system_integrity()
 	if(!src.stat)
-		stat(null, text("System integrity: [round((health/maxHealth)*100)]%"))
+		stat(null, "HP: [round(health, 0.1)] / [maxHealth]")
 	else
 		stat(null, text("Systems nonfunctional"))
 

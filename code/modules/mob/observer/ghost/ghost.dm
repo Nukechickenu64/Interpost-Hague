@@ -2,9 +2,9 @@ var/global/list/image/ghost_darkness_images = list() //this is a list of images 
 var/global/list/image/ghost_sightless_images = list() //this is a list of images for things ghosts should still be able to see even without ghost sight
 
 /mob/observer/ghost
-	name = "ghost"
-	desc = "It's a g-g-g-g-ghooooost!" //jinkies!
-	icon = 'icons/mob/mob.dmi'
+	name = "wraith"
+	desc = "A lost shadow in limbo."
+	icon = 'icons/os13/wraith/spectres.dmi'
 	icon_state = "ghost"
 	appearance_flags = KEEP_TOGETHER
 	canmove = 0
@@ -106,7 +106,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	return target && !target.density
 
 /mob/observer/ghost/proc/offer_pain_possession()
-	if(!client || !pain_possession_candidates || !pain_possession_turf)
+	if(!can_affect_world() || !client || !pain_possession_candidates || !pain_possession_turf)
 		return
 	var/list/options = list()
 	for(var/obj/target in pain_possession_candidates)
@@ -129,7 +129,7 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 		possess_pain_object(chosen)
 
 /mob/observer/ghost/proc/possess_pain_object(obj/target)
-	if(!client || control_object || pain_possession_object || !valid_pain_possession_target(target))
+	if(!can_affect_world(TRUE) || !client || control_object || pain_possession_object || !valid_pain_possession_target(target))
 		return FALSE
 	stop_following()
 	can_reenter_corpse = FALSE
@@ -194,6 +194,12 @@ Works together with spawning an observer, noted above.
 /mob/observer/ghost/Life()
 	..()
 	if(!loc) return
+	if(!can_affect_world())
+		if(pain_possession_object)
+			end_pain_possession()
+		if(invisibility == 0)
+			set_invisibility(INVISIBILITY_OBSERVER)
+			mouse_opacity = 1
 	if(!client) return 0
 
 	handle_hud_glasses()
@@ -290,6 +296,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/Stat()
 	. = ..()
 	if(statpanel("Status"))
+		stat("Pain", wraith_pain)
+		stat("Physical effects", can_affect_world() ? "Available" : "Requires Phi above 90")
 		if(SSevac.evacuation_controller)
 			var/eta_status = SSevac.evacuation_controller.get_status_panel_eta()
 			if(eta_status)
@@ -465,6 +473,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/become_mouse()
 	set name = "BecomeMouse"
 	set category = "Ghost"
+	if(!can_affect_world(TRUE))
+		return
 
 	if(config.disable_player_mice)
 		to_chat(src, "<span class='warning'>Spawning as a mouse is currently disabled.</span>")
@@ -479,7 +489,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		return
 
 	var/response = alert(src, "Are you -sure- you want to become a mouse?","Are you sure you want to squeek?","Squeek!","Nope!")
-	if(response != "Squeek!") return  //Hit the wrong key...again.
+	if(response != "Squeek!" || !client || !can_affect_world(TRUE))
+		return
 
 	//find a viable mouse candidate
 	var/mob/living/simple_animal/mouse/host
@@ -529,6 +540,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	return ..()
 
 /mob/observer/ghost/proc/try_possession(var/mob/living/M)
+	if(!can_affect_world(TRUE))
+		return FALSE
 	if(!config.ghosts_can_possess_animals)
 		to_chat(src, "<span class='warning'>Ghosts are not permitted to possess animals.</span>")
 		return 0
@@ -574,7 +587,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	return 0
 
 /mob/observer/ghost/can_admin_interact()
-	return check_rights(R_ADMIN, 0, src)
+	return can_affect_world() && check_rights(R_ADMIN, 0, src)
 
 /mob/observer/ghost/verb/toggle_ghostsee()
 	set name = "ToggleGhostVision"

@@ -57,6 +57,8 @@
 		wearing_rig = null
 
 	..()
+	if(cyberdeck_needs_sleep)
+		recover_from_cyberdeck_ejection()
 
 	if(life_tick%30==15)
 		hud_updateflag = 1022

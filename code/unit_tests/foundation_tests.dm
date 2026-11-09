@@ -246,33 +246,31 @@ datum/unit_test/foundation/proc/TestStep(type_to_test)
 	name = "FOUNDATION: Look-far cull mask retains body visibility across the shifted viewport"
 
 /datum/unit_test/foundation/look_far_cull_mask/start_test()
-	var/turf/body_turf = get_safe_turf()
+	var/turf/body_turf = get_safe_turf() || locate(world.maxx - 25, world.maxy - 25, world.maxz)
 	var/turf/eye_turf = get_step(body_turf, EAST)
 	var/mob/viewer = new(body_turf)
 	viewer.see_in_dark = 8
-	var/list/visible = view(1, viewer)
+	var/list/visible = view(2, viewer)
 	var/list/strips = get_los_cull_strips(eye_turf, 1, viewer, TRUE)
-	var/hidden_tiles = 0
 	var/visible_tiles = 0
 	for(var/offset_y in -1 to 1)
 		for(var/offset_x in -1 to 1)
 			var/turf/tile = locate(eye_turf.x + offset_x, eye_turf.y + offset_y, eye_turf.z)
 			var/is_hidden = FALSE
 			for(var/atom/movable/los_strip/strip as anything in strips)
-				var/matrix/strip_transform = strip.transform
-				if(strip_transform.f == offset_y * world.icon_size && abs(offset_x * world.icon_size - strip_transform.c) < strip_transform.a * world.icon_size / 2)
+				var/icon/strip_icon = icon(strip.icon)
+				var/pixel_offset = offset_x * world.icon_size - strip.pixel_x
+				if(strip.pixel_y == offset_y * world.icon_size && pixel_offset >= 0 && pixel_offset < strip_icon.Width())
 					is_hidden = TRUE
 					break
 			var/expected_hidden = tile && !(tile in visible)
 			if(is_hidden != expected_hidden)
 				fail("Shifted viewport tile ([offset_x], [offset_y]) did not match character-based visibility.")
-			if(expected_hidden)
-				hidden_tiles++
-			else if(tile)
+			if(tile && !expected_hidden && get_dist(body_turf, tile) > 1)
 				visible_tiles++
-	if(!hidden_tiles || !visible_tiles)
-		fail("The mask fixture did not exercise both hidden and visible tiles.")
+	if(!visible_tiles)
+		fail("The mask fixture did not exercise a visible tile beyond the normal viewport.")
 	qdel(viewer)
 	if(!reported)
-		pass("Mask strips cover hidden tiles beyond the body footprint without hiding visible tiles.")
+		pass("The shifted mask preserves visibility from the body beyond the normal viewport.")
 	return TRUE

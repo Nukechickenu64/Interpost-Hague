@@ -462,12 +462,15 @@
 	var/area/A = get_area(src)
 	return A && A.lightswitch && !bridge_startup_pending && has_power
 
-/obj/machinery/light/proc/flicker(var/amount = rand(10, 20), var/power_loss = FALSE, var/bridge_startup = FALSE)
-	if((!power_loss && !bridge_startup) || flickering || get_status() != LIGHT_OK)
-		return
+/obj/machinery/light/proc/flicker(var/amount = rand(10, 20), var/power_loss = FALSE, var/bridge_startup = FALSE, mob/observer/ghost/spectral_source)
+	var/haunted = !!spectral_source
+	if((!power_loss && !bridge_startup && !haunted) || flickering || get_status() != LIGHT_OK)
+		return FALSE
+	if(haunted && !spectral_source.can_affect_world())
+		return FALSE
 	var/area/room = get_area(src)
-	if(!room || !room.lightswitch || bridge_startup_pending || (bridge_startup && !powered()))
-		return
+	if(!room || !room.lightswitch || bridge_startup_pending || ((bridge_startup || haunted) && !powered()))
+		return FALSE
 	flickering = TRUE
 	var/generation = ++flicker_generation
 	playsound(src, 'sound/machines/lflick.ogg', 40)
@@ -475,6 +478,8 @@
 		for(var/i = 0; i < amount; i++)
 			if(QDELETED(src) || generation != flicker_generation)
 				return
+			if(haunted && (QDELETED(spectral_source) || !spectral_source.can_affect_world()))
+				break
 			if(get_status() != LIGHT_OK || !room.lightswitch || bridge_startup_pending)
 				break
 			if(power_loss ? powered(ignore_switch = TRUE) : !powered())
@@ -486,6 +491,7 @@
 			on = powered() && get_status() == LIGHT_OK
 			update_icon(0)
 			flickering = FALSE
+	return TRUE
 
 /obj/machinery/light/attack_ai(mob/user)
 	return

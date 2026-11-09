@@ -94,6 +94,8 @@
 	try_drone_spawn(src)
 
 /proc/try_drone_spawn(var/mob/user, var/obj/machinery/drone_fabricator/fabricator)
+	if(!ghost_can_affect_world(user, TRUE))
+		return
 
 	if(GAME_STATE < RUNLEVEL_GAME)
 		to_chat(user, "<span class='danger'>The game hasn't started yet!</span>")
@@ -132,7 +134,7 @@
 			return
 		fabricator = all_fabricators[choice]
 
-	if(user && fabricator && !((fabricator.stat & NOPOWER) || !fabricator.produce_drones || fabricator.drone_progress < 100))
+	if(user?.client && ghost_can_affect_world(user, TRUE) && fabricator && !((fabricator.stat & NOPOWER) || !fabricator.produce_drones || fabricator.drone_progress < 100))
 		log_and_message_admins("has joined the round as a maintenance drone.")
 		var/mob/drone = fabricator.create_drone(user.client)
 		if(drone)

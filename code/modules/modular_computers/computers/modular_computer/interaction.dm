@@ -138,7 +138,9 @@
 	update_uis()
 
 /obj/item/modular_computer/attack_ghost(var/mob/observer/ghost/user)
-	return attack_self(user)
+	if(ghost_can_affect_world(user))
+		return attack_self(user)
+	return ..()
 
 /obj/item/modular_computer/attack_ai(var/mob/user)
 	return attack_self(user)

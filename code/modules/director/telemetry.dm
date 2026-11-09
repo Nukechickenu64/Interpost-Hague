@@ -127,6 +127,10 @@ var/global/list/telemetry_structural_dirty
 // === Individual samplers ===
 
 /datum/telemetry/proc/sample_power_grid()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		var/coverage = power_net.os13_generation_coverage()
+		samples[TELEMETRY_POWER_GRID] = isnull(coverage) ? 0 : round(coverage)
+		return
 	var/powered = 0
 	var/total = 0
 	for(var/obj/machinery/power/area_smes/A in SSmachines.machinery)

@@ -1,0 +1,104 @@
+
+/datum/map/alpha
+	name = "Alpha"
+	full_name = "Station Alpha"
+	path = "alpha"
+
+	lobby_icon = 'maps/alpha/alpha_lobby.dmi'
+
+	station_levels = list(1,2,3)
+	admin_levels = list(4)
+	atmos_isolated_z_levels = list(4)
+	contact_levels = list(1,2,3)
+	player_levels = list(1,2,3,5)
+	accessible_z_levels = list("1"=1,"2"=1,"3"=1,"5"=90) //Percentage of chance to get on this or that Z level as you drift through space.
+
+	allowed_spawns = list("Cryogenic Storage", "Cryogenic Storage Captain")
+
+	station_name  = "NT-Vesper-13"
+	station_short = "NT-Vesper-13"
+	dock_name     = "Gnezdo"
+	boss_name     = "NANOTRASEN CORPORATE COMMAND"
+	boss_short    = "NT"
+	company_name  = "Nanotrasen"
+	company_short = "NT"
+	system_name = "Algol, Beta Persei"
+
+	map_admin_faxes = list("NANOTRASEN MAIL SUBROUTINE")
+
+	shuttle_docked_message = " has docked with the station. Command staff is prioritised."
+	shuttle_leaving_dock = "The Spiteful has departed from home dock."
+	shuttle_called_message = "A scheduled crew transfer shuttle Spiteful has been sent."
+	shuttle_recall_message = "The Spiteful has been recalled. Continuous wasting of resources may result in the crew's termination."
+	emergency_shuttle_docked_message = "The Spiteful has docked with the station. Command staff is prioritised."
+	emergency_shuttle_leaving_dock = "The Spiteful emergency escape shuttle has departed from %dock_name%."
+	emergency_shuttle_called_message = "Spiteful emergency escape shuttle has been sent. It will arrive in approximately 10 minutes."
+	emergency_shuttle_recall_message = "The Spiteful emergency escape shuttle has been recalled. Continuous wasting of resources may result in the crew's termination."
+
+	evac_controller_type = /datum/evacuation_controller/shuttle
+
+/datum/map/alpha/setup_map()
+	var/station_designation = pick("Vesper", "Aquila", "Bellatrix", "Cygni", "Draco", "Erebus", "Helios", "Kepler", "Orion", "Sagan", "Sirius", "Valkyrie")
+	station_name = "NT-[station_designation]-13"
+	station_short = station_name
+	..()
+
+/datum/map/alpha/perform_map_generation()
+	new /datum/random_map/automata/cave_system(null,1,1,1,200, 200) // Create the mining Z-level.
+	new /datum/random_map/noise/ore(null,1,1,1,64, 64)
+	return 1
+
+/datum/map/os13classic
+	parent_type = /datum/map/alpha
+	name = "OS13 Classic"
+	full_name = "Orbital Station 13 Classic"
+	path = "os13classic"
+	lobby_icon = 'maps/os13/os13_lobby.dmi'
+	lobby_screens = list("os13_title")
+	// Classic is the two-deck map. The separate recreation has eight decks.
+	station_levels = list(1,2)
+	admin_levels = list()
+	atmos_isolated_z_levels = list()
+	contact_levels = list(1,2)
+	player_levels = list(1,2)
+	map_levels = list(1,2)
+	accessible_z_levels = list("1"=1,"2"=1)
+	station_name = "Orbital Station 13"
+	station_short = "OS13"
+
+/datum/map/os13classic/setup_map()
+	// Establish the physical stack before atom initialization. Keep this in the
+	// map configuration so saving the DMM cannot remove the deck connections.
+	new /obj/effect/landmark/map_data/os13classic(locate(1, 1, 3))
+	. = ..()
+	station_name = "Orbital Station 13"
+	station_short = "OS13"
+	lobby_music = new /lobby_music/os13
+
+/obj/effect/landmark/map_data/os13classic
+	height = 3
+
+/lobby_music/os13
+	song = 'sound/music/os13_lobby.ogg'
+
+/datum/map/os13classic/perform_map_generation()
+	return TRUE
+
+/datum/event_container/mundane
+	available_events = list(
+		// Severity level, event name, even type, base weight, role weights, one shot, min weight, max weight. Last two only used if set and non-zero
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Nothing",			/datum/event/nothing,			100),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "APC Damage",		/datum/event/apc_damage,		20, 	list(ASSIGNMENT_ENGINEER = 10)),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Brand Intelligence",/datum/event/brand_intelligence,10, 	list(ASSIGNMENT_JANITOR = 10),	1),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Camera Damage",		/datum/event/camera_damage,		20, 	list(ASSIGNMENT_ENGINEER = 10)),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Lost Carp",			/datum/event/carp_migration, 	20, 	list(ASSIGNMENT_SECURITY = 10), 1),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Mundane News", 		/datum/event/mundane_news, 		300),
+		//new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Psionic Signal", 		/datum/event/minispasm, 		300),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Shipping Error",	/datum/event/shipping_error	, 	30, 	list(ASSIGNMENT_ANY = 2), 0),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Meteor Wave",		/datum/event/meteor_wave,		200, 	list(ASSIGNMENT_ANY = 10)),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Sensor Suit Jamming",/datum/event/sensor_suit_jamming,50,	list(ASSIGNMENT_MEDICAL = 20, ASSIGNMENT_AI = 20), 1),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Trivial News",		/datum/event/trivial_news, 		400),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Vermin Infestation",/datum/event/infestation, 		100,	list(ASSIGNMENT_JANITOR = 100)),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Wallrot",			/datum/event/wallrot, 			0,		list(ASSIGNMENT_ENGINEER = 30, ASSIGNMENT_GARDENER = 50)),
+		new /datum/event_meta(EVENT_LEVEL_MUNDANE, "Space Cold Outbreak",/datum/event/space_cold,		100,	list(ASSIGNMENT_MEDICAL = 20)),
+	)

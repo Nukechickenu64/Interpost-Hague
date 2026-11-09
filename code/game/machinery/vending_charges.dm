@@ -76,6 +76,11 @@
 	icon_vend = "equipment-vend"
 	icon_deny = "equipment-deny"
 
+/obj/machinery/vending/engineering/os13/Initialize()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		products = products + list(/obj/item/device/fixboy, /obj/item/device/os13_foam_container, /obj/item/stack/cable_coil)
+	return ..()
+
 /obj/item/vending_charge/proc/compatible(obj/machinery/vending/V)
 	return istype(V)
 

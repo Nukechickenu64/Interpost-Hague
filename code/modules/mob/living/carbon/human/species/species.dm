@@ -648,20 +648,21 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	if(!client)
 		return
 	remove_cryo_filter_effect()
-	cryo_filter_effect = new
-	client.screen += cryo_filter_effect
-	// Rarely add a strong directional ghost image to the standard cryo blur.
-	if(prob(20))
-		cryo_double_sight_effect = new
-		client.screen += cryo_double_sight_effect
-		animate_cryo_double_sight()
+	var/double_sight = prob(20)
+	cryo_filter_effects = list()
+	// The floor and its projected shadows are composed separately from objects.
+	for(var/world_plane in list(DEFAULT_PLANE, WORLD_TERRAIN_DISPLAY_PLANE, WORLD_SHADOW_DISPLAY_PLANE))
+		var/obj/screen/plane_master/cryo/effect = new
+		effect.plane = world_plane
+		cryo_filter_effects += effect
+		client.screen += effect
+		if(double_sight)
+			effect.filters += filter(type = "motion_blur", name = "cryo_double_sight", x = 4, y = -3)
+			animate_cryo_double_sight(effect.filters["cryo_double_sight"])
 
-/mob/living/proc/animate_cryo_double_sight()
-	if(!cryo_double_sight_effect)
-		return
-	var/double_sight = cryo_double_sight_effect.filters[1]
+/mob/living/proc/animate_cryo_double_sight(double_sight)
 	// Shift the directional ghost around the view, periodically returning to focus.
-	animate(double_sight, x = 0, y = 0, time = 1.2 SECONDS, easing = SINE_EASING | EASE_OUT, loop = -1)
+	animate(double_sight, x = 0, y = 0, time = 1.2 SECONDS, easing = SINE_EASING | EASE_OUT, loop = -1, tag = "cryo_double_sight")
 	animate(double_sight, x = 5, y = 1, time = 0.9 SECONDS, easing = SINE_EASING | EASE_IN)
 	animate(double_sight, x = 2, y = 5, time = 0.9 SECONDS, easing = SINE_EASING)
 	animate(double_sight, x = -4, y = 3, time = 0.9 SECONDS, easing = SINE_EASING)
@@ -670,23 +671,23 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	animate(double_sight, x = 0, y = 0, time = 1.2 SECONDS, easing = SINE_EASING | EASE_IN)
 
 /mob/living/proc/fade_cryo_filter_effect(var/duration = 40 SECONDS)
-	if(!cryo_filter_effect)
+	if(!cryo_filter_effects)
 		return
-	animate(cryo_filter_effect.filters[1], size = 0, time = duration, flags = ANIMATION_PARALLEL)
-	animate(cryo_filter_effect.filters[2], size = 0, time = duration, flags = ANIMATION_PARALLEL)
-	animate(cryo_filter_effect.filters[3], size = 0, time = duration, flags = ANIMATION_PARALLEL)
-	if(cryo_double_sight_effect)
-		animate(cryo_double_sight_effect.filters[1], x = 0, y = 0, time = duration, easing = SINE_EASING | EASE_OUT)
-	addtimer(CALLBACK(src, /mob/living/proc/remove_cryo_filter_effect), duration, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_NO_HASH_WAIT)
+	for(var/obj/screen/plane_master/cryo/effect as anything in cryo_filter_effects)
+		animate(effect.filters[1], size = 0, time = duration, flags = ANIMATION_PARALLEL)
+		animate(effect.filters[2], size = 0, time = duration, flags = ANIMATION_PARALLEL)
+		animate(effect.filters[3], size = 0, time = duration, flags = ANIMATION_PARALLEL)
+		var/double_sight = effect.filters["cryo_double_sight"]
+		if(double_sight)
+			animate(double_sight, x = 0, y = 0, time = duration, easing = SINE_EASING | EASE_OUT, tag = "cryo_double_sight")
+	addtimer(CALLBACK(src, /mob/living/proc/remove_cryo_filter_effect, cryo_filter_effects), duration, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_NO_HASH_WAIT)
 
-/mob/living/proc/remove_cryo_filter_effect()
-	if(!cryo_filter_effect)
+/mob/living/proc/remove_cryo_filter_effect(list/fading_effects)
+	if(!cryo_filter_effects || (fading_effects && fading_effects != cryo_filter_effects))
 		return
 	if(client)
-		client.screen -= cryo_filter_effect
-		client.screen -= cryo_double_sight_effect
-	QDEL_NULL(cryo_filter_effect)
-	QDEL_NULL(cryo_double_sight_effect)
+		client.screen -= cryo_filter_effects
+	QDEL_NULL_LIST(cryo_filter_effects)
 
 /datum/species/proc/post_organ_rejuvenate(var/obj/item/organ/org)
 	return

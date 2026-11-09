@@ -79,7 +79,9 @@
 		else if(istype(A, /area/crew_quarters/captain))
 			captain_cabinets += C
 	var/obj/structure/filingcabinet/id_records/cabinet
-	if(istype(job, /datum/job/captain) && captain_cabinets.len)
+	if(istype(job, /datum/job/captain) || istype(job, /datum/job/os13/captain))
+		if(!captain_cabinets.len)
+			return
 		cabinet = pick(captain_cabinets)
 	else
 		cabinet = pick((hop_cabinets.len && prob(98)) ? hop_cabinets : GLOB.id_record_cabinets)
@@ -89,6 +91,7 @@
 		W.desc = outfit.id_desc
 	W.rank = job.title
 	W.assignment = alt_title || job.title
+	W.access |= job.get_access()
 	H.set_id_info(W)
 	// Unnamed so the owner has to prove it's theirs via photo, prints and DNA.
 	W.registered_name = null

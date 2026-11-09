@@ -3,10 +3,12 @@
 		health = maxHealth
 		stat = CONSCIOUS
 		return
-	health = maxHealth - (getBruteLoss() + getFireLoss())
+	gurps_updatehealth()
 	return
 
 /mob/living/silicon/robot/getBruteLoss()
+	if(gurps_bodyparts)
+		return gurps_body_damage()
 	var/amount = 0
 	for(var/V in components)
 		var/datum/robot_component/C = components[V]
@@ -14,6 +16,8 @@
 	return amount
 
 /mob/living/silicon/robot/getFireLoss()
+	if(gurps_bodyparts)
+		return gurps_body_damage(TRUE)
 	var/amount = 0
 	for(var/V in components)
 		var/datum/robot_component/C = components[V]
@@ -21,12 +25,18 @@
 	return amount
 
 /mob/living/silicon/robot/adjustBruteLoss(var/amount)
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(amount)
+	amount *= gurps_legacy_health_scale
 	if(amount > 0)
 		take_overall_damage(amount, 0)
 	else
 		heal_overall_damage(-amount, 0)
 
 /mob/living/silicon/robot/adjustFireLoss(var/amount)
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(amount, TRUE)
+	amount *= gurps_legacy_health_scale
 	if(amount > 0)
 		take_overall_damage(0, amount)
 	else
@@ -56,33 +66,39 @@
 		return C
 	return 0
 
+/mob/living/silicon/robot/gurps_absorb_injury(var/injury)
+	if(injury <= 0 || !cell || !istype(module_active, /obj/item/borg/combat/shield))
+		return injury
+	var/obj/item/borg/combat/shield/shield = module_active
+	var/absorbed = injury * shield.shield_level
+	var/cost = absorbed * gurps_legacy_health_scale * 100
+	if(cell.charge < cost)
+		cell.charge = 0
+		to_chat(src, SPAN_WARNING("Your shield has overloaded!"))
+		return injury
+	cell.charge -= cost
+	return max(0, injury - absorbed)
+
 /mob/living/silicon/robot/heal_organ_damage(var/brute, var/burn)
+	if(!gurps_damage_applying)
+		if(brute) gurps_adjust_body_damage(-brute)
+		if(burn) gurps_adjust_body_damage(-burn, TRUE)
+		return
 	var/list/datum/robot_component/parts = get_damaged_components(brute,burn)
 	if(!parts.len)	return
 	var/datum/robot_component/picked = pick(parts)
 	picked.heal_damage(brute,burn)
 
 /mob/living/silicon/robot/take_organ_damage(var/brute = 0, var/burn = 0, var/sharp = 0, var/edge = 0, var/emp = 0)
+	if(!gurps_damage_applying)
+		initialize_gurps_anatomy()
+		var/flags = (sharp ? DAM_SHARP : 0) | (edge ? DAM_EDGE : 0)
+		if(brute) gurps_receive_damage(brute / gurps_legacy_health_scale, BRUTE, BP_CHEST, damage_flags = flags, ignore_armor = emp)
+		if(burn) gurps_receive_damage(burn / gurps_legacy_health_scale, BURN, BP_CHEST, ignore_armor = emp)
+		return
 	var/list/components = get_damageable_components()
 	if(!components.len)
 		return
-
-	 //Combat shielding absorbs a percentage of damage directly into the cell.
-	if(module_active && istype(module_active,/obj/item/borg/combat/shield))
-		var/obj/item/borg/combat/shield/shield = module_active
-		//Shields absorb a certain percentage of damage based on their power setting.
-		var/absorb_brute = brute*shield.shield_level
-		var/absorb_burn = burn*shield.shield_level
-		var/cost = (absorb_brute+absorb_burn)*100
-
-		cell.charge -= cost
-		if(cell.charge <= 0)
-			cell.charge = 0
-			to_chat(src, "<span class='warning'>Your shield has overloaded!</span>")
-		else
-			brute -= absorb_brute
-			burn -= absorb_burn
-			to_chat(src, "<span class='warning'>Your shield absorbs some of the impact!</span>")
 
 	if(!emp)
 		var/datum/robot_component/armour/A = get_armour()
@@ -94,6 +110,10 @@
 	C.take_damage(brute,burn,sharp,edge)
 
 /mob/living/silicon/robot/heal_overall_damage(var/brute, var/burn)
+	if(!gurps_damage_applying)
+		if(brute) gurps_adjust_body_damage(-brute)
+		if(burn) gurps_adjust_body_damage(-burn, TRUE)
+		return
 	var/list/datum/robot_component/parts = get_damaged_components(brute,burn)
 
 	while(parts.len && (brute>0 || burn>0) )
@@ -111,24 +131,11 @@
 
 /mob/living/silicon/robot/take_overall_damage(var/brute = 0, var/burn = 0, var/sharp = 0, var/used_weapon = null)
 	if(status_flags & GODMODE)	return	//godmode
+	if(!gurps_damage_applying)
+		if(brute) apply_damage(brute, BRUTE, damage_flags = sharp ? DAM_SHARP : 0, used_weapon = used_weapon)
+		if(burn) apply_damage(burn, BURN, used_weapon = used_weapon)
+		return
 	var/list/datum/robot_component/parts = get_damageable_components()
-
-	 //Combat shielding absorbs a percentage of damage directly into the cell.
-	if(module_active && istype(module_active,/obj/item/borg/combat/shield))
-		var/obj/item/borg/combat/shield/shield = module_active
-		//Shields absorb a certain percentage of damage based on their power setting.
-		var/absorb_brute = brute*shield.shield_level
-		var/absorb_burn = burn*shield.shield_level
-		var/cost = (absorb_brute+absorb_burn)*100
-
-		cell.charge -= cost
-		if(cell.charge <= 0)
-			cell.charge = 0
-			to_chat(src, "<span class='warning'>Your shield has overloaded!</span>")
-		else
-			brute -= absorb_brute
-			burn -= absorb_burn
-			to_chat(src, "<span class='warning'>Your shield absorbs some of the impact!</span>")
 
 	var/datum/robot_component/armour/A = get_armour()
 	if(A)
@@ -151,3 +158,12 @@
 /mob/living/silicon/robot/emp_act(severity)
 	uneq_all()
 	..() //Damage is handled at /silicon/ level.
+
+/mob/living/silicon/robot/rejuvenate()
+	..()
+	for(var/component_name in components)
+		var/datum/robot_component/component = components[component_name]
+		component.brute_damage = 0
+		component.electronics_damage = 0
+		if(component.installed == -1)
+			component.repair()

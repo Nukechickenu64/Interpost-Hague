@@ -60,6 +60,55 @@ other types of metals and chemistry for reagents).
 /datum/design/proc/Fabricate(var/newloc, var/fabricator)
 	return new build_path(newloc)
 
+/datum/design/proc/get_replicator_materials()
+	var/static/list/recipes = list(
+		/datum/design/item/disk/tech/os13 = list("steel" = 1, "zbrite" = 1),
+		/datum/design/item/disk/design = list("steel" = 1, "zbrite" = 1),
+		/datum/design/item/powercell/basic = list("steel" = 2, "zbrite" = 1),
+		/datum/design/item/powercell/high = list("steel" = 4, "elerium" = 2, "zbrite" = 2),
+		/datum/design/item/solar_panel = list("steel" = 2, "zbrite" = 4),
+		/datum/design/item/solar_panel/advanced = list("steel" = 3, "elerium" = 3, "zbrite" = 6),
+		/datum/design/item/os13_trinet_helmet = list("steel" = 2, "zbrite" = 3),
+		/datum/design/item/os13_trinet_suit = list("steel" = 5, "elerium" = 2, "zbrite" = 1),
+		/datum/design/item/os13_space_boots = list("steel" = 1, "zbrite" = 1),
+		/datum/design/item/os13_magnetic_boots = list("steel" = 3, "elerium" = 2, "zbrite" = 1),
+		/datum/design/item/os13_distress_beacon = list("steel" = 2, "zbrite" = 2),
+		/datum/design/item/os13_tnc_laser = list("steel" = 4, "elerium" = 1, "zbrite" = 3),
+		/datum/design/item/os13_heavy_gravpulser = list("steel" = 10, "elerium" = 8, "zbrite" = 5),
+		/datum/design/item/os13_stun_mine = list("steel" = 2, "elerium" = 1, "zbrite" = 1),
+		/datum/design/item/os13_energy_gun = list("steel" = 6, "elerium" = 3, "zbrite" = 4),
+		/datum/design/item/os13_energy_sword = list("steel" = 4, "elerium" = 5, "zbrite" = 3),
+		/datum/design/item/os13_advanced_fixboy = list("steel" = 3, "elerium" = 2, "zbrite" = 4),
+		/datum/design/item/os13_remcom = list("steel" = 5, "elerium" = 4, "zbrite" = 5),
+		/datum/design/item/weapon/stunrevolver = list("steel" = 3, "zbrite" = 2),
+		/datum/design/item/weapon/stunrifle = list("steel" = 5, "elerium" = 2, "zbrite" = 3),
+		/datum/design/item/waterchip = list("steel" = 2, "zbrite" = 3),
+		/datum/design/item/os13_gravcutter = list("steel" = 5, "elerium" = 3, "zbrite" = 2),
+		/datum/design/item/os13_artificial_liver = list("steel" = 2, "elerium" = 2, "zbrite" = 2),
+		/datum/design/item/os13_artificial_eyeball = list("steel" = 1, "elerium" = 2, "zbrite" = 3),
+		/datum/design/item/os13_advanced_neural_port = list("steel" = 3, "elerium" = 6, "zbrite" = 5),
+		/datum/design/item/os13_psiboost = list("steel" = 5, "elerium" = 12, "zbrite" = 8)
+	)
+	var/list/recipe = recipes[type]
+	if(recipe)
+		. = recipe.Copy()
+		for(var/material_id in .)
+			.[material_id] *= SHEET_MATERIAL_AMOUNT
+		return
+	. = list()
+	var/minimum_sheets = 1
+	for(var/technology in req_tech)
+		minimum_sheets = max(minimum_sheets, ceil(req_tech[technology] / 2))
+	for(var/material_id in materials)
+		if(materials[material_id] <= 0)
+			continue
+		var/feedstock = copytext(material_id, 1, 2) == "$" ? copytext(material_id, 2) : material_id
+		if(!(feedstock in GLOB.replicator_material_names))
+			feedstock = (feedstock in list("glass", "rglass", "phoronglass", "borosilicate", "diamond", "quartz")) ? "zbrite" : "elerium"
+		.[feedstock] += materials[material_id]
+	for(var/material_id in .)
+		.[material_id] = clamp(max(minimum_sheets, ceil(.[material_id] / SHEET_MATERIAL_AMOUNT)), 1, 15) * SHEET_MATERIAL_AMOUNT
+
 /datum/design/item
 	build_type = PROTOLATHE
 
@@ -81,7 +130,7 @@ other types of metals and chemistry for reagents).
 	desc = "Produce additional disks for storing technology data."
 	id = "tech_disk"
 	req_tech = list(TECH_DATA = 1)
-	materials = list(DEFAULT_WALL_MATERIAL = 30, "glass" = 10)
+	materials = list(DEFAULT_WALL_MATERIAL = 1, "glass" = 1)
 	build_path = /obj/item/disk/tech_disk
 	sort_string = "AAAAB"
 

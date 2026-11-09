@@ -7,7 +7,7 @@
 	anchored = 1
 	luminosity = 1
 	icon = LIGHTING_ICON
-	plane = LIGHTING_PLANE
+	plane = LIGHTING_SAMPLE_PLANE
 	layer = LIGHTING_LAYER
 	invisibility = INVISIBILITY_LIGHTING
 	color = "#000000"
@@ -75,9 +75,25 @@
 		return
 	update_edge_guard()
 
+	var/turf/surface = lighting_sample_surface(T)
+	if(surface != T && !TURF_IS_DYNAMICALLY_LIT_UNSAFE(surface))
+		// Leave fullbright openings visible without feeding white into the bloom or veil.
+		luminosity = TRUE
+		if(alpha)
+			animate(src)
+			alpha = 0
+			has_light_sample = FALSE
+			lum_r = lum_g = lum_b = 1
+			QDEL_NULL(tile_glow)
+			T.refresh_lighting_edge_guards()
+		return
+	if(!alpha)
+		alpha = initial(alpha)
+		T.refresh_lighting_edge_guards()
+
 	// Sample one light value for the whole tile. The light plane supplies spatial
 	// blur and bloom; the tile itself must not bilinearly interpolate four colors.
-	var/list/rgb = lighting_tile_rgb(T)
+	var/list/rgb = lighting_tile_rgb(T, surface)
 	var/set_luminosity = max(rgb[1], rgb[2], rgb[3]) > 1e-6
 	luminosity = enhanced_los_enabled ? TRUE : set_luminosity
 	// Keep geometry/visibility current, but do not restart identical color and
@@ -134,13 +150,14 @@
 	// if (T.above && T.above.shadower)
 	// 	T.above.shadower.copy_lighting(src)
 
-/proc/lighting_tile_rgb(turf/T)
+/proc/lighting_sample_surface(turf/T)
 	// Overwritten open turfs show a lower floor, not a surface at this height.
-	// Shade that visible surface once; the existing Z-copy multiplier supplies
-	// the depth cue. Crawlspace covers keep their own surface lighting.
-	var/turf/surface = T
-	while(surface.below && !surface.opaque_counter && (surface.z_flags & ZM_MIMIC_BELOW) && (surface.z_flags & ZM_MIMIC_OVERWRITE))
-		surface = surface.below
+	// Crawlspace covers keep their own surface lighting.
+	while(T.below && !T.opaque_counter && (T.z_flags & ZM_MIMIC_BELOW) && (T.z_flags & ZM_MIMIC_OVERWRITE))
+		T = T.below
+	return T
+
+/proc/lighting_tile_rgb(turf/T, turf/surface = lighting_sample_surface(T))
 	if(surface != T && !TURF_IS_DYNAMICALLY_LIT_UNSAFE(surface))
 		return list(1, 1, 1)
 	T = surface
@@ -165,10 +182,9 @@
 		blue += C.lum_b
 	return lighting_display_rgb(red / max(1, count), green / max(1, count), blue / max(1, count))
 
-// Native visibility omits tiles behind an opaque boundary. Without padding,
-// blur/bloom samples the white fullbright backdrop there and lights the wall's
-// outer edge even when every actual light sample is zero. Put black padding
-// below the real tile samples; visible neighbors replace it with their own RGB.
+// Native visibility can omit a tile behind an opaque boundary while some of
+// its neighbors' art still extends into it. Keep those overhangs shaded with
+// black padding below the real tile samples. Visible neighbors supply their RGB.
 // Exclude nondynamic neighbors so their intentionally fullbright backing stays.
 var/global/list/lighting_edge_guard_cache = list()
 
@@ -180,8 +196,8 @@ var/global/list/lighting_edge_guard_cache = list()
 	simulated = FALSE
 	luminosity = 1
 	invisibility = INVISIBILITY_LIGHTING
-	plane = LIGHTING_PLANE
-	// Both padding and samples use the topdown group, above the screen backing.
+	plane = LIGHTING_SAMPLE_PLANE
+	// Both padding and samples use the topdown group for consistent ordering.
 	layer = LIGHTING_LAYER - 0.1
 	blend_mode = BLEND_OVERLAY
 
@@ -197,7 +213,7 @@ var/global/list/lighting_edge_guard_cache = list()
 		for(var/dy in -1 to 1)
 			for(var/dx in -1 to 1)
 				var/turf/N = locate(T.x + dx, T.y + dy, T.z)
-				if(!N || TURF_IS_DYNAMICALLY_LIT(N))
+				if(!N || (TURF_IS_DYNAMICALLY_LIT_UNSAFE(N) && !(N.lighting_overlay && !N.lighting_overlay.alpha)))
 					mask |= bit
 				bit <<= 1
 	var/key = "[mask]"

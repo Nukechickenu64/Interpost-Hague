@@ -56,7 +56,7 @@
 			var/damage = O.force
 			if (O.damtype == PAIN)
 				damage = 0
-			health -= damage
+			apply_damage(damage, O.damtype, user.zone_sel?.selecting, damage_flags = O.damage_flags(), used_weapon = O)
 			visible_message("<span class='danger'>\The [src] has been attacked with \the [O] by \the [user].</span>")
 		else
 			visible_message("<span class='danger'>\The [src] blocks the [O] with its shield!</span>")
@@ -66,10 +66,10 @@
 		visible_message("<span class='warning'>\The [user] gently taps \the [src] with \the [O].</span>")
 
 
-/mob/living/simple_animal/hostile/syndicate/melee/bullet_act(var/obj/item/projectile/Proj)
+/mob/living/simple_animal/hostile/syndicate/melee/bullet_act(var/obj/item/projectile/Proj, var/def_zone)
 	if(!Proj)	return
 	if(prob(65))
-		src.health -= Proj.damage
+		return ..(Proj, def_zone)
 	else
 		visible_message("<span class='danger'>\The [src] blocks \the [Proj] with its shield!</span>")
 	return 0

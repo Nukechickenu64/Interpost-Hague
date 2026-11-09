@@ -14,18 +14,17 @@
 	for(var/n in 1 to severity)
 		waves += rand(20,35)
 
-	start_side = pick(GLOB.cardinal)
+	var/datum/event_meta/space_hazard/hazard = event_meta
+	start_side = (istype(hazard) && hazard.approach_dir) ? hazard.approach_dir : pick(GLOB.cardinal)
 	endWhen = worst_case_end()
 
 /datum/event/meteor_wave/announce()
 	// OS13 parity: proximity countdown to first impact (marshal video 32:45).
 	var/seconds_to_impact = max(0, round((next_meteor - activeFor) * 2))
-	to_world("<span class='danger'><b>DANGER! Proximity alert! [seconds_to_impact]s until the collision!</b></span>")
-	switch(severity)
-		if(EVENT_LEVEL_MAJOR)
-			GLOB.using_map.meteors_detected_announcement()
-		else
-			command_announcement.Announce("The [station_name()] is now in a meteor shower.", "[station_name()] Sensor Array")
+	if(severity == EVENT_LEVEL_MAJOR)
+		station_alert_radio("DANGER! Proximity alert! [replacetext(GLOB.using_map.meteor_detected_message, "%STATION_NAME%", station_name())] Impact from the [dir2text(start_side)] in [seconds_to_impact]s!", GLOB.using_map.meteor_detected_sound)
+	else
+		station_alert_radio("DANGER! Proximity alert! The [station_name()] is entering a meteor shower. Impact from the [dir2text(start_side)] in [seconds_to_impact]s!")
 
 /datum/event/meteor_wave/tick()
 	// Begin sending the alarm signals to shield diffusers so the field is already regenerated (if it exists) by the time actual meteors start flying around.
@@ -41,8 +40,7 @@
 	return activeFor + ((30 / severity) * waves) + 30
 
 /datum/event/meteor_wave/proc/send_wave()
-	var/pick_side = prob(80) ? start_side : (prob(50) ? turn(start_side, 90) : turn(start_side, -90))
-	spawn() spawn_meteors(get_wave_size(), get_meteors(), pick_side)
+	spawn() spawn_meteors(get_wave_size(), get_meteors(), start_side)
 	next_meteor += rand(next_meteor_lower, next_meteor_upper) / severity
 	waves--
 	endWhen = worst_case_end()
@@ -51,11 +49,7 @@
 	return severity * rand(2,4)
 
 /datum/event/meteor_wave/end()
-	switch(severity)
-		if(EVENT_LEVEL_MAJOR)
-			command_announcement.Announce("The [station_name()] has cleared the meteor storm.", "[station_name()] Sensor Array")
-		else
-			command_announcement.Announce("The [station_name()] has cleared the meteor shower.", "[station_name()] Sensor Array")
+	station_alert_radio("The [station_name()] has cleared the meteor [severity == EVENT_LEVEL_MAJOR ? "storm" : "shower"].")
 
 /datum/event/meteor_wave/proc/get_meteors()
 	switch(severity)

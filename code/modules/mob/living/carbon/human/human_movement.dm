@@ -104,6 +104,8 @@
 	var/movement_delay = tally + config.human_delay
 	if(is_leech() && leech_stat_bonuses[STAT_DX])
 		movement_delay /= 3
+	if(os13_hypnogenesis_until > world.time)
+		movement_delay += 6
 	return movement_delay
 
 /mob/proc/get_jetpack()
@@ -117,6 +119,8 @@
 			var/obj/item/rig/rig = back
 			for(var/obj/item/rig_module/maneuvering_jets/module in rig.installed_modules)
 				return module.jets
+	if(istype(s_store, /obj/item/tank/jetpack))
+		return s_store
 	return null
 
 /mob/living/carbon/human/Process_Spacemove(var/check_drift = 0)

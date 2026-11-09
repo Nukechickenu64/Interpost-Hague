@@ -539,6 +539,12 @@ var/list/rank_prefix = list(\
 		if(!action_allowed || usr != src)
 			return
 		switch(action_id)
+			if("os13_open_cache")
+				var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+				orders?.open_cache(src)
+			if("os13_traitor_thoughts")
+				var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+				orders?.thoughts(src)
 			if("CreateRune")
 				var/spell/rune_write/rune_spell = locate(/spell/rune_write) in mind.learned_spells
 				if(!rune_spell)

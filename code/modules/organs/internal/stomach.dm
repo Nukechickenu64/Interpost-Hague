@@ -252,7 +252,7 @@
 			unlock_achievement(new/datum/achievement/shit_pants())
 
 		//Poo on the face.
-		else if(M != src && M.lying)//Can only shit on them if they're lying down.
+		else if(M && M != src && M.lying)//Can only shit on them if they're lying down.
 			message = "<span class='combatbold'>[H]</span><span class='hygiene'> shits right on </span><span class='combatbold'>[M]'s</span><span class='hygiene'> face!</span>"
 			M.reagents.add_reagent(/datum/reagent/poo, 10)
 			M.unlock_achievement(new/datum/achievement/shit_on())

@@ -77,7 +77,11 @@ var/global/list/protected_objects = list(/obj/structure/table, /obj/structure/wi
 			melee_damage_upper = 2 + I.force
 			move_to_delay = 2 * I.w_class
 
-		maxHealth = health
+		maxHealth = max(1, round(health / 10))
+		health = maxHealth
+		var/datum/gurps_bodypart/torso = gurps_bodypart_for(BP_CHEST)
+		torso.brute = 0
+		torso.burn = 0
 		if(creator)
 			src.creator = weakref(creator)
 			faction = "\ref[creator]" // very unique

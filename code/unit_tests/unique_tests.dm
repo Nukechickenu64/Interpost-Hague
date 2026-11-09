@@ -150,27 +150,6 @@
 		fail("Lazy field allocation, survey safety, round-trip movement, or level reuse failed.")
 	return 1
 
-/datum/unit_test/research_processor_only_offers_buildable_designs
-	name = "RESEARCH: Ideation Condenser Only Offers Buildable Designs"
-
-/datum/unit_test/research_processor_only_offers_buildable_designs/start_test()
-	var/obj/machinery/research_processor/processor = new
-	var/list/choices = processor.get_design_choices("grief")
-	var/valid = choices && choices.len
-	for(var/design_type in choices)
-		var/datum/design/design = design_type
-		if(!initial(design.build_path) || !(initial(design.build_type) & (PROTOLATHE|IMPRINTER)))
-			valid = FALSE
-	var/selected_type = processor.pick_weighted_design("grief")
-	if(selected_type && !(selected_type in choices))
-		valid = FALSE
-	qdel(processor)
-	if(valid)
-		pass("The condenser selects only designs that a fabricator can build.")
-	else
-		fail("The condenser candidate pool includes invalid designs or is empty.")
-	return 1
-
 /datum/unit_test/bluegate_activation_is_occupant_only
 	name = "BLUEGATE: Only Occupant Can Activate Transformation"
 

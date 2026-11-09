@@ -195,10 +195,11 @@ GLOBAL_LIST_INIT(replicator_material_names, list("steel" = "steel", "plasteel" =
 
 /obj/machinery/r_n_d/protolathe/getLackingMaterials(datum/design/D)
 	var/list/missing = list()
-	for(var/material_id in D.materials)
-		var/required = D.materials[material_id] * mat_efficiency - material_amount(material_id, TRUE)
+	var/list/recipe = D.get_replicator_materials()
+	for(var/material_id in recipe)
+		var/required = recipe[material_id] * mat_efficiency - material_amount(material_id, TRUE)
 		if(required > 0)
-			missing += "[required] [material_name(material_id)]"
+			missing += "[round(required / SHEET_MATERIAL_AMOUNT, 0.01)] sheets of [material_name(material_id)]"
 	for(var/chemical in D.chemicals)
 		if(!reagents.has_reagent(chemical, D.chemicals[chemical] * mat_efficiency))
 			var/datum/reagent/R = chemical

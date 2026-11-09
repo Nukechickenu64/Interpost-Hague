@@ -578,7 +578,7 @@
 	if(!(C in render_sources) || !(physical_source in render_sources) || !(C.lighting_overlay in render_sources) || !(C.lighting_overlay.edge_guard in render_sources))
 		fail("Retaining a wall omitted its light sample or dark edge padding.")
 	var/mutable_appearance/retained_light = los_retained_wall_appearance(C.lighting_overlay)
-	if(retained_light.plane != LIGHTING_PLANE || !retained_light.color)
+	if(retained_light.plane != LIGHTING_SAMPLE_PLANE || !retained_light.color)
 		fail("Retained lighting escaped the multiply lightmap.")
 	C.set_opacity(FALSE)
 	retained_area.dynamic_lighting = was_dynamic
@@ -711,9 +711,14 @@
 	var/mob/viewer = new(C)
 	viewer.see_in_dark = 20
 	var/turf/eye_turf = locate(C.x + 4, C.y, C.z)
-	var/turf/wall = locate(C.x + 2, C.y + 1, C.z)
-	wall.set_opacity(TRUE)
-	var/list/visible = view(7, viewer)
+	for(var/dx in 1 to 11)
+		var/turf/wall = locate(C.x + dx, C.y + 2, C.z)
+		wall.set_opacity(TRUE)
+	var/list/visible = view(11, viewer)
+	var/turf/clear_far_tile = locate(C.x + 11, C.y, C.z)
+	var/turf/blocked_far_tile = locate(C.x + 8, C.y + 4, C.z)
+	if(!(clear_far_tile in visible) || (blocked_far_tile in visible))
+		fail("Fixture must have both a visible tile and a blocked tile beyond the normal viewport.")
 	var/list/strips = get_los_cull_strips(eye_turf, 7, viewer, TRUE)
 	var/hidden_count = 0
 	for(var/dy in -7 to 7)
@@ -729,7 +734,7 @@
 				fail("Camera offset changed body visibility at ([dx], [dy]).")
 	if(!hidden_count) fail("Fixture did not exercise a concealed tile.")
 	qdel(viewer)
-	if(!reported) pass("Every viewport tile was compared with visibility from the character's body.")
+	if(!reported) pass("The shifted viewport shows clear distant tiles and still hides tiles blocked from the body.")
 	return TRUE
 
 /datum/unit_test/lighting_los_mesh

@@ -17,3 +17,17 @@
 	antag_scaling_coeff = 5
 	end_on_antag_death = 0
 	latejoin_antag_tags = list(MODE_TRAITOR)
+	var/datum/os13_traitor_orders/os13_orders
+
+/datum/game_mode/traitor/pre_setup()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		round_description = "Orbital Station 13 has awakened to evidence of sabotage. Find the traitor and secure the station."
+		extended_round_description = "After six centuries in cryosleep, the crew of Orbital Station 13 wakes to a damaged station. The Marshal must investigate the sabotage and bring the traitor to the Brig while the rest of the crew repairs the station and defends it against outside threats."
+		latejoin_antag_tags = list()
+		round_autoantag = FALSE
+		addantag_allowed = ADDANTAG_ADMIN
+		antag_scaling_coeff = 0
+	return ..()
+
+/datum/game_mode/traitor/check_finished()
+	return os13_orders?.bomb_detonated || ..()

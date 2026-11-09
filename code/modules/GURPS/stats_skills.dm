@@ -318,6 +318,8 @@ proc/conToToxinModifier(var/constitution, var/w_class)
 /mob/living/proc/gurps_melee_attack_check(mob/living/target)
 	if(!target)
 		return FALSE
+	if(has_gurps_anatomy() && (!gurps_manipulator_usable() || incapacitated()))
+		return FALSE
 
 	var/attack_margin = skillcheck_margin(skills[SKILL_MELEE], SKILL_MELEE)
 	if(attack_margin < 0)

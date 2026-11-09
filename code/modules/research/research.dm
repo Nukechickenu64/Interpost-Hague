@@ -100,16 +100,28 @@ research holder datum.
 //Adds a tech to known_tech list. Checks to make sure there aren't duplicates and updates existing tech's levels if needed.
 //Input: datum/tech; Output: Null
 /datum/research/proc/AddTech2Known(var/datum/tech/T)
+	return import_technologies(list(T))
+
+/datum/research/proc/import_technologies(list/recordings)
 	var/os13 = istype(GLOB.using_map, /datum/map/alpha)
-	if(QDELETED(T) || (os13 && (!(T.type in research_technology_types()) || T.level != 1)))
-		log_debug("Research rejected an unavailable technology import.")
-		return FALSE
+	var/list/targets = list()
+	for(var/datum/tech/T as anything in recordings)
+		if(QDELETED(T) || (os13 && (!istype(T, /datum/tech/os13) || T.type == /datum/tech/os13 || T.level != 1)))
+			log_debug("Research rejected an unavailable technology import.")
+			return FALSE
+		var/datum/tech/target = find_import_target(T, os13)
+		if(!target)
+			return FALSE
+		targets[T] = target
+	for(var/datum/tech/recording as anything in targets)
+		var/datum/tech/target = targets[recording]
+		target.level = max(target.level, recording.level)
+	return length(targets) > 0
+
+/datum/research/proc/find_import_target(datum/tech/T, os13)
 	for(var/datum/tech/known in known_tech)
 		if(T.id == known.id && (!os13 || T.type == known.type))
-			if(T.level > known.level)
-				known.level = os13 ? 1 : T.level
-			return TRUE
-	return FALSE
+			return known
 
 /datum/research/proc/AddDesign2Known(var/datum/design/D)
 	if(istype(GLOB.using_map, /datum/map/alpha) && !DesignHasReqs(D))
@@ -258,8 +270,11 @@ research holder datum.
 /obj/item/disk/tech_disk/examine(mob/user)
 	. = ..()
 	to_chat(user, SPAN_NOTICE("<b>Technologies:</b>"))
-	if(stored)
-		to_chat(user, SPAN_NOTICE("[html_encode(stored.name)] ([istype(stored, /datum/tech/os13) ? "tier" : "level"] [stored.display_level()])"))
+	for(var/datum/tech/recording in research_recordings())
+		to_chat(user, SPAN_NOTICE("[html_encode(recording.name)] ([istype(recording, /datum/tech/os13) ? "tier" : "level"] [recording.display_level()])"))
+
+/obj/item/disk/tech_disk/proc/research_recordings()
+	return stored ? list(stored) : list()
 
 /obj/item/disk/tech_disk/os13
 	name = "Diskette"
@@ -271,7 +286,28 @@ research holder datum.
 
 /obj/item/disk/tech_disk/os13/core
 	name = "Core Diskette"
-	desc = "A core technology diskette. Its source-provided contents are unknown."
+	desc = "A core technology diskette for the Replicator console."
+	var/list/core_recordings
+
+/obj/item/disk/tech_disk/os13/core/Initialize(mapload)
+	. = ..()
+	stored = new /datum/tech/os13/battery
+	core_recordings = list(stored, new /datum/tech/os13/solar_panel, new /datum/tech/os13/icepick_mk1)
+
+/obj/item/disk/tech_disk/os13/core/research_recordings()
+	return core_recordings ? core_recordings.Copy() : ..()
+
+/obj/item/disk/tech_disk/os13/core/set_research(datum/tech/technology)
+	if(core_recordings)
+		for(var/datum/tech/recording in core_recordings)
+			if(recording != technology)
+				qdel(recording)
+		core_recordings = null
+	return ..()
+
+/obj/item/disk/tech_disk/os13/core/Destroy()
+	set_research(null)
+	return ..()
 
 /obj/item/disk/design_disk
 	name = "component design disk"
@@ -352,7 +388,13 @@ research holder datum.
 		/datum/design/item/os13_advanced_neural_port = /datum/tech/os13/advanced_port,
 		/datum/design/item/os13_psiboost = /datum/tech/os13/psiboost
 	)
-	return catalogue
+	if(!istype(GLOB.using_map, /datum/map/os13classic))
+		return catalogue
+	var/static/list/classic_catalogue
+	if(!classic_catalogue)
+		classic_catalogue = catalogue.Copy()
+		classic_catalogue[/datum/design/item/os13_psiboost/advanced] = /datum/tech/os13/psiboost_plus
+	return classic_catalogue
 
 /datum/tech/os13
 	level = 1
@@ -370,6 +412,12 @@ research holder datum.
 	name = "ICE-Pick MK2"
 	id = "os13_icepick_mk2"
 	desc = "Speeds up ICE-Pick recharge by ten times."
+
+/datum/tech/os13/icepick_mk1
+	name = "ICE-Pick Mk.I"
+	id = "os13_icepick_mk1"
+	desc = "Software for removing information in cyberspace."
+	initially_available = FALSE
 
 /datum/tech/os13/distress_beacon
 	name = "Distress Beacon"

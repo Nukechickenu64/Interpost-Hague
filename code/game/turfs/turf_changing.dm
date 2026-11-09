@@ -34,6 +34,7 @@
 	var/old_ao_neighbors = ao_neighbors
 	var/old_opaque_counter = opaque_counter
 	var/old_z_flags = z_flags
+	var/turf/old_above = above
 	var/old_lighting_visibility_sources = lighting_visibility_sources
 	var/datum/gas_mixture/old_air
 	if(istype(src, /turf/simulated))
@@ -67,10 +68,15 @@
 		A.forceMove(null)
 
 	var/turf/simulated/W = new N( locate(src.x, src.y, src.z) )
+	if(old_above)
+		W.above = old_above
+		old_above.below = W
 	if(istype(W, /turf/simulated) && old_air)
 		W.air = old_air
 	for(var/atom/movable/A in old_contents)
-		A.forceMove(W)
+		// Exit and lighting refresh hooks can delete objects while the turf is replaced.
+		if(!QDELETED(A))
+			A.forceMove(W)
 
 	W.opaque_counter = old_opaque_counter
 	W.RecalculateOpacity()

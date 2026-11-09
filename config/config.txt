@@ -433,3 +433,9 @@ ORGANS_CAN_DECAY
 
 ## Director recruitment policy: crew (automatically assign existing human crew), ghosts, or disabled.
 DIRECTOR_ANTAG_POLICY crew
+
+## Optional OS13 round-start cryo captions. Valid custom rows replace the built-in sequence.
+## Separate the start time, end time, and caption with |. Times are in seconds.
+## Use chronological, non-overlapping rows within 0-9.6 seconds.
+# OS13_CRYO_SPEAKER Lakamaka's Voice
+# OS13_CRYO_CAPTION 1.1 | 1.5 | ... wish there was some other way ...

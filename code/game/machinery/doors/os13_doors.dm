@@ -512,7 +512,7 @@
 
 // ---------------------------------------------------------------------------
 // Remote-controlled blast-door versions of every OS13 door above. They share
-// the layered/emissive renderer but open only from buttons or wifi (`id`).
+// the layered/emissive renderer and support buttons, wifi, and airlock controllers.
 // ---------------------------------------------------------------------------
 
 /obj/machinery/door/blast/os13

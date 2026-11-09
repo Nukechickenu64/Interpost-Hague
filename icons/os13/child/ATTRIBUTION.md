@@ -1,0 +1,16 @@
+# Deathweb child sprites
+
+The DMI sheets in this directory are unmodified copies from the Deathweb contributors at [commit d264167e57357ce9fc5aa43c631dc13bb0f0c1f3](https://github.com/Near-Web/Deathweb/tree/d264167e57357ce9fc5aa43c631dc13bb0f0c1f3). The upstream README licenses assets under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) and code under AGPL-3.0.
+
+| Local sheet | Upstream path |
+| --- | --- |
+| `body.dmi` | `icons/mob/flesh/old/human_child_old.dmi` |
+| `deformed.dmi` | `icons/mob/human_races/child/r_def_child.dmi` |
+| `damage.dmi` | `icons/mob/dam_child.dmi` |
+| `damage_mask.dmi` | `icons/mob/human_races/child/dam_mask_child.dmi` |
+| `uniforms.dmi` | `icons/obj/clothing/uniforms.dmi` |
+| `uniforms_worn.dmi` | `icons/mob/uniform.dmi` |
+| `suits.dmi` | `icons/obj/clothing/suits.dmi` |
+| `suits_worn.dmi` | `icons/mob/suit.dmi` |
+| `shoes.dmi` | `icons/obj/clothing/shoes.dmi` |
+| `shoes_worn.dmi` | `icons/mob/feet.dmi` |

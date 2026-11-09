@@ -54,6 +54,27 @@ These are implementation choices, not claims about the full advanced rules:
 * **Fatigue:** action costs feed existing fatigue; stamina recovery has one owner. Idle combat no longer receives background fatigue/stamina recovery from `handle_fatigue`. Movement is observed for both clients and NPCs. Existing stamina/fatigue scales and rapid mode toggling are not a full GURPS fatigue/recovery model.
 * **Other attacks:** projectiles, thrown items, energy damage, holographic gloves, nonhuman attackers and special item overrides are not converted by the ordinary BRUTE melee entry point. They require mixed-encounter regression coverage before full parity can be claimed.
 
+## Nonhuman anatomy and HP
+
+Simple animals, utility bots, borgs, maintenance drones, pAIs and AI cores now use lightweight `gurps_bodyparts` injury records and one flat HP pool. This is separate from human external organs and does not provide human surgery, wounds, bleeding or replacement-limb sprites. The common damage boundary is in `code/modules/mob/living/damage_procs.dm`.
+
+At initialization, legacy maximum health is converted to `max(1, floor(maxHealth / 10))`. `gurps_max_hp` can override the resulting content profile. A normal borg has 20 HP; its existing 30-point repair becomes 3 HP. The actual legacy-to-HP ratio is retained per mob, including small creatures. Legacy projectiles, environmental damage and repairs convert once at entry; human physical weapon damage uses the existing native GURPS damage roll instead.
+
+The default body has a torso, head, eyes and paired limbs/extremities. AI cores and space worms use a core profile, slimes and mimics use an amorphous profile, and space carp have fins. Missing locations fall back to the torso. Organic cutting/impaling injury receives multipliers after resistance; machines do not receive those organic multipliers. Limb damage above half maximum HP, extremity damage above one third, and eye damage above one tenth disable the affected part. Disabled locomotion stops movement; one damaged leg slows simple animals and borgs. Disabled arms/hands drop held inventory, and losing both manipulators prevents borg module use. Severe edged injury can mark a limb severed. Ordinary healing does not regrow an organic severed limb; full machine repair can restore a severed mechanical part.
+
+Built-in flat damage resistance is 4 for silicons/borgs, 6 for AI cores, and 2 for maintenance drones, utility bots and recognized robotic simple animals. `gurps_damage_resistance` is a content setting, not a certified tabletop equipment profile. Resistance is subtracted before injury; direct environmental loss and EMP damage bypass it. Borg combat shields absorb before HP and component damage and retain their cell cost. Legacy components still control hardware functions but no longer add separate HP pools.
+
+HP can become negative. At zero HP, consciousness is checked no more than once per second; each crossed negative multiple of maximum HP requires a survival roll. Minus five times maximum HP is fatal. Existing power-failure and special death effects remain. These are real-time adaptations, not full advanced GURPS certification. Examine and status panels show numeric HP; examine also lists injured, crippled and missing parts.
+
+The normal `Interpost-Hague.dme` build passes with zero errors and warnings. Interactive runtime verification has not been performed. Manual acceptance checks:
+
+1. Attack selected arms, hands, legs and eyes on a simple animal and borg; verify injury stays at that location and affects holding tools, movement or vision.
+2. Compare a low-damage attack and an armor-penetrating high-damage attack against a borg, AI core and robotic simple animal; check numeric HP and DR.
+3. Damage a borg with its combat shield active and inactive; check both HP and cell consumption. EMP should bypass ordinary armor.
+4. Use medical healing on an animal, welding/cable repairs on a borg, and a recharge station; verify the single HP pool and limb disability recover together. Admin rejuvenation should restore all parts and borg components.
+5. Reduce HP through zero and negative HP thresholds; verify consciousness checks, survival rolls and death. Confirm the AI's backup power duration is unchanged by the HP conversion.
+6. Examine an AI, slime, mimic, carp and space worm; verify core/amorphous/finned profiles and no fabricated humanoid limbs on those profiles.
+
 ## Verification
 
 The dedicated project is `combat_parity_regression.dme`. Tests are also included under `UNIT_TEST` in the main project. They create fixtures on an isolated platform, independent of engineering-test helpers.

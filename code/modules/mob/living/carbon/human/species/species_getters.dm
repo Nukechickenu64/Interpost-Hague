@@ -22,6 +22,9 @@
 /datum/species/proc/get_damage_mask(var/mob/living/carbon/human/H)
 	return damage_mask
 
+/datum/species/proc/get_limb_damage_icon(mob/living/carbon/human/H, obj/item/organ/external/limb)
+	return new /icon(get_damage_overlays(H), limb.damage_state)
+
 /datum/species/proc/get_examine_name(var/mob/living/carbon/human/H)
 	return name
 

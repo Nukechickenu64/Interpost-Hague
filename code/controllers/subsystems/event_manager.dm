@@ -23,6 +23,7 @@ SUBSYSTEM_DEF(event)
 	var/list/datum/event_container/event_containers
 
 	var/datum/event_meta/new_event = new
+	var/datum/space_hazard_forecast/space_hazards = new
 
 //Subsystem procs
 /datum/controller/subsystem/event/Initialize()
@@ -44,9 +45,11 @@ SUBSYSTEM_DEF(event)
 	finished_events = SSevent.finished_events
 	all_events = SSevent.all_events
 	event_containers = SSevent.event_containers
+	space_hazards = SSevent.space_hazards
 
 /datum/controller/subsystem/event/fire(resumed = FALSE)
 	if (!resumed)
+		space_hazards.process()
 		processing_events = active_events.Copy()
 		pos = EVENT_LEVEL_MUNDANE
 

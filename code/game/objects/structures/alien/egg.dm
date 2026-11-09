@@ -44,6 +44,8 @@
 		icon_state = "egg"
 
 /obj/structure/alien/egg/attack_ghost(var/mob/observer/ghost/user)
+	if(!istype(user) || !user.can_affect_world(TRUE))
+		return
 	if(progress == -1) //Egg has been hatched.
 		return
 
@@ -64,7 +66,7 @@
 	if(!src || confirm != "Yes")
 		return
 
-	if(!user || !user.ckey)
+	if(!user || !user.ckey || !user.can_affect_world(TRUE))
 		return
 
 	if(progress == -1) //Egg has been hatched.

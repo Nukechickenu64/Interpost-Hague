@@ -20,8 +20,9 @@
 /obj/effect/wingrille_spawn/attack_hand()
 	attack_generic()
 
-/obj/effect/wingrille_spawn/attack_ghost()
-	attack_generic()
+/obj/effect/wingrille_spawn/attack_ghost(mob/user)
+	if(ghost_can_affect_world(user, TRUE))
+		attack_generic()
 
 /obj/effect/wingrille_spawn/attack_generic()
 	activate()

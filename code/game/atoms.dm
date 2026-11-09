@@ -654,6 +654,8 @@ its easier to just keep the beam vertical.
 
 //Jumping
 /atom/proc/jump_act(atom/target, mob/living/carbon/human/user)
+	if(user.os13_hypnogenesis_until > world.time)
+		return
 	//No jumping on the ground dummy && No jumping in space && No jumping in straightjacket or while being incapacitated (except handcuffs) && No jumping vhile being legcuffed or locked in closet
 	if(user.incapacitated(INCAPACITATION_STUNNED|INCAPACITATION_KNOCKOUT|INCAPACITATION_BUCKLED_PARTIALLY|INCAPACITATION_BUCKLED_FULLY|INCAPACITATION_FORCELYING) || user.isinspace() \
 		|| istype(user.wear_suit, /obj/item/clothing/suit/straight_jacket) || istype(user.loc, /obj/structure/closet))

@@ -1,8 +1,8 @@
-DM compiler version 516.1687
+DM compiler version 516.1688
 loading Interpost-Hague.dme
 loading interface/skin.dmf
-loading maps/alpha/alpha.dmm
+loading maps/os13classic/os13classic.dmm
 loading maps/hell/hell-1.dmm
 saving Interpost-Hague.dmb (DEBUG mode)
-Interpost-Hague.dmb - 0 errors, 0 warnings (10/13/26 8:47 am)
-Total time: 0:23
+Interpost-Hague.dmb - 0 errors, 0 warnings (11/7/26 10:50 pm)
+Total time: 0:24

@@ -1,5 +1,6 @@
 /mob/living/bot
 	name = "Bot"
+	gurps_damage_resistance = 2
 	health = 20
 	maxHealth = 20
 	icon = 'icons/obj/aibots.dmi'
@@ -68,23 +69,19 @@
 
 /mob/living/bot/Life()
 	..()
-	if(health <= 0)
-		death()
+	handle_stunned()
+	handle_weakened()
+	handle_paralysed()
+	gurps_health_status()
+	if(stat == DEAD || paralysis || stunned || weakened || stat == UNCONSCIOUS)
 		return
-	weakened = 0
-	stunned = 0
-	paralysis = 0
 
 	if(on && !client && !busy)
 		spawn(0)
 			handleAI()
 
 /mob/living/bot/updatehealth()
-	if(status_flags & GODMODE)
-		health = maxHealth
-		set_stat(CONSCIOUS)
-	else
-		health = maxHealth - getFireLoss() - getBruteLoss()
+	gurps_updatehealth()
 	setOxyLoss(0)
 	setToxLoss(0)
 
@@ -113,7 +110,8 @@
 	else if(isWelder(O))
 		if(health < maxHealth)
 			if(open)
-				health = min(maxHealth, health + 10)
+				adjustBruteLoss(-10)
+				adjustFireLoss(-10)
 				user.visible_message("<span class='notice'>\The [user] repairs \the [src].</span>","<span class='notice'>You repair \the [src].</span>")
 			else
 				to_chat(user, "<span class='notice'>Unable to repair with the maintenance panel closed.</span>")

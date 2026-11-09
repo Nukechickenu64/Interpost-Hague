@@ -157,6 +157,17 @@ var/list/ANTAG_FREQS = list(SYND_FREQ, RAID_FREQ)
 //Department channels, arranged lexically
 var/list/DEPT_FREQS = list(AI_FREQ, COMM_FREQ, ENG_FREQ, MED_FREQ, INQ_FREQ, SEC_FREQ, SCI_FREQ, SRV_FREQ, SUP_FREQ, EXP_FREQ, ENT_FREQ)
 
+/proc/radio_frequency_is_synthetic_only(var/frequency)
+	if(frequency == PUB_FREQ)
+		return FALSE
+	for(var/channel_name in radiochannels)
+		if(radiochannels[channel_name] == frequency)
+			return TRUE
+	return FALSE
+
+/proc/is_ai_or_robot_radio_user(var/mob/user)
+	return istype(user, /mob/living/silicon/ai) || istype(user, /mob/living/silicon/robot)
+
 #define TRANSMISSION_WIRE	0
 #define TRANSMISSION_RADIO	1
 

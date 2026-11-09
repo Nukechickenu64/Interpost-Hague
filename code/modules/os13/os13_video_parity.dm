@@ -11,6 +11,7 @@ GLOBAL_VAR_INIT(os13_opening_announced, FALSE)
 /datum/mind
 	var/os13_awakening_received = FALSE
 	var/os13_loyal_sheet_received = FALSE
+	var/os13_loyal_sheet_memory
 
 /datum/game_mode
 	var/os13_loyal_sheets_ready = FALSE
@@ -71,12 +72,13 @@ GLOBAL_VAR_INIT(os13_opening_announced, FALSE)
 	var/list/sheet = list()
 	sheet += "<span class='danger'><b>YOU ARE A LOYAL CREW MEMBER OF ORBITAL STATION 13.</b></span>"
 	sheet += "<span class='warning'>We've been betrayed. The traitor is among us.</span>"
-	sheet += "<b>Objective #1</b>: At the end of the shift, the traitor shall be locked in the brig as a scapegoat."
+	sheet += "<b>Objective #1</b>: At the end of the shift, the traitor shall be locked in the Brig."
 	sheet += "<b>Objective #2</b>: Defend the station from any outside threat."
 	sheet += "<b>Objective #3</b>: Stay alive."
-	sheet += "<span class='notice'>Reward: +5 for capturing the traitor, +1 if another crewmember was kept alive.</span>"
+	sheet += "<span class='notice'>Reward: +5 for capturing the traitor, +1 if another crewmember was locked up as a scapegoat.</span>"
 	var/briefing = jointext(sheet, "<br>")
 	H.mind.os13_loyal_sheet_received = TRUE
+	H.mind.os13_loyal_sheet_memory = briefing
 	H.mind.store_memory(briefing)
 	to_chat(H, briefing)
 

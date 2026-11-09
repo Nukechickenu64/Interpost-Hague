@@ -563,6 +563,9 @@ var/const/CLICK_HANDLER_ALL                  = (~0)
 	click_handlers.Push(click_handler)
 
 /mob/proc/scramble(var/atom/A)
+	var/mob/living/carbon/human/person = src
+	if(istype(person) && person.os13_hypnogenesis_until > world.time)
+		return
 	var/direction
 	if(stat || buckled || paralysis || stunned || sleeping || (status_flags & FAKEDEATH) || restrained() || pulledby) //|| (weakened > 5)) //You should be able to crawl when injured.
 		return

@@ -30,32 +30,8 @@
 /obj/machinery/computer/os13_radar/attack_hand(mob/user)
 	if(..())
 		return
-	var/obj/effect/overmap/origin = map_sectors["[z]"]
-	if(QDELETED(origin) || !GLOB.using_map.use_overmap || origin.z != GLOB.using_map.overmap_z)
-		to_chat(user, SPAN_WARNING("Radar unavailable: no overmap link."))
-		return
-	var/obj/machinery/shipsensors/sensor
-	var/list/connected_levels = GetConnectedZlevels(z)
-	for(var/obj/machinery/shipsensors/candidate in SSmachines.machinery)
-		if(!(candidate.z in connected_levels) || candidate.inoperable() || !candidate.use_power || !candidate.powered())
-			continue
-		if(candidate.health <= 0 || !candidate.in_vacuum() || candidate.range <= 0)
-			continue
-		if(!sensor || candidate.range > sensor.range)
-			sensor = candidate
-	if(!sensor)
-		to_chat(user, SPAN_WARNING("Radar unavailable: no operational sensor suite."))
-		return
-	var/list/report = list("<b>RADAR CONTACTS</b>", "Sensor range: [sensor.range] overmap tiles.")
-	var/contacts = 0
-	for(var/obj/effect/overmap/contact in range(sensor.range, origin))
-		if(contact == origin || QDELETED(contact) || contact.invisibility || !contact.alpha)
-			continue
-		var/contact_name = contact.known ? html_encode(contact.name) : "Unidentified contact"
-		report += "[contact_name]: ([contact.x], [contact.y])"
-		contacts++
-	if(!contacts)
-		report += "No contacts detected within sensor range."
+	var/list/report = list("<b>RADAR CONTACTS</b>", "Station time: [stationtime2text()]")
+	report += SSevent.space_hazards.radar_report()
 	to_chat(user, jointext(report, "<br>"))
 
 // "This is Scout Controls." (marshal video 1:04:30, scout cockpit)

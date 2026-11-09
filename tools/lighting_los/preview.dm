@@ -192,7 +192,7 @@ var/global/artemis_preview_capture_started = FALSE
 // an OS screenshot. Files go to the client's BYOND/screenshots directory.
 /mob/living/carbon/human/artemis_preview/proc/preview_snapshot(label)
 	if(!client) return
-	if(world.params["ao_elevator_capture"] || world.params["edge_debug_capture"])
+	if(world.params["ao_elevator_capture"] || world.params["edge_debug_capture"] || world.params["los_dark_capture"])
 		preview_suppress_grain()
 		sleep(2)
 	world.log << "ARTEMIS_CAPTURE [label] at [world.time]"
@@ -1030,15 +1030,22 @@ var/global/artemis_preview_capture_started = FALSE
 
 /mob/living/carbon/human/artemis_preview/proc/preview_dark_sequence()
 	var/obj/screen/plane_master/lighting/light_plane = locate() in client.screen
+	var/obj/screen/lighting_backdrop/backdrop = locate() in client.screen
+	// Exercise an unpadded cull boundary in both compositions.
+	var/list/guard_alphas = list()
+	for(var/turf/T in range(20, artemis_preview_origin))
+		var/atom/movable/lighting_edge_guard/guard = T.lighting_overlay?.edge_guard
+		if(guard)
+			guard_alphas[guard] = guard.alpha
+			guard.alpha = 0
 	// Compare both compositions in one world, with identical lamp samples.
 	for(var/mode in list("before", "after"))
 		var/legacy = mode == "before"
-		for(var/turf/T in range(20, artemis_preview_origin))
-			if(!T.lighting_overlay) continue
-			T.lighting_overlay.layer = legacy ? 2 : LIGHTING_LAYER
-			T.lighting_overlay.blend_mode = legacy ? BLEND_MULTIPLY : BLEND_OVERLAY
-			if(T.lighting_overlay.edge_guard)
-				T.lighting_overlay.edge_guard.alpha = legacy ? 0 : 255
+		backdrop.color = legacy ? "#ffffff" : "#000000"
+		if(legacy)
+			light_plane.remove_filter("light_coverage")
+		else
+			light_plane.add_filter("light_coverage", 5, list("type" = "alpha", render_source = "*light_samples"))
 		light_plane.add_filter("light_softness", 1, list("type" = "blur", size = 2))
 		light_plane.add_filter("bloom", 4, list("type" = "bloom", threshold = LIGHTING_BLOOM_THRESHOLD, size = LIGHTING_BLOOM_SIZE, offset = LIGHTING_BLOOM_OFFSET, alpha = LIGHTING_BLOOM_ALPHA))
 		for(var/obj/machinery/floor_light/lamp in artemis_preview_lamps)
@@ -1057,6 +1064,10 @@ var/global/artemis_preview_capture_started = FALSE
 		sleep(5)
 		preview_snapshot("[mode]-dark-unfiltered")
 		sleep(5)
+	for(var/atom/movable/lighting_edge_guard/guard in guard_alphas)
+		guard.alpha = guard_alphas[guard]
+	light_plane.add_filter("light_softness", 1, list("type" = "blur", size = 2))
+	light_plane.add_filter("bloom", 4, list("type" = "bloom", threshold = LIGHTING_BLOOM_THRESHOLD, size = LIGHTING_BLOOM_SIZE, offset = LIGHTING_BLOOM_OFFSET, alpha = LIGHTING_BLOOM_ALPHA))
 	world.log << "ARTEMIS_DARK complete"
 
 /proc/build_artemis_spot_scene()

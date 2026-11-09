@@ -129,6 +129,8 @@
 	return ..()
 
 /obj/machinery/portable_atmospherics/hydroponics/attack_ghost(var/mob/observer/ghost/user)
+	if(!ghost_can_affect_world(user, TRUE))
+		return
 	if(!(harvest && seed && seed.has_mob_product))
 		return
 

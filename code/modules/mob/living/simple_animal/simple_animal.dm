@@ -71,6 +71,7 @@
 
 /mob/living/simple_animal/Initialize()
 	. = ..()
+	initialize_gurps_anatomy()
 	skills[SKILL_MELEE] = gurps_melee_skill
 	skills[SKILL_RANGE] = gurps_ranged_skill
 	if(!client)
@@ -96,8 +97,8 @@
 			set_density(1)
 		return 0
 
-	if(health <= 0)
-		death()
+	gurps_health_status()
+	if(stat == DEAD)
 		return
 
 	handle_atmos()
@@ -119,7 +120,7 @@
 			visible_message("<span class='warning'>\The [src] struggles against \the [buckled]!</span>")
 
 	//Movement
-	if(!client && !stop_automated_movement && wander && !anchored)
+	if(!client && !stop_automated_movement && wander && !anchored && gurps_mobile())
 		if(isturf(src.loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
 			turns_since_move++
 			if(turns_since_move >= turns_per_move)
@@ -200,13 +201,13 @@
 /mob/living/simple_animal/proc/audible_emote(var/act_desc)
 	custom_emote(2, act_desc)
 
-/mob/living/simple_animal/bullet_act(var/obj/item/projectile/Proj)
+/mob/living/simple_animal/bullet_act(var/obj/item/projectile/Proj, var/def_zone)
 	if(!Proj || Proj.nodamage)
 		return
 
-	bullet_impact_visuals(Proj)
-	adjustBruteLoss(Proj.damage)
-	Proj.on_hit(src)
+	bullet_impact_visuals(Proj, def_zone)
+	apply_damage(Proj.damage, Proj.damage_type, def_zone, damage_flags = Proj.damage_flags(), used_weapon = Proj)
+	Proj.on_hit(src, 0, def_zone)
 	return 0
 
 /mob/living/simple_animal/attack_hand(mob/living/carbon/human/M as mob)
@@ -228,7 +229,7 @@
 			if(!M.gurps_melee_attack_check(src))
 				M.do_attack_animation(src)
 				return
-			adjustBruteLoss(harm_intent_damage)
+			apply_damage(harm_intent_damage, BRUTE, M.zone_sel?.selecting)
 			M.visible_message("<span class='warning'>[M] [response_harm] \the [src]</span>")
 			M.do_attack_animation(src)
 
@@ -271,13 +272,18 @@
 		to_chat(user, "<span class='danger'>This weapon is ineffective, it does no damage.</span>")
 		return 2
 
-	var/damage = O.force
+	var/damage = effective_force
 	if (O.damtype == PAIN)
 		damage = 0
 	if(supernatural && istype(O,/obj/item/nullrod))
 		damage *= 2
 		purge = 3
-	adjustBruteLoss(damage)
+	if(ishuman(user) && O.damtype == BRUTE)
+		var/mob/living/carbon/human/attacker = user
+		var/damage_type = O.edge ? "cut" : (O.sharp ? "imp" : "cr")
+		gurps_receive_damage(attacker.combat_roll_damage(O, damage_type), BRUTE, hit_zone, damage_flags = O.damage_flags(), used_weapon = O)
+	else
+		apply_damage(damage, O.damtype, hit_zone, damage_flags = O.damage_flags(), used_weapon = O)
 
 	return 0
 
@@ -285,6 +291,10 @@
 	var/tally = ..() //Incase I need to add stuff other than "speed" later
 
 	tally += speed
+	if(!gurps_mobile())
+		tally += 10
+	else if(!gurps_limb_usable(BP_L_LEG) || !gurps_limb_usable(BP_R_LEG) || health < maxHealth / 3)
+		tally += 3
 	if(purge)//Purged creatures will move more slowly. The more time before their purge stops, the slower they'll move.
 		if(tally <= 0)
 			tally = 1
@@ -296,13 +306,16 @@
 	. = ..()
 
 	if(statpanel("Status") && show_stat_health)
-		stat(null, "Health: [round((health / maxHealth) * 100)]%")
+		stat(null, "HP: [round(health, 0.1)] / [maxHealth]")
 
 /mob/living/simple_animal/death(gibbed, deathmessage = "dies!", show_dead_message)
 	icon_state = icon_dead
 	update_icon()
 	density = 0
-	adjustBruteLoss(maxHealth) //Make sure dey dead.
+	var/datum/gurps_bodypart/torso = gurps_bodypart_for(BP_CHEST)
+	if(health > 0)
+		torso.brute += health
+		gurps_updatehealth()
 	walk_to(src,0)
 	return ..(gibbed,deathmessage,show_dead_message)
 
@@ -326,12 +339,24 @@
 	adjustBruteLoss(damage * blocked_mult(getarmor(null, "bomb")))
 
 /mob/living/simple_animal/adjustBruteLoss(damage)
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(damage)
 	..()
 	updatehealth()
 
 /mob/living/simple_animal/adjustFireLoss(damage)
-	..()
-	updatehealth()
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(damage, TRUE)
+	return
+
+/mob/living/simple_animal/getBruteLoss()
+	return gurps_body_damage()
+
+/mob/living/simple_animal/getFireLoss()
+	return gurps_body_damage(TRUE)
+
+/mob/living/simple_animal/updatehealth()
+	gurps_updatehealth()
 
 /mob/living/simple_animal/adjustToxLoss(damage)
 	..()

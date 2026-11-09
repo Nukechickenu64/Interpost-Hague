@@ -110,19 +110,21 @@
 /turf/simulated/open/crawlspace/panel/directional
 	icon_state = "h"
 
+/turf/simulated/open/crawlspace/proc/fits_crawlspace(mob/mover)
+	if(mover.lying)
+		return TRUE
+	var/mob/living/carbon/human/human = mover
+	return istype(human) && human.is_child()
+
 /turf/simulated/open/crawlspace/CanPass(atom/movable/mover, turf/target, height=1.5, air_group=0)
-	if(ismob(mover))
-		var/mob/M = mover
-		if(!M.lying)
-			return FALSE
+	if(ismob(mover) && !fits_crawlspace(mover))
+		return FALSE
 	return ..()
 
 /turf/simulated/open/crawlspace/Enter(atom/movable/mover as mob|obj, atom/forget as mob|obj|turf|area)
-	if(ismob(mover))
-		var/mob/M = mover
-		if(!M.lying)
-			to_chat(M, SPAN_WARNING("You need to be crawling to move into [src]."))
-			return FALSE
+	if(ismob(mover) && !fits_crawlspace(mover))
+		to_chat(mover, SPAN_WARNING("You need to be crawling to move into [src]."))
+		return FALSE
 	return ..()
 
 /mob/living
@@ -190,11 +192,17 @@
 		else
 			to_chat(user, "<span class='warning'>The plating is going to need some support.</span>")
 
+	var/obj/structure/shladder/ladder = locate(/obj/structure/shladder) in below
+	if(ladder)
+		return ladder.attackby(C, user)
 	for(var/atom/movable/M in below)
 		if(M.movable_flags & MOVABLE_FLAG_Z_INTERACT)
 			return M.attackby(C, user)
 
 /turf/simulated/open/attack_hand(mob/user)
+	var/obj/structure/shladder/ladder = locate(/obj/structure/shladder) in below
+	if(ladder)
+		return ladder.attack_hand(user)
 	for(var/atom/movable/M in below)
 		if(M.movable_flags & MOVABLE_FLAG_Z_INTERACT)
 			return M.attack_hand(user)

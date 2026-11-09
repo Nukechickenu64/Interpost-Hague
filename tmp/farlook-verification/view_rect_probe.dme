@@ -1,0 +1,17 @@
+world
+	maxx = 90
+	maxy = 90
+	maxz = 1
+	view = "15x15"
+
+world/New()
+	..()
+	var/mob/viewer = new(locate(45, 45, 1))
+	viewer.see_in_dark = 60
+	for(var/size in list("81x41", "41x81", "81x61", "81x81"))
+		var/list/visible = view(size, viewer)
+		var/turf/east = locate(85, 45, 1)
+		var/turf/north = locate(45, 85, 1)
+		var/turf/corner = locate(85, 85, 1)
+		world.log << "VIEW [size] east=[east in visible] north=[north in visible] corner=[corner in visible] count=[length(visible)]"
+	shutdown()

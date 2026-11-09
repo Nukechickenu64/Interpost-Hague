@@ -14,6 +14,24 @@
 
 /datum/unit_test/engineer_solar_service/start_test()
 	var/failure = ""
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		var/faults = 0
+		var/replacements = 0
+		var/deployed = 0
+		for(var/obj/machinery/power/solar_base/base in GLOB.solar_bases)
+			if(!is_station_turf(get_turf(base)))
+				continue
+			faults += !!base.defective
+			replacements += (!base.panel || base.panel.broken)
+			deployed += !!base.deployed
+		var/obj/structure/solar_panel_cart/cart = locate() in locate(102, 118, 1)
+		if(faults != 4 || replacements != 6 || deployed || length(cart?.panels) != replacements)
+			failure += "Classic lost its stowed startup faults or matching stock of replacement panels. "
+		var/reserves = 0
+		for(var/obj/machinery/power/smes/classic/storage in power_net.storage)
+			reserves++
+		if(reserves != 2)
+			failure += "Classic's two exterior units did not register as grid reserve storage. "
 	var/turf/T = engineer_test_turf()
 	var/mob/living/carbon/human/U = new(T)
 	var/obj/machinery/power/solar_base/installed/damaged/B = new(T)
@@ -385,6 +403,20 @@
 	var/list/data = C.atmos_data(U)
 	if(!data["tank"] || data["vents"].len != 2 || data["supply_status"] != "online" || data["vents"][1]["mode"] != "FILTER")
 		failure += "Console data did not report the live reserve and vent states. "
+	controller.locked = TRUE
+	var/obj/item/card/id/keycard = new(T)
+	keycard.access = list(access_engine_equip)
+	U.put_in_hands(keycard)
+	controller.attackby(keycard, U)
+	if(controller.locked || !controller.can_use_modcon(U))
+		failure += "A held engineering keycard did not unlock Classic's Modcon. "
+	var/manual_before = A.atmos_manual_lockdown
+	controller.attack_hand_right(U)
+	if(controller.locked || A.atmos_manual_lockdown == manual_before)
+		failure += "Classic's right-click changed the keycard lock or failed to operate the compartment shutters. "
+	A.atmos_manual_lockdown = manual_before
+	A.update_atmos_lockdown()
+	qdel(keycard)
 	controller.locked = FALSE
 	if(controller.apply_modcon_action(U, list("modcon" = "vent", "vent" = "all", "mode" = "STOP")) || findtext(controller.modcon_report(U), "modcon=vent"))
 		failure += "The local modcon accepted or offered commands without access. "
@@ -520,6 +552,12 @@
 	vent.Process()
 	if(abs(T.test_air.total_moles - remaining) > 0.001)
 		failure += "Refill bypassed disabled supply. "
+	tank.enabled = TRUE
+	vent.set_engineering_mode("SIPHON")
+	var/reserve_before = tank.air_contents.total_moles
+	vent.Process()
+	if(vent.engineering_mode_name() != "SIPHON" || T.test_air.total_moles >= remaining || tank.air_contents.total_moles <= reserve_before)
+		failure += "Siphon did not recover room gas into the reserve. "
 	// The current game uses filtering vents; the standalone scrubber was removed.
 	// With ample power, one 750 L cycle samples 42 of these 140 moles in 2500 L.
 	qdel(T.test_air)
@@ -545,7 +583,7 @@
 	if(failure)
 		fail(failure)
 	else
-		pass("Real gas filtering without modcon cartridge wear, welding, stop mode, finite-reserve refill and single-cycle filtering vent flow verified.")
+		pass("Filtering, welding, stop mode, finite-reserve refill and siphon recovery verified.")
 	return TRUE
 
 /datum/unit_test/engineer_timed_maintenance
@@ -614,12 +652,62 @@
 	B.attackby(W, U)
 	if(B.defective || B.servicing || world.time - start < 3 SECONDS || abs(W.get_fuel() - (before - 1)) > 0.001)
 		failure += "An uninterrupted three-second solar weld did not repair the base. "
-	for(var/atom/fixture in list(B, W, U))
+	U.drop_from_inventory(W)
+	var/obj/item/device/fixboy/fixboy = new(T)
+	var/obj/item/weapon/material/shard/shard = new(T)
+	U.put_in_hands(fixboy)
+	U.put_in_hands(shard)
+	var/obj/machinery/computer/C = new(T)
+	C.set_broken(TRUE)
+	fixboy.afterattack(C, U, TRUE)
+	if(C.stat & BROKEN || !QDELETED(shard))
+		failure += "The FixBoy did not consume a glass shard to repair the console. "
+	var/turf/room = T.ChangeTurf(/turf/simulated/floor)
+	var/turf/breach = get_step(room, EAST).ChangeTurf(/turf/space)
+	var/obj/item/device/os13_foam_container/foam = new(room)
+	U.put_in_hands(foam)
+	U.set_dir(EAST)
+	fixboy.worn_use(U)
+	var/obj/structure/foamedmetal/os13_hull_patch/patch = locate() in breach
+	if(!foam.spent || !patch || !(SSair.air_blocked(room, breach) & AIR_BLOCKED))
+		failure += "The FixBoy and foam container did not close an open hull edge. "
+	qdel(patch)
+	breach.ChangeTurf(/turf/unsimulated/floor)
+	room.ChangeTurf(/turf/unsimulated/floor)
+	qdel(foam)
+	qdel(fixboy)
+	var/obj/machinery/os13_outer_antenna/antenna = os13_outer_antenna()
+	if(!antenna || !istype(get_area(antenna), /area/external))
+		failure += "The outer antenna was not available at the mapped hull. "
+	else
+		antenna.set_broken(TRUE)
+		if(os13_outer_antenna())
+			failure += "The damaged antenna still served the bridge receiver. "
+		U.forceMove(get_turf(antenna))
+		var/obj/item/screwdriver/screwdriver = new(U.loc)
+		var/obj/item/stack/cable_coil/cable = new(U.loc, 2)
+		U.put_in_hands(screwdriver)
+		antenna.attackby(screwdriver, U)
+		U.drop_from_inventory(screwdriver)
+		U.put_in_hands(cable)
+		antenna.attackby(cable, U)
+		if((antenna.stat & BROKEN) || !antenna.panel_open || cable.get_amount() != 1 || os13_outer_antenna())
+			failure += "Antenna cable repair failed or brought an open antenna online. "
+		U.drop_from_inventory(cable)
+		U.put_in_hands(screwdriver)
+		antenna.attackby(screwdriver, U)
+		if(os13_outer_antenna() != antenna)
+			failure += "Closing the repaired antenna did not restore the bridge link. "
+		qdel(screwdriver)
+		qdel(cable)
+		antenna.panel_open = FALSE
+		antenna.set_broken(FALSE)
+	for(var/atom/fixture in list(B, W, fixboy, shard, C, U))
 		qdel(fixture)
 	if(failure)
 		fail(failure)
 	else
-		pass("Vent welding and unwelding, held lit tools, fuel, concurrent use, movement/drop/shutdown interruptions and timed solar repair verified.")
+		pass("Vent and solar servicing, FixBoy shard repair, pressure sealing and mapped antenna repair verified.")
 	return TRUE
 
 
@@ -724,7 +812,7 @@
 			failure += "Area dialog labels/order differ from the recording. "
 		if(menu.prompts[2]["title"] != "Modcon Unit" || menu.prompts[2]["prompt"] != "CHOOSE AN ACTION" || jointext(menu.prompts[2]["choices"], "|") != "Toggle Lockdown|Disable Auto-Lockdown|Air Vent 1|Air Vent 2|Air Vent 3|Air Vent 4|Air Vent 5|Air Vent 6|ALL VENTS|(Cancel)")
 			failure += "Modcon action labels/order differ from the recording. "
-		if(jointext(menu.prompts[3]["choices"], "|") != "REFILL|STOP|FILTER|(Cancel)")
+		if(jointext(menu.prompts[3]["choices"], "|") != "REFILL|STOP|FILTER|SIPHON|(Cancel)")
 			failure += "Vent mode labels/order differ from the recording. "
 	if(menu.reports.len != 2 || !findtext(menu.reports[1], "*LOCKDOWN PRESSURE: 60 kPA") || !findtext(menu.reports[2], "Engineering &lt;Deck&gt;") || !findtext(menu.reports[2], "Vent-6") || !findtext(menu.reports[2], "&gt; Pressure: 100 kPa") || findtext(menu.reports[2], "href="))
 		failure += "Native report omitted real readings/numbering, failed escaping or included extra command links. "

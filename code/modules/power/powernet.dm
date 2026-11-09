@@ -94,6 +94,13 @@ var/global/datum/powernet/power_net = new
 /datum/powernet/proc/last_surplus()
 	return max(avail - load, 0)
 
+// Classic uses the shared grid, so only fresh production counts toward recovery.
+// Reserve discharge can cover demand without making generation self-sustaining.
+/datum/powernet/proc/os13_generation_coverage()
+	if(!sampled_at || world.time - sampled_at > SSmachines.wait * 2 || viewload <= 0)
+		return null
+	return min(100, generated / viewload * 100)
+
 /datum/powernet/proc/draw_power(var/amount)
 	var/draw = between(0, amount, avail - load)
 	load += draw
@@ -110,7 +117,6 @@ var/global/datum/powernet/power_net = new
 
 // Amount of power granted when the infinite power admin secret is enabled.
 #define INFINITE_STATION_POWER_AMOUNT 999999999
-#define POWER_STARTUP_GRACE_PERIOD (10 MINUTES)
 
 // Area channel values (match code/game/area definitions)
 #define GP_EQUIP 1
@@ -125,8 +131,8 @@ var/global/datum/powernet/power_net = new
 	if(problem > 0)
 		problem = max(problem - 1, 0)
 
-	// Admin infinite power secret and round-start grace period.
-	if(GLOB.infinite_station_power || (round_start_time && world.time >= round_start_time && world.time - round_start_time < POWER_STARTUP_GRACE_PERIOD))
+	// Admin infinite power secret.
+	if(GLOB.infinite_station_power)
 		newavail = max(newavail, INFINITE_STATION_POWER_AMOUNT)
 
 	generated = max(0, newavail - smes_newavail)
@@ -236,7 +242,6 @@ var/global/datum/powernet/power_net = new
 			return 0
 
 #undef INFINITE_STATION_POWER_AMOUNT
-#undef POWER_STARTUP_GRACE_PERIOD
 #undef GP_EQUIP
 #undef GP_LIGHT
 #undef GP_ENVIRON

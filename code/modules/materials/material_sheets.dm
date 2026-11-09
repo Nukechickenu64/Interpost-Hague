@@ -14,6 +14,16 @@
 	var/perunit = SHEET_MATERIAL_AMOUNT
 	var/apply_colour //temp pending icon rewrite
 
+/obj/item/stack/material/New(var/loc, var/amount = null)
+	if(!uses_charge && (default_type in list("steel", "iron", "zbrite", "elerium")))
+		var/quantity = isnull(amount) ? src.amount : amount
+		src.amount = 1
+		..(loc, 1)
+		for(var/ingot = 1, ingot < quantity, ingot++)
+			new src.type(loc, 1)
+		return
+	..(loc, amount)
+
 /obj/item/stack/material/Initialize()
 	. = ..()
 	if(!default_type)
@@ -36,12 +46,31 @@
 		obj_flags &= (~OBJ_FLAG_CONDUCTIBLE)
 
 	matter = material.get_matter()
+	if(!uses_charge && (material.name in list("steel", "iron", "zbrite", "elerium")))
+		max_amount = 1
+		icon = 'icons/os13/objects/objects/mining.dmi'
+		switch(material.name)
+			if("steel")
+				icon_state = "steel_ingot"
+			if("iron")
+				icon_state = "iron_ingot"
+			if("zbrite")
+				icon_state = "zrbite"
+			if("elerium")
+				icon_state = "elerium"
 	update_strings()
 
 /obj/item/stack/material/get_material()
 	return material
 
 /obj/item/stack/material/proc/update_strings()
+	if(!uses_charge && (material.name in list("steel", "iron", "zbrite", "elerium")))
+		var/material_label = material.use_name
+		singular_name = "ingot"
+		SetName("[material_label] ingot")
+		desc = "An ingot of [material_label]."
+		gender = NEUTER
+		return
 	// Update from material datum.
 	singular_name = material.sheet_singular_name
 
@@ -62,6 +91,8 @@
 /obj/item/stack/material/transfer_to(obj/item/stack/S, var/tamount=null, var/type_verified)
 	var/obj/item/stack/material/M = S
 	if(!istype(M) || material.name != M.material.name)
+		return 0
+	if((!uses_charge && max_amount == 1) || (!M.uses_charge && M.max_amount == 1))
 		return 0
 	var/transfer = ..(S,tamount,1)
 	if(src) update_strings()
@@ -252,6 +283,14 @@
 	icon_state = "sheet-plasteel"
 	item_state = "sheet-metal"
 	default_type = "plasteel"
+
+/obj/item/stack/material/elerium
+	name = "elerium ingot"
+	default_type = "elerium"
+
+/obj/item/stack/material/zbrite
+	name = "zbrite ingot"
+	default_type = "zbrite"
 
 /obj/item/stack/material/plasteel/ten
 	amount = 10

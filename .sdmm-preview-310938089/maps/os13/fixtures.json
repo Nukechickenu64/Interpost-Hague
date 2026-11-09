@@ -1,0 +1,6458 @@
+[
+  {
+    "position": [
+      120,
+      123,
+      2
+    ],
+    "path": "/obj/structure/ladder/up"
+  },
+  {
+    "position": [
+      115,
+      122,
+      2
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      3
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      3
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      4
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      4
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      5
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      5
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      6
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      6
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      7
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      7
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      8
+    ],
+    "path": "/obj/structure/ladder/updown"
+  },
+  {
+    "position": [
+      115,
+      122,
+      8
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      120,
+      123,
+      9
+    ],
+    "path": "/obj/structure/ladder"
+  },
+  {
+    "position": [
+      115,
+      122,
+      9
+    ],
+    "path": "/obj/structure/sign/os13_deck"
+  },
+  {
+    "position": [
+      103,
+      125,
+      2
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      104,
+      125,
+      2
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      105,
+      125,
+      2
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      103,
+      126,
+      2
+    ],
+    "path": "/obj/structure/closet/secure_closet/engineering_personal"
+  },
+  {
+    "position": [
+      105,
+      126,
+      2
+    ],
+    "path": "/obj/structure/closet/secure_closet/engineering_personal"
+  },
+  {
+    "position": [
+      107,
+      126,
+      2
+    ],
+    "path": "/obj/structure/closet/secure_closet/engineering_personal"
+  },
+  {
+    "position": [
+      108,
+      124,
+      2
+    ],
+    "path": "/obj/machinery/vending/engineering/os13"
+  },
+  {
+    "position": [
+      103,
+      124,
+      2
+    ],
+    "path": "/obj/machinery/autolathe"
+  },
+  {
+    "position": [
+      109,
+      126,
+      2
+    ],
+    "path": "/obj/machinery/computer/engineering_power"
+  },
+  {
+    "position": [
+      105,
+      121,
+      2
+    ],
+    "path": "/obj/structure/solar_panel_cart/loaded"
+  },
+  {
+    "position": [
+      107,
+      121,
+      2
+    ],
+    "path": "/obj/structure/harvester"
+  },
+  {
+    "position": [
+      104,
+      121,
+      2
+    ],
+    "path": "/obj/machinery/computer/station_gas_control"
+  },
+  {
+    "position": [
+      97,
+      110,
+      2
+    ],
+    "path": "/obj/machinery/station_gas_tank"
+  },
+  {
+    "position": [
+      99,
+      110,
+      2
+    ],
+    "path": "/obj/machinery/filter_hub"
+  },
+  {
+    "position": [
+      97,
+      113,
+      2
+    ],
+    "path": "/obj/structure/closet/secure_closet/engineering_personal"
+  },
+  {
+    "position": [
+      99,
+      113,
+      2
+    ],
+    "path": "/obj/structure/closet/secure_closet/engineering_personal"
+  },
+  {
+    "position": [
+      104,
+      122,
+      2
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      106,
+      128,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      134,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      91,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      92,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      93,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      94,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      95,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      96,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      97,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      98,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      99,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      100,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      101,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      102,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      103,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      108,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      109,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      110,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      111,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      112,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      113,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      114,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      115,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      116,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      117,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      118,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      119,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      120,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      121,
+      139,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      91,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      92,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      93,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      94,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      95,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      96,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      97,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      98,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      99,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      100,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      101,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      102,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      103,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      108,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      109,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      110,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      111,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      112,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      113,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      114,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      115,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      116,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      117,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      118,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      119,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      120,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      121,
+      143,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      91,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      92,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      93,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      94,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      95,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      96,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      97,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      98,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      99,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      100,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      101,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      102,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      103,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      108,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      109,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      110,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      111,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      112,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      113,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      114,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      115,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      116,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      117,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      118,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      119,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      120,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      121,
+      147,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      91,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      92,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      93,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      94,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      95,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      96,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      97,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      98,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      99,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      100,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      101,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      102,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      103,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      108,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      109,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      110,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      111,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      112,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      113,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      114,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      115,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      116,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      117,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      118,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      119,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      120,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      121,
+      151,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      91,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      92,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      93,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      94,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      95,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      96,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      97,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      98,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      99,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      100,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      101,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      102,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      103,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      108,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      109,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      110,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      111,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      112,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      113,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      114,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      115,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      116,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      117,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      118,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      119,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      120,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      121,
+      155,
+      2
+    ],
+    "path": "/obj/machinery/power/solar_base/installed"
+  },
+  {
+    "position": [
+      104,
+      130,
+      2
+    ],
+    "path": "/obj/machinery/power/smes"
+  },
+  {
+    "position": [
+      108,
+      130,
+      2
+    ],
+    "path": "/obj/machinery/power/smes"
+  },
+  {
+    "position": [
+      104,
+      132,
+      2
+    ],
+    "path": "/obj/machinery/power/smes"
+  },
+  {
+    "position": [
+      108,
+      132,
+      2
+    ],
+    "path": "/obj/machinery/power/smes"
+  },
+  {
+    "position": [
+      106,
+      133,
+      2
+    ],
+    "path": "/obj/machinery/computer/engineering_power"
+  },
+  {
+    "position": [
+      102,
+      125,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      104,
+      125,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      106,
+      125,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      102,
+      121,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      104,
+      121,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      106,
+      121,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      107,
+      126,
+      3
+    ],
+    "path": "/obj/machinery/vending/medical"
+  },
+  {
+    "position": [
+      102,
+      126,
+      3
+    ],
+    "path": "/obj/machinery/computer/crew"
+  },
+  {
+    "position": [
+      114,
+      116,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      115,
+      116,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      116,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      118,
+      117,
+      3
+    ],
+    "path": "/obj/item/modular_computer/console/preset/medical"
+  },
+  {
+    "position": [
+      114,
+      114,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      118,
+      114,
+      3
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      115,
+      117,
+      3
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      122,
+      123,
+      3
+    ],
+    "path": "/obj/machinery/chemical_dispenser/full"
+  },
+  {
+    "position": [
+      125,
+      123,
+      3
+    ],
+    "path": "/obj/machinery/chem_master"
+  },
+  {
+    "position": [
+      122,
+      120,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      123,
+      120,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      124,
+      120,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      125,
+      120,
+      3
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      130,
+      122,
+      3
+    ],
+    "path": "/obj/machinery/clonepod"
+  },
+  {
+    "position": [
+      132,
+      122,
+      3
+    ],
+    "path": "/obj/machinery/computer/cloning"
+  },
+  {
+    "position": [
+      134,
+      122,
+      3
+    ],
+    "path": "/obj/machinery/dna_scannernew"
+  },
+  {
+    "position": [
+      130,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/vending/medical"
+  },
+  {
+    "position": [
+      132,
+      123,
+      3
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      101,
+      114,
+      3
+    ],
+    "path": "/obj/machinery/optable"
+  },
+  {
+    "position": [
+      104,
+      114,
+      3
+    ],
+    "path": "/obj/machinery/computer/operating"
+  },
+  {
+    "position": [
+      100,
+      110,
+      3
+    ],
+    "path": "/obj/structure/closet/secure_closet/medical_wall"
+  },
+  {
+    "position": [
+      100,
+      116,
+      4
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      101,
+      116,
+      4
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      102,
+      116,
+      4
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      100,
+      116,
+      4
+    ],
+    "path": "/obj/machinery/chargemaster"
+  },
+  {
+    "position": [
+      102,
+      116,
+      4
+    ],
+    "path": "/obj/machinery/chargemaster"
+  },
+  {
+    "position": [
+      100,
+      117,
+      4
+    ],
+    "path": "/obj/item/precursor_charge"
+  },
+  {
+    "position": [
+      101,
+      117,
+      4
+    ],
+    "path": "/obj/item/precursor_charge"
+  },
+  {
+    "position": [
+      102,
+      117,
+      4
+    ],
+    "path": "/obj/item/precursor_charge"
+  },
+  {
+    "position": [
+      108,
+      117,
+      4
+    ],
+    "path": "/obj/item/modular_computer/console/preset/supply"
+  },
+  {
+    "position": [
+      106,
+      117,
+      4
+    ],
+    "path": "/obj/machinery/vending/engineering/os13"
+  },
+  {
+    "position": [
+      102,
+      118,
+      4
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      94,
+      99,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      94,
+      104,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      101,
+      99,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      101,
+      104,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      105,
+      99,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      105,
+      104,
+      4
+    ],
+    "path": "/obj/structure/closet/crate"
+  },
+  {
+    "position": [
+      120,
+      106,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      120,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      123,
+      106,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      123,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      126,
+      106,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      126,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/biomass_vat"
+  },
+  {
+    "position": [
+      119,
+      114,
+      4
+    ],
+    "path": "/obj/machinery/computer/hydroponics/os13"
+  },
+  {
+    "position": [
+      123,
+      114,
+      4
+    ],
+    "path": "/obj/machinery/biomass_press"
+  },
+  {
+    "position": [
+      127,
+      114,
+      4
+    ],
+    "path": "/obj/machinery/vending/hydro_cultures"
+  },
+  {
+    "position": [
+      118,
+      105,
+      4
+    ],
+    "path": "/obj/item/hydroponics_supply/skimmer"
+  },
+  {
+    "position": [
+      124,
+      115,
+      4
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      104,
+      121,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      105,
+      121,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      106,
+      121,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      107,
+      121,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      108,
+      121,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      104,
+      120,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      106,
+      120,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      108,
+      120,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      103,
+      122,
+      5
+    ],
+    "path": "/obj/machinery/vending/boozeomat"
+  },
+  {
+    "position": [
+      110,
+      122,
+      5
+    ],
+    "path": "/obj/machinery/vending/cigarette"
+  },
+  {
+    "position": [
+      109,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/chemical_dispenser/bar_soft/full"
+  },
+  {
+    "position": [
+      106,
+      122,
+      5
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      115,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/biomass_press/food_processor/pizza"
+  },
+  {
+    "position": [
+      117,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/biomass_press/food_processor/sandwich"
+  },
+  {
+    "position": [
+      118,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/biomass_press/food_processor/shawarma/broken"
+  },
+  {
+    "position": [
+      115,
+      119,
+      5
+    ],
+    "path": "/obj/machinery/biomass_press/food_processor/meat_processor"
+  },
+  {
+    "position": [
+      118,
+      119,
+      5
+    ],
+    "path": "/obj/structure/hygiene/sink"
+  },
+  {
+    "position": [
+      104,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      105,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      104,
+      112,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      104,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      109,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      110,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      109,
+      112,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      109,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      123,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      124,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      123,
+      112,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      123,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      127,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      128,
+      113,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      127,
+      112,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      127,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      131,
+      119,
+      5
+    ],
+    "path": "/obj/machinery/vending/snack"
+  },
+  {
+    "position": [
+      132,
+      119,
+      5
+    ],
+    "path": "/obj/machinery/vending/snack"
+  },
+  {
+    "position": [
+      131,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/vending/coffee"
+  },
+  {
+    "position": [
+      120,
+      103,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      123,
+      103,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      120,
+      106,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      123,
+      106,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      120,
+      109,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      123,
+      109,
+      5
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      120,
+      110,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      121,
+      110,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      122,
+      110,
+      5
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      121,
+      110,
+      5
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      143,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      143,
+      116,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      146,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      146,
+      116,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      149,
+      114,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      149,
+      116,
+      5
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      112,
+      120,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      113,
+      120,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      114,
+      120,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      115,
+      120,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      113,
+      120,
+      6
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      116,
+      121,
+      6
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      110,
+      121,
+      6
+    ],
+    "path": "/obj/machinery/vending/security"
+  },
+  {
+    "position": [
+      114,
+      121,
+      6
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      95,
+      137,
+      6
+    ],
+    "path": "/obj/structure/closet/secure_closet/security"
+  },
+  {
+    "position": [
+      97,
+      137,
+      6
+    ],
+    "path": "/obj/structure/closet/secure_closet/security"
+  },
+  {
+    "position": [
+      99,
+      137,
+      6
+    ],
+    "path": "/obj/structure/closet/secure_closet/security"
+  },
+  {
+    "position": [
+      101,
+      137,
+      6
+    ],
+    "path": "/obj/structure/closet/secure_closet/security"
+  },
+  {
+    "position": [
+      95,
+      134,
+      6
+    ],
+    "path": "/obj/structure/table/rack"
+  },
+  {
+    "position": [
+      97,
+      134,
+      6
+    ],
+    "path": "/obj/structure/table/rack"
+  },
+  {
+    "position": [
+      99,
+      134,
+      6
+    ],
+    "path": "/obj/structure/table/rack"
+  },
+  {
+    "position": [
+      101,
+      134,
+      6
+    ],
+    "path": "/obj/structure/table/rack"
+  },
+  {
+    "position": [
+      98,
+      138,
+      6
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      102,
+      133,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      145,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      113,
+      144,
+      6
+    ],
+    "path": "/obj/structure/hygiene/toilet"
+  },
+  {
+    "position": [
+      116,
+      145,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      117,
+      144,
+      6
+    ],
+    "path": "/obj/structure/hygiene/toilet"
+  },
+  {
+    "position": [
+      120,
+      145,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      121,
+      144,
+      6
+    ],
+    "path": "/obj/structure/hygiene/toilet"
+  },
+  {
+    "position": [
+      108,
+      141,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      124,
+      141,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      108,
+      133,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      124,
+      133,
+      6
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      117,
+      137,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      118,
+      137,
+      6
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      118,
+      136,
+      6
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      118,
+      138,
+      6
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      117,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/r_n_d/protolathe"
+  },
+  {
+    "position": [
+      121,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/r_n_d/protolathe"
+  },
+  {
+    "position": [
+      124,
+      126,
+      7
+    ],
+    "path": "/obj/machinery/computer/rdconsole"
+  },
+  {
+    "position": [
+      122,
+      126,
+      7
+    ],
+    "path": "/obj/machinery/r_n_d/destructive_analyzer"
+  },
+  {
+    "position": [
+      119,
+      124,
+      7
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      120,
+      124,
+      7
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      121,
+      124,
+      7
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      122,
+      127,
+      7
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      111,
+      111,
+      7
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      112,
+      111,
+      7
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      112,
+      104,
+      7
+    ],
+    "path": "/obj/machinery/computer/rdconsole"
+  },
+  {
+    "position": [
+      124,
+      112,
+      7
+    ],
+    "path": "/obj/machinery/chemical_dispenser/full"
+  },
+  {
+    "position": [
+      133,
+      126,
+      7
+    ],
+    "path": "/obj/structure/closet"
+  },
+  {
+    "position": [
+      136,
+      126,
+      7
+    ],
+    "path": "/obj/structure/closet"
+  },
+  {
+    "position": [
+      133,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/computer/robotics"
+  },
+  {
+    "position": [
+      97,
+      139,
+      7
+    ],
+    "path": "/obj/machinery/r_n_d/protolathe"
+  },
+  {
+    "position": [
+      97,
+      140,
+      7
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      116,
+      138,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      139,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      140,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      141,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      138,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      139,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      140,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      141,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      115,
+      138,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      118,
+      138,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      115,
+      139,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      118,
+      139,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      115,
+      140,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      118,
+      140,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      115,
+      141,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      118,
+      141,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      113,
+      142,
+      9
+    ],
+    "path": "/obj/structure/flora/pottedplant"
+  },
+  {
+    "position": [
+      120,
+      142,
+      9
+    ],
+    "path": "/obj/structure/flora/pottedplant"
+  },
+  {
+    "position": [
+      115,
+      143,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      143,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      143,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      118,
+      143,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      112,
+      142,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/command"
+  },
+  {
+    "position": [
+      120,
+      140,
+      9
+    ],
+    "path": "/obj/machinery/computer/crew"
+  },
+  {
+    "position": [
+      116,
+      142,
+      9
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      112,
+      148,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      115,
+      148,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      118,
+      148,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      120,
+      148,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/security"
+  },
+  {
+    "position": [
+      116,
+      146,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/command"
+  },
+  {
+    "position": [
+      120,
+      146,
+      9
+    ],
+    "path": "/obj/machinery/computer/engineering_power"
+  },
+  {
+    "position": [
+      116,
+      145,
+      9
+    ],
+    "path": "/obj/structure/bed/chair"
+  },
+  {
+    "position": [
+      115,
+      134,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      134,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      117,
+      134,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      118,
+      134,
+      9
+    ],
+    "path": "/obj/structure/table/standard"
+  },
+  {
+    "position": [
+      116,
+      134,
+      9
+    ],
+    "path": "/obj/item/modular_computer/console/preset/command"
+  },
+  {
+    "position": [
+      120,
+      134,
+      9
+    ],
+    "path": "/obj/machinery/vending/coffee"
+  },
+  {
+    "position": [
+      116,
+      135,
+      9
+    ],
+    "path": "/obj/structure/sign/os13_label"
+  },
+  {
+    "position": [
+      125,
+      141,
+      9
+    ],
+    "path": "/obj/structure/bed"
+  },
+  {
+    "position": [
+      125,
+      139,
+      9
+    ],
+    "path": "/obj/structure/closet/secure_closet/captains"
+  },
+  {
+    "position": [
+      118,
+      112,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      109,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      119,
+      111,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      130,
+      127,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      134,
+      113,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      139,
+      114,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      117,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      134,
+      112,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      137,
+      118,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      103,
+      133,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      131,
+      129,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      135,
+      129,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      102,
+      134,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      114,
+      134,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      151,
+      116,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      162,
+      128,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      100,
+      116,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      101,
+      112,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      104,
+      123,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      105,
+      110,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      111,
+      125,
+      2
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      111,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      107,
+      123,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      107,
+      114,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      107,
+      110,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      108,
+      119,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      121,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      121,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      112,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      114,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      119,
+      111,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      111,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      122,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      114,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      129,
+      121,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      137,
+      119,
+      3
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      86,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      88,
+      96,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      90,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      90,
+      102,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      91,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      91,
+      101,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      91,
+      98,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      94,
+      109,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      94,
+      102,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      97,
+      113,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      97,
+      101,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      97,
+      98,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      99,
+      117,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      99,
+      107,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      100,
+      96,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      103,
+      101,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      103,
+      98,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      105,
+      95,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      109,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      102,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      97,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      101,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      98,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      118,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      107,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      124,
+      108,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      124,
+      107,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      126,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      109,
+      4
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      105,
+      117,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      114,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      119,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      132,
+      111,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      133,
+      116,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      134,
+      116,
+      5
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      89,
+      129,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      89,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      92,
+      134,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      92,
+      131,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      93,
+      128,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      93,
+      127,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      101,
+      123,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      101,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      102,
+      128,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      104,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      104,
+      123,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      105,
+      143,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      107,
+      145,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      110,
+      141,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      110,
+      137,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      110,
+      133,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      110,
+      123,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      111,
+      131,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      147,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      143,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      139,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      147,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      143,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      131,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      132,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      118,
+      133,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      147,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      143,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      139,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      131,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      148,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      141,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      137,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      133,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      123,
+      118,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      145,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      117,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      127,
+      143,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      132,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      122,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      114,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      111,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      129,
+      114,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      131,
+      124,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      132,
+      113,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      133,
+      127,
+      6
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      97,
+      136,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      116,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      111,
+      109,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      113,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      113,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      114,
+      106,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      118,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      139,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      113,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      109,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      118,
+      118,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      118,
+      101,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      136,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      118,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      137,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      106,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      136,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      132,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      126,
+      123,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      126,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      127,
+      128,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      127,
+      114,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      129,
+      112,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      129,
+      107,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      130,
+      126,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      130,
+      111,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      132,
+      114,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      136,
+      124,
+      7
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      118,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      119,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      123,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      124,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      126,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      127,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      129,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      130,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      131,
+      116,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      132,
+      113,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      132,
+      112,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      134,
+      113,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      134,
+      112,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      135,
+      116,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      135,
+      109,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      136,
+      118,
+      8
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      98,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      100,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      104,
+      134,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      104,
+      131,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      105,
+      133,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      106,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      107,
+      116,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      108,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      109,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      110,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      144,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      124,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      113,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      112,
+      106,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      114,
+      136,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      115,
+      114,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      132,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      131,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      116,
+      106,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      136,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      117,
+      114,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      119,
+      144,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      116,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      113,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      120,
+      106,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      140,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      121,
+      100,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      122,
+      122,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      123,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      124,
+      138,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      124,
+      133,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      125,
+      127,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      127,
+      104,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      122,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      128,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/door/airlock"
+  },
+  {
+    "position": [
+      95,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      95,
+      135,
+      6
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      95,
+      136,
+      6
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      95,
+      138,
+      6
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      100,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      81,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      81,
+      110,
+      4
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      81,
+      111,
+      4
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      82,
+      106,
+      4
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      85,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      85,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      85,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      90,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      90,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      120,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      100,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      118,
+      102,
+      5
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      118,
+      102,
+      5
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      118,
+      103,
+      5
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      118,
+      104,
+      5
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      125,
+      105,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      105,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      101,
+      112,
+      5
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      101,
+      112,
+      5
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      101,
+      113,
+      5
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      102,
+      112,
+      5
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      105,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      105,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      110,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      140,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      145,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      150,
+      115,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      96,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      96,
+      128,
+      9
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      96,
+      129,
+      9
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      97,
+      128,
+      9
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      100,
+      125,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      100,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      105,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      125,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      100,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      105,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      135,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      140,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      100,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      105,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      135,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      120,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      135,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      145,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      120,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      140,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      130,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      130,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      120,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      145,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      105,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      110,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      105,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      125,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      130,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      135,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      130,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      115,
+      9
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      96,
+      109,
+      2
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      96,
+      109,
+      2
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      96,
+      110,
+      2
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      96,
+      111,
+      2
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      100,
+      110,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      120,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      120,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      120,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      130,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      125,
+      2
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      118,
+      104,
+      4
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      118,
+      104,
+      4
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      118,
+      107,
+      4
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      118,
+      108,
+      4
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      120,
+      110,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      115,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      105,
+      4
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      103,
+      119,
+      5
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      103,
+      119,
+      5
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      103,
+      120,
+      5
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      103,
+      121,
+      5
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      105,
+      120,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      120,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      120,
+      5
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      109,
+      3
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      100,
+      109,
+      3
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      100,
+      111,
+      3
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      100,
+      112,
+      3
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      100,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      110,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      125,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      110,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      105,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      110,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      120,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      115,
+      3
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      115,
+      115,
+      8
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      115,
+      116,
+      8
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      115,
+      117,
+      8
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      115,
+      120,
+      8
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      115,
+      8
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      120,
+      8
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      91,
+      134,
+      7
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      91,
+      134,
+      7
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      92,
+      134,
+      7
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      92,
+      135,
+      7
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      95,
+      135,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      135,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      140,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      100,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      110,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      115,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      105,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      110,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      130,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      135,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      105,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      110,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      115,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      130,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      105,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      115,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      125,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      135,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      125,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      135,
+      130,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      140,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      105,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      105,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      110,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      120,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      130,
+      7
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      82,
+      117,
+      6
+    ],
+    "path": "/obj/machinery/power/area_smes"
+  },
+  {
+    "position": [
+      82,
+      117,
+      6
+    ],
+    "path": "/obj/effect/area_power_marker"
+  },
+  {
+    "position": [
+      82,
+      118,
+      6
+    ],
+    "path": "/obj/machinery/alarm"
+  },
+  {
+    "position": [
+      82,
+      119,
+      6
+    ],
+    "path": "/obj/machinery/atmospherics/unary/vent_pump"
+  },
+  {
+    "position": [
+      90,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      90,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      100,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      135,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      110,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      145,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      110,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      140,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      130,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      85,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      90,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      90,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      95,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      105,
+      130,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      115,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      120,
+      115,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      120,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      125,
+      125,
+      6
+    ],
+    "path": "/obj/machinery/light/small"
+  },
+  {
+    "position": [
+      118,
+      122,
+      5
+    ],
+    "path": "/obj/effect/landmark"
+  },
+  {
+    "position": [
+      119,
+      122,
+      9
+    ],
+    "path": "/obj/effect/landmark"
+  }
+]

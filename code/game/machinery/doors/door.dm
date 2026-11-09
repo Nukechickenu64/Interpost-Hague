@@ -424,8 +424,20 @@
 
 /obj/machinery/door/proc/can_close_on_occupants()
 	for(var/turf/turf in locs)
-		if(locate(/mob/living) in turf)
-			return FALSE
+		for(var/mob/living/occupant in turf)
+			if(occupant.buckled)
+				return FALSE
+			var/list/directions = GLOB.cardinal.Copy()
+			while(directions.len)
+				var/direction = pick(directions)
+				directions -= direction
+				var/turf/destination = get_step(turf, direction)
+				if(!destination || (destination in locs) || !destination.Enter(occupant))
+					continue
+				occupant.forceMove(destination)
+				break
+			if(occupant.loc == turf)
+				return FALSE
 	return TRUE
 
 /obj/machinery/door/proc/close(var/forced = 0)

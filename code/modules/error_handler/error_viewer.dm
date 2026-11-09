@@ -37,9 +37,10 @@ GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
 			error_viewer.show_to(usr.client, null, href_list["viewruntime_linear"])
 
 /datum/error_viewer/proc/browse_to(client/user, html)
-	var/datum/browser/browser = new(user.mob, "error_viewer", null, 600, 400)
-	browser.set_content(html)
-	browser.add_head_content({"
+	html = {"
+	<!DOCTYPE html>
+	<html>
+	<head>
 	<style>
 	.runtime
 	{
@@ -55,8 +56,13 @@ GLOBAL_DATUM(error_cache, /datum/error_viewer/error_cache)
 		display: inline-block;
 	}
 	</style>
-	"})
-	browser.open()
+	</head>
+	<body>
+	[html]
+	</body>
+	</html>
+	"}
+	show_browser(user.mob, html, "window=error_viewer;size=600x400")
 
 /datum/error_viewer/proc/build_header(datum/error_viewer/back_to, linear)
 	// Common starter HTML for show_to

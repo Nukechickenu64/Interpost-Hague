@@ -518,8 +518,6 @@
 		return
 	return interact(user)
 
-// Right-click toggles the control lock. An engineering access card is still
-// required in the ID slot; there is no direct ID swipe anymore.
 /obj/machinery/alarm/attack_hand_right(mob/user)
 	if(user.incapacitated() || !Adjacent(user))
 		return
@@ -528,6 +526,14 @@
 		return
 	if(stat & (NOPOWER|BROKEN))
 		to_chat(user, SPAN_WARNING("It does nothing."))
+		return
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		if(!alarm_area || shorted || !modcon_access(user))
+			to_chat(user, SPAN_WARNING("The compartment lockdown controls are unavailable."))
+			return
+		alarm_area.atmos_manual_lockdown = !alarm_area.atmos_manual_lockdown
+		alarm_area.update_atmos_lockdown()
+		to_chat(user, SPAN_NOTICE("Manual compartment lockdown [alarm_area.atmos_manual_lockdown ? "engaged" : "released"]."))
 		return
 	if(wires.IsIndexCut(AALARM_WIRE_IDSCAN))
 		to_chat(user, SPAN_WARNING("The scanner beeps but nothing happens."))
@@ -543,6 +549,10 @@
 
 /obj/machinery/alarm/interact(mob/user)
 	if(locked || buildstage != 2 || shorted || (stat & (NOPOWER|BROKEN)))
+		if(locked && buildstage == 2 && !shorted && !(stat & (NOPOWER|BROKEN)) && alarm_area && user.Adjacent(src) && !user.incapacitated() && istype(GLOB.using_map, /datum/map/os13classic))
+			to_chat(user, vent_report())
+			to_chat(user, SPAN_NOTICE("Swipe an engineering keycard to unlock the controls."))
+			return
 		to_chat(user, SPAN_WARNING("The modcon controls are locked or offline."))
 		return
 	var/datum/engineering_atmos_menu/menu = new(src, user)
@@ -930,6 +940,21 @@
 			return TOPIC_REFRESH
 
 /obj/machinery/alarm/attackby(obj/item/W as obj, mob/user as mob)
+	var/obj/item/card/id/card = istype(GLOB.using_map, /datum/map/os13classic) && W ? W.GetIdCard() : null
+	if(card)
+		if(user.incapacitated() || !Adjacent(user) || user.get_active_hand() != W)
+			return
+		if(buildstage != 2 || shorted || (stat & (NOPOWER|BROKEN)) || wires.IsIndexCut(AALARM_WIRE_IDSCAN))
+			to_chat(user, SPAN_WARNING("The Modcon keycard reader is offline."))
+			return
+		if(!check_access(card))
+			to_chat(user, SPAN_WARNING("Access denied. An engineering keycard is required."))
+			return
+		locked = !locked
+		update_icon()
+		add_fingerprint(user)
+		to_chat(user, SPAN_NOTICE("You [locked ? "lock" : "unlock"] the Modcon controls."))
+		return
 	switch(buildstage)
 		if(2)
 			if(istype(W, /obj/item/weapon/chemical_scrubber))
@@ -1005,7 +1030,10 @@
 	if (buildstage < 1)
 		to_chat(user, "The circuit is missing.")
 	if (buildstage == 2)
-		to_chat(user, "Right-click to [locked ? "unlock" : "lock"] the controls. An engineering ID in the ID slot is required.")
+		if(istype(GLOB.using_map, /datum/map/os13classic))
+			to_chat(user, "Click for the compartment report. Swipe an engineering keycard to [locked ? "unlock" : "lock"] the controls. Right-click to toggle manual compartment lockdown.")
+		else
+			to_chat(user, "Right-click to [locked ? "unlock" : "lock"] the controls. An engineering ID in the ID slot is required.")
 /*
 AIR ALARM CIRCUIT
 Just a object used in constructing air alarms

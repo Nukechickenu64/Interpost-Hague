@@ -14,7 +14,7 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 	SSticker.can_fire = FALSE
 	SSmachines.can_fire = FALSE
 	var/datum/shield_crawlspace_regression/check = new
-	check.run()
+	check.run_checks()
 
 /area/maintenance/shield_crawlspace_regression
 	name = "Shield maintenance regression"
@@ -34,7 +34,7 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 		failures++
 		world.log << "SHIELD_CRAWLSPACE_FAIL: [message]"
 
-/datum/shield_crawlspace_regression/proc/run()
+/datum/shield_crawlspace_regression/proc/run_checks()
 	var/baseline_runtimes = GLOB.total_runtimes
 	var/area/maintenance/room = new /area/maintenance/shield_crawlspace_regression
 	var/area/ordinary = new /area/shield_crawlspace_regression
@@ -117,6 +117,60 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 	subject.status_flags |= GODMODE
 	expect(!generator.shock_crawlspace_occupant(subject) && subject.getFireLoss() == damage, "Electrification bypassed normal electrocution immunity.")
 
+	generator.shutdown_field()
+	check_child_crawlspaces()
 	expect(GLOB.total_runtimes == baseline_runtimes, "Native runtime errors occurred during the checks.")
 	world.log << "SHIELD_CRAWLSPACE_RESULT: [failures ? "FAIL" : "PASS"] failures=[failures] new_runtimes=[GLOB.total_runtimes - baseline_runtimes]"
 	del(world)
+
+/datum/shield_crawlspace_regression/proc/check_child_crawlspaces()
+	var/turf/start = locate(22,24,1)
+	var/turf/passage = locate(23,24,1)
+	passage = passage.ChangeTurf(/turf/simulated/open/crawlspace/maintenance)
+	var/turf/hatch = locate(24,24,1)
+	hatch = hatch.ChangeTurf(/turf/simulated/open/crawlspace/hatch)
+	var/turf/panel = locate(25,24,1)
+	panel = panel.ChangeTurf(/turf/simulated/open/crawlspace/panel/directional)
+	var/turf/exit = locate(26,24,1)
+	var/mob/living/carbon/human/cadet = new(start)
+	cadet.mind_initialize()
+	cadet.age = 56
+	job_master.EquipRank(cadet, "Cadet", FALSE, TRUE)
+	expect(cadet.is_child() && cadet.mob_size == MOB_SMALL && cadet.age >= 10 && cadet.age <= 14 && cadet.maxHealth == 80, "Round-start Cadet retained an adult body or age.")
+	expect(istype(cadet.w_uniform, /obj/item/clothing/under/os13_child) && istype(cadet.shoes, /obj/item/clothing/shoes/os13_child), "Round-start Cadet did not receive fitted clothes.")
+	var/mob/living/carbon/human/late_cadet = new(start)
+	late_cadet.mind_initialize()
+	late_cadet.gender = FEMALE
+	late_cadet.age = 45
+	job_master.EquipRank(late_cadet, "Cadet", TRUE, TRUE)
+	expect(late_cadet.is_child() && late_cadet.age >= 10 && late_cadet.age <= 14 && late_cadet.gender == FEMALE, "Late-join Cadet did not retain their gender in a child body.")
+	expect(istype(late_cadet.w_uniform, /obj/item/clothing/under/os13_child) && istype(late_cadet.shoes, /obj/item/clothing/shoes/os13_child), "Late-join Cadet lacked their basic clothes.")
+	for(var/mob/living/carbon/human/child in list(cadet, late_cadet))
+		child.regenerate_icons()
+		var/list/body_states = icon_states(child.species.get_icobase(child))
+		for(var/obj/item/organ/external/limb in child.organs)
+			limb.get_icon()
+			expect(limb.icon_state in body_states, "[child.gender] child limb [limb.icon_name] referenced an absent sprite.")
+		var/obj/item/uniform = child.w_uniform
+		var/obj/item/shoes = child.shoes
+		expect(uniform && (uniform.get_icon_state(child, slot_w_uniform_str) in icon_states(uniform.item_icons[slot_w_uniform_str])), "The child uniform lacked its worn sprite.")
+		expect(shoes && (shoes.get_icon_state(child, slot_shoes_str) in icon_states(shoes.item_icons[slot_shoes_str])), "The child shoes lacked their worn sprite.")
+	qdel(late_cadet)
+	cadet.forceMove(start)
+	expect(cadet.Move(passage) && cadet.loc == passage && !cadet.lying, "An upright Cadet could not walk into a crawlspace.")
+	var/obj/machinery/door/airlock/maintenance/door = new(hatch)
+	door.welded = TRUE
+	expect(!cadet.Move(hatch) && cadet.loc == passage, "Child crawlspace access bypassed a welded airlock.")
+	qdel(door)
+	expect(cadet.Move(hatch) && cadet.Move(panel) && cadet.Move(exit) && cadet.loc == exit && !cadet.lying, "An upright child failed to walk through and out of hatch and panel crawlspaces.")
+	qdel(cadet)
+	var/mob/living/carbon/human/adult = new(start)
+	adult.mob_size = MOB_SMALL
+	expect(!adult.Move(passage) && adult.loc == start, "Small adult could walk upright into a crawlspace.")
+	var/obj/item/clothing/under/os13_child/uniform = new(start)
+	expect(!adult.equip_to_slot_if_possible(uniform, slot_w_uniform), "An adult could wear the fitted child uniform.")
+	adult.lying = TRUE
+	expect(adult.Move(passage) && adult.loc == passage, "An adult could no longer crawl into a crawlspace.")
+	qdel(uniform)
+	qdel(adult)
+	world.log << "CHILD_CRAWLSPACE_CHECK: Cadet round-start and late-join bodies and clothes, child movement, hatch collision and adult crawling"

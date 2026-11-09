@@ -84,6 +84,8 @@
 	return amount
 
 /mob/living/carbon/human/adjustBruteLoss(var/amount)
+	if(amount > 0 && os13_psi_armor_until > world.time)
+		amount *= 1 - os13_psi_armor_fraction
 	amount = amount*species.brute_mod
 	if(amount > 0)
 		take_overall_damage(amount, 0)
@@ -92,6 +94,8 @@
 	BITSET(hud_updateflag, HEALTH_HUD)
 
 /mob/living/carbon/human/adjustFireLoss(var/amount)
+	if(amount > 0 && os13_psi_armor_until > world.time)
+		amount *= 1 - os13_psi_armor_fraction
 	amount = amount*species.burn_mod
 	if(amount > 0)
 		take_overall_damage(0, amount)
@@ -390,6 +394,9 @@ This function restores all organs.
 		else
 			if(!def_zone)	def_zone = ran_zone(def_zone)
 			organ = get_organ(check_zone(def_zone))
+
+	if(damage > 0 && (damagetype == BRUTE || damagetype == BURN) && os13_psi_armor_until > world.time)
+		damage *= 1 - os13_psi_armor_fraction
 
 	//Handle other types of damage
 	if(!(damagetype in list(BRUTE, BURN, PAIN, CLONE)))

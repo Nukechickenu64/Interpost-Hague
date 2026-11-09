@@ -24,6 +24,7 @@
 
 	closed_layer = ABOVE_WINDOW_LAYER
 	var/id = 1.0
+	frequency = 1379
 	dir = 1
 	explosion_resistance = 25
 
@@ -35,6 +36,7 @@
 	var/_wifi_id
 	var/datum/wifi/receiver/button/door/wifi_receiver
 	var/material/implicit_material
+	var/radio_door_command
 
 /obj/machinery/door/blast/Initialize()
 	. = ..()
@@ -52,10 +54,71 @@
 
 	implicit_material = get_material_by_name("plasteel")
 
-/obj/machinery/door/airlock/Destroy()
+	if(id_tag)
+		set_frequency(frequency)
+		return INITIALIZE_HINT_LATELOAD
+
+/obj/machinery/door/blast/LateInitialize()
+	. = ..()
+	send_status()
+
+/obj/machinery/door/blast/Destroy()
+	if(radio_connection)
+		unregister_radio(src, frequency)
+		radio_connection = null
 	qdel(wifi_receiver)
 	wifi_receiver = null
 	return ..()
+
+/obj/machinery/door/blast/set_frequency(new_frequency)
+	. = ..()
+	update_nearby_tiles(need_rebuild = TRUE)
+
+/obj/machinery/door/blast/receive_signal(datum/signal/signal)
+	if(!signal || signal.encryption || !id_tag || signal.data["tag"] != id_tag)
+		return
+	var/turf/sender = get_turf(signal.source)
+	if(!sender || sender.z != z || get_dist(src, sender) > AIRLOCK_CONTROL_RANGE)
+		return
+
+	var/command = signal.data["command"]
+	switch(command)
+		if("lock", "unlock", "update")
+			if(command != "update")
+				locked = command == "lock"
+			spawn(0)
+				send_status()
+		if("open", "close", "secure_open", "secure_close")
+			if(command == "secure_open" || command == "secure_close")
+				locked = TRUE
+			radio_door_command = command
+			START_PROCESSING(SSmachines, src)
+			spawn(0)
+				execute_radio_door_command()
+
+/obj/machinery/door/blast/Process()
+	if(!radio_door_command)
+		return PROCESS_KILL
+	execute_radio_door_command()
+
+/obj/machinery/door/blast/proc/execute_radio_door_command()
+	set waitfor = FALSE
+	if(!radio_door_command || operating || !operable())
+		return
+	var/command = radio_door_command
+	radio_door_command = null
+	switch(command)
+		if("open", "secure_open")
+			if(density && open(command == "secure_open"))
+				return
+			if(density && !radio_door_command)
+				radio_door_command = command
+		if("close", "secure_close")
+			if(!density && close(command == "secure_close"))
+				return
+			if(!density && !radio_door_command)
+				radio_door_command = command
+	send_status()
 
 // Proc: Bumped()
 // Parameters: 1 (AM - Atom that tried to walk through this object)
@@ -97,6 +160,7 @@
 	sleep(15)
 	src.layer = open_layer
 	src.operating = 0
+	send_status()
 
 // Proc: force_close()
 // Parameters: None
@@ -118,6 +182,7 @@
 	src.set_opacity(1)
 	sleep(15)
 	src.operating = 0
+	send_status()
 	return TRUE
 
 // Proc: force_toggle()
@@ -164,8 +229,8 @@
 // Proc: open()
 // Parameters: None
 // Description: Opens the door. Does necessary checks. Automatically closes if autoclose is true
-/obj/machinery/door/blast/open()
-	if (src.operating || (stat & BROKEN || stat & NOPOWER))
+/obj/machinery/door/blast/open(ignore_radio_lock = FALSE)
+	if(operating || !operable() || (locked && !ignore_radio_lock))
 		return
 	force_open()
 	if(autoclose)
@@ -176,10 +241,12 @@
 // Proc: close()
 // Parameters: None
 // Description: Closes the door. Does necessary checks.
-/obj/machinery/door/blast/close()
-	if (src.operating || (stat & BROKEN || stat & NOPOWER))
+/obj/machinery/door/blast/close(ignore_radio_lock = FALSE)
+	if(operating || !operable() || (locked && !ignore_radio_lock))
 		return
-	if(!force_close() && autoclose)
+	if(force_close())
+		return TRUE
+	if(autoclose)
 		addtimer(CALLBACK(src, .proc/close), next_close_time(), TIMER_UNIQUE|TIMER_OVERRIDE)
 
 
@@ -193,7 +260,8 @@
 	update_icon()
 
 /obj/machinery/door/blast/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
-	if(air_group) return 1
+	if(air_group)
+		return !radio_connection
 	return ..()
 
 

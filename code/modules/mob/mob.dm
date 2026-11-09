@@ -115,7 +115,6 @@
 
 /mob
 	var/stealth_mode = FALSE
-	var/list/examine_memory
 
 // Like visible_message, but each onlooker must pass a perception roll to notice.
 /mob/proc/perceived_visible_message(var/message, var/self_message, var/range = world.view)
@@ -300,28 +299,7 @@
 		return
 
 	perceived_visible_message("<span class='looksatbold'>[name]</span> <span class='looksat'>looks at [A].</span>")
-
-	if(ishuman(A))
-		A.examine(src)
-		return
-
-	if(!examine_memory)
-		examine_memory = list()
-	var/weakref/ref = weakref(A)
-	switch(examine_memory[ref])
-		if(2)
-			A.examine(src)
-			return
-		if(1)
-			if(perception_check())
-				examine_memory[ref] = 2
-				A.examine(src)
-				return
-			to_chat(src, "<span class='uppertext'>This is \a [A].</span>\n<span class='statustext'>You can't make out anything more.</span>")
-			return 1
-
-	examine_memory[ref] = 1
-	to_chat(src, "<span class='uppertext'>This is \a [A].</span>")
+	A.examine(src)
 	return 1
 
 /mob/verb/pointed(atom/A as mob|obj|turf in view())

@@ -181,13 +181,27 @@
 	department = "Civilian"
 	department_flag = CIV
 	selection_color = "#797979"
-	ideal_character_age = 16
+	ideal_character_age = 12
+	outfit_type = /decl/hierarchy/outfit/job/os13_cadet
 	main_stat = STAT_DX
 	trained_skills = list("cleaning")
 	access = list(access_maint_tunnels)
-	job_desc = "Help the crew with errands. Your small build fits maintenance passages; bridge access must be granted by the Captain."
+	job_desc = "Help the crew with errands. As a child, you can walk upright through crawlspaces. Bridge access must be granted by the Captain."
 
-/datum/job/os13/cadet/initialize_character(mob/living/carbon/human/H)
+/datum/job/os13/cadet/initialize_character(mob/living/carbon/human/H, no_starting_equipment = FALSE)
+	H.set_species(SPECIES_CHILD)
 	. = ..()
-	H.mob_size = MOB_SMALL
+	// Late join skips job equipment. The child's basic clothes still fit their body.
+	if(no_starting_equipment)
+		H.equip_to_slot_or_del(new /obj/item/clothing/under/os13_child(H), slot_w_uniform)
+		H.equip_to_slot_or_del(new /obj/item/clothing/shoes/os13_child(H), slot_shoes)
 	return .
+
+/datum/job/os13/cadet/equip_preview(mob/living/carbon/human/H, alt_title, datum/mil_branch/branch)
+	H.set_species(SPECIES_CHILD)
+	return ..()
+
+/decl/hierarchy/outfit/job/os13_cadet
+	name = "Cadet"
+	uniform = /obj/item/clothing/under/os13_child
+	shoes = /obj/item/clothing/shoes/os13_child

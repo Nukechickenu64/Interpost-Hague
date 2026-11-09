@@ -100,9 +100,8 @@
 		var/obj/item/weldingtool/WT = O
 		if (WT.remove_fuel(0))
 			if(health < maxHealth)
-				health += pick(1,1,1,2,2,3)
-				if(health > maxHealth)
-					health = maxHealth
+				adjustBruteLoss(-pick(1,1,1,2,2,3))
+				adjustFireLoss(-pick(1,1,1,2,2,3))
 				add_fingerprint(user)
 				src.visible_message("<span class='notice'>\The [user] has spot-welded some of the damage to \the [src]!</span>")
 			else

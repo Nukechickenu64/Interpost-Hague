@@ -173,6 +173,7 @@
 	icon_state = "vat_empty"
 	// The 64px art is centered on its solid base tile; leave space above and beside mapped vats.
 	pixel_x = -16
+	plane = DEFAULT_PLANE
 	layer = STRUCTURE_LAYER
 	appearance_flags = KEEP_TOGETHER|TILE_BOUND|LONG_GLIDE
 	density = TRUE
@@ -413,6 +414,8 @@
 			light_state = "over_harvest3"
 		if(light_state)
 			var/image/status_light = image('icons/os13/objects/objects/hydroponics.dmi', light_state)
+			status_light.plane = FLOAT_PLANE
+			status_light.layer = FLOAT_LAYER
 			status_light.pixel_x = 16
 			status_light.pixel_y = 16
 			overlays += status_light

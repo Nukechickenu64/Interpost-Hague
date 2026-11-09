@@ -24,11 +24,11 @@
 /obj/structure/bed/chair/cyberdeck/post_buckle_mob()
 	. = ..()
 	if(linked_console && buckled_mob != linked_console.operator_body)
-		linked_console.end_dive("The chair connection was broken.")
+		linked_console.forced_eject("The chair connection was broken.")
 
 /obj/structure/bed/chair/cyberdeck/Destroy()
 	if(linked_console)
-		linked_console.end_dive("The cyberdeck chair was destroyed.")
+		linked_console.forced_eject("The cyberdeck chair was destroyed.")
 	return ..()
 
 /obj/machinery/computer/cyberdeck
@@ -60,7 +60,7 @@
 		desc = "Connects a seated, helmet-wearing technician to a research data field. Insert a technology disk and select a research field. Collect all data to record the technology and return to your body."
 
 /obj/machinery/computer/cyberdeck/Destroy()
-	end_dive("The research console was destroyed.")
+	forced_eject("The research console was destroyed.")
 	if(disk)
 		disk.dropInto(loc)
 		disk = null
@@ -69,7 +69,7 @@
 /obj/machinery/computer/cyberdeck/power_change()
 	. = ..()
 	if(stat & (BROKEN|NOPOWER))
-		end_dive("The research console lost power or failed.")
+		forced_eject("The research console lost power or failed.")
 
 /obj/machinery/computer/cyberdeck/attackby(obj/item/I, mob/user)
 	if(!istype(I, /obj/item/disk))
@@ -109,7 +109,12 @@
 	data["collection_mode"] = istype(GLOB.using_map, /datum/map/alpha)
 	if(data["collection_mode"])
 		data["scan_status"] = network_level(/datum/tech/os13/scan_mk2) > 0 ? "Mk.II installed (10x recharge)" : network_level(/datum/tech/os13/scan_mk1) > 0 ? "Mk.I installed" : "unavailable (install Scan research)"
-		data["icepick_status"] = network_level(/datum/tech/os13/icepick_mk2) > 0 ? "MK2 installed (10x recharge)" : "base ability available (MK2 not installed)"
+		if(network_level(/datum/tech/os13/icepick_mk2) > 0)
+			data["icepick_status"] = "MK2 installed (10x recharge)"
+		else if(istype(GLOB.using_map, /datum/map/os13classic))
+			data["icepick_status"] = network_level(/datum/tech/os13/icepick_mk1) > 0 ? "Mk.I installed" : "unavailable (install ICE-Pick research)"
+		else
+			data["icepick_status"] = "base ability available (MK2 not installed)"
 	data["dive_id"] = dive_id
 	data["disk_ref"] = disk ? "\ref[disk]" : null
 	data["recording_ref"] = disk && disk.stored ? "\ref[disk.stored]" : "blank"
@@ -117,6 +122,10 @@
 		data["stored_research"] = disk.stored.name
 		data["stored_level"] = disk.stored.display_level()
 		data["stored_level_label"] = istype(disk.stored, /datum/tech/os13) ? "tier" : "level"
+		var/list/recordings = list()
+		for(var/datum/tech/recording in disk.research_recordings())
+			recordings += "[recording.name] ([istype(recording, /datum/tech/os13) ? "tier" : "level"] [recording.display_level()])"
+		data["recordings"] = recordings
 	if(state != CYBERDECK_IDLE)
 		data["operator"] = operator_body ? operator_body.real_name : "Unknown operator"
 		data["research"] = pending_tech ? pending_tech.name : "Research archive"
@@ -211,7 +220,7 @@
 /obj/machinery/computer/cyberdeck/proc/eligible_operator(mob/living/carbon/human/H, obj/structure/bed/chair/cyberdeck/C)
 	if(istype(GLOB.using_map, /datum/map/alpha) && (!istype(H) || !H.has_os13_neural_port()))
 		return FALSE
-	return istype(H) && !QDELETED(H) && chair_in_link_area(C) && (!C.linked_console || C.linked_console == src) && H.buckled == C && C.buckled_mob == H && H.loc == C.loc && H.stat == CONSCIOUS && istype(H.head, /obj/item/clothing/head/cyberdeck) && H.mind && H.mind.current == H
+	return istype(H) && !QDELETED(H) && !H.os13_psi_control && chair_in_link_area(C) && (!C.linked_console || C.linked_console == src) && H.buckled == C && C.buckled_mob == H && H.loc == C.loc && H.stat == CONSCIOUS && istype(H.head, /obj/item/clothing/head/cyberdeck) && H.mind && H.mind.current == H
 
 /obj/machinery/computer/cyberdeck/proc/network_level(tech_type)
 	return research_network_level(tech_type)
@@ -309,6 +318,9 @@
 		end_dive("Avatar control transfer failed; your body was recalled and the disk is safe.")
 		return FALSE
 	state = CYBERDECK_RUNNING
+	if(istype(GLOB.using_map, /datum/map/os13classic) && operator_body.cyberdeck_needs_sleep)
+		operator_body.adjustBrainLoss(10)
+		to_chat(dive_body, SPAN_DANGER("Your unrested brain takes damage as the neural link starts. Sleep before diving again."))
 	protection_active_at = building.collection_mode ? world.time + rand(10, 30) SECONDS : 0
 	dive_deadline = world.time + (10 + selected_level) MINUTES
 	status_message = building.collection_mode ? "Dive active. Collect all research data; the final collection completes the download." : "Dive active. Decrypt the relays and download the data core."
@@ -356,9 +368,33 @@
 	if(state != CYBERDECK_RUNNING)
 		return
 	if(!dive_valid(dive_body) || !dive_body.client)
-		end_dive("Neural link lost, avatar integrity failed, or archive time expired. No data was written.")
+		forced_eject("Neural link lost, avatar integrity failed, or archive time expired. No data was written.")
 		return
-	schedule_monitor()
+	instance.advance_guardians(dive_body)
+	if(state == CYBERDECK_RUNNING)
+		schedule_monitor()
+
+/obj/machinery/computer/cyberdeck/proc/forced_eject(message)
+	if(state == CYBERDECK_RUNNING && istype(GLOB.using_map, /datum/map/os13classic) && !QDELETED(operator_body))
+		operator_body.cyberdeck_needs_sleep = TRUE
+		operator_body.cyberdeck_sleep_started = 0
+		message += " The forced ejection leaves you exhausted. Sleep before diving again or risk brain damage."
+	end_dive(message)
+
+/mob/living/carbon/human
+	var/cyberdeck_needs_sleep = FALSE
+	var/cyberdeck_sleep_started = 0
+
+/mob/living/carbon/human/proc/recover_from_cyberdeck_ejection()
+	if(!voluntary_sleeping || !sleeping || stat == DEAD || InStasis())
+		cyberdeck_sleep_started = 0
+		return
+	if(!cyberdeck_sleep_started)
+		cyberdeck_sleep_started = world.time
+	else if(world.time >= cyberdeck_sleep_started + 30 SECONDS)
+		cyberdeck_needs_sleep = FALSE
+		cyberdeck_sleep_started = 0
+		to_chat(src, SPAN_NOTICE("Your mind has recovered from the forced ejection."))
 
 /obj/machinery/computer/cyberdeck/proc/complete_dive(mob/living/simple_animal/cyber_avatar/V)
 	if(!dive_valid(V) || instance.decrypted < instance.required_keys)

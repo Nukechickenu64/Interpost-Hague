@@ -251,6 +251,8 @@
 	if(owner.confused && prob(owner.m_intent == "run" ? 70 : 35))
 		dir = turn(dir, pick(90, -90))
 		T = get_step(owner, dir)
+	if(invader_lift_tile_unavailable(T) && !invader_lift_tile_unavailable(get_turf(owner)))
+		return FALSE
 	var/turf/start = get_turf(owner)
 	owner.SelfMove(T, dir)
 	return get_turf(owner) != start

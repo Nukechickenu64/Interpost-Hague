@@ -147,8 +147,9 @@
 		return FALSE
 	if(istype(GLOB.using_map, /datum/map/alpha) && (!linked_console || !linked_console.files || !linked_console.files.DesignHasReqs(D)))
 		return FALSE
-	for(var/M in D.materials)
-		if(material_amount(M, TRUE) < D.materials[M] * mat_efficiency)
+	var/list/recipe = D.get_replicator_materials()
+	for(var/M in recipe)
+		if(material_amount(M, TRUE) < recipe[M] * mat_efficiency)
 			return 0
 	for(var/C in D.chemicals)
 		if(!reagents.has_reagent(C, D.chemicals[C] * mat_efficiency))
@@ -162,8 +163,9 @@
 	producing_design = D
 	production_turf = get_turf(src)
 	var/power = active_power_usage
-	for(var/M in D.materials)
-		power += round(D.materials[M] / 5)
+	var/list/recipe = D.get_replicator_materials()
+	for(var/M in recipe)
+		power += round(recipe[M] / 5)
 	power = max(active_power_usage, power)
 	use_power_oneoff(power)
 	conversion_pulse(3 SECONDS)
@@ -180,16 +182,17 @@
 		log_debug("Replicator [src] at [x],[y],[z] cancelled production because its blueprint became unavailable.")
 		visible_message(SPAN_WARNING("\The [src] cancels production: the blueprint is unavailable. No feedstock was consumed."))
 	else if(!stat && powered() && !panel_open && get_turf(src) == production_turf && canBuild(D))
-		for(var/M in D.materials)
-			consume_material(M, D.materials[M] * mat_efficiency)
+		var/list/recipe = D.get_replicator_materials()
+		for(var/M in recipe)
+			consume_material(M, recipe[M] * mat_efficiency)
 		for(var/C in D.chemicals)
 			reagents.remove_reagent(C, D.chemicals[C] * mat_efficiency)
 		if(D.build_path)
 			var/obj/new_item = D.Fabricate(src, src)
 			new_item.loc = loc
-			if(mat_efficiency != 1 && length(new_item.matter))
-				for(var/material in new_item.matter)
-					new_item.matter[material] *= mat_efficiency
+			new_item.matter = recipe.Copy()
+			for(var/material in new_item.matter)
+				new_item.matter[material] *= mat_efficiency
 	else
 		queue.Insert(1, D)
 		queue_revision++

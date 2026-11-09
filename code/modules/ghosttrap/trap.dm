@@ -37,6 +37,8 @@ var/list/ghost_traps
 
 // Check for bans, proper atom types, etc.
 /datum/ghosttrap/proc/assess_candidate(var/mob/observer/ghost/candidate, var/mob/target, var/feedback = TRUE)
+	if(!istype(candidate) || !candidate.can_affect_world(feedback))
+		return FALSE
 	if(!candidate.MayRespawn(1, minutes_since_death))
 		return 0
 	if(islist(ban_checks))
@@ -177,7 +179,7 @@ datum/ghosttrap/drone/assess_candidate(var/mob/observer/ghost/candidate, var/mob
 		return 0
 
 datum/ghosttrap/drone/transfer_personality(var/mob/candidate, var/mob/living/silicon/robot/drone/drone)
-	if(!assess_candidate(candidate))
+	if(!assess_candidate(candidate, drone))
 		return 0
 	drone.transfer_personality(candidate.client)
 

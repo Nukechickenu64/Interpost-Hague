@@ -133,8 +133,9 @@
 /obj/effect/catwalk_plated/attack_hand()
 	attack_generic()
 
-/obj/effect/catwalk_plated/attack_ghost()
-	attack_generic()
+/obj/effect/catwalk_plated/attack_ghost(mob/user)
+	if(ghost_can_affect_world(user, TRUE))
+		attack_generic()
 
 /obj/effect/catwalk_plated/attack_generic()
 	activate()

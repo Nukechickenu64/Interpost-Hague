@@ -146,7 +146,8 @@ var/bomb_set
 	..()
 
 /obj/machinery/nuclearbomb/attack_ghost(mob/user as mob)
-	attack_hand(user)
+	if(ghost_can_affect_world(user, TRUE))
+		attack_hand(user)
 
 /obj/machinery/nuclearbomb/attack_hand(mob/user as mob)
 	if(extended)

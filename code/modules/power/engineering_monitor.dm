@@ -26,6 +26,24 @@
 	circuit = /obj/item/circuitboard/engineering_power
 	var/array_id = "station"
 
+/obj/machinery/computer/engineering_power/classic
+	desc = "A grid monitor and local solar deployment controller. Its built-in backup supply can spread the array during a blackout."
+	idle_power_usage = 0
+	active_power_usage = 0
+
+/obj/machinery/computer/engineering_power/classic/powered()
+	return TRUE
+
+/obj/machinery/power/smes/classic
+	desc = "A finite startup reserve that supplies the station until the solar arrays are deployed. It recharges from surplus generation."
+	should_be_mapped = TRUE
+	capacity = 6000
+	input_attempt = TRUE
+	input_level = 25000
+	input_level_max = 25000
+	output_level = 35000
+	output_level_max = 35000
+
 /obj/machinery/computer/engineering_power/attack_hand(mob/user)
 	if(..())
 		return
@@ -75,7 +93,7 @@
 
 /obj/item/device/fixboy
 	name = "FixBoy-2000"
-	desc = "A handheld engineering diagnostic. Use it on a machine or wall to inspect damage, or activate it to read the station power report. To repair a console's broken glass, use it on the console while holding one processed zbrite bar (glass) in your other hand."
+	desc = "A handheld engineering diagnostic. Use it on a machine or wall to inspect damage, or activate it to read the station power report. Use it on a broken console with a glass shard or processed zbrite bar in your other hand."
 	icon = 'icons/os13/objects/objects/device.dmi'
 	icon_state = "fixboy"
 	item_state = "multitool"
@@ -85,7 +103,7 @@
 	matter = list("steel" = 500, "glass" = 500)
 
 /obj/item/device/fixboy/afterattack(atom/target, mob/user, proximity)
-	if(!proximity || user.incapacitated())
+	if(!proximity || QDELETED(target) || !user.Adjacent(target) || user.incapacitated())
 		return
 	if(user.get_active_hand() != src && user.get_inactive_hand() != src)
 		to_chat(user, SPAN_WARNING("Hold the FixBoy-2000 to use it."))
@@ -94,16 +112,16 @@
 	if(istype(target, /obj/machinery/computer))
 		var/obj/machinery/computer/C = target
 		if(C.stat & BROKEN)
-			var/obj/item/stack/material/bar = user.get_active_hand() == src ? user.get_inactive_hand() : user.get_active_hand()
-			if(!istype(bar) || bar.get_material_name() != "glass" || bar.get_amount() < 1)
-				to_chat(user, SPAN_WARNING("Broken glass detected. Hold one processed zbrite bar (glass) in your other hand to repair \the [C]."))
-				return
-			if(!bar.use(1))
-				to_chat(user, SPAN_WARNING("Unable to consume a zbrite bar for the repair."))
+			var/obj/item/replacement = user.get_active_hand() == src ? user.get_inactive_hand() : user.get_active_hand()
+			var/obj/item/stack/material/bar = replacement
+			if(istype(replacement, /obj/item/weapon/material/shard) && (replacement.get_material_name() in list("glass", "rglass")))
+				qdel(replacement)
+			else if(!istype(bar) || bar.get_material_name() != "glass" || !bar.use(1))
+				to_chat(user, SPAN_WARNING("Broken glass detected. Hold a glass shard or processed zbrite bar in your other hand to repair \the [C]."))
 				return
 			C.set_broken(FALSE)
 			playsound(C, 'sound/items/Deconstruct.ogg', 50, TRUE)
-			to_chat(user, SPAN_NOTICE("You use one zbrite bar to repair \the [C]'s broken glass."))
+			to_chat(user, SPAN_NOTICE("You replace \the [C]'s broken glass."))
 		else
 			to_chat(user, SPAN_NOTICE("[C.name]: no broken glass detected. [C.stat & NOPOWER ? "No external power." : "Power available."]"))
 	else if(istype(target, /obj/machinery/power/solar_base))
@@ -128,6 +146,61 @@
 		report += "[entry["name"]]: [entry["load"]] kW[entry["offline"] ? " (power cut)" : ""]<br>"
 	report += "<br>TOTAL DEMAND: [data["demand"]] kW<br>GENERATED: [data["generated"]] kW<br>STORED: [data["stored"]] / [data["capacity"]] MJ<br>Solar output: [data["solar_output"]] kW ([data["working"]] / [data["panels"]] mounts generating)<br>Updated [data["age"]] seconds ago."
 	to_chat(user, SPAN_NOTICE(report))
+
+/obj/item/device/fixboy/worn_use(mob/user)
+	if(!istype(GLOB.using_map, /datum/map/os13classic))
+		return ..()
+	if(!isturf(user.loc) || user.incapacitated() || loc != user || !user.isEquipped(src))
+		return
+	var/obj/item/device/os13_foam_container/container = user.get_equipped_item(slot_back)
+	if(!istype(container) || container.spent)
+		for(var/obj/item/device/os13_foam_container/held in list(user.get_active_hand(), user.get_inactive_hand()))
+			if(!held.spent)
+				container = held
+				break
+	if(!istype(container) || container.spent)
+		to_chat(user, SPAN_WARNING("Hold a charged foam container or wear one on your back."))
+		return
+	var/turf/room = get_turf(user)
+	var/turf/breach = get_step(room, user.dir)
+	if(!istype(room, /turf/simulated) || !istype(breach, /turf/space) || !(user.dir in GLOB.cardinal) || get_area(room) != get_area(breach) || (SSair.air_blocked(room, breach) & AIR_BLOCKED))
+		to_chat(user, SPAN_WARNING("Face an open hull breach from inside its compartment."))
+		return
+	container.spent = TRUE
+	container.icon_state = "dispenser_foam_empty"
+	new /obj/structure/foamedmetal/os13_hull_patch(breach)
+	user.visible_message(SPAN_NOTICE("[user] seals the breach with expanding metal foam."))
+
+/obj/item/device/os13_foam_container
+	name = "Foam Container"
+	desc = "A one-shot hull sealant canister. Hold it or wear it on your back, face the breach, and right-click your equipped FixBoy to dispense the foam."
+	icon = 'icons/os13/turf/turf/neekothing.dmi'
+	icon_state = "dispenser_foam"
+	w_class = ITEM_SIZE_NORMAL
+	slot_flags = SLOT_BACK
+	var/spent = FALSE
+
+/obj/structure/foamedmetal/os13_hull_patch
+	name = "metal foam hull patch"
+	desc = "A temporary pressure seal over a hull breach."
+	atmos_canpass = CANPASS_DENSITY
+
+/obj/structure/foamedmetal/os13_hull_patch/New()
+	..()
+	update_breach_edges(get_turf(src))
+
+/obj/structure/foamedmetal/os13_hull_patch/Destroy()
+	var/turf/breach = get_turf(src)
+	. = ..()
+	update_breach_edges(breach)
+
+/obj/structure/foamedmetal/os13_hull_patch/proc/update_breach_edges(turf/breach)
+	if(!breach)
+		return
+	for(var/direction in GLOB.cardinal)
+		var/turf/simulated/neighbor = get_step(breach, direction)
+		if(istype(neighbor))
+			SSair.mark_for_update(neighbor)
 
 /datum/autolathe/recipe/fixboy
 	name = "FixBoy-2000"

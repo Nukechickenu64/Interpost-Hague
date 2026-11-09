@@ -16,6 +16,8 @@
 	if(istype(A, /mob/living/carbon/human))
 		var/mob/living/carbon/human/clone = A
 		if(clone.clone_claimable)
+			if(!can_affect_world(TRUE))
+				return
 			if(!MayRespawn(1))
 				return
 			if(!clone.can_inhabit_clone())
@@ -30,6 +32,9 @@
 		if(A == mind.current || (mind.current in A)) // double click your corpse or whatever holds it
 			reenter_corpse()						// (cloning scanner, body bag, closet, mech, etc)
 			return
+	if(istype(A, /obj/machinery/light))
+		wraith_flicker(A)
+		return
 	if(!client || !client.holder)
 		return
 

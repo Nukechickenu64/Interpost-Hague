@@ -1,0 +1,28 @@
+world
+	maxx = 40
+	maxy = 40
+	maxz = 1
+	view = "15x15"
+	map_format = SIDE_MAP
+
+world/New()
+	..()
+	var/turf/center = locate(15, 15, 1)
+	var/mob/viewer = new(center)
+	viewer.see_in_dark = 20
+	var/turf/wall = locate(17, 16, 1)
+	var/turf/behind_wall = locate(23, 19, 1)
+	wall.opacity = TRUE
+	for(var/size in list(7, 11, "23x15"))
+		var/list/visible = view(size, viewer)
+		world.log << "SINGLE [size] blocked=[!(behind_wall in visible)] count=[length(visible)] sight=[viewer.sight] opacity=[wall.opacity]"
+	wall.opacity = FALSE
+	for(var/offset in 1 to 7)
+		var/turf/blocker = locate(17, 15 + offset, 1)
+		blocker.opacity = TRUE
+	var/turf/clear = locate(26, 15, 1)
+	var/turf/blocked = locate(23, 21, 1)
+	for(var/size in list(7, 11, "23x15"))
+		var/list/visible = view(size, viewer)
+		world.log << "PARTITION [size] clear=[clear in visible] blocked=[!(blocked in visible)] count=[length(visible)]"
+	shutdown()

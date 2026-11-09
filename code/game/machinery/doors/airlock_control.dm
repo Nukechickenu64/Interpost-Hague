@@ -1,11 +1,14 @@
 #define AIRLOCK_CONTROL_RANGE 22
 
-// This code allows for airlocks to be controlled externally by setting an id_tag and comm frequency (disables ID access)
-obj/machinery/door/airlock
+// Airlocks and blast doors use the same radio protocol. A blast door's button ID is separate.
+/obj/machinery/door
 	var/id_tag
 	var/frequency
-	var/shockedby = list()
 	var/datum/radio_frequency/radio_connection
+	var/locked = FALSE
+
+obj/machinery/door/airlock
+	var/shockedby = list()
 	var/cur_command = null	//the command the door is currently attempting to complete
 
 obj/machinery/door/airlock/Process()
@@ -92,7 +95,7 @@ obj/machinery/door/airlock/proc/command_completed(var/command)
 
 	return 1	//Unknown command. Just assume it's completed.
 
-obj/machinery/door/airlock/proc/send_status(var/bumped = 0)
+/obj/machinery/door/proc/send_status(var/bumped = 0)
 	if(radio_connection)
 		var/datum/signal/signal = new
 		signal.transmission_method = 1 //radio signal
@@ -126,11 +129,9 @@ obj/machinery/door/airlock/Bumped(atom/AM)
 			send_status(1)
 	return
 
-obj/machinery/door/airlock/proc/set_frequency(new_frequency)
-	radio_controller.remove_object(src, frequency)
-	if(new_frequency)
-		frequency = new_frequency
-		radio_connection = radio_controller.add_object(src, frequency, RADIO_AIRLOCK)
+/obj/machinery/door/proc/set_frequency(new_frequency)
+	radio_connection = register_radio(src, frequency, new_frequency, RADIO_AIRLOCK)
+	frequency = new_frequency
 
 
 obj/machinery/door/airlock/Initialize()
@@ -151,6 +152,8 @@ obj/machinery/door/airlock/New()
 		set_frequency(frequency)
 
 obj/machinery/door/airlock/Destroy()
+	qdel(wifi_receiver)
+	wifi_receiver = null
 	if(frequency && radio_controller)
 		radio_controller.remove_object(src,frequency)
 	return ..()

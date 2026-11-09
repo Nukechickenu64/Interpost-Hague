@@ -1,5 +1,5 @@
 /mob/observer/ghost/say(var/message)
-	if(pain_possession_object && pain_possession_object.has_possession_mouth())
+	if(pain_possession_object && can_affect_world() && pain_possession_object.has_possession_mouth())
 		if(world.time < next_pain_speech)
 			return
 		message = sanitize(message)

@@ -58,6 +58,9 @@
 		A.add_hiddenprint(src)
 		A.attack_robot(src)
 		return
+	if(!gurps_manipulator_usable())
+		to_chat(src, SPAN_WARNING("Your manipulators are disabled."))
+		return
 
 	// buckled cannot prevent machine interlinking but stops arm movement
 	if( buckled )

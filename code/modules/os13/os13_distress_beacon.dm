@@ -2,6 +2,62 @@
 // Navigation/range/activation choices are documented in os13_missing_objects.md.
 GLOBAL_LIST_EMPTY(os13_distress_beacons)
 
+/obj/machinery/os13_outer_antenna
+	name = "long-range communications antenna"
+	desc = "An exterior antenna linked to the bridge distress receiver."
+	icon = 'icons/os13/objects/objects/miscobjs.dmi'
+	icon_state = "antena"
+	anchored = TRUE
+	use_power = POWER_USE_OFF
+	var/repairing = FALSE
+
+/obj/machinery/os13_outer_antenna/ex_act(severity)
+	if(severity <= 2)
+		set_broken(TRUE)
+
+/obj/machinery/os13_outer_antenna/examine(mob/user)
+	. = ..()
+	if(stat & BROKEN)
+		to_chat(user, SPAN_WARNING(panel_open ? "The exposed signal feed needs one length of cable." : "The signal feed is damaged. Open the service panel with a screwdriver."))
+	else
+		to_chat(user, SPAN_NOTICE(panel_open ? "Close the service panel with a screwdriver to bring the antenna online." : "The signal feed is ready."))
+
+/obj/machinery/os13_outer_antenna/attackby(obj/item/tool, mob/user)
+	if(!isScrewdriver(tool) && !isCoil(tool))
+		return ..()
+	if(repairing || user.incapacitated() || !Adjacent(user) || user.get_active_hand() != tool)
+		return TRUE
+	if(isScrewdriver(tool))
+		panel_open = !panel_open
+		playsound(src, 'sound/items/Screwdriver.ogg', 50, TRUE)
+		to_chat(user, SPAN_NOTICE("You [panel_open ? "open" : "close"] the antenna's service panel."))
+		return TRUE
+	if(!(stat & BROKEN) || !panel_open)
+		return TRUE
+	var/obj/item/stack/cable_coil/cable = tool
+	repairing = TRUE
+	to_chat(user, SPAN_NOTICE("You start replacing the damaged signal feed."))
+	if(do_after(user, 3 SECONDS, src) && !QDELETED(src) && !QDELETED(cable) && Adjacent(user) && user.get_active_hand() == cable && panel_open && (stat & BROKEN) && cable.use(1))
+		set_broken(FALSE)
+		to_chat(user, SPAN_NOTICE("You replace the damaged signal feed. Close the panel to restore the link."))
+	repairing = FALSE
+	return TRUE
+
+/proc/os13_outer_antenna()
+	for(var/obj/machinery/os13_outer_antenna/antenna in SSmachines.machinery)
+		if(!QDELETED(antenna) && is_station_turf(get_turf(antenna)) && !(antenna.stat & BROKEN) && !antenna.panel_open)
+			return antenna
+
+/proc/os13_outer_distress_report()
+	if(!os13_outer_antenna())
+		return SPAN_WARNING("Long-range distress receiver offline. Check the exterior antenna.")
+	var/list/signals = list()
+	for(var/obj/item/device/os13_distress_beacon/beacon in GLOB.os13_distress_beacons)
+		if(beacon.signal_available() && istype(get_area(beacon), /area/space))
+			var/turf/position = get_turf(beacon)
+			signals += "Distress signal at [position.x], [position.y], sector [position.z]."
+	return signals.len ? jointext(signals, "<br>") : "No active distress signals detected in open space."
+
 /obj/item/device/os13_distress_beacon
 	name = "Distress Beacon"
 	desc = "It gives a chance to survive for those who've lost themselves in space."

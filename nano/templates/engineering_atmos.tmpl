@@ -40,6 +40,7 @@
     {{:helper.link('REFILL', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'REFILL'})}}
     {{:helper.link('STOP', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'STOP'})}}
     {{:helper.link('FILTER', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'FILTER'})}}
+    {{:helper.link('SIPHON', null, {'area': data.selected, 'vent': 'all', 'vent_mode': 'SIPHON'})}}
 </div>
 {{/if}}
 {{for data.vents}}
@@ -50,11 +51,12 @@
     <br>{{:helper.link('REFILL', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'REFILL'})}}
     {{:helper.link('STOP', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'STOP'})}}
     {{:helper.link('FILTER', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'FILTER'})}}
+    {{:helper.link('SIPHON', null, {'area': data.selected, 'vent': value.ref, 'vent_mode': 'SIPHON'})}}
     {{/if}}
 </div>
 {{empty}}
 <div class="item">No vents in this area.</div>
 {{/for}}
-<div class="item">REFILL supplies air. FILTER removes contaminants using the modcon cartridge. STOP disables the selected vents. Vent readings show actual pressure; lockdown settings use gas quantity at 20 C.</div>
+<div class="item">REFILL supplies air. FILTER removes contaminants. SIPHON draws room gas into the station reserve. STOP disables the selected vents. Vent readings show actual pressure.</div>
 {{/if}}
 {{if !data.can_control}}<div class="item">Engineering or atmospherics access is required to change settings.</div>{{/if}}

@@ -65,6 +65,8 @@ obj/item/organ/external/take_general_damage(var/amount, var/silent = FALSE)
 				droplimb(0, DROPLIMB_BLUNT)
 			if(force_droplimbburn)
 				droplimb(0, DROPLIMB_BURN)
+			if(!owner)
+				return
 
 	// High brute damage or sharp objects may damage internal organs
 	var/damage_amt = brute

@@ -48,7 +48,7 @@
 	set name = "Leap"
 	set desc = "Leap at a target and grab them aggressively."
 
-	if(last_special > world.time)
+	if(last_special > world.time || os13_hypnogenesis_until > world.time)
 		return
 
 	if(incapacitated(INCAPACITATION_DISABLED) || buckled || pinned.len)
@@ -68,7 +68,7 @@
 	if(get_dist(get_turf(T), get_turf(src)) > 4) return
 
 	//check again because we waited for user input
-	if(last_special > world.time)
+	if(last_special > world.time || os13_hypnogenesis_until > world.time)
 		return
 
 	if(incapacitated(INCAPACITATION_DISABLED) || buckled || pinned.len || stance_damage >= 4)

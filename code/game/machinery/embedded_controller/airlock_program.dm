@@ -4,6 +4,7 @@
 #define STATE_PREPARE		1
 #define STATE_DEPRESSURIZE	2
 #define STATE_PRESSURIZE	3
+#define STATE_ACCESS		4
 
 #define TARGET_NONE			0
 #define TARGET_INOPEN		-1
@@ -80,10 +81,14 @@
 			memory["internal_sensor_pressure"] = text2num(signal.data["tile_moles"])
 
 	else if(receive_tag==tag_exterior_door)
+		if(!signal.data["door_status"] || !signal.data["lock_status"])
+			return
 		memory["exterior_status"]["state"] = signal.data["door_status"]
 		memory["exterior_status"]["lock"] = signal.data["lock_status"]
 
 	else if(receive_tag==tag_interior_door)
+		if(!signal.data["door_status"] || !signal.data["lock_status"])
+			return
 		memory["interior_status"]["state"] = signal.data["door_status"]
 		memory["interior_status"]["lock"] = signal.data["lock_status"]
 
@@ -140,11 +145,12 @@
 			else if(state == target_state)
 				begin_cycle_in()
 
-		if("cycle_ext_door")
-			cycleDoors(TARGET_OUTOPEN)
-
-		if("cycle_int_door")
-			cycleDoors(TARGET_INOPEN)
+		if("cycle_ext_door", "cycle_int_door")
+			if(done_cycling())
+				state = STATE_ACCESS
+				target_state = command == "cycle_ext_door" ? TARGET_OUTOPEN : TARGET_INOPEN
+				memory["processing"] = TRUE
+				process_access_cycle()
 
 		if("abort")
 			stop_cycling()
@@ -211,6 +217,9 @@
 		master.audible_message("<span class='notice'>Cycling in progress. Pressure: [kpa] kPa</span>", hearing_distance = 5)
 
 	switch(state)
+		if(STATE_ACCESS)
+			process_access_cycle()
+
 		if(STATE_PREPARE)
 			if (check_doors_secured())
 				var/chamber_pressure = memory["chamber_sensor_pressure"]
@@ -284,6 +293,21 @@
 
 	return 1
 
+/datum/computer/file/embedded_program/airlock/proc/process_access_cycle()
+	var/cycle_out = target_state == TARGET_OUTOPEN
+	if(cycle_out && !check_interior_door_secured())
+		toggleDoor(memory["interior_status"], tag_interior_door, TRUE, "close")
+		return
+	if(!cycle_out && !check_exterior_door_secured())
+		toggleDoor(memory["exterior_status"], tag_exterior_door, TRUE, "close")
+		return
+	var/list/door_status = memory[cycle_out ? "exterior_status" : "interior_status"]
+	var/secure = memory["secure"]
+	if(door_status["state"] == "open" && door_status["lock"] == (secure ? "locked" : "unlocked"))
+		stop_cycling()
+		return
+	toggleDoor(door_status, cycle_out ? tag_exterior_door : tag_interior_door, secure, "open")
+
 //these are here so that other types don't have to make so many assuptions about our implementation
 
 /datum/computer/file/embedded_program/airlock/proc/begin_cycle_in()
@@ -321,6 +345,7 @@
 
 /datum/computer/file/embedded_program/airlock/proc/signalDoor(var/tag, var/command)
 	var/datum/signal/signal = new
+	signal.source = master
 	signal.data["tag"] = tag
 	signal.data["command"] = command
 	post_signal(signal, RADIO_AIRLOCK)
@@ -425,6 +450,7 @@ send an additional command to open the door again.
 #undef STATE_IDLE
 #undef STATE_DEPRESSURIZE
 #undef STATE_PRESSURIZE
+#undef STATE_ACCESS
 
 #undef TARGET_NONE
 #undef TARGET_INOPEN

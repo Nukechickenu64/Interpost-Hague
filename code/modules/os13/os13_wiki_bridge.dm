@@ -6,12 +6,25 @@ GLOBAL_LIST_EMPTY(os13_approved_documents)
 	return !istype(GLOB.using_map, /datum/map/alpha) || GLOB.os13_salvage_authorized
 
 /obj/machinery/computer/bridge/proc/os13_general_report()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		return {"<h2>Orbital Station 13 &mdash; General Report</h2>
+			<p><b>MALFUNCTION DETECTED</b><br>
+			AUTOMATIC METEOR PROTECTION SYSTEM: Unavailable<br>
+			STEALTH SYSTEM: Unavailable</p>
+			<p>ROCKET DEFENCE: Online<br>
+			IFF: Online</p>
+			<p>PLANNED NEW SHIFT DATE: 30 DEC 2437<br>
+			(cancelled: reactivation confirmation not received)<br>
+			<b>EMERGENCY REACTIVATION DATE: 23 AUG 3022</b><br>
+			(caused by core systems malfunction)</p>
+			<p>OUTER COMMUNICATIONS: Unavailable<br>
+			<em>TNC Aurora</em> communication link: Unavailable</p>"}
 	var/list/lines = list("<h2>Orbital Station 13: General Report</h2>")
 	lines += "<h3>Recovered emergency record</h3><p><b>Emergency reactivation: 23 August 3022.</b> The record indicates approximately six centuries of hibernation. The onboard AI's self-destruction damaged station systems and triggered the emergency awakening. Contact with corporate command cannot be assumed.</p>"
 	lines += "<p>The recovered account identifies locked research databases, failed clone backups, deteriorated solar equipment and an expired water chip. These are historical incident entries, not live fault measurements. Inspect each installation before declaring it repaired.</p>"
 	lines += os13_awakening_account()
 	lines += "<h3>Command briefing</h3><p>Assemble the crew, distribute departmental keycards, assign the Marshal to investigate the sabotage and agree research priorities with the Scientific Overseer. Research recovery, fabrication of a replacement water chip and station repairs require the appropriate crew and equipment.</p>"
-	lines += "<h3>Current recovery procedure</h3><ol><li>Use WAKE STATION to restore bridge-controlled lighting and reset station air-alarm thermostats to 20&deg;C. Broken lights, missing power and damaged machinery still require repairs.</li><li>Install a working portable water control chip in its holder.</li><li>Keep at least 90% of station power controllers supplying a distribution channel for 30 seconds. A switched-on breaker alone does not establish a working power supply.</li></ol>"
+	lines += "<h3>Current recovery procedure</h3><ol><li>Use WAKE STATION to restore bridge-controlled lighting and reset station air-alarm thermostats to 20&deg;C. Broken lights, missing power and damaged machinery still require repairs.</li><li>Install a working portable water control chip in its holder.</li><li>[GLOB.bridge_crew_objectives.power_grid_goal()].</li></ol>"
 	var/wake_state = GLOB.station_wake_sequence.started ? (GLOB.station_wake_sequence.active ? "In progress" : (GLOB.station_wake_sequence.finished ? "Complete" : "Interrupted")) : "Not started"
 	lines += "<h3>Live readings: [stationtime2text()]</h3><p>Wake sequence: [wake_state].<br>Water control chip: [GLOB.waterchip_installed ? "Installed" : "Not installed"].<br>Cryogenic startup alarm: [GLOB.cryo_startup_effect.active ? "Active" : "Inactive"].</p>"
 	if(GLOB.station_wake_sequence.active)
@@ -23,6 +36,19 @@ GLOBAL_LIST_EMPTY(os13_approved_documents)
 	else
 		lines += "<p><b>Station telemetry unavailable: AI Director is not initialized.</b></p>"
 	return jointext(lines, "")
+
+/obj/machinery/computer/bridge/proc/os13_classic_station_status()
+	var/wake_state = GLOB.station_wake_sequence.started ? (GLOB.station_wake_sequence.active ? "In progress" : (GLOB.station_wake_sequence.finished ? "Complete" : "Interrupted")) : "Not started"
+	var/report = "<p>Wake sequence: [wake_state].<br>Water control chip: [GLOB.waterchip_installed ? "Installed" : "Not installed"].<br>Cryogenic startup alarm: [GLOB.cryo_startup_effect.active ? "Active" : "Inactive"].</p>"
+	report += os13_startup_readiness()
+	report += GLOB.bridge_crew_objectives.get_status_report()
+	report += "<p>Long-range distress receiver: [os13_outer_antenna() ? "online" : "offline"].</p>"
+	var/sky_veteran = os13_sky_veteran_name()
+	if(sky_veteran)
+		report += "<p>Hall of Fame, Sky Veteran: [html_encode(sky_veteran)]</p>"
+	if(SSdirector)
+		report += SSdirector.station_status_report()
+	return report
 
 /obj/machinery/computer/bridge/proc/os13_startup_readiness()
 	var/controllers_total = 0
@@ -83,7 +109,12 @@ GLOBAL_LIST_EMPTY(os13_approved_documents)
 			if(!QDELETED(record))
 				clone_records++
 	var/list/lines = list("<h3>Startup readiness</h3><table border='1' cellpadding='5'><tr><th>System</th><th>Current local reading</th></tr>")
-	lines += "<tr><td>Area power supply</td><td>[controllers_total ? "[controllers_online] / [controllers_total] controllers supplying at least one channel" : "Unavailable: no station controllers detected"]</td></tr>"
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		var/coverage = power_net.os13_generation_coverage()
+		var/grid_reading = isnull(coverage) ? "Awaiting live grid sample" : "[round(power_net.generated / 1000, 0.01)] kW generated / [round(power_net.viewload / 1000, 0.01)] kW demand; [round(power_net.stored_energy / 1000, 0.01)] kWh reserve; [length(power_net.depowered_areas)] areas shed"
+		lines += "<tr><td>Station power grid</td><td>[grid_reading]</td></tr>"
+	else
+		lines += "<tr><td>Area power supply</td><td>[controllers_total ? "[controllers_online] / [controllers_total] controllers supplying at least one channel" : "Unavailable: no station controllers detected"]</td></tr>"
 	lines += "<tr><td>Replicator research</td><td>[research_consoles ? "[research_online] / [research_consoles] consoles operational; [length(installed_technologies)] distinct technologies stored" : "Unavailable: no station research consoles detected"]</td></tr>"
 	lines += "<tr><td>Legacy solar arrays</td><td>[panels_total ? "[panels_intact] / [panels_total] panels intact; [panels_linked] intact panels linked to a controller and power network" : "No legacy station solar panels detected"]</td></tr>"
 	lines += "<tr><td>OS13 solar mounts</td><td>[bases_total ? "[bases_total] mounts; [bases_faulty] defective bases; [bases_missing_panels] missing or shattered panels; [round(bases_output / 1000, 0.01)] kW configured output" : "Unavailable: no station OS13 solar mounts detected"]</td></tr>"

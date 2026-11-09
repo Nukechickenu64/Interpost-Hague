@@ -195,6 +195,12 @@
 /client/proc/Move_object(direct)
 	if(mob && mob.control_object)
 		var/mob/observer/ghost/ghost = mob
+		if(istype(ghost) && !ghost.can_affect_world())
+			if(ghost.pain_possession_object)
+				ghost.end_pain_possession()
+			else
+				ghost.control_object = null
+			return
 		if(istype(ghost) && ghost.pain_possession_object)
 			if(world.time < move_delay)
 				return
@@ -529,6 +535,8 @@
 		inertia_dir = 0
 		return 1
 	if(istype(loc, /turf/space))
+		return 0
+	if(!mob_has_gravity())
 		return 0
 
 	//Check to see if we slipped

@@ -80,7 +80,7 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	var/list/current_listeners = list()
 	for(var/client/listener in GLOB.clients)
 		var/turf/location = get_turf(listener.mob)
-		if(!location || !isStationLevel(location.z) || istype(listener.mob, /mob/new_player))
+		if(!location || !isStationLevel(location.z) || istype(listener.mob, /mob/new_player) || listener.os13_cryo_intro)
 			continue
 		var/mob/living/living_listener = listener.mob
 		if(istype(living_listener) && ((living_listener.sdisabilities & DEAF) || living_listener.ear_deaf))
@@ -364,7 +364,7 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 	var/disallow_occupant_types = list()
 
 	var/mob/occupant = null       // Person waiting to be despawned.
-	var/issue_joiner_access_card = FALSE
+	var/joiner_wake_timer
 	var/time_till_despawn = 9000  // Down to 15 minutes //30 minutes-ish is too long
 	var/time_entered = 0          // Used to keep track of the safe period.
 	var/obj/item/device/radio/intercom/announce //
@@ -467,6 +467,9 @@ GLOBAL_DATUM_INIT(cryo_startup_effect, /datum/cryo_startup_effect, new)
 
 /obj/machinery/cryopod/Destroy()
 	if(occupant)
+		var/datum/os13_cryo_intro/intro = occupant.client?.os13_cryo_intro
+		if(intro?.pod == src)
+			qdel(intro)
 		occupant.forceMove(loc)
 	remove_layered_visuals()
 	return ..()
@@ -884,36 +887,80 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 
 #define CRYOPOD_LID_OPEN_TIME 5 // Total frame delay of the "cryopod_opening" state.
 
+/obj/machinery/cryopod/proc/schedule_joiner_wake(mob/living/carbon/human/joiner, roundstart, delay)
+	if(roundstart && joiner.client && istype(GLOB.using_map, /datum/map/alpha) && istype(job_master.GetJob(joiner.job), /datum/job/os13))
+		var/datum/os13_cryo_intro/intro = new(joiner, src)
+		addtimer(CALLBACK(intro, /datum/os13_cryo_intro/proc/wait_for_viewport), 2 SECONDS)
+	else if(roundstart)
+		joiner.start_cryo_filter_effect()
+	// Keep the normal wake timer as a fallback if the viewport never becomes ready.
+	joiner_wake_timer = addtimer(CALLBACK(src, .proc/wake_joiner, joiner, FALSE), delay, TIMER_STOPPABLE)
+
+/obj/machinery/cryopod/proc/start_joiner_intro(datum/os13_cryo_intro/intro)
+	deltimer(joiner_wake_timer)
+	intro.play()
+	var/delay = OS13_CRYO_RELEASE_TIME
+	if(layered_visuals && lid_visual && lid_closed)
+		delay -= CRYOPOD_LID_OPEN_TIME
+	joiner_wake_timer = addtimer(CALLBACK(src, .proc/wake_joiner, occupant, TRUE), delay, TIMER_STOPPABLE | TIMER_CLIENT_TIME)
+
+/obj/machinery/cryopod/proc/wake_joiner(mob/living/carbon/human/joiner, cinematic)
+	joiner_wake_timer = null
+	if(!joiner || occupant != joiner)
+		return
+	if(joiner.loc != src)
+		addtimer(CALLBACK(src, .proc/clear_moved_occupant, joiner), 0)
+		return
+	start_release(cinematic)
+
+/obj/machinery/cryopod/proc/clear_moved_occupant(mob/leaver)
+	if(leaver && occupant == leaver && leaver.loc != src)
+		set_occupant(null)
+
 // Opens the lid and only lets the occupant out once the opening animation has finished.
-/obj/machinery/cryopod/proc/start_release()
+/obj/machinery/cryopod/proc/start_release(cinematic = FALSE)
 	if(releasing || !occupant)
 		return
+	if(joiner_wake_timer)
+		deltimer(joiner_wake_timer)
+		joiner_wake_timer = null
 	playsound(src, 'sound/machines/cryoexit.ogg', 40)
 	if(!layered_visuals || !lid_visual || !lid_closed)
-		release_occupant()
+		release_occupant(occupant, cinematic)
 		return
 	releasing = TRUE
 	lid_closed = FALSE
 	lid_visual.icon_state = "cryopod_open"
 	flick("cryopod_opening", lid_visual)
-	addtimer(CALLBACK(src, /obj/machinery/cryopod/proc/release_occupant), CRYOPOD_LID_OPEN_TIME)
+	addtimer(CALLBACK(src, .proc/release_occupant, occupant, cinematic), CRYOPOD_LID_OPEN_TIME, cinematic ? TIMER_CLIENT_TIME : 0)
 
 #undef CRYOPOD_LID_OPEN_TIME
 
-/obj/machinery/cryopod/proc/release_occupant()
+/obj/machinery/cryopod/proc/release_occupant(mob/releasing_occupant, cinematic)
+	if(occupant != releasing_occupant)
+		return
 	releasing = FALSE
 	if(QDELETED(src))
 		return
 	if(!occupant)
 		update_icon()
 		return
+	if(occupant.loc != src)
+		addtimer(CALLBACK(src, .proc/clear_moved_occupant, occupant), 0)
+		return
 
 	if(occupant.client)
 		occupant.client.eye = src.occupant.client.mob
 		occupant.client.perspective = MOB_PERSPECTIVE
+		var/datum/os13_cryo_intro/intro = occupant.client.os13_cryo_intro
+		if(intro?.pod == src)
+			if(cinematic)
+				intro.wake()
+			else
+				qdel(intro)
 
 	occupant.forceMove(get_turf(src))
-	occupant.resting = TRUE
+	occupant.resting = !cinematic
 	occupant.update_canmove()
 	occupant.fatigue = occupant.max_fatigue
 	// OS13 parity: cryosleep after-effects (all three recordings, 00:00).
@@ -926,36 +973,22 @@ GLOBAL_LIST_EMPTY(cryopod_occupant_masks)
 		var/mob/living/released_occupant = occupant
 		released_occupant.update_stamina_hud()
 		released_occupant.fade_cryo_filter_effect()
-	if(issue_joiner_access_card && ishuman(occupant))
-		dispense_joiner_access_card(occupant)
 	set_occupant(null)
-
-/obj/machinery/cryopod/proc/dispense_joiner_access_card(var/mob/living/carbon/human/joiner)
-	var/datum/job/job = job_master.GetJob(joiner.job)
-	if(!job)
-		WARNING("Cryopod could not issue an access card for [joiner.real_name], job [joiner.job].")
-		to_chat(joiner, "<span class='warning'>The cryopod could not determine your role and failed to dispense a temporary access card. Please contact an administrator.</span>")
-		return
-
-	var/obj/item/card/id/cryo_temporary/card = new(get_turf(src))
-	card.rank = job.title
-	card.assignment = (joiner.mind && joiner.mind.role_alt_title) ? joiner.mind.role_alt_title : job.title
-	card.access = job.get_access()
-	joiner.set_id_info(card)
-	card.add_fingerprint(joiner)
-	if(!joiner.equip_to_slot_if_possible(card, slot_wear_id, disable_warning = TRUE))
-		if(!joiner.put_in_hands(card))
-			card.forceMove(get_turf(src))
-			to_chat(joiner, "<span class='notice'>Your temporary access card falls onto the floor beside the cryopod.</span>")
-	to_chat(joiner, "<span class='notice'>The cryopod dispenses a temporary access card for your role: [card.assignment]. It is dissolving in the air and will disappear in three minutes.</span>")
 
 // instant: show the pod already closed instead of animating the lid (e.g. latejoiners spawning inside).
 /obj/machinery/cryopod/proc/set_occupant(var/mob/living/carbon/occupant, var/instant = FALSE, var/joining = FALSE)
+	if(src.occupant != occupant)
+		if(joiner_wake_timer)
+			deltimer(joiner_wake_timer)
+			joiner_wake_timer = null
+		var/datum/os13_cryo_intro/intro = src.occupant?.client?.os13_cryo_intro
+		if(intro?.pod == src)
+			qdel(intro)
+		releasing = FALSE
 	src.occupant = occupant
 	if(occupant)
 		has_fake_occupant = FALSE
 		fake_occupant_appearance = null
-	issue_joiner_access_card = occupant && joining
 	if(!occupant)
 		SetName(initial(name))
 		update_icon()

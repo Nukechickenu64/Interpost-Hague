@@ -114,7 +114,7 @@
 		if(can_join_with(W))
 			dirs += get_dir(src, W)
 	for(var/obj/structure/window/W in orange(src, 1))
-		if(W.anchored && W.density && W.is_fulltile())
+		if(W.anchored && W.density && W.is_fulltile() && !istype(W, /obj/structure/window/newstyle))
 			dirs += get_dir(src, W)
 			if(propagate)
 				W.update_icon()

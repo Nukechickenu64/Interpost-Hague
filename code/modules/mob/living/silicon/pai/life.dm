@@ -26,12 +26,7 @@
 
 	handle_statuses()
 
-	if(health <= 0)
-		death(null,"gives one shrill beep before falling lifeless.")
+	gurps_health_status()
 
 /mob/living/silicon/pai/updatehealth()
-	if(status_flags & GODMODE)
-		health = 100
-		set_stat(CONSCIOUS)
-	else
-		health = 100 - getBruteLoss() - getFireLoss()
+	gurps_updatehealth()

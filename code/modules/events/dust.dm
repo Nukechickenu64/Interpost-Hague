@@ -9,19 +9,24 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 	endWhen		= 30
 	var/min_delay = 30
 	var/last_wave
+	var/approach_dir
+
+/datum/event/dust/setup()
+	var/datum/event_meta/space_hazard/hazard = event_meta
+	approach_dir = (istype(hazard) && hazard.approach_dir) ? hazard.approach_dir : pick(GLOB.cardinal)
 
 /datum/event/dust/announce()
-	command_announcement.Announce("The [station_name()] is now passing through a belt of space dust.", "[station_name()] Sensor Array")
+	station_alert_radio("The [station_name()] is now passing through a belt of space dust approaching from the [dir2text(approach_dir)].")
 
 /datum/event/dust/tick()
 	if(world.time > last_wave + min_delay && prob(10))
-		dust_swarm(severity)
+		dust_swarm(severity, approach_dir)
 		last_wave = world.time
 
 /datum/event/dust/end()
-	command_announcement.Announce("The [station_name()] has now passed through the belt of space dust.", "[station_name()] Sensor Array")
+	station_alert_radio("The [station_name()] has now passed through the belt of space dust.")
 
-/proc/dust_swarm(var/strength = EVENT_LEVEL_MUNDANE)
+/proc/dust_swarm(var/strength = EVENT_LEVEL_MUNDANE, var/start_dir = pick(GLOB.cardinal))
 	if(!GLOB.using_map || !GLOB.using_map.station_levels || !GLOB.using_map.station_levels.len)
 		return
 	if(world.maxx <= TRANSITIONEDGE * 4 || world.maxy <= TRANSITIONEDGE * 4)
@@ -29,13 +34,15 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 
 	var/numbers = rand(strength * 10, strength * 15)
 
-	var/start_dir = pick(GLOB.cardinal)
+	var/edge = start_dir
+	if(!(edge in GLOB.cardinal))
+		edge = prob(50) ? (start_dir & (NORTH|SOUTH)) : (start_dir & (EAST|WEST))
 	var/turf/startloc
 	var/turf/targloc
 	var/randomz = pick(GLOB.using_map.station_levels)
 	var/randomx = rand(1+TRANSITIONEDGE*2, world.maxx-TRANSITIONEDGE*2)
 	var/randomy = rand(1+TRANSITIONEDGE*2, world.maxy-TRANSITIONEDGE*2)
-	switch(start_dir)
+	switch(edge)
 		if(NORTH)
 			startloc = locate(randomx, world.maxy - TRANSITIONEDGE, randomz)
 			targloc = locate(world.maxx - randomx,  1 + TRANSITIONEDGE, randomz)
@@ -48,6 +55,8 @@ The "dust" will damage the hull of the station causin minor hull breaches.
 		if(WEST)
 			startloc = locate(1 + TRANSITIONEDGE, randomy, randomz)
 			targloc = locate(world.maxx - TRANSITIONEDGE, world.maxy - randomy, randomz)
+	if(startloc && edge != start_dir)
+		targloc = spaceDebrisFinishLoc(start_dir, randomz, startloc)
 	if(!startloc || !targloc)
 		return
 	var/list/starters = getcircle(startloc, 3)

@@ -6,7 +6,9 @@
 
 /datum/proc/CanUseTopic(var/mob/user, var/datum/topic_state/state = GLOB.default_state)
 	var/datum/src_object = nano_host()
-	return state.can_use_topic(src_object, user)
+	. = state.can_use_topic(src_object, user)
+	if(!ghost_can_affect_world(user))
+		return min(., STATUS_UPDATE)
 
 /datum/topic_state/proc/href_list(var/mob/user)
 	return list()

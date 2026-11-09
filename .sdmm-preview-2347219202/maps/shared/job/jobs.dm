@@ -1,0 +1,916 @@
+/datum/map/frontier
+	allowed_jobs = list(
+						/datum/job/captain,
+						//datum/job/countess,
+						//datum/job/hop,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						//datum/job/officer,
+						//datum/job/detective,
+						/datum/job/cmo,
+						/datum/job/doctor,
+						/datum/job/rd,
+						/datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						//datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						//datum/job/bartender,
+						//datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						/datum/job/chaplain,
+						//datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+/datum/map/utopia
+	full_name = "Utopia"
+	path = "utopia"
+	allowed_jobs = list(
+						/datum/job/captain,
+						/datum/job/hop,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						/datum/job/officer,
+						/datum/job/detective,
+						/datum/job/doctor,
+						/datum/job/cmo,
+						///datum/job/rd,
+						///datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						/datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						/datum/job/bartender,
+						/datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						//datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+
+/datum/map/dreyfus
+	allowed_jobs = list(
+						/datum/job/captain,
+						//datum/job/countess,
+						//datum/job/hop,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						/datum/job/officer,
+						//datum/job/detective,
+						/datum/job/cmo,
+						/datum/job/rd,
+						/datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						//datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						//datum/job/bartender,
+						/datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						//datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+/datum/map/alpha
+	allowed_jobs = list(
+						/datum/job/captain,
+						//datum/job/countess,
+						/datum/job/hop,
+						///datum/job/supreme_arbiter,
+						///datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						/datum/job/officer,
+						///datum/job/detective,
+						/datum/job/doctor,
+						///datum/job/cmo,
+						/datum/job/rd,
+						/datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						///datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						///datum/job/bartender,
+						///datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						///datum/job/chaplain,
+						///datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+/datum/map/bearcat
+	full_name = "Bearcat"
+	path = "bearcat"
+	allowed_jobs = list(
+						/datum/job/captain,
+						/datum/job/hop,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						/datum/job/officer,
+						/datum/job/detective,
+						/datum/job/doctor,
+						/datum/job/cmo,
+						/datum/job/rd,
+						/datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						/datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						/datum/job/bartender,
+						/datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						/datum/job/chaplain,
+						//datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+/datum/map/torch
+	full_name = "Torch"
+	path = "torch"
+	allowed_jobs = list(
+						/datum/job/captain,
+						//datum/job/countess,
+						/datum/job/hop,
+						//datum/job/supreme_arbiter,
+						//datum/job/arbiter,
+						///datum/job/medassist
+						/datum/job/hos,
+						/datum/job/officer,
+						/datum/job/detective,
+						/datum/job/cmo,
+						/datum/job/doctor,
+						/datum/job/rd,
+						/datum/job/scientist,
+						/datum/job/qm,
+						/datum/job/cargo_tech,
+						/datum/job/cargo_tech/machinist,
+						/datum/job/mining,
+						/datum/job/chef,
+						/datum/job/bartender,
+						/datum/job/hydro,
+						/datum/job/janitor,
+						/datum/job/engineer,
+						/datum/job/chaplain,
+						//datum/job/jester
+						///datum/job/assistant,
+						/datum/job/greyhound,
+						///datum/job/cadet
+						///datum/job/ouvrier
+						///datum/job/jr_upkeep
+						///datum/job/raider
+						///datum/job/raider/leader
+						///datum/job/chaplain,
+						)
+
+/datum/job/initialize_character(var/mob/living/carbon/human/H)
+	..()
+	H.assign_random_virtue()
+	H.assign_random_sin()
+	H.assign_random_quirk()
+
+/datum/job/assistant
+	title = "Assistant"
+	supervisors = "everyone"
+	minimal_player_age = 14
+	ideal_character_age = 21
+	alt_titles = null
+	social_class = SOCIAL_CLASS_MIN
+	total_positions = 0
+	department_flag = CIV
+	spawn_positions = 1
+	access = list(access_maint_tunnels)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(9,11), rand(9,11), rand(7,10))
+		H.generate_stats(STAT_DX)
+		H.generate_skills(list("crafting","melee","cleaning","mining"))
+
+/datum/job/greyhound
+	title = "Greyhound"
+	create_record = 0
+	announced = FALSE
+	wakeup_flavor = FALSE
+	job_desc = "You miss your parents, who forgo cryosleep, they taught you well, you love God and the sleepers."
+	supervisors = "the sleepers, and GOD"
+	minimal_player_age = 14
+	selection_color = "#797979"
+	ideal_character_age = 72
+	alt_titles = null
+	social_class = SOCIAL_CLASS_MIN
+	total_positions = 1
+	department_flag = CIV
+	outfit_type = /decl/hierarchy/outfit/shipraiders
+	spawn_positions = 1
+	access = list(access_maint_tunnels)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		// Station-born generalist; a touch nimble like assistants
+		H.religion = NARSIE_RELIGION //A christian born on a spaceship? what's that flesh mound?
+		H.newgeneratestats(9,14,9,13,9,15,10,16)
+		H.generate_skills(list("crafting","cleaning","mining","medical","cooking","melee", "gardening","ranged"))
+
+/datum/job/captain
+	title = "Captain"
+	supervisors = "your own wits and Nanotrasen"
+	job_desc = "Leader of the ship and its crew, responsible for making tough decisions and ensuring the safety of all aboard."
+	minimal_player_age = 41
+	ideal_character_age = 65
+	outfit_type = /decl/hierarchy/outfit/job/dreyfus/magistrate
+	social_class = SOCIAL_CLASS_MAX
+	department_flag = SPT
+	sex_lock = MALE
+	rankprefix  = "Captain"
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
+		H.newgeneratestats(9,14,9,13,9,15,10,16)
+		H.generate_skills(list("ranged"))
+
+/datum/job/hop
+	title = "Executive Officer"
+	job_desc = "Second-in-command on the ship, assisting the Captain in decision-making and management."
+	supervisors = "the Captain"
+	minimal_player_age = 31
+	ideal_character_age = 45
+	total_positions = 1
+	spawn_positions = 1
+	outfit_type = /decl/hierarchy/outfit/job/dreyfus/adjoint
+	department_flag = SPT
+	social_class = SOCIAL_CLASS_HIGH
+	rankprefix  = "Executive Officer"
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(6,9), rand(9,11), rand(10,12))
+		H.newgeneratestats(8,12,9,13,10,12,7,12)
+		H.generate_skills(list("melee","ranged","medical"))
+
+/datum/job/rd
+	selection_color = "#0055A1"
+	title = "Head Scientist"
+	job_desc = "The lead researcher in charge of the science department, overseeing all research projects and experiments."
+	supervisors = "the Captain"
+	minimal_player_age = 21
+	ideal_character_age = 40
+	total_positions = 1
+	spawn_positions = 1
+	outfit_type = /decl/hierarchy/outfit/job/science/superviseur
+	social_class = SOCIAL_CLASS_HIGH
+	department_flag = SCI
+	rankprefix  = "Dr."
+	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
+			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
+			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks,
+			access_tox_storage, access_teleporter, access_sec_doors,
+			access_research, access_robotics, access_xenobiology, access_ai_upload, access_tech_storage,
+			access_RC_announce, access_keycard_auth, access_tcomsat, access_gateway, access_xenoarch, access_network, access_rd, access_research, access_medical, access_morgue, access_medical_equip)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
+			access_chemistry, access_virology, access_cmo, access_surgery, access_RC_announce,
+			access_keycard_auth, access_sec_doors, access_psychiatrist, access_eva, access_maint_tunnels, access_external_airlocks,
+			access_tox_storage, access_teleporter, access_sec_doors,
+			access_research, access_robotics, access_xenobiology, access_ai_upload, access_tech_storage,
+			access_RC_announce, access_keycard_auth, access_tcomsat, access_gateway, access_xenoarch, access_network, access_rd, access_research, access_medical, access_morgue, access_medical_equip)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		//H.set_species("Machine")
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		..()
+		//H.add_stats(rand(5,7), rand(5,8), rand(12,15))
+		H.newgeneratestats(7,12,8,13,12,17,6,11)
+		H.generate_skills(list("science","medical", "crafting"))
+
+/datum/job/scientist
+	selection_color = "#006BCA"
+	title = "General Researcher"
+	job_desc = "A scientist conducting various research projects and experiments to advance knowledge and technology."
+	supervisors = "the Head Scientist"
+	minimal_player_age = 19
+	ideal_character_age = 30
+	total_positions = 1
+	spawn_positions = 3
+	department_flag = SCI
+	rankprefix  = "Dr."
+	access = list(access_robotics, access_tox, access_tox_storage, access_research, access_xenobiology, access_xenoarch, access_robotics)
+	minimal_access = list(access_tox, access_tox_storage, access_research, access_xenoarch, access_robotics)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		//H.set_species("Machine") //rd only for now - 08.03
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		..()
+		//H.add_stats(rand(5,7), rand(5,8), rand(10,14))
+		H.newgeneratestats(8,13,7,12,11,15,8,12)
+		H.generate_skills(list("science","medical", "crafting"))
+
+/datum/job/doctor
+	selection_color = "#633d63"
+	title = "Medical Officer"
+	job_desc = "The primary medical practitioner on the ship, responsible for treating injuries and illnesses among the crew."
+	department_flag = MED
+	supervisors = "the Captain and Hippocrates"
+	minimal_player_age = 19
+	ideal_character_age = 30
+	total_positions = 2
+	spawn_positions = 3
+	rankprefix  = "Dr."
+	access = list(access_medical, access_medical_equip, access_genetics, access_tox,
+			access_chemistry, access_virology, access_surgery)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_tox,
+			access_chemistry, access_virology, access_surgery)
+
+/datum/job/doctor/initialize_character(var/mob/living/carbon/human/H)
+	..()
+	H.newgeneratestats(7,13,10,13,11,14,9,14)
+	H.generate_skills(list("medical","cleaning", "surgery"))
+
+/datum/job/cmo
+	title = "CMO"
+	job_desc = "Chief Medical Officer, overseeing the medical department and ensuring the health and well-being of all crew members."
+	supervisors = "the Captain"
+	selection_color = "#382238"
+	department = "Medical"
+	department_flag = MED
+
+	total_positions = 1
+	spawn_positions = 1
+	outfit_type = /decl/hierarchy/outfit/job/medical/cmo
+	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox, access_chemistry, access_virology, access_cmo, access_surgery, access_maint_tunnels)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox, access_chemistry, access_virology, access_cmo, access_surgery, access_maint_tunnels)
+
+/datum/job/cmo/initialize_character(var/mob/living/carbon/human/H)
+	..()
+	H.newgeneratestats(8,14,10,13,12,16,10,15)
+	H.generate_skills(list("medical","cleaning", "surgery"))
+
+/datum/job/hos
+	title = "Major"
+	supervisors = "the Captain"
+	job_desc = "Head of the Security Department, responsible for maintaining order and safety aboard the ship."
+	department_flag = SEC
+	total_positions = 1
+	spawn_positions = 1
+	selection_color = "#601c1c"
+	rankprefix  = "Major"
+	sex_lock = MALE
+	access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory,
+			            access_forensics_lockers, access_morgue, access_maint_tunnels, access_all_personal_lockers,
+			            access_research, access_engine, access_mining, access_medical, access_construction, access_mailsorting,
+			            access_heads, access_hos, access_RC_announce, access_keycard_auth, access_gateway, access_external_airlocks)
+	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_armory,
+			            access_forensics_lockers, access_morgue, access_maint_tunnels, access_all_personal_lockers,
+			            access_research, access_engine, access_mining, access_medical, access_construction, access_mailsorting,
+			            access_heads, access_hos, access_RC_announce, access_keycard_auth, access_gateway, access_external_airlocks)
+	minimal_player_age = 7
+	outfit_type = /decl/hierarchy/outfit/job/security/head_peacekeeper
+	social_class = SOCIAL_CLASS_HIGH
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal())//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		H.newgeneratestats(12,19,10,15,6,12,12,16)
+		//H.generate_stats(STAT_ST)
+		H.generate_skills(list("melee","ranged"))
+
+/datum/job/officer
+	title = "Enforcer"
+	job_desc = "A security officer responsible for maintaining order and enforcing regulations aboard the ship."
+	department = "Security"
+	supervisors = "The Major"
+	department_flag = SEC
+	total_positions = 1
+	spawn_positions = 8
+	rankprefix  = "Enforcer"
+	access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_morgue, access_external_airlocks)
+	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_external_airlocks)
+	minimal_player_age = 0
+	outfit_type = /decl/hierarchy/outfit/job/security/peacekeeper
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		H.newgeneratestats(12,15,10,13,6,14,9,14)
+		H.generate_skills(list("melee","ranged"))
+
+/datum/job/detective
+	title = "Detective"
+	department = "Security"
+
+	department_flag = SEC
+	total_positions = 1
+	spawn_positions = 1
+	access = list(access_security, access_eva, access_sec_doors, access_maint_tunnels, access_morgue, access_external_airlocks, access_detoffice)
+	minimal_access = list(access_security, access_eva, access_sec_doors, access_maint_tunnels, access_external_airlocks, access_detoffice)
+	minimal_player_age = 0
+	outfit_type = /decl/hierarchy/outfit/job/security/detective
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(11,16), rand(10,14), rand(7,10))
+		H.generate_stats(STAT_ST) //detective is getting removed, i'm not bothering to give them stat ranges
+		H.generate_skills(list("melee","ranged"))
+
+/datum/job/qm
+	selection_color = "#3d3315"
+	title = "Vessel Overseer"
+	job_desc = "the Vessel Overseer is responsible for managing the station's supplies, cargo, and overall logistics."
+	supervisors = "the Captain"
+	minimal_player_age = 21
+	ideal_character_age = 30
+	total_positions = 1
+	spawn_positions = 2
+	department_flag = SUP
+	rankprefix  = "Vessel Overseer"
+	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
+	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat, access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_ce)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal() && roll(20, 6) > 21)//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(8,12), rand(9,12), rand(7,10))
+		H.newgeneratestats(8,13,10,14,11,14,8,14)
+		H.generate_skills(list("crafting","engineering", "mining"))
+
+/datum/job/engineer
+	title = "Maintainer"
+	job_desc = "Responsible for the upkeep and repair of the ship's systems and infrastructure."
+	supervisors = "the Vessel Overseer"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 3
+	//alt_titles = null
+	department_flag = ENG
+	rankprefix  = "Maintainer"
+	outfit_type = /decl/hierarchy/outfit/job/dreyfus/inge/inge
+	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
+	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(10,15), rand(7,10), rand(9,14))
+		H.newgeneratestats(10,14,10,14,11,14,7,14)
+		H.generate_skills(list("crafting","engineering"))
+
+/datum/job/mining
+	selection_color = "#7c6a2e"
+	title = "Excavator"
+	job_desc = "Responsible for extracting valuable minerals and resources from asteroids and planetary bodies."
+	supervisors = "the Vessel Overseer"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = SUP
+	rankprefix  = "Excavator"
+	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
+	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station, access_xenoarch)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(9,16), rand(9,12), rand(6,9))
+		H.newgeneratestats(12,16,8,13,6,11,9,16)
+		H.generate_skills(list("crafting","engineering", "mining"))
+
+/datum/job/cargo_tech
+	selection_color = "#7c6a2e"
+	title = "Cargo Technician"
+	job_desc = "Responsible for managing and organizing the ship's cargo and supplies."
+	supervisors = "the Vessel Overseer"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	rankprefix  = "Cargo Technician"
+	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
+	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(9,12), rand(9,12), rand(6,9))
+		H.newgeneratestats(11,13,8,13,6,11,9,16)
+		H.generate_skills(list("crafting","engineering", "mining"))
+
+/datum/job/cargo_tech/machinist
+	title = "Machinist"
+	total_positions = 1
+	spawn_positions = 1
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(10,15), rand(7,10), rand(9,14))
+		H.generate_stats(STAT_IQ)
+		H.generate_skills(list("crafting","engineering"))
+
+//kid roles
+/datum/job/ouvrier
+	selection_color = "#7c6a2e"
+	title = "Cargo Assistant"
+	job_desc = "A young helper in the cargo department, eager to learn the ropes of managing supplies and logistics."
+	supervisors = "the Cargo Overseer"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = SUP
+	department = "Supply"
+	access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
+	minimal_access = list(access_maint_tunnels, access_mailsorting, access_manufacturing, access_cargo, access_cargo_bot, access_mining, access_mining_station)
+	outfit_type = /decl/hierarchy/outfit/job/cargo_kid
+	social_class = SOCIAL_CLASS_MIN
+
+	initialize_character(var/mob/living/carbon/human/H)
+		H.set_species("Child")
+		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
+		..()
+
+/datum/job/chef
+	title = "Nutritionist"
+	supervisors = "the Executive Manager"
+	job_desc = "Responsible for overseeing the nutritional needs and meal planning for the crew."
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 1
+	spawn_positions = 2
+	minimal_access = list(access_bar, access_kitchen, access_hydroponics)
+	department_flag = SRV
+	rankprefix  = "Nutritionist"
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		H.newgeneratestats(11,13,8,13,6,11,9,16)
+		H.generate_skills(list("cooking","melee"))
+
+/datum/job/bartender
+	title = "Barkeeper"
+	department = "Service"
+	job_desc = "Responsible for serving drinks and managing the bar area."
+	department_flag = SRV
+	total_positions = 1
+	spawn_positions = 1
+	supervisors = "the Viscount"
+	selection_color = "#515151"
+	access = list(access_hydroponics, access_bar, access_kitchen)
+	minimal_access = list(access_bar)
+	outfit_type = /decl/hierarchy/outfit/job/service/bartender
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		H.newgeneratestats(9,13,8,13,9,13,9,14)
+		H.generate_skills(list("cooking","ranged"))
+
+/datum/job/chaplain
+	title = "Priest"
+	supervisors = "the Arbiters and Verina"
+	minimal_player_age = 21
+	ideal_character_age = 30
+	total_positions = 1
+	spawn_positions = 1
+	outfit_type = /decl/hierarchy/outfit/job/priest
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		if(!H.religion_is_legal())//Heretical priests would be weird.
+			H.religion = LEGAL_RELIGION
+		H.generate_stats(STAT_IQ)
+		H.generate_skills(list("melee"))
+// religion skills in the future maybe...HAHAHA No.
+
+/datum/job/janitor
+	title = "Sanitation Technician"
+	job_desc = "Responsible for maintaining cleanliness and hygiene aboard the ship."
+	supervisors = "the Executive Officer"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = SRV
+	rankprefix  = "Sanitation Technician"
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		//H.add_stats(rand(9,12), rand(9,12), rand(5,9))
+		H.newgeneratestats(12,16,8,13,4,9,9,16)
+		H.generate_skills(list("cleaning"))
+
+/datum/job/hydro
+	title = "Botanic"
+	job_desc = "Responsible for cultivating and maintaining the ship's hydroponic gardens."
+	department = "Service"
+	department_flag = SRV
+	total_positions = 2
+	spawn_positions = 2
+	supervisors = "the Viscount"
+	selection_color = "#515151"
+	minimal_access = list(access_bar, access_kitchen, access_hydroponics)
+//	alt_titles = list("Hydroponicist")
+	outfit_type = /decl/hierarchy/outfit/job/service/gardener
+
+	initialize_character(var/mob/living/carbon/human/H)
+		..()
+		H.generate_stats(STAT_HT)
+		H.generate_skills(list("gardening","cooking"))
+
+/*
+/datum/job/jester
+	title = "Jester"
+	department = "Service"
+	department_flag = SRV
+	total_positions = 1
+	spawn_positions = 1
+	supervisors = "The Viscount"
+	selection_color = "#852639"
+	minimal_access = list()
+	outfit_type = /decl/hierarchy/outfit/job/jester
+
+	equip(var/mob/living/carbon/human/H)
+		..()
+		//H.generate_stats(STAT_DX)
+		H.newgeneratestats(2,18,2,18,2,18,2,18)
+		H.generate_skills(list("melee"))
+		H.setBrainLoss(rand(50, 180))
+
+//CHURCH JOBS
+//The inquisitor, aka the supreme arbiter.
+/datum/job/supreme_arbiter
+	title = "Supreme Arbiter"
+	department = "Civilian"
+	supervisors = "our glorious God, Verina"
+	department_flag = CRH
+	total_positions = 1
+	spawn_positions = 1
+	selection_color = "#6161aa"
+	access = list(access_maint_tunnels, access_chapel_office)
+	minimal_access = list(access_maint_tunnels, access_chapel_office)
+	outfit_type = /decl/hierarchy/outfit/job/supreme_arbiter
+	social_class = SOCIAL_CLASS_HIGH
+
+	equip(var/mob/living/carbon/human/H)//Still weaker than the Head Peacekeeper.
+		..()
+		if(!H.religion_is_legal())//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(9,14), rand(8,12), rand(12,16))
+		H.generate_stats(STAT_ST)
+		H.generate_skills(list("melee","ranged"))
+
+/datum/job/arbiter
+	title = "Inquisitor"
+	department = "Civilian"
+	supervisors = "the Supreme Arbiter and Verina"
+	department_flag = CRH
+	total_positions = 2
+	spawn_positions = 2
+	selection_color = "#6161aa"
+	access = list(access_maint_tunnels, access_chapel_office)
+	minimal_access = list(access_maint_tunnels, access_chapel_office)
+	outfit_type = /decl/hierarchy/outfit/job/arbiter
+	social_class = SOCIAL_CLASS_HIGH
+
+	equip(var/mob/living/carbon/human/H)//Peacekeeper stats.
+		..()
+		if(!H.religion_is_legal())//So that they can't be heretics.
+			H.religion = LEGAL_RELIGION
+		//H.add_stats(rand(11,16), rand(10,14), rand(7,10))
+		H.generate_stats(STAT_ST)
+		H.generate_skills(list("melee","ranged"))
+*/
+
+/datum/job/medassist
+	selection_color = "#633d63"
+	title = "Medical Assistant"
+	job_desc = "A young helper in the medical department, eager to learn the ropes of healing and care."
+	supervisors = "the Undertaker"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = MED
+	department = "Medical"
+	access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
+			access_chemistry, access_virology, access_cmo, access_surgery)
+	minimal_access = list(access_medical, access_medical_equip, access_morgue, access_genetics, access_heads, access_tox,
+			access_chemistry, access_virology, access_cmo, access_surgery)
+	outfit_type = /decl/hierarchy/outfit/job/medassist.
+
+	initialize_character(var/mob/living/carbon/human/H)
+		H.set_species("Child")
+		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
+		H.generate_skills(list("medical","cleaning", "surgery"))
+		..()
+
+/* Children roles.  They were too buggy, need TODO later
+/datum/job/cadet
+	selection_color = "#633d63"
+	title = "Security Cadet"
+	supervisors = "the officers"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = SEC
+	department = "Security"
+	access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_morgue, access_external_airlocks)
+	minimal_access = list(access_security, access_eva, access_sec_doors, access_brig, access_maint_tunnels, access_external_airlocks)
+	outfit_type = /decl/hierarchy/outfit/job/cadet
+
+	equip(var/mob/living/carbon/human/H)
+		H.set_species("Child")
+		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
+		H.generate_skills("melee")
+		..()
+
+/datum/job/jr_upkeep
+	selection_color = "#633d63"
+	title = "Junior Engineer"
+	supervisors = "the engineers"
+	minimal_player_age = 16
+	ideal_character_age = 21
+	total_positions = 2
+	spawn_positions = 2
+	department_flag = SEC
+	department = "Security"
+	access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
+	minimal_access = list(access_eva, access_engine, access_engine_equip, access_tech_storage, access_maint_tunnels, access_external_airlocks, access_construction, access_atmospherics, access_emergency_storage, access_tcomsat)
+	outfit_type = /decl/hierarchy/outfit/job/jr_upkeep
+
+	equip(var/mob/living/carbon/human/H)
+		H.set_species("Child")
+		H.add_stats(rand(3,6), rand(12,16), rand(6,9))
+		H.generate_skills("cleaning")
+		..()
+
+*/
+/*
+//OFF STATION JOBS
+
+/datum/job/raider
+	title = "Raider"
+	department = "Civilian"
+	department_flag = CIV
+	total_positions = 5
+	spawn_positions = 5
+	create_record = 0
+	has_email = 0
+	//no_late_join = 1
+	selection_color = "#6161aa"
+	outfit_type = /decl/hierarchy/outfit/shipraiders
+	social_class = SOCIAL_CLASS_MIN
+
+	equip(var/mob/living/carbon/human/H)
+		..()
+		H.real_name = "[get_random_raider_name()]"//Give them a random raider nickname.
+		H.name = H.real_name
+
+		//Peacekeeper setup.
+		//H.add_stats(rand(11,18), rand(10,14), rand(7,10))
+		H.generate_stats(STAT_ST)
+		H.generate_skills("ranged")
+
+		//Some dumb if shit.
+		if(prob(50))
+			H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/shitty/bayonet(H),slot_back)
+		else if(prob(50))
+			H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/shotgun/pump/boltaction/shitty(H),slot_back)
+		else
+			H.equip_to_slot_or_del(new /obj/item/weapon/gun/projectile/shotgun/pump/shitty(H),slot_back)
+
+		if(prob(50))
+			H.equip_to_slot_or_del(new /obj/item/clothing/mask/gas(H),slot_wear_mask)
+
+		//H.religion = ILLEGAL_RELIGION//Their raiders they believe in the raider religion.
+
+/datum/job/raider/leader
+	title = "Lead Raider"
+	total_positions = 1
+	spawn_positions = 1
+
+	equip(var/mob/living/carbon/human/H)
+		..()
+		H.real_name = "The Leader"
+		H.name = H.real_name
+
+//Stupid random names for them.
+/datum/job/proc/get_random_raider_name()
+	return "[pick("Spook", "Big", "Big Boy", "Big Girl", "Cheese", "Artist", "Greasy", "Dick", "Weasel", "Small", "Dixon", "Dixy", "Rat", "Knot", "Suffering", "Slick", "Scars", "Old Guy", "Heel", "Nine Lives", "Two Fingers", "Poet", "Dash", "Angel", "Bug", "Beast", "Enema", "Animal", "Oz", "Cinnamon", "Heavy", "Echo", "Cannon", "Under", "Smokes", "Joe", "Pig")]"
+
+/obj/item/clothing/under/ert/raider
+	name = "raiders uniform"
+*/
+
+/mob/living/proc/assign_random_quirk()
+	if(prob(50))//50% of not choosing a quirk at all.
+		return
+	var/list/random_quirks = list()
+	for(var/thing in subtypesof(/datum/quirk))//Populate possible quirks list.
+		var/datum/quirk/Q = thing
+		random_quirks += Q
+	if(!random_quirks.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/quirk/chosen_quirk = pick(random_quirks)
+	src.quirk = new chosen_quirk
+	to_chat(src, "<span class='notice'>I remember what's wrong with me. I am [quirk.name]. [quirk.description]</span>")
+	switch(chosen_quirk)
+		if(/datum/quirk/cig_addict)
+			var/datum/reagent/new_reagent = new /datum/reagent/nicotine
+			src.reagents.addiction_list.Add(new_reagent)
+		if(/datum/quirk/alcoholic)
+			var/datum/reagent/new_reagent = new /datum/reagent/ethanol
+			src.reagents.addiction_list.Add(new_reagent)
+
+/mob/living/proc/assign_random_sin()
+	var/list/random_sins = list()
+	for(var/thing in subtypesof(/datum/sin))//Populate possible quirks list.
+		var/datum/sin/S = thing
+		random_sins += S
+	if(!random_sins.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/sin/chosen_sin = pick(random_sins)
+	src.sin = new chosen_sin
+	to_chat(src, "<span class='notice'>I am of a sinful nature. My sin is called [sin.name].</span>")
+
+/mob/living/proc/assign_random_virtue()
+	var/list/random_virtues = list()
+	for(var/thing in subtypesof(/datum/virtue))//Populate possible quirks list.
+		var/datum/virtue/V = thing
+		random_virtues += V
+	if(!random_virtues.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/virtue/chosen_virtue = pick(random_virtues)
+	src.virtue = new chosen_virtue
+	to_chat(src, "<span class='notice'>I have something good in me. My virtue is called [virtue.name].</span>")
+
+/mob/living/proc/assign_random_nuisance()
+	if(prob(80))
+		return
+	var/list/random_nuisances = list()
+	for(var/thing in subtypesof(/datum/nuisance))//Populate possible quirks list.
+		var/datum/nuisance/N = thing
+		random_nuisances += N
+	if(!random_nuisances.len)//If there's somewhow nothing there afterwards return.
+		return
+	var/datum/nuisance/chosen_nuisance = pick(random_nuisances)
+	src.nuisance = new chosen_nuisance
+	to_chat(src, "<span class='notice'>I am a <br>nuisance.</br>. I specialize in [nuisance.name].</span>")

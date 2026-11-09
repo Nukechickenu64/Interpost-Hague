@@ -19,7 +19,7 @@
 	var/syndie = 0//Holder to see if it's a syndicate encrypted radio
 	var/intercept = 0 //can intercept other channels
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
-	slot_flags = SLOT_BELT
+	slot_flags = SLOT_BELT | SLOT_AMULET
 	throw_speed = 2
 	throw_range = 9
 	w_class = ITEM_SIZE_SMALL
@@ -119,6 +119,8 @@
 	var/dat[0]
 
 	for(var/ch_name in channels)
+		if(radio_frequency_is_synthetic_only(radiochannels[ch_name]) && !is_ai_or_robot_radio_user(user))
+			continue
 		var/chan_stat = channels[ch_name]
 		var/listening = !!(chan_stat & FREQ_LISTENING) != 0
 
@@ -136,6 +138,8 @@
 
 /obj/item/device/radio/proc/has_channel_access(var/mob/user, var/freq)
 	if(!user)
+		return 0
+	if(radio_frequency_is_synthetic_only(text2num(freq)) && !is_ai_or_robot_radio_user(user))
 		return 0
 
 	if(!(freq in internal_channels))

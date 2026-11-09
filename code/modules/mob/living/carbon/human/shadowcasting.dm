@@ -663,8 +663,8 @@ var/global/shadowcast_generation = 0
 	if(W.opacity && (W.icon || W.overlays.len)) sources += W
 	for(var/obj/O in W)
 		if(O.opacity && (O.icon || O.overlays.len) && !hidden_mounts?[O]) sources += O
-	// Native culling removes the light sample with the wall art. Retaining only
-	// the art exposes the white backdrop, so retain its lighting in the same pass.
+	// Native culling removes the light sample with the wall art. Retain its
+	// lighting alongside the art so the retained cap still gets shaded.
 	var/atom/movable/lighting_overlay/light = W.lighting_overlay
 	if(light)
 		sources += light
@@ -843,10 +843,15 @@ var/global/shadowcast_generation = 0
 /proc/get_los_cull_strips(turf/center, range, mob/viewer, use_viewer = FALSE)
 	var/list/visible = list()
 	var/turf/visibility_center = center
+	var/visibility_range = range
 	if(viewer && isturf(viewer.loc) && (use_viewer || viewer.loc == center))
 		visibility_center = get_turf(viewer)
-		// view() from the mob matches the client's native culling exactly (opacity AND darkness/see_in_dark)
-		for(var/turf/T in view(range, viewer))
+		if(visibility_center != center)
+			// Cover the shifted viewport without widening the query on the other axis.
+			var/width = 2 * (range + abs(center.x - visibility_center.x)) + 1
+			var/height = 2 * (range + abs(center.y - visibility_center.y)) + 1
+			visibility_range = "[width]x[height]"
+		for(var/turf/T in view(visibility_range, viewer))
 			visible[T] = TRUE
 	else
 		// Remote eyes (cameras etc.) fall back to pure opacity culling
@@ -854,7 +859,7 @@ var/global/shadowcast_generation = 0
 			visible[T] = TRUE
 		END_FOR_DVIEW
 	var/list/visible_faces = list()
-	FOR_DVIEW(var/turf/wall, range, visibility_center, INVISIBILITY_MAXIMUM)
+	FOR_DVIEW(var/turf/wall, visibility_range, visibility_center, INVISIBILITY_MAXIMUM)
 		if(los_boundary_face_visible(wall, visibility_center, visible))
 			visible_faces[wall] = TRUE
 	END_FOR_DVIEW

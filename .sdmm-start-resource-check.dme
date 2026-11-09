@@ -1,1 +1,2 @@
 #include "Interpost-Hague.dme"
+#include "code\modules\events\space_hazards.dm"

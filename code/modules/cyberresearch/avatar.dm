@@ -20,6 +20,7 @@
 	var/scan_timer
 	var/scan_ready_at = 0
 	var/icepick_ready_at = 0
+	var/guardian_fatigue = 0
 
 /mob/living/simple_animal/cyber_avatar/Initialize(mapload)
 	. = ..()
@@ -33,6 +34,10 @@
 	set category = "Abilities"
 	if(QDELETED(master_console) || !master_console.dive_valid(src) || !master_console.instance.collection_mode || !client)
 		to_chat(src, SPAN_WARNING("ICE-Pick requires an active cyberspace connection."))
+		return
+	var/advanced_icepick = research_network_level(/datum/tech/os13/icepick_mk2) > 0
+	if(istype(GLOB.using_map, /datum/map/os13classic) && !advanced_icepick && research_network_level(/datum/tech/os13/icepick_mk1) <= 0)
+		to_chat(src, SPAN_WARNING("Install ICE-Pick software at the Replicator before using it."))
 		return
 	if(world.time < icepick_ready_at)
 		to_chat(src, SPAN_WARNING("ICE-Pick is recharging: [ceil((icepick_ready_at - world.time) / 10)] seconds remaining."))
@@ -68,7 +73,7 @@
 	if(!C.instance.erase_information(target, src))
 		to_chat(src, SPAN_WARNING("That information is no longer available for ICE-Pick. Nothing was removed."))
 		return
-	icepick_ready_at = world.time + (research_network_level(/datum/tech/os13/icepick_mk2) > 0 ? 3 SECONDS : 30 SECONDS)
+	icepick_ready_at = world.time + (advanced_icepick ? 3 SECONDS : 30 SECONDS)
 
 /mob/living/simple_animal/cyber_avatar/proc/clear_scan()
 	if(scan_timer)
@@ -144,6 +149,7 @@
 	. = ..()
 	if(!QDELETED(master_console) && master_console.dive_valid(src) && master_console.instance.collection_mode && master_console.advanced_port_active())
 		. = max(0.5, . / 2)
+	. += guardian_fatigue
 
 /mob/living/simple_animal/cyber_avatar/UnarmedAttack(atom/A, proximity)
 	if(stat != CONSCIOUS || !proximity || !Adjacent(A))
@@ -179,14 +185,14 @@
 
 /mob/living/simple_animal/cyber_avatar/death(gibbed, deathmessage, show_dead_message)
 	if(!QDELETED(master_console) && master_console.dive_body == src)
-		master_console.end_dive("Avatar integrity lost. Your body has been recalled; no data was written.")
+		master_console.forced_eject("Avatar integrity lost. Your body has been recalled; no data was written.")
 		return TRUE
 	return ..()
 
 /mob/living/simple_animal/cyber_avatar/Destroy()
 	clear_scan()
 	if(!QDELETED(master_console) && master_console.dive_body == src)
-		master_console.end_dive("Your cyberspace avatar was disconnected.")
+		master_console.forced_eject("Your cyberspace avatar was disconnected.")
 	return ..()
 
 /mob/living/simple_animal/cyber_avatar/Logout()

@@ -24,6 +24,7 @@
 
 /mob/living/carbon/human/var/list/pain_possession_candidates
 /mob/living/carbon/human/var/turf/pain_possession_turf
+/mob/living/carbon/human/var/wraith_echo_dropped = FALSE
 
 /mob/living/carbon/human/death(gibbed,deathmessage="seizes up and falls limp...", show_dead_message = "You have died.")
 
@@ -31,7 +32,7 @@
 	if(leech_starving)
 		stop_leech_starvation()
 	var/turf/death_turf = get_turf(src)
-	if(!gibbed && getHalLoss() >= 300 && death_turf)
+	if(wraith_effects_allowed() && !gibbed && getHalLoss() >= 300 && death_turf)
 		for(var/obj/target in death_turf)
 			if(!target.anchored && !istype(target, /obj/effect))
 				LAZYADD(pain_possession_candidates, target)
@@ -82,6 +83,9 @@
 		wearing_rig.notify_ai("<span class='danger'>Warning: user death event. Mobility control passed to integrated intelligence system.</span>")
 
 	. = ..(gibbed,"no message")
+	if(stat == DEAD && death_turf && !wraith_echo_dropped)
+		wraith_echo_dropped = TRUE
+		new /obj/effect/wraith_echo(death_turf)
 	if(stat == DEAD && get_medical_bracelet())
 		var/area/death_area = get_area(src)
 		GLOB.global_announcer.autosay("Medical alert! [real_name] has died in [death_area ? death_area.name : "an unknown location"]!", "Medical Bracelet")

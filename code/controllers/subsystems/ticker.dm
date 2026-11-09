@@ -13,6 +13,9 @@ SUBSYSTEM_DEF(ticker)
 	var/master_mode = "dynamic"     //The underlying game mode (so "secret" or the voted mode). Saved to default back to previous round's mode in case the vote failed. This is a config_tag.
 	var/datum/game_mode/mode        //The actual gamemode, if selected.
 	var/round_progressing = 1       //Whether the lobby clock is ticking down.
+	var/phi
+	var/sun
+	var/lun
 
 	var/list/bad_modes = list()     //Holds modes we tried to start and failed to.
 	var/revotes_allowed = 0         //How many times a game mode revote might be attempted before giving up.
@@ -155,6 +158,13 @@ SUBSYSTEM_DEF(ticker)
 		to_world("<B>A <font color='blue'>Captain</font> must sacrifice everything for their crew.</B>")
 		return
 
+	phi = rand(1, 100)
+	sun = rand(1, 100)
+	lun = rand(1, 100)
+	// Classic has authored, serviceable faults and a matching stock of spare panels.
+	if(!istype(GLOB.using_map, /datum/map/os13classic))
+		for(var/obj/machinery/power/solar_base/base in GLOB.solar_bases)
+			base.roll_round_start_damage(lun)
 	GLOB.using_map.setup_news()
 	Master.SetRunLevel(RUNLEVEL_GAME)
 	create_characters() //Create player characters and transfer them
@@ -188,7 +198,9 @@ SUBSYSTEM_DEF(ticker)
 			if(captainless || prob(40))
 				eof.apply_event()
 				eof.announce_event()
-		sound_to(world, sound(GLOB.using_map.welcome_sound))
+	for(var/client/listener in GLOB.clients)
+		if(!listener.os13_cryo_intro)
+			sound_to(listener, sound(GLOB.using_map.welcome_sound))
 
 		//Holiday Round-start stuff	~Carn
 		//Holiday_Game_Start()
@@ -202,8 +214,14 @@ SUBSYSTEM_DEF(ticker)
 /datum/controller/subsystem/ticker/proc/playing_tick()
 	mode.process()
 	var/mode_finished = mode_finished()
+	var/round_finished = mode_finished && game_finished()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		if(!round_finished && !os13_fixed_traitor_mode()?.os13_orders?.bomb_detonated)
+			GLOB.os13_classic_round.tick(round_duration_in_ticks)
+		else
+			GLOB.os13_classic_round.abort()
 
-	if(mode_finished && game_finished())
+	if(round_finished)
 		Master.SetRunLevel(RUNLEVEL_POSTGAME)
 		GLOB.station_wake_sequence.stop()
 		GLOB.cryo_startup_effect.stop()

@@ -341,6 +341,8 @@
 			client.screen -= S
 		if(istype(S, /obj/screen/plane_master/shadowcasting) || istype(S, /obj/screen/plane_master/los_geometry) || istype(S, /obj/screen/plane_master/los_visible_objects) || istype(S, /obj/screen/plane_master/los_occluders) || istype(S, /obj/screen/plane_master/lighting) || istype(S, /obj/screen/plane_master/emissive) || istype(S, /obj/screen/plane_master/lighting_veil) || istype(S, /obj/screen/lighting_veil_display) || istype(S, /obj/screen/lighting_backdrop))
 			client.screen -= S
+		if(istype(S, /obj/screen/plane_master/lighting_samples))
+			client.screen -= S
 	client.screen.Add(new /obj/screen/plane_master/world_terrain, new /obj/screen/plane_master/world_shadows, new /obj/screen/world_terrain_display, new /obj/screen/world_shadow_display)
 	var/obj/screen/plane_master/shadowcasting/p3 = new
 	var/obj/screen/plane_master/lighting/p4 = new
@@ -352,7 +354,7 @@
 	// These additional mask passes are only used by enhanced LOS.
 	if(enhanced_los_enabled)
 		client.screen.Add(new /obj/screen/plane_master/los_occluders, new /obj/screen/plane_master/los_geometry, new /obj/screen/plane_master/los_visible_objects)
-	client.screen.Add(p4)
+	client.screen.Add(p4, new /obj/screen/plane_master/lighting_samples)
 	client.screen.Add(new /obj/screen/lighting_backdrop)
 	client.screen.Add(new /obj/screen/plane_master/emissive)
 	client.screen.Add(new /obj/screen/plane_master/lighting_veil)
@@ -364,7 +366,7 @@
 // projected silhouettes, wall masks or rays). Keep each renderer pass populated
 // just as ghost_master does, so an empty target cannot corrupt the terrain pass.
 /client/proc/sync_world_plane_guards()
-	var/list/world_planes = list(WORLD_TERRAIN_SOURCE_PLANE, WORLD_SHADOW_SOURCE_PLANE, SHADOWCASTING_PLANE, SHADOWCASTING_REFLECTOR_PLANE, SHADOWCASTING_GEOMETRY_PLANE, DEFAULT_PLANE, LIGHTING_PLANE, EMISSIVE_PLANE, LIGHTING_VEIL_SOURCE_PLANE)
+	var/list/world_planes = list(WORLD_TERRAIN_SOURCE_PLANE, WORLD_SHADOW_SOURCE_PLANE, SHADOWCASTING_PLANE, SHADOWCASTING_REFLECTOR_PLANE, SHADOWCASTING_GEOMETRY_PLANE, DEFAULT_PLANE, LIGHTING_PLANE, LIGHTING_SAMPLE_PLANE, EMISSIVE_PLANE, LIGHTING_VEIL_SOURCE_PLANE)
 	var/list/planes = list()
 	for(var/obj/screen/plane_master/P in screen)
 		if((P.appearance_flags & PLANE_MASTER) && (P.plane in world_planes))

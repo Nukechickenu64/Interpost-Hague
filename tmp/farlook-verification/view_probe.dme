@@ -1,0 +1,15 @@
+world
+	maxx = 90
+	maxy = 90
+	maxz = 1
+	view = "15x15"
+
+world/New()
+	..()
+	var/mob/viewer = new(locate(45, 45, 1))
+	viewer.see_in_dark = 60
+	for(var/dist in list(7, 11, 34, 35, 40))
+		var/list/visible = view(dist, viewer)
+		var/turf/edge = locate(45 + dist, 45, 1)
+		world.log << "VIEW [dist] edge=[edge in visible] count=[length(visible)]"
+	shutdown()

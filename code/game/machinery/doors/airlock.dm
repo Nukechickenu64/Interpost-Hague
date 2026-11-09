@@ -16,7 +16,6 @@
 	var/next_beep_at = 0				//World time when we may next beep due to doors being blocked by mobs
 	var/spawnPowerRestoreRunning = 0
 	var/welded = null
-	var/locked = 0
 	var/lock_cut_state = BOLTS_FINE
 	var/lights = 1 // bolt lights show by default
 	var/aiDisabledIdScanner = 0
@@ -1312,7 +1311,7 @@ About the new airlock wires panel:
 	if(safe)
 		for(var/turf/turf in locs)
 			for(var/atom/movable/AM in turf)
-				if(AM.blocks_airlock())
+				if(!istype(AM, /mob/living) && AM.blocks_airlock())
 					if(world.time > next_beep_at)
 						playsound(src.loc, close_failure_blocked, 30, 0, -3)
 						next_beep_at = world.time + SecondsToTicks(10)
@@ -1323,6 +1322,9 @@ About the new airlock wires panel:
 				if(AM.airlock_crush(door_crush_damage))
 					take_damage(door_crush_damage)
 					use_power_oneoff(door_crush_damage * 100)		// Uses bunch extra power for crushing the target.
+
+	if(!..())
+		return FALSE
 
 	use_power_oneoff(360)	//360 W seems much more appropriate for an actuator moving an industrial door capable of crushing people
 	if(arePowerSystemsOn())

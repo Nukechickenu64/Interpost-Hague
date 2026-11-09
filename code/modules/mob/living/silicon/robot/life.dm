@@ -79,8 +79,7 @@
 	if(src.resting)
 		Weaken(5)
 
-	if(health < config.health_threshold_dead && src.stat != 2) //die only once
-		death()
+	gurps_health_status()
 
 	if (src.stat != DEAD) //Alive.
 		if (src.paralysis || src.stunned || src.weakened || !src.has_power) //Stunned etc.
@@ -316,7 +315,7 @@
 			weaponlock_time = 120
 
 /mob/living/silicon/robot/update_canmove()
-	if(paralysis || stunned || weakened || buckled || lockcharge || !is_component_functioning("actuator")) canmove = 0
+	if(stat == DEAD || paralysis || stunned || weakened || buckled || lockcharge || !gurps_mobile() || !is_component_functioning("actuator")) canmove = 0
 	else canmove = 1
 	return canmove
 

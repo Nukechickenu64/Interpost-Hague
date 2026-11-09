@@ -107,7 +107,26 @@ datum/announcement/proc/NewsCast(message as text, message_title as text)
 	GLOB.using_map.level_x_biohazard_announcement(7)
 
 /proc/ion_storm_announcement()
-	command_announcement.Announce("It has come to our attention that the [station_name()] passed through an ion storm.  Please monitor all electronic equipment for malfunctions.", "Anomaly Alert")
+	station_alert_radio("It has come to our attention that the [station_name()] passed through an ion storm. Please monitor all electronic equipment for malfunctions.")
+
+// Delivered on Common, so only listeners near a working radio hear it.
+/proc/station_alert_radio(message, alert_sound)
+	if(!message || !radio_controller)
+		return
+	var/datum/radio_frequency/connection = radio_controller.return_frequency(PUB_FREQ)
+	if(!connection)
+		return
+	message = sanitize(message, extra = 0)
+	var/list/receivers = list()
+	for(var/obj/item/device/radio/R in connection.devices["[RADIO_CHAT]"])
+		var/list/heard = R.send_hear(PUB_FREQ, GLOB.using_map.contact_levels)
+		if(heard)
+			receivers |= heard
+	var/rendered = "<span class='[frequency_span_class(PUB_FREQ)]'><span class='nameradio'><b>Station Alert</b> [icon2html(GLOB.global_announcer, world, realsize = FALSE)]</span> - <span class='message'>[message]</span></span>"
+	for(var/mob/M in receivers)
+		M.show_message(rendered, 2)
+		if(alert_sound)
+			sound_to(M, alert_sound)
 
 /proc/AnnounceArrival(var/mob/living/carbon/human/character, var/datum/job/job, var/join_message)
 	if(!istype(job) || !job.announced)

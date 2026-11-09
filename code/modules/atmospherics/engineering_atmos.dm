@@ -104,7 +104,7 @@
 
 // Both the station console and the local modcon use the same area-scoped command.
 /obj/machinery/alarm/proc/set_engineering_vent_mode(obj/machinery/atmospherics/unary/vent_pump/target, new_mode)
-	if(!alarm_area || alarm_area.master_air_alarm != src || buildstage != 2 || (stat & (NOPOWER|BROKEN)) || shorted || !(new_mode in list("REFILL", "STOP", "FILTER")))
+	if(!alarm_area || alarm_area.master_air_alarm != src || buildstage != 2 || (stat & (NOPOWER|BROKEN)) || shorted)
 		return FALSE
 	if(target && (QDELETED(target) || get_area(target) != alarm_area))
 		return FALSE
@@ -117,12 +117,20 @@
 		mode = AALARM_MODE_SCRUBBING
 	return changed
 
+/obj/machinery/alarm/proc/modcon_access(mob/user)
+	if(allowed(user))
+		return TRUE
+	if(!istype(GLOB.using_map, /datum/map/os13classic))
+		return FALSE
+	var/obj/item/card/id/card = user.get_active_hand()?.GetIdCard()
+	return card && check_access(card)
+
 /obj/machinery/alarm/proc/can_use_modcon(mob/user, obj/machinery/computer/station_gas_control/console = null, obj/item/device/fixboy/advanced/remote = null)
 	if(remote)
 		return remote.can_control(user, src)
 	if(console)
 		return console.can_use_atmos_console(user, TRUE) && (alarm_area in console.controlled_areas()) && alarm_area.master_air_alarm == src && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
-	return user && !user.incapacitated() && user.Adjacent(src) && allowed(user) && !locked && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
+	return user && !user.incapacitated() && user.Adjacent(src) && modcon_access(user) && !locked && buildstage == 2 && !(stat & (NOPOWER|BROKEN)) && !shorted
 
 /obj/machinery/alarm/proc/apply_modcon_action(mob/user, list/command, obj/machinery/computer/station_gas_control/console = null, obj/item/device/fixboy/advanced/remote = null)
 	if(!can_use_modcon(user, console, remote) || !alarm_area)
@@ -182,7 +190,7 @@
 		if(controller && (QDELETED(controller) || !(controller.alarm_area in console.controlled_areas()) || controller.alarm_area.master_air_alarm != controller))
 			return FALSE
 		return !require_access || !controller || controller.can_use_modcon(user, console)
-	return controller && !controller.locked && controller.buildstage == 2 && !controller.shorted && !(controller.stat & (NOPOWER|BROKEN)) && !user.incapacitated() && user.Adjacent(controller) && (!require_access || controller.allowed(user))
+	return controller && controller.alarm_area && !controller.locked && controller.buildstage == 2 && !controller.shorted && !(controller.stat & (NOPOWER|BROKEN)) && !user.incapacitated() && user.Adjacent(controller) && (!require_access || controller.modcon_access(user))
 
 /datum/engineering_atmos_menu/proc/choose(prompt, title, list/choices)
 	return input(user, prompt, title) as anything in choices
@@ -242,7 +250,7 @@
 		return FALSE
 	var/list/command = actions[action]
 	if(command["modcon"] == "vent")
-		var/list/modes = list("REFILL", "STOP", "FILTER", "(Cancel)")
+		var/list/modes = list("REFILL", "STOP", "FILTER", "SIPHON", "(Cancel)")
 		var/mode = choose("CHOOSE AN ACTION", "Modcon Unit", modes)
 		if(!available(TRUE) || !(mode in modes) || mode == "(Cancel)")
 			return FALSE
@@ -281,7 +289,12 @@
 	for(var/obj/machinery/atmospherics/unary/vent_pump/vent in vents)
 		var/turf/T = get_turf(vent)
 		var/datum/gas_mixture/air = T ? T.return_air() : null
-		text += "<div class='engineering-vent'><i>Vent-[++index]</i><br>&gt; Pressure: [air ? "[round(air.return_pressure(), 0.1)] kPa" : "UNKNOWN"]<br>&gt; Status: [vent.engineering_mode_name()]</div>"
+		var/status = vent.engineering_mode_name()
+		if(vent.malfunction)
+			status = "MALFUNCTION (service with a screwdriver)"
+		else if(vent.stat & BROKEN)
+			status = "BROKEN"
+		text += "<div class='engineering-vent'><i>Vent-[++index]</i><br>&gt; Pressure: [air ? "[round(air.return_pressure(), 0.1)] kPa" : "UNKNOWN"]<br>&gt; Status: [status]</div>"
 	return "[text]</div>"
 
 /obj/machinery/alarm/verb/diagnostic_readout()
@@ -292,7 +305,7 @@
 
 /obj/machinery/alarm/proc/vent_control_links(target_ref)
 	var/text = ""
-	for(var/action in list("REFILL", "STOP", "FILTER"))
+	for(var/action in list("REFILL", "STOP", "FILTER", "SIPHON"))
 		text += "<a href='?src=\ref[src];modcon=vent;vent=[target_ref];mode=[action]'>[action]</a> "
 	return text
 
@@ -482,14 +495,16 @@
 	return engineering_mode ? engineering_mode : (pump_direction ? "FILTER" : "SIPHON")
 
 /obj/machinery/atmospherics/unary/vent_pump/proc/set_engineering_mode(mode)
-	if(malfunction || (stat & (NOPOWER|BROKEN)) || !(mode in list("REFILL", "STOP", "FILTER")))
+	if(malfunction || (stat & (NOPOWER|BROKEN)) || !(mode in list("REFILL", "STOP", "FILTER", "SIPHON")))
+		return FALSE
+	if(mode == "SIPHON" && airlock_controlled)
 		return FALSE
 	engineering_mode = mode
 	hibernate = 0
 	last_flow_rate = 0
 	last_power_draw = 0
-	pump_direction = 1
-	pressure_checks = 1 // External bound; the legacy vent constants are file-local.
+	pump_direction = mode != "SIPHON"
+	pressure_checks = pump_direction ? 1 : 0 // Refill has an external target. Siphon evacuates the room.
 	external_pressure_bound = external_pressure_bound_default
 	update_use_power(mode == "STOP" ? POWER_USE_OFF : POWER_USE_IDLE)
 	update_icon()

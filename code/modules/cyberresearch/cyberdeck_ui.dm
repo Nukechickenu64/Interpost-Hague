@@ -19,7 +19,10 @@
 	html += "<div class='cyber-connections'><section class='cyber-panel'><h2>01 / Media drive</h2><div class='cyber-value'>[html_encode(data["disk_name"])]</div>"
 	if(data["media"] != "missing")
 		html += "<p class='cyber-muted'><b>Technologies:</b>"
-		if(data["media"] == "recorded")
+		if(length(data["recordings"]))
+			for(var/recording in data["recordings"])
+				html += "<br>[html_encode(recording)]"
+		else if(data["media"] == "recorded")
 			html += "<br>[html_encode(data["stored_research"])] ([html_encode(data["stored_level_label"])] [data["stored_level"]])"
 		html += "</p>"
 	if(active)

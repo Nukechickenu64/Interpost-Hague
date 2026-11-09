@@ -73,6 +73,16 @@ GLOBAL_LIST_EMPTY(solar_bases)
 		panel = new initial_panel_type(src)
 	update_icon()
 
+/obj/machinery/power/solar_base/proc/roll_round_start_damage(var/chance)
+	if(!panel || panel.broken || defective || (stat & BROKEN) || !prob(chance))
+		return
+	if(prob(50))
+		panel.shatter()
+	else
+		defective = TRUE
+	last_output = 0
+	update_icon()
+
 /obj/machinery/power/solar_base/Destroy()
 	GLOB.solar_bases -= src
 	QDEL_NULL(panel)

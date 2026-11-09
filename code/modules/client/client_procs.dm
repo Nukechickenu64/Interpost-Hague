@@ -100,6 +100,9 @@
 
 	if(ismob(mob) && mob.handle_tilectx_topic(href_list))
 		return
+	// Physical hrefs can outlive the UI that opened them.
+	if(istype(hsrc, /atom) && hsrc != mob && !isobserver(hsrc) && !ghost_can_affect_world(mob))
+		return
 
 	..()	//redirect to hsrc.Topic()
 

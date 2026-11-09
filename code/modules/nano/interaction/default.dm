@@ -70,7 +70,8 @@ GLOBAL_DATUM_INIT(default_state, /datum/topic_state/default, new)
 	if (dist <= 1) // interactive (green visibility)
 		// Checking adjacency even when distance is 0 because get_dist() doesn't include Z-level differences and
 		// the client might have its eye shifted up/down thus putting src_object in view.
-		return Adjacent(src_object) ? STATUS_INTERACTIVE : STATUS_UPDATE
+		// Check reach from the device so the user's chair does not block its own controls.
+		return src_object.Adjacent(src) ? STATUS_INTERACTIVE : STATUS_UPDATE
 	else if (dist <= 2)
 		return STATUS_UPDATE 		// update only (orange visibility)
 	else if (dist <= 4)

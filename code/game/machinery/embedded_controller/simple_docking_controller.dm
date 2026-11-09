@@ -92,6 +92,7 @@
 
 /datum/computer/file/embedded_program/docking/simple/proc/signal_door(var/command)
 	var/datum/signal/signal = new
+	signal.source = master
 	signal.data["tag"] = tag_door
 	signal.data["command"] = command
 	post_signal(signal)

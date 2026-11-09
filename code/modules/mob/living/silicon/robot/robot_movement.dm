@@ -21,6 +21,8 @@
 	var/tally = ..() //Incase I need to add stuff other than "speed" later
 
 	tally += speed
+	if(!gurps_limb_usable(BP_L_LEG) || !gurps_limb_usable(BP_R_LEG) || !gurps_limb_usable(BP_L_FOOT) || !gurps_limb_usable(BP_R_FOOT) || health < maxHealth / 3)
+		tally += 3
 
 	if(module_active && istype(module_active,/obj/item/borg/combat/mobility))
 		tally-=3

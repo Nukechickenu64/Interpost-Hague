@@ -486,14 +486,6 @@ spawn in an already-closed pod. SOUTH/WEST pods have the headrest at the upper
 left, and NORTH/EAST pods are mirrored. Robotic storage and life pods keep their
 old sprites.
 
-Cryopods dispense a temporary ID access card when a joining crewmember leaves
-their pod. The card displays their role (including alternate titles) and grants
-their job's configured access. It is equipped in an empty ID slot, otherwise
-placed in a free hand or dropped beside the pod; existing IDs are not replaced.
-The card is dissolving in the air and disappears three minutes after dispensing,
-even if stored or handed to someone else. Returning to cryosleep does not issue
-another card.
-
 ## Admin testing: Mid-round job spawn
 
 Admins can test how any job spawns mid-round using the new verb:

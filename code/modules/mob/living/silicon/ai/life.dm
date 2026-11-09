@@ -8,7 +8,10 @@
 
 	src.updatehealth()
 
-	if ((hardware_integrity() <= 0) || (backup_capacitor() <= 0))
+	gurps_health_status()
+	if(stat == DEAD)
+		return
+	if(backup_capacitor() <= 0)
 		death()
 		return
 

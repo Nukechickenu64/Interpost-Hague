@@ -66,7 +66,7 @@
 	if(!hud_icon)
 		hud_icon = "hud[ckey(title)]"
 
-/datum/job/proc/initialize_character(var/mob/living/carbon/human/H)
+/datum/job/proc/initialize_character(var/mob/living/carbon/human/H, no_starting_equipment = FALSE)
 	return TRUE
 
 /datum/job/proc/equip(var/mob/living/carbon/human/H, var/alt_title, var/datum/mil_branch/branch, var/datum/mil_rank/grade)

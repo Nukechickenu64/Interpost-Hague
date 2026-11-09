@@ -1,5 +1,6 @@
 /mob/living/New()
 	..()
+	initialize_gurps_anatomy()
 	if(stat == DEAD)
 		add_to_dead_mob_list()
 	else
@@ -466,6 +467,16 @@ default behaviour is:
 	fire_stacks = 0
 
 /mob/living/proc/rejuvenate()
+	if(has_gurps_anatomy())
+		initialize_gurps_anatomy()
+		for(var/zone in gurps_bodyparts)
+			var/datum/gurps_bodypart/part = gurps_bodyparts[zone]
+			part.brute = 0
+			part.burn = 0
+			part.crippled = FALSE
+			part.severed = FALSE
+		gurps_death_check_level = 0
+		gurps_updatehealth()
 	if(reagents)
 		reagents.clear_reagents()
 
@@ -537,6 +548,8 @@ default behaviour is:
 /mob/living/Move(a, b, flag)
 	if (buckled)
 		return
+	if(has_gurps_anatomy() && (!gurps_mobile() || paralysis || stunned || weakened || stat == DEAD))
+		return FALSE
 
 	if (restrained())
 		stop_pulling()
@@ -842,7 +855,7 @@ default behaviour is:
 		ear_deaf = deaf
 
 /mob/proc/can_be_possessed_by(var/mob/observer/ghost/possessor)
-	return istype(possessor) && possessor.client
+	return istype(possessor) && possessor.can_affect_world() && possessor.client
 
 /mob/living/can_be_possessed_by(var/mob/observer/ghost/possessor)
 	if(!..())
@@ -859,7 +872,7 @@ default behaviour is:
 
 /mob/living/proc/do_possession(var/mob/observer/ghost/possessor)
 
-	if(!(istype(possessor) && possessor.ckey))
+	if(!(istype(possessor) && possessor.can_affect_world(TRUE) && possessor.ckey))
 		return 0
 
 	if(src.ckey || src.client)
@@ -953,7 +966,12 @@ default behaviour is:
 	return 1
 
 /mob/living/Destroy()
+	if(gurps_bodyparts)
+		for(var/zone in gurps_bodyparts)
+			qdel(gurps_bodyparts[zone])
+		gurps_bodyparts = null
 	QDEL_NULL(blur_effect)
+	remove_cryo_filter_effect()
 	if(auras)
 		for(var/a in auras)
 			remove_aura(a)

@@ -81,6 +81,25 @@ weld may run on a vent at a time. Vent gauges display mol/cycle to match the gas
 model. Newly built scrubbers initialize their buffer correctly and filter only
 once per processing cycle.
 
+## Classic startup
+
+Both exterior banks start retracted with standard panels. Across the two
+banks, four mounts have repairable defects, four panels are shattered, and
+two mounts are empty. The west service platforms hold a loaded six-panel
+cart and a Harvester. Inspect the mounts, unsecure and remove the panels,
+wrench exposed defects, then fit and secure intact panels. Collect mirror
+shards for reclamation. Each exterior console can spread its own bank on
+backup power even if the shared grid is down.
+
+The two exterior storage units each hold 6 kWh and feed the existing global
+grid. They discharge against real demand and recharge from surplus. The
+bridge uses live generation and demand for recovery. It requires 30 seconds
+without load shedding or reliance on stored power. The fault count, bank
+layout, retracted starting state, and reserve sizes are Classic choices.
+The recording establishes the low-power briefing, damaged mounts, repair,
+salvage, and deployment sequence. It leaves the original fault distribution
+and reserve configuration open.
+
 ## Power integration
 
 This work extends the global grid already present in the working tree. It does

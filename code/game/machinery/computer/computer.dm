@@ -159,12 +159,15 @@
 
 /obj/machinery/computer/attackby(I as obj, user as mob)
 	if(isScrewdriver(I))
-		to_chat(user, SPAN_WARNING("\The [src] cannot be dismantled. Repair broken glass with a FixBoy-2000 and one zbrite bar."))
+		to_chat(user, SPAN_WARNING("\The [src] cannot be dismantled. Repair broken glass with a FixBoy-2000 and a glass shard or zbrite bar."))
 	else
 		..()
 
 /obj/machinery/computer/attack_ghost(var/mob/ghost)
-	attack_hand(ghost)
+	if(ghost_can_affect_world(ghost))
+		attack_hand(ghost)
+	else
+		return ..()
 
 /obj/machinery/computer/retro //same shit but cooler
 	name = "computer"

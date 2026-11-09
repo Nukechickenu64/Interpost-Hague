@@ -146,6 +146,30 @@
 	if(!scenery.bound_overlay || scenery.bound_overlay.loc != render_upper || scenery.bound_overlay.icon != scenery.icon)
 		fail("Excluding renderer helpers also removed a visible lower-deck object.")
 	qdel(scenery)
+	var/turf/render_top = GetAbove(render_upper)
+	render_top = render_top.ChangeTurf(/turf/simulated/open)
+	var/turf/upper_wall = get_step(render_upper, NORTH)
+	upper_wall.set_opacity(TRUE)
+	SSlighting.fire(FALSE, TRUE)
+	if(!render_upper.lighting_overlay?.tile_glow || !render_top.lighting_overlay?.tile_glow)
+		fail("The test shaft must start above a floor that produces glow.")
+	render_lower = render_lower.ChangeTurf(/turf/space)
+	if(!istype(render_lower, /turf/space) || render_lower.above != render_upper || render_upper.below != render_lower)
+		fail("Replacing the lower floor with space broke the shaft's Z-mimic link.")
+	SSlighting.fire(FALSE, TRUE)
+	for(var/turf/opening in list(render_upper, render_top))
+		var/atom/movable/lighting_overlay/lightmap = opening.lighting_overlay
+		if(!lightmap || !lightmap.luminosity || lightmap.alpha || lightmap.tile_glow)
+			fail("An opening over space lost visibility or added a sample to bloom or veil.")
+	// The upper wall's southern edge padding would otherwise darken the uncovered opening.
+	if(text2num(upper_wall.lighting_overlay.edge_guard_key) & (1 << 1))
+		fail("Wall padding covered a fullbright opening over space.")
+	render_lower.ChangeTurf(/turf/simulated/floor/airless)
+	render_lamp.light.force_update()
+	SSlighting.fire(FALSE, TRUE)
+	for(var/turf/opening in list(render_upper, render_top))
+		if(!opening.lighting_overlay?.alpha || !opening.lighting_overlay?.tile_glow)
+			fail("Replacing space with a lit floor did not restore the shaft's lighting passes.")
 	qdel(render_lamp)
 	SSlighting.fire(FALSE, TRUE)
 	qdel(lamp)
@@ -153,5 +177,5 @@
 	z_levels = original_z_levels
 	for(var/area/A in areas)
 		A.dynamic_lighting = areas[A]
-	if(!reported) pass("Up/down spill, stacked openings, height falloff, color, blockers, visible-floor shading, Z-copy helper exclusion, physical scenery and cleanup verified.")
+	if(!reported) pass("Cross-deck lighting, Z-copy scenery, and fullbright openings without bloom or veil verified.")
 	return TRUE

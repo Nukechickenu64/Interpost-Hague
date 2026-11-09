@@ -212,7 +212,7 @@
  */
 /obj/structure/bed/roller
 	name = "roller bed"
-	icon = 'icons/obj/rollerbed.dmi'
+	icon = 'icons/os13/objects/objects/weapons/personal.dmi'
 	icon_state = "down"
 	anchored = 0
 	buckle_pixel_shift = "x=0;y=6"

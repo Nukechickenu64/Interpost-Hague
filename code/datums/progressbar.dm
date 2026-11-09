@@ -16,7 +16,7 @@
 	bar.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA
 	bar.plane = MAP_HUD_PLANE
 	bar.layer = PROGRESSBAR_LAYER
-	bar.pixel_y = WORLD_ICON_SIZE
+	bar.pixel_y = 0
 	src.user = user
 	if(user)
 		client = user.client

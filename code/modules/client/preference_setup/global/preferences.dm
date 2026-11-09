@@ -146,6 +146,10 @@ var/list/_client_preferences_by_type
 	description ="Show floating chat above speakers"
 	key = "CHAT_RUNECHAT"
 
+/datum/client_preference/os13_cryo_flashes
+	description = "Show OS13 cryo caption flashes"
+	key = "OS13_CRYO_FLASHES"
+
 /datum/client_preference/ghost_ears
 	description ="Ghost ears"
 	key = "CHAT_GHOSTEARS"

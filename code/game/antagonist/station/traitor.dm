@@ -14,6 +14,58 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 	initial_spawn_req = 2
 	initial_spawn_target = 5
 	show_objectives_on_creation = 0 //we are not antagonists, we do not need the antagonist shpiel/objectives
+	porco_tab = "Traitor"
+
+/datum/antagonist/traitor/attempt_spawn(spawn_target)
+	var/datum/game_mode/traitor/mode = os13_fixed_traitor_mode()
+	if(!mode)
+		return ..()
+	if(mode.os13_orders || !length(candidates))
+		return FALSE
+	while(length(candidates))
+		var/datum/mind/candidate = pick(candidates)
+		candidates -= candidate
+		var/mob/living/carbon/human/H = candidate.current
+		if(!istype(H) || H.stat == DEAD || !H.client || H.mind != candidate || candidate.special_role || player_is_antag(candidate) || !can_become_antag(candidate))
+			continue
+		if(!istype(candidate.assigned_job, /datum/job/os13))
+			continue
+		var/datum/os13_traitor_orders/orders = new(candidate)
+		if(orders.setup())
+			mode.os13_orders = orders
+			addtimer(CALLBACK(orders, /datum/os13_traitor_orders/proc/restore_memory), 3 MINUTES)
+			return TRUE
+		qdel(orders)
+		message_admins("OS13 Traitor could not find a mapped maintenance cache or lifeboat berth.")
+		return FALSE
+	message_admins("No eligible OS13 crew member remained in the Traitor lottery after job assignment.")
+	return FALSE
+
+/datum/antagonist/traitor/update_current_antag_max(datum/game_mode/mode)
+	if(istype(mode, /datum/game_mode/traitor) && istype(GLOB.using_map, /datum/map/os13classic))
+		cur_max = 1
+		return
+	return ..()
+
+/datum/antagonist/traitor/greet(datum/mind/player)
+	var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+	if(orders?.owner == player)
+		orders.brief(player.current)
+		return TRUE
+	return ..()
+
+/datum/antagonist/traitor/get_porco_actions(mob/living/carbon/human/user)
+	var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+	if(!orders?.can_act(user))
+		return ..()
+	return list(list("os13_open_cache", "Open Cache"), list("os13_traitor_thoughts", "Thoughts"))
+
+/datum/antagonist/traitor/print_player_summary()
+	var/datum/game_mode/traitor/mode = os13_fixed_traitor_mode()
+	if(!mode)
+		return ..()
+	if(mode.os13_orders)
+		to_world(mode.os13_orders.debrief())
 
 /datum/antagonist/traitor/get_extra_panel_options(var/datum/mind/player)
 	return "<a href='?src=\ref[player];common=crystals'>\[set creation charges\]</a><a href='?src=\ref[src];spawn_uplink=\ref[player.current]'>\[spawn uplink\]</a>"
@@ -26,6 +78,13 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 		return 1
 
 /datum/antagonist/traitor/create_objectives(var/datum/mind/traitor)
+	var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+	if(orders?.owner == traitor)
+		var/datum/objective/os13_traitor/objective = new
+		objective.owner = traitor
+		objective.orders = orders
+		traitor.objectives += objective
+		return
 	if(!..())
 		return
 
@@ -79,6 +138,9 @@ GLOBAL_DATUM_INIT(traitors, /datum/antagonist/traitor, new)
 	return
 
 /datum/antagonist/traitor/equip(var/mob/living/carbon/human/traitor_mob)
+	var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+	if(orders?.owner == traitor_mob?.mind && orders)
+		return TRUE
 	if(istype(traitor_mob, /mob/living/silicon)) // this needs to be here because ..() returns false if the mob isn't human
 		add_law_zero(traitor_mob)
 		give_intel(traitor_mob)

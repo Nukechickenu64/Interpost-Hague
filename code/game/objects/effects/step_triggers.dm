@@ -13,8 +13,10 @@
 	..()
 	if(!H)
 		return
-	if(isobserver(H) && !(isghost(H) && affect_ghosts))
-		return
+	if(isobserver(H))
+		var/mob/observer/ghost/ghost = H
+		if(!istype(ghost) || !affect_ghosts || !ghost.can_affect_world())
+			return
 	Trigger(H)
 
 

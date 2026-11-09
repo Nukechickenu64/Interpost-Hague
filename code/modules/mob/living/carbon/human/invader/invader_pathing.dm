@@ -27,8 +27,16 @@
 			. += 6
 			break
 
+/proc/invader_lift_tile_unavailable(turf/tile)
+	if(!istype(GLOB.using_map, /datum/map/os13classic))
+		return FALSE
+	var/datum/shuttle/autodock/ferry/lift2/lift = SSshuttle.shuttles["Mining Lift"]
+	return lift?.classic_bay_contains(tile) && !(get_area(tile) in lift.shuttle_area)
+
 /proc/invader_can_step(var/turf/from, var/turf/T, var/mob/living/M, var/allow_doors = TRUE)
 	if(!from || !T || T.density || T.z != from.z || istype(T, /turf/space) || istype(T, /turf/simulated/open))
+		return FALSE
+	if(invader_lift_tile_unavailable(T) && !invader_lift_tile_unavailable(from))
 		return FALSE
 	var/d = get_dir(from, T)
 	for(var/obj/structure/window/W in from)

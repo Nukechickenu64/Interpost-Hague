@@ -211,15 +211,16 @@ Disks, each of which holds one technology or design. Technology exports are snap
 			return TOPIC_REFRESH
 		var/obj/item/disk/tech_disk/upload_disk = t_disk
 		var/datum/tech/upload_tech = t_disk.stored
-		if(QDELETED(upload_tech))
-			to_chat(user, "<span class='warning'>The research recording is no longer available.</span>")
-			return TOPIC_REFRESH
-		if(istype(GLOB.using_map, /datum/map/alpha) && (!(upload_tech.type in research_technology_types()) || upload_tech.level != 1))
-			to_chat(user, "<span class='warning'>This recording is not an extracted technology from the OS13 wiki catalogue.</span>")
-			return TOPIC_REFRESH
+		var/list/upload_recordings = upload_disk.research_recordings()
+		var/list/recording_ids = list()
+		var/list/recording_levels = list()
+		for(var/datum/tech/recording as anything in upload_recordings)
+			if(QDELETED(recording))
+				to_chat(user, "<span class='warning'>The research recording is no longer available.</span>")
+				return TOPIC_REFRESH
+			recording_ids[recording] = recording.id
+			recording_levels[recording] = recording.level
 		var/datum/research/upload_files = files
-		var/upload_id = upload_tech.id
-		var/upload_level = upload_tech.level
 		screen = 0.0
 		. = TOPIC_REFRESH
 		spawn(50)
@@ -233,11 +234,12 @@ Disks, each of which holds one technology or design. Technology exports are snap
 				to_chat(user, "<span class='warning'>Technology import interrupted: check the disk and console power.</span>")
 				updateUsrDialog()
 				return
-			if(upload_tech.id != upload_id || upload_tech.level != upload_level)
-				screen = 1.2
-				to_chat(user, "<span class='warning'>Technology import cancelled: the recording's technology or level changed during processing. Review its current contents before importing again.</span>")
-				updateUsrDialog()
-				return
+			for(var/datum/tech/recording as anything in upload_recordings)
+				if(QDELETED(recording) || recording.id != recording_ids[recording] || recording.level != recording_levels[recording])
+					screen = 1.2
+					to_chat(user, "<span class='warning'>Technology import cancelled: the recording's technology or level changed during processing. Review its current contents before importing again.</span>")
+					updateUsrDialog()
+					return
 			screen = 1.2
 			var/list/previous_designs = files.known_designs.Copy()
 			var/list/previous_archives = list()
@@ -245,15 +247,18 @@ Disks, each of which holds one technology or design. Technology exports are snap
 				for(var/tech_type in research_technology_types())
 					if(research_archive_available(tech_type))
 						previous_archives += tech_type
-			if(!files.AddTech2Known(upload_tech))
+			if(!files.import_technologies(upload_recordings))
 				to_chat(user, "<span class='warning'>Technology import refused: the recording is outside this research catalogue.</span>")
 				updateUsrDialog()
 				return
 			files.RefreshResearch() // Newly uploaded technology may unlock additional fabrication designs.
 			if(istype(GLOB.using_map, /datum/map/alpha))
-				to_chat(user, "<span class='notice'>[html_encode(upload_tech.name)] technology installed.</span>")
+				var/list/installed_types = list()
+				for(var/datum/tech/recording as anything in upload_recordings)
+					installed_types += recording.type
+					to_chat(user, "<span class='notice'>[html_encode(recording.name)] technology installed.</span>")
 				for(var/tech_type in research_technology_types())
-					if(tech_type == upload_tech.type || (tech_type in previous_archives) || !research_archive_available(tech_type))
+					if((tech_type in installed_types) || (tech_type in previous_archives) || !research_archive_available(tech_type))
 						continue
 					var/datum/tech/os13/revealed = tech_type
 					to_chat(user, "<span class='notice'>New cyberspace archive available: [html_encode(initial(revealed.name))]. Extract and install its data to unlock its technology.</span>")
@@ -510,14 +515,14 @@ Disks, each of which holds one technology or design. Technology exports are snap
 	else if(href_list["disposeI"] && linked_imprinter)  //Causes the circuit imprinter to dispose of a single reagent (all of it)
 		var/datum/reagent/R = locate(href_list["disposeI"]) in linked_imprinter.reagents.reagent_list
 		if(R)
-			linked_imprinter.reagents.del_reagent(href_list["dispose"])
+			linked_imprinter.reagents.del_reagent(R.type)
 		. = TOPIC_REFRESH
 
 	else if(href_list["disposeallI"] && linked_imprinter) //Causes the circuit imprinter to dispose of all it's reagents.
 		linked_imprinter.reagents.clear_reagents()
 		. = TOPIC_REFRESH
 
-	else if(href_list["removeI"] && linked_lathe)
+	else if(href_list["removeI"] && linked_imprinter)
 		linked_imprinter.removeFromQueue(text2num(href_list["removeI"]))
 		. = TOPIC_REFRESH
 
@@ -739,9 +744,10 @@ Disks, each of which holds one technology or design. Technology exports are snap
 				dat += "Operations: "
 				dat += "<A href='?src=\ref[src];menu=1.3'>Load Tech to Disk</A> || "
 			else
-				dat += "Name: [html_encode(t_disk.stored.name)]<BR>"
-				dat += "[istype(t_disk.stored, /datum/tech/os13) ? "Tier" : "Level"]: [t_disk.stored.display_level()]<BR>"
-				dat += "Description: [html_encode(t_disk.stored.desc)]<HR>"
+				for(var/datum/tech/recording in t_disk.research_recordings())
+					dat += "Name: [html_encode(recording.name)]<BR>"
+					dat += "[istype(recording, /datum/tech/os13) ? "Tier" : "Level"]: [recording.display_level()]<BR>"
+					dat += "Description: [html_encode(recording.desc)]<HR>"
 				dat += "Operations: "
 				dat += "<A href='?src=\ref[src];updt_tech=1;disk=\ref[t_disk];recording=\ref[t_disk.stored]'>Upload to Database</A> || "
 				dat += "<A href='?src=\ref[src];clear_tech=1;disk=\ref[t_disk];recording=\ref[t_disk.stored]'>Clear Disk</A> || "
@@ -774,12 +780,17 @@ Disks, each of which holds one technology or design. Technology exports are snap
 				if(d_disk.blueprint.build_type & IMPRINTER)
 					dat += "Fabricator Type: Circuit Imprinter<BR>"
 				dat += "Base Required Materials (before machine efficiency):<BR>"
-				for(var/M in d_disk.blueprint.materials)
+				var/is_replicator_design = d_disk.blueprint.build_type & PROTOLATHE
+				var/list/recipe = is_replicator_design ? d_disk.blueprint.get_replicator_materials() : d_disk.blueprint.materials
+				for(var/M in recipe)
 					var/material_id = copytext(M, 1, 2) == "$" ? copytext(M, 2) : M
 					var/material_label = GLOB.replicator_material_names[material_id]
 					if(!material_label)
 						material_label = CallMaterialName(material_id)
-					dat += "* [html_encode(material_label)] x [d_disk.blueprint.materials[M]] material units<BR>"
+					if(is_replicator_design)
+						dat += "* [html_encode(material_label)] x [recipe[M] / SHEET_MATERIAL_AMOUNT] sheets<BR>"
+					else
+						dat += "* [html_encode(material_label)] x [recipe[M]] material units<BR>"
 				if(length(d_disk.blueprint.chemicals))
 					dat += "Base Required Chemicals (before machine efficiency):<BR>"
 					for(var/chemical in d_disk.blueprint.chemicals)
@@ -890,8 +901,9 @@ Disks, each of which holds one technology or design. Technology exports are snap
 				if(!D.build_path || !(D.build_type & PROTOLATHE))
 					continue
 				var/temp_dat
-				for(var/M in D.materials)
-					temp_dat += ", [D.materials[M] * linked_lathe.mat_efficiency] [capitalize(linked_lathe.material_name(M))]"
+				var/list/recipe = D.get_replicator_materials()
+				for(var/M in recipe)
+					temp_dat += ", [round(recipe[M] * linked_lathe.mat_efficiency / SHEET_MATERIAL_AMOUNT, 0.01)] sheets [capitalize(linked_lathe.material_name(M))]"
 				for(var/T in D.chemicals)
 					temp_dat += ", [D.chemicals[T]*linked_lathe.mat_efficiency] [CallReagentName(T)]"
 				if(temp_dat)
@@ -1004,7 +1016,8 @@ Disks, each of which holds one technology or design. Technology exports are snap
 			for(var/datum/reagent/R in linked_imprinter.reagents.reagent_list)
 				dat += "Name: [R.name] | Units: [R.volume] "
 				dat += "<A href='?src=\ref[src];disposeI=\ref[R]'>(Purge)</A><BR>"
-				dat += "<A href='?src=\ref[src];disposeallI=1'><U>Disposal All Chemicals in Storage</U></A><BR>"
+			if(length(linked_imprinter.reagents.reagent_list))
+				dat += "<A href='?src=\ref[src];disposeallI=1'><U>Dispose All Chemicals in Storage</U></A><BR>"
 
 		if(4.3)
 			dat += "<A href='?src=\ref[src];menu=1.0'>Main Menu</A> || "

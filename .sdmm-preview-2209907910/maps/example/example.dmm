@@ -1,0 +1,213 @@
+"aa" = (/turf/space,/area/space)
+"ab" = (/turf/simulated/wall,/area/constructionsite)
+"ac" = (/turf/simulated/floor/tiled,/area/constructionsite)
+"ad" = (/obj/machinery/light{dir = 1},/turf/simulated/floor/tiled,/area/constructionsite)
+"ae" = (/obj/machinery/light{icon_state = "tube1"; dir = 8},/turf/simulated/floor/tiled,/area/constructionsite)
+"af" = (/obj/machinery/light{icon_state = "tube1"; dir = 4},/turf/simulated/floor/tiled,/area/constructionsite)
+"ag" = (/obj/effect/landmark/start,/turf/simulated/floor/tiled,/area/constructionsite)
+"ak" = (/obj/machinery/light,/turf/simulated/floor/tiled,/area/constructionsite)
+"al" = (/obj/effect/landmark{name = "tdome1"},/turf/simulated/floor/tiled,/area/constructionsite)
+"am" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 5},/turf/simulated/floor/tiled,/area/constructionsite)
+"an" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/air,/turf/simulated/floor/tiled,/area/constructionsite)
+"ao" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 4},/turf/simulated/floor/tiled,/area/constructionsite)
+"ap" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 6},/turf/simulated/floor/tiled,/area/constructionsite)
+"aq" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/empty,/turf/simulated/floor/tiled,/area/constructionsite)
+"ar" = (/obj/machinery/atmospherics/unary/vent_pump/on{dir = 1; engineering_mode = "FILTER"},/turf/simulated/floor/tiled,/area/constructionsite)
+"as" = (/obj/machinery/atmospherics/unary/vent_pump/on,/turf/simulated/floor/tiled,/area/constructionsite)
+"at" = (/obj/effect/landmark{name = "JoinLate"},/turf/simulated/floor/tiled,/area/constructionsite)
+"au" = (/obj/machinery/light_switch{pixel_x = -25},/turf/simulated/floor/tiled,/area/constructionsite)
+"av" = (/obj/machinery/light_switch{pixel_x = 25},/turf/simulated/floor/tiled,/area/constructionsite)
+"aw" = (/obj/effect/floor_decal/industrial/hatch/yellow,/turf/simulated/floor/tiled,/area/constructionsite)
+"ax" = (/obj/structure/ladder/up,/turf/simulated/floor/tiled,/area/constructionsite)
+"ay" = (/turf/simulated/wall/iron,/area/shuttle/escape)
+"az" = (/obj/effect/wingrille_spawn/reinforced,/turf/simulated/floor/plating,/area/shuttle/escape)
+"aA" = (/obj/machinery/computer/shuttle_control{shuttle_tag = "Example"},/turf/simulated/floor/plating,/area/shuttle/escape)
+"aC" = (/obj/machinery/light,/turf/simulated/floor/plating,/area/shuttle/escape)
+"aD" = (/obj/machinery/door/airlock/external/bolted{frequency = 1379; id_tag = "example_shuttle_port_hatch"},/turf/simulated/floor/plating,/area/shuttle/escape)
+"aE" = (/obj/machinery/door/airlock/external/bolted{frequency = 1379; id_tag = "example_shuttle_starboard_hatch"},/turf/simulated/floor/plating,/area/shuttle/escape)
+"aF" = (/obj/machinery/embedded_controller/radio/simple_docking_controller{id_tag = "lower_level_dock"; pixel_x = -8; pixel_y = -25},/turf/simulated/floor,/area/constructionsite)
+"aG" = (/obj/machinery/door/airlock/external/bolted{frequency = 1379; id_tag = "lower_level_dock_hatch"},/turf/simulated/floor,/area/constructionsite)
+"aH" = (/turf/simulated/floor,/area/constructionsite)
+"aI" = (/obj/effect/landmark/test/safe_turf,/turf/simulated/floor/tiled,/area/constructionsite)
+"aJ" = (/obj/effect/landmark/test/space_turf,/turf/space,/area/space)
+"aK" = (/obj/structure/hygiene/shower,/turf/simulated/floor/tiled,/area/constructionsite)
+"aL" = (/obj/structure/hygiene/sink/kitchen,/turf/simulated/floor/tiled,/area/constructionsite)
+"aM" = (/obj/item/device/waterchip,/turf/simulated/floor/tiled,/area/constructionsite)
+"aN" = (/obj/machinery/waterchip_holder,/turf/simulated/floor/tiled,/area/constructionsite)
+"aO" = (/obj/effect/landmark/map_data{height = 2},/turf/space,/area/space)
+"aP" = (/turf/simulated/wall,/area/medical/surgery)
+"aR" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/optable,/obj/machinery/oxygen_pump/anesthetic{pixel_y = 32},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"aS" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/computer/operating,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"aV" = (/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"aW" = (/obj/structure/lattice,/turf/simulated/open,/area/medical/surgery)
+"aX" = (/obj/machinery/light{dir = 1},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"aZ" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/hygiene/sink{ icon_state = "sink"; dir = 4},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"ba" = (/turf/simulated/open,/area/medical/surgery)
+"bc" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/body_scanconsole{ icon_state = "body_scannerconsole"; dir = 4},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bd" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/bodyscanner{ icon_state = "body_scanner_0"; dir = 4},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"be" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/sleeper{ icon_state = "sleeper_0"; dir = 8},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bf" = (/obj/machinery/light_switch{pixel_x = 25},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bh" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/ladder/updown,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bi" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/atmospherics/unary/freezer,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bj" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/atmospherics/unary/cryo_cell,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bk" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/portable_atmospherics/canister/oxygen/prechilled,/obj/machinery/atmospherics/portables_connector,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bl" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/light{icon_state = "tube1"; dir = 4},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bm" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/closet/secure_closet/freezer/meat,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bn" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/mecha_part_fabricator,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bo" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/atmospherics/pipe/simple/visible/blue{ icon_state = "intact"; dir = 5},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bq" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/atmospherics/pipe/simple/visible/blue{ icon_state = "intact"; dir = 9},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"br" = (/obj/machinery/atmospherics/unary/vent_pump/on,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bs" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/organ_printer/flesh/mapped,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bt" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 5},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bu" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 4},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bv" = (/obj/machinery/atmospherics/portables_connector{ icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/air,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bw" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/organ_printer/robot/mapped,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"by" = (/obj/machinery/atmospherics/pipe/simple/visible{ icon_state = "intact"; dir = 6},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bz" = (/obj/machinery/atmospherics/portables_connector{ icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/empty,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bA" = (/obj/machinery/light_switch{pixel_x = -25},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bB" = (/obj/machinery/atmospherics/unary/vent_pump/on{dir = 1; engineering_mode = "FILTER"},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bC" = (/obj/machinery/light{icon_state = "tube1"; dir = 8},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bD" = (/obj/machinery/light{icon_state = "tube1"; dir = 4},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bH" = (/obj/machinery/light,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"bI" = (/turf/simulated/wall)
+"bJ" = (/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bK" = (/obj/machinery/light{dir = 1},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bL" = (/obj/structure/lattice,/turf/simulated/open)
+"bM" = (/turf/simulated/open)
+"bN" = (/obj/machinery/light_switch{pixel_x = 25},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bO" = (/obj/machinery/light{icon_state = "tube1"; dir = 8},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bP" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/ladder,/turf/simulated/floor/tiled)
+"bQ" = (/turf/simulated/floor)
+"bR" = (/obj/machinery/embedded_controller/radio/simple_docking_controller{id_tag = "upper_level_dock"; pixel_x = 8; pixel_y = -25},/turf/simulated/floor)
+"bS" = (/obj/machinery/door/airlock/external/bolted{frequency = 1379},/turf/simulated/floor)
+"bT" = (/obj/machinery/atmospherics/unary/vent_pump/on,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bU" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/light{icon_state = "tube1"; dir = 4},/turf/simulated/floor/tiled)
+"bV" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 5},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bW" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 4},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bX" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/air,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bY" = (/obj/machinery/atmospherics/pipe/simple/visible{icon_state = "intact"; dir = 6},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"bZ" = (/obj/machinery/atmospherics/portables_connector{icon_state = "map_connector"; dir = 8},/obj/machinery/portable_atmospherics/canister/empty,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"ca" = (/obj/machinery/light_switch{pixel_x = -25},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"cb" = (/obj/machinery/atmospherics/unary/vent_pump/on{dir = 1; engineering_mode = "FILTER"},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"cc" = (/obj/machinery/light{icon_state = "tube1"; dir = 4},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"cg" = (/obj/machinery/light,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+"ch" = (/obj/structure/bed/chair{dir = 1},/obj/machinery/embedded_controller/radio/simple_docking_controller{id_tag = "example_shuttle_starboard"; pixel_x = 28},/obj/machinery/embedded_controller/radio/simple_docking_controller{id_tag = "example_shuttle_port"; pixel_x = -28},/obj/effect/shuttle_landmark,/turf/simulated/floor/plating,/area/shuttle/escape)
+"ci" = (/obj/machinery/power/area_smes{dir = 8; name = "west bump"; pixel_x = -24;area_id="AREA_example_area_constructionsite"},/obj/effect/area_power_marker{area_id="AREA_example_area_constructionsite"},/turf/simulated/floor/tiled,/area/constructionsite,/obj/effect/power_link_helper{net_tag="example_net_1";port="in";target_type=/obj/machinery/power/area_smes})
+"cj" = (/obj/machinery/power/debug_items/infinite_generator,/turf/simulated/floor/tiled,/area/constructionsite)
+"ck" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/iv_drip,/obj/item/reagent_containers/ivbag/blood/OMinus,/obj/item/reagent_containers/ivbag/blood/OMinus,/obj/item/reagent_containers/ivbag/blood/OMinus,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cl" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/glass,/obj/item/storage/firstaid/surgery,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cm" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/glass,/obj/item/reagent_containers/dropper,/obj/item/reagent_containers/chem_disp_cartridge,/obj/item/stack/nanopaste,/obj/machinery/light{icon_state = "tube1"; dir = 8},/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cn" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/glass,/obj/item/weapon/surgery_tool/scalpel/laser1,/obj/item/weapon/surgery_tool/scalpel/laser2,/obj/item/weapon/surgery_tool/scalpel/laser3,/obj/item/device/robotanalyzer,/obj/item/device/healthanalyzer,/obj/item/storage/firstaid/adv,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"co" = (/obj/machinery/power/area_smes{dir = 8; name = "west bump"; pixel_x = -24;area_id="AREA_example_area_medical_surgery"},/obj/effect/area_power_marker{area_id="AREA_example_area_medical_surgery"},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery,/obj/effect/power_link_helper{net_tag="example_net_4";port="in";target_type=/obj/machinery/power/area_smes})
+"cp" = (/obj/machinery/power/debug_items/infinite_generator,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cq" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/rack,/obj/item/stack/material/plasteel/fifty,/obj/item/stack/material/steel/fifty,/obj/item/stack/material/glass/fifty,/obj/item/stack/material/gold/ten,/obj/item/stack/material/mhydrogen/ten,/obj/item/stack/material/silver/ten,/obj/item/stack/material/uranium/ten,/obj/item/stack/material/diamond/ten,/obj/item/stack/material/phoron/fifty,/obj/item/storage/belt/utility/full,/obj/item/stack/material/steel/fifty,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cr" = (/obj/machinery/light{dir = 1},/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/glass,/obj/item/storage/box/syringes,/obj/item/storage/box/freezer,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cs" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/structure/table/glass,/obj/item/storage/box/gloves,/obj/item/storage/box/masks,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"ct" = (/obj/effect/floor_decal/corner/blue/diagonal,/obj/machinery/atmospherics/pipe/manifold/visible/blue,/obj/item/reagent_containers/glass/beaker/cryoxadone,/turf/simulated/floor/tiled/white,/area/medical/surgery)
+"cu" = (/obj/machinery/power/area_smes{dir = 8; name = "west bump"; pixel_x = -24;area_id="AREA_example_unknown_19_22_3"},/obj/effect/area_power_marker{area_id="AREA_example_unknown_19_22_3"},/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled,/obj/effect/power_link_helper{net_tag="example_net_2";port="in";target_type=/obj/machinery/power/area_smes})
+"cv" = (/obj/machinery/power/debug_items/infinite_generator,/obj/effect/floor_decal/corner/blue/diagonal,/turf/simulated/floor/tiled)
+
+(1,2,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabababababababababababababababaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacacacadacacacacacadacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacalalalacawabawacacacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacalalalacawawawacacacacavabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaealalalaxawawawacacacacafabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacacacacacacacacacacasacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaayayayaaaaabaKaLaMaNacacacacacacamaoanabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaazaAazaaaaabauacacacacacagacacacacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaazchazabababacacacacaIacacacacacapaoaqabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaDaCaEaGaFaHacacacacacacacacacacaracacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaayayayabababaeacatatatacacacacacacacafabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabciacatatatacacacacacacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacacatatatacacacacacacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcjacacakacacacacacakacacacabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabababababababababababababababaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaJaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}
+
+(1,2,2) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaOaaaaaaaPaPaPaPaPaPaPaPaPaPaPaPaPaPaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPckaRaScrcsaVaWaVaVaXaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPclaVaVaVaZaWaWbaaVaVaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPcmbcbdaVbebababaaVaVaVaVbfaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPcnaVaVaVbhbibjbkaVaVaVaVblaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPbmaVbnaVaVboctbqaVaVbraVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPbsaVaVaVaVaVaVaVaVaVbtbubvaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPbwaVcqaVaVaVaVaVaVaVaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPaVaVaVaVaVaVaVaVaVaVbybubzaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPbAaVaVaVaVaVaVaVaVaVbBaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPbCaVaVaVaVaVaVaVaVaVaVaVbDaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPcoaVaVaVaVaVaVaVaVaVaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPaVaVaVaVaVaVaVaVaVaVaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPcpaVaVbHaVaVaVaVaVbHaVaVaVaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaPaPaPaPaPaPaPaPaPaPaPaPaPaPaPaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}
+
+(1,2,3) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaOaaaaaabIbIbIbIbIbIbIbIbIbIbIbIbIbIbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbKbJbJbLbJbJbKbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbLbLbLbJbJbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbMbMbMbJbJbJbJbNbIbIbIbIaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbObJbJbJbPbMbMbMbJbJbJbJbJbQbQbRbSaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbJbJbJbJbJbTbJbUbIbIbIbIaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbJbJbJbJbJbVbWbXbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbJbJbJbJbJbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbJbJbJbJbJbYbWbZbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIcabJbJbJbJbJbJbJbJbJcbbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbObJbJbJbJbJbJbJbJbJbJbJccbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIcubJbJbJbJbJbJbJbJbJbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbJbJbJbJbJbJbJbJbJbJbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIcvbJbJcgbJbJbJbJbJcgbJbJbJbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabIbIbIbIbIbIbIbIbIbIbIbIbIbIbIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

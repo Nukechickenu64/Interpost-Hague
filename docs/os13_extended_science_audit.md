@@ -1484,6 +1484,12 @@ These systems are **already substantial implementations**, not wholly missing:
   Insertion uses the inventory unequip contract, like the cyberdeck drive;
   a disk that cannot be removed stays in the inventory and does not occupy
   the console's drive.
+  The mapped OS13Classic science console works from its north-facing chair:
+  shared UI reach checks use device-to-user adjacency, matching physical
+  interaction and ignoring the user's chair without bypassing walls or windows.
+  One console is sufficient; the legacy `core` subtype only sets an ID.
+  Manually verify main-menu navigation while seated, disk operations and
+  production, then confirm moving out of reach or behind a window blocks actions.
 - [Shared storage](../code/modules/research/replicator_storage.dm): central
   controller creates west steel, east elerium and south zbrite compartments;
   initially locked, two-second science-authorized toggle, capacity 15 sheets,

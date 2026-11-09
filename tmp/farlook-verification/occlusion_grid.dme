@@ -1,0 +1,27 @@
+world
+	maxx = 50
+	maxy = 50
+	maxz = 1
+	view = "15x15"
+	map_format = SIDE_MAP
+
+world/New()
+	..()
+	var/turf/center = locate(25, 25, 1)
+	var/mob/viewer = new(center)
+	viewer.see_in_dark = 20
+	for(var/offset in 1 to 12)
+		var/turf/blocker = locate(27, 25 + offset, 1)
+		blocker.opacity = TRUE
+	for(var/dark_range in list(8, 20))
+		viewer.see_in_dark = dark_range
+		for(var/size in list(7, 11, "23x15"))
+			var/list/visible = view(size, viewer)
+			world.log << "MASK [size], dark [dark_range], count [length(visible)]"
+			for(var/dy in -7 to 7)
+				var/line = ""
+				for(var/dx in -7 to 11)
+					var/turf/T = locate(25 + dx, 25 + dy, 1)
+					line += T.opacity ? "W" : (T in visible ? "." : "#")
+				world.log << line
+	shutdown()

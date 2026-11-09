@@ -189,7 +189,7 @@ turf/attackby(obj/item/weapon/W as obj, mob/user as mob)
 
 var/const/enterloopsanity = 100
 
-/turf/Entered(atom/atom as mob|obj)
+/turf/Entered(atom/atom as mob|obj, atom/old_loc)
 
 	..()
 
@@ -216,6 +216,8 @@ var/const/enterloopsanity = 100
 		else
 			M.inertia_dir = 0
 			M.make_floating(0) //we know we're not on solid ground so skip the checks to save a bit of processing
+	else if(isobj(A))
+		inertial_drift(A, old_loc)
 
 	var/objects = 0
 	if(A && (A.movable_flags & MOVABLE_FLAG_PROXMOVE))
@@ -246,9 +248,14 @@ var/const/enterloopsanity = 100
 /turf/proc/protects_atom(var/atom/A)
 	return FALSE
 
-/turf/proc/inertial_drift(atom/movable/A)
+// Objects that move themselves or are part of multi-tile vehicles
+var/global/list/space_drift_excluded_types = list(/obj/effect, /obj/item/projectile, /obj/mecha, /obj/vehicle, /obj/structure/vehicleparts)
+
+/turf/proc/inertial_drift(atom/movable/A, atom/old_loc)
 	if(!(A.last_move))	return
-	if((istype(A, /mob/) && src.x > 2 && src.x < (world.maxx - 1) && src.y > 2 && src.y < (world.maxy-1)))
+	if(src.x <= 2 || src.x >= (world.maxx - 1) || src.y <= 2 || src.y >= (world.maxy - 1))
+		return
+	if(istype(A, /mob/))
 		var/mob/M = A
 		if(M.Process_Spacemove(1)) //if this mob can control their own movement in space then they shouldn't be drifting
 			M.inertia_dir  = 0
@@ -258,6 +265,19 @@ var/const/enterloopsanity = 100
 				if(!M.inertia_dir)
 					M.inertia_dir = M.last_move
 				step(M, M.inertia_dir)
+		return
+
+	if(A.anchored || A.throwing || A.pulledby || !A.simulated || is_type_in_list(A, space_drift_excluded_types))
+		return
+	// last_move is stale after drops and teleports; only a fresh step carries momentum
+	if(!isturf(old_loc) || old_loc.z != z || get_dist(old_loc, src) != 1 || get_dir(old_loc, src) != A.last_move)
+		return
+	if(has_gravity(A, src))
+		return
+	var/drift_dir = A.last_move
+	spawn(5)
+		if(A && !A.anchored && !A.pulledby && !A.throwing && A.loc == src)
+			step(A, drift_dir)
 	return
 
 /turf/proc/levelupdate()

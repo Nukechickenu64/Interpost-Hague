@@ -51,8 +51,7 @@
 	if(href_list["release_stack"])
 		if(machine.stack_storage[href_list["release_stack"]] > 0)
 			var/stacktype = machine.stack_paths[href_list["release_stack"]]
-			var/obj/item/stack/material/S = new stacktype (get_turf(machine.output))
-			S.amount = machine.stack_storage[href_list["release_stack"]]
+			new stacktype(get_turf(machine.output), machine.stack_storage[href_list["release_stack"]])
 			machine.stack_storage[href_list["release_stack"]] = 0
 
 	src.add_fingerprint(usr)
@@ -108,6 +107,9 @@
 		for(var/obj/item/O in T.contents)
 			if(istype(O,/obj/item/stack/material))
 				var/obj/item/stack/material/S = O
+				if(!S.uses_charge && S.max_amount == 1)
+					O.loc = output.loc
+					continue
 				if(!isnull(stack_storage[initial(S.name)]))
 					stack_storage[initial(S.name)] += S.amount
 					O.loc = null
@@ -120,8 +122,7 @@
 	for(var/sheet in stack_storage)
 		if(stack_storage[sheet] >= stack_amt)
 			var/stacktype = stack_paths[sheet]
-			var/obj/item/stack/material/S = new stacktype (get_turf(output))
-			S.amount = stack_amt
+			new stacktype(get_turf(output), stack_amt)
 			stack_storage[sheet] -= stack_amt
 
 /obj/machinery/mineral/stacking_machine/Topic(href, href_list)

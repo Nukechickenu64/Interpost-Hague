@@ -151,7 +151,10 @@ var/icon/medical_sclera_mask
 		if(owner.head && (owner.head.flags_inv & BLOCKHEADHAIR))
 			if(!(hair_style.flags & VERY_SHORT))
 				hair_style = GLOB.hair_styles_list["Short Hair"]
-		if(hair_style && (species.get_bodytype(owner) in hair_style.species_allowed))
+		var/hair_bodytype = species.get_bodytype(owner)
+		if(hair_bodytype == SPECIES_CHILD)
+			hair_bodytype = SPECIES_HUMAN
+		if(hair_style && (hair_bodytype in hair_style.species_allowed))
 			var/icon/hair_s = new/icon("icon" = hair_style.icon, "icon_state" = "[hair_style.icon_state]_s")
 			if(hair_style.do_colouration && islist(h_col) && h_col.len >= 3)
 				hair_s.Blend(rgb(h_col[1], h_col[2], h_col[3]), hair_style.blend)

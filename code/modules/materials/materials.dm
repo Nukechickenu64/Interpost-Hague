@@ -440,6 +440,25 @@ var/list/name_to_material
 	composite_material = list(DEFAULT_WALL_MATERIAL = 3750, "platinum" = 3750) //todo
 	apply_icon_colour_to_walls = FALSE
 
+/material/elerium
+	parent_type = /material/plasteel
+	name = "elerium"
+	display_name = "elerium"
+	stack_type = /obj/item/stack/material/elerium
+	composite_material = null
+	sheet_singular_name = "ingot"
+	sheet_plural_name = "ingots"
+
+/material/zbrite
+	name = "zbrite"
+	display_name = "zbrite"
+	stack_type = /obj/item/stack/material/zbrite
+	flags = MATERIAL_BRITTLE
+	icon_colour = "#00e1ff"
+	conductive = 0
+	sheet_singular_name = "ingot"
+	sheet_plural_name = "ingots"
+
 /material/plasteel/titanium
 	name = "titanium"
 	brute_armor = 10

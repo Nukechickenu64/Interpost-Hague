@@ -1,40 +1,46 @@
 /mob/living/silicon/ai
+	gurps_damage_resistance = 6
 	var/fireloss = 0
 	var/bruteloss = 0
 	var/oxyloss = 0
 
 /mob/living/silicon/ai/getFireLoss()
-	return fireloss
+	return gurps_body_damage(TRUE)
 
 /mob/living/silicon/ai/getBruteLoss()
-	return bruteloss
+	return gurps_body_damage()
 
 /mob/living/silicon/ai/getOxyLoss()
 	return oxyloss
 
 /mob/living/silicon/ai/adjustFireLoss(var/amount)
 	if(status_flags & GODMODE) return
-	fireloss = max(0, fireloss + min(amount, health))
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(amount, TRUE)
+	fireloss = gurps_body_damage(TRUE)
 
 /mob/living/silicon/ai/adjustBruteLoss(var/amount)
 	if(status_flags & GODMODE) return
-	bruteloss = max(0, bruteloss + min(amount, health))
+	if(!gurps_damage_applying)
+		return gurps_adjust_body_damage(amount)
+	bruteloss = gurps_body_damage()
 
 /mob/living/silicon/ai/adjustOxyLoss(var/amount)
 	if(status_flags & GODMODE) return
-	oxyloss = max(0, oxyloss + min(amount, maxHealth - oxyloss))
+	oxyloss = max(0, oxyloss + min(amount / gurps_legacy_health_scale, maxHealth - oxyloss))
 
 /mob/living/silicon/ai/setFireLoss(var/amount)
 	if(status_flags & GODMODE)
 		fireloss = 0
 		return
-	fireloss = max(0, amount)
+	initialize_gurps_anatomy()
+	adjustFireLoss(amount - getFireLoss() * gurps_legacy_health_scale)
 
 /mob/living/silicon/ai/setOxyLoss(var/amount)
 	if(status_flags & GODMODE)
 		oxyloss = 0
 		return
-	oxyloss = max(0, amount)
+	oxyloss = max(0, amount / gurps_legacy_health_scale)
 
 /mob/living/silicon/ai/updatehealth()
 	if(status_flags & GODMODE)
@@ -42,7 +48,7 @@
 		set_stat(CONSCIOUS)
 		setOxyLoss(0)
 	else
-		health = maxHealth - getFireLoss() - getBruteLoss() // Oxyloss is not part of health as it represents AIs backup power. AI is immune against ToxLoss as it is machine.
+		gurps_updatehealth()
 
 /mob/living/silicon/ai/rejuvenate()
 	..()

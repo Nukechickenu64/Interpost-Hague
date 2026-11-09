@@ -431,6 +431,8 @@
 			close_tile_context_menu()
 			return TRUE
 		}
+		if(procname != "examine" && !ghost_can_affect_world(src, TRUE))
+			return TRUE
 		if(target && procname) {
 			if(procname == "pickup") {
 				if(!target.Adjacent(src)) {

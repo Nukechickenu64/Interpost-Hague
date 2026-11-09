@@ -93,7 +93,8 @@
 		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
 		s.set_up(3, 1, src)
 		s.start()
-		health += rand(25,100)
+		adjustBruteLoss(-rand(25,100))
+		adjustFireLoss(-rand(25,100))
 
 	//spark for no reason
 	if(prob(5))

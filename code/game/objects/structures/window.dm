@@ -446,6 +446,160 @@
 	damage_per_fire_tick = 2.0
 	maxhealth = 12.0
 
+/obj/structure/window/newstyle
+	parent_type = /obj/structure/window/basic
+	icon = 'icons/obj/newwindows.dmi'
+	icon_state = "window1"
+	dir = SOUTHWEST
+	layer = FULL_WINDOW_LAYER
+	var/window_style = "window"
+	var/damage_stage = 1
+	var/cut_chance = 25
+	var/cut_damage = 5
+
+/obj/structure/window/newstyle/is_full_window()
+	return TRUE
+
+/obj/structure/window/newstyle/is_fulltile()
+	return TRUE
+
+/obj/structure/window/newstyle/Initialize(Loc, start_dir = null, constructed = 0)
+	. = ..()
+	if(damage_stage >= 3)
+		health = 0
+		set_density(FALSE)
+		update_nearby_tiles(need_rebuild = 1)
+	update_nearby_icons()
+
+/obj/structure/window/newstyle/update_icon()
+	overlays.Cut()
+	icon_state = ""
+	layer = FULL_WINDOW_LAYER
+	var/connections = 0
+	if(anchored)
+		for(var/connection_dir in list(NORTH, SOUTH, EAST, WEST))
+			for(var/obj/structure/window/newstyle/neighbor in get_step(src, connection_dir))
+				if(neighbor != src && neighbor.anchored && neighbor.type == type)
+					connections |= connection_dir
+					break
+	var/sprite_dir = SOUTH
+	if(connections & (NORTH | SOUTH))
+		if((connections & (NORTH | SOUTH)) == (NORTH | SOUTH))
+			sprite_dir = NORTH
+		else
+			sprite_dir = (connections & NORTH) ? WEST : EAST
+	else if(connections & (EAST | WEST))
+		if((connections & (EAST | WEST)) == (EAST | WEST))
+			sprite_dir = SOUTHEAST
+		else
+			sprite_dir = (connections & EAST) ? SOUTHWEST : NORTHEAST
+	var/sprite_state = "[window_style][damage_stage]"
+	if(window_style == "pwindow")
+		sprite_state = damage_stage == 1 ? "pwindow" : (damage_stage == 2 ? "pwindow2" : "window[damage_stage]")
+	overlays += image(icon, sprite_state, dir = sprite_dir)
+
+/obj/structure/window/newstyle/take_damage(damage = 0, sound_effect = 1)
+	if(damage_stage >= 3)
+		if(damage > 0 && damage_stage == 3)
+			shatter()
+		return
+	. = ..()
+	if(damage_stage < 3)
+		damage_stage = health <= maxhealth / 2 ? 2 : 1
+		update_icon()
+
+/obj/structure/window/newstyle/shatter(display_message = 1)
+	if(damage_stage == 4)
+		return
+	playsound(loc, "shatter", 70, 1)
+	if(display_message)
+		visible_message(damage_stage < 3 ? "[src] shatters, leaving sharp glass around the frame!" : "The remaining glass in [src] breaks away!")
+	damage_stage = damage_stage < 3 ? 3 : 4
+	health = 0
+	set_density(FALSE)
+	update_nearby_tiles(need_rebuild = 1)
+	update_nearby_icons()
+
+/obj/structure/window/newstyle/CanPass(atom/movable/mover, turf/target, height = 0, air_group = 0)
+	if(!density)
+		return TRUE
+	return ..()
+
+/obj/structure/window/newstyle/CheckExit(atom/movable/mover, turf/target)
+	if(!density)
+		return TRUE
+	return ..()
+
+/obj/structure/window/newstyle/CanFluidPass(coming_from)
+	return !density
+
+/obj/structure/window/newstyle/Crossed(atom/movable/mover)
+	. = ..()
+	if(damage_stage != 3 || !ishuman(mover) || !prob(cut_chance))
+		return
+	var/mob/living/carbon/human/human = mover
+	if(human.buckled || (human.species.species_flags & SPECIES_FLAG_NO_MINOR_CUT))
+		return
+	var/list/bodyparts = human.get_damageable_organs()
+	if(!length(bodyparts))
+		return
+	var/obj/item/organ/external/bodypart = pick(bodyparts)
+	bodypart.take_external_damage(cut_damage, 0, DAM_SHARP | DAM_EDGE, "broken window glass")
+	human.updatehealth()
+	playsound(loc, 'sound/effects/glass_step.ogg', 50, 1)
+	to_chat(human, "<span class='danger'>The jagged glass in \the [src] cuts your [bodypart.name]!</span>")
+
+/obj/structure/window/newstyle/attackby(obj/item/tool, mob/user)
+	if(!istype(tool) || (tool.item_flags & ITEM_FLAG_NO_BLUDGEON))
+		return
+	if(damage_stage == 3 && isCrowbar(tool))
+		shatter()
+		return
+	if(!isScrewdriver(tool) && !isCrowbar(tool) && !isWrench(tool) && !isCoil(tool))
+		if(tool.damtype == BRUTE || tool.damtype == BURN)
+			user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
+			user.do_attack_animation(src)
+			hit(tool.force)
+			return
+	return ..()
+
+/obj/structure/window/newstyle/Move()
+	var/turf/old_location = get_turf(src)
+	. = ..()
+	update_nearby_icons(old_location)
+
+/obj/structure/window/newstyle/apply_silicate(amount)
+	if(damage_stage >= 3)
+		return
+	. = ..()
+	damage_stage = health <= maxhealth / 2 ? 2 : 1
+	update_icon()
+
+/obj/structure/window/newstyle/white
+	name = "white-framed window"
+	window_style = "wwindow"
+	icon_state = "wwindow1"
+
+/obj/structure/window/newstyle/phoron
+	name = "phoron window"
+	window_style = "pwindow"
+	icon_state = "pwindow"
+	shardtype = /obj/item/weapon/material/shard/phoron
+	glasstype = /obj/item/stack/material/glass/phoronglass
+	maxhealth = 40
+	maximal_heat = T0C + 2000
+	damage_per_fire_tick = 1
+
+/obj/structure/window/newstyle/circular
+	name = "broken circular window"
+	icon_state = "cwindow4"
+	damage_stage = 4
+
+/obj/structure/window/newstyle/circular/update_icon()
+	overlays.Cut()
+	icon_state = "cwindow4"
+	layer = FULL_WINDOW_LAYER
+
 /obj/structure/window/phoronbasic
 	name = "phoron window"
 	desc = "A borosilicate alloy window. It seems to be quite durable against hits."

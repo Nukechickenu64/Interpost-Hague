@@ -88,6 +88,8 @@
 			in_use = 0
 
 /obj/attack_ghost(mob/user)
+	if(!ghost_can_affect_world(user))
+		return ..()
 	ui_interact(user)
 	tg_ui_interact(user)
 	..()

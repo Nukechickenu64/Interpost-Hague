@@ -50,15 +50,20 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 		check_power_grid()
 
 /datum/bridge_crew_objectives/proc/check_power_grid()
-	var/powered = 0
-	var/total = 0
-	for(var/obj/machinery/power/area_smes/controller in SSmachines.machinery)
-		if(!is_station_turf(get_turf(controller)))
-			continue
-		total++
-		if(controller.is_supplying_power())
-			powered++
-	if(!total || powered * 100 < total * 90)
+	var/stable
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		stable = power_net.os13_generation_coverage() == 100 && !length(power_net.depowered_areas)
+	else
+		var/powered = 0
+		var/total = 0
+		for(var/obj/machinery/power/area_smes/controller in SSmachines.machinery)
+			if(!is_station_turf(get_turf(controller)))
+				continue
+			total++
+			if(controller.is_supplying_power())
+				powered++
+		stable = total && powered * 100 >= total * 90
+	if(!stable)
 		power_stable_since = 0
 		return
 	if(!power_stable_since)
@@ -85,7 +90,12 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	var/wake_status = completed["wake_station"] ? "Complete" : "Pending"
 	var/water_status = completed["water_service"] ? "Complete" : "Pending"
 	var/power_status = completed["power_grid"] ? "Complete" : "Pending"
-	return "<h3>Bridge Recovery Objectives</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td></tr><tr><td>Keep at least 90% of station power controllers supplying a distribution channel for 30 seconds</td><td>[power_status]</td></tr></table>"
+	return "<h3>Bridge Recovery Objectives</h3><table border='1' cellpadding='5'><tr><th>Objective</th><th>Status</th></tr><tr><td>Complete the WAKE STATION sequence</td><td>[wake_status]</td></tr><tr><td>Install the water control chip</td><td>[water_status]</td></tr><tr><td>[power_grid_goal()]</td><td>[power_status]</td></tr></table>"
+
+/datum/bridge_crew_objectives/proc/power_grid_goal()
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		return "Keep generation at or above station demand for 30 seconds without shedding any areas"
+	return "Keep at least 90% of station power controllers supplying a distribution channel for 30 seconds"
 
 /datum/station_wake_sequence
 	var/active = FALSE
@@ -213,15 +223,16 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 
 /obj/machinery/computer/bridge/update_icon()
 	overlays.Cut()
+	layer = STRUCTURE_LAYER
 	var/state_suffix = (stat & NOPOWER) ? "0" : ""
 	icon_state = "tncA[state_suffix]"
 	if(stat & NOPOWER)
 		set_light(0)
 	else
 		set_light(light_range_on, light_power_on)
-	overlays += image(icon, "tncB[state_suffix]", pixel_x = 32)
-	overlays += image(icon, "tncC[state_suffix]", pixel_y = 32)
-	overlays += image(icon, "tncD[state_suffix]", pixel_x = 32, pixel_y = 32)
+	overlays += image(icon, "tncB[state_suffix]", layer = STRUCTURE_LAYER, pixel_x = 32)
+	overlays += image(icon, "tncC[state_suffix]", layer = overlay_layer, pixel_y = 32)
+	overlays += image(icon, "tncD[state_suffix]", layer = overlay_layer, pixel_x = 32, pixel_y = 32)
 
 /obj/machinery/computer/bridge/proc/topic_requires_command_access(var/list/href_list)
 	if(!href_list || !href_list["action"])
@@ -237,6 +248,17 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	if(get_dist(src, usr) > 1)
 		return
 	switch(href_list["action"])
+		if("os13_arm_destruct", "os13_abort_destruct")
+			if(os13_emergency_controls_available(usr))
+				os13_emergency_destruct(usr, href_list["action"] == "os13_abort_destruct")
+				attack_hand(usr)
+		if("os13_cancel_lifeboat")
+			var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+			if(!orders || !os13_command_available(usr))
+				return
+			if(!orders.cancel_launch())
+				to_chat(usr, SPAN_WARNING(orders.bridge_infected ? "LIFEBOAT RECALL BLOCKED. Foreign program detected." : "No lifeboat launch is pending."))
+			show_menu(usr)
 		if("os13_general_report", "os13_today_reports", "os13_approved_documents", "os13_erase_documents", "os13_salvage")
 			if(!os13_command_available(usr))
 				return
@@ -253,6 +275,9 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 					os13_toggle_salvage(usr)
 			if(!QDELETED(src))
 				show_menu(usr)
+		if("os13_distress_report")
+			if(istype(GLOB.using_map, /datum/map/os13classic) && os13_command_available(usr))
+				to_chat(usr, os13_outer_distress_report())
 		if("os13_toggle_shields", "os13_shield_direction")
 			if(!istype(GLOB.using_map, /datum/map/alpha))
 				to_chat(usr, "<span class='warning'>OS13 shield control is not available on this station.</span>")
@@ -260,6 +285,8 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 			os13_control_shields(usr, href_list["action"])
 			show_menu(usr)
 		if("cancel_shuttle")
+			if(istype(GLOB.using_map, /datum/map/os13classic))
+				return
 			if(!check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
@@ -274,6 +301,8 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 			cancel_call_proc(usr)
 			show_menu(usr)
 		if("call_shuttle")
+			if(istype(GLOB.using_map, /datum/map/os13classic))
+				return
 			if(!check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
 				to_chat(usr, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
@@ -327,12 +356,13 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 				playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 				return
 			playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
-			if(!SSdirector)
+			var/classic = istype(GLOB.using_map, /datum/map/os13classic)
+			if(!classic && !SSdirector)
 				to_chat(usr, "<span class='warning'>Station telemetry unavailable: AI Director is not initialized.</span>")
 				return
 			var/datum/browser/popup = new(usr, "bridge_station_status", "Station Status", 650, 500)
 			popup.device_source = src
-			popup.set_content("[GLOB.bridge_crew_objectives.get_status_report()]<hr>[SSdirector.station_status_report()]")
+			popup.set_content(classic ? os13_classic_station_status() : "[GLOB.bridge_crew_objectives.get_status_report()]<hr>[SSdirector.station_status_report()]")
 			popup.open()
 		if("announce")
 			if(topic_requires_command_access(href_list) && !check_mapper_access(usr.GetAccess(), usr.GetAccess(ACCESS_REGION_COMMAND)))
@@ -385,6 +415,9 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 	if(stat & (BROKEN|NOPOWER))
 		return
 	if(!check_mapper_access(user.GetAccess(), user.GetAccess(ACCESS_REGION_COMMAND)))
+		if(os13_emergency_controls_available(user))
+			to_chat(user, "<div class='firstdivmood'><div class='compbox'>[os13_emergency_controls()]</div></div>")
+			return
 		to_chat(user, "<span class='warning'>ACCESS DENIED: Command authorization required.</span>")
 		playsound(src, 'sound/machines/TERMINAL_DAT.ogg', 10, 1, -2)
 		return
@@ -403,8 +436,19 @@ GLOBAL_DATUM_INIT(bridge_crew_objectives, /datum/bridge_crew_objectives, new)
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_salvage'>SALVAGE COORDINATES: [GLOB.os13_salvage_authorized ? "ALLOWED" : "PROHIBITED"]</a></span>\n"
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_toggle_shields'>TOGGLE SHIELDS</a></span>\n"
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_shield_direction'>SELECT SHIELDS</a></span>\n"
+		if(istype(GLOB.using_map, /datum/map/os13classic))
+			menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_distress_report'>DISTRESS SIGNALS</a></span>\n"
+		var/datum/os13_traitor_orders/orders = os13_fixed_traitor_mode()?.os13_orders
+		if(orders?.launch_timer)
+			menu += "<span class='graytext'>LIFEBOAT DEPARTURE IN [max(0, round((orders.launch_time - world.time) / (1 SECOND)))] SECONDS</span>\n"
+			menu += "<span class='feedback'><a href='?src=\ref[src];action=os13_cancel_lifeboat'>CANCEL LIFEBOAT LAUNCH</a></span>\n"
 	if(!GLOB.station_wake_sequence.started)
 		menu += "<span class='feedback'><a href='?src=\ref[src];action=wake_station'>WAKE STATION</a></span>\n"
+	if(istype(GLOB.using_map, /datum/map/os13classic))
+		menu += os13_emergency_controls_available(user) ? os13_emergency_controls() : "<span class='graytext'>EMERGENCY CONTROLS LOCKED</span>\n"
+		menu += "<span class='feedback'><a href='?src=\ref[src];action=announce'>PRIORITY ANNOUNCEMENT</a></span></div></div>"
+		to_chat(user, menu)
+		return
 	var/datum/evacuation_controller/evacuation = SSevac.evacuation_controller
 	if(!evacuation)
 		menu += "<span class='graytext'>ESCAPE SHUTTLE UNAVAILABLE</span>\n"

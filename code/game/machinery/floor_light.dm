@@ -7,13 +7,15 @@ var/list/floor_light_cache = list()
 	desc = "A backlit floor panel."
 	layer = ABOVE_TILE_LAYER
 	anchored = 0
-	use_power = POWER_USE_ACTIVE
-	idle_power_usage = 2
-	active_power_usage = 20
+	use_power = POWER_USE_OFF
+	idle_power_usage = 0
+	active_power_usage = 0
 	power_channel = LIGHT
 	matter = list(DEFAULT_WALL_MATERIAL = 250, "glass" = 250)
 
 	var/on
+	var/on_until = 0
+	var/emergency_power = FALSE
 	var/damaged
 	var/default_light_range = 4
 	var/default_light_power = 2
@@ -23,10 +25,23 @@ var/list/floor_light_cache = list()
 /obj/machinery/floor_light/prebuilt
 	anchored = 1
 
+/obj/machinery/floor_light/Initialize()
+	. = ..()
+	if(on)
+		on_until = world.time + 1 MINUTE
+	power_change()
+
+/obj/machinery/floor_light/power_change()
+	. = ..()
+	update_light_state()
+	update_brightness()
+
 /obj/machinery/floor_light/attackby(var/obj/item/W, var/mob/user)
 	if(isScrewdriver(W))
 		anchored = !anchored
 		visible_message("<span class='notice'>\The [user] has [anchored ? "attached" : "detached"] \the [src].</span>")
+		update_light_state()
+		update_brightness()
 	else if(isWelder(W) && (damaged || (stat & BROKEN)))
 		var/obj/item/weldingtool/WT = W
 		if(!WT.remove_fuel(0, user))
@@ -68,46 +83,53 @@ var/list/floor_light_cache = list()
 			to_chat(user, "<span class='warning'>\The [src] is too damaged to be functional.</span>")
 			return
 
-		if(stat & NOPOWER)
-			to_chat(user, "<span class='warning'>\The [src] is unpowered.</span>")
+		power_change()
+		if(emergency_power)
+			to_chat(user, "<span class='warning'>\The [src] is providing emergency lighting.</span>")
 			return
 
 		on = !on
-		if(on) 
-			update_use_power(POWER_USE_ACTIVE)
+		on_until = on ? world.time + 1 MINUTE : 0
 		visible_message("<span class='notice'>\The [user] turns \the [src] [on ? "on" : "off"].</span>")
 		update_brightness()
 		return
 
 /obj/machinery/floor_light/Process()
 	..()
-	var/need_update
-	if((!anchored || broken()) && on)
-		update_use_power(POWER_USE_OFF)
-		on = 0
-		need_update = 1
-	else if(use_power && !on)
-		update_use_power(POWER_USE_OFF)
-		need_update = 1
-	if(need_update)
+	if(update_light_state())
 		update_brightness()
 
+/obj/machinery/floor_light/proc/update_light_state()
+	var/was_on = on
+	var/was_emergency = emergency_power
+	var/area/light_area = get_area(src)
+	emergency_power = light_area && !light_area.powered(LIGHT)
+	if(emergency_power)
+		on = TRUE
+		on_until = 0
+	else if(was_emergency || (on && world.time >= on_until))
+		on = FALSE
+		on_until = 0
+	if(!anchored || broken())
+		on = FALSE
+		on_until = 0
+	return on != was_on || emergency_power != was_emergency
+
 /obj/machinery/floor_light/proc/update_brightness()
-	if(on && use_power == POWER_USE_ACTIVE)
+	update_use_power(POWER_USE_OFF)
+	if(on && anchored && !broken())
 		if(light_range != default_light_range || light_power != default_light_power || light_color != default_light_colour)
 			set_light(default_light_range, default_light_power, default_light_colour)
 	else
-		use_power = POWER_USE_OFF
 		if(light_range || light_power)
 			set_light(0)
 
-	change_power_consumption((light_range + light_power) * 20, POWER_USE_ACTIVE)
 	update_icon()
 
 /obj/machinery/floor_light/update_icon()
 	overlays.Cut()
 	emissive_overlay = null
-	if(use_power && !broken())
+	if(on && anchored && !broken())
 		if(isnull(damaged))
 			var/cache_key = "floorlight-[default_light_colour]"
 			if(!floor_light_cache[cache_key])
@@ -135,7 +157,7 @@ var/list/floor_light_cache = list()
 		overlays += emissive_overlay
 
 /obj/machinery/floor_light/proc/broken()
-	return (stat & (BROKEN|NOPOWER))
+	return (stat & BROKEN)
 
 /obj/machinery/floor_light/ex_act(severity)
 	switch(severity)
@@ -174,29 +196,12 @@ var/list/floor_light_cache = list()
 	on = 0
 	use_power = POWER_USE_OFF
 
-/obj/machinery/floor_light/os13/Initialize()
-	. = ..()
-	update_brightness()
-
-/obj/machinery/floor_light/os13/power_change()
-	. = ..()
-	update_brightness()
-
-/obj/machinery/floor_light/os13/update_brightness()
-	var/lit = on && anchored && !broken()
-	update_use_power(lit ? POWER_USE_ACTIVE : POWER_USE_OFF)
-	if(lit)
-		set_light(default_light_range, default_light_power, default_light_colour)
-	else
-		set_light(0)
-	update_icon()
-
 /obj/machinery/floor_light/os13/update_icon()
 	// Do not inherit the square panel's cached "on"/"flicker" overlays.
 	overlays.Cut()
 	emissive_overlay = null
 	icon_state = "floorlight0"
-	if(on && anchored && use_power == POWER_USE_ACTIVE && !broken())
+	if(on && anchored && !broken())
 		icon_state = "floorlight1"
 		if(!isnull(damaged))
 			icon_state = "floorlight01"

@@ -1,0 +1,3 @@
+#define DEBUG
+#include "Interpost-Hague.dme"
+#include "tools/os13_parity/wraith_regression.dm"

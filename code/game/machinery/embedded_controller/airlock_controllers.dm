@@ -25,8 +25,8 @@
 		icon_state = "zshu1"
 
 /obj/machinery/embedded_controller/radio/airlock/New()
-	..()
 	program = new/datum/computer/file/embedded_program/airlock(src)
+	..()
 
 /obj/machinery/embedded_controller/radio/airlock/Destroy()
 	for(var/thing in dummy_terminals)
@@ -144,6 +144,9 @@
 				continue
 			if(neighbour.c_airblock(neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
 				continue
+			var/obj/machinery/door/blast/blast_boundary = locate() in neighbour
+			if(blast_boundary?.block_air_zones)
+				continue
 			if(SSair.air_blocked(current, neighbour) & (AIR_BLOCKED | ZONE_BLOCKED))
 				continue
 			chamber[neighbour] = TRUE
@@ -160,9 +163,10 @@
 	var/obj/machinery/embedded_controller/radio/airlock/airlock_controller/controller
 	var/obj/machinery/airlock_sensor/chamber_sensor
 	var/list/air_pumps = list()
-	var/obj/machinery/door/airlock/exterior_door
-	var/obj/machinery/door/airlock/interior_door
+	var/obj/machinery/door/exterior_door
+	var/obj/machinery/door/interior_door
 	var/list/nearby_doors = list()
+	var/list/nearby_blast_doors = list()
 	for(var/obj/machinery/embedded_controller/radio/airlock/airlock_controller/C in range(search_radius, src))
 		if(chamber[get_turf(C)])
 			if(controller)
@@ -190,39 +194,56 @@
 				log_error("Airlock link marker at [x],[y],[z] found multiple air pumps.")
 				return
 			air_pumps += P
-	for(var/obj/machinery/door/airlock/D in range(search_radius, src))
-		if(D.z != z)
+	for(var/obj/machinery/door/D in range(search_radius, src))
+		var/is_airlock = istype(D, /obj/machinery/door/airlock)
+		if(D.z != z || (!is_airlock && !istype(D, /obj/machinery/door/blast)))
 			continue
 		var/borders_chamber = FALSE
 		for(var/turf/door_tile in D.locs)
 			for(var/direction in GLOB.cardinal)
 				if(chamber[get_step(door_tile, direction)])
 					borders_chamber = TRUE
-		if(borders_chamber)
+		if(!borders_chamber)
+			continue
+		if(is_airlock || (D.id_tag && (D.id_tag == controller.tag_exterior_door || D.id_tag == controller.tag_interior_door)))
 			nearby_doors += D
+		else if(D.block_air_zones && !(locate(/obj/machinery/door/airlock) in D.loc))
+			nearby_blast_doors += D
+	if(nearby_doors.len < 2)
+		nearby_doors += nearby_blast_doors
 	if(!chamber_sensor || !air_pumps.len || nearby_doors.len != 2)
-		log_error("Airlock link marker at [x],[y],[z] requires one controller, one chamber sensor, a tagged pump group, and exactly two airlocks.")
+		log_error("Airlock link marker at [x],[y],[z] requires one controller, one chamber sensor, a tagged pump group, and exactly two chamber doors.")
 		return
 
-	for(var/obj/machinery/door/airlock/D in nearby_doors)
-		if(controller.tag_exterior_door)
-			if(D.id_tag == controller.tag_exterior_door)
+	for(var/obj/machinery/door/D in nearby_doors)
+		if(D.id_tag && D.id_tag == controller.tag_exterior_door)
+			exterior_door = D
+		else if(D.id_tag && D.id_tag == controller.tag_interior_door)
+			interior_door = D
+	if(exterior_door && !interior_door)
+		interior_door = (nearby_doors - exterior_door)[1]
+	else if(interior_door && !exterior_door)
+		exterior_door = (nearby_doors - interior_door)[1]
+	else if(!exterior_door && !interior_door && !controller.tag_exterior_door)
+		for(var/obj/machinery/door/D in nearby_doors)
+			if(get_dir(src, D) & dir)
 				exterior_door = D
 			else
 				interior_door = D
-		else if(get_dir(src, D) & dir)
-			exterior_door = D
-		else
-			interior_door = D
 	if(!exterior_door || !interior_door)
 		log_error("Airlock link marker at [x],[y],[z] must face one of its two airlock doors.")
 		return
 
 	var/link_id = controller.id_tag ? controller.id_tag : "AIRLOCK_[sequential_id(/obj/effect/landmark/airlock_link)]"
+	var/exterior_tag = controller.tag_exterior_door ? controller.tag_exterior_door : "[link_id]_outer"
+	var/interior_tag = controller.tag_interior_door ? controller.tag_interior_door : "[link_id]_inner"
+	if(exterior_tag == interior_tag)
+		log_error("Airlock link marker at [x],[y],[z] requires distinct tags for the two chamber doors.")
+		return
 	var/airlock_frequency = controller.frequency
 	controller.id_tag = link_id
-	controller.tag_exterior_door = "[link_id]_outer"
-	controller.tag_interior_door = "[link_id]_inner"
+	controller.tag_exterior_door = exterior_tag
+	controller.tag_interior_door = interior_tag
 	controller.tag_airpump = "[link_id]_pump"
 	controller.tag_chamber_sensor = "[link_id]_sensor"
 	var/datum/computer/file/embedded_program/airlock/airlock_program = controller.program

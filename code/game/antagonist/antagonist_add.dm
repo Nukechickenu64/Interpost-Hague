@@ -1,4 +1,4 @@
-/datum/antagonist/proc/add_antagonist(var/datum/mind/player, var/ignore_role, var/do_not_equip, var/move_to_spawn, var/do_not_announce, var/preserve_appearance)
+/datum/antagonist/proc/add_antagonist(var/datum/mind/player, var/ignore_role, var/do_not_equip, var/move_to_spawn, var/do_not_announce, var/preserve_appearance, var/keep_living_body = FALSE)
 
 	if(!add_antagonist_mind(player, ignore_role))
 		return
@@ -11,7 +11,7 @@
 	player.special_role = role_text
 
 	var/created_default = FALSE
-	if(isghostmind(player))
+	if(isghostmind(player) && !(keep_living_body && isliving(player.current) && player.current.stat != DEAD))
 		var/mob/living/default_mob = create_default(player.current)
 		if(!default_mob || !default_mob.mind || !(default_mob.mind in current_antagonists))
 			remove_antagonist(player)

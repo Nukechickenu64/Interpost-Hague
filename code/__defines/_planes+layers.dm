@@ -208,6 +208,7 @@ What is the naming convention for planes or layers?
 
 // Hidden source only; the additive display remains below beams and LOS.
 #define LIGHTING_VEIL_SOURCE_PLANE 13
+#define LIGHTING_SAMPLE_PLANE 15
 
 // Hidden world passes, composed behind ordinary SIDE_MAP objects. Fractional
 // layers alone cannot keep a projected sprite above a neighbouring turf.
@@ -272,7 +273,7 @@ What is the naming convention for planes or layers?
 			blurred_masters -= P
 			continue
 		if(masters["[P.plane]"] != P)
-			P.filters -= blurred_masters[P]
+			P.filters -= "eye_blur"
 			blurred_masters -= P
 
 	for(var/world_plane in world_planes)
@@ -285,16 +286,16 @@ What is the naming convention for planes or layers?
 			D.plane = world_plane
 			owned_screens.Add(P, D)
 			C.screen.Add(P, D)
-		if(!(blurred_masters[P] in P.filters))
-			// Append directly: named filters rebuild the list and erase native drug filters.
-			P.filters += filter(type = "blur", size = 2)
-			blurred_masters[P] = P.filters[P.filters.len]
+		if(!P.filters["eye_blur"])
+			// Preserve other native filters that add_filter() would overwrite.
+			P.filters += filter(type = "blur", name = "eye_blur", size = 2)
+			blurred_masters |= P
 	C.screen |= src
 
 /obj/screen/plane_master/blur_all/proc/clear()
 	for(var/obj/screen/plane_master/P in blurred_masters)
 		if(P && !P.gc_destroyed)
-			P.filters -= blurred_masters[P]
+			P.filters -= "eye_blur"
 	blurred_masters.Cut()
 	if(blur_client)
 		blur_client.screen -= owned_screens
@@ -322,20 +323,27 @@ What is the naming convention for planes or layers?
 #define LIGHTING_VEIL_STRENGTH   0.2
 #define LIGHTING_VEIL_BLUR        8
 
-// Tile samples and their boundary padding form the lightmap; multiply it with
-// the world once. The white backdrop preserves areas without dynamic lighting.
+/obj/screen/plane_master/lighting_samples
+	name = "lighting sample plane master"
+	plane = LIGHTING_SAMPLE_PLANE
+	render_target = "*light_samples"
+	mouse_opacity = 0
+
+// Filter the samples over black, then restore their unfiltered coverage. A
+// white backing would feed bloom at cull edges, and blurring transparent edges
+// would let the fullbright world show through. Uncovered areas stay fullbright.
 /obj/screen/plane_master/lighting
 	name = "lighting plane master"
 	plane = LIGHTING_PLANE
 	blend_mode = BLEND_MULTIPLY
 	mouse_opacity = 0
-	render_target = "light"
 
 /obj/screen/plane_master/lighting/New()
 	. = ..()
-	// Soften the boundaries of uniform tile samples, then bloom bright tiles.
+	add_filter("light_samples", 0, list("type" = "layer", render_source = "*light_samples"))
 	add_filter("light_softness", 1, list("type" = "blur", size = 2))
 	add_filter("bloom", 4, list("type" = "bloom", threshold = LIGHTING_BLOOM_THRESHOLD, size = LIGHTING_BLOOM_SIZE, offset = LIGHTING_BLOOM_OFFSET, alpha = LIGHTING_BLOOM_ALPHA))
+	add_filter("light_coverage", 5, list("type" = "alpha", render_source = "*light_samples"))
 
 /obj/screen/plane_master/emissive
 	name = "emissive plane master"
@@ -351,6 +359,7 @@ What is the naming convention for planes or layers?
 /obj/screen/lighting_backdrop
 	name = ""
 	plane = LIGHTING_PLANE
+	color = "#000000"
 	// Screen objects draw above map objects in the same plane unless pushed into the background
 	layer = BACKGROUND_LAYER + 1
 	blend_mode = BLEND_OVERLAY
@@ -441,9 +450,6 @@ var/global/icon/solid_white_icon
 /obj/screen/plane_master/cryo
 	plane = DEFAULT_PLANE
 	filters = list(filter(type = "blur", size = 3), filter(type = "ripple", size = 1), filter(type = "bloom", size = 1))
-
-/obj/screen/plane_master/cryo/double_sight
-	filters = filter(type = "motion_blur", x = 4, y = -3)
 
 /obj/screen/plane_master/skewium
 	plane = DEFAULT_PLANE

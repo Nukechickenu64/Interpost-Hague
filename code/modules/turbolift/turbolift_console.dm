@@ -99,7 +99,9 @@
 
 
 /obj/structure/lift/panel/attack_ghost(var/mob/user)
-	return interact(user)
+	if(ghost_can_affect_world(user))
+		return interact(user)
+	return ..()
 
 /obj/structure/lift/panel/interact(var/mob/user)
 	if(!..())

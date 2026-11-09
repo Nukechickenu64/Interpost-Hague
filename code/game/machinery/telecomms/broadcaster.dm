@@ -229,6 +229,8 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
   /* ###### Prepare the radio connection ###### */
 
 	var/display_freq = freq
+	if(radio_frequency_is_synthetic_only(display_freq) && !is_ai_or_robot_radio_user(M))
+		return 0
 
 	var/list/obj/item/device/radio/radios = list()
 
@@ -289,6 +291,8 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 	  /* --- Loop through the receivers and categorize them --- */
 		if(istype(R, /mob/new_player)) // we don't want new players to hear messages. rare but generates runtimes.
 			continue
+		if(radio_frequency_is_synthetic_only(display_freq) && !is_ai_or_robot_radio_user(R) && !isghost(R))
+			continue
 
 		// Ghosts hearing all radio chat don't want to hear syndicate intercepts, they're duplicates
 		if(data == 3 && isghost(R) && R.get_preference_value(/datum/client_preference/ghost_radio) == GLOB.PREF_ALL_CHATTER)
@@ -327,15 +331,13 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 	if (length(heard_masked) || length(heard_normal) || length(heard_voice) || length(heard_garbled) || length(heard_gibberish))
 
 	  /* --- Some miscellaneous variables to format the string output --- */
-		var/freq_text = get_frequency_name(display_freq)
-
 		var/part_b_extra = ""
 		if(data == 3) // intercepted radio message
 			part_b_extra = " <i>(Intercepted)</i>"
-		var/part_a = "<span class='[frequency_span_class(display_freq)]'><b>\[[freq_text]\][part_b_extra]</b>[icon2html(radio, world, realsize=FALSE)]<span class='nameradio'>" // goes in the actual output
+		var/part_a = "<span class='[frequency_span_class(display_freq)]'><b>[part_b_extra]</b><span class='nameradio'>" // goes in the actual output
 
 		// --- Some more pre-message formatting ---
-		var/part_b = "</span> <span class='message'>" // Tweaked for security headsets -- TLE
+		var/part_b = " [icon2html(radio, world, realsize=FALSE)]</span> <span class='message'>" // Tweaked for security headsets -- TLE
 		var/part_c = "</span></span>"
 
 
@@ -443,6 +445,8 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 	for (var/mob/R in receive)
 
 	  /* --- Loop through the receivers and categorize them --- */
+		if(radio_frequency_is_synthetic_only(display_freq) && !is_ai_or_robot_radio_user(R) && !isghost(R))
+			continue
 		// --- Check for compression ---
 		if(compression > 0)
 
@@ -468,7 +472,6 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 
 	  /* --- Some miscellaneous variables to format the string output --- */
 		var/part_a = "<span class='[frequency_span_class(display_freq)]'><span class='nameradio'>" // goes in the actual output
-		var/freq_text = get_frequency_name(display_freq)
 
 		// --- Some more pre-message formatting ---
 
@@ -479,7 +482,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 		// Create a radio headset for the sole purpose of using its icon
 		var/obj/item/device/radio/headset/radio = new
 
-		var/part_b = "</span><b> [icon2html(radio, world, realsize=FALSE)]\[[freq_text]\][part_b_extra]</b> <span class='message'>" // Tweaked for security headsets -- TLE
+		var/part_b = "</span><b> [icon2html(radio, world, realsize=FALSE)][part_b_extra]</b> <span class='message'>" // Tweaked for security headsets -- TLE
 		var/part_c = "</span></span>"
 
 		//End of research and feedback code.

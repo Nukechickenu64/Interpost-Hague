@@ -85,7 +85,7 @@
 
 	var/startLevel = start[1]
 	var/turf/pickedstart = start[2]
-	var/turf/pickedgoal = spaceDebrisFinishLoc(startSide, startLevel)
+	var/turf/pickedgoal = spaceDebrisFinishLoc(startSide, startLevel, pickedstart)
 
 	var/Me = pickweight(meteortypes)
 	var/obj/effect/meteor/M = new Me(pickedstart)
@@ -95,6 +95,8 @@
 	return
 
 /proc/spaceDebrisStartLoc(startSide, Z)
+	if(!(startSide in GLOB.cardinal))
+		startSide = prob(50) ? (startSide & (NORTH|SOUTH)) : (startSide & (EAST|WEST))
 	var/starty
 	var/startx
 	switch(startSide)
@@ -113,7 +115,16 @@
 	var/turf/T = locate(startx, starty, Z)
 	return T
 
-/proc/spaceDebrisFinishLoc(startSide, Z)
+/proc/spaceDebrisFinishLoc(startSide, Z, turf/start)
+	// Diagonal approaches exit through one of the two opposite edges, continuing away from the start corner.
+	if(start && !(startSide in GLOB.cardinal))
+		var/low_x = (startSide & EAST) ? TRANSITIONEDGE : start.x
+		var/high_x = (startSide & EAST) ? start.x : world.maxx - TRANSITIONEDGE
+		var/low_y = (startSide & NORTH) ? TRANSITIONEDGE : start.y
+		var/high_y = (startSide & NORTH) ? start.y : world.maxy - TRANSITIONEDGE
+		if(prob(50))
+			return locate((startSide & EAST) ? TRANSITIONEDGE : world.maxx - TRANSITIONEDGE, rand(low_y, high_y), Z)
+		return locate(rand(low_x, high_x), (startSide & NORTH) ? TRANSITIONEDGE : world.maxy - TRANSITIONEDGE, Z)
 	var/endy
 	var/endx
 	switch(startSide)

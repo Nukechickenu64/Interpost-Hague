@@ -86,7 +86,7 @@ var/list/mob_hat_cache = list()
 	self_destruct()
 
 /mob/living/silicon/robot/drone/can_be_possessed_by(var/mob/observer/ghost/possessor)
-	if(!istype(possessor) || !possessor.client || !possessor.ckey)
+	if(!istype(possessor) || !possessor.can_affect_world(TRUE) || !possessor.client || !possessor.ckey)
 		return 0
 	if(!config.allow_drone_spawn)
 		to_chat(src, "<span class='danger'>Playing as drones is not currently permitted.</span>")
@@ -102,7 +102,7 @@ var/list/mob_hat_cache = list()
 	return 1
 
 /mob/living/silicon/robot/drone/do_possession(var/mob/observer/ghost/possessor)
-	if(!(istype(possessor) && possessor.ckey))
+	if(!(istype(possessor) && possessor.can_affect_world(TRUE) && possessor.ckey))
 		return 0
 	if(src.ckey || src.client)
 		to_chat(possessor, "<span class='warning'>\The [src] already has a player.</span>")
@@ -281,22 +281,17 @@ var/list/mob_hat_cache = list()
 //DRONE LIFE/DEATH
 //For some goddamn reason robots have this hardcoded. Redefining it for our fragile friends here.
 /mob/living/silicon/robot/drone/updatehealth()
-	if(status_flags & GODMODE)
-		health = 35
-		set_stat(CONSCIOUS)
-		return
-	health = 35 - (getBruteLoss() + getFireLoss())
-	return
+	return ..()
 
 //Easiest to check this here, then check again in the robot proc.
 //Standard robots use config for crit, which is somewhat excessive for these guys.
 //Drones killed by damage will gib.
 /mob/living/silicon/robot/drone/handle_regular_status_updates()
-	if(health <= -35 && src.stat != DEAD)
+	if(health <= -5 * maxHealth && src.stat != DEAD)
 		self_destruct()
 		return
-	if(health <= 0 && src.stat != DEAD)
-		death()
+	gurps_health_status()
+	if(stat == DEAD)
 		return
 	..()
 
