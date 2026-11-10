@@ -158,12 +158,13 @@ var/global/shadow_preview_legacy_rotation = FALSE
 
 // The width axis must rotate with the projected height axis. Keeping width
 // horizontal made the two axes almost parallel under an east/west light.
-/proc/dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+/proc/dynamic_shadow_projection(dx, dy, distance, shadow_length, foot_depth)
 	var/along_x = dx / distance * shadow_length
 	var/along_y = dy / distance * shadow_length * DSHADOW_FLATTEN
 	var/across_x = -dy / distance * 0.9
 	var/across_y = dx / distance * 0.9 * DSHADOW_FLATTEN
-	return matrix(across_x, along_x, along_x * half_height, across_y, along_y, along_y * half_height - half_height)
+	// Keep the point at (0, -foot_depth) fixed as the silhouette rotates.
+	return matrix(across_x, along_x, along_x * foot_depth, across_y, along_y, along_y * foot_depth - foot_depth)
 
 // Objects, nonhuman casters and prone humans use the original flatter shear.
 /atom/movable/proc/get_dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
@@ -176,7 +177,8 @@ var/global/shadow_preview_legacy_rotation = FALSE
 /mob/living/carbon/human/get_dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
 	if(lying)
 		return ..()
-	return dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height)
+	var/foot_inset = species ? species.shadow_foot_inset : 0
+	return dynamic_shadow_projection(dx, dy, distance, shadow_length, half_height - foot_inset)
 
 /atom/movable/proc/dynamic_shadow_sprite_dir(dx, dy)
 	return dir

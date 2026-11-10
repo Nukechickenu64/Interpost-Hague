@@ -130,14 +130,6 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 
 	if(is_freq_listening(signal)) // detect subspace signals
 
-		signal.data["done"] = 1 // mark the signal as being broadcasted
-		signal.data["compression"] = 0
-
-		// Search for the original signal and mark it as done as well
-		var/datum/signal/original = signal.data["original"]
-		if(original)
-			original.data["done"] = 1
-
 		if(signal.data["slow"] > 0)
 			sleep(signal.data["slow"]) // simulate the network lag if necessary
 
@@ -145,12 +137,20 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 
 		var/datum/radio_frequency/connection = signal.data["connection"]
 
-		if(connection.frequency in ANTAG_FREQS) // if antag broadcast, just
+		if(connection.frequency in ANTAG_FREQS)
+			// An intercepted copy does not count as delivery on the original frequency.
+			signal.data["done"] = 1
+			signal.data["compression"] = 0
+			signal.data["level"] = list(0)
+			var/datum/signal/original = signal.data["original"]
+			if(original)
+				original.data["done"] = 1
+				original.data["level"] = signal.data["level"]
 			Broadcast_Message(signal.data["connection"], signal.data["mob"],
 							  signal.data["vmask"], signal.data["vmessage"],
 							  signal.data["radio"], signal.data["message"],
 							  signal.data["name"], signal.data["job"],
-							  signal.data["realname"], signal.data["vname"],, signal.data["compression"], list(0), connection.frequency,
+							  signal.data["realname"], signal.data["vname"],, signal.data["compression"], signal.data["level"], connection.frequency,
 							  signal.data["verb"], signal.data["language"])
 		else
 			if(intercept)
@@ -158,7 +158,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 							  signal.data["vmask"], signal.data["vmessage"],
 							  signal.data["radio"], signal.data["message"],
 							  signal.data["name"], signal.data["job"],
-							  signal.data["realname"], signal.data["vname"], 3, signal.data["compression"], list(0), connection.frequency,
+							  signal.data["realname"], signal.data["vname"], 3, 0, list(0), connection.frequency,
 							  signal.data["verb"], signal.data["language"])
 
 
@@ -239,18 +239,6 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 	if(data == 1)
 
 		for (var/obj/item/device/radio/intercom/R in connection.devices["[RADIO_CHAT]"])
-			if(R.receive_range(display_freq, level) > -1)
-				radios += R
-
-	// --- Broadcast only to intercoms and station-bounced radios ---
-
-	else if(data == 2)
-
-		for (var/obj/item/device/radio/R in connection.devices["[RADIO_CHAT]"])
-
-			if(istype(R, /obj/item/device/radio/headset))
-				continue
-
 			if(R.receive_range(display_freq, level) > -1)
 				radios += R
 

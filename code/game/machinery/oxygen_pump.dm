@@ -109,6 +109,8 @@
 	if(target.wear_mask && target != breather)
 		to_chat(user, "<span class='warning'>\The [target] is already wearing a mask.</span>")
 		return
+	if(!contained.fits_clothing_size(target, slot_wear_mask, user))
+		return
 	if(target.head && (target.head.body_parts_covered & FACE))
 		to_chat(user, "<span class='warning'>Remove their [target.head] first.</span>")
 		return

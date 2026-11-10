@@ -141,10 +141,12 @@
 	if(!..())
 		return 0
 
-	if(other.zone)
+	var/datum/gas_mixture/source_air = other.zone?.air || other.air
+	if(source_air)
 		if(!src.air)
 			src.make_air()
-		src.air.copy_from(other.zone.air)
+		src.air.copy_from(source_air)
+	if(other.zone)
 		other.zone.remove(other)
 	return 1
 

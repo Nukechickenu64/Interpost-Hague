@@ -5,7 +5,6 @@
 	icon_state = "headset"
 	item_state = "headset"
 	matter = list(DEFAULT_WALL_MATERIAL = 75)
-	subspace_transmission = 1
 	canhear_range = 0 // can't hear headsets from very far away
 
 	slot_flags = SLOT_EARS
@@ -54,15 +53,13 @@
 	return ..()
 
 /obj/item/device/radio/headset/receive_range(freq, level, aiOverride = 0)
-	if (aiOverride)
-		playsound(loc, 'sound/effects/radio_chatter.ogg', 25)//, 1)
-		return ..(freq, level)
-	if(ishuman(src.loc))
-		var/mob/living/carbon/human/H = src.loc
-		if(H.l_ear == src || H.r_ear == src)
-			playsound(loc, 'sound/effects/radio_chatter.ogg', 25)//, 1)
-			return ..(freq, level)
-	return -1
+	if(!aiOverride)
+		var/mob/living/carbon/human/wearer = loc
+		if(!istype(wearer) || (wearer.l_ear != src && wearer.r_ear != src))
+			return -1
+	. = ..(freq, level)
+	if(. >= 0)
+		playsound(loc, 'sound/effects/radio_chatter.ogg', 25)
 
 /obj/item/device/radio/headset/syndicate
 	origin_tech = list(TECH_ILLEGAL = 3)

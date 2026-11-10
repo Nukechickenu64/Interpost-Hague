@@ -137,24 +137,42 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 	cadet.age = 56
 	job_master.EquipRank(cadet, "Cadet", FALSE, TRUE)
 	expect(cadet.is_child() && cadet.mob_size == MOB_SMALL && cadet.age >= 10 && cadet.age <= 14 && cadet.maxHealth == 80, "Round-start Cadet retained an adult body or age.")
-	expect(istype(cadet.w_uniform, /obj/item/clothing/under/os13_child) && istype(cadet.shoes, /obj/item/clothing/shoes/os13_child), "Round-start Cadet did not receive fitted clothes.")
 	var/mob/living/carbon/human/late_cadet = new(start)
 	late_cadet.mind_initialize()
 	late_cadet.gender = FEMALE
 	late_cadet.age = 45
 	job_master.EquipRank(late_cadet, "Cadet", TRUE, TRUE)
 	expect(late_cadet.is_child() && late_cadet.age >= 10 && late_cadet.age <= 14 && late_cadet.gender == FEMALE, "Late-join Cadet did not retain their gender in a child body.")
-	expect(istype(late_cadet.w_uniform, /obj/item/clothing/under/os13_child) && istype(late_cadet.shoes, /obj/item/clothing/shoes/os13_child), "Late-join Cadet lacked their basic clothes.")
 	for(var/mob/living/carbon/human/child in list(cadet, late_cadet))
+		var/list/starting_gear = child.get_equipped_items(TRUE)
+		expect(child.get_medical_bracelet() && starting_gear.len == 1 && !child.worn_underwear.len && !child.backpack_setup, "[child == cadet ? "Round-start" : "Late-join"] Cadet did not spawn with only a medical bracelet.")
 		child.regenerate_icons()
 		var/list/body_states = icon_states(child.species.get_icobase(child))
 		for(var/obj/item/organ/external/limb in child.organs)
 			limb.get_icon()
 			expect(limb.icon_state in body_states, "[child.gender] child limb [limb.icon_name] referenced an absent sprite.")
-		var/obj/item/uniform = child.w_uniform
-		var/obj/item/shoes = child.shoes
+			limb.status |= ORGAN_MUTATED
+			limb.get_icon()
+			var/deformed_sheet = limb.organ_tag == BP_L_FOOT ? child.species.icobase : child.species.deform
+			expect(limb.icon_state in icon_states(deformed_sheet), "[child.gender] mutated child limb [limb.icon_name] referenced an absent sprite.")
+			limb.status &= ~ORGAN_MUTATED
+		child.mutations |= SKELETON
+		for(var/obj/item/organ/external/limb in child.organs)
+			limb.get_icon()
+			var/skeleton_sheet = limb.organ_tag == BP_GROIN ? 'icons/os13/child/overlays.dmi' : 'icons/os13/mob/mob/flesh/skeleton_child.dmi'
+			expect(limb.icon_state in icon_states(skeleton_sheet), "[child.gender] child skeleton [limb.icon_name] referenced an absent sprite.")
+		child.mutations -= SKELETON
+		child.regenerate_icons()
+		var/obj/item/organ/external/head_organ = child.get_organ(BP_HEAD)
+		for(var/stage in SURGERY_OPEN to SURGERY_ENCASED)
+			var/incision_state = child.species.get_surgery_icon_state(head_organ, stage)
+			expect(incision_state in icon_states(child.species.surgery_overlays), "[child.gender] child head incision stage [stage] lacked a fitted sprite.")
+		var/obj/item/uniform = new /obj/item/clothing/under/os13_child(start)
+		var/obj/item/shoes = new /obj/item/clothing/shoes/os13_child(start)
 		expect(uniform && (uniform.get_icon_state(child, slot_w_uniform_str) in icon_states(uniform.item_icons[slot_w_uniform_str])), "The child uniform lacked its worn sprite.")
 		expect(shoes && (shoes.get_icon_state(child, slot_shoes_str) in icon_states(shoes.item_icons[slot_shoes_str])), "The child shoes lacked their worn sprite.")
+		qdel(uniform)
+		qdel(shoes)
 	qdel(late_cadet)
 	cadet.forceMove(start)
 	expect(cadet.Move(passage) && cadet.loc == passage && !cadet.lying, "An upright Cadet could not walk into a crawlspace.")
@@ -163,6 +181,15 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 	expect(!cadet.Move(hatch) && cadet.loc == passage, "Child crawlspace access bypassed a welded airlock.")
 	qdel(door)
 	expect(cadet.Move(hatch) && cadet.Move(panel) && cadet.Move(exit) && cadet.loc == exit && !cadet.lying, "An upright child failed to walk through and out of hatch and panel crawlspaces.")
+	var/turf/wardrobe_tile = locate(122, 122, 1)
+	var/obj/structure/closet/os13/nt/wardrobe = locate() in wardrobe_tile
+	var/obj/item/clothing/under/os13_child/cadet/cadet_uniform = wardrobe ? (locate(/obj/item/clothing/under/os13_child/cadet) in wardrobe) : null
+	expect(cadet_uniform, "The NT closet outside cryo lacked the Cadet uniform.")
+	if(cadet_uniform)
+		expect(wardrobe.open() && cadet_uniform.loc == wardrobe_tile, "Opening the cryo hallway closet did not release the Cadet uniform.")
+		expect(cadet.equip_to_slot_if_possible(cadet_uniform, slot_w_uniform) && cadet.w_uniform == cadet_uniform, "A Cadet could not wear the uniform from the closet.")
+		var/image/uniform_art = cadet.overlays_standing[UNIFORM_LAYER]
+		expect(uniform_art?.icon == 'icons/os13/child/overlays.dmi' && uniform_art.icon_state == "cadet_s", "The Cadet uniform used the wrong worn sprite.")
 	qdel(cadet)
 	var/mob/living/carbon/human/adult = new(start)
 	adult.mob_size = MOB_SMALL
@@ -173,4 +200,4 @@ SUBSYSTEM_DEF(shield_crawlspace_regression)
 	expect(adult.Move(passage) && adult.loc == passage, "An adult could no longer crawl into a crawlspace.")
 	qdel(uniform)
 	qdel(adult)
-	world.log << "CHILD_CRAWLSPACE_CHECK: Cadet round-start and late-join bodies and clothes, child movement, hatch collision and adult crawling"
+	world.log << "CHILD_CRAWLSPACE_CHECK: Cadet round-start and late-join bodies and bracelet-only spawns, child movement, hatch collision and adult crawling"

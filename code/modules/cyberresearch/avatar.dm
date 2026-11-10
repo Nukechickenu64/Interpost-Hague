@@ -1,3 +1,6 @@
+#define CYBER_AVATAR_LIGHT_POWER 0.24
+#define CYBER_AVATAR_LIGHT_COLOR "#8984ff"
+
 // A flat sprite controlled by a mind: no human organs, equipment or atmosphere.
 /mob/living/simple_animal/cyber_avatar
 	name = "cyberspace avatar"
@@ -25,6 +28,7 @@
 /mob/living/simple_animal/cyber_avatar/Initialize(mapload)
 	. = ..()
 	if(istype(GLOB.using_map, /datum/map/alpha))
+		set_light(11, CYBER_AVATAR_LIGHT_POWER, CYBER_AVATAR_LIGHT_COLOR)
 		verbs += /mob/living/simple_animal/cyber_avatar/proc/eject
 		verbs += /mob/living/simple_animal/cyber_avatar/proc/scan
 		verbs += /mob/living/simple_animal/cyber_avatar/proc/icepick
@@ -79,6 +83,7 @@
 	if(scan_timer)
 		deltimer(scan_timer)
 		scan_timer = null
+		set_light(null, CYBER_AVATAR_LIGHT_POWER, CYBER_AVATAR_LIGHT_COLOR)
 	if(scan_client)
 		scan_client.images -= scan_images
 	scan_images.Cut()
@@ -98,10 +103,11 @@
 		to_chat(src, SPAN_WARNING("Scan is recharging: [ceil((scan_ready_at - world.time) / 10)] seconds remaining."))
 		return
 	clear_scan()
+	set_light(null, 0.85, "#bec7ff")
 	scan_ready_at = world.time + (advanced_scan ? 3 SECONDS : 30 SECONDS)
 	scan_client = client
 	for(var/atom/A in view(client.view, src))
-		if(!istype(A, /obj/effect/cyberdeck_node) && !istype(A, /turf/unsimulated/wall/cyberdeck) && !istype(A, /turf/unsimulated/floor/cyberdeck) && !istype(A, /mob/living/simple_animal/cyber_avatar))
+		if(!istype(A, /obj/effect/cyberdeck_node) && !istype(A, /turf/unsimulated/wall/cyberdeck) && !istype(A, /mob/living/simple_animal/cyber_avatar))
 			continue
 		if(A.invisibility > see_invisible || A.alpha <= 0)
 			continue
@@ -198,3 +204,6 @@
 /mob/living/simple_animal/cyber_avatar/Logout()
 	clear_scan()
 	return ..()
+
+#undef CYBER_AVATAR_LIGHT_POWER
+#undef CYBER_AVATAR_LIGHT_COLOR

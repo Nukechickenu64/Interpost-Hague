@@ -27,6 +27,9 @@ This saves us from having to call add_fingerprint() any time something is put in
 			else
 				update_inv_r_hand(0)
 		else
+			var/obj/item/clothing/clothing = I
+			if(istype(clothing) && !clothing.fits_clothing_size(H, null, H))
+				return
 			to_chat(H, "<span class='warning'>I cannot equip that.</span>")
 
 /mob/living/carbon/human/proc/equip_in_one_of_slots(obj/item/W, list/slots, del_on_fail = 1)
@@ -280,6 +283,9 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(!istype(W)) return
 	if(!has_organ_for_slot(slot)) return
 	if(!species || !species.hud || !(slot in species.hud.equip_slots)) return
+	var/obj/item/clothing/clothing = W
+	if(istype(clothing) && !clothing.fits_clothing_size(src, slot))
+		return
 	if(slot == slot_l_store || slot == slot_r_store)
 		var/obj/item/storage/internal/pockets/pocket_storage = get_pocket_storage(slot)
 		if(!pocket_storage || !pocket_storage.can_be_inserted(W, src, -1, -1, 1))

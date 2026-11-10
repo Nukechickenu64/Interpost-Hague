@@ -182,6 +182,8 @@
 	src.set_opacity(1)
 	sleep(15)
 	src.operating = 0
+	if(os13 && !os13_door_animation)
+		src.update_icon()
 	send_status()
 	return TRUE
 

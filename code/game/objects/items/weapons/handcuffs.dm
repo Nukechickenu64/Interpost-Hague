@@ -27,6 +27,12 @@
 		return "legcuff1"
 	return ..()
 
+/obj/item/weapon/handcuffs/get_mob_overlay(mob/user_mob, slot)
+	var/mob/living/carbon/human/wearer = user_mob
+	if(istype(wearer) && wearer.is_child() && (slot == slot_handcuffed_str || slot == slot_legcuffed_str))
+		return overlay_image('icons/os13/child/overlays.dmi', get_icon_state(wearer, slot), color, RESET_COLOR)
+	return ..()
+
 /obj/item/weapon/handcuffs/attack(var/mob/living/carbon/C, var/mob/living/user)
 
 	if(!user.IsAdvancedToolUser())

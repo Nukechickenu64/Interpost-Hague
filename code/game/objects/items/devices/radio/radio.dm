@@ -15,7 +15,7 @@
 	var/broadcasting = 0
 	var/listening = 1
 	var/list/channels = list() //see communications.dm for full list. First channel is a "default" for :h
-	var/subspace_transmission = 0
+	var/subspace_transmission = 0 // If set, this radio requires a relay to transmit.
 	var/syndie = 0//Holder to see if it's a syndicate encrypted radio
 	var/intercept = 0 //can intercept other channels
 	obj_flags = OBJ_FLAG_CONDUCTIBLE
@@ -272,23 +272,14 @@
 	if(!radio_connection)
 		set_frequency(frequency)
 
-	/* Quick introduction:
-		This new radio system uses a very robust FTL signaling technology unoriginally
-		dubbed "subspace" which is somewhat similar to 'blue-space' but can't
-		actually transmit large mass. Headsets are the only radio devices capable
-		of sending subspace transmissions to the Communications Satellite.
-
-		A headset sends a signal to a subspace listener/reciever elsewhere in space,
-		the signal gets processed and logged, and an audible transmission gets sent
-		to each individual headset.
-	*/
-
 	//#### Grab the connection datum ####//
 	var/datum/radio_frequency/connection = handle_message_mode(M, message, channel)
 	if (!istype(connection))
 		return 0
 
 	var/turf/position = get_turf(src)
+	if(!position)
+		return 0
 
 	//#### Tagging the signal with all appropriate identity values ####//
 
@@ -339,7 +330,7 @@
 
 
 
-  /* ###### Radio headsets can only broadcast through subspace ###### */
+	// Subspace-only devices cannot fall back to direct radio.
 	if(subspace_transmission)
 		// First, we want to generate a new radio signal
 		var/datum/signal/signal = new
@@ -387,17 +378,9 @@
 		for(var/obj/machinery/telecomms/allinone/R in telecomms_list)
 			R.receive_signal(signal)
 
-		if(position.z in signal.data["level"]) // level membership check
+		if((position.z in signal.data["level"]) || (0 in signal.data["level"]))
 			return signal.data["done"]
 		return 0
-
-
-  /* ###### Intercoms and station-bounced radios ###### */
-	var/filter_type = 2
-
-	/* --- Intercoms can only broadcast to other intercoms, but bounced radios can broadcast to bounced radios and intercoms --- */
-	if(istype(src, /obj/item/device/radio/intercom))
-		filter_type = 1
 
 
 	var/datum/signal/signal = new
@@ -443,16 +426,13 @@
 
 	sleep(rand(10,25)) // wait a little...
 
-	if(position.z in signal.data["level"]) // level membership check
-		if(signal.data["done"])
-			// we're done here.
-			return 1
+	if(signal.data["done"] && ((position.z in signal.data["level"]) || (0 in signal.data["level"])))
+		return 1
 
-	// Oh my god; the comms are down or something because the signal hasn't been broadcasted yet in our level.
-	// Send a mundane broadcast with limited targets:
-
-	//THIS IS TEMPORARY. YEAH RIGHT
-	if(!connection)	return 0	//~Carn
+	// Direct radio covers connected decks. Intercoms fall back to other intercoms only.
+	if(!connection)
+		return 0
+	var/filter_type = istype(src, /obj/item/device/radio/intercom) ? 1 : 0
 	return Broadcast_Message(connection, M, voicemask, pick(M.speak_emote),
 					  src, message, displayname, jobname, real_name, M.voice_name,
 					  filter_type, signal.data["compression"], GetConnectedZlevels(position.z), connection.frequency,verb,speaking)

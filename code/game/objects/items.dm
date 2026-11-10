@@ -360,6 +360,9 @@
 		if(!temp)
 			to_chat(user, "<span class='notice'>You try to use your hand, but realize it is no longer attached!</span>")
 			return
+		if((user.hand ? H.wrist_l : H.wrist_r) == src)
+			to_chat(user, SPAN_WARNING("Use your other hand to remove \the [src]."))
+			return
 		// OS13 parity: bending for floor items hurts with a badly damaged chest.
 		if(isturf(loc))
 			var/obj/item/organ/external/chest = H.organs_by_name[BP_CHEST]
@@ -571,6 +574,11 @@ var/list/global/slot_flags_enumeration = list(
 	if(!force)
 		//Next check that the slot is free
 		if(H.get_equipped_item(slot) && !(slot in list(slot_l_store, slot_r_store)))
+			return 0
+
+		if((slot == slot_wrist_l && H.l_hand == src) || (slot == slot_wrist_r && H.r_hand == src))
+			if(!disable_warning)
+				to_chat(H, SPAN_WARNING("Use your other hand to put on \the [src]."))
 			return 0
 
 		//Next check if the slot is accessible.
@@ -1067,24 +1075,25 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 		else
 			mob_icon = default_onmob_icons[slot]
 
-	var/image/ret_overlay = overlay_image(mob_icon,mob_state,color,RESET_COLOR)
-	if(user_human && user_human.species && user_human.species.equip_adjust.len && !spritesheet)
-		var/list/equip_adjusts = user_human.species.equip_adjust
-		if(equip_adjusts[slot])
-			var/image_key = "[user_human.species] [mob_icon] [mob_state] [color]"
-			ret_overlay = user_human.species.equip_overlays[image_key]
-			if(!ret_overlay)
-				var/icon/final_I = new(mob_icon, icon_state = mob_state)
-				var/list/shifts = equip_adjusts[slot]
-				if(shifts && shifts.len)
-					var/shift_facing
-					for(shift_facing in shifts)
-						var/list/facing_list = shifts[shift_facing]
-						final_I = dir_shift(final_I, text2dir(shift_facing), facing_list["x"], facing_list["y"])
-				ret_overlay = overlay_image(final_I, color, flags = RESET_COLOR)
+	var/datum/species/wearer_species = user_human?.species
+	var/list/shifts = !spritesheet && wearer_species ? wearer_species.equip_adjust[slot] : null
+	if(mob_icon && shifts?.len)
+		// Share the directional art, since callers may change the returned image.
+		var/cache_key = isfile(mob_icon) ? "[slot]|[mob_icon]|[mob_state]" : null
+		var/icon/shifted = cache_key ? wearer_species.equip_overlays[cache_key] : null
+		if(!shifted)
+			shifted = new(mob_icon, icon_state = mob_state)
+			for(var/facing in shifts)
+				var/list/offset = shifts[facing]
+				dir_shift(shifted, text2dir(facing), offset["x"], offset["y"])
+			if(cache_key)
+				wearer_species.equip_overlays[cache_key] = shifted
+		mob_icon = shifted
+		mob_state = null
 
-				user_human.species.equip_overlays[image_key] = ret_overlay
-
+	var/image/ret_overlay = overlay_image(mob_icon, mob_state, color, RESET_COLOR)
+	if(!spritesheet && wearer_species?.equip_offset_y?[slot])
+		ret_overlay.pixel_y = wearer_species.equip_offset_y[slot]
 	return ret_overlay
 
 /obj/item/get_examine_line(mob/user)

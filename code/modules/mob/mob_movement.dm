@@ -232,7 +232,7 @@
 	if(mob.incorporeal_move && isobserver(mob))
 		if(world.time < move_delay)
 			return
-		move_delay = world.time + mob.get_move_intent_delay()
+		move_delay = world.time + 0.2 SECONDS
 		Process_Incorpmove(direct)
 		return
 

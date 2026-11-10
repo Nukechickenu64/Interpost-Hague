@@ -21,14 +21,15 @@
 	target.current.unlock_achievement(new/datum/achievement/traitor())
 	return 1
 
-/datum/antagonist/proc/create_default(var/mob/source)
+/datum/antagonist/proc/create_default(var/mob/source, var/turf/spawn_turf)
+	var/turf/initial_turf = spawn_turf ? spawn_turf : get_turf(source)
 	var/mob/living/M
 	if(mob_path)
-		M = new mob_path(get_turf(source))
+		M = new mob_path(initial_turf)
 	else
-		M = new /mob/living/carbon/human(get_turf(source))
+		M = new /mob/living/carbon/human(initial_turf)
 	M.ckey = source.ckey
-	add_antagonist(M.mind, 1, 0, 1) // Equip them and move them to spawn.
+	add_antagonist(M.mind, TRUE, FALSE, !spawn_turf)
 	return M
 
 /datum/antagonist/proc/create_id(var/assignment, var/mob/living/carbon/human/player, var/equip = 1)

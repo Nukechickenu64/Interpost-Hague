@@ -17,6 +17,8 @@
 	var/damage_overlays = 'icons/mob/human_races/masks/dam_human.dmi'
 	var/damage_mask = 'icons/mob/human_races/masks/dam_mask_human.dmi'
 	var/blood_mask = 'icons/mob/human_races/masks/blood_human.dmi'
+	var/bleeding_overlays = 'icons/mob/human_races/human_bleeding.dmi'
+	var/surgery_overlays = 'icons/mob/surgery.dmi'
 
 	var/prone_icon                            // If set, draws this from icobase when mob is prone.
 	var/has_floating_eyes                     // Eyes will overlay over darkness (glow)
@@ -44,6 +46,7 @@
 	var/icon/icon_template = 'icons/mob/human_races/r_template.dmi' // Used for mob icon generation for non-32x32 species.
 	var/pixel_offset_x = 0                    // Used for offsetting large icons.
 	var/pixel_offset_y = 0                    // Used for offsetting large icons.
+	var/shadow_foot_inset = 0                 // Transparent rows below the standing feet.
 
 	var/mob_size	= MOB_MEDIUM
 	var/strength    = STR_MEDIUM
@@ -211,6 +214,7 @@
 	var/pass_flags = 0
 	var/breathing_sound = 'sound/voice/monkey.ogg'
 	var/list/equip_adjust = list()
+	var/list/equip_offset_y
 	var/list/equip_overlays = list()
 
 	var/teeth_type = /obj/item/stack/teeth/generic		//The type of teeth they have.

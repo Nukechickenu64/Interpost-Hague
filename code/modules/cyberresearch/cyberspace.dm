@@ -18,12 +18,13 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 		console_count++
 	var/slot_count = max(CYBERDECK_MIN_INSTANCES, console_count)
 	var/first_z = world.maxz + 1
+	var/archive_area_type = istype(GLOB.using_map, /datum/map/alpha) ? /area/cyberdeck_archive/os13 : /area/cyberdeck_archive
 	report_progress("Preparing [slot_count] reusable cyberspace z-levels...")
 	world.maxz += slot_count
 	for(var/slot = 0, slot < slot_count, slot++)
 		var/datum/cyberdeck_instance/I = new
 		I.z_level = first_z + slot
-		I.archive_area = new
+		I.archive_area = new archive_area_type
 		I.origin_x = max(2, round((world.maxx - max_size) / 2))
 		I.origin_y = max(2, round((world.maxy - max_size) / 2))
 		GLOB.using_map.player_levels |= I.z_level
@@ -59,6 +60,10 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	has_gravity = TRUE
 	base_turf = /turf/unsimulated/wall/cyberdeck
 
+/area/cyberdeck_archive/os13
+	dynamic_lighting = TRUE
+	luminosity = 0
+
 /turf/unsimulated/wall/cyberdeck
 	name = "firewall"
 	desc = "The sealed boundary of a virtual research archive."
@@ -89,9 +94,17 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 
 /turf/unsimulated/floor/cyberdeck/Initialize(mapload)
 	. = ..()
-	if(istype(GLOB.using_map, /datum/map/alpha))
-		icon = 'icons/os13/mob/mob/HUD/grid.dmi'
-		icon_state = "1"
+	if(istype(loc, /area/cyberdeck_archive/os13))
+		icon = 'icons/effects/effects.dmi'
+		icon_state = "nothing"
+
+/obj/effect/cyberdeck_ice_light
+	icon = null
+	mouse_opacity = 0
+	anchored = TRUE
+	light_range = 2.5
+	light_power = 0.75
+	light_color = "#6654ff"
 
 // A slot owns one isolated z-level. Slots are reused, never shared by active dives.
 /datum/cyberdeck_instance
@@ -107,6 +120,7 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	var/turf/entry_turf
 	var/list/floors = list()
 	var/list/nodes = list()
+	var/list/ice_lights = list()
 	var/list/guardian_trail = list()
 	var/list/cells = list()
 	var/required_keys
@@ -186,8 +200,11 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 				if(cells[cell_index(x, y)])
 					T = T.ChangeTurf(/turf/unsimulated/floor/cyberdeck)
 					floors += T
-				else if(!istype(T, /turf/unsimulated/wall/cyberdeck))
-					T.ChangeTurf(/turf/unsimulated/wall/cyberdeck)
+				else
+					if(!istype(T, /turf/unsimulated/wall/cyberdeck))
+						T = T.ChangeTurf(/turf/unsimulated/wall/cyberdeck)
+					if(collection_mode && x > 1 && x < size && y > 1 && y < size)
+						ice_lights[T] = new /obj/effect/cyberdeck_ice_light(T)
 				CHECK_TICK
 				if(cancelled || QDELETED(owner))
 					generating = FALSE
@@ -282,6 +299,8 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 		to_chat(V, SPAN_WARNING("This tile is not an active ICE barrier."))
 		return FALSE
 	V.clear_scan()
+	qdel(ice_lights[T])
+	ice_lights -= T
 	var/turf/opened = T.ChangeTurf(/turf/unsimulated/floor/cyberdeck)
 	cells[index] = TRUE
 	floors |= opened
@@ -318,6 +337,9 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	for(var/obj/effect/cyberdeck_node/N in nodes)
 		qdel(N)
 	nodes.Cut()
+	for(var/T in ice_lights)
+		qdel(ice_lights[T])
+	ice_lights.Cut()
 	guardian_trail.Cut()
 	for(var/turf/T in floors)
 		T.ChangeTurf(/turf/unsimulated/wall/cyberdeck)
@@ -352,6 +374,9 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	name = "research data"
 	desc = "Collect this data by clicking it nearby or moving onto it."
 	icon_state = "data"
+	light_range = 2.5
+	light_power = 0.85
+	light_color = "#b6c8ff"
 	var/collected = FALSE
 
 /obj/effect/cyberdeck_node/data_fragment/interact(mob/living/simple_animal/cyber_avatar/V)
@@ -361,6 +386,7 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	collected = TRUE
 	alpha = 0
 	mouse_opacity = 0
+	set_light(0)
 	instance.decrypted++
 	if(instance.decrypted >= instance.required_keys)
 		instance.owner.complete_dive(V)
@@ -447,6 +473,7 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	. = ..()
 	if(istype(GLOB.using_map, /datum/map/alpha))
 		desc = "Click nearby or step onto this portal to return to your body without completing the download."
+		set_light(2.5, 0.55, "#d9ed9e")
 
 /obj/effect/cyberdeck_node/exit/interact(mob/living/simple_animal/cyber_avatar/V)
 	if(can_interact(V))
@@ -461,6 +488,11 @@ GLOBAL_LIST_EMPTY(cyberdeck_instances)
 	name = "red ICE"
 	desc = "A hostile packet. Avoid stepping on it: it damages avatar integrity."
 	icon_state = "red_ice"
+
+/obj/effect/cyberdeck_node/ice/Initialize(mapload)
+	. = ..()
+	if(istype(GLOB.using_map, /datum/map/alpha))
+		set_light(1.75, 0.55, "#ff5d70")
 
 /obj/effect/cyberdeck_node/ice/Crossed(atom/movable/AM)
 	. = ..()

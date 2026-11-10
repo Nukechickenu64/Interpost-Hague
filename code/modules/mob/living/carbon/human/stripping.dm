@@ -90,6 +90,9 @@
 		else
 			visible_message("<span class='danger'>\The [user] is trying to remove \the [src]'s [target_slot.name]!</span>")
 	else
+		var/obj/item/clothing/clothing = held
+		if(istype(clothing) && !clothing.fits_clothing_size(src, text2num(slot_to_strip_text), user))
+			return
 		visible_message("<span class='danger'>\The [user] is trying to put \a [held] on \the [src]!</span>")
 
 	if(!do_mob(user, src, HUMAN_STRIP_DELAY))

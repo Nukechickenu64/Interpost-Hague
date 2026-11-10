@@ -4,6 +4,7 @@
 	var/flash_protection = FLASH_PROTECTION_NONE	// Sets the item's level of flash protection.
 	var/tint = TINT_NONE							// Sets the item's level of visual impairment tint.
 	var/list/species_restricted = list("exclude") //Only these species can wear this kit.
+	var/child_sized = FALSE // The worn sprite is fitted to the child body.
 	var/gunshot_residue //Used by forensics.
 
 	var/list/accessories = list()
@@ -41,6 +42,10 @@
 		var/mob/living/carbon/human/user_human = user_mob
 		if(blood_DNA && user_human.species.blood_mask)
 			var/image/bloodsies	= overlay_image(user_human.species.blood_mask, blood_overlay_type, blood_color, RESET_COLOR)
+			if(user_human.is_child() && ret.icon)
+				var/icon/stain = new(bloodsies.icon, bloodsies.icon_state)
+				stain.AddAlphaMask(icon(ret.icon, ret.icon_state))
+				bloodsies = overlay_image(stain, color = blood_color, flags = RESET_COLOR)
 			ret.overlays	+= bloodsies
 
 	if(accessories.len)
@@ -73,6 +78,15 @@
 	QDEL_NULL_LIST(accessories)
 	return ..()
 
+/obj/item/clothing/proc/fits_clothing_size(mob/living/carbon/human/wearer, slot, mob/user)
+	if(slot in list(slot_l_hand, slot_r_hand, slot_l_store, slot_r_store, slot_s_store, slot_in_backpack))
+		return TRUE
+	if(child_sized == wearer.is_child())
+		return TRUE
+	if(user)
+		to_chat(user, "<span class='warning'>\The [src] [gender == PLURAL ? "don't" : "doesn't"] fit.</span>")
+	return FALSE
+
 //BS12: Species-restricted clothing check.
 /obj/item/clothing/mob_can_equip(mob/M, slot, disable_warning = 0)
 
@@ -80,10 +94,13 @@
 	if (!..())
 		return 0
 
-	if(species_restricted && istype(M,/mob/living/carbon/human))
+	var/mob/living/carbon/human/H = M
+	if(!fits_clothing_size(H, slot, disable_warning ? null : H))
+		return FALSE
+
+	if(species_restricted)
 		var/exclusive = null
 		var/wearable = null
-		var/mob/living/carbon/human/H = M
 
 		if("exclude" in species_restricted)
 			exclusive = 1
@@ -304,8 +321,10 @@ BLIND		// can't see anything
 	desc = "[desc]<br>They have been modified to accommodate a different shape."
 	return
 
-/obj/item/clothing/gloves/mob_can_equip(mob/user)
+/obj/item/clothing/gloves/mob_can_equip(mob/user, slot, disable_warning = 0)
 	var/mob/living/carbon/human/H = user
+	if(slot == slot_gloves && istype(H) && !fits_clothing_size(H, slot, disable_warning ? null : user))
+		return FALSE
 
 	if(istype(H.gloves, /obj/item/clothing/ring))
 		ring = H.gloves

@@ -1296,10 +1296,14 @@ var/list/rank_prefix = list(\
 		create_stack()
 	full_prosthetic = null
 
-	//recheck species-restricted clothing
+	// Recheck fit and species restrictions after the body changes.
 	for(var/slot in slot_first to slot_last)
 		var/obj/item/clothing/C = get_equipped_item(slot)
-		if(istype(C) && !C.mob_can_equip(src, slot, 1))
+		if(!istype(C))
+			continue
+		if(!C.fits_clothing_size(src, slot))
+			unEquip(C, force = TRUE)
+		else if(!C.mob_can_equip(src, slot, 1))
 			unEquip(C)
 
 	add_teeth()

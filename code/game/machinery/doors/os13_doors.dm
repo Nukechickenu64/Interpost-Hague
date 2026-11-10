@@ -96,14 +96,7 @@
 		if(foreground in states)
 			overlays += os13_door_part(foreground, ABOVE_HUMAN_LAYER)
 	if(os13_door_lights_on())
-		var/light_state
-		if(os13_door_animation == "opening" && ("light_opening" in states))
-			light_state = "light_opening"
-		else if(os13_door_animation == "closing" && ("light_closing" in states))
-			light_state = "light_closing"
-		if(light_state)
-			overlays += os13_door_part(light_state, ABOVE_LIGHTING_LAYER, TRUE)
-		if("light" in states)
+		if(("light" in states) && density && operating != 1 && os13_door_animation != "opening" && os13_door_animation != "closing")
 			overlays += os13_door_part("light", ABOVE_LIGHTING_LAYER, TRUE)
 		if(os13_door_frame_state)
 			var/indicator_state = "[os13_door_frame_state][density ? "1" : "0"]"
@@ -147,6 +140,13 @@
 				return TRUE
 			state = ("mdoor_spark" in states) ? "mdoor_spark" : "door_spark"
 	if(state in states)
+		if(animation == "closing")
+			// Keep the lights off through the last moving frame, even if density has already changed.
+			switch(icon)
+				if('icons/os13/objects/objects/doors/door_tnc.dmi')
+					duration = max(duration, 21)
+				if('icons/os13/objects/objects/doors/doorTNCmed.dmi', 'icons/os13/objects/objects/doors/doorTNCmed2.dmi')
+					duration = max(duration, 13)
 		os13_door_animation = animation
 		var/serial = ++os13_door_animation_serial
 		update_icon()

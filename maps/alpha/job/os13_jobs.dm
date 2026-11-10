@@ -188,14 +188,9 @@
 	access = list(access_maint_tunnels)
 	job_desc = "Help the crew with errands. As a child, you can walk upright through crawlspaces. Bridge access must be granted by the Captain."
 
-/datum/job/os13/cadet/initialize_character(mob/living/carbon/human/H, no_starting_equipment = FALSE)
+/datum/job/os13/cadet/initialize_character(mob/living/carbon/human/H)
 	H.set_species(SPECIES_CHILD)
-	. = ..()
-	// Late join skips job equipment. The child's basic clothes still fit their body.
-	if(no_starting_equipment)
-		H.equip_to_slot_or_del(new /obj/item/clothing/under/os13_child(H), slot_w_uniform)
-		H.equip_to_slot_or_del(new /obj/item/clothing/shoes/os13_child(H), slot_shoes)
-	return .
+	return ..()
 
 /datum/job/os13/cadet/equip_preview(mob/living/carbon/human/H, alt_title, datum/mil_branch/branch)
 	H.set_species(SPECIES_CHILD)
@@ -203,5 +198,5 @@
 
 /decl/hierarchy/outfit/job/os13_cadet
 	name = "Cadet"
-	uniform = /obj/item/clothing/under/os13_child
+	uniform = /obj/item/clothing/under/os13_child/cadet
 	shoes = /obj/item/clothing/shoes/os13_child

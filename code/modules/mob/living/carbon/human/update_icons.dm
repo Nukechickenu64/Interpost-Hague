@@ -190,7 +190,7 @@ var/global/list/damage_icon_parts = list()
 //constructs damage icon for each organ from mask * damage field and saves it in our overlays_ lists
 /mob/living/carbon/human/UpdateDamageIcon(var/update_icons=1)
 	// first check whether something actually changed about damage appearance
-	var/damage_appearance = ""
+	var/damage_appearance = "[species.get_bodytype(src)]|"
 
 	if(!species.damage_overlays || !species.damage_mask)
 		return
@@ -198,7 +198,7 @@ var/global/list/damage_icon_parts = list()
 	for(var/obj/item/organ/external/O in organs)
 		if(O.is_stump())
 			continue
-		damage_appearance += O.damage_state
+		damage_appearance += "[O.organ_tag]:[O.damage_state]|"
 
 	if(damage_appearance == previous_damage_appearance)
 		// nothing to do here
@@ -242,6 +242,7 @@ var/global/list/damage_icon_parts = list()
 	var/fat = (FAT in src.mutations)
 	var/hulk = (HULK in src.mutations)
 	var/skeleton = (SKELETON in src.mutations)
+	var/child_body = is_child()
 
 	//CACHING: Generate an index key from visible bodyparts.
 	//0 = destroyed, 1 = normal, 2 = robotic, 3 = necrotic.
@@ -276,6 +277,8 @@ var/global/list/damage_icon_parts = list()
 		for(var/M in part.markings)
 			icon_key += "[M][part.markings[M]["color"]]"
 		if(part)
+			if(child_body)
+				icon_key += "_mutated_[part.status & ORGAN_MUTATED]"
 			icon_key += "_medical_limb_[part.can_show_medical_skin()]_[part.get_medical_skin_pallor()]"
 			icon_key += "[part.species.get_race_key(part.owner)]"
 			icon_key += "[part.dna.GetUIState(DNA_UI_GENDER)]"
@@ -368,6 +371,10 @@ var/global/list/damage_icon_parts = list()
 
 /mob/living/carbon/human/proc/update_underwear(var/update_icons=1)
 	overlays_standing[UNDERWEAR_LAYER] = list()
+	if(is_child())
+		if(update_icons)
+			update_icons()
+		return
 	for(var/entry in worn_underwear)
 		var/obj/item/underwear/UW = entry
 
@@ -594,7 +601,7 @@ var/global/list/damage_icon_parts = list()
 		overlays_standing[GLOVES_LAYER]	= gloves.get_mob_overlay(src,slot_gloves_str)
 	else
 		if(blood_DNA && species.blood_mask)
-			var/image/bloodsies	= overlay_image(species.blood_mask, "bloodyhands", hand_blood_color, RESET_COLOR)
+			var/image/bloodsies = is_child() ? overlay_image('icons/os13/child/overlays.dmi', "bloodyhands_skin", hand_blood_color, RESET_COLOR) : overlay_image(species.blood_mask, "bloodyhands", hand_blood_color, RESET_COLOR)
 			overlays_standing[GLOVES_LAYER]	= bloodsies
 		else
 			overlays_standing[GLOVES_LAYER]	= null
@@ -634,7 +641,7 @@ var/global/list/damage_icon_parts = list()
 		overlays_standing[SHOES_LAYER] = shoes.get_mob_overlay(src,slot_shoes_str)
 	else
 		if(feet_blood_DNA && species.blood_mask)
-			var/image/bloodsies = overlay_image(species.blood_mask, "shoeblood", hand_blood_color, RESET_COLOR)
+			var/image/bloodsies = is_child() ? overlay_image('icons/os13/child/overlays.dmi', "shoeblood_skin", hand_blood_color, RESET_COLOR) : overlay_image(species.blood_mask, "shoeblood", hand_blood_color, RESET_COLOR)
 			overlays_standing[SHOES_LAYER] = bloodsies
 		else
 			overlays_standing[SHOES_LAYER] = null
@@ -877,23 +884,27 @@ var/global/list/damage_icon_parts = list()
 /mob/living/carbon/human/update_fire(var/update_icons=1)
 	overlays_standing[HUMAN_FIRE_LAYER] = null
 	if(on_fire)
-		var/image/standing = overlay_image('icons/mob/OnFire.dmi', "Standing", RESET_COLOR)
+		var/image/standing = overlay_image('icons/mob/OnFire.dmi', is_child() ? "Generic_mob_burning" : "Standing", flags = RESET_COLOR)
+		if(is_child())
+			standing.pixel_y = species.shadow_foot_inset
 		overlays_standing[HUMAN_FIRE_LAYER] = standing
 	if(update_icons)   update_icons()
 
 /mob/living/carbon/human/proc/update_surgery(var/update_icons=1)
 	overlays_standing[SURGERY_LEVEL] = null
-	var/image/total = new
+	var/image/total = image('icons/mob/human.dmi', "blank")
 	for(var/obj/item/organ/external/E in organs)
-		if(E.robotic < ORGAN_ROBOT && E.open())
-			var/image/I = image("icon"='icons/mob/surgery.dmi', "icon_state"="[E.icon_name][round(E.open())]", "layer"=-SURGERY_LEVEL)
-			total.overlays += I
+		if(E.robotic >= ORGAN_ROBOT)
+			continue
+		var/stage = round(E.open())
+		if(stage)
+			total.overlays += image(icon = species.surgery_overlays, icon_state = species.get_surgery_icon_state(E, stage), layer = -SURGERY_LEVEL)
 	total.appearance_flags = RESET_COLOR
 	overlays_standing[SURGERY_LEVEL] = total
 	if(update_icons)   update_icons()
 
 /mob/living/carbon/human/proc/update_bandaging(var/update_icons=1)
-	var/image/DD = image(icon='icons/mob/human_races/masks/bandages_human.dmi', icon_state="")
+	var/image/DD = image('icons/mob/human.dmi', "blank")
 	for (var/obj/item/organ/external/O in organs)
 		if (O.is_stump())
 			continue
@@ -901,8 +912,8 @@ var/global/list/damage_icon_parts = list()
 			continue
 		for (var/datum/wound/W in O.wounds)
 			if (W.bandaged || W.clamped || W.salved)
-				DD.overlays += image(icon='icons/mob/human_races/masks/bandages_human.dmi', icon_state="[O.organ_tag]b")
-				continue
+				DD.overlays += species.get_bandage_overlay(O)
+				break
 	overlays_standing[BANDAGES_LAYER] = DD
 	if (update_icons)   update_icons()
 
@@ -937,15 +948,15 @@ var/global/list/damage_icon_parts = list()
 
 /mob/living/carbon/human/proc/update_bleeding(var/update_icons=1)
 	overlays_standing[BLEEDING_LAYER] = null
-	var/image/total = new
+	var/image/total = image('icons/mob/human.dmi', "blank")
 	for(var/obj/item/organ/external/E in organs)
 		if (E.wounds.len == 0)
 			continue
 		if(E.status & ORGAN_BLEEDING) // check if bleeding, i dont know if there is another way to do it maybe without the loop
-			var/image/I = image(icon='icons/mob/human_races/human_bleeding.dmi', icon_state="[E.organ_tag]_s1")
+			var/image/I = image(icon=species.bleeding_overlays, icon_state="[E.organ_tag]_s1")
 			total.overlays += I
 		else if(E.status & (!(ORGAN_BLEEDING)))
-			var/image/IM = image(icon='icons/mob/human_races/human_bleeding.dmi', icon_state="[E.organ_tag]_s0")
+			var/image/IM = image(icon=species.bleeding_overlays, icon_state="[E.organ_tag]_s0")
 			total.overlays += IM
 	total.appearance_flags = RESET_COLOR
 	overlays_standing[BLEEDING_LAYER] = total

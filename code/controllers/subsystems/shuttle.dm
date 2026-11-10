@@ -20,6 +20,7 @@ SUBSYSTEM_DEF(shuttle)
 	last_landmark_registration_time = world.time
 	initialize_shuttles()
 	. = ..()
+	prepare_lifeboat_landings()
 	var/datum/shuttle/autodock/multi/mining/mining_shuttle = shuttles["Mining"]
 	if(istype(mining_shuttle))
 		var/datum/mining_expedition_controller/expedition = get_mining_expedition()

@@ -245,6 +245,7 @@
 	//////////////
 /client/Del()
 	clear_os13_parallax()
+	QDEL_NULL(cyberspace_grid)
 	clear_vehicle_placement()
 	clear_atmos_subarea_visualizer()
 	ticket_panels -= src

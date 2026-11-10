@@ -25,6 +25,12 @@
 /datum/species/proc/get_limb_damage_icon(mob/living/carbon/human/H, obj/item/organ/external/limb)
 	return new /icon(get_damage_overlays(H), limb.damage_state)
 
+/datum/species/proc/get_bandage_overlay(obj/item/organ/external/limb)
+	return image('icons/mob/human_races/masks/bandages_human.dmi', "[limb.organ_tag]b")
+
+/datum/species/proc/get_surgery_icon_state(obj/item/organ/external/limb, stage)
+	return "[limb.icon_name][stage]"
+
 /datum/species/proc/get_examine_name(var/mob/living/carbon/human/H)
 	return name
 

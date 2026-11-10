@@ -198,7 +198,7 @@
 	return !QDELETED(bomb) && bomb.armed && bomb.anchored && isturf(bomb.loc) && bomb_site(bomb.loc)
 
 /datum/os13_traitor_orders/proc/request_launch()
-	if(launch_timer || !lifeboat?.shuttle?.can_depart())
+	if(launch_timer || QDELETED(lifeboat) || lifeboat.launched || !lifeboat.operable() || !is_station_turf(get_turf(lifeboat)))
 		return FALSE
 	launch_time = world.time + 90 SECONDS
 	launch_timer = addtimer(CALLBACK(src, .proc/depart), 90 SECONDS, TIMER_STOPPABLE)
@@ -216,15 +216,13 @@
 /datum/os13_traitor_orders/proc/depart()
 	launch_timer = null
 	bridge_infected = FALSE
-	if(GAME_STATE != RUNLEVEL_GAME || !lifeboat?.shuttle?.can_depart())
+	if(GAME_STATE != RUNLEVEL_GAME || QDELETED(lifeboat) || !lifeboat.operable() || lifeboat.launched || !is_station_turf(get_turf(lifeboat)))
 		return FALSE
-	var/mob/living/passenger = lifeboat.shuttle.secured_passenger()
-	if(!passenger)
+	var/mob/living/passenger = lifeboat.occupant
+	if(QDELETED(passenger) || passenger.stat == DEAD || passenger.loc != lifeboat || lifeboat.releasing)
 		lifeboat.audible_message(SPAN_WARNING("Lifeboat launch aborted: no living passenger secured."))
 		return FALSE
-	if(!lifeboat.launch())
-		lifeboat.audible_message(SPAN_WARNING("Lifeboat launch aborted: no clear escape route."))
-		return FALSE
+	lifeboat.launch()
 	escaped = passenger == owner.current && passenger.mind == owner && !is_station_turf(get_turf(lifeboat))
 	if(escaped && genetics_uploaded && charge_ready())
 		bomb.activate(src)
@@ -289,7 +287,6 @@
 	return orders?.bomb_detonated
 
 /obj/machinery/cryopod/lifepod/os13_lifeboat
-	parent_type = /obj/machinery/cryopod/lifepod/lifeboat
 	name = "EVA lifeboat"
 	desc = "A single-passenger lifeboat launched from the main bridge console."
 	use_power = POWER_USE_OFF

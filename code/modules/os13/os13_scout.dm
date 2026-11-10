@@ -36,6 +36,9 @@
 	update_icon()
 
 /proc/os13_scout_controller(atom/terminal)
+	if(istype(terminal, /obj/machinery/computer/os13_scout_controls/lifeboat))
+		var/area/shuttle/lifeboat/cabin = get_area(terminal)
+		return istype(cabin) ? cabin.shuttle?.controller : null
 	for(var/datum/mining_expedition_controller/civ13/controller in civ13_mining_expeditions)
 		if(!QDELETED(controller) && os13_scout_is_onboard(terminal, controller))
 			return controller

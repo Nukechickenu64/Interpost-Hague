@@ -1,5 +1,5 @@
 /obj/item/clothing/proc/can_attach_accessory(obj/item/clothing/accessory/A)
-	if(valid_accessory_slots && istype(A) && (A.slot in valid_accessory_slots))
+	if(valid_accessory_slots && istype(A) && child_sized == A.child_sized && (A.slot in valid_accessory_slots))
 		.=1
 	else
 		return 0
@@ -16,6 +16,9 @@
 			return
 
 		var/obj/item/clothing/accessory/A = I
+		if(child_sized != A.child_sized)
+			to_chat(user, "<span class='warning'>\The [A] won't fit on \the [src].</span>")
+			return
 		if(can_attach_accessory(A))
 			user.drop_item()
 			attach_accessory(user, A)
@@ -77,6 +80,8 @@
  *  items on spawn
  */
 /obj/item/clothing/proc/attach_accessory(mob/user, obj/item/clothing/accessory/A)
+	if(child_sized != A.child_sized)
+		return
 	accessories += A
 	A.on_attached(src, user)
 	src.verbs |= /obj/item/clothing/proc/removetie_verb

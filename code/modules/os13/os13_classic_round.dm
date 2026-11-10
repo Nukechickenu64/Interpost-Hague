@@ -14,6 +14,9 @@ GLOBAL_DATUM_INIT(os13_classic_round, /datum/os13_classic_round, new)
 	var/datum/shuttle/charon/charon
 	var/next_dock_attempt = 0
 
+/datum/os13_classic_round/proc/self_destruct_active()
+	return destruct_at > world.time
+
 /datum/os13_classic_round/proc/emergency_available()
 	if(GAME_STATE != RUNLEVEL_GAME || !istype(GLOB.using_map, /datum/map/os13classic) || SSticker.mode?.explosion_in_progress || SSticker.mode?.station_was_nuked || os13_fixed_traitor_mode()?.os13_orders?.bomb_detonated)
 		return FALSE
@@ -106,7 +109,7 @@ GLOBAL_DATUM_INIT(os13_classic_round, /datum/os13_classic_round, new)
 	var/datum/os13_classic_round/incident = GLOB.os13_classic_round
 	if(incident.destruct_at)
 		return "<span class='graytext'>SELF-DESTRUCT IN [max(0, round((incident.destruct_at - world.time) / (1 SECOND)))] SECONDS</span>\n<span class='feedback'><a href='?src=\ref[src];action=os13_abort_destruct'>ABORT SELF-DESTRUCT</a></span>\n"
-	return "<span class='graytext'>CREW LIFEBOATS UNLOCKED IN EVA</span>\n<span class='feedback'><a href='?src=\ref[src];action=os13_arm_destruct'>ARM SELF-DESTRUCT</a></span>\n"
+	return "<span class='graytext'>LIFEBOAT SHUTTLES LOCKED UNTIL SELF-DESTRUCT</span>\n<span class='feedback'><a href='?src=\ref[src];action=os13_arm_destruct'>ARM SELF-DESTRUCT</a></span>\n"
 
 /obj/machinery/computer/bridge/proc/os13_emergency_destruct(mob/user, cancel = FALSE)
 	if(!os13_emergency_controls_available(user))

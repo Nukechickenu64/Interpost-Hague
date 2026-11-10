@@ -461,12 +461,12 @@
 	src.layer = closed_layer
 	update_nearby_tiles()
 	sleep(7)
+	operating = 0
 	update_icon()
 	if(visible && !glass)
 		set_opacity(1)	//caaaaarn!
 		if (filler)
 			filler.set_opacity(0)
-	operating = 0
 
 	//I shall not add a check every x ticks if a door has closed over some fire.
 	var/obj/fire/fire = locate() in loc

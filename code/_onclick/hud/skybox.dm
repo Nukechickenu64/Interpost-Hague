@@ -9,6 +9,7 @@
 
 /client
 	var/obj/skybox/skybox
+	var/obj/skybox/os13_layer/cyberspace/cyberspace_grid
 	var/list/os13_parallax_layers = list()
 	var/obj/screen/plane_master/os13_parallax/os13_parallax_master
 	var/skybox_z
@@ -27,8 +28,31 @@
 	blend_mode = BLEND_OVERLAY
 	var/depth = 0
 	var/pixels_per_tile = 1
+	var/parallax_period = 480
 	var/tiled_z
 	var/tiled_view
+
+/obj/skybox/os13_layer/proc/get_tile(turf/T)
+	if(depth)
+		return SSskybox.get_os13_stars(T.z, depth)
+	return image(icon = 'icons/turf/fullscreen4.dmi', icon_state = "space2")
+
+/obj/skybox/os13_layer/cyberspace
+	pixels_per_tile = 8
+	parallax_period = 32
+
+/obj/skybox/os13_layer/cyberspace/get_tile(turf/T)
+	var/static/image/grid
+	if(!grid)
+		// Pack the animated 32-pixel pattern into one shared skybox tile.
+		var/icon/pattern = icon('icons/os13/mob/mob/HUD/grid.dmi', "1")
+		var/icon/tile = icon(pattern)
+		tile.Crop(1, 1, 480, 480)
+		for(var/x in 1 to 480 step 32)
+			for(var/y in 1 to 480 step 32)
+				tile.Blend(pattern, ICON_OVERLAY, x, y)
+		grid = image(icon = tile)
+	return grid
 
 /obj/skybox/os13_layer/proc/update_layer(client/C, turf/T, rebuild)
 	if(rebuild || tiled_z != T.z || tiled_view != C.view)
@@ -39,11 +63,7 @@
 		// Cover half the viewport plus the largest wrapped shift and one spare tile.
 		var/radius_x = Ceiling((view_size[1] * world.icon_size / 2 + 512) / 480)
 		var/radius_y = Ceiling((view_size[2] * world.icon_size / 2 + 512) / 480)
-		var/image/tile
-		if(depth)
-			tile = SSskybox.get_os13_stars(T.z, depth)
-		else
-			tile = image(icon = 'icons/turf/fullscreen4.dmi', icon_state = "space2")
+		var/image/tile = get_tile(T)
 		for(var/x in -radius_x to radius_x)
 			for(var/y in -radius_y to radius_y)
 				var/image/piece = image(null)
@@ -51,16 +71,16 @@
 				piece.pixel_x = x * 480 - 224
 				piece.pixel_y = y * 480 - 224
 				overlays += piece
-	// Wrap at the authored image width and keep the TILE_BOUND anchor near the
+	// Wrap at the pattern width and keep the TILE_BOUND anchor near the
 	// screen centre; a far-translated anchor can be culled, exposing the edges.
 	var/offset_x = round((T.x * world.icon_size + C.pixel_x) * pixels_per_tile / world.icon_size)
 	var/offset_y = round((T.y * world.icon_size + C.pixel_y) * pixels_per_tile / world.icon_size)
-	offset_x = ((offset_x % 480) + 480) % 480
-	offset_y = ((offset_y % 480) + 480) % 480
-	if(offset_x >= 240)
-		offset_x -= 480
-	if(offset_y >= 240)
-		offset_y -= 480
+	offset_x = ((offset_x % parallax_period) + parallax_period) % parallax_period
+	offset_y = ((offset_y % parallax_period) + parallax_period) % parallax_period
+	if(offset_x >= parallax_period / 2)
+		offset_x -= parallax_period
+	if(offset_y >= parallax_period / 2)
+		offset_y -= parallax_period
 	set_camera_offset(-offset_x, -offset_y)
 	C.screen |= src
 
@@ -83,11 +103,21 @@
 	var/turf/T = get_turf(eye)
 	if(!T)
 		screen -= skybox
+		screen -= cyberspace_grid
 		for(var/obj/skybox/os13_layer/L in os13_parallax_layers)
 			screen -= L
 		screen -= os13_parallax_master
 		skybox_z = null
 		return
+	if(istype(T.loc, /area/cyberdeck_archive/os13))
+		screen -= skybox
+		if(os13_parallax_layers.len)
+			clear_os13_parallax()
+		if(!cyberspace_grid)
+			cyberspace_grid = new
+		cyberspace_grid.update_layer(src, T, rebuild)
+		return
+	screen -= cyberspace_grid
 	var/use_os13 = SSskybox.use_os13_parallax()
 	if(skybox_z != T.z || skybox_uses_os13 != use_os13)
 		rebuild = TRUE

@@ -65,7 +65,7 @@
 		return
 	if(!os13_unlocked)
 		os13_unlocked = TRUE
-		visible_message(SPAN_NOTICE("[user] unlocks the Scout Controls!"))
+		visible_message(SPAN_NOTICE("[user] unlocks [src]!"))
 	add_fingerprint(user)
 	controller.show_local_menu(user, src)
 
@@ -737,6 +737,8 @@
 	desc = "A small pair of polished jackboots."
 	icon = 'icons/os13/objects/objects/clothing/shoes.dmi'
 	icon_state = "jackboots"
+	item_icons = list(slot_shoes_str = 'icons/os13/child/overlays.dmi')
+	child_sized = TRUE
 	w_class = ITEM_SIZE_SMALL
 
 // "Ring: Noble Ring"

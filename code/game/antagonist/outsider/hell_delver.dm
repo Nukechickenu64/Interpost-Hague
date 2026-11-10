@@ -20,16 +20,34 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 	show_objectives_on_creation = 0 //we are not antagonists, we do not need the antagonist shpiel/objectives
 
 /datum/antagonist/delver/create_default(var/mob/source)
-	var/mob/living/carbon/human/M = ..()
-	if(istype(M)) M.age = rand(25,45)
+	if(!source?.client)
+		return
+	if((!is_antagonist_enabled(id) && !check_rights(R_ADMIN, FALSE)) || jobban_isbanned(source, id))
+		to_chat(source, "<span class='warning'>You cannot join the delver squad.</span>")
+		return
+	var/turf/spawn_turf = get_spawn_turf()
+	if(!spawn_turf)
+		to_chat(source, "<span class='warning'>There is nowhere to spawn in Hell.</span>")
+		message_admins("Unable to place Hell Delver: no Hell spawn turf found.")
+		return
+	var/mob/living/carbon/human/delver = ..(source, spawn_turf)
+	delver.age = rand(25, 45)
+	return delver
 
 /datum/antagonist/delver/place_mob(var/mob/living/mob)
+	var/turf/spawn_turf = get_spawn_turf()
+	if(!spawn_turf)
+		message_admins("Unable to place Hell Delver: no Hell spawn turf found.")
+		return
+	mob.forceMove(spawn_turf)
+
+/datum/antagonist/delver/proc/get_spawn_turf()
 	var/list/hell_spawn_locations = list()
-	for(var/obj/effect/landmark/L in world)
+	for(var/obj/effect/landmark/L in landmarks_list)
 		if(L.name != landmark_id)
 			continue
 		var/turf/T = get_turf(L)
-		if(istype(T, /turf/simulated/floor/helldirt) || istype(T, /turf/simulated/floor/hellslate))
+		if((istype(T, /turf/simulated/floor/helldirt) || istype(T, /turf/simulated/floor/hellslate)) && !turf_contains_dense_objects(T))
 			hell_spawn_locations += T
 
 	if(!hell_spawn_locations.len)
@@ -40,10 +58,7 @@ GLOBAL_DATUM_INIT(delver, /datum/antagonist/delver, new)
 			if(!T.density && !turf_contains_dense_objects(T))
 				hell_spawn_locations += T
 
-	if(!hell_spawn_locations.len)
-		message_admins("Unable to place Hell Delver: no Hell spawn turf found.")
-		return
-	mob.forceMove(pick_mobless_turf_if_exists(hell_spawn_locations))
+	return pick_mobless_turf_if_exists(hell_spawn_locations)
 
 /datum/antagonist/delver/Initialize()
 	..()
